@@ -54,6 +54,7 @@ type token =
   | With
   | LeftPar
   | RightPar
+  | Semicolon
   | Affect
   | Var of string
   | Const of string
