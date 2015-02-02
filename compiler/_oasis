@@ -1,5 +1,5 @@
 OASISFormat: 0.4
-OcamlVersion: >= 4.02
+OcamlVersion: >= 4.01
 BuildTools:  ocamlbuild
 Name:        compiler
 Version:     0.1
