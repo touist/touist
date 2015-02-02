@@ -20,7 +20,7 @@ rule lexer = parse
   | ">"        { GT           }
   | "<="       { LE           }
   | ">="       { GE           }
-  | "empty"    { Empty        } 
+  | "empty"    { Empty        }
   | "in"       { In           }
   | "subset"   { Subset       }
   | "+"        { Plus         }
@@ -57,6 +57,6 @@ rule lexer = parse
   | ")"        { RightPar     }
   | "="        { Affect       }
   | digits+                     as n { Int   (int_of_string n)   }
-  | digits+ '.' digits+         as f { Float (float_of_string f) }
+  | digits+ '.' digits*         as f { Float (float_of_string f) }
   | '?' alpha (alpha | digits)* as v { Var   v                   }
   | '!' alpha (alpha | digits)* as c { Const c                   }
