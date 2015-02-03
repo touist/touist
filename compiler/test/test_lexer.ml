@@ -50,6 +50,7 @@ let string_of_token = function
   | LeftPar    -> "LeftPar"
   | RightPar   -> "RightPar"
   | Affect     -> "Affect"
+  | Semicolon  -> "Semicolon"
   | Var v      -> "Var " ^ v
   | Const c    -> "Const " ^ c
   | Eof        -> "Eof"

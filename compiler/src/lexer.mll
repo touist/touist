@@ -56,6 +56,7 @@ rule lexer = parse
   | "("        { LeftPar      }
   | ")"        { RightPar     }
   | "="        { Affect       }
+  | ";"        { Semicolon    }
   | digits+                     as n { Int   (int_of_string n)   }
   | digits+ '.' digits*         as f { Float (float_of_string f) }
   | '?' alpha (alpha | digits)* as v { Var   v                   }
