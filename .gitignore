@@ -1,3 +1,7 @@
+# Backup
+
+*.swp
+
 # OCaml
 
 *.annot
@@ -23,6 +27,9 @@ setup.log
 META
 *.mllib
 *.mldylib
+
+# menhir conflicts file
+*.conflicts
 
 # Java
 
