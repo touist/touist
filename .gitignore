@@ -1,6 +1,7 @@
 # Backup
 
 *.swp
+*.bak
 
 # OCaml
 
