@@ -78,9 +78,9 @@ rule lexer = parse
   | identifier     { TERM t                    }
   | integer        { INT  (int_of_string n)    }
   | double         { FLOAT (float_of_string f) }
-  | newline        { next_line lexbuf; NEWLINE }
+  | newline        { next_line lexbuf          }
   | ";;"           { comments_parse lexbuf     }
   | _              { raise (SyntaxError ("Unexpected char: " ^ Lexing.lexeme lexbuf)) }
 and comments_parse = parse
-  | '\n'           { incr line; parse lexbuf }
+  | '\n'           { next_line lexbuf; parse lexbuf }
   | _              { comments_parse lexbuf   }
