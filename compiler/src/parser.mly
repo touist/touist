@@ -1,131 +1,95 @@
 %{
-  (* OCaml code here *)
+  (* Ocaml code here *)
 %}
 
-%token TRUE FALSE AND OR XOR EQUAL NOTEQUAL LT GT LE GE EMPTY IN SUBSET
-%token ADD SUBSTRACT MULTIPLY DIVIDE MOD CARD SQRT
-%token INT FLOAT
-%token <int> INTEGER
-%token <float> RATIONAL
-%token SET UNION INTER MINUS UPPERSET
-%token EXACT ATLEAST ATMOST
-%token IF THEN ELSE
+%token TRUE FALSE AND OR XOR IMPLY NOT
 %token TRUECLAUSE FALSECLAUSE
-%token NOT IMPLY
-%token BIGOR BIGAND
-%token BEGIN END
-%token FORMULA SETS
-%token CONSTANT
-%token LP RP LB RB
-%token WITH OF
-%token RANGE DOT COMMA NEWLINE
-%token AFFECT
-%token <string> IDENT
+%token <string> TERM
+%token EQUAL NOTEQUAL LT GT LE GE
+%token EMPTY IN SUBSET
+%token EXACT ATLEAST ATMOST
+
+%token <int> INT
+%token <float> FLOAT
 %token <string> VAR
-%token <string> CONST
-%token EOF
+%token ADD SUB MUL DIV MOD SQRT
+%token TOINT TOFLOAT
 
-%start <Ast.prog> start
+%token UNION INTER DIFF UPPERSET
+%token RANGE DOT CARD
 
-%left OR AND EQUAL NOTEQUAL LT GT LE GE SUBSET
-%nonassoc NOT
-%left IMPLY
+%token AFFECT IF THEN ELSE BIGAND BIGOR WITH
+
+%token BEGIN SETS FORMULA END EOF
+%token LPAREN RPAREN LBRACK RBRACK COMMA
+
+%start <Ast.prog> prog
 
 %%
 
-start:
-  | BEGIN SETS s = sets END SETS BEGIN FORMULA f = formula END FORMULA EOF { `Begin (Some(s), f) }
-  | BEGIN FORMULA f = formula END FORMULA EOF { `Begin (None, f) }
+prog:
+  | BEGIN SETS s = list(command) END SETS BEGIN FORMULA c = list(command) END FORMULA EOF { Ast.Begin (Some s, c) }
+  | BEGIN FORMULA c = list(command) END FORMULA EOF { Ast.Begin (None, c) }
 
-sets:
-  | def = separated_list(NEWLINE, define_set) { def }
-(*  | def = define_set          { [def]  }
-  | def = define_set s = sets { def::s }*)
-
-define_set:
-  | VAR a = atom AFFECT e = int_expr   { `Affect (a, `Int_expr   e) }
-  | VAR a = atom AFFECT e = float_expr { `Affect (a, `Float_expr e) }
-  | SET a = atom AFFECT e = set_expr   { `Affect (a, `Set_expr   e) }
-
-formula:
-  | f = separated_list(NEWLINE, clause_expr) { f }
-(*  | c = clause_expr             { Ast.Clause [c]    }
-  | c = clause_expr f = formula { Ast.Clause (c::f) }*)
-
-bool_expr:
-  | TRUE                                          { `Bool true                 }
-  | FALSE                                         { `False                     }
-  | LP    i  = IDENT    IN       e  = set_expr RP { `In               (i, e)   }
-  | LP    e1 = set_expr SUBSET   e2 = set_expr RP { `Subset           (e1, e2) }
-  | LP    a1 = atom     EQUAL    a2 = atom RP     { `Equal            (a1, a2) }
-  | LP    a1 = atom     NOTEQUAL a2 = atom RP     { `Not_equal        (a1, a2) }
-  | LP    a1 = atom     LT       a2 = atom RP     { `Lesser_than      (a1, a2) }
-  | LP    a1 = atom     LE       a2 = atom RP     { `Lesser_or_equal  (a1, a2) }
-  | LP    a1 = atom     GT       a2 = atom RP     { `Greater_than     (a1, a2) }
-  | LP    a1 = atom     GE       a2 = atom RP     { `Greater_or_equal (a1, a2) }
-  | EMPTY e  = set_expr                           { `Empty            e        }
-  | LP    e1 = bool_expr AND   e2 = bool_expr RP  { `And              (e1, e2) }
-  | LP    e1 = bool_expr OR    e2 = bool_expr RP  { `Or               (e1, e2) }
-  | LP    e1 = bool_expr IMPLY e2 = bool_expr RP  { `Imply            (e1, e2) }
-  | LP    e1 = bool_expr XOR   e2 = bool_expr RP  { `Xor              (e1, e2) }
-  | NOT   e  = bool_expr                          { `Not              e        }
-
-int_expr:
-  | i = INTEGER                                    { `Integer   i        }
-  | LP    e1 = int_expr ADD       e2 = int_expr RP { `Add       (e1, e2) }
-  | LP    e1 = int_expr MULTIPLY  e2 = int_expr RP { `Multiply  (e1, e2) }
-  | LP    e1 = int_expr SUBSTRACT e2 = int_expr RP { `Substract (e1, e2) }
-  | LP    e1 = int_expr DIVIDE    e2 = int_expr RP { `Divide    (e1, e2) }
-  | LP    e1 = int_expr MOD       e2 = int_expr RP { `Modulo    (e1, e2) }
-  | CARD  e  = set_expr                            { `Card      e        }
-  | INT   e  = float_expr                          { `Int       e        }
-
-float_expr:
-  | f = RATIONAL                                       { `Rational  f        }
-  | LP    e1 = float_expr ADD       e2 = float_expr RP { `Add       (e1, e2) }
-  | LP    e1 = float_expr MULTIPLY  e2 = float_expr RP { `Multiply  (e1, e2) }
-  | LP    e1 = float_expr SUBSTRACT e2 = float_expr RP { `Substract (e1, e2) }
-  | LP    e1 = float_expr DIVIDE    e2 = float_expr RP { `Divide    (e1, e2) }
-  | FLOAT e  = int_expr                                { `Float     e        }
-  | SQRT  e  = float_expr                              { `Sqrt      e        }
-
-set_expr:
-  | LP tl = term_list RP { `Set tl }
-  | LP e1 = set_expr UNION e2 = set_expr RP { `Union        (e1, e2) }
-  | LP e1 = set_expr INTER e2 = set_expr RP { `Intersection (e1, e2) }
-  | LP e1 = set_expr MINUS e2 = set_expr RP { `Difference   (e1, e2) }
-  | LP e1 = int_expr RANGE e2 = int_expr RP { `Range        (e1, e2) }
-  |    e  = set_expr DOT   i  = int_expr    { `Dot          (e, i)   }
-  | UPPERSET LP i = IDENT IN e = set_expr RP { `Upperset (i, e) }
-  | LP IF b = bool_expr THEN e1 = set_expr ELSE e2 = set_expr RP { `If (b, e1, e2) }
-
-clause_expr:
-  | TRUECLAUSE  { `Trueclause  }
-  | FALSECLAUSE { `Falseclause }
-  | NOT e = clause_expr { `Not e }
-  | LP e1 = clause_expr AND   e2 = clause_expr RP { `And   (e1, e2) }
-  | LP e1 = clause_expr OR    e2 = clause_expr RP { `Or    (e1, e2) }
-  | LP e1 = clause_expr IMPLY e2 = clause_expr RP { `Imply (e1, e2) }
-  | LP e1 = clause_expr XOR   e2 = clause_expr RP { `Xor   (e1, e2) }
-  | LP BIGAND  b = bigbody RP { `Bigand b }
-  | LP BIGOR   b = bigbody RP { `Bigor  b }
-  | LP EXACT   i = INTEGER OF b = bigbody RP { `Exact   (i, b) }
-  | LP ATLEAST i = INTEGER OF b = bigbody RP { `Atleast (i, b) }
-  | LP ATMOST  i = INTEGER OF b = bigbody RP { `Atmost  (i, b) }
-  | LP IF b = bool_expr THEN e1 = clause_expr ELSE e2 = clause_expr RP { `If (b, e1, e2) }
+command:
+  | v = VAR AFFECT s = sexp { Ast.Affect (v, Ast.Set s) }
+  | v = VAR AFFECT a = aexp { Ast.Affect (v, a)         }
+  | LPAREN IF b = bexp THEN c1 = command ELSE c2 = command RPAREN { Ast.If (b, c1, c2) }
+  | LPAREN BIGAND b = bigbody RPAREN { Ast.Bigand b }
+  | LPAREN BIGOR  b = bigbody RPAREN { Ast.Bigor  b }
+  | c = bexp { Ast.Clause c }
 
 bigbody:
-  | id = IDENT IN s = set_expr      c = clause_expr               { (id, s, None, c)   }
-  | id = IDENT IN s = set_expr WITH b = bool_expr c = clause_expr { (id, s, Some b, c) }
+  | v = VAR IN s = sexp c = command { (v, s, None, c) }
+  | v = VAR IN s = sexp WITH b = bexp c = command { (v, s, Some b, c) }
 
-atom:
-  | id = IDENT { (id, None) }
-  | id = IDENT LP tl = term_list RP { (id, Some tl) }
+bexp:
+  | TRUE        { Ast.True        }
+  | FALSE       { Ast.False       }
+  | TRUECLAUSE  { Ast.Trueclause  }
+  | FALSECLAUSE { Ast.Falseclause }
+  | t = TERM    { Ast.Term t      }
+  | LPAREN e1 = bexp AND   e2 = bexp RPAREN { Ast.And   (e1, e2) }
+  | LPAREN e1 = bexp OR    e2 = bexp RPAREN { Ast.Or    (e1, e2) }
+  | LPAREN e1 = bexp XOR   e2 = bexp RPAREN { Ast.Xor   (e1, e2) }
+  | LPAREN e1 = bexp IMPLY e2 = bexp RPAREN { Ast.Imply (e1, e2) }
+  | NOT    e  = bexp                        { Ast.Not   e        }
+  | LPAREN a1 = aexp EQUAL    a2 = aexp RPAREN { Ast.Equal            (a1, a2) }
+  | LPAREN a1 = aexp NOTEQUAL a2 = aexp RPAREN { Ast.Not_equal        (a1, a2) }
+  | LPAREN a1 = aexp LT       a2 = aexp RPAREN { Ast.Lesser_than      (a1, a2) }
+  | LPAREN a1 = aexp LE       a2 = aexp RPAREN { Ast.Lesser_or_equal  (a1, a2) }
+  | LPAREN a1 = aexp GT       a2 = aexp RPAREN { Ast.Greater_than     (a1, a2) }
+  | LPAREN a1 = aexp GE       a2 = aexp RPAREN { Ast.Greater_or_equal (a1, a2) }
+  | EMPTY  s  = sexp                                  { Ast.Empty   s        }
+  | LPAREN v  = set_body IN      s  = sexp     RPAREN { Ast.In      (v, s)   }
+  | LPAREN s1 = sexp     SUBSET  s2 = sexp     RPAREN { Ast.Subset  (s1, s2) }
+  | LPAREN i  = aexp     EXACT   b  = bigbody  RPAREN { Ast.Exact   (i, b)   }
+  | LPAREN i  = aexp     ATLEAST b  = bigbody  RPAREN { Ast.Atleast (i, b)   }
+  | LPAREN i  = aexp     ATMOST  b  = bigbody  RPAREN { Ast.Atmost  (i, b)   }
 
-term_list:
-  | tl = separated_list(COMMA, term) { tl }
+aexp:
+  | v = VAR   { Ast.Var   v }
+  | i = INT   { Ast.Int   i }
+  | f = FLOAT { Ast.Float f }
+  | LPAREN  a1 = aexp ADD a2 = aexp RPAREN { Ast.Add (a1, a2) }
+  | LPAREN  a1 = aexp SUB a2 = aexp RPAREN { Ast.Sub (a1, a2) }
+  | LPAREN  a1 = aexp MUL a2 = aexp RPAREN { Ast.Mul (a1, a2) }
+  | LPAREN  a1 = aexp DIV a2 = aexp RPAREN { Ast.Div (a1, a2) }
+  | LPAREN  a1 = aexp MOD a2 = aexp RPAREN { Ast.Mod (a1, a2) }
+  | SQRT    LPAREN a = aexp RPAREN { Ast.Sqrt     a }
+  | TOINT   LPAREN a = aexp RPAREN { Ast.To_int   a }
+  | TOFLOAT LPAREN a = aexp RPAREN { Ast.To_float a }
 
-term:
-  | id = IDENT    { `Ident    id }
-  | i  = INTEGER  { `Integer  i  }
-  | f  = RATIONAL { `Rational f  }
+sexp:
+  | LBRACK s = separated_list(COMMA, set_body) RBRACK { Ast.Set_body s }
+  | LPAREN s1 = sexp UNION s2 = sexp RPAREN { Ast.Union (s1, s2) }
+  | LPAREN s1 = sexp INTER s2 = sexp RPAREN { Ast.Inter (s1, s2) }
+  | LPAREN s1 = sexp DIFF  s2 = sexp LPAREN { Ast.Diff  (s1, s2) }
+  | UPPERSET LPAREN v = VAR COMMA s = sexp RPAREN { Ast.Upperset (Ast.Var v, s) }
+  | LPAREN a1 = aexp RANGE a2 = aexp RPAREN { Ast.Range (a1, a2) }
+  | s = sexp DOT LPAREN i = aexp RPAREN { Ast.Dot (s, i) }
+  | CARD LPAREN s = sexp RPAREN { Ast.Card s }
+
+set_body:
+  | a = aexp { Ast.Num  a }
+  | b = bexp { Ast.Prop b }
