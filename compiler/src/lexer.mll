@@ -19,71 +19,68 @@ let integer    = '-'? digits+
 let double     = '-'? digits+ '.' digits+
 
 rule lexer = parse
-  | eof            { EOF                          }
-  | empty+         { lexer lexbuf                 }
-  | "begin"        { BEGIN                        }
-  | "end"          { END                          }
-  | "sets"         { SETS                         }
-  | "formula"      { FORMULA                      }
-  | "constant"     { CONSTANT                     }
-  | "set"          { SET                          }
-  | "in"           { IN                           }
-  | "subset"       { SUBSET                       }
-  | "empty"        { EMPTY                        }
-  | "union"        { UNION                        }
-  | "inter"        { INTER                        }
-  | "minus"        { MINUS                        }
-  | "upperset"     { UPPERSET                     }
-  | "bigand"       { BIGAND                       }
-  | "bigor"        { BIGOR                        }
-  | "exact"        { EXACT                        }
-  | "atleast"      { ATLEAST                      }
-  | "almost"       { ALMOST                       }
-  | "of"           { OF                           }
-  | "with"         { WITH                         }
-  | "true-clause"  { TRUECLAUSE                   }
-  | "false-clause" { FALSECLAUSE                  }
-  | "#"            { CARD                         }
-  | "("            { LP                           }
-  | ")"            { RP                           }
-  | "."            { DOT                          }
-  | ".."           { RANGE                        }
-  | ","            { COMMA                        }
-  | "=="           { EQUAL                        }
-  | "<>"           { NOTEQUAL                     }
-  | "+"            { ADD                          }
-  | "-"            { SUBSTRACT                    }
-  | "*"            { MULTIPLY                     }
-  | "/"            { DIVIDE                       }
-  | "mod"          { MOD                          }
-  | "sqrt"         { SQRT                         }
-  | "["            { LB                           }
-  | "]"            { RB                           }
-  | "<"            { LT                           }
-  | ">"            { GT                           }
-  | "<="           { LE                           }
-  | ">="           { GE                           }
-  | "="            { AFFECT                       }
-  | "int"          { INT                          }
-  | "real"         { REAL                         }
-  | "true"         { TRUE                         }
-  | "false"        { FALSE                        }
-  | "and"          { AND                          }
-  | "or"           { OR                           }
-  | "=>"           { IMPLY                        }
-  | "xor"          { XOR                          }
-  | "~"            { NOT                          }
-  | "if"           { IF                           }
-  | "then"         { THEN                         }
-  | "else"         { ELSE                         }
-  | '?' identifier { VAR v                        }
-  | '!' identifier { CONST c                      }
-  | identifier     { IDENT i                      }
-  | integer        { INTEGER  (int_of_string n)   }
-  | double         { RATIONAL (float_of_string f) }
-  | newline        { next_line lexbuf; NEWLINE    }
-  | ";;"           { comments_parse lexbuf        }
+  | eof            { EOF                       }
+  | empty+         { lexer lexbuf              }
+  | "begin"        { BEGIN                     }
+  | "end"          { END                       }
+  | "sets"         { SETS                      }
+  | "formula"      { FORMULA                   }
+  | "in"           { IN                        }
+  | "subset"       { SUBSET                    }
+  | "empty"        { EMPTY                     }
+  | "union"        { UNION                     }
+  | "inter"        { INTER                     }
+  | "diff"         { DIFF                      }
+  | "upperset"     { UPPERSET                  }
+  | "bigand"       { BIGAND                    }
+  | "bigor"        { BIGOR                     }
+  | "exact"        { EXACT                     }
+  | "atleast"      { ATLEAST                   }
+  | "almost"       { ALMOST                    }
+  | "of"           { OF                        }
+  | "with"         { WITH                      }
+  | "true-clause"  { TRUECLAUSE                }
+  | "false-clause" { FALSECLAUSE               }
+  | "#"            { CARD                      }
+  | "("            { LPAREN                    }
+  | ")"            { RPAREN                    }
+  | "."            { DOT                       }
+  | ".."           { RANGE                     }
+  | ","            { COMMA                     }
+  | "=="           { EQUAL                     }
+  | "!="           { NOTEQUAL                  }
+  | "+"            { ADD                       }
+  | "-"            { SUB                       }
+  | "*"            { MUL                       }
+  | "/"            { DIV                       }
+  | "mod"          { MOD                       }
+  | "sqrt"         { SQRT                      }
+  | "["            { LBRACK                    }
+  | "]"            { RBRACK                    }
+  | "<"            { LT                        }
+  | ">"            { GT                        }
+  | "<="           { LE                        }
+  | ">="           { GE                        }
+  | "="            { AFFECT                    }
+  | "int"          { TOINT                     }
+  | "real"         { TOFLOAT                   }
+  | "true"         { TRUE                      }
+  | "false"        { FALSE                     }
+  | "and"          { AND                       }
+  | "or"           { OR                        }
+  | "=>"           { IMPLY                     }
+  | "xor"          { XOR                       }
+  | "~"            { NOT                       }
+  | "if"           { IF                        }
+  | "then"         { THEN                      }
+  | "else"         { ELSE                      }
+  | '$' identifier { VAR v                     }
+  | identifier     { TERM t                    }
+  | integer        { INT  (int_of_string n)    }
+  | double         { FLOAT (float_of_string f) }
+  | newline        { next_line lexbuf; NEWLINE }
+  | ";;"           { comments_parse lexbuf     }
   | _              { raise (SyntaxError ("Unexpected char: " ^ Lexing.lexeme lexbuf)) }
 and comments_parse = parse
-  | '\n'           { incr line; parse lexbuf      }
-  | _              { comments_parse lexbuf        }
+  | '\n'           { incr line; parse lexbuf }
+  | _              { comments_parse lexbuf   }
