@@ -11,7 +11,7 @@ import translation.Traducteur;
 
 /**
  * Une instance Gestionnaire est le "lanceur" de haut niveau
- * de la traduction puis de la résolution.
+ * de la traduction puis de la résolution par miniSAT.
  * @author Maël
  */
 public class Gestionnaire {
@@ -26,7 +26,8 @@ public class Gestionnaire {
      * @param clauses
      */
     public void preparation(BaseDeClauses clauses) {
-
+	traducteur = new Traducteur();
+	traducteur.appelTraducteurOcaml();
     }
 
     /**

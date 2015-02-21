@@ -14,13 +14,17 @@ import java.util.List;
  */
 public class Traducteur {
     private ResultatOcaml ocaml;
-    
+
+    /**
+     * XXX Que fait cette fonction exactement ?
+     * @return
+     */
     public boolean appelTraducteurOcaml() {
         return false;
     }
-    
+
     public List<String> getTranslatedFilePath() {
         return new ArrayList<>();
     }
-    
+
 }
