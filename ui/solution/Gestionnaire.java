@@ -36,6 +36,8 @@ public class Gestionnaire {
     /**
      * Asks the external solver if this DIMACS file has models
      * @return the next model, NULL if no model exists
+     * @note pour le moment, fait appel a calculerModelSAT.
+     * Plus tard on pourra préciser le solveur à utiliser.
      */
     public Model computeModel() {
         return new Model();
