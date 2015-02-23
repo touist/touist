@@ -13,5 +13,12 @@ import java.util.Map;
  */
 public class ResultatOcaml {
     private String dimacsFilePath;
-    Map<Integer, String> literaux;
+    private Map<Integer, String> literaux;
+    public String getDimacsFilePath() {
+        return dimacsFilePath;
+    }
+
+    public Map<Integer, String> getLiteraux() {
+        return literaux;
+    }
 }

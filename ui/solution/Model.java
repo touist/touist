@@ -5,15 +5,26 @@
  */
 package solution;
 
+import java.util.ArrayList;
+
 /**
  *
  * @author Skander
  */
 public class Model {
     
-    StringBuffered br;
-    
+    private StringBuffer br;
+    public ArrayList<String> model=new ArrayList<String>();
+    public Model(StringBuffer br) {
+        this.br=br;
+        parse_TR(br);
+    }
+    //Get Correspondance and Valuate Literal item.
+    private void parse_TR(StringBuffer br){
+        
+    }
     public String toString() {
+        
         return br.toString();
     }
 }
