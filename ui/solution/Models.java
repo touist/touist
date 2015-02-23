@@ -10,10 +10,13 @@ import java.util.List;
 /**
  *
  * @author Skander
+ * @Modified by Abdel
  */
+//Be careful
+//Null Return means not exist.
 public class Models {
     private List<Model> models;
-    private int currentIndex;
+    private int currentIndex=0;
     
     public Model getCurrentModel() {
         return models.get(currentIndex);
@@ -24,18 +27,33 @@ public class Models {
     }
     
     public void export() {
-        
+        //Seconde Increment
     }
     
-    public void next(){
-        
+    public Model next(){
+        if(this.reachedEnd())
+            { 
+            this.currentIndex++;
+            return models.get(currentIndex);
+            }
+        else
+            return null;
     }
     
-    public void previous() {
-        
+    public Model previous() {
+        if(this.reachedBegin())
+            {
+            this.currentIndex++;
+            return models.get(currentIndex);
+            }
+        else
+            return null;
     }
     
-    public boolean reachedEnd() {
+    private boolean reachedEnd() {
         return currentIndex >= models.size()-1;
+    }
+    private boolean reachedBegin() {
+        return currentIndex <0;
     }
 }

@@ -11,7 +11,9 @@ package solution;
  */
 public class Model {
     
-    public String afficher() {
-        return "TODO : terminer d'ecrire cette classe";
+    StringBuffered br;
+    
+    public String toString() {
+        return br.toString();
     }
 }

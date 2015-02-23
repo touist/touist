@@ -49,3 +49,4 @@ hs_err_pid*
 .classpath
 
 .project
+/nbproject/private/
