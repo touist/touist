@@ -5,6 +5,10 @@
  */
 package gui;
 
+import gui.resultsView.ResultsPanel;
+import gui.editorView.EditorPanel;
+import java.awt.CardLayout;
+import javax.swing.JPanel;
 import solution.BaseDeClauses;
 import solution.Gestionnaire;
 import solution.Models;
@@ -15,15 +19,50 @@ import solution.Models;
  */
 public class MainFrame extends javax.swing.JFrame {
 
-    private static BaseDeClauses clause;
-    private static Gestionnaire gestionnaire;
-    private static Models models;
+    private BaseDeClauses clause;
+    private Gestionnaire gestionnaire;
+    private Models models;
+    
+    public State state;
+    
+    public final static String EDITOR_PANEL = "editor_panel";
+    public final static String RESULTS_PANEL = "results_panel";
+    private JPanel cards = new JPanel(new CardLayout());
+    private EditorPanel editorPanel1 = new EditorPanel();
+    private ResultsPanel resultsPanel1 = new ResultsPanel();
+    private int numberOfFormulas;
     
     /**
      * Creates new form MainFrame
      */
     public MainFrame() {
+        state = State.EDIT_SINGLE;
+        
+        add(cards);
+        cards.add(editorPanel1, EDITOR_PANEL);
+        cards.add(resultsPanel1, RESULTS_PANEL);
+        setViewToEditor();
+        
         initComponents();
+    }
+
+    public int getNumberOfFormulas() {
+        return numberOfFormulas;
+    }
+
+    public void setNumberOfFormulas(int numberOfFormulas) {
+        this.numberOfFormulas = numberOfFormulas;
+    }
+    
+    
+    
+    public void setViewToEditor() {
+        ((CardLayout)cards.getLayout()).show(cards, EDITOR_PANEL);
+    }
+    
+    public void setViewToResults() {
+        resultsPanel1.applyRestrictions();
+        ((CardLayout)cards.getLayout()).show(cards, RESULTS_PANEL);
     }
 
     /**
@@ -36,17 +75,7 @@ public class MainFrame extends javax.swing.JFrame {
     private void initComponents() {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 400, Short.MAX_VALUE)
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 300, Short.MAX_VALUE)
-        );
+        getContentPane().setLayout(new java.awt.CardLayout());
 
         pack();
     }// </editor-fold>//GEN-END:initComponents

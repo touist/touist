@@ -8,6 +8,7 @@ package solution;
 import solution.solvers.SolverSAT;
 import translation.ResultatOcaml;
 import translation.Traducteur;
+import java.io.IOException;
 
 /**
  * This class is the high-level launcher for translation
@@ -25,12 +26,13 @@ public class Gestionnaire {
      * and producing a ResultatOcaml object.
      * @param clauses
      */
-    public void preparation(BaseDeClauses clauses) {
+    public void preparation(BaseDeClauses clauses) throws IOException {
 	// 1. Save the ClauseBase into a temporary .bigand file
-	clauses.saveToFile("clauses");
+	String bigandPath = "tmp.bigand";
+	clauses.saveToFile(bigandPath);
 	// 2. Call the translator (bigand to dimacs)
 	traducteur = new Traducteur();
-	traducteur.appelTraducteurOcaml(); // XXX How does it work?
+	traducteur.appelTraducteurOcaml(bigandPath); // XXX How does it work?
     }
 
     /**

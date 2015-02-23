@@ -28,6 +28,7 @@ public class Traducteur {
      * XXX Que fait cette fonction exactement ?
      * @return
      */
+<<<<<<< HEAD
     public Traducteur(){
         ocaml=new ResultatOcaml();
     }
@@ -51,6 +52,17 @@ public class Traducteur {
         while((line=br.readLine())!=null){
             ocaml.addLiteraux(Integer.parseInt(line.split(" ")[0]),line.split(" ")[1]);
         }
+=======
+    public boolean appelTraducteurOcaml(String bigandFilePath) {
+        return false;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public List<String> getTranslatedFilePath() {
+>>>>>>> origin/develop
         return new ArrayList<>();
     }
 
