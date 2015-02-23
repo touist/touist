@@ -19,10 +19,14 @@ public class Traducteur {
      * XXX Que fait cette fonction exactement ?
      * @return
      */
-    public boolean appelTraducteurOcaml() {
+    public boolean appelTraducteurOcaml(String bigandFilePath) {
         return false;
     }
 
+    /**
+     *
+     * @return
+     */
     public List<String> getTranslatedFilePath() {
         return new ArrayList<>();
     }

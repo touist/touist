@@ -27,10 +27,11 @@ public class Gestionnaire {
      */
     public void preparation(BaseDeClauses clauses) {
 	// 1. Save the ClauseBase into a temporary .bigand file
-	clauses.saveToFile("clauses");
+	String bigandPath = "tmp.bigand";
+	clauses.saveToFile(bigandPath);
 	// 2. Call the translator (bigand to dimacs)
 	traducteur = new Traducteur();
-	traducteur.appelTraducteurOcaml(); // XXX How does it work?
+	traducteur.appelTraducteurOcaml(bigandPath); // XXX How does it work?
     }
 
     /**
