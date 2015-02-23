@@ -5,7 +5,6 @@
  */
 package translation;
 
-import java.util.HashMap;
 import java.util.Map;
 
 /**

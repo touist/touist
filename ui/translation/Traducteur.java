@@ -42,10 +42,11 @@ public class Traducteur {
             while((line=reader.readLine())!=null){
                 br.append(line+"\n");
                }
-        
+            ocaml.setDimacsFilePath(br.toString().split("\n")[0]);
+            TranslatedFileR(br.toString().split("\n")[1]);
     }
 
-    public List<String> getTranslatedFilePath(String tr_path) throws FileNotFoundException, IOException {
+    private void TranslatedFileR(String tr_path) throws FileNotFoundException, IOException {
         File TR=new File(tr_path);
         BufferedReader br=new BufferedReader(new FileReader(TR));
         String line="";
