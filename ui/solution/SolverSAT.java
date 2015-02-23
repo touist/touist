@@ -23,7 +23,7 @@ public class SolverSAT {
     private Process p;
     private boolean IsFirtCompute=true;
     private PrintWriter out;
-    public Model computeModel(ResultatOcaml ocaml) throws IOException {
+    public Model computeModel(ResultatOcaml ocaml,Models all_models) throws IOException {
         if(this.IsFirtCompute)
         {this.p=start(ocaml.getDimacsFilePath());
             this.IsFirtCompute=false;
@@ -41,11 +41,15 @@ public class SolverSAT {
             br.append(line+"\n");
         }
         Model model=new Model();
-        
+        Parse_Model(model,ocaml,br.toString().split(" "));
+        all_models.addModel(model);
         return model;
     }
-    private void Parse_Model(Model model){
-    
+    //Get Correspondance and Valuate Literal item.
+    private void Parse_Model(Model model,ResultatOcaml ocaml,String[] output_Value){
+        for (String Literal : output_Value){
+            model.addLiteral(ocaml.getLiteraux().get(Integer.parseInt(Literal)));
+        }
     }
     public Process start(String dimacsFilesPath) throws IOException {
         this.p=Runtime.getRuntime().exec("java -cp .:sat4j-sat.jar Minisat "+dimacsFilesPath);

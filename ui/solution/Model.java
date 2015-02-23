@@ -15,15 +15,13 @@ import java.util.ArrayList;
 public class Model {
     
     //private StringBuffer br;
+    //Contain Literals item Valuated True and Satisfy Logical Problem.
     public ArrayList<String> Literals_T=new ArrayList<String>();
-    public Model() {
-        
-    }
-    //Get Correspondance and Valuate Literal item.
-    private void addLiteral(String value_T){
+    public void addLiteral(String value_T){
         Literals_T.add(value_T);
     }
     public String toString() {
+        //Skander use Literals_T as you like
         return "";
     }
 }
