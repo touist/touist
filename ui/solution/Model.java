@@ -10,21 +10,20 @@ import java.util.ArrayList;
 /**
  *
  * @author Skander
+ * @Modified By Abdel
  */
 public class Model {
     
-    private StringBuffer br;
-    public ArrayList<String> model=new ArrayList<String>();
-    public Model(StringBuffer br) {
-        this.br=br;
-        parse_TR(br);
+    //private StringBuffer br;
+    public ArrayList<String> Literals_T=new ArrayList<String>();
+    public Model() {
+        
     }
     //Get Correspondance and Valuate Literal item.
-    private void parse_TR(StringBuffer br){
-        
+    private void addLiteral(String value_T){
+        Literals_T.add(value_T);
     }
     public String toString() {
-        
-        return br.toString();
+        return "";
     }
 }

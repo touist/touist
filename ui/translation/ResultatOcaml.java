@@ -10,15 +10,24 @@ import java.util.Map;
 /**
  *
  * @author Skander
+ * @Modified By Abdel
  */
 public class ResultatOcaml {
     private String dimacsFilePath;
     private Map<Integer, String> literaux;
+
+    public void setDimacsFilePath(String dimacsFilePath) {
+        this.dimacsFilePath = dimacsFilePath;
+    }
+
+    public void addLiteraux(int cleP,String P) {
+        this.literaux.putIfAbsent(cleP, P);
+    }
     public String getDimacsFilePath() {
         return dimacsFilePath;
     }
-
     public Map<Integer, String> getLiteraux() {
         return literaux;
     }
+   
 }

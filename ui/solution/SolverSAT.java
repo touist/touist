@@ -17,11 +17,12 @@ import translation.ResultatOcaml;
 /**
  *
  * @author Skander
+ * @Modified by Abdel
  */
 public class SolverSAT {
-    Process p;
-    boolean IsFirtCompute=true;
-    PrintWriter out;
+    private Process p;
+    private boolean IsFirtCompute=true;
+    private PrintWriter out;
     public Model computeModel(ResultatOcaml ocaml) throws IOException {
         if(this.IsFirtCompute)
         {this.p=start(ocaml.getDimacsFilePath());
@@ -39,8 +40,12 @@ public class SolverSAT {
         while((line=reader.readLine())!=null){
             br.append(line+"\n");
         }
-        Model model=new Model(br);
+        Model model=new Model();
+        
         return model;
+    }
+    private void Parse_Model(Model model){
+    
     }
     public Process start(String dimacsFilesPath) throws IOException {
         this.p=Runtime.getRuntime().exec("java -cp .:sat4j-sat.jar Minisat "+dimacsFilesPath);
