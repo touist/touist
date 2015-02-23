@@ -5,6 +5,7 @@
  */
 package translation;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -14,7 +15,7 @@ import java.util.Map;
  */
 public class ResultatOcaml {
     private String dimacsFilePath;
-    private Map<Integer, String> literaux;
+    private Map<Integer, String> literaux=new HashMap();
 
     public void setDimacsFilePath(String dimacsFilePath) {
         this.dimacsFilePath = dimacsFilePath;
