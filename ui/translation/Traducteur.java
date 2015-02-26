@@ -11,10 +11,6 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -28,7 +24,6 @@ public class Traducteur {
      * XXX Que fait cette fonction exactement ?
      * @return
      */
-<<<<<<< HEAD
     public Traducteur(){
         ocaml=new ResultatOcaml();
     }
@@ -53,18 +48,6 @@ public class Traducteur {
         while((line=br.readLine())!=null){
             ocaml.addLiteraux(Integer.parseInt(line.split(" ")[0]),line.split(" ")[1]);
         }
-=======
-    public boolean appelTraducteurOcaml(String bigandFilePath) {
-        return false;
-    }
-
-    /**
-     *
-     * @return
-     */
-    public List<String> getTranslatedFilePath() {
->>>>>>> origin/develop
-        return new ArrayList<>();
     }
 
 }
