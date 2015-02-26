@@ -5,10 +5,10 @@
  */
 package solution;
 
-import solution.solvers.SolverSAT;
+import java.io.IOException;
+
 import translation.ResultatOcaml;
 import translation.Traducteur;
-import java.io.IOException;
 
 /**
  * This class is the high-level launcher for translation
@@ -32,7 +32,8 @@ public class Gestionnaire {
 	clauses.saveToFile(bigandPath);
 	// 2. Call the translator (bigand to dimacs)
 	traducteur = new Traducteur();
-	traducteur.appelTraducteurOcaml(bigandPath); // XXX How does it work?
+	traducteur.appelTraducteurOcaml(bigandPath);
+	traducteur.getTranslatedFilePath();
     }
 
     /**
