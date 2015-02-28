@@ -5,7 +5,9 @@
  */
 package solution;
 
-import java.util.List;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
 
 /**
  *
@@ -14,46 +16,25 @@ import java.util.List;
  */
 //Be careful
 //Null Return means not exist.
-public class Models {
-    private List<Model> models;
-    private int currentIndex=0;
-    
-    public Model getCurrentModel() {
-        return models.get(currentIndex);
+public class Models implements Iterable<Model> {
+    private Collection<Model> models = new ArrayList<Model>();
+    private Solver solverInterface;
+
+    public Models(Solver solverThatProducesTheModels) {
+
     }
-    
+
     public void addModel(Model model) {
         models.add(model);
     }
-    
+
+    @Override
+    public Iterator<Model> iterator() {
+	// TODO do it !
+	return new ModelsIterator(models,solverInterface);
+    }
+
     public void export() {
         //Seconde Increment
-    }
-    
-    public Model next(){
-        if(this.reachedEnd())
-            { 
-            this.currentIndex++;
-            return models.get(currentIndex);
-            }
-        else
-            return null;
-    }
-    
-    public Model previous() {
-        if(this.reachedBegin())
-            {
-            this.currentIndex++;
-            return models.get(currentIndex);
-            }
-        else
-            return null;
-    }
-    
-    private boolean reachedEnd() {
-        return currentIndex >= models.size()-1;
-    }
-    private boolean reachedBegin() {
-        return currentIndex <0;
     }
 }

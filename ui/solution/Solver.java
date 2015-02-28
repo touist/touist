@@ -11,18 +11,38 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
-import solution.Model;
+
 import translation.ResultatOcaml;
 
 /**
- *
- * @author Skander
- * @Modified by Abdel
+ * This class
+ * - launches the solver program with the DIMACS input
+ * - if this DIMACS is satisfiable, gives an iterable
+ * object that will, itself, call SolverSAT to get
+ * the next model.
+ * @author Abdel
  */
-public class SolverSAT {
+public class Solver implements Iterable<Model> {
     private Process p;
     private boolean IsFirtCompute=true;
     private PrintWriter out;
+
+    public Solver(String dimacsFilePath) {
+
+    }
+
+    public Solver(String dimacsFilePath, LiteralsMap map) {
+
+    }
+
+    public Models launch() {
+	return null;
+
+    }
+    public void stop() {
+
+    }
+
     public Model computeModel(ResultatOcaml ocaml,Models all_models) throws IOException {
         if(this.IsFirtCompute)
         {this.p=start(ocaml.getDimacsFilePath());
@@ -55,7 +75,7 @@ public class SolverSAT {
         this.p=Runtime.getRuntime().exec("java -cp .:sat4j-sat.jar Minisat "+dimacsFilesPath);
         return p;
     }
-    
+
     public void stop() {
         out=new PrintWriter (new BufferedWriter (new OutputStreamWriter(p.getOutputStream())));
         out.println("\n0");
@@ -63,4 +83,5 @@ public class SolverSAT {
         this.IsFirtCompute=true;
         this.p.destroy();
     }
+
 }

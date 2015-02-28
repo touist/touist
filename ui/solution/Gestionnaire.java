@@ -19,7 +19,7 @@ public class Gestionnaire {
     Traducteur traducteur;
     Models models;
     ResultatOcaml ocaml;
-    SolverSAT solverSAT;
+    Solver solverSAT;
 
     /**
      * Translates the ClauseBase using the Traducteur
@@ -30,7 +30,7 @@ public class Gestionnaire {
 	// 1. Save the ClauseBase into a temporary .bigand file
 	String bigandPath = "tmp.bigand";
 	clauses.saveToFile(bigandPath);
-	// 2. Call the translator (bigand to dimacs)
+	// 2. Call the translator/compiler (bigand to dimacs)
 	traducteur = new Traducteur();
 	traducteur.appelTraducteurOcaml(bigandPath);
 	traducteur.getTranslatedFilePath();
@@ -42,7 +42,7 @@ public class Gestionnaire {
      * @note pour le moment, fait appel a calculerModelSAT.
      * Plus tard on pourra préciser le solveur à utiliser.
      */
-    public Model computeModel() {
-        return new Model();
+    public Models computeModel() {
+
     }
 }
