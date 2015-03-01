@@ -52,7 +52,7 @@ public class SolverTestSAT4J extends Solver {
 		StringBuffer br = new StringBuffer();
 		String line = "";
 		while ((line = stdout.readLine()) != null) {
-			br.append(line + "\n");
+			br.append(line + "\n"); // XXX The \n goes into the parsing!
 		}
 
 		return parseModel(br.toString().split(" "));
@@ -60,6 +60,7 @@ public class SolverTestSAT4J extends Solver {
 
 	@Override
 	protected Model parseModel(String[] rawModelOutput) {
+		// TODO The parser should be able to handle the "-3" (negation)
 		Model model = new Model();
 		for (String rawLiteral : rawModelOutput) {
 			if (getLiteralsMap() != null) {
