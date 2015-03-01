@@ -6,13 +6,14 @@
 package solution;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 /**
  *
  * @author Skander
  * @Modified By Abdel
  */
-public class Model {
+public class Model implements Iterable<String>{
 
 	// private StringBuffer br;
 	// Contain Literals item Valuated True and Satisfy Logical Problem.
@@ -30,5 +31,10 @@ public class Model {
 			out = out + " " + s;
 		}
 		return out;
+	}
+
+	@Override
+	public Iterator<String> iterator() {
+		return literals.iterator();
 	}
 }
