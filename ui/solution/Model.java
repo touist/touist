@@ -13,13 +13,14 @@ import java.util.ArrayList;
  * @Modified By Abdel
  */
 public class Model {
-    
+
     //private StringBuffer br;
     //Contain Literals item Valuated True and Satisfy Logical Problem.
-    public ArrayList<String> Literals_T=new ArrayList<String>();
-    public void addLiteral(String value_T){
-        Literals_T.add(value_T);
+    public ArrayList<String> Literals = new ArrayList<String>();
+    public void addLiteral(String literalName){
+        Literals.add(literalName);
     }
+    @Override
     public String toString() {
         //Skander use Literals_T as you like
         return "";
