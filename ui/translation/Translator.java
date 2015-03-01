@@ -78,9 +78,9 @@ public class Translator {
 
 	/**
 	 * Calls the translator/compiler to transform the ".bigand" file to a
-	 * ".dimacs" file (along with a "mapping" file).
-	 * This method also calls the parsing methods parseErrorsAndWarnings
-	 * and (if the translation actually passed) parseLiteralsMapFile.
+	 * ".dimacs" file (along with a "mapping" file). This method also calls the
+	 * parsing methods parseErrorsAndWarnings and (if the translation actually
+	 * passed) parseLiteralsMapFile.
 	 *
 	 * @param bigandFilePath is the name of the file that the
 	 * translator/compiler is going to compute. The translation is handled by a
@@ -110,7 +110,7 @@ public class Translator {
 		}
 		dimacsFilePath = br.toString().split("\n")[0];
 		parseLiteralsMapFile(br.toString().split("\n")[1]);
-		return false; // XXX
+		return false; // TODO translation went ok?
 	}
 
 	/**
@@ -157,7 +157,7 @@ public class Translator {
 	 * translation program
 	 */
 	private void parseErrorsAndWarnings(String rawStderr) {
-		// TODO
+		// TODO parseErrorsAndWarnings
 	}
 
 	/**
