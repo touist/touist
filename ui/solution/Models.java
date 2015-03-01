@@ -6,35 +6,27 @@
 package solution;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  *
- * @author Skander
- * @Modified by Abdel
  */
-//Be careful
-//Null Return means not exist.
+
 public class Models implements Iterable<Model> {
-    private Collection<Model> models = new ArrayList<Model>();
+    private List<Model> models = new ArrayList<Model>();
     private Solver solverInterface;
 
     public Models(Solver solverThatProducesTheModels) {
-
-    }
-
-    public void addModel(Model model) {
-        models.add(model);
+	this.solverInterface = solverThatProducesTheModels;
     }
 
     @Override
     public Iterator<Model> iterator() {
-	// TODO do it !
 	return new ModelsIterator(models,solverInterface);
     }
 
     public void export() {
-        //Seconde Increment
+        // TODO incrément 2
     }
 }
