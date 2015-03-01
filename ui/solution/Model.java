@@ -16,15 +16,15 @@ public class Model {
 
 	// private StringBuffer br;
 	// Contain Literals item Valuated True and Satisfy Logical Problem.
-	public ArrayList<String> Literals = new ArrayList<String>();
+	public ArrayList<String> literals = new ArrayList<String>();
 
 	public void addLiteral(String literalName) {
-		Literals.add(literalName);
+		literals.add(literalName);
 	}
 
 	@Override
 	public String toString() {
-		// Skander use Literals_T as you like
-		return "";
+		// TODO Skander, please write the proper toString
+		return literals.toString();
 	}
 }
