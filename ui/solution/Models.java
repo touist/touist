@@ -5,55 +5,49 @@
  */
 package solution;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 /**
- *
- * @author Skander
- * @Modified by Abdel
+ * This class is the Model container. An instance of Models allows the user to
+ * iterate (with iterate()) on the different models. When using
+ * ModelsIterator.hasNext(), the Solver.nextModel() will be called and the next
+ * model will be automatically retrieved.
  */
-//Be careful
-//Null Return means not exist.
-public class Models {
-    private List<Model> models;
-    private int currentIndex=0;
-    
-    public Model getCurrentModel() {
-        return models.get(currentIndex);
-    }
-    
-    public void addModel(Model model) {
-        models.add(model);
-    }
-    
-    public void export() {
-        //Seconde Increment
-    }
-    
-    public Model next(){
-        if(this.reachedEnd())
-            { 
-            this.currentIndex++;
-            return models.get(currentIndex);
-            }
-        else
-            return null;
-    }
-    
-    public Model previous() {
-        if(this.reachedBegin())
-            {
-            this.currentIndex++;
-            return models.get(currentIndex);
-            }
-        else
-            return null;
-    }
-    
-    private boolean reachedEnd() {
-        return currentIndex >= models.size()-1;
-    }
-    private boolean reachedBegin() {
-        return currentIndex <0;
-    }
+public class Models implements Iterable<Model> {
+	private List<Model> models = new ArrayList<Model>();
+	private Solver solverInterface; // The solver that created this inst. of
+									// Models
+
+	/**
+	 * Create an instance of Models; you need to pass the Solver instance that
+	 * created this instance of Models because Models will call
+	 * Solver.nextModel() when you do ModelsIterator.hasNext(). This constructor
+	 * is protected because it should only be used by Solver and not by the end
+	 * user.
+	 *
+	 * @param solverThatProducesTheModels
+	 */
+	protected Models(Solver solverThatProducesTheModels) {
+		this.solverInterface = solverThatProducesTheModels;
+	}
+
+	/**
+	 * This iterator allows the user to iterate over the Model instances. The
+	 * whole list of Model is not computed before getting the first Model: this
+	 * list is built "on the fly", when the user uses ModelsIterator.hasNext().
+	 */
+	@Override
+	public Iterator<Model> iterator() {
+		return new ModelsIterator(models, solverInterface);
+	}
+
+	/**
+	 * Exports the models already computed.
+	 * @param fileName
+	 */
+	public void exportTo(String fileName) {
+		// TODO increment #2
+	}
 }
