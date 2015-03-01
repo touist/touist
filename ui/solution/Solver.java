@@ -11,77 +11,87 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
-
-import translation.ResultatOcaml;
+import java.util.Map;
 
 /**
  * This class
  * - launches the solver program with the DIMACS input
- * - if this DIMACS is satisfiable, gives an iterable
- * object that will, itself, call SolverSAT to get
+ * - if this DIMACS is satisfiable, gives an iterable Models
+ * - gives a way to get the next Model and do the translation
+ * with the literalsMap (DIMACS integers to literal names)
+ *
  * the next model.
  * @author Abdel
  */
-public class Solver implements Iterable<Model> {
+public class Solver {
     private Process p;
-    private boolean IsFirtCompute=true;
     private PrintWriter out;
+    private String dimacsFilePath;
+    private Map<Integer,String> literalsMap;
 
     public Solver(String dimacsFilePath) {
-
+	this.dimacsFilePath = dimacsFilePath;
+	this.literalsMap = null;
     }
 
-    public Solver(String dimacsFilePath, LiteralsMap map) {
-
+    public Solver(String dimacsFilePath, Map<Integer,String> literalsMap) {
+	this.dimacsFilePath = dimacsFilePath;
+	this.literalsMap = literalsMap;
     }
 
     public Models launch() {
 	return null;
-
-    }
-    public void stop() {
-
     }
 
-    public Model computeModel(ResultatOcaml ocaml,Models all_models) throws IOException {
-        if(this.IsFirtCompute)
-        {this.p=start(ocaml.getDimacsFilePath());
-            this.IsFirtCompute=false;
-        }
-        //wizz
+    /**
+     * ONLY used by ModelsIterator
+     * @return null if no more model (or if not satisfiable)
+     * @throws IOException
+     */
+    protected Model nextModel() throws IOException {
         out=new PrintWriter (new BufferedWriter (new OutputStreamWriter(p.getOutputStream())));
         out.println("1");
         out.flush();
         out.close();
-        //wizz
         StringBuffer br=new StringBuffer();
         BufferedReader reader =new BufferedReader(new InputStreamReader(p.getInputStream()));
         String line="";
         while((line=reader.readLine())!=null){
             br.append(line+"\n");
         }
-        Model model=new Model();
-        Parse_Model(model,ocaml,br.toString().split(" "));
-        all_models.addModel(model);
-        return model;
+        return parseModel(br.toString().split(" "));
     }
-    //Get Correspondance and Valuate Literal item.
-    private void Parse_Model(Model model,ResultatOcaml ocaml,String[] output_Value){
-        for (String Literal : output_Value){
-            model.addLiteral(ocaml.getLiteraux().get(Integer.parseInt(Literal)));
+
+    /**
+     *
+     * @param rawModelOutput The output
+     * @return a model with, if a literalMap was given, the translated
+     * literal. If no literalMap is given, the Model stores the literal
+     * as given by the solver (an integer).
+     */
+    private Model parseModel(String[] rawModelOutput){
+        Model model=new Model();
+        for (String rawLiteral : rawModelOutput){
+            if(literalsMap != null){
+        	model.addLiteral(literalsMap.get(Integer.parseInt(rawLiteral)));
+            } else {
+        	model.addLiteral(rawLiteral);
+            }
         }
+        return model;
     }
     public Process start(String dimacsFilesPath) throws IOException {
         this.p=Runtime.getRuntime().exec("java -cp .:sat4j-sat.jar Minisat "+dimacsFilesPath);
         return p;
     }
 
-    public void stop() {
+    /**
+     * Kills the solver program process
+     */
+    public void close() {
         out=new PrintWriter (new BufferedWriter (new OutputStreamWriter(p.getOutputStream())));
         out.println("\n0");
         out.close();
-        this.IsFirtCompute=true;
         this.p.destroy();
     }
-
 }
