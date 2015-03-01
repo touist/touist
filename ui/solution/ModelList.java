@@ -42,7 +42,7 @@ public class ModelList implements Iterable<Model> {
 	 */
 	@Override
 	public Iterator<Model> iterator() {
-		return new ModelsIterator(models, solverInterface);
+		return new ModelListIterator(models, solverInterface);
 	}
 
 	/**
