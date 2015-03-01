@@ -11,7 +11,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Scanner;
 
 /**
  * This class is a first implementation of the "Solver" abstract class. It
@@ -84,5 +86,40 @@ public class SolverTestSAT4J extends Solver {
 		out.println("\n0");
 		out.close();
 		this.p.destroy();
+	}
+
+	public static void main(String[] args) {
+		SolverTestSAT4J solverInterfaceWrittenByAbdel = new SolverTestSAT4J(
+				"/Users/maelv/prog/touist/bin/term1_gr_2pin_w4.shuffled.cnf");
+		Models models = null;
+		try {
+			models = solverInterfaceWrittenByAbdel.launch();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		Iterator<Model> it = models.iterator();
+		if (it.hasNext()) {
+			System.out.println("Satisfiable");
+		} else {
+			System.out.println("Insatisfiable");
+		}
+		Scanner sc = new Scanner(System.in);
+		String answer;
+		boolean continuer = true;
+		Model m;
+
+		while (it.hasNext() && continuer) {
+			System.out.println("Model : ");
+			m = it.next();
+			m.toString();
+
+			System.out.println("Contiuner ? o/n");
+			answer = sc.nextLine();
+			continuer = (answer.charAt(0) == 'o');
+		}
+		sc.close();
+		solverInterfaceWrittenByAbdel.close();
+
 	}
 }
