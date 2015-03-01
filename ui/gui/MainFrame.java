@@ -1,17 +1,36 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ *
+ * Project TouIST, 2015. Easily formalize and solve real-world sized problems
+ * using propositional logic and linear theory of reals with a nice GUI.
+ *
+ * https://github.com/olzd/touist
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the GNU Lesser General Public License
+ * (LGPL) version 2.1 which accompanies this distribution, and is available at
+ * http://www.gnu.org/licenses/lgpl-2.1.html
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * Contributors:
+ *     Alexis Comte, Abdelwahab Heba, Olivier Lezaud,
+ *     Skander Ben Slimane, Maël Valais
+ *
  */
+
 package gui;
 
-import gui.resultsView.ResultsPanel;
 import gui.editorView.EditorPanel;
+import gui.resultsView.ResultsPanel;
+
 import java.awt.CardLayout;
+
 import javax.swing.JPanel;
+
 import solution.BaseDeClauses;
-import solution.Gestionnaire;
-import solution.Models;
 
 /**
  *
@@ -22,27 +41,27 @@ public class MainFrame extends javax.swing.JFrame {
     private BaseDeClauses clause = new BaseDeClauses();
     private Gestionnaire gestionnaire = new Gestionnaire();
     private Models models = new Models();
-    
+
     public State state;
-    
+
     public final static String EDITOR_PANEL = "editor_panel";
     public final static String RESULTS_PANEL = "results_panel";
     private JPanel cards = new JPanel(new CardLayout());
     private EditorPanel editorPanel1 = new EditorPanel();
     private ResultsPanel resultsPanel1 = new ResultsPanel();
     private int numberOfFormulas;
-    
+
     /**
      * Creates new form MainFrame
      */
     public MainFrame() {
         state = State.EDIT_SINGLE;
-        
+
         add(cards);
         cards.add(editorPanel1, EDITOR_PANEL);
         cards.add(resultsPanel1, RESULTS_PANEL);
         setViewToEditor();
-        
+
         initComponents();
     }
 
@@ -58,8 +77,8 @@ public class MainFrame extends javax.swing.JFrame {
         return models;
     }
 
-    
-    
+
+
     public int getNumberOfFormulas() {
         return numberOfFormulas;
     }
@@ -67,13 +86,13 @@ public class MainFrame extends javax.swing.JFrame {
     public void setNumberOfFormulas(int numberOfFormulas) {
         this.numberOfFormulas = numberOfFormulas;
     }
-    
-    
-    
+
+
+
     public void setViewToEditor() {
         ((CardLayout)cards.getLayout()).show(cards, EDITOR_PANEL);
     }
-    
+
     public void setViewToResults() {
         resultsPanel1.applyRestrictions();
         ((CardLayout)cards.getLayout()).show(cards, RESULTS_PANEL);
@@ -101,7 +120,7 @@ public class MainFrame extends javax.swing.JFrame {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
         /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html
          */
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
@@ -123,7 +142,8 @@ public class MainFrame extends javax.swing.JFrame {
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
+            @Override
+			public void run() {
                 new MainFrame().setVisible(true);
             }
         });

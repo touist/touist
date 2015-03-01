@@ -1,8 +1,26 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ *
+ * Project TouIST, 2015. Easily formalize and solve real-world sized problems
+ * using propositional logic and linear theory of reals with a nice GUI.
+ *
+ * https://github.com/olzd/touist
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the GNU Lesser General Public License
+ * (LGPL) version 2.1 which accompanies this distribution, and is available at
+ * http://www.gnu.org/licenses/lgpl-2.1.html
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * Contributors:
+ *     Alexis Comte, Abdelwahab Heba, Olivier Lezaud,
+ *     Skander Ben Slimane, Maël Valais
+ *
  */
+
 package solution;
 
 import java.io.BufferedReader;
@@ -31,17 +49,17 @@ class FormatException extends Exception {
 public class BaseDeClauses {
     private List<String> formules;
     private List<String> sets;
-    
-    private static final String errorBeginFormula = "Syntax error at line %d" 
+
+    private static final String errorBeginFormula = "Syntax error at line %d"
                                        + ". Formula begin section already"
                                        + " declared.";
     private static final String errorEndFormula =  "Syntax error at line %d"
                                        + ". No formula section is opened.";
-    private static final String errorBeginSet = 
+    private static final String errorBeginSet =
                                 errorBeginFormula.replace("Formula","Set");
-    private static final String errorEndSet = 
+    private static final String errorEndSet =
                                 errorEndFormula.replace("formula","set");
-    
+
     /**
      * Construct a set of clauses
      */
@@ -64,7 +82,7 @@ public class BaseDeClauses {
     public List<String> getSets() {
         return sets;
     }
-    
+
 
     /**
      * Import the list of formules from a file
@@ -123,14 +141,14 @@ public class BaseDeClauses {
                 }
                 else if(Arrays.equals(words,new String[]{"ends","sets"})) {
                     if(setSection == false) {
-                        String message = String.format(errorEndSet,indexLine); 
+                        String message = String.format(errorEndSet,indexLine);
                         throw new FormatException(message);
                     }
                     else {
                         setSection = false;
                     }
                 }
-                
+
             }
             else if(formulaSection) {
                 addFormule(line);
@@ -144,7 +162,7 @@ public class BaseDeClauses {
     public void saveToFile(String path) throws IOException {
         int sizeBuffer = 8192;
         BufferedWriter writer = new BufferedWriter(new FileWriter(path), sizeBuffer);
-        
+
 	if(!sets.isEmpty()) {
             writer.write("begins sets\n");
             for(String set:sets) {
@@ -159,7 +177,7 @@ public class BaseDeClauses {
             }
             writer.write("ends sets\n");
         }
-        
+
         writer.flush();
         writer.close();
     }
@@ -172,12 +190,12 @@ public class BaseDeClauses {
     public void addFormule(String formule) {
         formules.add(formule);
     }
-    
+
     /**
      * Add a set to the current list of sets
      * @param A set
      */
-    
+
     public void addSet(String set) {
         sets.add(set);
     }
@@ -191,7 +209,7 @@ public class BaseDeClauses {
     public String removeFormule(int index) {
         return formules.remove(index);
     }
-    
+
     /**
      * Remove a set at a given index
      * @param index
@@ -200,7 +218,7 @@ public class BaseDeClauses {
     public String removeSet(int index) {
         return sets.remove(index);
     }
-    
+
     public static void main(String[] args) {
         System.out.println("essai");
     }

@@ -1,13 +1,31 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ *
+ * Project TouIST, 2015. Easily formalize and solve real-world sized problems
+ * using propositional logic and linear theory of reals with a nice GUI.
+ *
+ * https://github.com/olzd/touist
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the GNU Lesser General Public License
+ * (LGPL) version 2.1 which accompanies this distribution, and is available at
+ * http://www.gnu.org/licenses/lgpl-2.1.html
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * Contributors:
+ *     Alexis Comte, Abdelwahab Heba, Olivier Lezaud,
+ *     Skander Ben Slimane, Maël Valais
+ *
  */
+
 package gui.resultsView;
 
+import entity.Model;
 import gui.AbstractComponentPanel;
 import gui.State;
-import form.Model;
 
 /**
  *
@@ -16,7 +34,7 @@ import form.Model;
 public class ResultsPanel extends AbstractComponentPanel {
 
     private int currentModelIndex = 0;
-    
+
     /**
      * Creates new form ResultsPanel
      */
@@ -29,7 +47,7 @@ public class ResultsPanel extends AbstractComponentPanel {
      */
     public void applyRestrictions() {
         switch(getState()) {
-            case EDIT_SINGLE : 
+            case EDIT_SINGLE :
                 // impossible
                 break;
             case EDIT_MULTIPLE :
@@ -39,11 +57,11 @@ public class ResultsPanel extends AbstractComponentPanel {
                 jButtonNext.setEnabled(false);
                 jButtonPrevious.setEnabled(false);
                 break;
-            case FIRST_RESULT : 
+            case FIRST_RESULT :
                 jButtonNext.setEnabled(true);
                 jButtonPrevious.setEnabled(false);
                 break;
-            case INTER_RESULT : 
+            case INTER_RESULT :
                 jButtonNext.setEnabled(true);
                 jButtonPrevious.setEnabled(true);
                 break;
@@ -51,11 +69,11 @@ public class ResultsPanel extends AbstractComponentPanel {
                 jButtonNext.setEnabled(false);
                 jButtonPrevious.setEnabled(true);
                 break;
-            default : 
+            default :
                 System.out.println("Undefined action set for the state : " + getState());
         }
     }
-    
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -78,21 +96,24 @@ public class ResultsPanel extends AbstractComponentPanel {
 
         jButtonEditor.setText("Retour en édition");
         jButtonEditor.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButtonEditorActionPerformed(evt);
             }
         });
 
         jButtonPrevious.setText("Précédent");
         jButtonPrevious.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButtonPreviousActionPerformed(evt);
             }
         });
 
         jButtonNext.setText("Suivant");
         jButtonNext.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButtonNextActionPerformed(evt);
             }
         });
@@ -165,7 +186,7 @@ public class ResultsPanel extends AbstractComponentPanel {
                     getFrame().setViewToEditor();
                 }
                 break;
-            case INTER_RESULT : 
+            case INTER_RESULT :
                 if(getFrame().getNumberOfFormulas() > 1) {
                     setState(State.EDIT_MULTIPLE);
                     getFrame().setViewToEditor();
@@ -183,7 +204,7 @@ public class ResultsPanel extends AbstractComponentPanel {
                     getFrame().setViewToEditor();
                 }
                 break;
-            default : 
+            default :
                 System.out.println("Undefined action set for the state : " + getState());
         }
         getFrame().setViewToEditor();
@@ -220,7 +241,7 @@ public class ResultsPanel extends AbstractComponentPanel {
                 sinon à INTER_RESULT
                 */
                 break;
-            default : 
+            default :
                 System.out.println("Undefined action set for the state : " + getState());
         }
     }//GEN-LAST:event_jButtonPreviousActionPerformed
@@ -258,7 +279,7 @@ public class ResultsPanel extends AbstractComponentPanel {
             case LAST_RESULT :
                 // interdit
                 break;
-            default : 
+            default :
                 System.out.println("Undefined action set for the state : " + getState());
         }
     }//GEN-LAST:event_jButtonNextActionPerformed
