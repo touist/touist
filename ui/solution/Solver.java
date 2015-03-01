@@ -6,7 +6,6 @@
 package solution;
 
 import java.io.IOException;
-import java.util.Map;
 
 /**
  * A sub-class must implement Solver. The inherited class allows the user to
@@ -18,29 +17,9 @@ import java.util.Map;
  * @modified Maël
  */
 public abstract class Solver {
-	private String dimacsFilePath;
-	private Map<Integer, String> literalsMap; // "table de correspondance"
 
-	/**
-	 * This constructor is useful when the user wants to solve a problem without
-	 * using a "literalsMap" ("table de correspondance"). Hence the user has
-	 * only to pass a DIMACS file path.
-	 * @param dimacsFilePath
-	 */
-	public Solver(String dimacsFilePath) {
-		this.dimacsFilePath = dimacsFilePath;
-		this.literalsMap = null;
-	}
-
-	/**
-	 * This is the main constructor used by the user after he translated the
-	 * BIGAND file to a DIMACS file (and the "literalsMap" associated).
-	 * @param dimacsFilePath the DIMACS file
-	 * @param literalsMap the "literals map" ("table de correspondance")
-	 */
-	public Solver(String dimacsFilePath, Map<Integer, String> literalsMap) {
-		this.dimacsFilePath = dimacsFilePath;
-		this.literalsMap = literalsMap;
+	public Solver() {
+		super();
 	}
 
 	/**
@@ -50,7 +29,7 @@ public abstract class Solver {
 	 * @return the iterable Models instance.
 	 * @throws IOException
 	 */
-	public abstract Models launch() throws IOException;
+	public abstract void launch() throws IOException;
 
 	/**
 	 * Kills the solver program process
@@ -58,10 +37,19 @@ public abstract class Solver {
 	public abstract void close();
 
 	/**
+	 * Gives the list of models on which the user can iterate. The only way to
+	 * get the "next" models is to iterate. The size of Models is not known
+	 * unless hasNext() returns false.
+	 * Use this method after using launch().
+	 * @return the models
+	 */
+	public abstract Models getModels();
+
+	/**
 	 * ONLY used by ModelsIterator
-	 * @return null if no more model (or if not satisfiable)
 	 * @throws IOException
 	 */
+
 	protected abstract Model nextModel() throws IOException;
 
 	/**
@@ -72,12 +60,4 @@ public abstract class Solver {
 	 * solver (an integer).
 	 */
 	protected abstract Model parseModel(String[] rawModelOutput);
-
-	protected String getDimacsFilePath() {
-		return dimacsFilePath;
-	}
-
-	protected Map<Integer, String> getLiteralsMap() {
-		return literalsMap;
-	}
 }
