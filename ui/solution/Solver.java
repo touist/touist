@@ -5,8 +5,9 @@
  */
 package solution;
 
-import Entity.Model;
 import java.io.IOException;
+
+import entity.Model;
 
 /**
  * A sub-class must implement Solver. The inherited class allows the user to
@@ -44,7 +45,7 @@ public abstract class Solver {
 	 * Use this method after using launch().
 	 * @return the models
 	 */
-	public abstract Models getModels();
+	public abstract ModelList getModels();
 
 	/**
 	 * ONLY used by ModelsIterator

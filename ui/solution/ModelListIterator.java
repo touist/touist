@@ -5,12 +5,13 @@
  */
 package solution;
 
-import Entity.Model;
 import java.io.IOException;
 import java.util.List;
 import java.util.ListIterator;
 
-public class ModelsIterator implements ListIterator<Model> {
+import entity.Model;
+
+public class ModelListIterator implements ListIterator<Model> {
 	private Solver solverInterface;
 	private List<Model> models;
 	private int currentPosition;
@@ -20,7 +21,7 @@ public class ModelsIterator implements ListIterator<Model> {
 	 * @param solverInterface The instance of Solver that produces the new
 	 * Model-s
 	 */
-	public ModelsIterator(List<Model> models, Solver solverInterface) {
+	public ModelListIterator(List<Model> models, Solver solverInterface) {
 		super();
 		this.models = models;
 		this.solverInterface = solverInterface;
