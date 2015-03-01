@@ -8,7 +8,7 @@ package gui.editorView;
 import gui.AbstractComponentPanel;
 import gui.State;
 import javax.swing.JFileChooser;
-import solution.Model;
+import form.Model;
 
 /**
  *

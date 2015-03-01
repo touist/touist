@@ -5,6 +5,8 @@
  */
 package solution;
 
+import Entity.Model;
+import Entity.Literal;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -131,13 +133,15 @@ public class SolverTestSAT4J extends Solver {
 	protected Model parseModel(String[] rawModelOutput) {
 		// TODO The parser should be able to handle the "-3" (negation)
 		Model model = new Model();
+                System.out.println("je rentre parser"+ rawModelOutput);
 		for (String rawLiteral : rawModelOutput) {
 			// TODO add comments
 			if (getLiteralsMap() != null) {
-				model.addLiteral(getLiteralsMap().get(
-						Integer.parseInt(rawLiteral)));
+				
+                            model.addLiteral(new Literal(getLiteralsMap().get(
+						Integer.parseInt(rawLiteral)),Integer.parseInt(rawLiteral)>0));
 			} else {
-				model.addLiteral(rawLiteral);
+				model.addLiteral(new Literal(rawLiteral));
 			}
 		}
 		return model;
@@ -161,7 +165,7 @@ public class SolverTestSAT4J extends Solver {
 
 	public static void main(String[] args) {
 		// String pathToDimacs = "MiniSat/term1_gr_2pin_w4.shuffled.cnf";
-		String pathToDimacs = "MiniSat/essai.cnf";
+		String pathToDimacs = "essai.cnf";
 		SolverTestSAT4J solverInterface = new SolverTestSAT4J(
 				pathToDimacs);
 		try {
@@ -184,7 +188,6 @@ public class SolverTestSAT4J extends Solver {
 
 		while (it.hasNext() && continuer) {
 			m = it.next();
-
 			System.out.println("Modèle : " + m.toString());
 
 			System.out.println("Contiuner ? o/n");

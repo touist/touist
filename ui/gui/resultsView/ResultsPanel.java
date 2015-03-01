@@ -7,7 +7,7 @@ package gui.resultsView;
 
 import gui.AbstractComponentPanel;
 import gui.State;
-import solution.Model;
+import form.Model;
 
 /**
  *

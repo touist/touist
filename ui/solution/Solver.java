@@ -5,6 +5,7 @@
  */
 package solution;
 
+import Entity.Model;
 import java.io.IOException;
 
 /**
