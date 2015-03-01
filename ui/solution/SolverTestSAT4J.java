@@ -14,40 +14,31 @@ import java.io.PrintWriter;
 import java.util.Map;
 
 /**
- * This class
- * - launches the solver program with the DIMACS input
- * - if this DIMACS is satisfiable, gives an iterable Models
- * - gives a way to get the next Model and do the translation with the
- * literalsMap (DIMACS integers to literal names)
+ * This class is a first implementation of the "Solver" abstract class. It
+ * allows the user to use the "sat4j-sat.jar" program that Abdel prepared for
+ * testing purpose.
  *
  * the next model.
  * @author Abdel
  */
-public class Solver {
+public class SolverTestSAT4J extends Solver {
 	private Process p;
 	private PrintWriter out;
-	private String dimacsFilePath;
-	private Map<Integer, String> literalsMap;
 
-	public Solver(String dimacsFilePath) {
-		this.dimacsFilePath = dimacsFilePath;
-		this.literalsMap = null;
+	public SolverTestSAT4J(String dimacsFilePath) {
+		super(dimacsFilePath);
+		this.p = null;
+		this.out = null;
 	}
 
-	public Solver(String dimacsFilePath, Map<Integer, String> literalsMap) {
-		this.dimacsFilePath = dimacsFilePath;
-		this.literalsMap = literalsMap;
+	public SolverTestSAT4J(String dimacsFilePath,
+			Map<Integer, String> literalsMap) {
+		super(dimacsFilePath, literalsMap);
+		this.p = null;
+		this.out = null;
 	}
 
-	public Models launch() {
-		return null;
-	}
-
-	/**
-	 * ONLY used by ModelsIterator
-	 * @return null if no more model (or if not satisfiable)
-	 * @throws IOException
-	 */
+	@Override
 	protected Model nextModel() throws IOException {
 		out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(
 				p.getOutputStream())));
@@ -64,18 +55,13 @@ public class Solver {
 		return parseModel(br.toString().split(" "));
 	}
 
-	/**
-	 *
-	 * @param rawModelOutput The output
-	 * @return a model with, if a literalMap was given, the translated literal.
-	 * If no literalMap is given, the Model stores the literal as given by the
-	 * solver (an integer).
-	 */
-	private Model parseModel(String[] rawModelOutput) {
+	@Override
+	protected Model parseModel(String[] rawModelOutput) {
 		Model model = new Model();
 		for (String rawLiteral : rawModelOutput) {
-			if (literalsMap != null) {
-				model.addLiteral(literalsMap.get(Integer.parseInt(rawLiteral)));
+			if (getLiteralsMap() != null) {
+				model.addLiteral(getLiteralsMap().get(
+						Integer.parseInt(rawLiteral)));
 			} else {
 				model.addLiteral(rawLiteral);
 			}
@@ -83,15 +69,15 @@ public class Solver {
 		return model;
 	}
 
-	public Process start(String dimacsFilesPath) throws IOException {
+	@Override
+	public Models launch() throws IOException {
+		Models theIterableModels = new Models(this);
 		this.p = Runtime.getRuntime().exec(
-				"java -cp .:sat4j-sat.jar Minisat " + dimacsFilesPath);
-		return p;
+				"java -cp .:sat4j-sat.jar Minisat " + getDimacsFilePath());
+		return theIterableModels;
 	}
 
-	/**
-	 * Kills the solver program process
-	 */
+	@Override
 	public void close() {
 		out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(
 				p.getOutputStream())));
