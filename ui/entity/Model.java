@@ -5,31 +5,37 @@
  */
 package entity;
 
-import entity.Literal;
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  *
- * @author Skander
- * @Modified By Abdel
+ * @author Abdel
+ * @modified by Maël
  */
-public class Model {
+public class Model implements Iterable<Literal>{
 
-	// private StringBuffer br;
-	// Contain Literals item Valuated True and Satisfy Logical Problem.
-	public ArrayList<Literal> literals = new ArrayList<Literal>();
+	public List<Literal> literals = new ArrayList<Literal>();
 
-	public void addLiteral(Literal literalName) {
-		literals.add(literalName);
+	public void addLiteral(Literal literal) {
+		literals.add(literal);
 	}
 
 	@Override
 	public String toString() {
-		// TODO Skander, please write the proper toString
+		// TODO Please write a proper toString
 		String out = "";
 		for (Literal s : literals) {
 			out = out + " " + s.getLiteral();
 		}
 		return out;
 	}
+
+	@Override
+	public Iterator<Literal> iterator() {
+		return literals.iterator();
+	}
+
+
 }
