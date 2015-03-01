@@ -44,9 +44,10 @@ public abstract class Solver {
 	}
 
 	/**
-	 * Launch the solver program in background and check the satisfiability.
+	 * Launch the solver program in background. Does not check satisfiability
+	 * but waits for the ModelsIterator.hasNext() to retrieve the next model.
 	 * @param dimacsFilesPath The DIMACS file path
-	 * @return the iterable Models instance if satisfiable, null otherwise
+	 * @return the iterable Models instance.
 	 * @throws IOException
 	 */
 	public abstract Models launch() throws IOException;
