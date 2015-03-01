@@ -14,6 +14,7 @@ import java.io.PrintWriter;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.concurrent.TimeUnit;
 
 /**
  * This class is a first implementation of the "Solver" abstract class. It
@@ -25,35 +26,35 @@ import java.util.Scanner;
  */
 public class SolverTestSAT4J extends Solver {
 	private Process p;
-	private PrintWriter out;
+	private PrintWriter stdin;
+	private BufferedReader stderr;
+	private BufferedReader stdout;
+
 
 	public SolverTestSAT4J(String dimacsFilePath) {
 		super(dimacsFilePath);
 		this.p = null;
-		this.out = null;
+		this.stdin = null;
 	}
 
 	public SolverTestSAT4J(String dimacsFilePath,
 			Map<Integer, String> literalsMap) {
 		super(dimacsFilePath, literalsMap);
 		this.p = null;
-		this.out = null;
+		this.stdin = null;
 	}
 
 	@Override
 	protected Model nextModel() throws IOException {
-		out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(
-				p.getOutputStream())));
-		out.println("1");
-		out.flush();
-		out.close();
+		stdin.println("1");
+		stdin.flush();
+		stdin.close();
 		StringBuffer br = new StringBuffer();
-		BufferedReader reader = new BufferedReader(new InputStreamReader(
-				p.getInputStream()));
 		String line = "";
-		while ((line = reader.readLine()) != null) {
+		while ((line = stdout.readLine()) != null) {
 			br.append(line + "\n");
 		}
+
 		return parseModel(br.toString().split(" "));
 	}
 
@@ -73,18 +74,37 @@ public class SolverTestSAT4J extends Solver {
 
 	@Override
 	public Models launch() throws IOException {
+		// TODO We should be warned if the "java -cp" command fails because it
+		// can't find the files
 		Models theIterableModels = new Models(this);
-		this.p = Runtime.getRuntime().exec(
-				"java -cp .:sat4j-sat.jar Minisat " + getDimacsFilePath());
+		String command = "java -cp .:sat4j-sat.jar Minisat " + getDimacsFilePath();
+		this.p = Runtime.getRuntime().exec(command);
+		stderr = new BufferedReader(new InputStreamReader(p.getErrorStream()));
+		stdout = new BufferedReader(new InputStreamReader(p.getInputStream()));
+		stdin = new PrintWriter(new BufferedWriter(new OutputStreamWriter(
+				p.getOutputStream())));
+
+		System.out.println(stdout.readLine());
+		try {
+			if(p.waitFor(1, TimeUnit.SECONDS) && p.exitValue()==1) {
+				System.out.println(command);
+				System.out.println(stderr.readLine());
+			} else {
+				System.out.println("Le programme sat4j-sat.jar semble s'être lancé");
+			}
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+
 		return theIterableModels;
 	}
 
 	@Override
 	public void close() {
-		out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(
+		stdin = new PrintWriter(new BufferedWriter(new OutputStreamWriter(
 				p.getOutputStream())));
-		out.println("\n0");
-		out.close();
+		stdin.println("\n0");
+		stdin.close();
 		this.p.destroy();
 	}
 
