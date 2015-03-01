@@ -5,9 +5,10 @@
  */
 package gui.resultsView;
 
+import Entity.Model;
 import gui.AbstractComponentPanel;
 import gui.State;
-import form.Model;
+import solution.ModelsIterator;
 
 /**
  *
@@ -189,6 +190,22 @@ public class ResultsPanel extends AbstractComponentPanel {
         getFrame().setViewToEditor();
     }//GEN-LAST:event_jButtonEditorActionPerformed
 
+    /* 
+    Afficher le model précédent m
+    Si m est le premier
+    alors on passe à l'état FIRST_RESULT
+    sinon à INTER_RESULT
+    */
+    private State previousButtonHandler() {
+        Model m = ((ModelsIterator)getFrame().getModels().iterator()).previous();
+        jTextArea1.setText(m.toString());
+        if (((ModelsIterator)getFrame().getModels().iterator()).hasPrevious()) {
+            return State.INTER_RESULT;
+        } else {
+            return State.FIRST_RESULT;
+        }
+    }
+    
     private void jButtonPreviousActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonPreviousActionPerformed
         Model m;
         switch(getState()) {
@@ -205,26 +222,33 @@ public class ResultsPanel extends AbstractComponentPanel {
                 // interdit
                 break;
             case INTER_RESULT :
-                /* TODO
-                Afficher le model précédent m
-                Si m est le premier
-                alors on passe à l'état FIRST_RESULT
-                sinon à INTER_RESULT
-                */
+                setState(previousButtonHandler());
                 break;
             case LAST_RESULT :
-                /* TODO
-                Afficher le model précédent m
-                Si m est le premier
-                alors on passe à l'état FIRST_RESULT
-                sinon à INTER_RESULT
-                */
+                setState(previousButtonHandler());
                 break;
             default : 
                 System.out.println("Undefined action set for the state : " + getState());
         }
     }//GEN-LAST:event_jButtonPreviousActionPerformed
 
+    /* 
+    Affiche le model suivant m
+    si m est le dernier model de models (la liste des models calculés)
+    alors demander au solveur de chercher un autre model
+        si le solveur ne trouve pas, passe en état LAST_RESULT
+        sinon on passe en INTER_RESULT
+    */
+    private State nextButtonHandler() {
+        Model m = ((ModelsIterator)getFrame().getModels().iterator()).next();
+        jTextArea1.setText(m.toString());
+        if (getFrame().getModels().iterator().hasNext()){
+            return State.INTER_RESULT;
+        } else {
+            return State.LAST_RESULT;
+        }
+    }
+    
     private void jButtonNextActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonNextActionPerformed
         Model m;
         switch(getState()) {
@@ -238,22 +262,10 @@ public class ResultsPanel extends AbstractComponentPanel {
                 // interdit
                 break;
             case FIRST_RESULT :
-                /* TODO
-                Affiche le model suivant m
-                si m est le dernier model de models (la liste des models calculés)
-                alors demander au solveur de chercher un autre model
-                    si le solveur ne trouve pas, passe en état LAST_RESULT
-                    sinon on passe en INTER_RESULT
-                */
+                setState(nextButtonHandler());
                 break;
             case INTER_RESULT :
-                /* TODO
-                Affiche le model suivant m
-                si m est le dernier model de models (la liste des models calculés)
-                alors demander au solveur de chercher un autre model
-                    si le solveur ne trouve pas, passe en état LAST_RESULT
-                    sinon on passe en INTER_RESULT
-                */
+                setState(nextButtonHandler());
                 break;
             case LAST_RESULT :
                 // interdit

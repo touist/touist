@@ -10,8 +10,9 @@ import gui.editorView.EditorPanel;
 import java.awt.CardLayout;
 import javax.swing.JPanel;
 import solution.BaseDeClauses;
-import solution.Gestionnaire;
 import solution.Models;
+import solution.Solver;
+import translation.Translator;
 
 /**
  *
@@ -20,8 +21,9 @@ import solution.Models;
 public class MainFrame extends javax.swing.JFrame {
 
     private BaseDeClauses clause = new BaseDeClauses();
-    private Gestionnaire gestionnaire = new Gestionnaire();
-    private Models models = new Models();
+    private Translator translator = new Translator();
+    private Solver solver;
+    private Models models;
     
     public State state;
     
@@ -50,15 +52,25 @@ public class MainFrame extends javax.swing.JFrame {
         return clause;
     }
 
-    public Gestionnaire getGestionnaire() {
-        return gestionnaire;
+    public Solver getSolver() {
+        return solver;
+    }
+
+    public void setSolver(Solver solver) {
+        this.solver = solver;
     }
 
     public Models getModels() {
         return models;
     }
 
-    
+    public void setModels(Models models) {
+        this.models = models;
+    }
+
+    public Translator getTranslator() {
+        return translator;
+    }
     
     public int getNumberOfFormulas() {
         return numberOfFormulas;
@@ -67,8 +79,6 @@ public class MainFrame extends javax.swing.JFrame {
     public void setNumberOfFormulas(int numberOfFormulas) {
         this.numberOfFormulas = numberOfFormulas;
     }
-    
-    
     
     public void setViewToEditor() {
         ((CardLayout)cards.getLayout()).show(cards, EDITOR_PANEL);
