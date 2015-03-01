@@ -25,6 +25,10 @@ public class Model {
 	@Override
 	public String toString() {
 		// TODO Skander, please write the proper toString
-		return literals.toString();
+		String out = "";
+		for (String s : literals) {
+			out = out + " " + s;
+		}
+		return out;
 	}
 }
