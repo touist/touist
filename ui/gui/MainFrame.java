@@ -19,9 +19,9 @@ import solution.Models;
  */
 public class MainFrame extends javax.swing.JFrame {
 
-    private BaseDeClauses clause;
-    private Gestionnaire gestionnaire;
-    private Models models;
+    private BaseDeClauses clause = new BaseDeClauses();
+    private Gestionnaire gestionnaire = new Gestionnaire();
+    private Models models = new Models();
     
     public State state;
     
@@ -46,6 +46,20 @@ public class MainFrame extends javax.swing.JFrame {
         initComponents();
     }
 
+    public BaseDeClauses getClause() {
+        return clause;
+    }
+
+    public Gestionnaire getGestionnaire() {
+        return gestionnaire;
+    }
+
+    public Models getModels() {
+        return models;
+    }
+
+    
+    
     public int getNumberOfFormulas() {
         return numberOfFormulas;
     }

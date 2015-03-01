@@ -7,6 +7,8 @@ package gui.editorView;
 
 import gui.AbstractComponentPanel;
 import gui.State;
+import javax.swing.JFileChooser;
+import solution.Model;
 
 /**
  *
@@ -55,6 +57,7 @@ public class EditorPanel extends AbstractComponentPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jFileChooser1 = new javax.swing.JFileChooser();
         jButtonTest = new javax.swing.JButton();
         jButtonImport = new javax.swing.JButton();
         jSplitPane1 = new javax.swing.JSplitPane();
@@ -73,6 +76,11 @@ public class EditorPanel extends AbstractComponentPanel {
         });
 
         jButtonImport.setText("Importer");
+        jButtonImport.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonImportActionPerformed(evt);
+            }
+        });
 
         jLabel1.setText("Formules");
 
@@ -165,17 +173,48 @@ public class EditorPanel extends AbstractComponentPanel {
         }
     }//GEN-LAST:event_jButtonAddFormulaActionPerformed
 
+    private void initResultsView() {
+        /* ancienne version a remplarer
+        try {
+            //Chargement du solveur avec les fichiers générés par le traducteur
+            getFrame().getGestionnaire().preparation(getFrame().getClause());            
+            //Calcul du premier model
+            getFrame().getModels().addModel(getFrame().getGestionnaire().computeModel());
+            //Vérification si le model est unique pour initialiser la vue resultats
+            Model m = getFrame().getGestionnaire().computeModel();
+            if(m == null) {
+                setState(State.SINGLE_RESULT);
+            } else {
+                getFrame().getModels().addModel(m);
+                if(getFrame().getModels().reachedEnd()) {
+                    setState(State.SINGLE_RESULT);
+                } else {
+                    setState(State.FIRST_RESULT);
+                }
+            }  
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        */
+        /* TODO
+        Faire appel au solveur avec les fichiers générés par le traducteur
+        calculer un model
+        Si un model suivant existe
+        alors passer a l'état FIRST_RESULT
+        sinon passer à l'état SINGLE_RESULT
+        */
+        setState(State.SINGLE_RESULT);
+    }
+    
     private void jButtonTestActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonTestActionPerformed
 
         switch(getState()) {
             case EDIT_SINGLE : 
-                //TODO trouver le nombre de solutions pour définir le bon état pour la vue résultats
-                setState(State.SINGLE_RESULT);
+                initResultsView();
                 getFrame().setViewToResults();
                 break;
             case EDIT_MULTIPLE :
-                //TODO trouver le nombre de solutions pour définir le bon état pour la vue résultats
-                setState(State.SINGLE_RESULT);
+                initResultsView();
                 getFrame().setViewToResults();
                 break;
             case SINGLE_RESULT :
@@ -195,12 +234,62 @@ public class EditorPanel extends AbstractComponentPanel {
         }
     }//GEN-LAST:event_jButtonTestActionPerformed
 
+    private void appelBaseDeClauseImport() {
+        String path = "";
+        jFileChooser1.setFileSelectionMode(JFileChooser.FILES_ONLY);
+        jFileChooser1.showDialog(this, "Importer fichier");
+        path = jFileChooser1.getSelectedFile().getPath();
+
+        try {
+            getFrame().getClause().uploadFile(path);
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+
+        //Réinitialisation des sets et des formules
+        formulaTablePanel1.removeAll();
+        for(int i=0; i<getFrame().getClause().getSets().size(); i++) {
+            formulaTablePanel1.add(new FormulaPanel(i, FormulaPanelType.SET, getFrame().getClause().getSets().get(i)));
+        }
+        for(int i=0; i<getFrame().getClause().getFormules().size(); i++) {
+            formulaTablePanel1.add(new FormulaPanel(i, FormulaPanelType.FORMULA, getFrame().getClause().getFormules().get(i)));
+        }
+    }
+    
+    private void jButtonImportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonImportActionPerformed
+        switch (getState()) {
+            case EDIT_SINGLE : 
+                setState(State.EDIT_SINGLE);
+                appelBaseDeClauseImport();
+                break;
+            case EDIT_MULTIPLE :
+                setState(State.EDIT_MULTIPLE);
+                appelBaseDeClauseImport();
+                break;
+            case SINGLE_RESULT :
+                // impossible
+                break;
+            case FIRST_RESULT : 
+                // impossible
+                break;
+            case INTER_RESULT : 
+                // impossible
+                break;
+            case LAST_RESULT :
+                // impossible
+                break;
+            default : 
+                System.out.println("Undefined action set for the state : " + getState());
+        }
+    }//GEN-LAST:event_jButtonImportActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private gui.editorView.FormulaTablePanel formulaTablePanel1;
     private javax.swing.JButton jButtonAddFormula;
     private javax.swing.JButton jButtonImport;
     private javax.swing.JButton jButtonTest;
+    private javax.swing.JFileChooser jFileChooser1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;
