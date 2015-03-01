@@ -20,10 +20,6 @@ public class Models implements Iterable<Model> {
 	private Solver solverInterface; // The solver that created this inst. of
 									// Models
 
-	// Models will operate on the Solver instance as the user calls hasNext()
-	// when
-	// iterating
-
 	/**
 	 * Create an instance of Models; you need to pass the Solver instance that
 	 * created this instance of Models because Models will call
@@ -52,6 +48,6 @@ public class Models implements Iterable<Model> {
 	 * @param fileName
 	 */
 	public void exportTo(String fileName) {
-		// TODO incrément 2
+		// TODO increment #2
 	}
 }
