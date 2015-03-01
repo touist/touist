@@ -63,7 +63,7 @@ public abstract class Solver {
 	 * Use this method after using launch().
 	 * @return the models
 	 */
-	public abstract ModelList getModels();
+	public abstract ModelList getModelList();
 
 	/**
 	 * ONLY used by ModelsIterator

@@ -87,6 +87,7 @@ public class SolverTestSAT4J extends Solver {
 
 	@Override
 	public void launch() throws IOException {
+		// TODO We should be able to re-use the Solver instance
 		// TODO We should be warned if the "java -cp" command fails because it
 		// can't find the files
 
@@ -120,7 +121,7 @@ public class SolverTestSAT4J extends Solver {
 	}
 
 	@Override
-	public ModelList getModels() {
+	public ModelList getModelList() {
 		return models;
 	}
 
@@ -189,7 +190,7 @@ public class SolverTestSAT4J extends Solver {
 			e.printStackTrace();
 		}
 
-		Iterator<Model> it = solverInterface.getModels().iterator();
+		Iterator<Model> it = solverInterface.getModelList().iterator();
 		if (it.hasNext()) {
 			System.out.println("Satisfiable");
 		} else {
