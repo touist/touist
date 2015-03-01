@@ -122,7 +122,7 @@ public class SolverTestSAT4J extends Solver {
 		StringBuffer br = new StringBuffer();
 		String line = "";
 		while ((line = stdout.readLine()) != null) {
-			br.append(line + "\n"); // XXX The \n goes into the parsing!
+			br.append(line);
 		}
 		return parseModel(br.toString().split(" "));
 	}
