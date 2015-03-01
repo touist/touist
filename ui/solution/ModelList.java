@@ -17,7 +17,7 @@ import entity.Model;
  * ModelsIterator.hasNext(), the Solver.nextModel() will be called and the next
  * model will be automatically retrieved.
  */
-public class Models implements Iterable<Model> {
+public class ModelList implements Iterable<Model> {
 	private List<Model> models = new ArrayList<Model>();
 	private Solver solverInterface; // The solver that created this inst. of
 									// Models
@@ -31,7 +31,7 @@ public class Models implements Iterable<Model> {
 	 *
 	 * @param solverThatProducesTheModels
 	 */
-	protected Models(Solver solverThatProducesTheModels) {
+	protected ModelList(Solver solverThatProducesTheModels) {
 		this.solverInterface = solverThatProducesTheModels;
 	}
 

@@ -11,7 +11,7 @@ import java.awt.CardLayout;
 import javax.swing.JPanel;
 import solution.BaseDeClauses;
 import solution.Gestionnaire;
-import solution.Models;
+import solution.ModelList;
 
 /**
  *
@@ -21,7 +21,7 @@ public class MainFrame extends javax.swing.JFrame {
 
     private BaseDeClauses clause = new BaseDeClauses();
     private Gestionnaire gestionnaire = new Gestionnaire();
-    private Models models = new Models();
+    private ModelList models = new ModelList();
     
     public State state;
     
@@ -54,7 +54,7 @@ public class MainFrame extends javax.swing.JFrame {
         return gestionnaire;
     }
 
-    public Models getModels() {
+    public ModelList getModels() {
         return models;
     }
 

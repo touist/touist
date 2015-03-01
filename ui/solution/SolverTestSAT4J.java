@@ -36,7 +36,7 @@ public class SolverTestSAT4J extends Solver {
 	private String dimacsFilePath;
 	private Map<Integer, String> literalsMap; // "table de correspondance"
 
-	private Models models;
+	private ModelList models;
 
 	/**
 	 * This is the main constructor used by the user after he translated the
@@ -50,7 +50,7 @@ public class SolverTestSAT4J extends Solver {
 		this.literalsMap = literalsMap;
 		this.p = null;
 		this.stdin = null;
-		models = new Models(this);
+		models = new ModelList(this);
 	}
 
 	/**
@@ -64,7 +64,7 @@ public class SolverTestSAT4J extends Solver {
 		this.literalsMap = null;
 		this.p = null;
 		this.stdin = null;
-		models = new Models(this);
+		models = new ModelList(this);
 	}
 
 	@Override
@@ -102,7 +102,7 @@ public class SolverTestSAT4J extends Solver {
 	}
 
 	@Override
-	public Models getModels() {
+	public ModelList getModels() {
 		return models;
 	}
 
