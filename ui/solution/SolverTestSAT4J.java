@@ -5,8 +5,6 @@
  */
 package solution;
 
-import Entity.Model;
-import Entity.Literal;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -17,6 +15,9 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
+
+import Entity.Literal;
+import Entity.Model;
 
 /**
  * This class is a first implementation of the "Solver" abstract class. It
@@ -81,9 +82,7 @@ public class SolverTestSAT4J extends Solver {
 		stdout = new BufferedReader(new InputStreamReader(p.getInputStream()));
 		stdin = new PrintWriter(new BufferedWriter(new OutputStreamWriter(
 				p.getOutputStream())));
-		if (stdout.ready()) {
-			System.out.println(stdout.readLine());
-		}
+
 		try {
 			// Here is a way to know if the solver program has been actually
 			// launched:
@@ -116,29 +115,31 @@ public class SolverTestSAT4J extends Solver {
 
 	@Override
 	protected Model nextModel() throws IOException {
-		stdin = new PrintWriter(new BufferedWriter(new OutputStreamWriter(
-		p.getOutputStream())));
-                stdin.println("1");
+		stdin.println("1");
 		stdin.flush();
 		StringBuffer br = new StringBuffer();
 		String line = "";
-		while (stdout.ready() && (line = stdout.readLine()) != null) {
-			br.append(line);
+		while (!stdout.ready()) {
+			try {
+				p.waitFor(100, TimeUnit.MILLISECONDS);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
 		}
-		return parseModel(br.toString().split(" "));
+		return parseModel(stdout.readLine().split(" "));
 	}
 
 	@Override
 	protected Model parseModel(String[] rawModelOutput) {
 		// TODO The parser should be able to handle the "-3" (negation)
 		Model model = new Model();
-                //System.out.println("je rentre parser"+ rawModelOutput[0]);
+		// System.out.println("je rentre parser"+ rawModelOutput[0]);
 		for (String rawLiteral : rawModelOutput) {
 			// TODO add comments
 			if (getLiteralsMap() != null) {
-				
-                            model.addLiteral(new Literal(getLiteralsMap().get(
-						Integer.parseInt(rawLiteral)),Integer.parseInt(rawLiteral)>0));
+				model.addLiteral(new Literal(getLiteralsMap().get(
+						Integer.parseInt(rawLiteral)), Integer
+						.parseInt(rawLiteral) > 0));
 			} else {
 				model.addLiteral(new Literal(rawLiteral));
 			}
@@ -165,14 +166,12 @@ public class SolverTestSAT4J extends Solver {
 	public static void main(String[] args) {
 		// String pathToDimacs = "MiniSat/term1_gr_2pin_w4.shuffled.cnf";
 		String pathToDimacs = "term1_gr_2pin_w4.shuffled.cnf";
-		SolverTestSAT4J solverInterface = new SolverTestSAT4J(
-				pathToDimacs);
+		SolverTestSAT4J solverInterface = new SolverTestSAT4J(pathToDimacs);
 		try {
 			solverInterface.launch();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-
 
 		Iterator<Model> it = solverInterface.getModels().iterator();
 		if (it.hasNext()) {
@@ -184,7 +183,6 @@ public class SolverTestSAT4J extends Solver {
 		String answer;
 		boolean continuer = true;
 		Model m;
-
 
 		while (it.hasNext() && continuer) {
 			m = it.next();
