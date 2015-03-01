@@ -5,101 +5,90 @@
  */
 package solution;
 
-import java.util.Collection;
-import java.util.Iterator;
+import java.io.IOException;
+import java.util.List;
 import java.util.ListIterator;
 
 
 public class ModelsIterator implements ListIterator<Model>{
     private Solver solverInterface;
-    private Collection<Model> models;
+    private List<Model> models;
+    private int currentPosition;
 
     /**
      * @param models The collection that comes from Models
      * @param solverInterface The instance of Solver that produces the new Model-s
      */
-    public ModelsIterator(Collection<Model> models, Solver solverInterface) {
+    public ModelsIterator(List<Model> models, Solver solverInterface) {
 	super();
 	this.models = models;
 	this.solverInterface = solverInterface;
+	currentPosition = -1;
     }
 
     @Override
     public boolean hasNext() {
-	Model m = solverInterface.computeModel();
-	if(m == null) {
-	    // No more models, we can end the translation program
-	    solverInterface.stop();
-	} else {
-
+	Model m = null;
+	try {
+	    m = solverInterface.nextModel();
+	} catch (IOException e) {
+	    e.printStackTrace();
 	}
-	return false;
+
+	if(m == null) { // No models left
+	    solverInterface.close();
+	} else {
+	    models.add(m);
+	}
+	return currentPosition+1 < models.size();
     }
 
 
     @Override
     public Model next() {
-	// TODO Auto-generated method stub
-	return null;
+	return models.get(++currentPosition);
     }
 
 
     @Override
     public boolean hasPrevious() {
-	// TODO Auto-generated method stub
-	return false;
+	return currentPosition > 0;
     }
 
 
     @Override
     public Model previous() {
-	// TODO Auto-generated method stub
-	return null;
+	return models.get(--currentPosition);
     }
 
 
     @Override
     public int nextIndex() {
-	// TODO Auto-generated method stub
-	return 0;
+	return ++currentPosition;
     }
 
 
     @Override
     public int previousIndex() {
-	// TODO Auto-generated method stub
-	return 0;
+	return --currentPosition;
     }
 
 
     @Override
     public void remove() {
-	// TODO Auto-generated method stub
-
+	models.remove(currentPosition);
     }
 
 
     @Override
-    public void set(Model e) {
-	// TODO Auto-generated method stub
-
+    public void set(Model m) {
+	models.set(currentPosition, m);
     }
 
 
     @Override
-    public void add(Model e) {
-	// TODO Auto-generated method stub
-
+    public void add(Model m) {
+	models.add(currentPosition,m);
     }
-
-
-    @Override
-    public Iterator<Model> iterator() {
-	// TODO Auto-generated method stub
-	return null;
-    }
-
-
-
 
 }
