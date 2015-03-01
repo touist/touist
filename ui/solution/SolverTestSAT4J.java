@@ -77,7 +77,10 @@ public class SolverTestSAT4J extends Solver {
 		// TODO We should be warned if the "java -cp" command fails because it
 		// can't find the files
 		Models theIterableModels = new Models(this);
-		String command = "java -cp .:sat4j-sat.jar Minisat " + getDimacsFilePath();
+
+		// ".:MiniSat:MiniSat/sat4j-sat.jar" is the search path for binaries (with "-cp" flag)
+		// "Minisat" is the name of the class
+		String command = "java -cp .:MiniSat:MiniSat/sat4j-sat.jar Minisat " + getDimacsFilePath();
 		this.p = Runtime.getRuntime().exec(command);
 		stderr = new BufferedReader(new InputStreamReader(p.getErrorStream()));
 		stdout = new BufferedReader(new InputStreamReader(p.getInputStream()));
