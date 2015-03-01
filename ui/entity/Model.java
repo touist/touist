@@ -3,9 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package Entity;
+package entity;
 
-import Entity.Literal;
+import entity.Literal;
 import java.util.ArrayList;
 
 /**
@@ -20,8 +20,7 @@ public class Model {
 	public ArrayList<Literal> literals = new ArrayList<Literal>();
 
 	public void addLiteral(Literal literalName) {
-		
-                literals.add(literalName);
+		literals.add(literalName);
 	}
 
 	@Override

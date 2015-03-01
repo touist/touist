@@ -16,8 +16,8 @@ import java.util.Map;
 import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
 
-import Entity.Literal;
-import Entity.Model;
+import entity.Literal;
+import entity.Model;
 
 /**
  * This class is a first implementation of the "Solver" abstract class. It

@@ -5,10 +5,11 @@
  */
 package solution;
 
-import Entity.Model;
 import java.io.IOException;
 import java.util.List;
 import java.util.ListIterator;
+
+import entity.Model;
 
 public class ModelsIterator implements ListIterator<Model> {
 	private Solver solverInterface;
