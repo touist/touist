@@ -86,12 +86,15 @@ public class SolverTestSAT4J extends Solver {
 		stdout = new BufferedReader(new InputStreamReader(p.getInputStream()));
 		stdin = new PrintWriter(new BufferedWriter(new OutputStreamWriter(
 				p.getOutputStream())));
-
-		System.out.println(stdout.readLine());
+		if(stdout.ready()) {
+			System.out.println(stdout.readLine());
+		}
 		try {
+			// Here is a way to know if the solver program has been actually launched:
 			if(p.waitFor(1, TimeUnit.SECONDS) && p.exitValue()==1) {
 				System.out.println(command);
-				System.out.println(stderr.readLine());
+				if(stdout.ready()) System.out.println(stdout.readLine());
+				if(stderr.ready()) System.out.println(stderr.readLine());
 			} else {
 				System.out.println("Le programme sat4j-sat.jar semble s'être lancé");
 			}
@@ -112,8 +115,9 @@ public class SolverTestSAT4J extends Solver {
 	}
 
 	public static void main(String[] args) {
-		SolverTestSAT4J solverInterfaceWrittenByAbdel = new SolverTestSAT4J(
-				"/Users/maelv/prog/touist/bin/term1_gr_2pin_w4.shuffled.cnf");
+		//String pathToDimacs = "MiniSat/term1_gr_2pin_w4.shuffled.cnf";
+		String pathToDimacs = "MiniSat/essai.cnf";
+		SolverTestSAT4J solverInterfaceWrittenByAbdel = new SolverTestSAT4J(pathToDimacs);
 		Models models = null;
 		try {
 			models = solverInterfaceWrittenByAbdel.launch();
@@ -133,9 +137,9 @@ public class SolverTestSAT4J extends Solver {
 		Model m;
 
 		while (it.hasNext() && continuer) {
-			System.out.println("Model : ");
 			m = it.next();
-			m.toString();
+
+			System.out.println("Modèle : " + m.toString());
 
 			System.out.println("Contiuner ? o/n");
 			answer = sc.nextLine();
