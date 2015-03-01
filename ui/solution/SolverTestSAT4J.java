@@ -151,15 +151,13 @@ public class SolverTestSAT4J extends Solver {
 	protected Model parseModel(String[] rawModelOutput) {
 		// TODO The parser should be able to handle the "-3" (negation)
 		Model model = new Model();
-		// System.out.println("je rentre parser"+ rawModelOutput[0]);
 		for (String rawLiteral : rawModelOutput) {
-			// TODO add comments
-			if (getLiteralsMap() != null) {
-				model.addLiteral(new Literal(getLiteralsMap().get(
-						Integer.parseInt(rawLiteral)), Integer
-						.parseInt(rawLiteral) > 0));
+			int intLiteral = Integer.parseInt(rawLiteral);
+			if (getLiteralsMap() != null) { // if no liretalsMap has been given
+				model.addLiteral(new Literal(getLiteralsMap().get(intLiteral),
+						intLiteral > 0));
 			} else {
-				model.addLiteral(new Literal(rawLiteral));
+				model.addLiteral(new Literal(rawLiteral, intLiteral > 0));
 			}
 		}
 		return model;
