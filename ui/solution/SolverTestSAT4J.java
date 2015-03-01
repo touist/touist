@@ -109,8 +109,6 @@ public class SolverTestSAT4J extends Solver {
 
 	@Override
 	public void close() {
-		stdin = new PrintWriter(new BufferedWriter(new OutputStreamWriter(
-				p.getOutputStream())));
 		stdin.println("\n0");
 		stdin.close();
 		this.p.destroy();
@@ -122,10 +120,9 @@ public class SolverTestSAT4J extends Solver {
 		p.getOutputStream())));
                 stdin.println("1");
 		stdin.flush();
-		stdin.close();
 		StringBuffer br = new StringBuffer();
 		String line = "";
-		while ((line = stdout.readLine()) != null) {
+		while (stdout.ready() && (line = stdout.readLine()) != null) {
 			br.append(line);
 		}
 		return parseModel(br.toString().split(" "));
@@ -187,6 +184,7 @@ public class SolverTestSAT4J extends Solver {
 		String answer;
 		boolean continuer = true;
 		Model m;
+
 
 		while (it.hasNext() && continuer) {
 			m = it.next();
