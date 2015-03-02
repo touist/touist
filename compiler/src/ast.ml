@@ -28,6 +28,7 @@ and exp =
   | ClauseExp of clause_exp
   | ListExp   of list_exp
   | Dot       of set_exp * arith_exp
+  | If        of bool_exp * exp * exp
 and arith_exp =
   | Int      of int
   | Float    of float

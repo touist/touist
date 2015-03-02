@@ -93,6 +93,11 @@ and eval_exp = function
             with Not_found -> failwith "element " ^ b ^ " not in set " ^ x
         | _,_ -> type_error "unsupported types for '.' operator"
       end
+  | If (x, y, z) ->
+      if (eval_bool x) then
+        eval_exp y
+      else
+        eval_exp z
 
 and eval_arith = function
   | Int   _ as i -> i
