@@ -1,31 +1,12 @@
 /*
- *
- * Project TouIST, 2015. Easily formalize and solve real-world sized problems
- * using propositional logic and linear theory of reals with a nice GUI.
- *
- * https://github.com/olzd/touist
- *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the GNU Lesser General Public License
- * (LGPL) version 2.1 which accompanies this distribution, and is available at
- * http://www.gnu.org/licenses/lgpl-2.1.html
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
- *
- * Contributors:
- *     Alexis Comte, Abdelwahab Heba, Olivier Lezaud,
- *     Skander Ben Slimane, Maël Valais
- *
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
  */
-
 package gui.editorView;
 
 import gui.AbstractComponentPanel;
 import gui.State;
-
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
@@ -34,7 +15,7 @@ import javax.swing.event.DocumentListener;
  * @author Skander
  */
 public class FormulaPanel extends AbstractComponentPanel {
-
+    
     private int id;
     private FormulaPanelType type = FormulaPanelType.FORMULA;
     private String old = "";
@@ -50,7 +31,7 @@ public class FormulaPanel extends AbstractComponentPanel {
         buttonGroup1.add(jRadioButtonSet);
         jRadioButtonFormula.setSelected(true);
     }
-
+    
     public FormulaPanel(int id) {
         initComponents();
         setId(id);
@@ -60,7 +41,7 @@ public class FormulaPanel extends AbstractComponentPanel {
         addListenerToTextField();
         jRadioButtonFormula.setSelected(true);
     }
-
+    
     public FormulaPanel(int id, FormulaPanelType type, String str) {
         initComponents();
         setId(id);
@@ -71,10 +52,10 @@ public class FormulaPanel extends AbstractComponentPanel {
         addListenerToTextField();
         if(type == FormulaPanelType.FORMULA)
             jRadioButtonFormula.setSelected(true);
-        else
+        else 
             jRadioButtonSet.setSelected(true);
     }
-
+    
     /**
      * Reset the panel id.
      * @param id The new id.
@@ -87,7 +68,7 @@ public class FormulaPanel extends AbstractComponentPanel {
     public FormulaPanelType getType() {
         return type;
     }
-
+    
     /**
      * Disable the formula panel's delete button.
      */
@@ -102,10 +83,10 @@ public class FormulaPanel extends AbstractComponentPanel {
     public boolean isTextFieldFocusOwner() {
         return jTextField1.isFocusOwner();
     }
-
+    
     /**
      * Insert text at the caret position in the textfield.
-     * @param text
+     * @param text 
      */
     public void insertAtCaret(String text) {
         String newText = jTextField1.getText().substring(0, jTextField1.getCaretPosition())
@@ -113,7 +94,7 @@ public class FormulaPanel extends AbstractComponentPanel {
                 + jTextField1.getText().substring(jTextField1.getCaretPosition());
         jTextField1.setText(newText);
     }
-
+    
     /**
      * Set the error message.
      * @param message String describing the error.
@@ -121,7 +102,7 @@ public class FormulaPanel extends AbstractComponentPanel {
     public void setErrorMessage(String message) {
         jLabelErrorMessage.setText(message);
     }
-
+    
     /**
      * Return the text of the JTextField.
      * @return the text of the JTextField.
@@ -129,9 +110,9 @@ public class FormulaPanel extends AbstractComponentPanel {
     public String getText() {
         return jTextField1.getText();
     }
-
-
-
+    
+    
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -151,8 +132,7 @@ public class FormulaPanel extends AbstractComponentPanel {
 
         jButtonRemoveFormula.setText("Supprimer");
         jButtonRemoveFormula.addActionListener(new java.awt.event.ActionListener() {
-            @Override
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButtonRemoveFormulaActionPerformed(evt);
             }
         });
@@ -165,16 +145,14 @@ public class FormulaPanel extends AbstractComponentPanel {
 
         jRadioButtonFormula.setText("Formule");
         jRadioButtonFormula.addActionListener(new java.awt.event.ActionListener() {
-            @Override
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jRadioButtonFormulaActionPerformed(evt);
             }
         });
 
         jRadioButtonSet.setText("Set");
         jRadioButtonSet.addActionListener(new java.awt.event.ActionListener() {
-            @Override
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jRadioButtonSetActionPerformed(evt);
             }
         });
@@ -219,7 +197,7 @@ public class FormulaPanel extends AbstractComponentPanel {
 
     private void jButtonRemoveFormulaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonRemoveFormulaActionPerformed
         switch(getState()) {
-            case EDIT_SINGLE :
+            case EDIT_SINGLE : 
                 // interdit
                 break;
             case EDIT_MULTIPLE :
@@ -234,16 +212,16 @@ public class FormulaPanel extends AbstractComponentPanel {
             case SINGLE_RESULT :
                 // impossible
                 break;
-            case FIRST_RESULT :
+            case FIRST_RESULT : 
                 // impossible
                 break;
-            case INTER_RESULT :
+            case INTER_RESULT : 
                 // impossible
                 break;
             case LAST_RESULT :
                 // impossible
                 break;
-            default :
+            default : 
                 System.out.println("Undefined action set for the state : " + getState());
         }
     }//GEN-LAST:event_jButtonRemoveFormulaActionPerformed
@@ -286,7 +264,7 @@ public class FormulaPanel extends AbstractComponentPanel {
             }
         });
     }
-
+    
     public void textFieldTextUpdate() {
         ((FormulaTablePanel)getParent()).formulaPanelContentUpdate();
     }

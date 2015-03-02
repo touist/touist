@@ -1,32 +1,18 @@
 /*
- *
- * Project TouIST, 2015. Easily formalize and solve real-world sized problems
- * using propositional logic and linear theory of reals with a nice GUI.
- *
- * https://github.com/olzd/touist
- *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the GNU Lesser General Public License
- * (LGPL) version 2.1 which accompanies this distribution, and is available at
- * http://www.gnu.org/licenses/lgpl-2.1.html
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
- *
- * Contributors:
- *     Alexis Comte, Abdelwahab Heba, Olivier Lezaud,
- *     Skander Ben Slimane, Maël Valais
- *
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
  */
-
 package gui.editorView;
 
+import Entity.Model;
 import gui.AbstractComponentPanel;
 import gui.State;
-
+import java.util.Iterator;
+import java.util.ListIterator;
 import javax.swing.JFileChooser;
+import solution.ModelsIterator;
+import solution.SolverTestSAT4J;
 
 /**
  *
@@ -39,11 +25,12 @@ public class EditorPanel extends AbstractComponentPanel {
      */
     public EditorPanel() {
         initComponents();
+        //commentaire de test
     }
-
+    
     private void applyRestrictions() {
         switch (getState()) {
-            case EDIT_SINGLE :
+            case EDIT_SINGLE : 
                 formulaTablePanel1.allowRemoval(false);
                 break;
             case EDIT_MULTIPLE :
@@ -52,16 +39,16 @@ public class EditorPanel extends AbstractComponentPanel {
             case SINGLE_RESULT :
                 // impossible
                 break;
-            case FIRST_RESULT :
+            case FIRST_RESULT : 
                 // impossible
                 break;
-            case INTER_RESULT :
+            case INTER_RESULT : 
                 // impossible
                 break;
             case LAST_RESULT :
                 // impossible
                 break;
-            default :
+            default : 
                 System.out.println("Undefined action set for the state : " + getState());
         }
     }
@@ -88,16 +75,14 @@ public class EditorPanel extends AbstractComponentPanel {
 
         jButtonTest.setText("Tester");
         jButtonTest.addActionListener(new java.awt.event.ActionListener() {
-            @Override
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButtonTestActionPerformed(evt);
             }
         });
 
         jButtonImport.setText("Importer");
         jButtonImport.addActionListener(new java.awt.event.ActionListener() {
-            @Override
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButtonImportActionPerformed(evt);
             }
         });
@@ -106,8 +91,7 @@ public class EditorPanel extends AbstractComponentPanel {
 
         jButtonAddFormula.setText("Ajouter");
         jButtonAddFormula.addActionListener(new java.awt.event.ActionListener() {
-            @Override
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButtonAddFormulaActionPerformed(evt);
             }
         });
@@ -167,7 +151,7 @@ public class EditorPanel extends AbstractComponentPanel {
     private void jButtonAddFormulaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonAddFormulaActionPerformed
         // TODO add your handling code here:
         switch(getState()) {
-            case EDIT_SINGLE :
+            case EDIT_SINGLE : 
                 setState(State.EDIT_MULTIPLE);
                 formulaTablePanel1.addFormula();
                 applyRestrictions();
@@ -180,43 +164,21 @@ public class EditorPanel extends AbstractComponentPanel {
             case SINGLE_RESULT :
                 // impossible
                 break;
-            case FIRST_RESULT :
+            case FIRST_RESULT : 
                 // impossible
                 break;
-            case INTER_RESULT :
+            case INTER_RESULT : 
                 // impossible
                 break;
             case LAST_RESULT :
                 // impossible
                 break;
-            default :
+            default : 
                 System.out.println("Undefined action set for the state : " + getState());
         }
     }//GEN-LAST:event_jButtonAddFormulaActionPerformed
 
-    private void initResultsView() {
-        /* ancienne version a remplarer
-        try {
-            //Chargement du solveur avec les fichiers générés par le traducteur
-            getFrame().getGestionnaire().preparation(getFrame().getClause());
-            //Calcul du premier model
-            getFrame().getModels().addModel(getFrame().getGestionnaire().computeModel());
-            //Vérification si le model est unique pour initialiser la vue resultats
-            Model m = getFrame().getGestionnaire().computeModel();
-            if(m == null) {
-                setState(State.SINGLE_RESULT);
-            } else {
-                getFrame().getModels().addModel(m);
-                if(getFrame().getModels().reachedEnd()) {
-                    setState(State.SINGLE_RESULT);
-                } else {
-                    setState(State.FIRST_RESULT);
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        */
+    private State initResultsView() {
         /* TODO
         Faire appel au solveur avec les fichiers générés par le traducteur
         calculer un model
@@ -224,33 +186,55 @@ public class EditorPanel extends AbstractComponentPanel {
         alors passer a l'état FIRST_RESULT
         sinon passer à l'état SINGLE_RESULT
         */
-        setState(State.SINGLE_RESULT);
+        String bigAndFilePath = "bigAndFile-defaultname.txt"; //TODO se mettre d'accord sur un nom standard ou ajouter a Translator et BaseDeClause des méthode pour s'échange de objets File
+        getFrame().getClause().saveToFile(bigAndFilePath); //TODO gérer les IOException
+        getFrame().getTranslator().translate(bigAndFilePath); //TODO gérer les erreurs : return false ou IOException
+        
+        String translatedFilePath = getFrame().getTranslator().getDimacsFilePath();
+        getFrame().setSolver(new SolverTestSAT4J(translatedFilePath));
+        getFrame().getSolver().launch(); //TODO gérer les IOException
+        
+        // Si il y a au moins un model
+        ListIterator<Model> iter = (ListIterator<Model>) getFrame().getSolver().getModels().iterator();
+        if (iter.hasNext()) {
+            // Si il plus d'un model
+            iter.next();
+            if (iter.hasNext()) {
+                iter.previous();
+                return State.FIRST_RESULT;
+            } else {
+                iter.previous();
+                return State.SINGLE_RESULT;
+            }
+        } else {
+            return State.SINGLE_RESULT;
+        }
     }
-
+    
     private void jButtonTestActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonTestActionPerformed
 
         switch(getState()) {
-            case EDIT_SINGLE :
-                initResultsView();
+            case EDIT_SINGLE : 
+                setState(initResultsView());
                 getFrame().setViewToResults();
                 break;
             case EDIT_MULTIPLE :
-                initResultsView();
+                setState(initResultsView());
                 getFrame().setViewToResults();
                 break;
             case SINGLE_RESULT :
                 // impossible
                 break;
-            case FIRST_RESULT :
+            case FIRST_RESULT : 
                 // impossible
                 break;
-            case INTER_RESULT :
+            case INTER_RESULT : 
                 // impossible
                 break;
             case LAST_RESULT :
                 // impossible
                 break;
-            default :
+            default : 
                 System.out.println("Undefined action set for the state : " + getState());
         }
     }//GEN-LAST:event_jButtonTestActionPerformed
@@ -276,10 +260,10 @@ public class EditorPanel extends AbstractComponentPanel {
             formulaTablePanel1.add(new FormulaPanel(i, FormulaPanelType.FORMULA, getFrame().getClause().getFormules().get(i)));
         }
     }
-
+    
     private void jButtonImportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonImportActionPerformed
         switch (getState()) {
-            case EDIT_SINGLE :
+            case EDIT_SINGLE : 
                 setState(State.EDIT_SINGLE);
                 appelBaseDeClauseImport();
                 break;
@@ -290,16 +274,16 @@ public class EditorPanel extends AbstractComponentPanel {
             case SINGLE_RESULT :
                 // impossible
                 break;
-            case FIRST_RESULT :
+            case FIRST_RESULT : 
                 // impossible
                 break;
-            case INTER_RESULT :
+            case INTER_RESULT : 
                 // impossible
                 break;
             case LAST_RESULT :
                 // impossible
                 break;
-            default :
+            default : 
                 System.out.println("Undefined action set for the state : " + getState());
         }
     }//GEN-LAST:event_jButtonImportActionPerformed
