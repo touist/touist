@@ -1,41 +1,31 @@
-(* type a modifier pour coller avec l'AST
- * utilisé pour implémenter l'algo de transformation en CNF puis DIMACS
- * et pour les tests
- *)
-
-type t =
-  | T
-  | F
-  | Term    of string
-  | And     of (t * t)
-  | Or      of (t * t)
-  | Xor     of (t * t)
-  | Not     of t
-  | Implies of (t * t)
-  | Equiv   of (t * t)
+open Ast
 
 let to_cnf p =
   let rec remove_impl = function
-    | T | F | Term _ as x -> x
+    | Top -> Top
+    | Bottom -> Bottom
+    | Term _ as x -> x
     | Not     x      -> Not (remove_impl x)
     | And     (x, y) -> And (remove_impl x, remove_impl y)
     | Or      (x, y) -> Or (remove_impl x, remove_impl y)
     | Xor     (x, y) -> Xor (remove_impl x, remove_impl y)
     | Implies (x, y) -> Or (Not (remove_impl x), remove_impl y)
     | Equiv   (x, y) -> Not (Xor (remove_impl x, remove_impl y))
+    | Bigand _ | Bigor _ -> failwith "all bigor and bigand should have been eliminated"
   in
   let rec remove_xor = function
-    | T | F | Term _ as x -> x
+    | Top | Bottom | Term _ as x -> x
     | Not  x      -> Not (remove_xor x)
     | And  (x, y) -> And (remove_xor x, remove_xor y)
     | Or   (x, y) -> Or (remove_xor x, remove_xor y)
     | Xor  (x, y) -> And (Or (remove_xor x, remove_xor y), Not (And (remove_xor x, remove_xor y)))
     | Implies _ | Equiv _ -> failwith "there shouldn't be any implies/equiv left"
+    | Bigand _ | Bigor _  -> failwith "all bigor and bigand should have been eliminated"
   in
   let rec push_neg_in = function
-    | T | F | Term _ as x -> x
-    | Not  T              -> F
-    | Not  F              -> T
+    | Top | Bottom | Term _ as x -> x
+    | Not  Top            -> Bottom
+    | Not  Bottom         -> Top
     | Not  (Not x)        -> push_neg_in x
     | Not  (And (x, y))   -> Or (push_neg_in (Not x), push_neg_in (Not y))
     | Not  (Or (x, y))    -> And (push_neg_in (Not x), push_neg_in (Not y))
@@ -44,9 +34,10 @@ let to_cnf p =
     | Or   (x, y)         -> Or (push_neg_in x, push_neg_in y)
     | Xor     _           -> failwith "there shouldn't be any xors left"
     | Implies _ | Equiv _ -> failwith "there shouldn't be any implies/equiv left"
+    | Bigand _ | Bigor _  -> failwith "all bigor and bigand should have been eliminated"
   in
   let rec push_disj_in = function
-    | T | F | Term _ as x    -> x
+    | Top | Bottom | Term _ as x    -> x
     | Not  x                 -> Not (push_disj_in x)
     (*| Or   (x, And (y, z)) -> And (push_disj_in (Or (x, y)), push_disj_in (Or (x, y)))
     | Or   (And (x, y), z) -> And (push_disj_in (Or (x, z)), push_disj_in (Or (y, z)))
@@ -55,6 +46,7 @@ let to_cnf p =
     | And  (x, y)            -> And (push_disj_in x, push_disj_in y)
     | Xor     _           -> failwith "there shouldn't be any xors left"
     | Implies _ | Equiv _ -> failwith "there shouldn't be any implies left"
+    | Bigand _ | Bigor _  -> failwith "all bigor and bigand should have been eliminated"
   and dist x y =
     match x, y with
     | And (x, y), z -> And (push_disj_in (Or (x, z)), push_disj_in (Or (x, z)))
@@ -62,25 +54,25 @@ let to_cnf p =
     | x, y -> Or (push_disj_in x, push_disj_in y)
   in
   let rec simplify = function
-    | And (x, T) -> x
-    | And (T, x) -> x
-    | And (x, F) -> F
-    | And (F, x) -> F
-    | And (Not (Term x), Term y) as p -> if x = y then F else p
-    | And (Term x, Not (Term y)) as p -> if x = y then F else p
+    | And (x, Top) -> x
+    | And (Top, x) -> x
+    | And (x, Bottom) -> Bottom
+    | And (Bottom, x) -> Bottom
+    | And (Not (Term (x, None)), Term (y, None)) as p -> if x = y then Bottom else p
+    | And (Term (x, None), Not (Term (y, None))) as p -> if x = y then Bottom else p
     | And (x, y) -> if equal x y then simplify x else And (simplify x, simplify y)
-    | Or (x, T) -> T
-    | Or (T, x) -> T
-    | Or (x, F) -> x
-    | Or (F, x) -> x
-    | Or (Not (Term x), Term y) as p -> if x = y then T else p
-    | Or (Term x, Not (Term y)) as p -> if x = y then T else p
-    | Or (Or (Term x, y), Not (Term z)) as p -> if x = z then simplify y else p
-    | Or (Or (x, Term y), Not (Term z)) as p -> if y = z then simplify x else p
-    | Or (Or (Not (Term x), y), Term z) as p -> if x = z then simplify y else p
-    | Or (Or (x, Not (Term y)), Term z) as p -> if y = z then simplify x else p
-    | Or (Or (Term x, Not (Term y)), z) as p -> if x = y then simplify z else p
-    | Or (Or (Not (Term x), Term y), z) as p -> if x = y then simplify z else p
+    | Or (x, Top) -> Top
+    | Or (Top, x) -> Top
+    | Or (x, Bottom) -> x
+    | Or (Bottom, x) -> x
+    | Or (Not (Term (x, None)), Term (y, None)) as p -> if x = y then Top else p
+    | Or (Term (x, None), Not (Term (y, None))) as p -> if x = y then Top else p
+    | Or (Or (Term (x, None), y), Not (Term (z, None))) as p -> if x = z then simplify y else p
+    | Or (Or (x, Term (y, None)), Not (Term (z, None))) as p -> if y = z then simplify x else p
+    | Or (Or (Not (Term (x, None)), y), Term (z, None)) as p -> if x = z then simplify y else p
+    | Or (Or (x, Not (Term (y, None))), Term (z, None)) as p -> if y = z then simplify x else p
+    | Or (Or (Term (x, None), Not (Term (y, None))), z) as p -> if x = y then simplify z else p
+    | Or (Or (Not (Term (x, None)), Term (y, None)), z) as p -> if x = y then simplify z else p
     | Or (x, y) -> if equal x y then simplify x else Or (simplify x, simplify y)
     | x -> x
   and equal x y =
@@ -94,8 +86,9 @@ let to_dimacs prop =
   let table = Hashtbl.create 10
   and num_sym = ref 1 in
   let rec to_list = function
-    | Term x -> [gensym x]
-    | Not (Term x) -> [- (gensym x)]
+    | Term (x ,None) -> [gensym x]
+    | Term (x, _) -> failwith "unevaluated term"
+    | Not (Term (x, None)) -> [- (gensym x)]
     | And (x, y) -> (to_list x)@[0]@(to_list y)
     | Or (x, y) -> (to_list x)@(to_list y)
     | _ -> failwith "to_dimacs error"
@@ -110,7 +103,12 @@ let to_dimacs prop =
   in (to_list prop |> to_string) ^ "0", table
 
 let test () =
-  let p1 = Implies (And (Term "a", Term "b"), Implies (Or (And (Not (Term "a"),
-  Term "c"), Term "c"), Not (Term "a"))) in
-  to_cnf p1 |> to_dimacs
+  let p = Implies (And (Term ("a", None),
+                        Term ("b", None)),
+                   Implies (Or (And (Not (Term ("a", None)), Term ("c", None)),
+                                     Term ("c", None)),
+                                Not (Term ("a", None)))) in
+  let str, table = to_cnf p |> to_dimacs in
+  print_string str
 
+let () = test ()
