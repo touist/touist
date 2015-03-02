@@ -24,8 +24,8 @@
 package solution;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 
 import entity.Model;
 
@@ -59,7 +59,7 @@ public class ModelList implements Iterable<Model> {
 	 * list is built "on the fly", when the user uses ModelsIterator.hasNext().
 	 */
 	@Override
-	public Iterator<Model> iterator() {
+	public ListIterator<Model> iterator() {
 		return new ModelListIterator(models, solverInterface);
 	}
 
