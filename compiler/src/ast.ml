@@ -18,7 +18,7 @@ module GenSet = struct
 end
 
 type prog =
-  | Begin of affect list option * exp list
+  | Begin of affect list option * clause_exp list
 and affect =
   | Affect of string * exp
 and exp =
@@ -26,6 +26,8 @@ and exp =
   | SetExp    of set_exp
   | BoolExp   of bool_exp
   | ClauseExp of clause_exp
+  | ListExp   of list_exp
+  | Dot       of set_exp * arith_exp
 and arith_exp =
   | Int      of int
   | Float    of float
@@ -37,14 +39,15 @@ and arith_exp =
   | Sqrt     of arith_exp
   | To_int   of arith_exp
   | To_float of arith_exp
+  | Card     of set_exp
 and bool_exp =
   | Bool             of bool
   | Not              of bool_exp
-  | And              of bool_exp * bool_exp
-  | Or               of bool_exp * bool_exp
-  | Xor              of bool_exp * bool_exp
-  | Implies          of bool_exp * bool_exp
-  | Equiv            of bool_exp * bool_exp
+  | And              of bool_exp  * bool_exp
+  | Or               of bool_exp  * bool_exp
+  | Xor              of bool_exp  * bool_exp
+  | Implies          of bool_exp  * bool_exp
+  | Equiv            of bool_exp  * bool_exp
   | Equal            of arith_exp * arith_exp
   | Not_equal        of arith_exp * arith_exp
   | Lesser_than      of arith_exp * arith_exp
@@ -55,19 +58,18 @@ and bool_exp =
 and clause_exp =
   | Var     of string * arith_exp option
   | Not     of clause_exp
-  | And     of clause_exp * clause_exp
-  | Or      of clause_exp * clause_exp
-  | Xor     of clause_exp * clause_exp
-  | Implies of clause_exp * clause_exp
-  | Equiv   of clause_exp * clause_exp
-  | Bigand  of string list * set_exp list * clause_exp
-  | Bigor   of string list * set_exp list * clause_exp
+  | And     of clause_exp  * clause_exp
+  | Or      of clause_exp  * clause_exp
+  | Xor     of clause_exp  * clause_exp
+  | Implies of clause_exp  * clause_exp
+  | Equiv   of clause_exp  * clause_exp
+  | Bigand  of string list * set_exp list * exp
+  | Bigor   of string list * set_exp list * exp
 and set_exp =
   | Set   of GenSet.t
   | Union of set_exp * set_exp
   | Inter of set_exp * set_exp
   | Diff  of set_exp * set_exp
-  | Card  of set_exp
-  | Dot   of set_exp * arith_exp
+and list_exp =
+  | List  of int list 
   | Range of arith_exp * arith_exp
-
