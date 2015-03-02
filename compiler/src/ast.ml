@@ -18,46 +18,61 @@ module GenSet = struct
 end
 
 type prog =
-  | Begin of affect list option * clause_exp list
+  | Begin of affect list option * exp list
 and affect =
   | Affect of string * exp
 and exp =
-  | Scalar    of arith_exp
+  | Var       of string
+  | IntExp    of int_exp
+  | FloatExp  of float_exp
   | SetExp    of set_exp
   | BoolExp   of bool_exp
   | ClauseExp of clause_exp
   | ListExp   of list_exp
-  | Dot       of set_exp * arith_exp
+  | Dot       of set_exp * exp
   | If        of bool_exp * exp * exp
-and arith_exp =
-  | Int      of int
-  | Float    of float
-  | Add      of arith_exp * arith_exp
-  | Sub      of arith_exp * arith_exp
-  | Mul      of arith_exp * arith_exp
-  | Div      of arith_exp * arith_exp
-  | Mod      of arith_exp * arith_exp
-  | Sqrt     of arith_exp
-  | To_int   of arith_exp
-  | To_float of arith_exp
-  | Card     of set_exp
+and int_exp =
+  | IVar of string
+  | Int of int
+  | Add of int_exp * int_exp
+  | Sub of int_exp * int_exp
+  | Mul of int_exp * int_exp
+  | Div of int_exp * int_exp
+  | Mod of int_exp * int_exp
+  | To_int of float_exp
+and float_exp =
+  | FVar of string
+  | Float of float
+  | Add of float_exp * float_exp
+  | Sub of float_exp * float_exp
+  | Mul of float_exp * float_exp
+  | Div of float_exp * float_exp
+  | Sqrt of float_exp
+  | To_float of int_exp
 and bool_exp =
-  | Bool             of bool
-  | Not              of bool_exp
-  | And              of bool_exp  * bool_exp
-  | Or               of bool_exp  * bool_exp
-  | Xor              of bool_exp  * bool_exp
-  | Implies          of bool_exp  * bool_exp
-  | Equiv            of bool_exp  * bool_exp
-  | Equal            of arith_exp * arith_exp
-  | Not_equal        of arith_exp * arith_exp
-  | Lesser_than      of arith_exp * arith_exp
-  | Lesser_or_equal  of arith_exp * arith_exp
-  | Greater_than     of arith_exp * arith_exp
-  | Greater_or_equal of arith_exp * arith_exp
-  | Empty            of set_exp
+  | BVar              of string
+  | Bool              of bool
+  | Not               of bool_exp
+  | And               of bool_exp  * bool_exp
+  | Or                of bool_exp  * bool_exp
+  | Xor               of bool_exp  * bool_exp
+  | Implies           of bool_exp  * bool_exp
+  | Equiv             of bool_exp  * bool_exp
+  | Equal             of int_exp * int_exp
+  | Not_equal         of int_exp * int_exp
+  | Lesser_than       of int_exp * int_exp
+  | Lesser_or_equal   of int_exp * int_exp
+  | Greater_than      of int_exp * int_exp
+  | Greater_or_equal  of int_exp * int_exp
+  | FEqual            of float_exp * float_exp
+  | FNot_equal        of float_exp * float_exp
+  | FLesser_than      of float_exp * float_exp
+  | FLesser_or_equal  of float_exp * float_exp
+  | FGreater_than     of float_exp * float_exp
+  | FGreater_or_equal of float_exp * float_exp
+  | Empty             of set_exp
 and clause_exp =
-  | Var     of string * arith_exp option
+  | Var     of string * int_exp option
   | Not     of clause_exp
   | And     of clause_exp  * clause_exp
   | Or      of clause_exp  * clause_exp
@@ -67,10 +82,12 @@ and clause_exp =
   | Bigand  of string list * set_exp list * exp
   | Bigor   of string list * set_exp list * exp
 and set_exp =
+  | SVar  of string
   | Set   of GenSet.t
   | Union of set_exp * set_exp
   | Inter of set_exp * set_exp
   | Diff  of set_exp * set_exp
 and list_exp =
+  | LVar  of string
   | List  of int list 
-  | Range of arith_exp * arith_exp
+  | Range of int_exp * int_exp

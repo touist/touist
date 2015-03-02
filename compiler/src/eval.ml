@@ -16,47 +16,12 @@ let range min max step =
       loop (cpt::acc) (cpt+1)
   in loop [] min |> List.rev
 
-(* binary boolean operators on int and float:
- * <, <=
- * >, >=
- * =, <>
- *)
-let arith_pred f frepr x y =
-  match eval_arith x, eval_arith y with
-  | Int a, Int b -> f a b
-  | Float a, Float b -> f a b
-  | (Int _, Float _) ->
-      type_error "unsupported operand type(s) for '" ^ frepr ^ "': 'int' and 'float'"
-  | (Float _), (Int _) ->
-      type_error "unsupported operand type(s) for '" ^ frepr ^ "': 'float' and 'int'"
-
-(* binary operators on int or float:
- * + and +.
- * - and -.
- * * and *.
- * / and /.
- *)
-let arith_basic_op iop fop repr x y =
-  match eval_arith x, eval_arith y with
-  | Int a, Int b       -> Int (iop a b)
-  | Float a, Float b   -> Float (fop a b)
-  | (Int _), (Float _) ->
-      type_error "unsupported operand type(s) for '" ^ repr ^ "': 'int' and 'float'"
-  | (Float _), (Int _) ->
-      type_error "unsupported operand type(s) for '" ^ repr "': 'float' and 'int'"
-
-(* binary operators on sets of int, float or string:
-  * union
-  * inter
-  * diff
-  * ...
-  *)
 let set_bin_op iop fop sop repr s1 s2 =
-  match eval_set s1, eval_set s2 with
-  | GenSet.IS a, GenSet.IS b -> GenSet.IS (iop a b)
-  | GenSet.FS a, GenSet.FS b -> GenSet.FS (fop a b)
-  | GenSet.SS a, GenSet.SS b -> GenSet.SS (sop a b)
-  | _,_ -> type_error "unsupported set type(s) for '" ^ repr "'"
+  match s1, s2 with
+  | (GenSet.IS a), (GenSet.IS b) -> (GenSet.IS (iop a b))
+  | (GenSet.FS a), (GenSet.FS b) -> (GenSet.FS (fop a b))
+  | (GenSet.SS a), (GenSet.SS b) -> (GenSet.SS (sop a b))
+  | _,_ -> type_error ("unsupported set type(s) for '" ^ repr  ^ "'")
 
 
 (********************************************************************************
@@ -70,27 +35,39 @@ let rec eval_prog = function
   | Begin (Some sets, exp) ->
       List.iter eval_affect sets; List.map eval_exp exp
 
-and eval_affect = function
+and eval_affect : affect -> unit = function
   | Affect (str, exp) -> Hashtbl.replace toplevel str (eval_exp exp)
 
 and eval_exp = function
-  | Scalar    x -> eval_arith x
-  | SetExp    x -> eval_set x
+  | Var x ->
+      begin
+        try Hashtbl.find toplevel x
+        with Not_found -> failwith ("unbound variable: " ^ x)
+      end
+  | IntExp    x -> IntExp (Int (eval_int x))
+  | FloatExp  x -> FloatExp (Float (eval_float x))
+  | SetExp    x -> SetExp (Set (eval_set x))
   | BoolExp   x -> BoolExp (Bool (eval_bool x))
-  | ClauseExp x -> eval_clause x
-  | ListExp   x -> eval_list x
+  | ClauseExp x -> ClauseExp (eval_clause x)
+  | ListExp   x -> ListExp (eval_list x)
   | Dot (x, y) ->
       begin
-        match eval_set x, eval_arith y with
-        | GenSet.IS a, Int b ->
-            try Scalar (Int (IntSet.find b a))
-            with Not_found -> failwith "element " ^ (string_of_int b) ^ " not in set " ^ x
-        | GenSet.FS a, Int b ->
-            try Scalar (Float (FloatSet.find b a))
-            with Not_found -> failwith "element " ^ (string_of_float b) ^ " not in set " ^ x
-        | GenSet.SS a, Int b ->
-            try ClauseExp (Var ((StringSet.find b a), None))
-            with Not_found -> failwith "element " ^ b ^ " not in set " ^ x
+        match eval_set x, eval_exp y with
+        | (GenSet.IS a), IntExp (Int b) ->
+            begin
+              try IntExp (Int (IntSet.find b a))
+              with Not_found -> failwith ("element " ^ (string_of_int b) ^ " not in set")
+            end
+        | (GenSet.FS a), FloatExp (Float b) ->
+            begin
+              try FloatExp (Float (FloatSet.find b a))
+              with Not_found -> failwith ("element " ^ (string_of_float b) ^ " not in set")
+            end
+        | (GenSet.SS a), ClauseExp (Var (b, None)) ->
+            begin
+              try ClauseExp (Var ((StringSet.find b a), None))
+              with Not_found -> failwith ("element " ^ b ^ " not in set")
+            end
         | _,_ -> type_error "unsupported types for '.' operator"
       end
   | If (x, y, z) ->
@@ -99,48 +76,55 @@ and eval_exp = function
       else
         eval_exp z
 
-and eval_arith = function
-  | Int   _ as i -> i
-  | Float _ as f -> f
-  | Add (x, y) -> arith_basic_op (+)   (+.)   "+" x y
-  | Sub (x, y) -> arith_basic_op (-)   (-.)   "-" x y
-  | Mul (x, y) -> arith_basic_op ( * ) ( *. ) "*" x y 
-  | Div (x, y) -> arith_basic_op (/)   (/.)   "/" x y
-  | Mod (x, y) ->
+and eval_int = function
+  | IVar x ->
       begin
-        match eval_arith x, eval_arith y with
-        | Int a, Int b         -> Int (a mod b)
-        | (Float _), (Float _) -> type_error "unsupported operand type(s) for 'mod': 'float' and 'float'"
-        | (Int _), (Float _)   -> type_error "unsupported operand type(s) for 'mod': 'int' and 'float'"
-        | (Float _), (Int _)   -> type_error "unsupported operand type(s) for 'mod': 'float' and 'int'"
+        try
+          begin
+            match Hashtbl.find toplevel x with
+            | IntExp (Int a) -> a
+            | _ -> type_error ("variable '" ^ x ^ "' is not an int")
+          end
+        with Not_found -> failwith ("unbound variable: " ^ x)
       end
-  | Sqrt x ->
-      begin
-        match eval_arith x with
-        | Float a -> Float (sqrt a)
-        | Int _   -> type_error "unsupported operand type for 'sqrt': int"
-      end
-  | To_int x ->
-      begin
-        match eval_arith x with
-        | Int   a -> Int a
-        | Float a -> Int (int_of_float a)
-      end
-  | To_float x ->
-      begin
-        match x with
-        | Float a -> Float a
-        | Int   a -> Float (float_of_int a)
-      end
-  | Card x ->
-      begin
-        match eval_set x with
-        | GenSet.IS a -> Int (IntSet.cardinal    a)
-        | GenSet.FS a -> Int (FloatSet.cardinal  a)
-        | GenSet.SS a -> Int (StringSet.cardinal a)
-      end
+  | Int i -> i
+  | Add (x, y) -> (eval_int x) + (eval_int y)
+  | Sub (x, y) -> (eval_int x) - (eval_int y)
+  | Mul (x, y) -> (eval_int x) * (eval_int y)
+  | Div (x, y) -> (eval_int x) / (eval_int y)
+  | Mod (x, y) -> (eval_int x) mod (eval_int y)
+  | To_int x   -> int_of_float (eval_float x)
 
-and eval_bool = function 
+and eval_float = function
+  | FVar x ->
+      begin
+        try
+          begin
+            match Hashtbl.find toplevel x with
+            | FloatExp (Float a) -> a
+            | _ -> type_error ("variable '" ^ x ^ "' is not a float")
+          end
+        with Not_found -> failwith ("unbound variable: " ^ x)
+      end
+  | Float f -> f
+  | Add (x, y) -> (eval_float x) +. (eval_float y)
+  | Sub (x, y) -> (eval_float x) -. (eval_float y)
+  | Mul (x, y) -> (eval_float x) *. (eval_float y)
+  | Div (x, y) -> (eval_float x) /. (eval_float y)
+  | Sqrt x -> sqrt (eval_float x)
+  | To_float x -> float_of_int (eval_int x)
+
+and eval_bool = function
+  | BVar x ->
+      begin
+        try 
+          begin
+            match Hashtbl.find toplevel x with
+            | BoolExp (Bool a) -> a
+            | _         -> type_error ("variable '" ^ x ^ "' is not a bool")
+          end
+        with Not_found -> failwith ("unbound variable: " ^ x)
+      end
   | Bool b     -> b
   | Not  b     -> not (eval_bool b)
   | And (p, q) -> (eval_bool p) && (eval_bool q)
@@ -151,36 +135,55 @@ and eval_bool = function
       (p || q) && (not (p && q))
   | Implies (p, q) -> (not (eval_bool p)) || (eval_bool q)
   | Equiv (x, y)   -> not (eval_bool (Xor (x, y)))
-  | Equal            (x, y) -> arith_pred (=)  "="  x y
-  | Not_equal        (x, y) -> arith_pred (<>) "<>" x y
-  | Lesser_than      (x, y) -> arith_pred (<)  "<"  x y
-  | Lesser_or_equal  (x, y) -> arith_pred (<=) "<=" x y
-  | Greater_than     (x, y) -> arith_pred (>)  ">"  x y
-  | Greater_or_equal (x, y) -> arith_pred (>=) ">=" x y
+  | Equal             (x, y) -> (eval_int x)   =  (eval_int y)
+  | Not_equal         (x, y) -> (eval_int x)   <> (eval_int y)
+  | Lesser_than       (x, y) -> (eval_int x)   <  (eval_int y)
+  | Lesser_or_equal   (x, y) -> (eval_int x)   <= (eval_int y)
+  | Greater_than      (x, y) -> (eval_int x)   >  (eval_int y)
+  | Greater_or_equal  (x, y) -> (eval_int x)   >= (eval_int y)
+  | FEqual            (x, y) -> (eval_float x) =  (eval_float y)
+  | FNot_equal        (x, y) -> (eval_float x) <> (eval_float y)
+  | FLesser_than      (x, y) -> (eval_float x) <  (eval_float y)
+  | FLesser_or_equal  (x, y) -> (eval_float x) <= (eval_float y)
+  | FGreater_than     (x, y) -> (eval_float x) >  (eval_float y)
+  | FGreater_or_equal (x, y) -> (eval_float x) >= (eval_float y)
   | Empty x ->
       begin
         match eval_set x with
-        | Set y ->
-            begin
-              match y with
-              | IS i -> IntSet.empty i
-              | FS f -> FloatSet.empty f
-              | SS s -> StringSet.empty s
-            end
+        | (GenSet.IS i) -> IntSet.is_empty i
+        | (GenSet.FS f) -> FloatSet.is_empty f
+        | (GenSet.SS s) -> StringSet.is_empty s
       end
 
 and eval_set = function
-  | Set _ as s -> s
-  | Union (x, y) -> set_bin_op (IntSet.union) (FloatSet.union) (StringSet.union) "union" x y
-  | Inter (x, y) -> set_bin_op (IntSet.inter) (FloatSet.inter) (StringSet.inter) "union" x y
-  | Diff  (x, y) -> set_bin_op (IntSet.diff)  (FloatSet.diff)  (StringSet.diff)  "union" x y
+  | SVar x ->
+      begin
+        try
+          begin
+            match Hashtbl.find toplevel x with
+            | SetExp (Set a) -> a
+            | _ -> type_error ("variable '" ^ x ^ "' is not a set")
+          end
+        with Not_found -> failwith ("unbound variable: " ^ x)
+      end
+  | Set s -> s
+  | Union (x, y) -> set_bin_op (IntSet.union) (FloatSet.union) (StringSet.union) "union" (eval_set x) (eval_set y)
+  | Inter (x, y) -> set_bin_op (IntSet.inter) (FloatSet.inter) (StringSet.inter) "union" (eval_set x) (eval_set y)
+  | Diff  (x, y) -> set_bin_op (IntSet.diff)  (FloatSet.diff)  (StringSet.diff)  "union" (eval_set x) (eval_set y)
 
 and eval_list = function
-  | List _ as l  -> l
-  | Range (x, y) ->
+  | LVar x ->
       begin
-        match eval_arith x, eval_arith y with
-        | Int a, Int b -> List (range a b 1)
-        | _,_ -> type_error "unsupported types for operator '..'"
+        try
+          begin
+            match Hashtbl.find toplevel x with
+            | ListExp a -> a
+            | _         -> type_error ("variable '" ^ x ^ "' is not a list")
+          end
+        with Not_found -> failwith ("unbound variable: " ^ x)
       end
+  | List _ as l  -> l
+  | Range (x, y) -> List (range (eval_int x) (eval_int y) 1)
+      
+and eval_clause = fun x -> x
 
