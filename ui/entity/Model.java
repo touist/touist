@@ -21,19 +21,39 @@
  *
  */
 
-package touist;
+package entity;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  *
- * @author Skander
+ * @author Abdel
+ * @modified by Maël
  */
-public class TouIST {
+public class Model implements Iterable<Literal>{
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String[] args) {
-        // TODO code application logic here
-    }
+	public List<Literal> literals = new ArrayList<Literal>();
+
+	public void addLiteral(Literal literal) {
+		literals.add(literal);
+	}
+
+	@Override
+	public String toString() {
+		// TODO Please write a proper toString
+		String out = "";
+		for (Literal s : literals) {
+			out = out + " " + s.getLiteral();
+		}
+		return out;
+	}
+
+	@Override
+	public Iterator<Literal> iterator() {
+		return literals.iterator();
+	}
+
 
 }

@@ -21,19 +21,17 @@
  *
  */
 
-package touist;
+package translation;
+
+import java.util.Map;
 
 /**
- *
- * @author Skander
- */
-public class TouIST {
-
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String[] args) {
-        // TODO code application logic here
-    }
-
+* @author Abdel
+* @modified by Maël
+*/
+public interface TranslationResult {
+	    public void setDimacsFilePath(String dimacsFilePath);
+	    public void addLiteraux(int cleP,String P);
+	    public String getDimacsFilePath();
+	    public Map<Integer,String> getLiteraux();
 }

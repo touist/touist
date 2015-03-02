@@ -21,19 +21,29 @@
  *
  */
 
-package touist;
+package gui;
+
+import javax.swing.Icon;
+
+/**
+ * Cette classe permet de générer une image à partir du code LaTEX
+ * @author François Schwarzentruber
+ */
+ public class LaTEX {
+
 
 /**
  *
- * @author Skander
+ * @param codeLaTEX
+ * @return une image qui représente ce qu'affiche LaTEX à la place du code codeLaTEX
  */
-public class TouIST {
+    static Icon latexCodeToImageIcon(String codeLaTEX)
+    {
+         TeXFormula formula = new TeXFormula(codeLaTEX);
+         TeXIcon ti = formula.createTeXIcon(TeXConstants.STYLE_DISPLAY, 20);
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String[] args) {
-        // TODO code application logic here
+         return ti;
+
     }
 
 }

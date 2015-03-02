@@ -21,19 +21,37 @@
  *
  */
 
-package touist;
+package translation;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
- *
- * @author Skander
- */
-public class TouIST {
+* @author Abdel
+* @modified by Maël
+*/
+public class TranslationResultSAT implements TranslationResult{
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String[] args) {
-        // TODO code application logic here
-    }
+	    private String dimacsFilePath;
+	    private Map<Integer, String> literaux = new HashMap<Integer,String>();
+
+	    @Override
+		public void setDimacsFilePath(String dimacsFilePath) {
+	        this.dimacsFilePath = dimacsFilePath;
+	    }
+
+	    @Override
+		public void addLiteraux(int cleP,String P) {
+	        this.literaux.putIfAbsent(cleP, P);
+	    }
+	    @Override
+		public String getDimacsFilePath() {
+	        return dimacsFilePath;
+	    }
+	    @Override
+		public Map<Integer, String> getLiteraux() {
+	        return literaux;
+	    }
+
 
 }

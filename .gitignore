@@ -49,3 +49,17 @@ hs_err_pid*
 .classpath
 
 .project
+/nbproject/private/
+/dist/
+/build/
+nbproject/project.xml
+
+nbproject/project.properties
+
+nbproject/genfiles.properties
+
+nbproject/build-impl.xml
+
+build.xml
+
+*.mf

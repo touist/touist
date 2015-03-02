@@ -21,19 +21,39 @@
  *
  */
 
-package touist;
+package entity;
 
 /**
  *
- * @author Skander
+ * @author blida
  */
-public class TouIST {
+public class Literal {
+    private String literal;
+    private boolean literal_positivity;
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String[] args) {
-        // TODO code application logic here
+    public Literal(String get, boolean b) {
+       literal=get;
+       literal_positivity=b;
+    }
+
+    public Literal(String rawLiteral) {
+        literal=rawLiteral;
+    }
+
+    public String getLiteral() {
+        return literal;
+    }
+
+    public void setLiteral(String literal) {
+        this.literal = literal;
+    }
+
+    public boolean isLiteral_positivity() {
+        return literal_positivity;
+    }
+
+    public void setLiteral_positivity(boolean literal_positivity) {
+        this.literal_positivity = literal_positivity;
     }
 
 }

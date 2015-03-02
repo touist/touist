@@ -21,19 +21,13 @@
  *
  */
 
-package touist;
+package gui;
 
 /**
  *
  * @author Skander
  */
-public class TouIST {
-
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String[] args) {
-        // TODO code application logic here
-    }
-
+public enum State {
+    EDIT_SINGLE, EDIT_MULTIPLE, SINGLE_RESULT, FIRST_RESULT, INTER_RESULT,
+    LAST_RESULT
 }
