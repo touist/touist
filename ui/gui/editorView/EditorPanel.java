@@ -5,13 +5,14 @@
  */
 package gui.editorView;
 
-import Entity.Model;
+import entity.Model;
 import gui.AbstractComponentPanel;
 import gui.State;
-import java.util.Iterator;
+
 import java.util.ListIterator;
+
 import javax.swing.JFileChooser;
-import solution.ModelsIterator;
+
 import solution.SolverTestSAT4J;
 
 /**
@@ -27,10 +28,10 @@ public class EditorPanel extends AbstractComponentPanel {
         initComponents();
         //commentaire de test
     }
-    
+
     private void applyRestrictions() {
         switch (getState()) {
-            case EDIT_SINGLE : 
+            case EDIT_SINGLE :
                 formulaTablePanel1.allowRemoval(false);
                 break;
             case EDIT_MULTIPLE :
@@ -39,16 +40,16 @@ public class EditorPanel extends AbstractComponentPanel {
             case SINGLE_RESULT :
                 // impossible
                 break;
-            case FIRST_RESULT : 
+            case FIRST_RESULT :
                 // impossible
                 break;
-            case INTER_RESULT : 
+            case INTER_RESULT :
                 // impossible
                 break;
             case LAST_RESULT :
                 // impossible
                 break;
-            default : 
+            default :
                 System.out.println("Undefined action set for the state : " + getState());
         }
     }
@@ -75,14 +76,16 @@ public class EditorPanel extends AbstractComponentPanel {
 
         jButtonTest.setText("Tester");
         jButtonTest.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButtonTestActionPerformed(evt);
             }
         });
 
         jButtonImport.setText("Importer");
         jButtonImport.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButtonImportActionPerformed(evt);
             }
         });
@@ -91,7 +94,8 @@ public class EditorPanel extends AbstractComponentPanel {
 
         jButtonAddFormula.setText("Ajouter");
         jButtonAddFormula.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButtonAddFormulaActionPerformed(evt);
             }
         });
@@ -151,7 +155,7 @@ public class EditorPanel extends AbstractComponentPanel {
     private void jButtonAddFormulaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonAddFormulaActionPerformed
         // TODO add your handling code here:
         switch(getState()) {
-            case EDIT_SINGLE : 
+            case EDIT_SINGLE :
                 setState(State.EDIT_MULTIPLE);
                 formulaTablePanel1.addFormula();
                 applyRestrictions();
@@ -164,16 +168,16 @@ public class EditorPanel extends AbstractComponentPanel {
             case SINGLE_RESULT :
                 // impossible
                 break;
-            case FIRST_RESULT : 
+            case FIRST_RESULT :
                 // impossible
                 break;
-            case INTER_RESULT : 
+            case INTER_RESULT :
                 // impossible
                 break;
             case LAST_RESULT :
                 // impossible
                 break;
-            default : 
+            default :
                 System.out.println("Undefined action set for the state : " + getState());
         }
     }//GEN-LAST:event_jButtonAddFormulaActionPerformed
@@ -189,13 +193,13 @@ public class EditorPanel extends AbstractComponentPanel {
         String bigAndFilePath = "bigAndFile-defaultname.txt"; //TODO se mettre d'accord sur un nom standard ou ajouter a Translator et BaseDeClause des méthode pour s'échange de objets File
         getFrame().getClause().saveToFile(bigAndFilePath); //TODO gérer les IOException
         getFrame().getTranslator().translate(bigAndFilePath); //TODO gérer les erreurs : return false ou IOException
-        
+
         String translatedFilePath = getFrame().getTranslator().getDimacsFilePath();
         getFrame().setSolver(new SolverTestSAT4J(translatedFilePath));
         getFrame().getSolver().launch(); //TODO gérer les IOException
-        
+
         // Si il y a au moins un model
-        ListIterator<Model> iter = (ListIterator<Model>) getFrame().getSolver().getModels().iterator();
+        ListIterator<Model> iter = (ListIterator<Model>) getFrame().getSolver().getModelList().iterator();
         if (iter.hasNext()) {
             // Si il plus d'un model
             iter.next();
@@ -210,11 +214,11 @@ public class EditorPanel extends AbstractComponentPanel {
             return State.SINGLE_RESULT;
         }
     }
-    
+
     private void jButtonTestActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonTestActionPerformed
 
         switch(getState()) {
-            case EDIT_SINGLE : 
+            case EDIT_SINGLE :
                 setState(initResultsView());
                 getFrame().setViewToResults();
                 break;
@@ -225,16 +229,16 @@ public class EditorPanel extends AbstractComponentPanel {
             case SINGLE_RESULT :
                 // impossible
                 break;
-            case FIRST_RESULT : 
+            case FIRST_RESULT :
                 // impossible
                 break;
-            case INTER_RESULT : 
+            case INTER_RESULT :
                 // impossible
                 break;
             case LAST_RESULT :
                 // impossible
                 break;
-            default : 
+            default :
                 System.out.println("Undefined action set for the state : " + getState());
         }
     }//GEN-LAST:event_jButtonTestActionPerformed
@@ -260,10 +264,10 @@ public class EditorPanel extends AbstractComponentPanel {
             formulaTablePanel1.add(new FormulaPanel(i, FormulaPanelType.FORMULA, getFrame().getClause().getFormules().get(i)));
         }
     }
-    
+
     private void jButtonImportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonImportActionPerformed
         switch (getState()) {
-            case EDIT_SINGLE : 
+            case EDIT_SINGLE :
                 setState(State.EDIT_SINGLE);
                 appelBaseDeClauseImport();
                 break;
@@ -274,16 +278,16 @@ public class EditorPanel extends AbstractComponentPanel {
             case SINGLE_RESULT :
                 // impossible
                 break;
-            case FIRST_RESULT : 
+            case FIRST_RESULT :
                 // impossible
                 break;
-            case INTER_RESULT : 
+            case INTER_RESULT :
                 // impossible
                 break;
             case LAST_RESULT :
                 // impossible
                 break;
-            default : 
+            default :
                 System.out.println("Undefined action set for the state : " + getState());
         }
     }//GEN-LAST:event_jButtonImportActionPerformed

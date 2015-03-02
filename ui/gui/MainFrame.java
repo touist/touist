@@ -5,12 +5,15 @@
  */
 package gui;
 
-import gui.resultsView.ResultsPanel;
 import gui.editorView.EditorPanel;
+import gui.resultsView.ResultsPanel;
+
 import java.awt.CardLayout;
+
 import javax.swing.JPanel;
+
 import solution.BaseDeClauses;
-import solution.Models;
+import solution.ModelList;
 import solution.Solver;
 import translation.Translator;
 
@@ -23,28 +26,28 @@ public class MainFrame extends javax.swing.JFrame {
     private BaseDeClauses clause = new BaseDeClauses();
     private Translator translator = new Translator();
     private Solver solver;
-    private Models models;
-    
+    private ModelList models;
+
     public State state;
-    
+
     public final static String EDITOR_PANEL = "editor_panel";
     public final static String RESULTS_PANEL = "results_panel";
     private JPanel cards = new JPanel(new CardLayout());
     private EditorPanel editorPanel1 = new EditorPanel();
     private ResultsPanel resultsPanel1 = new ResultsPanel();
     private int numberOfFormulas;
-    
+
     /**
      * Creates new form MainFrame
      */
     public MainFrame() {
         state = State.EDIT_SINGLE;
-        
+
         add(cards);
         cards.add(editorPanel1, EDITOR_PANEL);
         cards.add(resultsPanel1, RESULTS_PANEL);
         setViewToEditor();
-        
+
         initComponents();
     }
 
@@ -60,18 +63,18 @@ public class MainFrame extends javax.swing.JFrame {
         this.solver = solver;
     }
 
-    public Models getModels() {
+    public ModelList getModelList() {
         return models;
     }
 
-    public void setModels(Models models) {
+    public void setModels(ModelList models) {
         this.models = models;
     }
 
     public Translator getTranslator() {
         return translator;
     }
-    
+
     public int getNumberOfFormulas() {
         return numberOfFormulas;
     }
@@ -79,11 +82,11 @@ public class MainFrame extends javax.swing.JFrame {
     public void setNumberOfFormulas(int numberOfFormulas) {
         this.numberOfFormulas = numberOfFormulas;
     }
-    
+
     public void setViewToEditor() {
         ((CardLayout)cards.getLayout()).show(cards, EDITOR_PANEL);
     }
-    
+
     public void setViewToResults() {
         resultsPanel1.applyRestrictions();
         ((CardLayout)cards.getLayout()).show(cards, RESULTS_PANEL);
@@ -111,7 +114,7 @@ public class MainFrame extends javax.swing.JFrame {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
         /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html
          */
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
@@ -133,7 +136,8 @@ public class MainFrame extends javax.swing.JFrame {
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
+            @Override
+			public void run() {
                 new MainFrame().setVisible(true);
             }
         });

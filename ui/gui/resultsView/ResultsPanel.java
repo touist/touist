@@ -5,11 +5,11 @@
  */
 package gui.resultsView;
 
-import Entity.Model;
+import entity.Model;
 import gui.AbstractComponentPanel;
 import gui.State;
+
 import java.util.ListIterator;
-import solution.ModelsIterator;
 
 /**
  *
@@ -19,13 +19,13 @@ public class ResultsPanel extends AbstractComponentPanel {
 
     private int currentModelIndex = 0;
     ListIterator<Model> iter;
-    
+
     /**
      * Creates new form ResultsPanel
      */
     public ResultsPanel() {
         initComponents();
-        iter = (ListIterator<Model>)getFrame().getSolver().getModels().iterator();
+        iter = (ListIterator<Model>)getFrame().getSolver().getModelList().iterator();
     }
 
     /**
@@ -33,7 +33,7 @@ public class ResultsPanel extends AbstractComponentPanel {
      */
     public void applyRestrictions() {
         switch(getState()) {
-            case EDIT_SINGLE : 
+            case EDIT_SINGLE :
                 // impossible
                 break;
             case EDIT_MULTIPLE :
@@ -43,11 +43,11 @@ public class ResultsPanel extends AbstractComponentPanel {
                 jButtonNext.setEnabled(false);
                 jButtonPrevious.setEnabled(false);
                 break;
-            case FIRST_RESULT : 
+            case FIRST_RESULT :
                 jButtonNext.setEnabled(true);
                 jButtonPrevious.setEnabled(false);
                 break;
-            case INTER_RESULT : 
+            case INTER_RESULT :
                 jButtonNext.setEnabled(true);
                 jButtonPrevious.setEnabled(true);
                 break;
@@ -55,11 +55,11 @@ public class ResultsPanel extends AbstractComponentPanel {
                 jButtonNext.setEnabled(false);
                 jButtonPrevious.setEnabled(true);
                 break;
-            default : 
+            default :
                 System.out.println("Undefined action set for the state : " + getState());
         }
     }
-    
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -82,21 +82,24 @@ public class ResultsPanel extends AbstractComponentPanel {
 
         jButtonEditor.setText("Retour en édition");
         jButtonEditor.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButtonEditorActionPerformed(evt);
             }
         });
 
         jButtonPrevious.setText("Précédent");
         jButtonPrevious.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButtonPreviousActionPerformed(evt);
             }
         });
 
         jButtonNext.setText("Suivant");
         jButtonNext.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButtonNextActionPerformed(evt);
             }
         });
@@ -169,7 +172,7 @@ public class ResultsPanel extends AbstractComponentPanel {
                     getFrame().setViewToEditor();
                 }
                 break;
-            case INTER_RESULT : 
+            case INTER_RESULT :
                 if(getFrame().getNumberOfFormulas() > 1) {
                     setState(State.EDIT_MULTIPLE);
                     getFrame().setViewToEditor();
@@ -187,20 +190,20 @@ public class ResultsPanel extends AbstractComponentPanel {
                     getFrame().setViewToEditor();
                 }
                 break;
-            default : 
+            default :
                 System.out.println("Undefined action set for the state : " + getState());
         }
         getFrame().setViewToEditor();
     }//GEN-LAST:event_jButtonEditorActionPerformed
 
-    /* 
+    /*
     Afficher le model précédent m
     Si m est le premier
     alors on passe à l'état FIRST_RESULT
     sinon à INTER_RESULT
     */
     private State previousButtonHandler() {
-                
+
         Model m = iter.previous();
         jTextArea1.setText(m.toString());
         if (iter.hasPrevious()) {
@@ -209,7 +212,7 @@ public class ResultsPanel extends AbstractComponentPanel {
             return State.FIRST_RESULT;
         }
     }
-    
+
     private void jButtonPreviousActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonPreviousActionPerformed
         Model m;
         switch(getState()) {
@@ -231,12 +234,12 @@ public class ResultsPanel extends AbstractComponentPanel {
             case LAST_RESULT :
                 setState(previousButtonHandler());
                 break;
-            default : 
+            default :
                 System.out.println("Undefined action set for the state : " + getState());
         }
     }//GEN-LAST:event_jButtonPreviousActionPerformed
 
-    /* 
+    /*
     Affiche le model suivant m
     si m est le dernier model de models (la liste des models calculés)
     alors demander au solveur de chercher un autre model
@@ -252,7 +255,7 @@ public class ResultsPanel extends AbstractComponentPanel {
             return State.LAST_RESULT;
         }
     }
-    
+
     private void jButtonNextActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonNextActionPerformed
         Model m;
         switch(getState()) {
@@ -274,7 +277,7 @@ public class ResultsPanel extends AbstractComponentPanel {
             case LAST_RESULT :
                 // interdit
                 break;
-            default : 
+            default :
                 System.out.println("Undefined action set for the state : " + getState());
         }
     }//GEN-LAST:event_jButtonNextActionPerformed
