@@ -1,31 +1,15 @@
 /*
- *
- * Project TouIST, 2015. Easily formalize and solve real-world sized problems
- * using propositional logic and linear theory of reals with a nice GUI.
- *
- * https://github.com/olzd/touist
- *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the GNU Lesser General Public License
- * (LGPL) version 2.1 which accompanies this distribution, and is available at
- * http://www.gnu.org/licenses/lgpl-2.1.html
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
- *
- * Contributors:
- *     Alexis Comte, Abdelwahab Heba, Olivier Lezaud,
- *     Skander Ben Slimane, Maël Valais
- *
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
  */
-
 package gui.resultsView;
 
 import entity.Model;
 import gui.AbstractComponentPanel;
 import gui.State;
+
+import java.util.ListIterator;
 
 /**
  *
@@ -34,12 +18,20 @@ import gui.State;
 public class ResultsPanel extends AbstractComponentPanel {
 
     private int currentModelIndex = 0;
+    ListIterator<Model> iter;
 
     /**
      * Creates new form ResultsPanel
      */
     public ResultsPanel() {
         initComponents();
+    }
+    
+    /**
+     * Update the models iterator
+     */
+    public void updateIterator() {
+        iter = getFrame().getSolver().getModelList().iterator();
     }
 
     /**
@@ -169,6 +161,7 @@ public class ResultsPanel extends AbstractComponentPanel {
                 // impossible
                 break;
             case SINGLE_RESULT :
+                getFrame().getSolver().close();
                 if(getFrame().getNumberOfFormulas() > 1) {
                     setState(State.EDIT_MULTIPLE);
                     getFrame().setViewToEditor();
@@ -178,6 +171,7 @@ public class ResultsPanel extends AbstractComponentPanel {
                 }
                 break;
             case FIRST_RESULT :
+                getFrame().getSolver().close();
                 if(getFrame().getNumberOfFormulas() > 1) {
                     setState(State.EDIT_MULTIPLE);
                     getFrame().setViewToEditor();
@@ -187,6 +181,7 @@ public class ResultsPanel extends AbstractComponentPanel {
                 }
                 break;
             case INTER_RESULT :
+                getFrame().getSolver().close();
                 if(getFrame().getNumberOfFormulas() > 1) {
                     setState(State.EDIT_MULTIPLE);
                     getFrame().setViewToEditor();
@@ -196,6 +191,7 @@ public class ResultsPanel extends AbstractComponentPanel {
                 }
                 break;
             case LAST_RESULT :
+                getFrame().getSolver().close();
                 if(getFrame().getNumberOfFormulas() > 1) {
                     setState(State.EDIT_MULTIPLE);
                     getFrame().setViewToEditor();
@@ -209,6 +205,23 @@ public class ResultsPanel extends AbstractComponentPanel {
         }
         getFrame().setViewToEditor();
     }//GEN-LAST:event_jButtonEditorActionPerformed
+
+    /*
+    Afficher le model précédent m
+    Si m est le premier
+    alors on passe à l'état FIRST_RESULT
+    sinon à INTER_RESULT
+    */
+    private State previousButtonHandler() {
+
+        Model m = iter.previous();
+        jTextArea1.setText(m.toString());
+        if (iter.hasPrevious()) {
+            return State.INTER_RESULT;
+        } else {
+            return State.FIRST_RESULT;
+        }
+    }
 
     private void jButtonPreviousActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonPreviousActionPerformed
         Model m;
@@ -226,25 +239,32 @@ public class ResultsPanel extends AbstractComponentPanel {
                 // interdit
                 break;
             case INTER_RESULT :
-                /* TODO
-                Afficher le model précédent m
-                Si m est le premier
-                alors on passe à l'état FIRST_RESULT
-                sinon à INTER_RESULT
-                */
+                setState(previousButtonHandler());
                 break;
             case LAST_RESULT :
-                /* TODO
-                Afficher le model précédent m
-                Si m est le premier
-                alors on passe à l'état FIRST_RESULT
-                sinon à INTER_RESULT
-                */
+                setState(previousButtonHandler());
                 break;
             default :
                 System.out.println("Undefined action set for the state : " + getState());
         }
     }//GEN-LAST:event_jButtonPreviousActionPerformed
+
+    /*
+    Affiche le model suivant m
+    si m est le dernier model de models (la liste des models calculés)
+    alors demander au solveur de chercher un autre model
+        si le solveur ne trouve pas, passe en état LAST_RESULT
+        sinon on passe en INTER_RESULT
+    */
+    private State nextButtonHandler() {
+        Model m = iter.next();
+        jTextArea1.setText(m.toString());
+        if (iter.hasNext()){
+            return State.INTER_RESULT;
+        } else {
+            return State.LAST_RESULT;
+        }
+    }
 
     private void jButtonNextActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonNextActionPerformed
         Model m;
@@ -259,22 +279,10 @@ public class ResultsPanel extends AbstractComponentPanel {
                 // interdit
                 break;
             case FIRST_RESULT :
-                /* TODO
-                Affiche le model suivant m
-                si m est le dernier model de models (la liste des models calculés)
-                alors demander au solveur de chercher un autre model
-                    si le solveur ne trouve pas, passe en état LAST_RESULT
-                    sinon on passe en INTER_RESULT
-                */
+                setState(nextButtonHandler());
                 break;
             case INTER_RESULT :
-                /* TODO
-                Affiche le model suivant m
-                si m est le dernier model de models (la liste des models calculés)
-                alors demander au solveur de chercher un autre model
-                    si le solveur ne trouve pas, passe en état LAST_RESULT
-                    sinon on passe en INTER_RESULT
-                */
+                setState(nextButtonHandler());
                 break;
             case LAST_RESULT :
                 // interdit

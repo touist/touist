@@ -1,24 +1,12 @@
 /*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
+/*
+ * SATResults.java
  *
- * Project TouIST, 2015. Easily formalize and solve real-world sized problems
- * using propositional logic and linear theory of reals with a nice GUI.
- *
- * https://github.com/olzd/touist
- *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the GNU Lesser General Public License
- * (LGPL) version 2.1 which accompanies this distribution, and is available at
- * http://www.gnu.org/licenses/lgpl-2.1.html
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
- *
- * Contributors:
- *     Alexis Comte, Abdelwahab Heba, Olivier Lezaud,
- *     Skander Ben Slimane, Maël Valais
- *
+ * Created on 26 sept. 2010, 02:57:12
  */
 
 package gui.editorView;
@@ -47,10 +35,10 @@ public class InsertionButton extends javax.swing.JButton  {
     private final FormulaTablePanel formulaTablePane;
 
 
-
+    
 
     /**
-     *
+     * 
      * @param formulaTablePane
      * @param texteScheme
      */
@@ -68,10 +56,9 @@ public class InsertionButton extends javax.swing.JButton  {
             System.out.println("Erreur d'insertion de bouton dans la palette : problème avec le code latex de "+ texteScheme);
         }
          addActionListener(new java.awt.event.ActionListener() {
-            @Override
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
                 switch(((MainFrame)getRootPane().getParent()).state) {
-                    case EDIT_SINGLE :
+                    case EDIT_SINGLE : 
                         ((MainFrame)getRootPane().getParent()).state = State.EDIT_SINGLE;
                         inserer(schemeCodeToInsert);
                         break;
@@ -82,16 +69,16 @@ public class InsertionButton extends javax.swing.JButton  {
                     case SINGLE_RESULT :
                         // impossible
                         break;
-                    case FIRST_RESULT :
+                    case FIRST_RESULT : 
                         // impossible
                         break;
-                    case INTER_RESULT :
+                    case INTER_RESULT : 
                         // impossible
                         break;
                     case LAST_RESULT :
                         // impossible
                         break;
-                    default :
+                    default : 
                         System.out.println("Undefined action set for the state : " + ((MainFrame)getRootPane().getParent()).state);
                 }
             }
@@ -117,11 +104,11 @@ public class InsertionButton extends javax.swing.JButton  {
         }
     }
 
-
+    
     public InsertionButton(FormulaTablePanel formulaTablePanel, String texteScheme, String aide) {
         this(formulaTablePanel, texteScheme);
         setToolTipText(aide);
-
+        
     }
 
 

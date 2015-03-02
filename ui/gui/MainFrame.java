@@ -1,26 +1,8 @@
 /*
- *
- * Project TouIST, 2015. Easily formalize and solve real-world sized problems
- * using propositional logic and linear theory of reals with a nice GUI.
- *
- * https://github.com/olzd/touist
- *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the GNU Lesser General Public License
- * (LGPL) version 2.1 which accompanies this distribution, and is available at
- * http://www.gnu.org/licenses/lgpl-2.1.html
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
- *
- * Contributors:
- *     Alexis Comte, Abdelwahab Heba, Olivier Lezaud,
- *     Skander Ben Slimane, Maël Valais
- *
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
  */
-
 package gui;
 
 import gui.editorView.EditorPanel;
@@ -31,6 +13,9 @@ import java.awt.CardLayout;
 import javax.swing.JPanel;
 
 import solution.BaseDeClauses;
+import solution.ModelList;
+import solution.Solver;
+import translation.Translator;
 
 /**
  *
@@ -39,8 +24,9 @@ import solution.BaseDeClauses;
 public class MainFrame extends javax.swing.JFrame {
 
     private BaseDeClauses clause = new BaseDeClauses();
-    private Gestionnaire gestionnaire = new Gestionnaire();
-    private Models models = new Models();
+    private Translator translator = new Translator();
+    private Solver solver;
+    private ModelList models;
 
     public State state;
 
@@ -69,15 +55,25 @@ public class MainFrame extends javax.swing.JFrame {
         return clause;
     }
 
-    public Gestionnaire getGestionnaire() {
-        return gestionnaire;
+    public Solver getSolver() {
+        return solver;
     }
 
-    public Models getModels() {
+    public void setSolver(Solver solver) {
+        this.solver = solver;
+    }
+
+    public ModelList getModelList() {
         return models;
     }
 
+    public void setModels(ModelList models) {
+        this.models = models;
+    }
 
+    public Translator getTranslator() {
+        return translator;
+    }
 
     public int getNumberOfFormulas() {
         return numberOfFormulas;
@@ -86,8 +82,10 @@ public class MainFrame extends javax.swing.JFrame {
     public void setNumberOfFormulas(int numberOfFormulas) {
         this.numberOfFormulas = numberOfFormulas;
     }
-
-
+    
+    public void updateResultsPanelIterator() {
+        resultsPanel1.updateIterator();
+    }
 
     public void setViewToEditor() {
         ((CardLayout)cards.getLayout()).show(cards, EDITOR_PANEL);
@@ -97,6 +95,7 @@ public class MainFrame extends javax.swing.JFrame {
         resultsPanel1.applyRestrictions();
         ((CardLayout)cards.getLayout()).show(cards, RESULTS_PANEL);
     }
+    
 
     /**
      * This method is called from within the constructor to initialize the form.
