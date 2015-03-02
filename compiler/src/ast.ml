@@ -1,63 +1,73 @@
+module IntSet = Set.Make(struct
+  type t = int
+  let compare = Pervasives.compare
+end)
+
+module FloatSet = Set.Make(struct
+  type t = float
+  let compare = Pervasives.compare
+end)
+
+module StringSet = Set.Make(String)
+
+module GenSet = struct
+  type t =
+    | IS of IntSet.t
+    | FS of FloatSet.t
+    | SS of StringSet.t
+end
+
 type prog =
-  | Begin of (command list option * command list)
-
-and command =
-  | Affect of (string * aexp)
-  | If     of (bexp * command * command)
-  | Bigand of bigbody
-  | Bigor  of bigbody
-  | Clause of bexp
-
-and bexp =
-  | True
-  | False
-  | Trueclause
-  | Falseclause
-  | Term             of string
-  | And              of (bexp * bexp)
-  | Or               of (bexp * bexp)
-  | Xor              of (bexp * bexp)
-  | Imply            of (bexp * bexp)
-  | Not              of bexp
-  | Equal            of (aexp * aexp)
-  | Not_equal        of (aexp * aexp)
-  | Lesser_than      of (aexp * aexp)
-  | Lesser_or_equal  of (aexp * aexp)
-  | Greater_than     of (aexp * aexp)
-  | Greater_or_equal of (aexp * aexp)
-  | Exact            of (aexp * bigbody)
-  | Atmost           of (aexp * bigbody)
-  | Atleast          of (aexp * bigbody)
-  | Empty            of sexp
-  | Subset           of (sexp * sexp)
-  | In               of (set_body * sexp) 
-
-and aexp =
-  | Var      of string
+  | Begin of affect list option * exp list
+and affect =
+  | Affect of string * exp
+and exp =
+  | Scalar    of arith_exp
+  | SetExp    of set_exp
+  | BoolExp   of bool_exp
+  | ClauseExp of clause_exp
+and arith_exp =
   | Int      of int
   | Float    of float
-  | Set      of sexp
-  | Add      of (aexp * aexp)
-  | Sub      of (aexp * aexp)
-  | Mul      of (aexp * aexp)
-  | Div      of (aexp * aexp)
-  | Mod      of (aexp * aexp)
-  | Sqrt     of aexp
-  | To_float of aexp
-  | To_int   of aexp
+  | Add      of arith_exp * arith_exp
+  | Sub      of arith_exp * arith_exp
+  | Mul      of arith_exp * arith_exp
+  | Div      of arith_exp * arith_exp
+  | Mod      of arith_exp * arith_exp
+  | Sqrt     of arith_exp
+  | To_int   of arith_exp
+  | To_float of arith_exp
+and bool_exp =
+  | Bool             of bool
+  | Not              of bool_exp
+  | And              of bool_exp * bool_exp
+  | Or               of bool_exp * bool_exp
+  | Xor              of bool_exp * bool_exp
+  | Implies          of bool_exp * bool_exp
+  | Equiv            of bool_exp * bool_exp
+  | Equal            of arith_exp * arith_exp
+  | Not_equal        of arith_exp * arith_exp
+  | Lesser_than      of arith_exp * arith_exp
+  | Lesser_or_equal  of arith_exp * arith_exp
+  | Greater_than     of arith_exp * arith_exp
+  | Greater_or_equal of arith_exp * arith_exp
+  | Empty            of set_exp
+and clause_exp =
+  | Var     of string * arith_exp option
+  | Not     of clause_exp
+  | And     of clause_exp * clause_exp
+  | Or      of clause_exp * clause_exp
+  | Xor     of clause_exp * clause_exp
+  | Implies of clause_exp * clause_exp
+  | Equiv   of clause_exp * clause_exp
+  | Bigand  of string list * set_exp list * clause_exp
+  | Bigor   of string list * set_exp list * clause_exp
+and set_exp =
+  | Set   of GenSet.t
+  | Union of set_exp * set_exp
+  | Inter of set_exp * set_exp
+  | Diff  of set_exp * set_exp
+  | Card  of set_exp
+  | Dot   of set_exp * arith_exp
+  | Range of arith_exp * arith_exp
 
-and sexp = 
-  | Set_body of set_body list
-  | Union    of (sexp * sexp)
-  | Inter    of (sexp * sexp)
-  | Diff     of (sexp * sexp)
-  | Upperset of (aexp * sexp)
-  | Range    of (aexp * aexp)
-  | Dot      of (sexp * aexp)
-  | Card     of sexp
-
-and set_body =
-  | Num  of aexp
-  | Prop of bexp
-
-and bigbody = (string * sexp * bexp option * command)
