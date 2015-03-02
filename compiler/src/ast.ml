@@ -28,11 +28,10 @@ and exp =
   | SetExp    of set_exp
   | BoolExp   of bool_exp
   | ClauseExp of clause_exp
-  | ListExp   of list_exp
   | Dot       of set_exp * exp
   | If        of bool_exp * exp * exp
 and int_exp =
-  | IVar of string
+  | Var of string
   | Int of int
   | Add of int_exp * int_exp
   | Sub of int_exp * int_exp
@@ -41,7 +40,7 @@ and int_exp =
   | Mod of int_exp * int_exp
   | To_int of float_exp
 and float_exp =
-  | FVar of string
+  | Var of string
   | Float of float
   | Add of float_exp * float_exp
   | Sub of float_exp * float_exp
@@ -50,7 +49,7 @@ and float_exp =
   | Sqrt of float_exp
   | To_float of int_exp
 and bool_exp =
-  | BVar              of string
+  | Var              of string
   | Bool              of bool
   | Not               of bool_exp
   | And               of bool_exp  * bool_exp
@@ -74,7 +73,7 @@ and bool_exp =
 and clause_exp =
   | Top
   | Bottom
-  | Term    of string * int_exp option
+  | Term    of string * term_opt option
   | Not     of clause_exp
   | And     of clause_exp  * clause_exp
   | Or      of clause_exp  * clause_exp
@@ -84,12 +83,12 @@ and clause_exp =
   | Bigand  of string list * set_exp list * exp
   | Bigor   of string list * set_exp list * exp
 and set_exp =
-  | SVar  of string
+  | Var  of string
   | Set   of GenSet.t
   | Union of set_exp * set_exp
   | Inter of set_exp * set_exp
   | Diff  of set_exp * set_exp
-and list_exp =
-  | LVar  of string
-  | List  of int list 
   | Range of int_exp * int_exp
+and term_opt =
+  | Str of string
+  | Num of int_exp

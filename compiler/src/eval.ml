@@ -49,7 +49,6 @@ and eval_exp = function
   | SetExp    x -> SetExp (Set (eval_set x))
   | BoolExp   x -> BoolExp (Bool (eval_bool x))
   | ClauseExp x -> ClauseExp (eval_clause x)
-  | ListExp   x -> ListExp (eval_list x)
   | Dot (x, y) ->
       begin
         match eval_set x, eval_exp y with
@@ -63,9 +62,9 @@ and eval_exp = function
               try FloatExp (Float (FloatSet.find b a))
               with Not_found -> failwith ("element " ^ (string_of_float b) ^ " not in set")
             end
-        | (GenSet.SS a), ClauseExp (Var (b, None)) ->
+        | (GenSet.SS a), ClauseExp (Term (b, None)) ->
             begin
-              try ClauseExp (Var ((StringSet.find b a), None))
+              try ClauseExp (Term ((StringSet.find b a), None))
               with Not_found -> failwith ("element " ^ b ^ " not in set")
             end
         | _,_ -> type_error "unsupported types for '.' operator"
@@ -77,7 +76,7 @@ and eval_exp = function
         eval_exp z
 
 and eval_int = function
-  | IVar x ->
+  | Var x ->
       begin
         try
           begin
@@ -96,7 +95,7 @@ and eval_int = function
   | To_int x   -> int_of_float (eval_float x)
 
 and eval_float = function
-  | FVar x ->
+  | Var x ->
       begin
         try
           begin
@@ -115,7 +114,7 @@ and eval_float = function
   | To_float x -> float_of_int (eval_int x)
 
 and eval_bool = function
-  | BVar x ->
+  | Var x ->
       begin
         try 
           begin
@@ -156,7 +155,7 @@ and eval_bool = function
       end
 
 and eval_set = function
-  | SVar x ->
+  | Var x ->
       begin
         try
           begin
@@ -170,20 +169,7 @@ and eval_set = function
   | Union (x, y) -> set_bin_op (IntSet.union) (FloatSet.union) (StringSet.union) "union" (eval_set x) (eval_set y)
   | Inter (x, y) -> set_bin_op (IntSet.inter) (FloatSet.inter) (StringSet.inter) "union" (eval_set x) (eval_set y)
   | Diff  (x, y) -> set_bin_op (IntSet.diff)  (FloatSet.diff)  (StringSet.diff)  "union" (eval_set x) (eval_set y)
+  | Range (x, y) -> GenSet.IS (IntSet.of_list (range (eval_int x) (eval_int y) 1))
 
-and eval_list = function
-  | LVar x ->
-      begin
-        try
-          begin
-            match Hashtbl.find toplevel x with
-            | ListExp a -> a
-            | _         -> type_error ("variable '" ^ x ^ "' is not a list")
-          end
-        with Not_found -> failwith ("unbound variable: " ^ x)
-      end
-  | List _ as l  -> l
-  | Range (x, y) -> List (range (eval_int x) (eval_int y) 1)
-      
 and eval_clause = fun x -> x
 
