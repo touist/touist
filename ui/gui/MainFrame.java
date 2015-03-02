@@ -82,6 +82,10 @@ public class MainFrame extends javax.swing.JFrame {
     public void setNumberOfFormulas(int numberOfFormulas) {
         this.numberOfFormulas = numberOfFormulas;
     }
+    
+    public void updateResultsPanelIterator() {
+        resultsPanel1.updateIterator();
+    }
 
     public void setViewToEditor() {
         ((CardLayout)cards.getLayout()).show(cards, EDITOR_PANEL);
@@ -91,6 +95,7 @@ public class MainFrame extends javax.swing.JFrame {
         resultsPanel1.applyRestrictions();
         ((CardLayout)cards.getLayout()).show(cards, RESULTS_PANEL);
     }
+    
 
     /**
      * This method is called from within the constructor to initialize the form.

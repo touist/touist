@@ -198,6 +198,9 @@ public class EditorPanel extends AbstractComponentPanel {
         getFrame().setSolver(new SolverTestSAT4J(translatedFilePath));
         getFrame().getSolver().launch(); //TODO gérer les IOException
 
+        // Initialise l'iterator de ResultsPanel
+        getFrame().updateResultsPanelIterator();
+        
         // Si il y a au moins un model
         ListIterator<Model> iter = (ListIterator<Model>) getFrame().getSolver().getModelList().iterator();
         if (iter.hasNext()) {
@@ -213,6 +216,7 @@ public class EditorPanel extends AbstractComponentPanel {
         } else {
             return State.SINGLE_RESULT;
         }
+                
     }
 
     private void jButtonTestActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonTestActionPerformed

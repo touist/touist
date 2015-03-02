@@ -25,7 +25,13 @@ public class ResultsPanel extends AbstractComponentPanel {
      */
     public ResultsPanel() {
         initComponents();
-        iter = (ListIterator<Model>)getFrame().getSolver().getModelList().iterator();
+    }
+    
+    /**
+     * Update the models iterator
+     */
+    public void updateIterator() {
+        iter = getFrame().getSolver().getModelList().iterator();
     }
 
     /**
@@ -155,6 +161,7 @@ public class ResultsPanel extends AbstractComponentPanel {
                 // impossible
                 break;
             case SINGLE_RESULT :
+                getFrame().getSolver().close();
                 if(getFrame().getNumberOfFormulas() > 1) {
                     setState(State.EDIT_MULTIPLE);
                     getFrame().setViewToEditor();
@@ -164,6 +171,7 @@ public class ResultsPanel extends AbstractComponentPanel {
                 }
                 break;
             case FIRST_RESULT :
+                getFrame().getSolver().close();
                 if(getFrame().getNumberOfFormulas() > 1) {
                     setState(State.EDIT_MULTIPLE);
                     getFrame().setViewToEditor();
@@ -173,6 +181,7 @@ public class ResultsPanel extends AbstractComponentPanel {
                 }
                 break;
             case INTER_RESULT :
+                getFrame().getSolver().close();
                 if(getFrame().getNumberOfFormulas() > 1) {
                     setState(State.EDIT_MULTIPLE);
                     getFrame().setViewToEditor();
@@ -182,6 +191,7 @@ public class ResultsPanel extends AbstractComponentPanel {
                 }
                 break;
             case LAST_RESULT :
+                getFrame().getSolver().close();
                 if(getFrame().getNumberOfFormulas() > 1) {
                     setState(State.EDIT_MULTIPLE);
                     getFrame().setViewToEditor();
