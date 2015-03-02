@@ -1,30 +1,11 @@
 /*
- *
- * Project TouIST, 2015. Easily formalize and solve real-world sized problems
- * using propositional logic and linear theory of reals with a nice GUI.
- *
- * https://github.com/olzd/touist
- *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the GNU Lesser General Public License
- * (LGPL) version 2.1 which accompanies this distribution, and is available at
- * http://www.gnu.org/licenses/lgpl-2.1.html
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
- *
- * Contributors:
- *     Alexis Comte, Abdelwahab Heba, Olivier Lezaud,
- *     Skander Ben Slimane, Maël Valais
- *
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
  */
-
 package gui.editorView;
 
 import gui.AbstractComponentPanel;
-
 import java.awt.GridLayout;
 import java.util.ArrayList;
 import java.util.List;
@@ -36,7 +17,7 @@ import java.util.List;
 public class FormulaTablePanel extends AbstractComponentPanel {
 
     private List<FormulaPanel> panels;
-
+    
     /**
      * Creates new form FormulaTablePanel
      */
@@ -46,27 +27,27 @@ public class FormulaTablePanel extends AbstractComponentPanel {
         //setLayout(new GridLayout());
         initComponents();
     }
-
+    
     private void updateFormulaPanels() {
         if (panels.size() == 1) {
             panels.get(0).enableDeleteButton(false);
         }
-
+        
         for (int i=0; i<panels.size(); i++) {
             if (panels.size() > 1)
                 panels.get(i).enableDeleteButton(true);
             panels.get(i).setId(i);
         }
-
+        
         setLayout(new GridLayout(panels.size(), 1));
-
-        removeAll();
+        
+        removeAll();        
         for (FormulaPanel fp : panels) {
             add(fp);
         }
         updateUI();
     }
-
+    
     /**
      * Add a new FormulaPanel.
      */
@@ -75,13 +56,13 @@ public class FormulaTablePanel extends AbstractComponentPanel {
         try {
             getFrame().setNumberOfFormulas(getFrame().getNumberOfFormulas() + 1);
         } catch (Exception e) {
-            // on fait ce try uniquement parceque a l'initialisation,
+            // on fait ce try uniquement parceque a l'initialisation, 
             // ce panel n'a pas de parent
             // donc getFrame() provoque soulève une NullPointerException
         }
         updateFormulaPanels();
     }
-
+    
     /**
      * Remove a fomula.
      * @param id id of the formula to remove.
@@ -91,9 +72,9 @@ public class FormulaTablePanel extends AbstractComponentPanel {
         getFrame().setNumberOfFormulas(getFrame().getNumberOfFormulas() - 1);
         updateFormulaPanels();
     }
-
+    
     /**
-     * Return the the focused formulaPanel if it exists.
+     * Return the the focused formulaPanel if it exists. 
      * @return the formulaPanel that have the focus, null if none of the panels has focus.
      */
     public FormulaPanel getFocusedFormulaPanel() {
@@ -104,7 +85,7 @@ public class FormulaTablePanel extends AbstractComponentPanel {
         }
         return null;
     }
-
+    
     /**
      * Defines if the formulaPanels' remove button is enabled or not.
      * @param b true to enable the remove button, false to disable it.
@@ -122,14 +103,14 @@ public class FormulaTablePanel extends AbstractComponentPanel {
     public int getNumberOfFormulas() {
         return panels.size();
     }
-
+    
     /**
      * Update BaseDeClause when one of the FormulaPanel is edited
      */
     public void formulaPanelContentUpdate() {
         getFrame().getClause().getFormules().clear();
         getFrame().getClause().getSets().clear();
-
+        
         for(FormulaPanel fp : panels) {
             switch(fp.getType()) {
                 case SET :
@@ -143,7 +124,7 @@ public class FormulaTablePanel extends AbstractComponentPanel {
             }
         }
     }
-
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
