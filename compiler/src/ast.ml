@@ -72,6 +72,8 @@ and bool_exp =
   | FGreater_or_equal of float_exp * float_exp
   | Empty             of set_exp
 and clause_exp =
+  | Top
+  | Bottom
   | Var     of string * int_exp option
   | Not     of clause_exp
   | And     of clause_exp  * clause_exp
