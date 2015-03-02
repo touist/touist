@@ -74,7 +74,7 @@ and bool_exp =
 and clause_exp =
   | Top
   | Bottom
-  | Var     of string * int_exp option
+  | Term    of string * int_exp option
   | Not     of clause_exp
   | And     of clause_exp  * clause_exp
   | Or      of clause_exp  * clause_exp
