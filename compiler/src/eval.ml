@@ -42,7 +42,7 @@ let rec eval_prog = function
   | Begin (Some sets, exp) ->
       List.iter eval_affect sets; List.map (eval_exp ~env:[]) exp
 
-and eval_affect : affect -> unit = function
+and eval_affect = function
   | Affect (str, exp) -> Hashtbl.replace toplevel str (eval_exp exp)
 
 and eval_exp ?(env=[]) = function
@@ -103,12 +103,20 @@ and eval_int ?(env=[]) = function
           with Not_found -> failwith ("unbound variable: " ^ x)
       end
   | Int i -> i
+  | Neg i -> - (eval_int ~env:env i)
   | Add (x, y) -> (eval_int ~env:env x) + (eval_int ~env:env y)
   | Sub (x, y) -> (eval_int ~env:env x) - (eval_int ~env:env y)
   | Mul (x, y) -> (eval_int ~env:env x) * (eval_int ~env:env y)
   | Div (x, y) -> (eval_int ~env:env x) / (eval_int ~env:env y)
   | Mod (x, y) -> (eval_int ~env:env x) mod (eval_int ~env:env y)
   | To_int x   -> int_of_float (eval_float x)
+  | Card x ->
+      begin
+        match eval_set x with
+        | GenSet.IS a -> Int (IntSet.cardinal a)
+        | GenSet.FS a -> Int (FloatSet.cardinal a)
+        | GenSet.SS a -> Int (StringSet.cardinal a)
+      end
 
 and eval_float = function
   | Var x ->
@@ -122,6 +130,7 @@ and eval_float = function
         with Not_found -> failwith ("unbound variable: " ^ x)
       end
   | Float f -> f
+  | Neg   f -> - (eval_float f)
   | Add (x, y) -> (eval_float x) +. (eval_float y)
   | Sub (x, y) -> (eval_float x) -. (eval_float y)
   | Mul (x, y) -> (eval_float x) *. (eval_float y)

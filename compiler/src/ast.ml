@@ -33,15 +33,18 @@ and exp =
 and int_exp =
   | Var    of string
   | Int    of int
+  | Neg    of int_exp
   | Add    of int_exp * int_exp
   | Sub    of int_exp * int_exp
   | Mul    of int_exp * int_exp
   | Div    of int_exp * int_exp
   | Mod    of int_exp * int_exp
   | To_int of float_exp
+  | Card   of set_exp
 and float_exp =
   | Var      of string
   | Float    of float
+  | Neg      of float_exp
   | Add      of float_exp * float_exp
   | Sub      of float_exp * float_exp
   | Mul      of float_exp * float_exp
