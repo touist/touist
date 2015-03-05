@@ -25,24 +25,23 @@ rule lexer = parse
   | "end"          { END                       }
   | "sets"         { SETS                      }
   | "formula"      { FORMULA                   }
+  | "do"           { DO                        }
   | "in"           { IN                        }
   | "subset"       { SUBSET                    }
   | "empty"        { EMPTY                     }
   | "union"        { UNION                     }
   | "inter"        { INTER                     }
   | "diff"         { DIFF                      }
-  | "upperset"     { UPPERSET                  }
   | "bigand"       { BIGAND                    }
   | "bigor"        { BIGOR                     }
-  | "exact"        { EXACT                     }
-  | "atleast"      { ATLEAST                   }
-  | "almost"       { ALMOST                    }
   | "of"           { OF                        }
-  | "with"         { WITH                      }
-  | "true-clause"  { TRUECLAUSE                }
-  | "false-clause" { FALSECLAUSE               }
-  | "#"            { CARD                      }
+  | "when"         { WHEN                      }
+  | "Top"          { TOP                       }
+  | "Bottom"       { BOTTOM                    }
+  | "card"         { CARD                      }
   | "("            { LPAREN                    }
+  | "["            { LBRACK                    }
+  | "]"            { RBRACK                    }
   | ")"            { RPAREN                    }
   | "."            { DOT                       }
   | ".."           { RANGE                     }
@@ -55,25 +54,24 @@ rule lexer = parse
   | "/"            { DIV                       }
   | "mod"          { MOD                       }
   | "sqrt"         { SQRT                      }
-  | "["            { LBRACK                    }
-  | "]"            { RBRACK                    }
   | "<"            { LT                        }
   | ">"            { GT                        }
   | "<="           { LE                        }
   | ">="           { GE                        }
   | "="            { AFFECT                    }
   | "int"          { TOINT                     }
-  | "real"         { TOFLOAT                   }
-  | "true"         { TRUE                      }
-  | "false"        { FALSE                     }
+  | "float"        { TOFLOAT                   }
+  | "true"         { BOOL (bool_of_string b)   }
+  | "false"        { BOOL (bool_of_string b)   }
   | "and"          { AND                       }
   | "or"           { OR                        }
   | "=>"           { IMPLY                     }
   | "xor"          { XOR                       }
-  | "~"            { NOT                       }
+  | "not"          { NOT                       }
   | "if"           { IF                        }
   | "then"         { THEN                      }
   | "else"         { ELSE                      }
+  | identifier     { STRING s                  }
   | '$' identifier { VAR v                     }
   | identifier     { TERM t                    }
   | integer        { INT  (int_of_string n)    }
