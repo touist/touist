@@ -19,7 +19,7 @@ let to_dimacs prop =
       Hashtbl.add table x n; incr num_sym; n
   in (go "" prop) ^ " 0", table
 
-
+(*
 let test () =
   let p = Implies (And (Term ("a", None),
                         Term ("b", None)),
@@ -30,3 +30,4 @@ let test () =
   print_string str
 
 let () = test ()
+*)
