@@ -31,25 +31,25 @@ and exp =
   | Dot       of set_exp * exp
   | If        of bool_exp * exp * exp
 and int_exp =
-  | Var of string
-  | Int of int
-  | Add of int_exp * int_exp
-  | Sub of int_exp * int_exp
-  | Mul of int_exp * int_exp
-  | Div of int_exp * int_exp
-  | Mod of int_exp * int_exp
+  | Var    of string
+  | Int    of int
+  | Add    of int_exp * int_exp
+  | Sub    of int_exp * int_exp
+  | Mul    of int_exp * int_exp
+  | Div    of int_exp * int_exp
+  | Mod    of int_exp * int_exp
   | To_int of float_exp
 and float_exp =
-  | Var of string
-  | Float of float
-  | Add of float_exp * float_exp
-  | Sub of float_exp * float_exp
-  | Mul of float_exp * float_exp
-  | Div of float_exp * float_exp
-  | Sqrt of float_exp
+  | Var      of string
+  | Float    of float
+  | Add      of float_exp * float_exp
+  | Sub      of float_exp * float_exp
+  | Mul      of float_exp * float_exp
+  | Div      of float_exp * float_exp
+  | Sqrt     of float_exp
   | To_float of int_exp
 and bool_exp =
-  | Var              of string
+  | Var               of string
   | Bool              of bool
   | Not               of bool_exp
   | And               of bool_exp  * bool_exp
@@ -57,18 +57,21 @@ and bool_exp =
   | Xor               of bool_exp  * bool_exp
   | Implies           of bool_exp  * bool_exp
   | Equiv             of bool_exp  * bool_exp
-  | Equal             of int_exp * int_exp
-  | Not_equal         of int_exp * int_exp
-  | Lesser_than       of int_exp * int_exp
-  | Lesser_or_equal   of int_exp * int_exp
-  | Greater_than      of int_exp * int_exp
-  | Greater_or_equal  of int_exp * int_exp
+  | Equal             of int_exp   * int_exp
+  | Not_equal         of int_exp   * int_exp
+  | Lesser_than       of int_exp   * int_exp
+  | Lesser_or_equal   of int_exp   * int_exp
+  | Greater_than      of int_exp   * int_exp
+  | Greater_or_equal  of int_exp   * int_exp
   | FEqual            of float_exp * float_exp
   | FNot_equal        of float_exp * float_exp
   | FLesser_than      of float_exp * float_exp
   | FLesser_or_equal  of float_exp * float_exp
   | FGreater_than     of float_exp * float_exp
   | FGreater_or_equal of float_exp * float_exp
+  | In                of exp       * set_exp
+  | Subset            of set_exp   * set_exp
+  | SEqual            of set_exp   * set_exp
   | Empty             of set_exp
 and clause_exp =
   | Top
@@ -80,10 +83,10 @@ and clause_exp =
   | Xor     of clause_exp  * clause_exp
   | Implies of clause_exp  * clause_exp
   | Equiv   of clause_exp  * clause_exp
-  | Bigand  of string list * set_exp list * exp
-  | Bigor   of string list * set_exp list * exp
+  | Bigand  of string * set_exp * bool_exp option * exp
+  | Bigor   of string * set_exp * bool_exp option * exp
 and set_exp =
-  | Var  of string
+  | Var   of string
   | Set   of GenSet.t
   | Union of set_exp * set_exp
   | Inter of set_exp * set_exp
