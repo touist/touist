@@ -49,8 +49,8 @@ let to_cnf p =
     | x, y          -> Or (push_disj_in x, push_disj_in y)
   in
   let rec simplify = function
-    | And (x, Top) -> x
-    | And (Top, x) -> x
+    | And (x, Top) -> simplify x
+    | And (Top, x) -> simplify x
     | And (x, Bottom) -> Bottom
     | And (Bottom, x) -> Bottom
     | And (Not (Term (x, None)), Term (y, None)) as p -> if x = y then Bottom else p
@@ -58,8 +58,8 @@ let to_cnf p =
     | And (x, y) -> if equal x y then simplify x else And (simplify x, simplify y)
     | Or (x, Top) -> Top
     | Or (Top, x) -> Top
-    | Or (x, Bottom) -> x
-    | Or (Bottom, x) -> x
+    | Or (x, Bottom) -> simplify x
+    | Or (Bottom, x) -> simplify x
     | Or (Not (Term (x, None)), Term (y, None)) as p -> if x = y then Top else p
     | Or (Term (x, None), Not (Term (y, None))) as p -> if x = y then Top else p
     | Or (Or (Term (x, None), y), Not (Term (z, None))) as p -> if x = z then simplify y else p
