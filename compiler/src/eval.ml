@@ -102,15 +102,6 @@ and eval_int ?(env=[]) = function
             end
           with Not_found -> failwith ("unbound variable: " ^ x)
       end
-      (*begin
-        try
-          begin
-            match Hashtbl.find toplevel x with
-            | IntExp (Int a) -> a
-            | _ -> type_error ("variable '" ^ x ^ "' is not an int")
-          end
-        with Not_found -> failwith ("unbound variable: " ^ x)
-      end*)
   | Int i -> i
   | Add (x, y) -> (eval_int ~env:env x) + (eval_int ~env:env y)
   | Sub (x, y) -> (eval_int ~env:env x) - (eval_int ~env:env y)
@@ -219,18 +210,28 @@ and eval_clause ?(env=[]) = function
   | Implies (x, y) -> Implies (eval_clause ~env:env x, eval_clause ~env:env y)
   | Equiv   (x, y) -> Equiv   (eval_clause ~env:env x, eval_clause ~env:env y)
   | Bigand (v, s, t, e) ->
+      let test =
+        match t with
+        | Some x -> x
+        | None   -> Bool true
+      in
       begin
         match eval_set s with
-        | GenSet.IS a -> bigand_int env v (IntSet.elements a) t e
-        | GenSet.FS a -> bigand_float env v (FloatSet.elements a) t e
-        | GenSet.SS a -> bigand_str env v (StringSet.elements a) t e
+        | GenSet.IS a -> bigand_int env v (IntSet.elements a) test e
+        | GenSet.FS a -> bigand_float env v (FloatSet.elements a) test e
+        | GenSet.SS a -> bigand_str env v (StringSet.elements a) test e
       end
   | Bigor (v, s, t, e) ->
+      let test =
+        match t with
+        | Some x -> x
+        | None   -> Bool true
+      in
       begin
         match eval_set s with
-        | GenSet.IS a -> bigor_int env v (IntSet.elements a) t e
-        | GenSet.FS a -> bigor_float env v (FloatSet.elements a) t e
-        | GenSet.SS a -> bigor_str env v (StringSet.elements a) t e
+        | GenSet.IS a -> bigor_int env v (IntSet.elements a) test e
+        | GenSet.FS a -> bigor_float env v (FloatSet.elements a) test e
+        | GenSet.SS a -> bigor_str env v (StringSet.elements a) test e
       end
 and bigand_int env var values test exp =
   List.fold_left (fun acc x ->
@@ -272,3 +273,14 @@ and eval_bigbody env exp =
   match eval_exp ~env:env exp with
   | ClauseExp a -> a
   | _ -> failwith "expected clause expression"
+
+(*
+let test () =
+  eval_clause (Bigand ("i", Range (Int 1, Int 3), None,
+                       ClauseExp (Bigand ("j", Range (Int 1, Int 3), None,
+                                  ClauseExp (And (Term ("a", Some (Num (Var "i"))),
+                                                  Term ("b", Some (Num (Var "j")))))))))
+let () =
+  let clause, table = Cnf.to_cnf (test ()) |> Dimacs.to_dimacs in
+  print_string clause
+*)
