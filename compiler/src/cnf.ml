@@ -2,9 +2,7 @@ open Ast
 
 let to_cnf p =
   let rec remove_impl = function
-    | Top -> Top
-    | Bottom -> Bottom
-    | Term _ as x -> x
+    | Top | Bottom | Term _ as x -> x
     | Not     x      -> Not (remove_impl x)
     | And     (x, y) -> And (remove_impl x, remove_impl y)
     | Or      (x, y) -> Or (remove_impl x, remove_impl y)
@@ -15,10 +13,10 @@ let to_cnf p =
   in
   let rec remove_xor = function
     | Top | Bottom | Term _ as x -> x
-    | Not  x      -> Not (remove_xor x)
-    | And  (x, y) -> And (remove_xor x, remove_xor y)
-    | Or   (x, y) -> Or (remove_xor x, remove_xor y)
-    | Xor  (x, y) -> And (Or (remove_xor x, remove_xor y), Not (And (remove_xor x, remove_xor y)))
+    | Not  x              -> Not (remove_xor x)
+    | And  (x, y)         -> And (remove_xor x, remove_xor y)
+    | Or   (x, y)         -> Or (remove_xor x, remove_xor y)
+    | Xor  (x, y)         -> And (Or (remove_xor x, remove_xor y), Not (And (remove_xor x, remove_xor y)))
     | Implies _ | Equiv _ -> failwith "there shouldn't be any implies/equiv left"
     | Bigand _ | Bigor _  -> failwith "all bigor and bigand should have been eliminated"
   in
@@ -38,12 +36,9 @@ let to_cnf p =
   in
   let rec push_disj_in = function
     | Top | Bottom | Term _ as x    -> x
-    | Not  x                 -> Not (push_disj_in x)
-    (*| Or   (x, And (y, z)) -> And (push_disj_in (Or (x, y)), push_disj_in (Or (x, y)))
-    | Or   (And (x, y), z) -> And (push_disj_in (Or (x, z)), push_disj_in (Or (y, z)))
-    | Or   (x, y)          -> Or (push_disj_in x, push_disj_in y) *)
-    | Or (x, y)              -> dist (push_disj_in x) (push_disj_in y)
-    | And  (x, y)            -> And (push_disj_in x, push_disj_in y)
+    | Not  x              -> Not (push_disj_in x)
+    | Or (x, y)           -> dist (push_disj_in x) (push_disj_in y)
+    | And  (x, y)         -> And (push_disj_in x, push_disj_in y)
     | Xor     _           -> failwith "there shouldn't be any xors left"
     | Implies _ | Equiv _ -> failwith "there shouldn't be any implies left"
     | Bigand _ | Bigor _  -> failwith "all bigor and bigand should have been eliminated"
@@ -51,7 +46,7 @@ let to_cnf p =
     match x, y with
     | And (x, y), z -> And (push_disj_in (Or (x, z)), push_disj_in (Or (x, z)))
     | x, And (y, z) -> And (push_neg_in (Or (x, y)), push_disj_in (Or (x, z)))
-    | x, y -> Or (push_disj_in x, push_disj_in y)
+    | x, y          -> Or (push_disj_in x, push_disj_in y)
   in
   let rec simplify = function
     | And (x, Top) -> x
@@ -81,34 +76,3 @@ let to_cnf p =
     | _ -> false
   in
   remove_impl p |> remove_xor |> push_neg_in |> push_disj_in |> simplify
-
-let to_dimacs prop =
-  let table = Hashtbl.create 10
-  and num_sym = ref 1 in
-  let rec to_list = function
-    | Term (x ,None) -> [gensym x]
-    | Term (x, _) -> failwith "unevaluated term"
-    | Not (Term (x, None)) -> [- (gensym x)]
-    | And (x, y) -> (to_list x)@[0]@(to_list y)
-    | Or (x, y) -> (to_list x)@(to_list y)
-    | _ -> failwith "to_dimacs error"
-  and gensym x =
-    try Hashtbl.find table x
-    with Not_found -> 
-      let n = !num_sym in
-      Hashtbl.add table x n; incr num_sym; n 
-  and to_string =
-    List.fold_left (fun acc x ->
-      if x = 0 then acc ^ " 0\n" else acc ^ string_of_int x ^ " ") "" 
-  in (to_list prop |> to_string) ^ "0", table
-
-let test () =
-  let p = Implies (And (Term ("a", None),
-                        Term ("b", None)),
-                   Implies (Or (And (Not (Term ("a", None)), Term ("c", None)),
-                                     Term ("c", None)),
-                                Not (Term ("a", None)))) in
-  let str, table = to_cnf p |> to_dimacs in
-  print_string str
-
-let () = test ()
