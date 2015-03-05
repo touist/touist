@@ -23,6 +23,13 @@ let set_bin_op iop fop sop repr s1 s2 =
   | (GenSet.SS a), (GenSet.SS b) -> (GenSet.SS (sop a b))
   | _,_ -> type_error ("unsupported set type(s) for '" ^ repr  ^ "'")
 
+let set_pred_op ipred fpred spred repr s1 s2 =
+  match s1, s2 with
+  | (GenSet.IS a), (GenSet.IS b) -> ipred a b
+  | (GenSet.FS a), (GenSet.FS b) -> fpred a b
+  | (GenSet.SS a), (GenSet.SS b) -> spred a b
+  | _,_ -> type_error ("unsupported set type(s) for '" ^ repr  ^ "'")
+
 
 (********************************************************************************
  *                             Eval functions                                   *
@@ -31,27 +38,29 @@ let set_bin_op iop fop sop repr s1 s2 =
 let toplevel = Hashtbl.create 10
 
 let rec eval_prog = function
-  | Begin (None, exp) -> List.map eval_exp exp
+  | Begin (None, exp) -> List.map (eval_exp ~env:[]) exp
   | Begin (Some sets, exp) ->
-      List.iter eval_affect sets; List.map eval_exp exp
+      List.iter eval_affect sets; List.map (eval_exp ~env:[]) exp
 
 and eval_affect : affect -> unit = function
   | Affect (str, exp) -> Hashtbl.replace toplevel str (eval_exp exp)
 
-and eval_exp = function
+and eval_exp ?(env=[]) = function
   | Var x ->
       begin
-        try Hashtbl.find toplevel x
-        with Not_found -> failwith ("unbound variable: " ^ x)
+        try List.assoc x env
+        with Not_found ->
+          try Hashtbl.find toplevel x
+          with Not_found -> failwith ("unbound variable: " ^ x)
       end
-  | IntExp    x -> IntExp (Int (eval_int x))
+  | IntExp    x -> IntExp (Int (eval_int ~env:env x))
   | FloatExp  x -> FloatExp (Float (eval_float x))
   | SetExp    x -> SetExp (Set (eval_set x))
   | BoolExp   x -> BoolExp (Bool (eval_bool x))
-  | ClauseExp x -> ClauseExp (eval_clause x)
+  | ClauseExp x -> ClauseExp (eval_clause ~env:env x)
   | Dot (x, y) ->
       begin
-        match eval_set x, eval_exp y with
+        match eval_set x, eval_exp ~env:env y with
         | (GenSet.IS a), IntExp (Int b) ->
             begin
               try IntExp (Int (IntSet.find b a))
@@ -71,13 +80,29 @@ and eval_exp = function
       end
   | If (x, y, z) ->
       if (eval_bool x) then
-        eval_exp y
+        eval_exp ~env:env y
       else
-        eval_exp z
+        eval_exp ~env:env z
 
-and eval_int = function
+and eval_int ?(env=[]) = function
   | Var x ->
       begin
+        try
+          begin
+            match List.assoc x env with
+            | IntExp (Int a) -> a
+            | _ -> type_error ("variable '" ^ x ^ "' is not an int")
+          end
+        with Not_found ->
+          try
+            begin
+              match Hashtbl.find toplevel x with
+              | IntExp (Int a) -> a
+              | _ -> type_error ("variable '" ^ x ^ "' is not an int")
+            end
+          with Not_found -> failwith ("unbound variable: " ^ x)
+      end
+      (*begin
         try
           begin
             match Hashtbl.find toplevel x with
@@ -85,13 +110,13 @@ and eval_int = function
             | _ -> type_error ("variable '" ^ x ^ "' is not an int")
           end
         with Not_found -> failwith ("unbound variable: " ^ x)
-      end
+      end*)
   | Int i -> i
-  | Add (x, y) -> (eval_int x) + (eval_int y)
-  | Sub (x, y) -> (eval_int x) - (eval_int y)
-  | Mul (x, y) -> (eval_int x) * (eval_int y)
-  | Div (x, y) -> (eval_int x) / (eval_int y)
-  | Mod (x, y) -> (eval_int x) mod (eval_int y)
+  | Add (x, y) -> (eval_int ~env:env x) + (eval_int ~env:env y)
+  | Sub (x, y) -> (eval_int ~env:env x) - (eval_int ~env:env y)
+  | Mul (x, y) -> (eval_int ~env:env x) * (eval_int ~env:env y)
+  | Div (x, y) -> (eval_int ~env:env x) / (eval_int ~env:env y)
+  | Mod (x, y) -> (eval_int ~env:env x) mod (eval_int ~env:env y)
   | To_int x   -> int_of_float (eval_float x)
 
 and eval_float = function
@@ -113,7 +138,7 @@ and eval_float = function
   | Sqrt x -> sqrt (eval_float x)
   | To_float x -> float_of_int (eval_int x)
 
-and eval_bool = function
+and eval_bool ?env = function
   | Var x ->
       begin
         try 
@@ -146,6 +171,16 @@ and eval_bool = function
   | FLesser_or_equal  (x, y) -> (eval_float x) <= (eval_float y)
   | FGreater_than     (x, y) -> (eval_float x) >  (eval_float y)
   | FGreater_or_equal (x, y) -> (eval_float x) >= (eval_float y)
+  | SEqual (x, y) -> set_pred_op (IntSet.equal) (FloatSet.equal) (StringSet.equal) "=" (eval_set x) (eval_set y)
+  | Subset (x, y) -> set_pred_op (IntSet.subset) (FloatSet.subset) (StringSet.subset) "subset" (eval_set x) (eval_set y)
+  | In (x, y) ->
+      begin
+        match eval_exp x, eval_set y with
+        | IntExp    (Int a),          GenSet.IS b -> IntSet.mem    a b
+        | FloatExp  (Float a),        GenSet.FS b -> FloatSet.mem  a b
+        | ClauseExp (Term (a, None)), GenSet.SS b -> StringSet.mem a b
+        | _,_ -> type_error "unexpected types for operator 'in'"
+      end
   | Empty x ->
       begin
         match eval_set x with
@@ -171,5 +206,69 @@ and eval_set = function
   | Diff  (x, y) -> set_bin_op (IntSet.diff)  (FloatSet.diff)  (StringSet.diff)  "union" (eval_set x) (eval_set y)
   | Range (x, y) -> GenSet.IS (IntSet.of_list (range (eval_int x) (eval_int y) 1))
 
-and eval_clause = fun x -> x
-
+and eval_clause ?(env=[]) = function
+  | Top    -> Top
+  | Bottom -> Bottom
+  | Term (x, None)  -> Term (x, None)
+  | Term (x, Some (Str y)) -> Term ((x ^ "(" ^ y ^ ")"), None)
+  | Term (x, Some (Num y)) -> Term ((x ^ "(" ^ (eval_int ~env:env y |> string_of_int) ^ ")"), None)
+  | Not     x      -> Not     (eval_clause ~env:env x)
+  | And     (x, y) -> And     (eval_clause ~env:env x, eval_clause ~env:env y)
+  | Or      (x, y) -> Or      (eval_clause ~env:env x, eval_clause ~env:env y)
+  | Xor     (x, y) -> Xor     (eval_clause ~env:env x, eval_clause ~env:env y)
+  | Implies (x, y) -> Implies (eval_clause ~env:env x, eval_clause ~env:env y)
+  | Equiv   (x, y) -> Equiv   (eval_clause ~env:env x, eval_clause ~env:env y)
+  | Bigand (v, s, t, e) ->
+      begin
+        match eval_set s with
+        | GenSet.IS a -> bigand_int env v (IntSet.elements a) t e
+        | GenSet.FS a -> bigand_float env v (FloatSet.elements a) t e
+        | GenSet.SS a -> bigand_str env v (StringSet.elements a) t e
+      end
+  | Bigor (v, s, t, e) ->
+      begin
+        match eval_set s with
+        | GenSet.IS a -> bigor_int env v (IntSet.elements a) t e
+        | GenSet.FS a -> bigor_float env v (FloatSet.elements a) t e
+        | GenSet.SS a -> bigor_str env v (StringSet.elements a) t e
+      end
+and bigand_int env var values test exp =
+  List.fold_left (fun acc x ->
+    if eval_bool test then
+      And (acc, eval_bigbody ((var, IntExp (Int x))::env) exp)
+    else
+      acc) Top values
+and bigand_float env var values test exp =
+  List.fold_left (fun acc x ->
+    if eval_bool test then
+      And (acc, eval_bigbody ((var, FloatExp (Float x))::env) exp)
+    else
+      acc) Top values
+and bigand_str env var values test exp =
+  List.fold_left (fun acc x ->
+    if eval_bool test then
+      And (acc, eval_bigbody ((var, ClauseExp (Term (x, None)))::env) exp)
+    else
+      acc) Top values
+and bigor_int env var values test exp =
+  List.fold_left (fun acc x ->
+    if eval_bool test then
+      Or (acc, eval_bigbody ((var, IntExp (Int x))::env) exp)
+    else
+      acc) Bottom values
+and bigor_float env var values test exp =
+  List.fold_left (fun acc x ->
+    if eval_bool test then
+      Or (acc, eval_bigbody ((var, FloatExp (Float x))::env) exp)
+    else
+      acc) Bottom values
+and bigor_str env var values test exp =
+  List.fold_left (fun acc x ->
+    if eval_bool test then
+      Or (acc, eval_bigbody ((var, ClauseExp (Term (x, None)))::env) exp)
+    else
+      acc) Bottom values
+and eval_bigbody env exp =
+  match eval_exp ~env:env exp with
+  | ClauseExp a -> a
+  | _ -> failwith "expected clause expression"
