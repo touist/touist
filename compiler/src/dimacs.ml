@@ -9,7 +9,7 @@ let to_dimacs prop =
     | Term   (x, None)        -> acc ^ string_of_int (gensym x)
     | Term   (x, _)           -> failwith ("unevaluated term: " ^ x)
     | Not    (Term (x, None)) -> acc ^ string_of_int (- (gensym x))
-    | And    (x, y)           -> (go acc x) ^ "0\n" ^ (go acc y)
+    | And    (x, y)           -> (go acc x) ^ " 0\n" ^ (go acc y)
     | Or     (x, y)           -> (go acc x) ^ " " ^ (go acc y)
     | _ -> failwith "non CNF clause"
   and gensym x =
