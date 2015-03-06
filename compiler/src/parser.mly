@@ -62,6 +62,7 @@ exp:
   | IF b = bool_exp THEN e1 = exp ELSE e2 = exp END { If (b, e1, e2) }
 
 int_exp:
+  | LPAREN e = int_exp RPAREN { e }
   | v  = VAR { Var v }
   | i  = INT { Int i }
   | SUB i = int_exp { Neg i } %prec neg
@@ -74,6 +75,7 @@ int_exp:
   | CARD  LPAREN s = set_exp   RPAREN { Card   s }
 
 float_exp:
+  | LPAREN e = float_exp RPAREN { e }
   | v  = VAR   { Var   v }
   | f  = FLOAT { Float f }
   | SUB f = float_exp { Neg f } %prec neg
@@ -85,6 +87,7 @@ float_exp:
   | TOFLOAT LPAREN i = int_exp   RPAREN { To_float i }
 
 bool_exp:
+  | LPAREN e = bool_exp RPAREN { e }
   | v = VAR  { Var  v }
   | b = BOOL { Bool b }
   | NOT b = bool_exp { Not b }
@@ -111,6 +114,7 @@ bool_exp:
   | EMPTY LPAREN s = set_exp RPAREN { Empty s }
 
 set_exp:
+  | LPAREN e = set_exp RPAREN { e }
   | v  = VAR      { Var v }
   | s  = set_decl { Set s }
   | UNION LPAREN s1 = set_exp COMMA s2 = set_exp RPAREN { Union (s1, s2) }
@@ -124,6 +128,7 @@ set_decl:
   | LBRACK s = separated_nonempty_list(COMMA, TERM)  RBRACK { GenSet.SS (StringSet.of_list s) }
 
 clause_exp:
+  | LPAREN e = clause_exp RPAREN { e }
   | TOP    { Top    }
   | BOTTOM { Bottom }
   | t = TERM { Term (t, None) }
