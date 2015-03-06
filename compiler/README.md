@@ -73,3 +73,6 @@ Then, to build the compiler just run `make`.
 You can also run `make install` to install it to the `/usr/local/bin/` directory
 and `make uninstall` to remove it.
 To clean up, use `make clean` and `make distclean`.
+
+Alternatively, you can build by using `ocamlbuild -use-menhir -package fileutils
+touistc.native`.
