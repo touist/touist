@@ -97,4 +97,4 @@ and set_exp =
   | Range of int_exp * int_exp
 and term_opt =
   | Str of string
-  | Num of int_exp
+  | Exp of exp

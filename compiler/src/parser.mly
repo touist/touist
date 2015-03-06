@@ -2,6 +2,7 @@
   open Ast
 %}
 
+%token BAND BOR
 %token AND OR XOR IMPLIES EQUIV NOT
 %token TOP BOTTOM
 %token <string> TERM
@@ -12,7 +13,6 @@
 %token <int> INT
 %token <float> FLOAT
 %token <string> VAR
-%token <string> STRING
 %token ADD SUB MUL DIV MOD SQRT
 %token TOINT TOFLOAT
 
@@ -26,7 +26,9 @@
 
 %start <Ast.prog> prog
 
-%left IMPLIES EQUIV
+%left BOR
+%left BAND
+%nonassoc EQUIV IMPLIES
 %left OR
 %left AND
 %left XOR
@@ -86,8 +88,8 @@ bool_exp:
   | v = VAR  { Var  v }
   | b = BOOL { Bool b }
   | NOT b = bool_exp { Not b }
-  | b1 = bool_exp AND     b2 = bool_exp { And     (b1, b2) }
-  | b1 = bool_exp OR      b2 = bool_exp { Or      (b1, b2) }
+  | b1 = bool_exp BAND    b2 = bool_exp { And     (b1, b2) }
+  | b1 = bool_exp BOR     b2 = bool_exp { Or      (b1, b2) }
   | b1 = bool_exp XOR     b2 = bool_exp { Xor     (b1, b2) }
   | b1 = bool_exp IMPLIES b2 = bool_exp { Implies (b1, b2) }
   | b1 = bool_exp EQUIV   b2 = bool_exp { Equiv   (b1, b2) }
@@ -117,9 +119,9 @@ set_exp:
   | LBRACK i1 = int_exp RANGE i2 = int_exp RBRACK { Range (i1, i2) }
 
 set_decl:
-  | LBRACK i = separated_nonempty_list(COMMA, INT)    RBRACK { GenSet.IS (IntSet.of_list i)    }
-  | LBRACK f = separated_nonempty_list(COMMA, FLOAT)  RBRACK { GenSet.FS (FloatSet.of_list f)  }
-  | LBRACK s = separated_nonempty_list(COMMA, STRING) RBRACK { GenSet.SS (StringSet.of_list s) }
+  | LBRACK i = separated_nonempty_list(COMMA, INT)   RBRACK { GenSet.IS (IntSet.of_list i)    }
+  | LBRACK f = separated_nonempty_list(COMMA, FLOAT) RBRACK { GenSet.FS (FloatSet.of_list f)  }
+  | LBRACK s = separated_nonempty_list(COMMA, TERM)  RBRACK { GenSet.SS (StringSet.of_list s) }
 
 clause_exp:
   | TOP    { Top    }
@@ -132,12 +134,12 @@ clause_exp:
   | c1 = clause_exp XOR     c2 = clause_exp { Xor     (c1, c2) }
   | c1 = clause_exp IMPLIES c2 = clause_exp { Implies (c1, c2) }
   | c1 = clause_exp EQUIV   c2 = clause_exp { Equiv   (c1, c2) }
-  | BIGAND v = STRING IN s = set_exp                   DO e = exp END { Bigand (v, s, None, e)   }
-  | BIGAND v = STRING IN s = set_exp WHEN b = bool_exp DO e = exp END { Bigand (v, s, Some b, e) }
-  | BIGOR  v = STRING IN s = set_exp                   DO e = exp END { Bigor  (v, s, None, e)   }
-  | BIGOR  v = STRING IN s = set_exp WHEN b = bool_exp DO e = exp END { Bigor  (v, s, Some b, e) }
+  | BIGAND v = VAR IN s = set_exp                   DO e = exp END { Bigand (v, s, None, e)   }
+  | BIGAND v = VAR IN s = set_exp WHEN b = bool_exp DO e = exp END { Bigand (v, s, Some b, e) }
+  | BIGOR  v = VAR IN s = set_exp                   DO e = exp END { Bigor  (v, s, None, e)   }
+  | BIGOR  v = VAR IN s = set_exp WHEN b = bool_exp DO e = exp END { Bigor  (v, s, Some b, e) }
 
 term_option:
-  | i = int_exp { Num i }
-  | s = STRING  { Str s }
+  | e = exp  { Exp e }
+  | s = TERM { Str s }
 
