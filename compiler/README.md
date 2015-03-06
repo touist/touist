@@ -73,7 +73,9 @@ There're two dependencies:
 - fileutils
 
 You can install them with `opam`:
-    $ opam install menhir fileutils
+```
+$ opam install menhir fileutils
+```
 
 Then, to build the compiler just run `make`.
 You can also run `make install` to install it to the `/usr/local/bin/` directory
