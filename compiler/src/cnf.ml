@@ -35,7 +35,7 @@ let to_cnf p =
     | Bigand _ | Bigor _  -> failwith "all bigor and bigand should have been eliminated"
   in
   let rec push_disj_in = function
-    | Top | Bottom | Term _ as x    -> x
+    | Top | Bottom | Term _ as x -> x
     | Not  x              -> Not (push_disj_in x)
     | Or (x, y)           -> dist (push_disj_in x) (push_disj_in y)
     | And  (x, y)         -> And (push_disj_in x, push_disj_in y)
