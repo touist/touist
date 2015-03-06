@@ -34,6 +34,7 @@ There will be two output file:
 - a mapping of the variables' name to their DIMACS representation (a number)
 
 `foo.dimacs`:
+```
     c CNF format file
     p cnf 9 12
     9 0
@@ -48,6 +49,7 @@ There will be two output file:
     3 0
     -2 0
     1 0
+```
 
 `.foo_table`:
     A(b) 8
