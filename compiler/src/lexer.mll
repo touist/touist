@@ -81,5 +81,5 @@ rule lexer = parse
   | ";;"           { comments_parse lexbuf          }
   | _              { raise (SyntaxError ("Unexpected char: " ^ lexeme lexbuf)) }
 and comments_parse = parse
-  | '\n'           { next_line lexbuf; comments_parse lexbuf }
-  | _              { comments_parse lexbuf                   }
+  | '\n'           { next_line lexbuf; lexer lexbuf }
+  | _              { comments_parse lexbuf          }
