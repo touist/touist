@@ -27,7 +27,7 @@ let write_to_file filename str =
 let _ =
   let in_file_path = Sys.argv.(1) in
   let in_file = FilePath.basename in_file_path in
-  let dimacs_filepath = FilePath.replace_extension in_file "dimacs" in
+  let dimacs_filepath = FilePath.replace_extension in_file "cnf" in
   let table_filepath  = "." ^ (FilePath.chop_extension in_file) ^ "_table" in
   let exp =
     Eval.eval (Parser.prog Lexer.lexer (Lexing.from_channel (open_in in_file_path)))
