@@ -35,7 +35,7 @@ There will be two output file:
 - a DIMACS file
 - a mapping of the variables' name to their DIMACS representation (a number)
 
-`foo.dimacs`:
+`foo.cnf`:
 ```
 c CNF format file
 p cnf 9 12
