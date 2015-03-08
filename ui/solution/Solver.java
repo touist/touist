@@ -51,6 +51,7 @@ public abstract class Solver {
 	 */
 	public abstract void launch() throws IOException;
 
+	public abstract boolean isSatisfiable();
 	/**
 	 * Kills the solver program process
 	 */
@@ -63,14 +64,14 @@ public abstract class Solver {
 	 * Use this method after using launch().
 	 * @return the models
 	 */
-	public abstract ModelList getModelList();
+	public abstract ModelList getModelList() throws NotSatisfiableException;
 
 	/**
 	 * ONLY used by ModelsIterator
 	 * @throws IOException
 	 */
 
-	protected abstract Model nextModel() throws IOException;
+	protected abstract Model nextModel() throws IOException, NotSatisfiableException;
 
 	/**
 	 *
@@ -79,5 +80,5 @@ public abstract class Solver {
 	 * If no literalMap is given, the Model stores the literal as given by the
 	 * solver (an integer).
 	 */
-	protected abstract Model parseModel(String[] rawModelOutput);
+	protected abstract Model parseModel(String[] rawModelOutput) throws NotSatisfiableException;
 }

@@ -53,6 +53,10 @@ public class ModelListIterator implements ListIterator<Model> {
 			m = solverInterface.nextModel();
 		} catch (IOException e) {
 			e.printStackTrace();
+			return false;
+		} catch (NotSatisfiableException e) {
+			e.printStackTrace();
+			return false;
 		}
 
 		if (m == null) { // No models left
