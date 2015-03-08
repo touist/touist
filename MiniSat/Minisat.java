@@ -76,14 +76,20 @@ public class Minisat {
         //Catch Exceptions....
         } catch (FileNotFoundException e) {
             System.out.println("Error Loading File");
+            System.exit(2);
         } catch (ParseFormatException e) {
             System.out.println("Incorrect Dimacs Content");
+            System.exit(3);
         } catch (IOException e) {
             System.out.println("Error StreamReader");
+            System.exit(4);
         } catch (ContradictionException e) {
             System.out.println("Unsatisfiable (trivial)!");
+            System.exit(1);
         }catch (org.sat4j.specs.TimeoutException ex) {
             System.out.println("Timeout Solver/Please Restart");
+            System.exit(6);
         }
+        System.exit(0);
     }
 }
