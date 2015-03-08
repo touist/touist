@@ -190,33 +190,51 @@ public class EditorPanel extends AbstractComponentPanel {
         alors passer a l'état FIRST_RESULT
         sinon passer à l'état SINGLE_RESULT
         */
+        
         String bigAndFilePath = "bigAndFile-defaultname.txt"; //TODO se mettre d'accord sur un nom standard ou ajouter a Translator et BaseDeClause des méthode pour s'échange de objets File
-        getFrame().getClause().saveToFile(bigAndFilePath); //TODO gérer les IOException
-        getFrame().getTranslator().translate(bigAndFilePath); //TODO gérer les erreurs : return false ou IOException
-
+        try {
+            getFrame().getClause().saveToFile(bigAndFilePath); //TODO gérer les IOException
+            getFrame().getTranslator().translate(bigAndFilePath); //TODO gérer les erreurs : return false ou IOException
+        } catch (Exception e) {
+            //TODO gérer proprement les exceptions
+            e.printStackTrace();
+        }
         String translatedFilePath = getFrame().getTranslator().getDimacsFilePath();
         getFrame().setSolver(new SolverTestSAT4J(translatedFilePath));
-        getFrame().getSolver().launch(); //TODO gérer les IOException
-
+        
+        if(! getFrame().getSolver().isSatisfiable()) {
+            System.out.println("Erreur : Clauses non satisfiable");
+        }
+        try {
+            getFrame().getSolver().launch(); //TODO gérer les IOException
+        } catch (Exception e) {
+            //TODO gérer proprement les exceptions
+            e.printStackTrace();
+        }
         // Initialise l'iterator de ResultsPanel
         getFrame().updateResultsPanelIterator();
         
         // Si il y a au moins un model
-        ListIterator<Model> iter = (ListIterator<Model>) getFrame().getSolver().getModelList().iterator();
-        if (iter.hasNext()) {
-            // Si il plus d'un model
-            iter.next();
+        try {
+            ListIterator<Model> iter = (ListIterator<Model>) getFrame().getSolver().getModelList().iterator();
             if (iter.hasNext()) {
-                iter.previous();
-                return State.FIRST_RESULT;
+                // Si il plus d'un model
+                iter.next();
+                if (iter.hasNext()) {
+                    iter.previous();
+                    return State.FIRST_RESULT;
+                } else {
+                    iter.previous();
+                    return State.SINGLE_RESULT;
+                }
             } else {
-                iter.previous();
                 return State.SINGLE_RESULT;
             }
-        } else {
-            return State.SINGLE_RESULT;
+        } catch (Exception e) {
+            //TODO gérer proprement les exceptions
+            e.printStackTrace();
         }
-                
+        return State.SINGLE_RESULT;
     }
 
     private void jButtonTestActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonTestActionPerformed

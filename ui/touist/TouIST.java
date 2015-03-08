@@ -43,7 +43,7 @@ public class TouIST {
     /**
      * @param args the command line arguments
      */
-    public static void main2(String[] args) {
+    public static void main(String[] args) {
         MainFrame frame = new MainFrame();
         frame.setVisible(true);
     }
@@ -52,7 +52,7 @@ public class TouIST {
 /*
  * Alternative mains for tests
  */
-	public static void main(String[] args) {
+	public static void main2(String[] args) {
 		/*
 		 * TRANSLATOR Tests
 		 */

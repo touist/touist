@@ -24,7 +24,7 @@ import translation.Translator;
 public class MainFrame extends javax.swing.JFrame {
 
     private BaseDeClauses clause = new BaseDeClauses();
-    private Translator translator = new Translator();
+    private Translator translator = new Translator("compiler/touistc.native");
     private Solver solver;
     private ModelList models;
 

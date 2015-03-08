@@ -10,6 +10,9 @@ import gui.AbstractComponentPanel;
 import gui.State;
 
 import java.util.ListIterator;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import solution.NotSatisfiableException;
 
 /**
  *
@@ -31,7 +34,12 @@ public class ResultsPanel extends AbstractComponentPanel {
      * Update the models iterator
      */
     public void updateIterator() {
-        iter = getFrame().getSolver().getModelList().iterator();
+        try {
+            iter = getFrame().getSolver().getModelList().iterator();
+        } catch (NotSatisfiableException e) {
+            //TODO gérer proprement l'exception
+            e.printStackTrace();
+        }
     }
 
     /**
