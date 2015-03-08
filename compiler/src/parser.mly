@@ -28,7 +28,7 @@
 
 %left BOR
 %left BAND
-%nonassoc EQUIV IMPLIES
+%right EQUIV IMPLIES
 %left OR
 %left AND
 %left XOR
@@ -49,10 +49,8 @@ prog:
 
 affect:
   | v = VAR AFFECT e = exp { Affect (v, e) }
-  | v = VAR AFFECT s = set_exp DOT LPAREN e = exp RPAREN { Affect (v, Dot (s, e)) }
 
 exp:
-  | LPAREN e = exp RPAREN { e }
   | v = VAR        { Var       v }
   | s = set_exp    { SetExp    s }
   | i = int_exp    { IntExp    i }
@@ -60,6 +58,7 @@ exp:
   | b = bool_exp   { BoolExp   b }
   | c = clause_exp { ClauseExp c }
   | IF b = bool_exp THEN e1 = exp ELSE e2 = exp END { If (b, e1, e2) }
+  | s = set_exp DOT LPAREN e = exp RPAREN { Dot (s, e) }
 
 int_exp:
   | LPAREN e = int_exp RPAREN { e }
@@ -91,17 +90,17 @@ bool_exp:
   | v = VAR  { BVar v }
   | b = BOOL { Bool b }
   | NOT b = bool_exp { BNot b }
-  | b1 = bool_exp BAND    b2 = bool_exp { BAnd     (b1, b2) }
-  | b1 = bool_exp BOR     b2 = bool_exp { BOr      (b1, b2) }
-  | b1 = bool_exp XOR     b2 = bool_exp { BXor     (b1, b2) }
-  | b1 = bool_exp IMPLIES b2 = bool_exp { BImplies (b1, b2) }
-  | b1 = bool_exp EQUIV   b2 = bool_exp { BEquiv   (b1, b2) }
-  | i1 = int_exp EQUAL    i2 = int_exp { Equal            (i1, i2) }
-  | i1 = int_exp NOTEQUAL i2 = int_exp { Not_equal        (i1, i2) }
-  | i1 = int_exp LT       i2 = int_exp { Lesser_than      (i1, i2) }
-  | i1 = int_exp LE       i2 = int_exp { Lesser_or_equal  (i1, i2) }
-  | i1 = int_exp GT       i2 = int_exp { Greater_than     (i1, i2) }
-  | i1 = int_exp GE       i2 = int_exp { Greater_or_equal (i1, i2) }
+  | b1 = bool_exp BAND      b2 = bool_exp  { BAnd              (b1, b2) }
+  | b1 = bool_exp BOR       b2 = bool_exp  { BOr               (b1, b2) }
+  | b1 = bool_exp XOR       b2 = bool_exp  { BXor              (b1, b2) }
+  | b1 = bool_exp IMPLIES   b2 = bool_exp  { BImplies          (b1, b2) }
+  | b1 = bool_exp EQUIV     b2 = bool_exp  { BEquiv            (b1, b2) }
+  | i1 = int_exp EQUAL      i2 = int_exp   { Equal             (i1, i2) }
+  | i1 = int_exp NOTEQUAL   i2 = int_exp   { Not_equal         (i1, i2) }
+  | i1 = int_exp LT         i2 = int_exp   { Lesser_than       (i1, i2) }
+  | i1 = int_exp LE         i2 = int_exp   { Lesser_or_equal   (i1, i2) }
+  | i1 = int_exp GT         i2 = int_exp   { Greater_than      (i1, i2) }
+  | i1 = int_exp GE         i2 = int_exp   { Greater_or_equal  (i1, i2) }
   | f1 = float_exp EQUAL    f2 = float_exp { FEqual            (f1, f2) }
   | f1 = float_exp NOTEQUAL f2 = float_exp { FNot_equal        (f1, f2) }
   | f1 = float_exp LT       f2 = float_exp { FLesser_than      (f1, f2) }
@@ -109,7 +108,9 @@ bool_exp:
   | f1 = float_exp GT       f2 = float_exp { FGreater_than     (f1, f2) }
   | f1 = float_exp GE       f2 = float_exp { FGreater_or_equal (f1, f2) }
   | s1 = set_exp EQUAL  s2 = set_exp { SEqual (s1, s2) }
-  | e  = exp     IN     s  = set_exp { In     (e, s)   }
+  | i  = int_exp   IN s = set_exp { In (IntExp i, s)   }
+  | f  = float_exp IN s = set_exp { In (FloatExp f, s) }
+  | t  = TERM      IN s = set_exp { In (ClauseExp (Term (t, None)), s) }
   | SUBSET LPAREN s1 = set_exp COMMA s2 = set_exp RPAREN { Subset (s1, s2) }
   | EMPTY LPAREN s = set_exp RPAREN { Empty s }
 
