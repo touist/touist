@@ -10,6 +10,19 @@ Input language grammar
 
 TODO
 
+## Usage
+From the `touistl.native --help`:
+```
+TouistL compiles files from the TouIST Language to SAT-DIMACS/SMT-LIB2
+Usage: touistc.native [-o translatedFile] [-table tableFile] file
+Note: if either tableFile or translatedFile is missing,
+artibrary names will be given.
+  -o The translated file
+  -table The literals table table (for SAT_DIMACS)
+  -help  Display this list of options
+  --help  Display this list of options
+```
+
 ## Example
 
 ### The input file

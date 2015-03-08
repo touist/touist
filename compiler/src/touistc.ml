@@ -96,13 +96,14 @@ let _ =
   let cmd = (FilePath.basename Sys.argv.(0)) (* ./touistl exec. name *)
   in let argspecs = (* This list enumerates the different flags (-x,-f...)*)
   [ (* "-flag", Arg.toSomething (ref var), "Usage for this flag"*)
-    ("-f", Arg.Set_string (input_file_path), "The file you want to translate");
     ("-o", Arg.Set_string (output_file_path), "The translated file");
     ("-table", Arg.Set_string (output_table_file_path), "The literals table table (for SAT_DIMACS)")
   ]
-  in let usage = "TouistL is a compiler from touistl (TouIST Language) "
-    ^"to SAT-DIMACS or SMT-LIB2 \n"
-    ^"Usage: "^cmd^" [-o translatedFile] [-table tableFile] fileToBeTranslated"
+  in let usage = "TouistL compiles files from the TouIST Language "
+    ^"to SAT-DIMACS/SMT-LIB2 \n"
+    ^"Usage: "^cmd^" [-o translatedFile] [-table tableFile] file \n"
+    ^"Note: if either tableFile or translatedFile is missing, \n"
+    ^"artibrary names will be given."
   in
 
   (* Step 1: we parse the args. If an arg. is "alone", we suppose
