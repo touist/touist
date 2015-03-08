@@ -136,8 +136,6 @@ public class SolverTestSAT4J extends Solver {
 	protected Model nextModel() throws IOException {
 		stdin.println("1");
 		stdin.flush();
-		StringBuffer br = new StringBuffer();
-		String line = "";
 		while (!stdout.ready()) {
 			try {
 				p.waitFor(100, TimeUnit.MILLISECONDS);
