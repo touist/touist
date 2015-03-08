@@ -68,11 +68,12 @@ A(c) 7
 
 ## Build
 
-There're two dependencies:
-- menhir
-- fileutils
+Before you go, make sure you have the following installed:
+- `ocaml` **4.02.0** (or latest)
+- `menhir` (equivalent of ocamlyacc)
+- `fileutils` (for reading/writing POSIX files)
 
-You can install them with `opam`:
+You can install them with `opam` (`opam` is an `apt-get`-like package manager for OCaml):
 ```
 $ opam install menhir fileutils
 ```
