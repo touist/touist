@@ -29,9 +29,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
-import java.util.Iterator;
 import java.util.Map;
-import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
 
 import entity.Literal;
@@ -197,45 +195,5 @@ public class SolverTestSAT4J extends Solver {
 	 */
 	protected Map<Integer, String> getLiteralsMap() {
 		return literalsMap;
-	}
-
-	public static void main(String[] args) {
-		// String pathToDimacs = "MiniSat/term1_gr_2pin_w4.shuffled.cnf";
-		String pathToDimacs = "term1_gr_2pin_w4.shuffled.cnf";
-		SolverTestSAT4J solverInterface = new SolverTestSAT4J(pathToDimacs);
-		try {
-			solverInterface.launch();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-		Iterator<Model> it = null;
-		try {
-			it = solverInterface.getModelList().iterator();
-		} catch (NotSatisfiableException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		if (solverInterface.isSatisfiable()) {
-			System.out.println("Satisfiable");
-		} else {
-			System.out.println("Insatisfiable");
-			System.exit(0);
-		}
-		Scanner sc = new Scanner(System.in);
-		String answer;
-		boolean continuer = true;
-		Model m;
-
-		while (it.hasNext() && continuer) {
-			m = it.next();
-			System.out.println("Modèle : " + m.toString());
-
-			System.out.println("Contiuner ? o/n");
-			answer = sc.nextLine();
-			continuer = (answer.charAt(0) == 'o');
-		}
-		sc.close();
-		solverInterface.close();
 	}
 }

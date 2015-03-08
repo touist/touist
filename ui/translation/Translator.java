@@ -34,19 +34,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import entity.Literal;
-
 /**
  * @author Abdel
  * @Modified by Mael
  */
 public class Translator {
-	final private char PREFIX_NEGATIVE_LITERAL = '-';
 	final private String outputFilePath = "out.cnf";
 	final private String outputTableFilePath = "out.table";
-	private String dimacsFilePath;
 	private String translatorProgramFilePath;
-	private Map<Integer, Literal> literalsMap = new HashMap<Integer, Literal>();
+	private Map<Integer,String> literalsMap = new HashMap<Integer,String>();
 	private List<Error> errors;
 	private List<Warning> warnings;
 
@@ -102,7 +98,6 @@ public class Translator {
 	}
 
 	public Translator(String translatorProgramFilePath) {
-		this.dimacsFilePath = null;
 		this.translatorProgramFilePath = translatorProgramFilePath;
 	}
 
@@ -162,9 +157,10 @@ public class Translator {
 	 * Allows the user to get the literalsMap that contains the matching table
 	 * between the DIMACS integers and the real literals names. This map is used
 	 * by the Solver instance.
+	 * @warning This table is NOT the same as the table returned by Solver class
 	 * @return the map
 	 */
-	public Map<Integer,Literal> getLiteralsMap() {
+	public Map<Integer,String> getLiteralsMap() {
 		return literalsMap;
 	}
 
@@ -173,7 +169,7 @@ public class Translator {
 	 * @return the file path
 	 */
 	public String getDimacsFilePath() {
-		return dimacsFilePath;
+		return outputFilePath;
 	}
 
 	/**
@@ -226,36 +222,12 @@ public class Translator {
 		String line = "";
 		while (br.ready()) {
 			line = br.readLine();
-			System.out.println(line);
 			String[] splitted = line.split(" ");
-			String literal = splitted[0];
-			boolean isPositive = (literal.charAt(0) != PREFIX_NEGATIVE_LITERAL);
+			String literalString = splitted[0];
 			int literalCode = Integer.parseInt(splitted[1]);
-			literalsMap.put(literalCode, new Literal(literal,isPositive));
+			literalsMap.put(literalCode, literalString);
 		}
 		br.close();
-	}
-
-	public static void main(String[] args) {
-		Translator t = new Translator("compiler/touistc.native");
-		boolean worked = false;
-		try {
-			worked = t.translate("compiler/test/foo.touistl");
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		if(worked) {
-			System.out.println("OK");
-			t.getLiteralsMap().toString();
-		}
-		else {
-			System.out.println("NOK");
-		}
-
 	}
 
 }
