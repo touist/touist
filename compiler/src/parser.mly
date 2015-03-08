@@ -63,8 +63,8 @@ exp:
 
 int_exp:
   | LPAREN e = int_exp RPAREN { e }
-  | v  = VAR { Var v }
-  | i  = INT { Int i }
+  | v  = VAR { IVar v }
+  | i  = INT { Int  i }
   | SUB i = int_exp { Neg i } %prec neg
   | i1 = int_exp ADD i2 = int_exp { Add (i1, i2) }
   | i1 = int_exp SUB i2 = int_exp { Sub (i1, i2) }
@@ -76,26 +76,26 @@ int_exp:
 
 float_exp:
   | LPAREN e = float_exp RPAREN { e }
-  | v  = VAR   { Var   v }
+  | v  = VAR   { FVar  v }
   | f  = FLOAT { Float f }
-  | SUB f = float_exp { Neg f } %prec neg
-  | f1 = float_exp ADD  f2 = float_exp { Add  (f1, f2) }
-  | f1 = float_exp SUB  f2 = float_exp { Sub  (f1, f2) }
-  | f1 = float_exp MUL  f2 = float_exp { Mul  (f1, f2) }
-  | f1 = float_exp DIV  f2 = float_exp { Div  (f1, f2) }
+  | SUB f = float_exp { FNeg f } %prec neg
+  | f1 = float_exp ADD  f2 = float_exp { FAdd  (f1, f2) }
+  | f1 = float_exp SUB  f2 = float_exp { FSub  (f1, f2) }
+  | f1 = float_exp MUL  f2 = float_exp { FMul  (f1, f2) }
+  | f1 = float_exp DIV  f2 = float_exp { FDiv  (f1, f2) }
   | SQRT    LPAREN f = float_exp RPAREN { Sqrt     f }
   | TOFLOAT LPAREN i = int_exp   RPAREN { To_float i }
 
 bool_exp:
   | LPAREN e = bool_exp RPAREN { e }
-  | v = VAR  { Var  v }
+  | v = VAR  { BVar v }
   | b = BOOL { Bool b }
-  | NOT b = bool_exp { Not b }
-  | b1 = bool_exp BAND    b2 = bool_exp { And     (b1, b2) }
-  | b1 = bool_exp BOR     b2 = bool_exp { Or      (b1, b2) }
-  | b1 = bool_exp XOR     b2 = bool_exp { Xor     (b1, b2) }
-  | b1 = bool_exp IMPLIES b2 = bool_exp { Implies (b1, b2) }
-  | b1 = bool_exp EQUIV   b2 = bool_exp { Equiv   (b1, b2) }
+  | NOT b = bool_exp { BNot b }
+  | b1 = bool_exp BAND    b2 = bool_exp { BAnd     (b1, b2) }
+  | b1 = bool_exp BOR     b2 = bool_exp { BOr      (b1, b2) }
+  | b1 = bool_exp XOR     b2 = bool_exp { BXor     (b1, b2) }
+  | b1 = bool_exp IMPLIES b2 = bool_exp { BImplies (b1, b2) }
+  | b1 = bool_exp EQUIV   b2 = bool_exp { BEquiv   (b1, b2) }
   | i1 = int_exp EQUAL    i2 = int_exp { Equal            (i1, i2) }
   | i1 = int_exp NOTEQUAL i2 = int_exp { Not_equal        (i1, i2) }
   | i1 = int_exp LT       i2 = int_exp { Lesser_than      (i1, i2) }
@@ -115,8 +115,8 @@ bool_exp:
 
 set_exp:
   | LPAREN e = set_exp RPAREN { e }
-  | v  = VAR      { Var v }
-  | s  = set_decl { Set s }
+  | v  = VAR      { SVar v }
+  | s  = set_decl { Set  s }
   | UNION LPAREN s1 = set_exp COMMA s2 = set_exp RPAREN { Union (s1, s2) }
   | INTER LPAREN s1 = set_exp COMMA s2 = set_exp RPAREN { Inter (s1, s2) }
   | DIFF  LPAREN s1 = set_exp COMMA s2 = set_exp RPAREN { Diff  (s1, s2) }

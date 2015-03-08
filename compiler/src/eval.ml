@@ -86,7 +86,7 @@ let eval exp =
           eval_exp ~env:env z
 
   and eval_int ?(env=[]) = function
-    | Var x ->
+    | IVar x ->
         begin
           try
             begin
@@ -120,7 +120,7 @@ let eval exp =
         end
 
   and eval_float = function
-    | Var x ->
+    | FVar x ->
         begin
           try
             begin
@@ -131,16 +131,16 @@ let eval exp =
           with Not_found -> failwith ("unbound variable: " ^ x)
         end
     | Float f -> f
-    | Neg   f -> -. (eval_float f)
-    | Add (x, y) -> (eval_float x) +. (eval_float y)
-    | Sub (x, y) -> (eval_float x) -. (eval_float y)
-    | Mul (x, y) -> (eval_float x) *. (eval_float y)
-    | Div (x, y) -> (eval_float x) /. (eval_float y)
+    | FNeg   f -> -. (eval_float f)
+    | FAdd (x, y) -> (eval_float x) +. (eval_float y)
+    | FSub (x, y) -> (eval_float x) -. (eval_float y)
+    | FMul (x, y) -> (eval_float x) *. (eval_float y)
+    | FDiv (x, y) -> (eval_float x) /. (eval_float y)
     | Sqrt x -> sqrt (eval_float x)
     | To_float x -> float_of_int (eval_int x)
 
   and eval_bool ?env = function
-    | Var x ->
+    | BVar x ->
         begin
           try 
             begin
@@ -151,15 +151,15 @@ let eval exp =
           with Not_found -> failwith ("unbound variable: " ^ x)
         end
     | Bool b     -> b
-    | Not  b     -> not (eval_bool b)
-    | And (p, q) -> (eval_bool p) && (eval_bool q)
-    | Or (p, q)  -> (eval_bool p) && (eval_bool q)
-    | Xor (x, y) ->
+    | BNot  b     -> not (eval_bool b)
+    | BAnd (p, q) -> (eval_bool p) && (eval_bool q)
+    | BOr (p, q)  -> (eval_bool p) && (eval_bool q)
+    | BXor (x, y) ->
         let p = eval_bool x in
         let q = eval_bool y in
         (p || q) && (not (p && q))
-    | Implies (p, q) -> (not (eval_bool p)) || (eval_bool q)
-    | Equiv (x, y)   -> not (eval_bool (Xor (x, y)))
+    | BImplies (p, q) -> (not (eval_bool p)) || (eval_bool q)
+    | BEquiv (x, y)   -> not (eval_bool (BXor (x, y)))
     | Equal             (x, y) -> (eval_int x)   =  (eval_int y)
     | Not_equal         (x, y) -> (eval_int x)   <> (eval_int y)
     | Lesser_than       (x, y) -> (eval_int x)   <  (eval_int y)
@@ -191,7 +191,7 @@ let eval exp =
         end
 
   and eval_set = function
-    | Var x ->
+    | SVar x ->
         begin
           try
             begin
