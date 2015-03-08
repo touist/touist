@@ -1,7 +1,8 @@
 # Compiler
 
-This is the compiler that produces files to the
-[DIMACS](http://www.satcompetition.org/2009/format-benchmarks2009.html) format.
+This is the compiler that compiles files from the `touisl` language to the well-known [DIMACS](http://www.satcompetition.org/2009/format-benchmarks2009.html) format.
+
+`touisl` is the high-level logic langage for expressing succintly complex formulas in propositionnal logic (and more).
 
 ## Grammar
 
@@ -11,6 +12,7 @@ TODO
 
 ## Example
 
+### The input file
 File `foo.touistl`:
 ```
 ;; this is a comment
@@ -30,7 +32,11 @@ begin formula
   end
 end formula
 ```
-
+### Running the example 
+```
+touistc.native foo.touistl
+```
+### Understanding the output files
 There will be two output file:
 - a DIMACS file
 - a mapping of the variables' name to their DIMACS representation (a number)
