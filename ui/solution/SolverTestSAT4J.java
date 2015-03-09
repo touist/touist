@@ -171,13 +171,16 @@ public class SolverTestSAT4J extends Solver {
 		Model model = new Model();
 		for (String rawLiteral : rawModelOutput) {
 			int literalInt = Integer.parseInt(rawLiteral);
+                        if(literalInt!=0){
 			int literalCode = (literalInt>0?literalInt:literalInt*(-1));
-			if (getLiteralsMap() != null) { // if no liretalsMap has been given
+			if (getLiteralsMap().get(literalCode) != null) { // if no liretalsMap has been given
 				model.addLiteral(new Literal(getLiteralsMap().get(literalCode),
 						literalInt>0));
-			} else {
+			}
+                        else {
 				model.addLiteral(new Literal(rawLiteral, literalInt > 0));
 			}
+                        }
 		}
 		return model;
 	}
