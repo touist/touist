@@ -300,6 +300,7 @@ public class EditorPanel extends AbstractComponentPanel {
         for(int i=0; i<getFrame().getClause().getFormules().size(); i++) {
             formulaTablePanel1.add(new FormulaPanel(i, FormulaPanelType.FORMULA, getFrame().getClause().getFormules().get(i)));
         }
+        formulaTablePanel1.updateUI();
     }
 
     private void jButtonImportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonImportActionPerformed

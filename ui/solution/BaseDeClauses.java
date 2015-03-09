@@ -157,9 +157,6 @@ public class BaseDeClauses {
                 addSet(line);
             }
         }
-        for ( String a : sets){
-            System.out.println(a);
-        }
     }
 
     public void saveToFile(String path) throws IOException {
