@@ -8,6 +8,7 @@ package gui.editorView;
 import entity.Model;
 import gui.AbstractComponentPanel;
 import gui.State;
+import java.awt.GridLayout;
 import java.io.File;
 
 import java.util.ListIterator;
@@ -300,12 +301,16 @@ public class EditorPanel extends AbstractComponentPanel {
         
         //Réinitialisation des sets et des formules
         formulaTablePanel1.removeAll();
+        formulaTablePanel1.setLayout(new GridLayout(getFrame().getClause().getSets().size()
+                + getFrame().getClause().getFormules().size(), 1));
         for(int i=0; i<getFrame().getClause().getSets().size(); i++) {
             formulaTablePanel1.add(new FormulaPanel(i, FormulaPanelType.SET, getFrame().getClause().getSets().get(i)));
         }
         for(int i=0; i<getFrame().getClause().getFormules().size(); i++) {
             formulaTablePanel1.add(new FormulaPanel(i, FormulaPanelType.FORMULA, getFrame().getClause().getFormules().get(i)));
         }
+        getFrame().setNumberOfFormulas(getFrame().getClause().getSets().size() 
+                + getFrame().getClause().getFormules().size());
         formulaTablePanel1.updateUI();
     }
 
