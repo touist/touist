@@ -228,7 +228,7 @@ public class EditorPanel extends AbstractComponentPanel {
              * sinon passer à l'état SINGLE_RESULT
              */
             if (iter.hasNext()) {
-           //     iter.next();
+                getFrame().setResultViewText(iter.next().toString());
                 if (iter.hasNext()) {
                    //iter.previous();
                     return State.FIRST_RESULT;

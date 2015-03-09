@@ -97,6 +97,10 @@ public class MainFrame extends javax.swing.JFrame {
         ((CardLayout)cards.getLayout()).show(cards, RESULTS_PANEL);
     }
     
+    public void setResultViewText(String text) {
+        resultsPanel1.setText(text);
+    }
+    
 
     /**
      * This method is called from within the constructor to initialize the form.

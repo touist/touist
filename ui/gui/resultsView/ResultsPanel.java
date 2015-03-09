@@ -41,6 +41,10 @@ public class ResultsPanel extends AbstractComponentPanel {
             e.printStackTrace();
         }
     }
+    
+    public void setText(String text) {
+        jTextArea1.setText(text);
+    }
 
     /**
      * Enable the next and previous buttons depending on the frame state.
