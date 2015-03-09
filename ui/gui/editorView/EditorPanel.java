@@ -242,19 +242,25 @@ public class EditorPanel extends AbstractComponentPanel {
             //TODO gérer proprement les exceptions
             e.printStackTrace();
         }
-        return State.SINGLE_RESULT;
+        return getState();
     }
 
     private void jButtonTestActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonTestActionPerformed
 
         switch(getState()) {
             case EDIT_SINGLE :
-                setState(initResultsView());
-                getFrame().setViewToResults();
+                State state = initResultsView();
+                if (state != getState()) {
+                    setState(state);
+                    getFrame().setViewToResults();
+                }
                 break;
             case EDIT_MULTIPLE :
-                setState(initResultsView());
-                getFrame().setViewToResults();
+                State state = initResultsView();
+                if (state != getState()) {
+                    setState(state);
+                    getFrame().setViewToResults();
+                }
                 break;
             case SINGLE_RESULT :
                 // impossible
