@@ -8,8 +8,10 @@ package gui.editorView;
 import entity.Model;
 import gui.AbstractComponentPanel;
 import gui.State;
+import java.io.File;
 
 import java.util.ListIterator;
+import java.util.Map;
 
 import javax.swing.JFileChooser;
 
@@ -26,7 +28,7 @@ public class EditorPanel extends AbstractComponentPanel {
      */
     public EditorPanel() {
         initComponents();
-        //commentaire de test
+        jFileChooser1.setCurrentDirectory(new File(System.getProperties().getProperty("user.dir")));
     }
 
     private void applyRestrictions() {
@@ -183,7 +185,7 @@ public class EditorPanel extends AbstractComponentPanel {
     }//GEN-LAST:event_jButtonAddFormulaActionPerformed
 
     private State initResultsView() {
-        /* TODO
+        /*
         Faire appel au solveur avec les fichiers générés par le traducteur
         calculer un model
         Si un model suivant existe
@@ -199,17 +201,20 @@ public class EditorPanel extends AbstractComponentPanel {
             //TODO gérer proprement les exceptions
             e.printStackTrace();
         }
-        String translatedFilePath = getFrame().getTranslator().getDimacsFilePath();
-        getFrame().setSolver(new SolverTestSAT4J(translatedFilePath));
+        //TODO delete the generated file "bigAndFile-defaultname.txt"
         
-        if(! getFrame().getSolver().isSatisfiable()) {
-            System.out.println("Erreur : Clauses non satisfiable");
-        }
+        String translatedFilePath = getFrame().getTranslator().getDimacsFilePath();
+        Map<Integer, String> literalsMap = getFrame().getTranslator().getLiteralsMap();
+        getFrame().setSolver(new SolverTestSAT4J(translatedFilePath, literalsMap));
+        
         try {
             getFrame().getSolver().launch(); //TODO gérer les IOException
         } catch (Exception e) {
             //TODO gérer proprement les exceptions
             e.printStackTrace();
+        }
+        if(! getFrame().getSolver().isSatisfiable()) {
+            System.out.println("Erreur : Clauses non satisfiable");
         }
         // Initialise l'iterator de ResultsPanel
         getFrame().updateResultsPanelIterator();
@@ -217,8 +222,11 @@ public class EditorPanel extends AbstractComponentPanel {
         // Si il y a au moins un model
         try {
             ListIterator<Model> iter = (ListIterator<Model>) getFrame().getSolver().getModelList().iterator();
+            /**
+             * Si il y a plus d'un model, alors passer à l'état FIRST_RESULT
+             * sinon passer à l'état SINGLE_RESULT
+             */
             if (iter.hasNext()) {
-                // Si il plus d'un model
                 iter.next();
                 if (iter.hasNext()) {
                     iter.previous();
@@ -269,14 +277,21 @@ public class EditorPanel extends AbstractComponentPanel {
         String path = "";
         jFileChooser1.setFileSelectionMode(JFileChooser.FILES_ONLY);
         jFileChooser1.showDialog(this, "Importer fichier");
-        path = jFileChooser1.getSelectedFile().getPath();
+        try {
+            path = jFileChooser1.getSelectedFile().getPath();
+        } catch (NullPointerException e) {
+            //TODO handle the case where user doesn't select a file or cancel the operation.
+            e.printStackTrace();
+        }
+        System.out.println(getFrame().getClause().getFormules());
 
         try {
             getFrame().getClause().uploadFile(path);
         } catch(Exception e) {
+            System.out.println("Error : Failed to load the file : " + path);
             e.printStackTrace();
         }
-
+        
         //Réinitialisation des sets et des formules
         formulaTablePanel1.removeAll();
         for(int i=0; i<getFrame().getClause().getSets().size(); i++) {
