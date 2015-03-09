@@ -164,18 +164,18 @@ public class BaseDeClauses {
         BufferedWriter writer = new BufferedWriter(new FileWriter(path), sizeBuffer);
 
 	if(!sets.isEmpty()) {
-            writer.write("begins sets\n");
+            writer.write("begin sets\n");
             for(String set:sets) {
                 writer.write(set+"\n");
             }
             writer.write("ends sets\n");
         }
         if(!formules.isEmpty()) {
-            writer.write("begins formules\n");
+            writer.write("begin formula\n");
             for(String formule:formules) {
                 writer.write(formule+"\n");
             }
-            writer.write("ends sets\n");
+            writer.write("end sets\n");
         }
 
         writer.flush();
