@@ -203,7 +203,7 @@ public class EditorPanel extends AbstractComponentPanel {
             e.printStackTrace();
         }
         //TODO delete the generated file "bigAndFile-defaultname.txt"
-        
+        //Add CurrentPath/dimacsFile
         String translatedFilePath = getFrame().getTranslator().getDimacsFilePath();
         Map<Integer, String> literalsMap = getFrame().getTranslator().getLiteralsMap();
         getFrame().setSolver(new SolverTestSAT4J(translatedFilePath, literalsMap));

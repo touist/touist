@@ -29,6 +29,8 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -45,7 +47,7 @@ public class Translator {
 	private Map<Integer,String> literalsMap = new HashMap<Integer,String>();
 	private List<Error> errors;
 	private List<Warning> warnings;
-
+        private String CurrentPath=Paths.get("").toAbsolutePath().toString();
 	private Process p;
 
 
@@ -130,11 +132,12 @@ public class Translator {
   			| COMPILE_JUSTWARNINGS -> 2
   			| ARGUMENTS_ERROR -> 3
 		 */
-		String cmd =
+		String cmd =    CurrentPath+"/"+
 				translatorProgramFilePath
 				+ " -o " + outputFilePath
 				+ " -table " + outputTableFilePath
 				+ " " + bigandFilePath;
+                System.out.println(cmd);
 		this.p = Runtime.getRuntime().exec(cmd);
 		int return_code = p.waitFor();
 		// Response will put 2Lines: first contain dimacs path & seconde TR path
@@ -169,7 +172,7 @@ public class Translator {
 	 * @return the file path
 	 */
 	public String getDimacsFilePath() {
-		return outputFilePath;
+		return CurrentPath+"/"+outputFilePath;
 	}
 
 	/**
