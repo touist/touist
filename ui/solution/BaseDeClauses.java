@@ -168,14 +168,14 @@ public class BaseDeClauses {
             for(String set:sets) {
                 writer.write(set+"\n");
             }
-            writer.write("ends sets\n");
+            writer.write("end sets\n");
         }
         if(!formules.isEmpty()) {
             writer.write("begin formula\n");
             for(String formule:formules) {
                 writer.write(formule+"\n");
             }
-            writer.write("end sets\n");
+            writer.write("end formula\n");
         }
 
         writer.flush();

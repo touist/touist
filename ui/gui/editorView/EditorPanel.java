@@ -217,8 +217,8 @@ public class EditorPanel extends AbstractComponentPanel {
         if(! getFrame().getSolver().isSatisfiable()) {
             System.out.println("Erreur : Clauses non satisfiable");
         }
-        // Initialise l'iterator de ResultsPanel
-        getFrame().updateResultsPanelIterator();
+         //Initialise l'iterator de ResultsPanel
+            getFrame().updateResultsPanelIterator();
         
         // Si il y a au moins un model
         try {
@@ -230,10 +230,10 @@ public class EditorPanel extends AbstractComponentPanel {
             if (iter.hasNext()) {
                 iter.next();
                 if (iter.hasNext()) {
-                    iter.previous();
+                   //iter.previous();
                     return State.FIRST_RESULT;
                 } else {
-                    iter.previous();
+                    //iter.previous();
                     return State.SINGLE_RESULT;
                 }
             } else {

@@ -96,24 +96,21 @@ public class ResultsPanel extends AbstractComponentPanel {
 
         jButtonEditor.setText("Retour en édition");
         jButtonEditor.addActionListener(new java.awt.event.ActionListener() {
-            @Override
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButtonEditorActionPerformed(evt);
             }
         });
 
         jButtonPrevious.setText("Précédent");
         jButtonPrevious.addActionListener(new java.awt.event.ActionListener() {
-            @Override
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButtonPreviousActionPerformed(evt);
             }
         });
 
         jButtonNext.setText("Suivant");
         jButtonNext.addActionListener(new java.awt.event.ActionListener() {
-            @Override
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButtonNextActionPerformed(evt);
             }
         });
@@ -121,7 +118,6 @@ public class ResultsPanel extends AbstractComponentPanel {
         jTextArea1.setEditable(false);
         jTextArea1.setColumns(20);
         jTextArea1.setRows(5);
-        jTextArea1.setText("Aucun model n'a été trouvé.");
         jScrollPane1.setViewportView(jTextArea1);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);

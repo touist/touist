@@ -151,7 +151,7 @@ public class Translator {
 
 		// TODO Parse the output from "List<String> lines"
 		if(return_code == 0) {
-			parseLiteralsMapFile(outputTableFilePath);
+			parseLiteralsMapFile(CurrentPath+"/"+outputTableFilePath);
 		}
 		return return_code==0;
 	}
