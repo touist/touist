@@ -246,17 +246,17 @@ public class EditorPanel extends AbstractComponentPanel {
     }
 
     private void jButtonTestActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonTestActionPerformed
-
+        State state;
         switch(getState()) {
             case EDIT_SINGLE :
-                State state = initResultsView();
+                state = initResultsView();
                 if (state != getState()) {
                     setState(state);
                     getFrame().setViewToResults();
                 }
                 break;
             case EDIT_MULTIPLE :
-                State state = initResultsView();
+                state = initResultsView();
                 if (state != getState()) {
                     setState(state);
                     getFrame().setViewToResults();
