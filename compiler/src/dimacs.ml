@@ -5,8 +5,8 @@ let to_dimacs prop =
   and num_sym  = ref 1
   and nbclause = ref 0 in
   let rec go acc = function
-    | Top                     -> failwith "clause is always true"
-    | Bottom                  -> failwith "clause is always false"
+    | Top                     -> acc (*failwith "clause is always true"*)
+    | Bottom                  -> acc (*failwith "clause is always false"*)
     | Term   (x, None)        -> acc ^ string_of_int (gensym x)
     | Term   (x, _)           -> failwith ("unevaluated term: " ^ x)
     | Not    (Term (x, None)) -> acc ^ string_of_int (- (gensym x))
