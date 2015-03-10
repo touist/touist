@@ -38,14 +38,14 @@ let to_cnf p =
     | Top | Bottom | Term _ as x -> x
     | Not  x              -> Not (push_disj_in x)
     | Or (x, y)           -> dist (push_disj_in x) (push_disj_in y)
-    | And  (x, y)         -> And (push_disj_in x, push_disj_in y)
+    | And (x, y)          -> And (push_disj_in x, push_disj_in y)
     | Xor     _           -> failwith "there shouldn't be any xors left"
     | Implies _ | Equiv _ -> failwith "there shouldn't be any implies left"
     | Bigand _ | Bigor _  -> failwith "all bigor and bigand should have been eliminated"
   and dist x y =
     match x, y with
-    | And (x, y), z -> And (push_disj_in (Or (x, z)), push_disj_in (Or (x, z)))
-    | x, And (y, z) -> And (push_neg_in (Or (x, y)), push_disj_in (Or (x, z)))
+    | And (x, y), z -> And (push_disj_in (Or (x, z)), push_disj_in (Or (y, z)))
+    | x, And (y, z) -> And (push_disj_in (Or (x, y)), push_disj_in (Or (x, z)))
     | x, y          -> Or (push_disj_in x, push_disj_in y)
   in
   let rec simplify = function
@@ -55,7 +55,7 @@ let to_cnf p =
     | And (Bottom, x) -> Bottom
     | And (Not (Term (x, None)), Term (y, None)) as p -> if x = y then Bottom else p
     | And (Term (x, None), Not (Term (y, None))) as p -> if x = y then Bottom else p
-    | And (x, y) -> if equal x y then simplify x else And (simplify x, simplify y)
+    | And (x, y) -> if x = y then simplify x else And (simplify x, simplify y)
     | Or (x, Top) -> Top
     | Or (Top, x) -> Top
     | Or (x, Bottom) -> simplify x
@@ -68,11 +68,7 @@ let to_cnf p =
     | Or (Or (x, Not (Term (y, None))), Term (z, None)) as p -> if y = z then simplify x else p
     | Or (Or (Term (x, None), Not (Term (y, None))), z) as p -> if x = y then simplify z else p
     | Or (Or (Not (Term (x, None)), Term (y, None)), z) as p -> if x = y then simplify z else p
-    | Or (x, y) -> if equal x y then simplify x else Or (simplify x, simplify y)
+    | Or (x, y) -> if x = y then simplify x else Or (simplify x, simplify y)
     | x -> x
-  and equal x y =
-    match compare x y with
-    | 0 -> true
-    | _ -> false
   in
   remove_impl p |> remove_xor |> push_neg_in |> push_disj_in |> simplify
