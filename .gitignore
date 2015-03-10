@@ -77,3 +77,7 @@ compiler/test/.test_table
 compiler/.foo_table
 
 bigAndFile-defaultname.txt
+
+*.table
+
+*.cnf
