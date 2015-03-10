@@ -60,12 +60,15 @@ public class ModelListIterator implements ListIterator<Model> {
 				System.err.println("hasNext(): you shouldn't use that "
 								+ "because the prob. is unsatisfiable");
 				return false;
+			} catch (SolverExecutionException e) {
+				System.err.println("hasNext(): "+e.getMessage());
 			}
 
 			if (nextModel == null) { // No models left
 				solverInterface.close();
 				hasNext = false;
 			} else {
+				hasNext = true;
 				models.add(nextModel);
 			}
 		} else { // Models have already been retrieved (e.g. because of
