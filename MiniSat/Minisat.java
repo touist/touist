@@ -34,6 +34,7 @@ import org.sat4j.specs.IProblem;
 import org.sat4j.specs.ISolver;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import org.sat4j.tools.ModelIterator;
 /**
  *
  * @author Abdel
@@ -52,10 +53,12 @@ public class Minisat {
         
         //Instanciate MiniSat Solver from org.sat4j.minisat.SolverFactory
         ISolver solver = SolverFactory.newDefault();
+        //ModelIterator
+        ModelIterator mi = new ModelIterator(solver);
         //TimeLimite for executing this Solver session
         solver.setTimeout(3600); // 1 hour timeout
         //DimacsReader will be an Iterator Reader for Solver Instance to resolve Problem
-        DimacsReader reader = new DimacsReader(solver);
+        DimacsReader reader = new DimacsReader(mi);
         try {
             //IProblem is an Instance who contain Problem Format(CNF)
             //if File contain wron CNF format, ParseFrmatException will be generated.

@@ -153,15 +153,28 @@ public class SolverTestSAT4J extends Solver {
 	protected Model nextModel() throws IOException, NotSatisfiableException {
 		stdin.println("1");
 		stdin.flush();
-		while (!stdout.ready()) {
-			try {
-				p.waitFor(100, TimeUnit.MILLISECONDS);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-		}
+                //Beug Fonction
+//		while (!stdout.ready()) {
+//			try { 
+//				p.waitFor(100, TimeUnit.MILLISECONDS);
+//			} catch (InterruptedException e) {
+//				e.printStackTrace();
+//			}
+//		}
+                //use isAlive to detect if the communication is up or not
+                //if it isn't: it mean that we have no next model and an externel solver is done.
+                if (p.isAlive()){
+                while(!stdout.ready()){
+                //the attente can be 1ms of 100ms or 101ms,
+                }
 		String[] elmts = stdout.readLine().split(" ");
-		return parseModel(elmts);
+                System.out.println(elmts);
+                return parseModel(elmts);
+                }
+                //no model
+                //see ModelListeIterator.HasNext()
+                //to see controle of this call method.
+		return null;
 	}
 
 	@Override
