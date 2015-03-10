@@ -71,7 +71,7 @@ public abstract class Solver {
 	 * @return the models
 	 * @throws NotSatisfiableException if not satisfiable
 	 */
-	public abstract ModelList getModelList() throws NotSatisfiableException;
+	public abstract ModelList getModelList() throws NotSatisfiableException,SolverExecutionException;
 
 	/**
 	 * ONLY used by ModelsIterator
