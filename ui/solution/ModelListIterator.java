@@ -48,19 +48,17 @@ public class ModelListIterator implements ListIterator<Model> {
 
 	@Override
 	public boolean hasNext() {
-		System.out.print(currentPosition);
 		boolean hasNext = false;
 		if (currentPosition == models.size() - 1) { // Need to get a new model?
 			Model nextModel = null;
 			try {
 				nextModel = solverInterface.nextModel();
 			} catch (IOException e) {
-				e.printStackTrace();
+				System.err.println("hasNext(): "+e.getMessage());
 				return false;
 			} catch (NotSatisfiableException e) {
-				System.err
-						.println("hasNext(): there isn't any model: unsatisfiable problem)");
-				e.printStackTrace();
+				System.err.println("hasNext(): you shouldn't use that "
+								+ "because the prob. is unsatisfiable");
 				return false;
 			}
 

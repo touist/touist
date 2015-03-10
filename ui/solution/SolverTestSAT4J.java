@@ -120,14 +120,11 @@ public class SolverTestSAT4J extends Solver {
 				while (stderr.ready())
 					error += "launch(): '" + stderr.readLine() + "'\n";
 				throw new IOException(error);
-			} else if (!p.isAlive() && p.exitValue() == 1) { // The solver
-																// returned
-																// "unsatisfiable"
+			} else if (!p.isAlive() && p.exitValue() == 1) { // Unsatisfiable (return=1)
 				hasFoundModels = false;
 				solverIsRunning = false;
 			} else { // The external solver is running as expected
-				System.out
-						.println("launch(): the external solver has been launched and is running");
+				System.out.println("launch(): the external solver is now running");
 				solverIsRunning = true;
 				hasFoundModels = true;
 			}
