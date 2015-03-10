@@ -233,11 +233,24 @@ let eval exp =
           | None   -> Bool true
         in
         begin
+          match v,s with
+          | [],[] | _,[] | [],_ -> failwith "malformed bigand expression"
+          | [x],[y] ->
+              begin
+                match eval_set y with
+                | GenSet.IS a -> bigand_int env x (IntSet.elements a) test e
+                | GenSet.FS a -> bigand_float env x (FloatSet.elements a) test e
+                | GenSet.SS a -> bigand_str env x (StringSet.elements a) test e
+              end
+          | x::xs,y::ys ->
+              eval_clause ~env:env (Bigand ([x],[y],None,ClauseExp(Bigand (xs,ys,t,e))))
+        end
+        (*begin
           match eval_set s with
           | GenSet.IS a -> bigand_int env v (IntSet.elements a) test e
           | GenSet.FS a -> bigand_float env v (FloatSet.elements a) test e
           | GenSet.SS a -> bigand_str env v (StringSet.elements a) test e
-        end
+        end*)
     | Bigor (v, s, t, e) ->
         let test =
           match t with
