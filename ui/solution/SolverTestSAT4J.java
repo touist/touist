@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.time.Instant;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -158,32 +159,32 @@ public class SolverTestSAT4J extends Solver {
 	}
 
 	@Override
-	protected Model nextModel() throws IOException, NotSatisfiableException {
-		if (!solverIsRunning)
-			throw new IOException("nextModel(): solver was already closed!");
-		stdin.println("1");
+	protected Model nextModel() throws IOException, NotSatisfiableException, SolverExecutionException {
+		final int WAIT_FOR_MODEL_TIMEOUT = 1000; // ms
+		if (p == null) // Should not happen
+			throw new SolverExecutionException("nextModel(): launch() has not been called");
+		if (!p.isAlive()) { // The solver is already done
+			return null;
+		}
+		String[] rawLiterals;
+		Model modelParsed = null;
+		stdin.println("1"); // tells the solver to give the next model 
 		stdin.flush();
-                //Beug Fonction
-//		while (!stdout.ready()) {
-//			try { 
-//				p.waitFor(100, TimeUnit.MILLISECONDS);
-//			} catch (InterruptedException e) {
-//				e.printStackTrace();
-//			}
-//		}
-                //use isAlive to detect if the communication is up or not
-                //if it isn't: it mean that we have no next model and an externel solver is done.
-                while(!stdout.ready() && p.isAlive()){
-                //the attente can be 1ms of 100ms or 101ms,
-                }
-                String line=stdout.readLine();
-                if (line==null)
-                    //see ModelListeIterator.HasNext()
-                    //to see controle of this call method.
-                    return null;
-		String[] elmts = line.split(" ");
-                System.out.println(line);
-                return parseModel(elmts);
+		// We wait for any output from the solver unless we get a timeout
+		Instant start = Instant.now();
+		Instant timeout = start.plusMillis(1000);
+		while(!stdout.ready() && Instant.now().isBefore(timeout)){
+			// Active waiting (I know, it is a bad way to do it!)
+		}
+		if(!stdout.ready()) { // Nothing has been read
+			throw new SolverExecutionException("nextModel(): the solver "
+					+ "doesn't give any output (timeout = "
+					+Integer.toString(WAIT_FOR_MODEL_TIMEOUT)+")");
+		} else { // Something has been read
+			rawLiterals = stdout.readLine().split(" ");
+			modelParsed = parseModel(rawLiterals);
+		}
+		return modelParsed;
 	}
 
 	@Override
@@ -195,7 +196,7 @@ public class SolverTestSAT4J extends Solver {
 		Model model = new Model();
 		for (String rawLiteral : rawModelOutput) {
 			int literalInt = Integer.parseInt(rawLiteral);
-			if (literalInt != 0) {
+			if (literalInt != 0) { // '0' means 'end of model'
 				int literalCode = (literalInt > 0 ? literalInt : literalInt * (-1));
 				if (getLiteralsMap().get(literalCode) != null) {
 					model.addLiteral(new Literal(getLiteralsMap().get(
