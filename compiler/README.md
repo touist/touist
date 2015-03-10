@@ -2,7 +2,7 @@
 
 This is the compiler that compiles files from the `touistl` language to the well-known [DIMACS](http://www.satcompetition.org/2009/format-benchmarks2009.html) format.
 
-`touisl` is the high-level logic langage for expressing succintly complex formulas in propositionnal logic (and more).
+`touistl` is the high-level logic langage for expressing succintly complex formulas in propositionnal logic (and more).
 
 ## Grammar
 
