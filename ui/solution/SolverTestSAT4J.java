@@ -55,7 +55,6 @@ public class SolverTestSAT4J extends Solver {
 
 	private ModelList models = null;
 	private boolean hasFoundModels = false;
-	private boolean solverIsRunning = false;
 
 	/**
 	 * This is the main constructor used by the user after he translated the
@@ -111,7 +110,6 @@ public class SolverTestSAT4J extends Solver {
 			// We check if the solver program has been actually launched:
 			if (p.waitFor(1, TimeUnit.MILLISECONDS) && !p.isAlive()
 					&& p.exitValue() > 1) {
-				solverIsRunning = false;
 				String error = "launch(): Error while launching external solver\n";
 				error += "launch(): external solver returned "
 						+ Integer.toString(p.exitValue()) + "\n";
@@ -123,10 +121,8 @@ public class SolverTestSAT4J extends Solver {
 				throw new IOException(error);
 			} else if (!p.isAlive() && p.exitValue() == 1) { // Unsatisfiable (return=1)
 				hasFoundModels = false;
-				solverIsRunning = false;
 			} else { // The external solver is running as expected
 				System.out.println("launch(): the external solver is now running");
-				solverIsRunning = true;
 				hasFoundModels = true;
 			}
 		} catch (InterruptedException e) {
@@ -155,15 +151,14 @@ public class SolverTestSAT4J extends Solver {
 		stdin.println("\n0");
 		stdin.close();
 		this.p.destroy();
-		solverIsRunning = false;
 		System.out.println("close(): solver has been closed correctly");
 	}
 
 	@Override
 	protected Model nextModel() throws IOException, NotSatisfiableException, SolverExecutionException {
-		final int WAIT_FOR_MODEL_TIMEOUT = 1000; // ms
+		final int WAIT_FOR_MODEL_TIMEOUT = 10000; // ms
 		if (p == null) // Should not happen
-			throw new SolverExecutionException("nextModel(): launch() has not been called");
+			throw new SolverExecutionException("nextModel(): exception: launch() has not been called");
 		if (!p.isAlive()) { // The solver is already done
 			return null;
 		}
@@ -172,15 +167,16 @@ public class SolverTestSAT4J extends Solver {
 		stdin.println("1"); // tells the solver to give the next model 
 		stdin.flush();
 		// We wait for any output from the solver unless we get a timeout
-		Instant start = Instant.now();
-		Instant timeout = start.plusMillis(1000);
-		while(!stdout.ready() && Instant.now().isBefore(timeout)){
+		final Instant start = Instant.now();
+		final Instant timeout = start.plusMillis(WAIT_FOR_MODEL_TIMEOUT);
+		int a =0;
+		while(!stdout.ready() && Instant.now().isBefore(timeout) && p.isAlive()){
 			// Active waiting (I know, it is a bad way to do it!)
 		}
 		if(!stdout.ready()) { // Nothing has been read
-			throw new SolverExecutionException("nextModel(): the solver "
-					+ "doesn't give any output (timeout = "
-					+Integer.toString(WAIT_FOR_MODEL_TIMEOUT)+")");
+			throw new SolverExecutionException("nextModel(): exception: "
+					+ "the solver didn't give any output (timeout = "
+					+Integer.toString(WAIT_FOR_MODEL_TIMEOUT)+"ms)");
 		} else { // Something has been read
 			rawLiterals = stdout.readLine().split(" ");
 			modelParsed = parseModel(rawLiterals);
@@ -224,9 +220,5 @@ public class SolverTestSAT4J extends Solver {
 	 */
 	protected Map<Integer, String> getLiteralsMap() {
 		return literalsMap;
-	}
-
-	protected boolean isStillRunning() {
-		return solverIsRunning;
 	}
 }
