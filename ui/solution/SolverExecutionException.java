@@ -9,7 +9,12 @@ public class SolverExecutionException extends Exception {
 	}
 
 	@Override
+	public String getMessage() {
+		return solverError;
+	}
+
+	@Override
 	public String toString() {
-		return "SolverException: " + solverError;
+		return "SolverExecutionException: " + solverError;
 	}
 }

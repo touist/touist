@@ -109,7 +109,7 @@ public class SolverTestSAT4J extends Solver {
 
 		try {
 			// We check if the solver program has been actually launched:
-			if (p.waitFor(1, TimeUnit.SECONDS) && !p.isAlive()
+			if (p.waitFor(1, TimeUnit.MILLISECONDS) && !p.isAlive()
 					&& p.exitValue() > 1) {
 				solverIsRunning = false;
 				String error = "launch(): Error while launching external solver\n";
@@ -156,6 +156,7 @@ public class SolverTestSAT4J extends Solver {
 		stdin.close();
 		this.p.destroy();
 		solverIsRunning = false;
+		System.out.println("close(): solver has been closed correctly");
 	}
 
 	@Override

@@ -54,7 +54,7 @@ public class ModelListIterator implements ListIterator<Model> {
 			try {
 				nextModel = solverInterface.nextModel();
 			} catch (IOException e) {
-				System.err.println("hasNext(): "+e.getMessage());
+				System.err.println("hasNext(): I/O exception: "+e.getMessage());
 				return false;
 			} catch (NotSatisfiableException e) {
 				System.err.println("hasNext(): you shouldn't use that "
@@ -67,6 +67,7 @@ public class ModelListIterator implements ListIterator<Model> {
 			if (nextModel == null) { // No models left
 				solverInterface.close();
 				hasNext = false;
+				System.out.println("hasNext(): there is no more models");
 			} else {
 				hasNext = true;
 				models.add(nextModel);
