@@ -1,6 +1,6 @@
 # Compiler
 
-This is the compiler that compiles files from the `touisl` language to the well-known [DIMACS](http://www.satcompetition.org/2009/format-benchmarks2009.html) format.
+This is the compiler that compiles files from the `touistl` language to the well-known [DIMACS](http://www.satcompetition.org/2009/format-benchmarks2009.html) format.
 
 `touisl` is the high-level logic langage for expressing succintly complex formulas in propositionnal logic (and more).
 
@@ -11,7 +11,7 @@ Input language grammar
 TODO
 
 ## Usage
-From the `touistl.native --help`:
+From the `touistc.native --help`:
 ```
 TouistL compiles files from the TouIST Language to SAT-DIMACS/SMT-LIB2
 Usage: touistc.native [-o translatedFile] [-table tableFile] file
