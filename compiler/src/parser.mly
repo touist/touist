@@ -34,12 +34,11 @@
 %left XOR
 %left NOT
 %left ADD SUB
+%nonassoc neg
 %left MUL DIV
 %left MOD
 %left LT GT LE GE
 %left EQUAL NOTEQUAL
-
-%nonassoc neg
 
 %%
 
@@ -64,12 +63,12 @@ int_exp:
   | LPAREN e = int_exp RPAREN { e }
   | v  = VAR { IVar v }
   | i  = INT { Int  i }
-  | SUB i = int_exp { Neg i } %prec neg
   | i1 = int_exp ADD i2 = int_exp { Add (i1, i2) }
   | i1 = int_exp SUB i2 = int_exp { Sub (i1, i2) }
   | i1 = int_exp MUL i2 = int_exp { Mul (i1, i2) }
   | i1 = int_exp DIV i2 = int_exp { Div (i1, i2) }
   | i1 = int_exp MOD i2 = int_exp { Mod (i1, i2) }
+  | SUB i = int_exp { Neg i } %prec neg
   | TOINT LPAREN f = float_exp RPAREN { To_int f }
   | CARD  LPAREN s = set_exp   RPAREN { Card   s }
 
@@ -77,11 +76,11 @@ float_exp:
   | LPAREN e = float_exp RPAREN { e }
   | v  = VAR   { FVar  v }
   | f  = FLOAT { Float f }
-  | SUB f = float_exp { FNeg f } %prec neg
   | f1 = float_exp ADD  f2 = float_exp { FAdd  (f1, f2) }
   | f1 = float_exp SUB  f2 = float_exp { FSub  (f1, f2) }
   | f1 = float_exp MUL  f2 = float_exp { FMul  (f1, f2) }
   | f1 = float_exp DIV  f2 = float_exp { FDiv  (f1, f2) }
+  | SUB f = float_exp { FNeg f } %prec neg
   | SQRT    LPAREN f = float_exp RPAREN { Sqrt     f }
   | TOFLOAT LPAREN i = int_exp   RPAREN { To_float i }
 
@@ -140,8 +139,8 @@ clause_exp:
   | c1 = clause_exp XOR     c2 = clause_exp { Xor     (c1, c2) }
   | c1 = clause_exp IMPLIES c2 = clause_exp { Implies (c1, c2) }
   | c1 = clause_exp EQUIV   c2 = clause_exp { Equiv   (c1, c2) }
-  | BIGAND v = VAR IN s = set_exp                   DO e = exp END { Bigand (v, s, None, e)   }
-  | BIGAND v = VAR IN s = set_exp WHEN b = bool_exp DO e = exp END { Bigand (v, s, Some b, e) }
+  | BIGAND v = separated_nonempty_list(COMMA, VAR) IN s = separated_nonempty_list(COMMA, set_exp) DO e = exp END { Bigand (v, s, None, e)   }
+  | BIGAND v = separated_nonempty_list(COMMA, VAR) IN s = separated_nonempty_list(COMMA, set_exp) WHEN b = bool_exp DO e = exp END { Bigand (v, s, Some b, e) }
   | BIGOR  v = VAR IN s = set_exp                   DO e = exp END { Bigor  (v, s, None, e)   }
   | BIGOR  v = VAR IN s = set_exp WHEN b = bool_exp DO e = exp END { Bigor  (v, s, Some b, e) }
 
