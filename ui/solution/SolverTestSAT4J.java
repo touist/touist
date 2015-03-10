@@ -55,6 +55,7 @@ public class SolverTestSAT4J extends Solver {
 
 	private ModelList models = null;
 	private boolean hasFoundModels = false;
+	private Instant lastHasNextCall = null;
 
 	/**
 	 * This is the main constructor used by the user after he translated the
@@ -108,7 +109,7 @@ public class SolverTestSAT4J extends Solver {
 
 		try {
 			// We check if the solver program has been actually launched:
-			if (p.waitFor(1, TimeUnit.MILLISECONDS) && !p.isAlive()
+			if (p.waitFor(10, TimeUnit.MILLISECONDS) && !p.isAlive()
 					&& p.exitValue() > 1) {
 				String error = "launch(): Error while launching external solver\n";
 				error += "launch(): external solver returned "
@@ -156,7 +157,15 @@ public class SolverTestSAT4J extends Solver {
 
 	@Override
 	protected Model nextModel() throws IOException, NotSatisfiableException, SolverExecutionException {
-		final int WAIT_FOR_MODEL_TIMEOUT = 10000; // ms
+		// This fixes the "two hasNext() in a row" issue:
+		if(lastHasNextCall!=null && Instant.now().isBefore(lastHasNextCall.plusMillis(100))) {
+			try {
+				p.waitFor(100,TimeUnit.MILLISECONDS);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+		final int WAIT_FOR_MODEL_TIMEOUT = 500; // ms
 		if (p == null) // Should not happen
 			throw new SolverExecutionException("nextModel(): exception: launch() has not been called");
 		if (!p.isAlive()) { // The solver is already done
@@ -169,7 +178,6 @@ public class SolverTestSAT4J extends Solver {
 		// We wait for any output from the solver unless we get a timeout
 		final Instant start = Instant.now();
 		final Instant timeout = start.plusMillis(WAIT_FOR_MODEL_TIMEOUT);
-		int a =0;
 		while(!stdout.ready() && Instant.now().isBefore(timeout) && p.isAlive()){
 			// Active waiting (I know, it is a bad way to do it!)
 		}
@@ -181,6 +189,7 @@ public class SolverTestSAT4J extends Solver {
 			rawLiterals = stdout.readLine().split(" ");
 			modelParsed = parseModel(rawLiterals);
 		}
+		lastHasNextCall = Instant.now();
 		return modelParsed;
 	}
 
