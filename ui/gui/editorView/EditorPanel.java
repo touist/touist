@@ -8,8 +8,11 @@ package gui.editorView;
 import entity.Model;
 import gui.AbstractComponentPanel;
 import gui.State;
+import java.awt.GridLayout;
+import java.io.File;
 
 import java.util.ListIterator;
+import java.util.Map;
 
 import javax.swing.JFileChooser;
 
@@ -26,7 +29,7 @@ public class EditorPanel extends AbstractComponentPanel {
      */
     public EditorPanel() {
         initComponents();
-        //commentaire de test
+        jFileChooser1.setCurrentDirectory(new File(System.getProperties().getProperty("user.dir")));
     }
 
     private void applyRestrictions() {
@@ -183,52 +186,82 @@ public class EditorPanel extends AbstractComponentPanel {
     }//GEN-LAST:event_jButtonAddFormulaActionPerformed
 
     private State initResultsView() {
-        /* TODO
+        /*
         Faire appel au solveur avec les fichiers générés par le traducteur
         calculer un model
         Si un model suivant existe
         alors passer a l'état FIRST_RESULT
         sinon passer à l'état SINGLE_RESULT
         */
+        
         String bigAndFilePath = "bigAndFile-defaultname.txt"; //TODO se mettre d'accord sur un nom standard ou ajouter a Translator et BaseDeClause des méthode pour s'échange de objets File
-        getFrame().getClause().saveToFile(bigAndFilePath); //TODO gérer les IOException
-        getFrame().getTranslator().translate(bigAndFilePath); //TODO gérer les erreurs : return false ou IOException
-
+        try {
+            getFrame().getClause().saveToFile(bigAndFilePath); //TODO gérer les IOException
+            getFrame().getTranslator().translate(bigAndFilePath); //TODO gérer les erreurs : return false ou IOException
+        } catch (Exception e) {
+            //TODO gérer proprement les exceptions
+            e.printStackTrace();
+        }
+        //TODO delete the generated file "bigAndFile-defaultname.txt"
+        //Add CurrentPath/dimacsFile
         String translatedFilePath = getFrame().getTranslator().getDimacsFilePath();
-        getFrame().setSolver(new SolverTestSAT4J(translatedFilePath));
-        getFrame().getSolver().launch(); //TODO gérer les IOException
-
-        // Initialise l'iterator de ResultsPanel
-        getFrame().updateResultsPanelIterator();
+        Map<Integer, String> literalsMap = getFrame().getTranslator().getLiteralsMap();
+        getFrame().setSolver(new SolverTestSAT4J(translatedFilePath, literalsMap));
+        
+        try {
+            getFrame().getSolver().launch(); //TODO gérer les IOException
+        } catch (Exception e) {
+            //TODO gérer proprement les exceptions
+            e.printStackTrace();
+        }
+        if(! getFrame().getSolver().isSatisfiable()) {
+            System.out.println("Erreur : Clauses non satisfiable");
+        }
+         //Initialise l'iterator de ResultsPanel
+            getFrame().updateResultsPanelIterator();
         
         // Si il y a au moins un model
-        ListIterator<Model> iter = (ListIterator<Model>) getFrame().getSolver().getModelList().iterator();
-        if (iter.hasNext()) {
-            // Si il plus d'un model
-            iter.next();
+        try {
+            ListIterator<Model> iter = (ListIterator<Model>) getFrame().getSolver().getModelList().iterator();
+            /**
+             * Si il y a plus d'un model, alors passer à l'état FIRST_RESULT
+             * sinon passer à l'état SINGLE_RESULT
+             */
             if (iter.hasNext()) {
-                iter.previous();
-                return State.FIRST_RESULT;
+                getFrame().setResultViewText(iter.next().toString());
+                if (iter.hasNext()) {
+                   //iter.previous();
+                    return State.FIRST_RESULT;
+                } else {
+                    //iter.previous();
+                    return State.SINGLE_RESULT;
+                }
             } else {
-                iter.previous();
                 return State.SINGLE_RESULT;
             }
-        } else {
-            return State.SINGLE_RESULT;
+        } catch (Exception e) {
+            //TODO gérer proprement les exceptions
+            e.printStackTrace();
         }
-                
+        return getState();
     }
 
     private void jButtonTestActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonTestActionPerformed
-
+        State state;
         switch(getState()) {
             case EDIT_SINGLE :
-                setState(initResultsView());
-                getFrame().setViewToResults();
+                state = initResultsView();
+                if (state != getState()) {
+                    setState(state);
+                    getFrame().setViewToResults();
+                }
                 break;
             case EDIT_MULTIPLE :
-                setState(initResultsView());
-                getFrame().setViewToResults();
+                state = initResultsView();
+                if (state != getState()) {
+                    setState(state);
+                    getFrame().setViewToResults();
+                }
                 break;
             case SINGLE_RESULT :
                 // impossible
@@ -251,22 +284,34 @@ public class EditorPanel extends AbstractComponentPanel {
         String path = "";
         jFileChooser1.setFileSelectionMode(JFileChooser.FILES_ONLY);
         jFileChooser1.showDialog(this, "Importer fichier");
-        path = jFileChooser1.getSelectedFile().getPath();
+        try {
+            path = jFileChooser1.getSelectedFile().getPath();
+        } catch (NullPointerException e) {
+            //TODO handle the case where user doesn't select a file or cancel the operation.
+            e.printStackTrace();
+        }
+        System.out.println(getFrame().getClause().getFormules());
 
         try {
             getFrame().getClause().uploadFile(path);
         } catch(Exception e) {
+            System.out.println("Error : Failed to load the file : " + path);
             e.printStackTrace();
         }
-
+        
         //Réinitialisation des sets et des formules
         formulaTablePanel1.removeAll();
+        formulaTablePanel1.setLayout(new GridLayout(getFrame().getClause().getSets().size()
+                + getFrame().getClause().getFormules().size(), 1));
         for(int i=0; i<getFrame().getClause().getSets().size(); i++) {
             formulaTablePanel1.add(new FormulaPanel(i, FormulaPanelType.SET, getFrame().getClause().getSets().get(i)));
         }
         for(int i=0; i<getFrame().getClause().getFormules().size(); i++) {
             formulaTablePanel1.add(new FormulaPanel(i, FormulaPanelType.FORMULA, getFrame().getClause().getFormules().get(i)));
         }
+        getFrame().setNumberOfFormulas(getFrame().getClause().getSets().size() 
+                + getFrame().getClause().getFormules().size());
+        formulaTablePanel1.updateUI();
     }
 
     private void jButtonImportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonImportActionPerformed

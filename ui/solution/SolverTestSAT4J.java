@@ -29,9 +29,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
-import java.util.Iterator;
 import java.util.Map;
-import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
 
 import entity.Literal;
@@ -54,7 +52,8 @@ public class SolverTestSAT4J extends Solver {
 	private String dimacsFilePath;
 	private Map<Integer, String> literalsMap; // "table de correspondance"
 
-	private ModelList models;
+	private ModelList models = null;
+	private boolean hasFoundModels = false;
 
 	/**
 	 * This is the main constructor used by the user after he translated the
@@ -75,6 +74,7 @@ public class SolverTestSAT4J extends Solver {
 	 * This constructor is useful when the user wants to solve a problem without
 	 * using a "literalsMap" ("table de correspondance"). Hence the user has
 	 * only to pass a DIMACS file path.
+	 * @warning ONLY FOR TESTS PURPOSE
 	 * @param dimacsFilePath
 	 */
 	public SolverTestSAT4J(String dimacsFilePath) {
@@ -91,9 +91,16 @@ public class SolverTestSAT4J extends Solver {
 		// TODO We should be warned if the "java -cp" command fails because it
 		// can't find the files
 
-		// ".:MiniSat:MiniSat/sat4j-sat.jar" is the search path for binaries
-		// (with "-cp" flag)
-		// "Minisat" is the name of the class
+		/*
+		 * MINISAT TESTING PROGRAM Behaviour
+		 * ".:MiniSat:MiniSat/sat4j-sat.jar" is the search path for binaries
+		 * RETURN VALUES:
+		 * 1 = unsatisfiable
+		 * 2 = parse issue
+		 * 3 = wrong dimacs content
+		 * 4 = error with the streamreader
+		 * 5 = solver timeout
+		 */
 		String command = "java -cp .:MiniSat:MiniSat/sat4j-sat.jar Minisat "
 				+ getDimacsFilePath();
 		this.p = Runtime.getRuntime().exec(command);
@@ -105,23 +112,33 @@ public class SolverTestSAT4J extends Solver {
 		try {
 			// Here is a way to know if the solver program has been actually
 			// launched:
-			if (p.waitFor(1, TimeUnit.SECONDS) && p.exitValue() == 1) {
+			if (p.waitFor(3, TimeUnit.SECONDS) && p.exitValue() > 1) {
+				System.out.println("Une erreur au lancement du solveur externe "
+						+ "(retour="+Integer.toString(p.exitValue())+") :");
 				System.out.println(command);
 				if (stdout.ready())
 					System.out.println(stdout.readLine());
 				if (stderr.ready())
 					System.out.println(stderr.readLine());
+				throw new IOException("Error during the execution of the external solver");
 			} else {
-				System.out
-						.println("Le programme Minisat.class semble s'être lancé");
+				System.out.println("OK, Minisat.class bien lancé");
 			}
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
+		//hasFoundModels = p.exitValue() == 0;
+                hasFoundModels=true;
 	}
 
 	@Override
-	public ModelList getModelList() {
+	public boolean isSatisfiable() {
+		return hasFoundModels;
+	}
+
+	@Override
+	public ModelList getModelList() throws NotSatisfiableException {
+		if(!hasFoundModels) throw new NotSatisfiableException();
 		return models;
 	}
 
@@ -133,11 +150,9 @@ public class SolverTestSAT4J extends Solver {
 	}
 
 	@Override
-	protected Model nextModel() throws IOException {
+	protected Model nextModel() throws IOException, NotSatisfiableException {
 		stdin.println("1");
 		stdin.flush();
-		StringBuffer br = new StringBuffer();
-		String line = "";
 		while (!stdout.ready()) {
 			try {
 				p.waitFor(100, TimeUnit.MILLISECONDS);
@@ -145,21 +160,27 @@ public class SolverTestSAT4J extends Solver {
 				e.printStackTrace();
 			}
 		}
-		return parseModel(stdout.readLine().split(" "));
+		String[] elmts = stdout.readLine().split(" ");
+		return parseModel(elmts);
 	}
 
 	@Override
-	protected Model parseModel(String[] rawModelOutput) {
+	protected Model parseModel(String[] rawModelOutput) throws NotSatisfiableException {
 		// TODO The parser should be able to handle the "-3" (negation)
+		if(!hasFoundModels) throw new NotSatisfiableException();
 		Model model = new Model();
 		for (String rawLiteral : rawModelOutput) {
-			int intLiteral = Integer.parseInt(rawLiteral);
-			if (getLiteralsMap() != null) { // if no liretalsMap has been given
-				model.addLiteral(new Literal(getLiteralsMap().get(intLiteral),
-						intLiteral > 0));
-			} else {
-				model.addLiteral(new Literal(rawLiteral, intLiteral > 0));
+			int literalInt = Integer.parseInt(rawLiteral);
+                        if(literalInt!=0){
+			int literalCode = (literalInt>0?literalInt:literalInt*(-1));
+			if (getLiteralsMap().get(literalCode) != null) { // if no liretalsMap has been given
+				model.addLiteral(new Literal(getLiteralsMap().get(literalCode),
+						literalInt>0));
 			}
+                        else {
+				model.addLiteral(new Literal(rawLiteral, literalInt > 0));
+			}
+                        }
 		}
 		return model;
 	}
@@ -178,38 +199,5 @@ public class SolverTestSAT4J extends Solver {
 	 */
 	protected Map<Integer, String> getLiteralsMap() {
 		return literalsMap;
-	}
-
-	public static void main(String[] args) {
-		// String pathToDimacs = "MiniSat/term1_gr_2pin_w4.shuffled.cnf";
-		String pathToDimacs = "term1_gr_2pin_w4.shuffled.cnf";
-		SolverTestSAT4J solverInterface = new SolverTestSAT4J(pathToDimacs);
-		try {
-			solverInterface.launch();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-		Iterator<Model> it = solverInterface.getModelList().iterator();
-		if (it.hasNext()) {
-			System.out.println("Satisfiable");
-		} else {
-			System.out.println("Insatisfiable");
-		}
-		Scanner sc = new Scanner(System.in);
-		String answer;
-		boolean continuer = true;
-		Model m;
-
-		while (it.hasNext() && continuer) {
-			m = it.next();
-			System.out.println("Modèle : " + m.toString());
-
-			System.out.println("Contiuner ? o/n");
-			answer = sc.nextLine();
-			continuer = (answer.charAt(0) == 'o');
-		}
-		sc.close();
-		solverInterface.close();
 	}
 }

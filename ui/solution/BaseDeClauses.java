@@ -112,7 +112,7 @@ public class BaseDeClauses {
                 words[1] = words[1].toLowerCase();
 
 
-                if(Arrays.equals(words,new String[]{"begins","formula"})) {
+                if(Arrays.equals(words,new String[]{"begin","formula"})) {
                     if(formulaSection == true) {
                         String message = String.format(errorBeginFormula,indexLine);
                         throw new FormatException(message);
@@ -121,7 +121,7 @@ public class BaseDeClauses {
                         formulaSection = true;
                     }
                 }
-                else if(Arrays.equals(words,new String[]{"ends","formula"})) {
+                else if(Arrays.equals(words,new String[]{"end","formula"})) {
                     if(formulaSection == false) {
                         String message = String.format(errorEndFormula,indexLine);
                         throw new FormatException(message);
@@ -130,7 +130,7 @@ public class BaseDeClauses {
                         formulaSection = false;
                     }
                 }
-                else if(Arrays.equals(words,new String[]{"begins","sets"})) {
+                else if(Arrays.equals(words,new String[]{"begin","sets"})) {
                     if(setSection == true) {
                         String message = String.format(errorBeginSet,indexLine);
                         throw new FormatException(message);
@@ -139,7 +139,7 @@ public class BaseDeClauses {
                         setSection = true;
                     }
                 }
-                else if(Arrays.equals(words,new String[]{"ends","sets"})) {
+                else if(Arrays.equals(words,new String[]{"end","sets"})) {
                     if(setSection == false) {
                         String message = String.format(errorEndSet,indexLine);
                         throw new FormatException(message);
@@ -164,18 +164,18 @@ public class BaseDeClauses {
         BufferedWriter writer = new BufferedWriter(new FileWriter(path), sizeBuffer);
 
 	if(!sets.isEmpty()) {
-            writer.write("begins sets\n");
+            writer.write("begin sets\n");
             for(String set:sets) {
                 writer.write(set+"\n");
             }
-            writer.write("ends sets\n");
+            writer.write("end sets\n");
         }
         if(!formules.isEmpty()) {
-            writer.write("begins formules\n");
+            writer.write("begin formula\n");
             for(String formule:formules) {
                 writer.write(formule+"\n");
             }
-            writer.write("ends sets\n");
+            writer.write("end formula\n");
         }
 
         writer.flush();

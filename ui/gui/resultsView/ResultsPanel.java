@@ -10,6 +10,9 @@ import gui.AbstractComponentPanel;
 import gui.State;
 
 import java.util.ListIterator;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import solution.NotSatisfiableException;
 
 /**
  *
@@ -31,7 +34,16 @@ public class ResultsPanel extends AbstractComponentPanel {
      * Update the models iterator
      */
     public void updateIterator() {
-        iter = getFrame().getSolver().getModelList().iterator();
+        try {
+            iter = getFrame().getSolver().getModelList().iterator();
+        } catch (NotSatisfiableException e) {
+            //TODO gérer proprement l'exception
+            e.printStackTrace();
+        }
+    }
+    
+    public void setText(String text) {
+        jTextArea1.setText(text);
     }
 
     /**
@@ -88,24 +100,21 @@ public class ResultsPanel extends AbstractComponentPanel {
 
         jButtonEditor.setText("Retour en édition");
         jButtonEditor.addActionListener(new java.awt.event.ActionListener() {
-            @Override
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButtonEditorActionPerformed(evt);
             }
         });
 
         jButtonPrevious.setText("Précédent");
         jButtonPrevious.addActionListener(new java.awt.event.ActionListener() {
-            @Override
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButtonPreviousActionPerformed(evt);
             }
         });
 
         jButtonNext.setText("Suivant");
         jButtonNext.addActionListener(new java.awt.event.ActionListener() {
-            @Override
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButtonNextActionPerformed(evt);
             }
         });
@@ -113,7 +122,6 @@ public class ResultsPanel extends AbstractComponentPanel {
         jTextArea1.setEditable(false);
         jTextArea1.setColumns(20);
         jTextArea1.setRows(5);
-        jTextArea1.setText("Aucun model n'a été trouvé.");
         jScrollPane1.setViewportView(jTextArea1);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);

@@ -16,17 +16,31 @@ public class PalettePanel extends javax.swing.JPanel {
      */
     public PalettePanel(FormulaTablePanel panels) {
         initComponents();
+        /*
         jToolBar1.add(new PaletteSeperationLabel("Propositions :"));
         jToolBar1.add(new InsertionButton(panels, "p", "insérer la proposition p"));
         jToolBar1.add(new InsertionButton(panels, "q", "insérer la proposition q"));
         jToolBar1.add(new InsertionButton(panels, "(p i)", "insérer la proposition (p i)"));
         jToolBar1.add(new InsertionButton(panels, "(p (i + 1))", "insérer la proposition (p (i + 1))"));
         jToolBar1.add(new InsertionButton(panels, "(p i j)", "insérer la proposition (p i j)"));
-        
-        jToolBar1.add(new PaletteSeperationLabel("Connecteurs :"));
+        */
+        jToolBar1.add(new PaletteSeperationLabel("Bool :"));
         //TODO ajouter les insertButtons
+        jToolBar1.add(new InsertionButton(panels, "True", ""));
+        jToolBar1.add(new InsertionButton(panels, "False", ""));
+        jToolBar1.add(new InsertionButton(panels, "(i in E)", ""));
+        jToolBar1.add(new InsertionButton(panels, "(E subset F)", ""));
+        jToolBar1.add(new InsertionButton(panels, "(x = y)", "test d'égalité"));
+        jToolBar1.add(new InsertionButton(panels, "(<var> < <var>)", ""));
+        jToolBar1.add(new InsertionButton(panels, "(<var> <= <var>)", ""));
+        jToolBar1.add(new InsertionButton(panels, "(empty <set>)", ""));
+        jToolBar1.add(new InsertionButton(panels, "(<bool-expr> and <bool-expr>)", ""));
+        jToolBar1.add(new InsertionButton(panels, "(<bool-expr> or <bool-expr>)", ""));
+        jToolBar1.add(new InsertionButton(panels, "(not <bool-expr>)", ""));
         
-        jToolBar1.add(new PaletteSeperationLabel("Macros :"));
+        jToolBar1.add(new PaletteSeperationLabel("Set :"));
+        jToolBar1.add(new InsertionButton(panels, "<id> ( <var-list> )", ""));
+        jToolBar1.add(new InsertionButton(panels, "<set> union <set>", ""));
         //TODO ajouter les insertButtons
     }
 

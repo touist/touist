@@ -37,7 +37,7 @@ public class Model implements Iterable<Literal>{
 	public List<Literal> literals = new ArrayList<Literal>();
 
 	public void addLiteral(Literal literal) {
-		literals.add(literal);
+                literals.add(literal);
 	}
 
 	@Override
@@ -45,7 +45,7 @@ public class Model implements Iterable<Literal>{
 		// TODO Please write a proper toString
 		String out = "";
 		for (Literal s : literals) {
-			out = out + " " + s.getLiteral();
+			out = out + " " + s.getLiteral()+ " Valuated : "+s.isLiteral_positivity()+"\n";
 		}
 		return out;
 	}

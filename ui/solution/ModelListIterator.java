@@ -48,11 +48,16 @@ public class ModelListIterator implements ListIterator<Model> {
 
 	@Override
 	public boolean hasNext() {
-		Model m = null;
+		System.out.print(currentPosition);
+                Model m = null;
 		try {
 			m = solverInterface.nextModel();
 		} catch (IOException e) {
 			e.printStackTrace();
+			return false;
+		} catch (NotSatisfiableException e) {
+			e.printStackTrace();
+			return false;
 		}
 
 		if (m == null) { // No models left

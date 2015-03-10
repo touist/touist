@@ -1,7 +1,8 @@
 # Compiler
 
-This is the compiler that produces files to the
-[DIMACS](http://www.satcompetition.org/2009/format-benchmarks2009.html) format.
+This is the compiler that compiles files from the `touisl` language to the well-known [DIMACS](http://www.satcompetition.org/2009/format-benchmarks2009.html) format.
+
+`touisl` is the high-level logic langage for expressing succintly complex formulas in propositionnal logic (and more).
 
 ## Grammar
 
@@ -9,8 +10,22 @@ Input language grammar
 
 TODO
 
+## Usage
+From the `touistl.native --help`:
+```
+TouistL compiles files from the TouIST Language to SAT-DIMACS/SMT-LIB2
+Usage: touistc.native [-o translatedFile] [-table tableFile] file
+Note: if either tableFile or translatedFile is missing,
+artibrary names will be given.
+  -o The translated file
+  -table The literals table table (for SAT_DIMACS)
+  -help  Display this list of options
+  --help  Display this list of options
+```
+
 ## Example
 
+### The input file
 File `foo.touistl`:
 ```
 ;; this is a comment
@@ -30,7 +45,11 @@ begin formula
   end
 end formula
 ```
-
+### Running the example 
+```
+touistc.native foo.touistl
+```
+### Understanding the output files
 There will be two output file:
 - a DIMACS file
 - a mapping of the variables' name to their DIMACS representation (a number)
@@ -68,11 +87,12 @@ A(c) 7
 
 ## Build
 
-There're two dependencies:
-- menhir
-- fileutils
+Before you go, make sure you have the following installed:
+- `ocaml` **4.02.0** (or latest)
+- `menhir` (equivalent of ocamlyacc)
+- `fileutils` (for reading/writing POSIX files)
 
-You can install them with `opam`:
+You can install them with `opam` (`opam` is an `apt-get`-like package manager for OCaml):
 ```
 $ opam install menhir fileutils
 ```

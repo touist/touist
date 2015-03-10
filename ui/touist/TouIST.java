@@ -23,7 +23,16 @@
 
 package touist;
 
+import entity.Model;
 import gui.MainFrame;
+
+import java.io.IOException;
+import java.util.Iterator;
+import java.util.Scanner;
+
+import solution.NotSatisfiableException;
+import solution.SolverTestSAT4J;
+import translation.Translator;
 
 /**
  *
@@ -39,4 +48,72 @@ public class TouIST {
         frame.setVisible(true);
     }
 
+
+/*
+ * Alternative mains for tests
+ */
+	public static void main2(String[] args) {
+		/*
+		 * TRANSLATOR Tests
+		 */
+		Translator translator = new Translator("compiler/touistc.native");
+		boolean worked = false;
+		try {
+			worked = translator.translate("compiler/test/foo.touistl");
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		if(worked) {
+			System.out.println("OK, la traduction a bien terminé");
+			translator.getLiteralsMap().toString();
+		}
+		else {
+			System.out.println("NOK, la traduction a échoué");
+		}
+
+
+		/*
+		 * SOLVER Tests
+		 */
+		SolverTestSAT4J solver = new SolverTestSAT4J(translator.getDimacsFilePath(),
+				translator.getLiteralsMap());
+		try {
+			solver.launch();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		if (solver.isSatisfiable()) {
+			System.out.println("Satisfiable");
+		} else {
+			System.out.println("Insatisfiable");
+			System.exit(0);
+		}
+		Scanner sc = new Scanner(System.in);
+		String answer;
+		boolean continuer = true;
+		Model m;
+
+		Iterator<Model> it = null;
+		try {
+			it = solver.getModelList().iterator();
+		} catch (NotSatisfiableException e) {
+			e.printStackTrace();
+		}
+		while (it.hasNext() && continuer) {
+			m = it.next();
+			System.out.println("Modèle : " + m.toString());
+
+			System.out.println("Contiuner ? o/n");
+			answer = sc.nextLine();
+			continuer = (answer.charAt(0) == 'o');
+		}
+		sc.close();
+		solver.close();
+
+	}
 }

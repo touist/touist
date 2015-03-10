@@ -52,25 +52,32 @@ public abstract class Solver {
 	public abstract void launch() throws IOException;
 
 	/**
+	 * Asks the solver if any models exist. The user MUST check
+	 * that before getting the model list.
+	 * @return the satisfiability
+	 */
+	public abstract boolean isSatisfiable();
+	/**
 	 * Kills the solver program process
 	 */
 	public abstract void close();
 
 	/**
+	 * WARNING: you must run isSatisfiable() BEFORE getting the model list.
 	 * Gives the list of models on which the user can iterate. The only way to
 	 * get the "next" models is to iterate. The size of Models is not known
 	 * unless hasNext() returns false.
 	 * Use this method after using launch().
 	 * @return the models
+	 * @throws NotSatisfiableException if not satisfiable
 	 */
-	public abstract ModelList getModelList();
+	public abstract ModelList getModelList() throws NotSatisfiableException;
 
 	/**
 	 * ONLY used by ModelsIterator
 	 * @throws IOException
 	 */
-
-	protected abstract Model nextModel() throws IOException;
+	protected abstract Model nextModel() throws IOException, NotSatisfiableException;
 
 	/**
 	 *
@@ -79,5 +86,5 @@ public abstract class Solver {
 	 * If no literalMap is given, the Model stores the literal as given by the
 	 * solver (an integer).
 	 */
-	protected abstract Model parseModel(String[] rawModelOutput);
+	protected abstract Model parseModel(String[] rawModelOutput) throws NotSatisfiableException;
 }
