@@ -173,18 +173,17 @@ public class SolverTestSAT4J extends Solver {
 //		}
                 //use isAlive to detect if the communication is up or not
                 //if it isn't: it mean that we have no next model and an externel solver is done.
-                if (p.isAlive()){
-                while(!stdout.ready()){
+                while(!stdout.ready() && p.isAlive()){
                 //the attente can be 1ms of 100ms or 101ms,
                 }
-		String[] elmts = stdout.readLine().split(" ");
-                System.out.println(elmts);
+                String line=stdout.readLine();
+                if (line==null)
+                    //see ModelListeIterator.HasNext()
+                    //to see controle of this call method.
+                    return null;
+		String[] elmts = line.split(" ");
+                System.out.println(line);
                 return parseModel(elmts);
-                }
-                //no model
-                //see ModelListeIterator.HasNext()
-                //to see controle of this call method.
-		return null;
 	}
 
 	@Override

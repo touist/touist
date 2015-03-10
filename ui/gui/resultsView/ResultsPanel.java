@@ -215,6 +215,7 @@ public class ResultsPanel extends AbstractComponentPanel {
                 System.out.println("Undefined action set for the state : " + getState());
         }
         getFrame().setViewToEditor();
+        this.updateUI();
     }//GEN-LAST:event_jButtonEditorActionPerformed
 
     /*
@@ -251,13 +252,16 @@ public class ResultsPanel extends AbstractComponentPanel {
                 break;
             case INTER_RESULT :
                 setState(previousButtonHandler());
+                applyRestrictions();
                 break;
             case LAST_RESULT :
                 setState(previousButtonHandler());
+                applyRestrictions();
                 break;
             default :
                 System.out.println("Undefined action set for the state : " + getState());
         }
+        this.updateUI();
     }//GEN-LAST:event_jButtonPreviousActionPerformed
 
     /*
@@ -291,9 +295,11 @@ public class ResultsPanel extends AbstractComponentPanel {
                 break;
             case FIRST_RESULT :
                 setState(nextButtonHandler());
+                applyRestrictions();
                 break;
             case INTER_RESULT :
                 setState(nextButtonHandler());
+                applyRestrictions();
                 break;
             case LAST_RESULT :
                 // interdit
@@ -301,6 +307,7 @@ public class ResultsPanel extends AbstractComponentPanel {
             default :
                 System.out.println("Undefined action set for the state : " + getState());
         }
+        this.updateUI();
     }//GEN-LAST:event_jButtonNextActionPerformed
 
 
