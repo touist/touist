@@ -10,6 +10,32 @@ Input language grammar
 
 TODO
 
+## Syntax
+
+### Reserved keywords
+
+These are the reserved keywords of the _touistl_ language:
+**begin, end, sets, formula, if, then, else, in, not, and, or, xor, bigand, bigor, 
+exact, atmost, atleast, mod.**
+
+### Operators and functions
+
+| Boolean   | Arithmetic | Clause  |
+|:----------|:-----------|:--------|
+| not       | +, -       | not     |
+| &&        | \*, /      | and     |
+| ||        | mod        | or      |
+| xor       | sqrt()     | xor     |
+| =>        | int()      | =>      |
+| <=>       | float()    | <=>     |
+| <, >      |            | bigand  |
+| <=, >=    |            | bigor   |
+| ==, !=    |            | exact   |
+| in        |            | atmost  |
+| empty()   |            | atleast |
+| susbset() |            |         |
+
+
 ## Usage
 From the `touistc.native --help`:
 ```
