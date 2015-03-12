@@ -14,7 +14,7 @@ TODO
 
 ### Reserved keywords
 
-These are the reserved keywords of the _touistl_ language:
+These are the reserved keywords of the _touistl_ language:  
 **begin, end, sets, formula, if, then, else, in, not, and, or, xor, bigand, bigor, 
 exact, atmost, atleast, mod.**
 
@@ -24,7 +24,7 @@ exact, atmost, atleast, mod.**
 |:----------|:-----------|:--------|:--------|
 | not       | +, -       | not     | \[\]    |
 | &&        | \*, /      | and     | \[..\]  |
-| ||        | mod        | or      | union() |
+| \|\|      | mod        | or      | union() |
 | xor       | sqrt()     | xor     | inter() |
 | =>        | int()      | =>      | diff()  |
 | <=>       | float()    | <=>     | card()  |
