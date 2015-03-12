@@ -1,5 +1,14 @@
 %{
   open Ast
+
+  let intset_of_list =
+    List.fold_left (fun acc x -> IntSet.add x acc) IntSet.empty
+  
+  let floatset_of_list =
+    List.fold_left (fun acc x -> FloatSet.add x acc) FloatSet.empty
+
+  let stringset_of_list =
+    List.fold_left (fun acc x -> StringSet.add x acc) StringSet.empty
 %}
 
 %token BAND BOR
@@ -21,8 +30,8 @@
 
 %token AFFECT IF THEN ELSE BIGAND BIGOR WHEN
 
-%token BEGIN SETS FORMULA END DO EOF
-%token LPAREN RPAREN LBRACK RBRACK COMMA
+%token BEGIN SETS FORMULA END EOF
+%token LPAREN RPAREN LBRACK RBRACK COMMA COLON
 
 %start <Ast.prog> prog
 
@@ -123,9 +132,9 @@ set_exp:
   | LBRACK i1 = int_exp RANGE i2 = int_exp RBRACK { Range (i1, i2) }
 
 set_decl:
-  | LBRACK i = separated_nonempty_list(COMMA, INT)   RBRACK { GenSet.IS (IntSet.of_list i)    }
-  | LBRACK f = separated_nonempty_list(COMMA, FLOAT) RBRACK { GenSet.FS (FloatSet.of_list f)  }
-  | LBRACK s = separated_nonempty_list(COMMA, TERM)  RBRACK { GenSet.SS (StringSet.of_list s) }
+  | LBRACK i = separated_nonempty_list(COMMA, INT)   RBRACK { GenSet.IS (intset_of_list    i) }
+  | LBRACK f = separated_nonempty_list(COMMA, FLOAT) RBRACK { GenSet.FS (floatset_of_list  f) }
+  | LBRACK s = separated_nonempty_list(COMMA, TERM)  RBRACK { GenSet.SS (stringset_of_list s) }
 
 clause_exp:
   | LPAREN e = clause_exp RPAREN { e }
@@ -139,10 +148,10 @@ clause_exp:
   | c1 = clause_exp XOR     c2 = clause_exp { Xor     (c1, c2) }
   | c1 = clause_exp IMPLIES c2 = clause_exp { Implies (c1, c2) }
   | c1 = clause_exp EQUIV   c2 = clause_exp { Equiv   (c1, c2) }
-  | BIGAND v = separated_nonempty_list(COMMA, VAR) IN s = separated_nonempty_list(COMMA, set_exp) DO e = exp END { Bigand (v, s, None, e)   }
-  | BIGAND v = separated_nonempty_list(COMMA, VAR) IN s = separated_nonempty_list(COMMA, set_exp) WHEN b = bool_exp DO e = exp END { Bigand (v, s, Some b, e) }
-  | BIGOR  v = VAR IN s = set_exp                   DO e = exp END { Bigor  (v, s, None, e)   }
-  | BIGOR  v = VAR IN s = set_exp WHEN b = bool_exp DO e = exp END { Bigor  (v, s, Some b, e) }
+  | BIGAND v = separated_nonempty_list(COMMA, VAR) IN s = separated_nonempty_list(COMMA, set_exp) COLON e = exp END { Bigand (v, s, None, e)   }
+  | BIGAND v = separated_nonempty_list(COMMA, VAR) IN s = separated_nonempty_list(COMMA, set_exp) WHEN b = bool_exp COLON e = exp END { Bigand (v, s, Some b, e) }
+  | BIGOR  v = VAR IN s = set_exp                   COLON e = exp END { Bigor  (v, s, None, e)   }
+  | BIGOR  v = VAR IN s = set_exp WHEN b = bool_exp COLON e = exp END { Bigor  (v, s, Some b, e) }
 
 term_option:
   | e = exp  { Exp e }
