@@ -51,7 +51,7 @@ artibrary names will be given.
 
 ## Example
 
-### The input file
+### Input file
 File `foo.touistl`:
 ```
 ;; this is a comment
@@ -114,7 +114,7 @@ A(c) 7
 ## Build
 
 Before you go, make sure you have the following installed:
-- `ocaml` **4.02.0** (or latest)
+- `ocaml` **4.01.0** (or latest)
 - `menhir` (equivalent of ocamlyacc)
 - `fileutils` (for reading/writing POSIX files)
 
