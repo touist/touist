@@ -10,9 +10,9 @@ import gui.AbstractComponentPanel;
 import gui.State;
 
 import java.util.ListIterator;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
 import solution.NotSatisfiableException;
+import solution.SolverExecutionException;
 
 /**
  *
@@ -29,19 +29,19 @@ public class ResultsPanel extends AbstractComponentPanel {
     public ResultsPanel() {
         initComponents();
     }
-    
+
     /**
      * Update the models iterator
      */
     public void updateIterator() {
         try {
             iter = getFrame().getSolver().getModelList().iterator();
-        } catch (NotSatisfiableException e) {
+        } catch (NotSatisfiableException | SolverExecutionException e) {
             //TODO gérer proprement l'exception
             e.printStackTrace();
         }
     }
-    
+
     public void setText(String text) {
         jTextArea1.setText(text);
     }
@@ -100,21 +100,24 @@ public class ResultsPanel extends AbstractComponentPanel {
 
         jButtonEditor.setText("Retour en édition");
         jButtonEditor.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButtonEditorActionPerformed(evt);
             }
         });
 
         jButtonPrevious.setText("Précédent");
         jButtonPrevious.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButtonPreviousActionPerformed(evt);
             }
         });
 
         jButtonNext.setText("Suivant");
         jButtonNext.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButtonNextActionPerformed(evt);
             }
         });
@@ -212,6 +215,7 @@ public class ResultsPanel extends AbstractComponentPanel {
                 System.out.println("Undefined action set for the state : " + getState());
         }
         getFrame().setViewToEditor();
+        this.updateUI();
     }//GEN-LAST:event_jButtonEditorActionPerformed
 
     /*
@@ -248,13 +252,16 @@ public class ResultsPanel extends AbstractComponentPanel {
                 break;
             case INTER_RESULT :
                 setState(previousButtonHandler());
+                applyRestrictions();
                 break;
             case LAST_RESULT :
                 setState(previousButtonHandler());
+                applyRestrictions();
                 break;
             default :
                 System.out.println("Undefined action set for the state : " + getState());
         }
+        this.updateUI();
     }//GEN-LAST:event_jButtonPreviousActionPerformed
 
     /*
@@ -288,9 +295,11 @@ public class ResultsPanel extends AbstractComponentPanel {
                 break;
             case FIRST_RESULT :
                 setState(nextButtonHandler());
+                applyRestrictions();
                 break;
             case INTER_RESULT :
                 setState(nextButtonHandler());
+                applyRestrictions();
                 break;
             case LAST_RESULT :
                 // interdit
@@ -298,6 +307,7 @@ public class ResultsPanel extends AbstractComponentPanel {
             default :
                 System.out.println("Undefined action set for the state : " + getState());
         }
+        this.updateUI();
     }//GEN-LAST:event_jButtonNextActionPerformed
 
 

@@ -70,21 +70,26 @@ public abstract class Solver {
 	 * Use this method after using launch().
 	 * @return the models
 	 * @throws NotSatisfiableException if not satisfiable
+	 * @throws SolverExecutionException if any error happened
 	 */
-	public abstract ModelList getModelList() throws NotSatisfiableException;
+	public abstract ModelList getModelList() throws NotSatisfiableException,SolverExecutionException;
+
+	/**
+	 * ONLY used by ModelsIterator.
+	 * @return the model if there was a model, null if there is no model left.
+	 * @throws IOException
+	 * @throws NotSatisfiableException
+	 * @throws SolverExecutionException
+	 */
+	protected abstract Model nextModel() throws IOException, NotSatisfiableException, SolverExecutionException;
 
 	/**
 	 * ONLY used by ModelsIterator
-	 * @throws IOException
-	 */
-	protected abstract Model nextModel() throws IOException, NotSatisfiableException;
-
-	/**
-	 *
 	 * @param rawModelOutput The output
 	 * @return a model with, if a literalMap was given, the translated literal.
 	 * If no literalMap is given, the Model stores the literal as given by the
 	 * solver (an integer).
+	 * @throws NotSatisfiableException if not satisfiable
 	 */
 	protected abstract Model parseModel(String[] rawModelOutput) throws NotSatisfiableException;
 }

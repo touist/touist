@@ -282,36 +282,36 @@ public class EditorPanel extends AbstractComponentPanel {
 
     private void appelBaseDeClauseImport() {
         String path = "";
-        jFileChooser1.setFileSelectionMode(JFileChooser.FILES_ONLY);
-        jFileChooser1.showDialog(this, "Importer fichier");
-        try {
-            path = jFileChooser1.getSelectedFile().getPath();
-        } catch (NullPointerException e) {
-            //TODO handle the case where user doesn't select a file or cancel the operation.
-            e.printStackTrace();
-        }
-        System.out.println(getFrame().getClause().getFormules());
-
-        try {
-            getFrame().getClause().uploadFile(path);
-        } catch(Exception e) {
-            System.out.println("Error : Failed to load the file : " + path);
-            e.printStackTrace();
-        }
+        int returnVal;
         
-        //Réinitialisation des sets et des formules
-        formulaTablePanel1.removeAll();
-        formulaTablePanel1.setLayout(new GridLayout(getFrame().getClause().getSets().size()
-                + getFrame().getClause().getFormules().size(), 1));
-        for(int i=0; i<getFrame().getClause().getSets().size(); i++) {
-            formulaTablePanel1.add(new FormulaPanel(i, FormulaPanelType.SET, getFrame().getClause().getSets().get(i)));
+        jFileChooser1.setFileSelectionMode(JFileChooser.FILES_ONLY);
+        returnVal = jFileChooser1.showDialog(this, "Importer fichier");
+        
+        if (returnVal == JFileChooser.APPROVE_OPTION && jFileChooser1.getSelectedFile() != null) {
+            path = jFileChooser1.getSelectedFile().getPath();
+
+            try {
+                getFrame().getClause().uploadFile(path);
+            } catch(Exception e) {
+                System.out.println("Error : Failed to load the file : " + path);
+                e.printStackTrace();
+            }
+
+            //Réinitialisation des sets et des formules
+            formulaTablePanel1.removeAll();
+            formulaTablePanel1.setLayout(new GridLayout(getFrame().getClause().getSets().size()
+                    + getFrame().getClause().getFormules().size(), 1));
+            for(int i=0; i<getFrame().getClause().getSets().size(); i++) {
+                formulaTablePanel1.add(new FormulaPanel(i, FormulaPanelType.SET, getFrame().getClause().getSets().get(i)));
+            }
+            for(int i=0; i<getFrame().getClause().getFormules().size(); i++) {
+                formulaTablePanel1.add(new FormulaPanel(i, FormulaPanelType.FORMULA, getFrame().getClause().getFormules().get(i)));
+            }
+            getFrame().setNumberOfFormulas(
+                    getFrame().getClause().getSets().size() 
+                    + getFrame().getClause().getFormules().size());
+            formulaTablePanel1.updateUI();
         }
-        for(int i=0; i<getFrame().getClause().getFormules().size(); i++) {
-            formulaTablePanel1.add(new FormulaPanel(i, FormulaPanelType.FORMULA, getFrame().getClause().getFormules().get(i)));
-        }
-        getFrame().setNumberOfFormulas(getFrame().getClause().getSets().size() 
-                + getFrame().getClause().getFormules().size());
-        formulaTablePanel1.updateUI();
     }
 
     private void jButtonImportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonImportActionPerformed

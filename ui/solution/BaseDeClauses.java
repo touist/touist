@@ -111,7 +111,6 @@ public class BaseDeClauses {
                 words[0] = words[0].toLowerCase();
                 words[1] = words[1].toLowerCase();
 
-
                 if(Arrays.equals(words,new String[]{"begin","formula"})) {
                     if(formulaSection == true) {
                         String message = String.format(errorBeginFormula,indexLine);
@@ -199,8 +198,37 @@ public class BaseDeClauses {
     public void addSet(String set) {
         sets.add(set);
     }
+    
+     /**
+     * Add all formules found in a string to the current list of formules
+     * @param a String
+     */
+    
+    public void addFormules(String text) {
+        String[] listeFormules = text.split("\n");
+        for (String f : listeFormules) {
+            f = f.trim();
+            if(!f.isEmpty()){
+                formules.add(f);
+            }
+        }
+    }
 
-
+    /**
+     * Add all sets found in a string to the current list of sets
+     * @param a String
+     */
+    
+    public void addSets(String text) {
+        String[] listeSets = text.split("\n");
+        for (String s : listeSets) {
+            s = s.trim();
+            if(!s.isEmpty()){
+                sets.add(s);
+            }
+        }
+    }
+    
     /**
      * Remove a formule at a given index
      * @param index

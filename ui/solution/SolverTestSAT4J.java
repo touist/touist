@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.time.Instant;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -54,6 +55,7 @@ public class SolverTestSAT4J extends Solver {
 
 	private ModelList models = null;
 	private boolean hasFoundModels = false;
+	private Instant lastHasNextCall = null;
 
 	/**
 	 * This is the main constructor used by the user after he translated the
@@ -92,13 +94,9 @@ public class SolverTestSAT4J extends Solver {
 		// can't find the files
 
 		/*
-		 * MINISAT TESTING PROGRAM Behaviour
-		 * ".:MiniSat:MiniSat/sat4j-sat.jar" is the search path for binaries
-		 * RETURN VALUES:
-		 * 1 = unsatisfiable
-		 * 2 = parse issue
-		 * 3 = wrong dimacs content
-		 * 4 = error with the streamreader
+		 * MINISAT TESTING PROGRAM Behaviour ".:MiniSat:MiniSat/sat4j-sat.jar"
+		 * is the search path for binaries RETURN VALUES: 1 = unsatisfiable 2 =
+		 * parse issue 3 = wrong dimacs content 4 = error with the streamreader
 		 * 5 = solver timeout
 		 */
 		String command = "java -cp .:MiniSat:MiniSat/sat4j-sat.jar Minisat "
@@ -110,25 +108,27 @@ public class SolverTestSAT4J extends Solver {
 				p.getOutputStream())));
 
 		try {
-			// Here is a way to know if the solver program has been actually
-			// launched:
-			if (p.waitFor(3, TimeUnit.SECONDS) && p.exitValue() > 1) {
-				System.out.println("Une erreur au lancement du solveur externe "
-						+ "(retour="+Integer.toString(p.exitValue())+") :");
-				System.out.println(command);
-				if (stdout.ready())
-					System.out.println(stdout.readLine());
-				if (stderr.ready())
-					System.out.println(stderr.readLine());
-				throw new IOException("Error during the execution of the external solver");
-			} else {
-				System.out.println("OK, Minisat.class bien lancé");
+			// We check if the solver program has been actually launched:
+			if (p.waitFor(10, TimeUnit.MILLISECONDS) && !p.isAlive()
+					&& p.exitValue() > 1) {
+				String error = "launch(): Error while launching external solver\n";
+				error += "launch(): external solver returned "
+						+ Integer.toString(p.exitValue()) + "\n";
+				error += "launch(): command used: '" + command + "'\n";
+				while (stdout.ready())
+					error += "launch(): '" + stdout.readLine() + "'\n";
+				while (stderr.ready())
+					error += "launch(): '" + stderr.readLine() + "'\n";
+				throw new IOException(error);
+			} else if (!p.isAlive() && p.exitValue() == 1) { // Unsatisfiable (return=1)
+				hasFoundModels = false;
+			} else { // The external solver is running as expected
+				System.out.println("launch(): the external solver is now running");
+				hasFoundModels = true;
 			}
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-		//hasFoundModels = p.exitValue() == 0;
-                hasFoundModels=true;
 	}
 
 	@Override
@@ -137,8 +137,13 @@ public class SolverTestSAT4J extends Solver {
 	}
 
 	@Override
-	public ModelList getModelList() throws NotSatisfiableException {
-		if(!hasFoundModels) throw new NotSatisfiableException();
+	public ModelList getModelList() throws NotSatisfiableException,
+			SolverExecutionException {
+		if (models == null)
+			throw new SolverExecutionException(
+					"getModelList(): solver hasn't been launched yet");
+		if (!hasFoundModels)
+			throw new NotSatisfiableException();
 		return models;
 	}
 
@@ -147,40 +152,65 @@ public class SolverTestSAT4J extends Solver {
 		stdin.println("\n0");
 		stdin.close();
 		this.p.destroy();
+		System.out.println("close(): solver has been closed correctly");
 	}
 
 	@Override
-	protected Model nextModel() throws IOException, NotSatisfiableException {
-		stdin.println("1");
-		stdin.flush();
-		while (!stdout.ready()) {
+	protected Model nextModel() throws IOException, NotSatisfiableException, SolverExecutionException {
+		// This fixes the "two hasNext() in a row" issue:
+		if(lastHasNextCall!=null && Instant.now().isBefore(lastHasNextCall.plusMillis(100))) {
 			try {
-				p.waitFor(100, TimeUnit.MILLISECONDS);
+				p.waitFor(100,TimeUnit.MILLISECONDS);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
 		}
-		String[] elmts = stdout.readLine().split(" ");
-		return parseModel(elmts);
+		final int WAIT_FOR_MODEL_TIMEOUT = 500; // ms
+		if (p == null) // Should not happen
+			throw new SolverExecutionException("nextModel(): exception: launch() has not been called");
+		if (!p.isAlive()) { // The solver is already done
+			return null;
+		}
+		String[] rawLiterals;
+		Model modelParsed = null;
+		stdin.println("1"); // tells the solver to give the next model 
+		stdin.flush();
+		// We wait for any output from the solver unless we get a timeout
+		final Instant start = Instant.now();
+		final Instant timeout = start.plusMillis(WAIT_FOR_MODEL_TIMEOUT);
+		while(!stdout.ready() && Instant.now().isBefore(timeout) && p.isAlive()){
+			// Active waiting (I know, it is a bad way to do it!)
+		}
+		if(!stdout.ready()) { // Nothing has been read
+			throw new SolverExecutionException("nextModel(): exception: "
+					+ "the solver didn't give any output (timeout = "
+					+Integer.toString(WAIT_FOR_MODEL_TIMEOUT)+"ms)");
+		} else { // Something has been read
+			rawLiterals = stdout.readLine().split(" ");
+			modelParsed = parseModel(rawLiterals);
+		}
+		lastHasNextCall = Instant.now();
+		return modelParsed;
 	}
 
 	@Override
-	protected Model parseModel(String[] rawModelOutput) throws NotSatisfiableException {
+	protected Model parseModel(String[] rawModelOutput)
+			throws NotSatisfiableException {
 		// TODO The parser should be able to handle the "-3" (negation)
-		if(!hasFoundModels) throw new NotSatisfiableException();
+		if (!hasFoundModels)
+			throw new NotSatisfiableException();
 		Model model = new Model();
 		for (String rawLiteral : rawModelOutput) {
 			int literalInt = Integer.parseInt(rawLiteral);
-                        if(literalInt!=0){
-			int literalCode = (literalInt>0?literalInt:literalInt*(-1));
-			if (getLiteralsMap().get(literalCode) != null) { // if no liretalsMap has been given
-				model.addLiteral(new Literal(getLiteralsMap().get(literalCode),
-						literalInt>0));
+			if (literalInt != 0) { // '0' means 'end of model'
+				int literalCode = (literalInt > 0 ? literalInt : literalInt * (-1));
+				if (getLiteralsMap().get(literalCode) != null) {
+					model.addLiteral(new Literal(getLiteralsMap().get(
+							literalCode), literalInt > 0));
+				} else {
+					model.addLiteral(new Literal(rawLiteral, literalInt > 0));
+				}
 			}
-                        else {
-				model.addLiteral(new Literal(rawLiteral, literalInt > 0));
-			}
-                        }
 		}
 		return model;
 	}

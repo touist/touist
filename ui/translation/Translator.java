@@ -29,7 +29,6 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -126,7 +125,7 @@ public class Translator {
 	 * @throws InterruptedException
 	 */
 	public boolean translate(String bigandFilePath) throws IOException, InterruptedException {
-		/* return_code :
+		/* return_code from the Touistl translator :
 		 *  | OK -> 0
   			| COMPILE_ERRORS -> 1
   			| COMPILE_JUSTWARNINGS -> 2
@@ -137,10 +136,9 @@ public class Translator {
 				+ " -o " + outputFilePath
 				+ " -table " + outputTableFilePath
 				+ " " + bigandFilePath;
-                System.out.println(cmd);
 		this.p = Runtime.getRuntime().exec(cmd);
+        System.out.println("translate(): cmd executed: "+cmd);
 		int return_code = p.waitFor();
-		// Response will put 2Lines: first contain dimacs path & seconde TR path
 		BufferedReader reader = new BufferedReader(new InputStreamReader(
 				this.p.getInputStream()));
 		List<String> lines = new ArrayList<String>();

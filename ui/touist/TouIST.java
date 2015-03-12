@@ -31,6 +31,7 @@ import java.util.Iterator;
 import java.util.Scanner;
 
 import solution.NotSatisfiableException;
+import solution.SolverExecutionException;
 import solution.SolverTestSAT4J;
 import translation.Translator;
 
@@ -101,7 +102,7 @@ public class TouIST {
 		Iterator<Model> it = null;
 		try {
 			it = solver.getModelList().iterator();
-		} catch (NotSatisfiableException e) {
+		} catch (NotSatisfiableException | SolverExecutionException e) {
 			e.printStackTrace();
 		}
 		while (it.hasNext() && continuer) {

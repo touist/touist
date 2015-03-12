@@ -63,3 +63,21 @@ nbproject/build-impl.xml
 build.xml
 
 *.mf
+
+*.cnf
+
+*.table
+
+compiler/test/.foo_table
+
+compiler/test/.test_table
+
+*.ncf
+
+compiler/.foo_table
+
+bigAndFile-defaultname.txt
+
+*.table
+
+*.cnf

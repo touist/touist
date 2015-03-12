@@ -48,24 +48,35 @@ public class ModelListIterator implements ListIterator<Model> {
 
 	@Override
 	public boolean hasNext() {
-		System.out.print(currentPosition);
-                Model m = null;
-		try {
-			m = solverInterface.nextModel();
-		} catch (IOException e) {
-			e.printStackTrace();
-			return false;
-		} catch (NotSatisfiableException e) {
-			e.printStackTrace();
-			return false;
-		}
+		boolean hasNext = false;
+		if (currentPosition == models.size() - 1) { // Need to get a new model?
+			Model nextModel = null;
+			try {
+				nextModel = solverInterface.nextModel();
+			} catch (IOException e) {
+				System.err.println("hasNext(): I/O exception: "+e.getMessage());
+				return false;
+			} catch (NotSatisfiableException e) {
+				System.err.println("hasNext(): you shouldn't use that "
+								+ "because the prob. is unsatisfiable");
+				return false;
+			} catch (SolverExecutionException e) {
+				System.err.println("hasNext(): "+e.getMessage());
+			}
 
-		if (m == null) { // No models left
-			solverInterface.close();
-		} else {
-			models.add(m);
+			if (nextModel == null) { // No models left
+				solverInterface.close();
+				hasNext = false;
+				System.out.println("hasNext(): there is no more models");
+			} else {
+				hasNext = true;
+				models.add(nextModel);
+			}
+		} else { // Models have already been retrieved (e.g. because of
+					// previous())
+			hasNext = true;
 		}
-		return currentPosition + 1 < models.size();
+		return hasNext;
 	}
 
 	@Override
