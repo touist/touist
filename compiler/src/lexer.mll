@@ -26,7 +26,6 @@ rule lexer = parse
   | "end"          { END          }
   | "sets"         { SETS         }
   | "formula"      { FORMULA      }
-  | "do"           { DO           }
   | "in"           { IN           }
   | "subset"       { SUBSET       }
   | "empty"        { EMPTY        }
@@ -61,6 +60,7 @@ rule lexer = parse
   | "<="           { LE           }
   | ">="           { GE           }
   | "="            { AFFECT       }
+  | ":"            { COLON        }
   | "int"          { TOINT        }
   | "float"        { TOFLOAT      }
   | "true"         { BOOL true    }

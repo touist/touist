@@ -20,20 +20,20 @@ exact, atmost, atleast, mod.**
 
 ### Operators and functions
 
-| Boolean   | Arithmetic | Clause  |
-|:----------|:-----------|:--------|
-| not       | +, -       | not     |
-| &&        | \*, /      | and     |
-| ||        | mod        | or      |
-| xor       | sqrt()     | xor     |
-| =>        | int()      | =>      |
-| <=>       | float()    | <=>     |
-| <, >      |            | bigand  |
-| <=, >=    |            | bigor   |
-| ==, !=    |            | exact   |
-| in        |            | atmost  |
-| empty()   |            | atleast |
-| susbset() |            |         |
+| Boolean   | Arithmetic | Clause  | Set     |
+|:----------|:-----------|:--------|:--------|
+| not       | +, -       | not     | \[\]    |
+| &&        | \*, /      | and     | \[..\]  |
+| ||        | mod        | or      | union() |
+| xor       | sqrt()     | xor     | inter() |
+| =>        | int()      | =>      | diff()  |
+| <=>       | float()    | <=>     | card()  |
+| <, >      |            | bigand  | .()     |
+| <=, >=    |            | bigor   |         |
+| ==, !=    |            | exact   |         |
+| in        |            | atmost  |         |
+| empty()   |            | atleast |         |
+| susbset() |            |         |         |
 
 
 ## Usage
