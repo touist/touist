@@ -16,7 +16,7 @@ TODO
 
 These are the reserved keywords of the _touistl_ language:  
 **begin, end, sets, formula, if, then, else, in, not, and, or, xor, bigand, bigor, 
-exact, atmost, atleast, mod.**
+exact, atmost, atleast, mod, Top, Bot.**
 
 ### Operators and functions
 
