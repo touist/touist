@@ -36,7 +36,7 @@ rule lexer = parse
   | "bigor"        { BIGOR        }
   | "when"         { WHEN         }
   | "Top"          { TOP          }
-  | "Bottom"       { BOTTOM       }
+  | "Bot"          { BOTTOM       }
   | "card"         { CARD         }
   | "("            { LPAREN       }
   | "["            { LBRACK       }
