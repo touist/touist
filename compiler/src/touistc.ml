@@ -96,11 +96,11 @@ let _ =
     ("-table", Arg.Set_string (output_table_file_path), "The literals table table (for SAT_DIMACS)")
   ]
   in
-  let usage = "TouistL compiles files from the TouIST Language "
-    ^"to SAT-DIMACS/SMT-LIB2 \n"
-    ^"Usage: "^cmd^" [-o translatedFile] [-table tableFile] file \n"
-    ^"Note: if either tableFile or translatedFile is missing, \n"
-    ^"artibrary names will be given."
+  let usage = "TouistL compiles files from the TouIST Language \
+    to SAT-DIMACS/SMT-LIB2 \n\
+    Usage: " ^ cmd ^" [-o translatedFile] [-table tableFile] file \n\
+    Note: if either tableFile or translatedFile is missing, \n\
+    artibrary names will be given."
   in
 
   (* Step 1: we parse the args. If an arg. is "alone", we suppose
