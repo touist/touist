@@ -31,7 +31,7 @@ and exp =
   | Dot       of set_exp * exp
   | If        of bool_exp * exp * exp
 and int_exp =
-  | IVar    of string
+  | IVar   of string
   | Int    of int
   | Neg    of int_exp
   | Add    of int_exp * int_exp
@@ -42,24 +42,24 @@ and int_exp =
   | To_int of float_exp
   | Card   of set_exp
 and float_exp =
-  | FVar      of string
+  | FVar     of string
   | Float    of float
-  | FNeg      of float_exp
-  | FAdd      of float_exp * float_exp
-  | FSub      of float_exp * float_exp
-  | FMul      of float_exp * float_exp
-  | FDiv      of float_exp * float_exp
+  | FNeg     of float_exp
+  | FAdd     of float_exp * float_exp
+  | FSub     of float_exp * float_exp
+  | FMul     of float_exp * float_exp
+  | FDiv     of float_exp * float_exp
   | Sqrt     of float_exp
   | To_float of int_exp
 and bool_exp =
-  | BVar               of string
+  | BVar              of string
   | Bool              of bool
-  | BNot               of bool_exp
-  | BAnd               of bool_exp  * bool_exp
-  | BOr                of bool_exp  * bool_exp
-  | BXor               of bool_exp  * bool_exp
-  | BImplies           of bool_exp  * bool_exp
-  | BEquiv             of bool_exp  * bool_exp
+  | BNot              of bool_exp
+  | BAnd              of bool_exp  * bool_exp
+  | BOr               of bool_exp  * bool_exp
+  | BXor              of bool_exp  * bool_exp
+  | BImplies          of bool_exp  * bool_exp
+  | BEquiv            of bool_exp  * bool_exp
   | Equal             of int_exp   * int_exp
   | Not_equal         of int_exp   * int_exp
   | Lesser_than       of int_exp   * int_exp
@@ -89,7 +89,7 @@ and clause_exp =
   | Bigand  of string list * set_exp list * bool_exp option * exp
   | Bigor   of string * set_exp * bool_exp option * exp
 and set_exp =
-  | SVar   of string
+  | SVar  of string
   | Set   of GenSet.t
   | Union of set_exp * set_exp
   | Inter of set_exp * set_exp
