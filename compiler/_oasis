@@ -1,5 +1,5 @@
 OASISFormat:  0.4
-OcamlVersion: >= 4.02.0
+OcamlVersion: >= 4.01.0
 Name:         TouiST Compiler
 Version:      0.1
 Synopsis:     This package is a compiler to the DIMACS file format
