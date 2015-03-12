@@ -3,7 +3,7 @@ begin sets
 end sets
 
 begin formula
-    bigand $i in $a do
+    bigand $i in $a:
         A($i) and B($i)
     end
 end formula
