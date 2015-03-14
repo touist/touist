@@ -2,21 +2,8 @@ open Lexer
 open Lexing
 open Arg (* Parses the arguments *)
 open FilePath (* Operations on file names *)
+open Printf
 
-(*
-let print_position outx lexbuf =
-  let pos = lexbuf.lex_curr_p in
-  fprintf outx "%s:%d:%d" pos.pos_fname pos.pos_lnum (pos.pos_cnum - pos.pos_bol+1)
-
-let parse_with_error lexbuf =
-  try Parser.prog Lexer.read lexbuf with
-  | SyntaxError msg ->
-      fprintf stderr "%a: %s\n" print_position lexbuf msg;
-      None
-  | Parser.Error ->
-      fprintf stderr "%a: syntax error\n" print_position lexbuf;
-      exit (-1)
-*)
 
 (* NOTE for utop or ocaml users: to open the FilePath module
 from the fileutils package, do the following:
@@ -32,14 +19,16 @@ Then you can open the FilePath module:
 type mode = SMTLIB2 | SAT_DIMACS
 type error =
   | OK
-  | COMPILE_ERRORS
+  | COMPILE_SYNTAX_ERROR
+  | COMPILE_SEMANTIC_ERROR
   | COMPILE_JUSTWARNINGS
   | ARGUMENTS_ERROR
 let get_code (e : error) : int = match e with
   | OK -> 0
-  | COMPILE_ERRORS -> 1
-  | COMPILE_JUSTWARNINGS -> 2
-  | ARGUMENTS_ERROR -> 3
+  | COMPILE_SYNTAX_ERROR -> 1
+  | COMPILE_SEMANTIC_ERROR -> 2
+  | COMPILE_JUSTWARNINGS -> 3
+  | ARGUMENTS_ERROR -> 4
 
 let input_file_path = ref ""
 let output_file_path = ref ""
@@ -75,13 +64,30 @@ Here, this kind of parameter is considered as an inputFilePath *)
 let argIsInputFilePath (inputFilePath:string) : unit =
   input_file_path := inputFilePath
 
+(* Used by parse_with_error *)
+let print_position outx lexbuf =
+  let pos = lexbuf.lex_curr_p in
+  fprintf outx "%s:%d:%d" pos.pos_fname pos.pos_lnum (pos.pos_cnum - pos.pos_bol+1)
+
+(* parse_with_error handles exceptions when calling
+the parser and lexer *)
+let parse_with_error lexbuf =
+  try Parser.prog Lexer.lexer lexbuf with
+  | SyntaxError msg ->
+      fprintf stderr "%a: %s\n" print_position lexbuf msg;
+      exit (get_code COMPILE_SYNTAX_ERROR) (* Should be "None" *)
+  | Parser.Error ->
+      fprintf stderr "%a: syntax error\n" print_position lexbuf;
+      exit (get_code COMPILE_SEMANTIC_ERROR)
+
+(* Main parsing/lexing function *)
 let translateToSATDIMACS
   (inputFilePath:string)
   (outputFilePath:string)
   (outputTableFilePath:string)
   : unit =
   let exp =
-    Eval.eval (Parser.prog Lexer.lexer (Lexing.from_channel (open_in inputFilePath)))
+    Eval.eval (parse_with_error (Lexing.from_channel (open_in inputFilePath)))
   in
   let c,t = Cnf.to_cnf exp |> Dimacs.to_dimacs in
   write_to_file outputFilePath c;
