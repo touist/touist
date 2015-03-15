@@ -148,10 +148,10 @@ clause_exp:
   | c1 = clause_exp XOR     c2 = clause_exp { Xor     (c1, c2) }
   | c1 = clause_exp IMPLIES c2 = clause_exp { Implies (c1, c2) }
   | c1 = clause_exp EQUIV   c2 = clause_exp { Equiv   (c1, c2) }
-  | BIGAND v = separated_nonempty_list(COMMA, VAR) IN s = separated_nonempty_list(COMMA, set_exp) COLON e = exp END { Bigand (v, s, None, e)   }
+  | BIGAND v = separated_nonempty_list(COMMA, VAR) IN s = separated_nonempty_list(COMMA, set_exp) COLON e = exp END { Bigand (v, s, None, e) }
   | BIGAND v = separated_nonempty_list(COMMA, VAR) IN s = separated_nonempty_list(COMMA, set_exp) WHEN b = bool_exp COLON e = exp END { Bigand (v, s, Some b, e) }
-  | BIGOR  v = VAR IN s = set_exp                   COLON e = exp END { Bigor  (v, s, None, e)   }
-  | BIGOR  v = VAR IN s = set_exp WHEN b = bool_exp COLON e = exp END { Bigor  (v, s, Some b, e) }
+  | BIGOR  v = separated_nonempty_list(COMMA, VAR) IN s = separated_nonempty_list(COMMA, set_exp) COLON e = exp END { Bigor (v, s, None, e) }
+  | BIGOR  v = separated_nonempty_list(COMMA, VAR) IN s = separated_nonempty_list(COMMA, set_exp) WHEN b = bool_exp COLON e = exp END { Bigor  (v, s, Some b, e) }
 
 term_option:
   | e = exp  { Exp e }

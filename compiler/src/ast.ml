@@ -87,7 +87,7 @@ and clause_exp =
   | Implies of clause_exp  * clause_exp
   | Equiv   of clause_exp  * clause_exp
   | Bigand  of string list * set_exp list * bool_exp option * exp
-  | Bigor   of string * set_exp * bool_exp option * exp
+  | Bigor   of string list * set_exp list * bool_exp option * exp
 and set_exp =
   | SVar  of string
   | Set   of GenSet.t

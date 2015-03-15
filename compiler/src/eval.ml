@@ -245,12 +245,6 @@ let eval exp =
           | x::xs,y::ys ->
               eval_clause ~env:env (Bigand ([x],[y],None,ClauseExp(Bigand (xs,ys,t,e))))
         end
-        (*begin
-          match eval_set s with
-          | GenSet.IS a -> bigand_int env v (IntSet.elements a) test e
-          | GenSet.FS a -> bigand_float env v (FloatSet.elements a) test e
-          | GenSet.SS a -> bigand_str env v (StringSet.elements a) test e
-        end*)
     | Bigor (v, s, t, e) ->
         let test =
           match t with
@@ -258,10 +252,17 @@ let eval exp =
           | None   -> Bool true
         in
         begin
-          match eval_set s with
-          | GenSet.IS a -> bigor_int env v (IntSet.elements a) test e
-          | GenSet.FS a -> bigor_float env v (FloatSet.elements a) test e
-          | GenSet.SS a -> bigor_str env v (StringSet.elements a) test e
+          match v,s with
+          | [],[] | _,[] | [],_ -> failwith "malformed bigor expression"
+          | [x],[y] ->
+              begin
+                match eval_set y with
+                | GenSet.IS a -> bigor_int env x (IntSet.elements a) test e
+                | GenSet.FS a -> bigor_float env x (FloatSet.elements a) test e
+                | GenSet.SS a -> bigor_str env x (StringSet.elements a) test e
+              end
+          | x::xs,y::ys ->
+              eval_clause ~env:env (Bigor ([x],[y],None,ClauseExp (Bigor (xs,ys,t,e))))
         end
   and bigand_int env var values test exp =
     List.fold_left (fun acc x ->
