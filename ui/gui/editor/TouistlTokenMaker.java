@@ -10,10 +10,13 @@
  */
 package gui.editor;
 
-import java.io.*;
+import java.io.IOException;
+
 import javax.swing.text.Segment;
 
-import org.fife.ui.rsyntaxtextarea.*;
+import org.fife.ui.rsyntaxtextarea.AbstractJFlexCTokenMaker;
+import org.fife.ui.rsyntaxtextarea.Token;
+import org.fife.ui.rsyntaxtextarea.TokenImpl;
 
 
 
@@ -411,7 +414,7 @@ public class TouistlTokenMaker extends AbstractJFlexCTokenMaker {
 			return yylex();
 		} catch (IOException ioe) {
 			ioe.printStackTrace();
-			return new Token();
+			return new TokenImpl();
 		}
 
 	}
