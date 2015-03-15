@@ -13,7 +13,7 @@
 let digits     = ['0' - '9']
 let alpha      = ['a' - 'z' 'A' - 'Z']
 let empty      = ['\t' ' ']
-let special    = [ '_']
+let special    = [ '_' '(' ')']
 let newline    = '\r' | '\n' | "\r\n"
 let identifier = (special | digits)* alpha (alpha | special | digits)*
 let integer    = digits+
