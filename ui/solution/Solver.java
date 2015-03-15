@@ -29,9 +29,9 @@ import entity.Model;
 
 /**
  * A sub-class must implement Solver. The inherited class allows the user to
- * launch the solver program with the right DIMACS input, to give the user an
- * iterable Models (or null if no model found) and to stop the solver program
- * (that is running background).
+ * launch the solver program with the right DIMACS input, let him know if the
+ * given problem is satisfiable and then give the user an iterable "Models". The
+ * user can also close the solver if needed. (that is running background).
  *
  * @author Abdel
  * @modified Maël
@@ -58,12 +58,12 @@ public abstract class Solver {
 	 */
 	public abstract boolean isSatisfiable();
 	/**
-	 * Kills the solver program process
+	 * Close the solver program process.
 	 */
 	public abstract void close();
 
 	/**
-	 * WARNING: you must run isSatisfiable() BEFORE getting the model list.
+	 * WARNING: you must run isSatisfiable() BEFORE using this method.
 	 * Gives the list of models on which the user can iterate. The only way to
 	 * get the "next" models is to iterate. The size of Models is not known
 	 * unless hasNext() returns false.
