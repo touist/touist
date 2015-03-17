@@ -5,7 +5,7 @@
  */
 package gui;
 
-import gui.editorView.EditorPanel;
+import gui.editorViewV2.EditorPanel;
 import gui.resultsView.ResultsPanel;
 
 import java.awt.CardLayout;

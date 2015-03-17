@@ -12,5 +12,6 @@ import javax.swing.JTextArea;
  * @author Skander
  */
 public class CustomTextArea extends JTextArea {
-    
+    private int lastCaretPosition = 0;
+
 }

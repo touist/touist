@@ -84,7 +84,10 @@
             </Container>
           </SubComponents>
         </Container>
-        <Component class="gui.editorView.PalettePanel" name="palettePanel1">
+        <Component class="gui.editorViewV2.PalettePanel" name="palettePanel2">
+          <AuxValues>
+            <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new gui.editorViewV2.PalettePanel(customTextArea1)"/>
+          </AuxValues>
           <Constraints>
             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JSplitPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JSplitPaneSupportLayout$JSplitPaneConstraintsDescription">
               <JSplitPaneConstraints position="left"/>

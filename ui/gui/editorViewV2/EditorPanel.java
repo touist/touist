@@ -32,7 +32,7 @@ public class EditorPanel extends javax.swing.JPanel {
         jScrollPane1 = new javax.swing.JScrollPane();
         customTextArea1 = new gui.editorViewV2.CustomTextArea();
         jPanel1 = new javax.swing.JPanel();
-        palettePanel1 = new gui.editorView.PalettePanel();
+        palettePanel2 = new gui.editorViewV2.PalettePanel(customTextArea1);
 
         jSplitPane1.setDividerLocation(400);
 
@@ -56,7 +56,7 @@ public class EditorPanel extends javax.swing.JPanel {
         jSplitPane1.setRightComponent(jPanel1);
 
         jSplitPane2.setRightComponent(jSplitPane1);
-        jSplitPane2.setLeftComponent(palettePanel1);
+        jSplitPane2.setLeftComponent(palettePanel2);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -77,6 +77,6 @@ public class EditorPanel extends javax.swing.JPanel {
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JSplitPane jSplitPane1;
     private javax.swing.JSplitPane jSplitPane2;
-    private gui.editorView.PalettePanel palettePanel1;
+    private gui.editorViewV2.PalettePanel palettePanel2;
     // End of variables declaration//GEN-END:variables
 }
