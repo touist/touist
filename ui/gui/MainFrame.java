@@ -6,6 +6,7 @@
 package gui;
 
 import gui.editorViewV2.EditorPanel;
+import gui.editorViewV2.ParentEditorPanel;
 import gui.resultsView.ResultsPanel;
 
 import java.awt.CardLayout;
@@ -33,7 +34,7 @@ public class MainFrame extends javax.swing.JFrame {
     public final static String EDITOR_PANEL = "editor_panel";
     public final static String RESULTS_PANEL = "results_panel";
     private JPanel cards = new JPanel(new CardLayout());
-    private EditorPanel editorPanel1 = new EditorPanel();
+    private ParentEditorPanel editorPanel1 = new ParentEditorPanel();
     private ResultsPanel resultsPanel1 = new ResultsPanel();
     private int numberOfFormulas;
 

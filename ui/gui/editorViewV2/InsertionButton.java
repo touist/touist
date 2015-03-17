@@ -50,11 +50,12 @@ public class InsertionButton extends JButton {
      * @param text 
      */
     private void insertAtCaret(String text) {
-        String newText = textArea.getText().substring(0, textArea.getCaretPosition())
-                + text
-                + textArea.getText().substring(textArea.getCaretPosition());
-        textArea.setText(newText);
-        
+        if (textArea.hasFocus()) {
+            String newText = textArea.getText().substring(0, textArea.getCaretPosition())
+                    + text
+                    + textArea.getText().substring(textArea.getCaretPosition());
+            textArea.setText(newText);
+        }
         //TODO update latex schematic area
     }
 }
