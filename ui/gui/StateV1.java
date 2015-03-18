@@ -9,7 +9,7 @@ package gui;
  *
  * @author Skander
  */
-public enum State {
-    EDITION, EDITION_ERROR, NO_RESULT, SINGLE_RESULT, FIRST_RESULT, 
-    INTER_RESULT, LAST_RESULT
+public enum StateV1 {
+    EDIT_SINGLE, EDIT_MULTIPLE, SINGLE_RESULT, FIRST_RESULT, INTER_RESULT, 
+    LAST_RESULT
 }

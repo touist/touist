@@ -3,13 +3,15 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package gui;
+package gui.editionView;
+
+import javax.swing.JTextArea;
 
 /**
  *
  * @author Skander
  */
-public enum State {
-    EDITION, EDITION_ERROR, NO_RESULT, SINGLE_RESULT, FIRST_RESULT, 
-    INTER_RESULT, LAST_RESULT
+public class CustomTextArea extends JTextArea {
+    private int lastCaretPosition = 0;
+
 }

@@ -5,8 +5,8 @@
  */
 package gui;
 
-import gui.editorViewV2.EditorPanel;
-import gui.editorViewV2.ParentEditorPanel;
+import gui.editionView.EditionPanel;
+import gui.editionView.ParentEditionPanel;
 import gui.resultsView.ResultsPanel;
 
 import java.awt.CardLayout;
@@ -34,7 +34,7 @@ public class MainFrame extends javax.swing.JFrame {
     public final static String EDITOR_PANEL = "editor_panel";
     public final static String RESULTS_PANEL = "results_panel";
     private JPanel cards = new JPanel(new CardLayout());
-    private ParentEditorPanel editorPanel1 = new ParentEditorPanel();
+    private ParentEditionPanel editorPanel1 = new ParentEditionPanel();
     private ResultsPanel resultsPanel1 = new ResultsPanel();
     private int numberOfFormulas;
 
@@ -42,7 +42,7 @@ public class MainFrame extends javax.swing.JFrame {
      * Creates new form MainFrame
      */
     public MainFrame() {
-        state = State.EDIT_SINGLE;
+        state = State.EDITION;
 
         add(cards);
         cards.add(editorPanel1, EDITOR_PANEL);
