@@ -47,11 +47,11 @@ public class PalettePanel extends javax.swing.JPanel {
             sections.add(section1);
             sections.add(section2);
 
-            section1.addInsertButton(new InsertionButton(editorTextArea, "Formule 1", "aide 1"));
-            section1.addInsertButton(new InsertionButton(editorTextArea, "Formule 2", "aide 2"));
-            section1.addInsertButton(new InsertionButton(editorTextArea, "Formule 3", "aide 3"));
-            section2.addInsertButton(new InsertionButton(editorTextArea, "Formule 4", "aide 4"));
-            section2.addInsertButton(new InsertionButton(editorTextArea, "Formule 5", "aide 5"));
+            section1.addInsertButton(new InsertionButton(editorTextArea, "$a and $b", "and"));
+            section1.addInsertButton(new InsertionButton(editorTextArea, "$a or $b", "or"));
+            section1.addInsertButton(new InsertionButton(editorTextArea, "not $a", "not"));
+            section2.addInsertButton(new InsertionButton(editorTextArea, "if $a \nthen \n\t$b \nelse \n\t$c\n", "if then else"));
+            section1.addInsertButton(new InsertionButton(editorTextArea, "bigand $i in $a: \n\tA($i) and B($i) \nend", "bigand"));
 
             sectionsContainerPanel.setLayout(new BoxLayout(sectionsContainerPanel, BoxLayout.Y_AXIS));
             for(PaletteSectionPanel section : sections) {
@@ -61,8 +61,8 @@ public class PalettePanel extends javax.swing.JPanel {
             PaletteSectionPanel section1 = new PaletteSectionPanel("Section 3");
             sections.add(section1);
 
-            section1.addInsertButton(new InsertionButton(editorTextArea, "Set 1", "aide 1"));
-            section1.addInsertButton(new InsertionButton(editorTextArea, "Set 2", "aide 2"));
+            section1.addInsertButton(new InsertionButton(editorTextArea, "$a = [a,b,c]", ""));
+            section1.addInsertButton(new InsertionButton(editorTextArea, "$b = [a,d,e,f]", ""));
 
             sectionsContainerPanel.setLayout(new BoxLayout(sectionsContainerPanel, BoxLayout.Y_AXIS));
             for(PaletteSectionPanel section : sections) {
