@@ -34,6 +34,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.StringTokenizer;
 
 /**
  * @author Abdel
@@ -132,6 +133,10 @@ public class Translator {
   			| COMPILE_JUSTWARNINGS -> 3
   			| ARGUMENTS_ERROR -> 4
 		 */
+		/*
+		 * Syntax of errors returned by translator:
+		 * num_row:num_col:message
+		 */
 		String cmd =    CurrentPath+"/"+
 				translatorProgramFilePath
 				+ " -o " + outputFilePath
@@ -156,16 +161,16 @@ public class Translator {
 		stdout.close();
 		errors = new ArrayList<Error>();
 		if(return_code == 1 || return_code == 2) {
+			System.err.println("translate(): the translator returned errors");
 			String file_name; int num_line; int num_col;
 			String message_error;
 			for (String errMessage : linesStdErr) {
 				System.err.println("translate(): "+errMessage);
-			//	StringTokenizer tokenizer = new StringTokenizer(errMessage,":");
-			//	file_name = tokenizer.nextToken();
-			//	num_line = Integer.parseInt(tokenizer.nextToken());
-			//	num_col = Integer.parseInt(tokenizer.nextToken());
-			//	message_error = tokenizer.nextToken();
-			//	errors.add(new Error(num_line,num_col,message_error));
+				StringTokenizer tokenizer = new StringTokenizer(errMessage,":");
+				num_line = Integer.parseInt(tokenizer.nextToken());
+				num_col = Integer.parseInt(tokenizer.nextToken());
+				message_error = tokenizer.nextToken();
+				errors.add(new Error(num_line,num_col,message_error));
 			}
 		}
 		if(return_code == 0) {
