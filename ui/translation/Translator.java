@@ -137,7 +137,7 @@ public class Translator {
 		 * Syntax of errors returned by translator:
 		 * num_row:num_col:message
 		 */
-		String cmd =    CurrentPath+"/"+
+		String cmd =    CurrentPath+File.separatorChar+
 				translatorProgramFilePath
 				+ " -o " + outputFilePath
 				+ " -table " + outputTableFilePath
@@ -174,7 +174,7 @@ public class Translator {
 			}
 		}
 		if(return_code == 0) {
-			parseLiteralsMapFile(CurrentPath+"/"+outputTableFilePath);
+			parseLiteralsMapFile(CurrentPath+File.separatorChar+outputTableFilePath);
 		}
 		return return_code==0;
 	}
@@ -195,7 +195,7 @@ public class Translator {
 	 * @return the file path
 	 */
 	public String getDimacsFilePath() {
-		return CurrentPath+"/"+outputFilePath;
+		return CurrentPath+File.separatorChar+outputFilePath;
 	}
 
 	/**
