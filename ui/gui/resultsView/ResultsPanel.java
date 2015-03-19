@@ -51,11 +51,16 @@ public class ResultsPanel extends AbstractComponentPanel {
      */
     public void applyRestrictions() {
         switch(getState()) {
-            case EDIT_SINGLE :
+            case EDITION :
                 // impossible
                 break;
-            case EDIT_MULTIPLE :
+            case EDITION_ERROR :
                 // impossible
+                break;
+            case NO_RESULT :
+                jButtonNext.setEnabled(false);
+                jButtonPrevious.setEnabled(false);
+                jTextArea1.setText("Aucune solution n'a été trouvée");
                 break;
             case SINGLE_RESULT :
                 jButtonNext.setEnabled(false);
@@ -65,7 +70,7 @@ public class ResultsPanel extends AbstractComponentPanel {
                 jButtonNext.setEnabled(true);
                 jButtonPrevious.setEnabled(false);
                 break;
-            case INTER_RESULT :
+            case MIDDLE_RESULT :
                 jButtonNext.setEnabled(true);
                 jButtonPrevious.setEnabled(true);
                 break;
@@ -165,51 +170,36 @@ public class ResultsPanel extends AbstractComponentPanel {
 
     private void jButtonEditorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonEditorActionPerformed
         switch(getState()) {
-            case EDIT_SINGLE :
+            case EDITION :
                 // impossible
                 break;
-            case EDIT_MULTIPLE :
+            case EDITION_ERROR :
                 // impossible
+                break;
+            case NO_RESULT :
+                getFrame().getSolver().close();
+                setState(State.EDITION);
+                getFrame().setViewToEditor();
                 break;
             case SINGLE_RESULT :
                 getFrame().getSolver().close();
-                if(getFrame().getNumberOfFormulas() > 1) {
-                    setState(State.EDIT_MULTIPLE);
-                    getFrame().setViewToEditor();
-                } else {
-                    setState(State.EDIT_SINGLE);
-                    getFrame().setViewToEditor();
-                }
+                setState(State.EDITION);
+                getFrame().setViewToEditor();
                 break;
             case FIRST_RESULT :
                 getFrame().getSolver().close();
-                if(getFrame().getNumberOfFormulas() > 1) {
-                    setState(State.EDIT_MULTIPLE);
-                    getFrame().setViewToEditor();
-                } else {
-                    setState(State.EDIT_SINGLE);
-                    getFrame().setViewToEditor();
-                }
+                setState(State.EDITION);
+                getFrame().setViewToEditor();
                 break;
-            case INTER_RESULT :
+            case MIDDLE_RESULT :
                 getFrame().getSolver().close();
-                if(getFrame().getNumberOfFormulas() > 1) {
-                    setState(State.EDIT_MULTIPLE);
-                    getFrame().setViewToEditor();
-                } else {
-                    setState(State.EDIT_SINGLE);
-                    getFrame().setViewToEditor();
-                }
+                setState(State.EDITION);
+                getFrame().setViewToEditor();
                 break;
             case LAST_RESULT :
                 getFrame().getSolver().close();
-                if(getFrame().getNumberOfFormulas() > 1) {
-                    setState(State.EDIT_MULTIPLE);
-                    getFrame().setViewToEditor();
-                } else {
-                    setState(State.EDIT_SINGLE);
-                    getFrame().setViewToEditor();
-                }
+                setState(State.EDITION);
+                getFrame().setViewToEditor();
                 break;
             default :
                 System.out.println("Undefined action set for the state : " + getState());
@@ -229,7 +219,7 @@ public class ResultsPanel extends AbstractComponentPanel {
         Model m = iter.previous();
         jTextArea1.setText(m.toString());
         if (iter.hasPrevious()) {
-            return State.INTER_RESULT;
+            return State.MIDDLE_RESULT;
         } else {
             return State.FIRST_RESULT;
         }
@@ -238,11 +228,14 @@ public class ResultsPanel extends AbstractComponentPanel {
     private void jButtonPreviousActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonPreviousActionPerformed
         Model m;
         switch(getState()) {
-            case EDIT_SINGLE :
+            case EDITION :
                 // impossible
                 break;
-            case EDIT_MULTIPLE :
+            case EDITION_ERROR :
                 // impossible
+                break;
+            case NO_RESULT :
+                // interdit
                 break;
             case SINGLE_RESULT :
                 // interdit
@@ -250,7 +243,7 @@ public class ResultsPanel extends AbstractComponentPanel {
             case FIRST_RESULT :
                 // interdit
                 break;
-            case INTER_RESULT :
+            case MIDDLE_RESULT :
                 setState(previousButtonHandler());
                 applyRestrictions();
                 break;
@@ -275,7 +268,7 @@ public class ResultsPanel extends AbstractComponentPanel {
         Model m = iter.next();
         jTextArea1.setText(m.toString());
         if (iter.hasNext()){
-            return State.INTER_RESULT;
+            return State.MIDDLE_RESULT;
         } else {
             return State.LAST_RESULT;
         }
@@ -284,11 +277,14 @@ public class ResultsPanel extends AbstractComponentPanel {
     private void jButtonNextActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonNextActionPerformed
         Model m;
         switch(getState()) {
-            case EDIT_SINGLE :
+            case EDITION :
                 // impossible
                 break;
-            case EDIT_MULTIPLE :
+            case EDITION_ERROR :
                 // impossible
+                break;
+            case NO_RESULT :
+                // interdit
                 break;
             case SINGLE_RESULT :
                 // interdit
@@ -297,7 +293,7 @@ public class ResultsPanel extends AbstractComponentPanel {
                 setState(nextButtonHandler());
                 applyRestrictions();
                 break;
-            case INTER_RESULT :
+            case MIDDLE_RESULT :
                 setState(nextButtonHandler());
                 applyRestrictions();
                 break;
