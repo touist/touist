@@ -49,7 +49,7 @@ public class InsertionButton extends JButton {
                     case FIRST_RESULT :
                         // impossible
                         break;
-                    case INTER_RESULT :
+                    case MIDDLE_RESULT :
                         // impossible
                         break;
                     case LAST_RESULT :

@@ -129,7 +129,7 @@ public class ParentEditionPanel extends AbstractComponentPanel {
             case FIRST_RESULT :
                 // impossible
                 break;
-            case INTER_RESULT :
+            case MIDDLE_RESULT :
                 // impossible
                 break;
             case LAST_RESULT :
@@ -161,7 +161,7 @@ public class ParentEditionPanel extends AbstractComponentPanel {
             case FIRST_RESULT :
                 // impossible
                 break;
-            case INTER_RESULT :
+            case MIDDLE_RESULT :
                 // impossible
                 break;
             case LAST_RESULT :
@@ -212,7 +212,7 @@ public class ParentEditionPanel extends AbstractComponentPanel {
             for(String set : getFrame().getClause().getSets()) {
                 text += set + "\n";
             }
-            editorPanelFormulas.setText(text);
+            editorPanelSets.setText(text);
         }   
     }
 

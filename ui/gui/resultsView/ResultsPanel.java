@@ -8,7 +8,6 @@ package gui.resultsView;
 import entity.Model;
 import gui.AbstractComponentPanel;
 import gui.State;
-import gui.StateV1;
 
 import java.util.ListIterator;
 
@@ -71,7 +70,7 @@ public class ResultsPanel extends AbstractComponentPanel {
                 jButtonNext.setEnabled(true);
                 jButtonPrevious.setEnabled(false);
                 break;
-            case INTER_RESULT :
+            case MIDDLE_RESULT :
                 jButtonNext.setEnabled(true);
                 jButtonPrevious.setEnabled(true);
                 break;
@@ -192,7 +191,7 @@ public class ResultsPanel extends AbstractComponentPanel {
                 setState(State.EDITION);
                 getFrame().setViewToEditor();
                 break;
-            case INTER_RESULT :
+            case MIDDLE_RESULT :
                 getFrame().getSolver().close();
                 setState(State.EDITION);
                 getFrame().setViewToEditor();
@@ -220,7 +219,7 @@ public class ResultsPanel extends AbstractComponentPanel {
         Model m = iter.previous();
         jTextArea1.setText(m.toString());
         if (iter.hasPrevious()) {
-            return State.INTER_RESULT;
+            return State.MIDDLE_RESULT;
         } else {
             return State.FIRST_RESULT;
         }
@@ -244,7 +243,7 @@ public class ResultsPanel extends AbstractComponentPanel {
             case FIRST_RESULT :
                 // interdit
                 break;
-            case INTER_RESULT :
+            case MIDDLE_RESULT :
                 setState(previousButtonHandler());
                 applyRestrictions();
                 break;
@@ -269,7 +268,7 @@ public class ResultsPanel extends AbstractComponentPanel {
         Model m = iter.next();
         jTextArea1.setText(m.toString());
         if (iter.hasNext()){
-            return State.INTER_RESULT;
+            return State.MIDDLE_RESULT;
         } else {
             return State.LAST_RESULT;
         }
@@ -294,7 +293,7 @@ public class ResultsPanel extends AbstractComponentPanel {
                 setState(nextButtonHandler());
                 applyRestrictions();
                 break;
-            case INTER_RESULT :
+            case MIDDLE_RESULT :
                 setState(nextButtonHandler());
                 applyRestrictions();
                 break;
