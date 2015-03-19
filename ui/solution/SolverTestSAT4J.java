@@ -100,8 +100,11 @@ public class SolverTestSAT4J extends Solver {
 		 * parse issue 3 = wrong dimacs content 4 = error with the streamreader
 		 * 5 = solver timeout
 		 */
-		String command = "java -cp .:MiniSat:MiniSat"+File.separatorChar+"sat4j-sat.jar Minisat "
-				+ getDimacsFilePath();
+		String command = "java -cp "
+				+ "."+File.pathSeparator+"MiniSat"
+				+File.pathSeparator+"MiniSat"
+				+File.separatorChar+"sat4j-sat.jar "
+				+ "Minisat " + getDimacsFilePath();
 		this.p = Runtime.getRuntime().exec(command);
 		stderr = new BufferedReader(new InputStreamReader(p.getErrorStream()));
 		stdout = new BufferedReader(new InputStreamReader(p.getInputStream()));
