@@ -67,7 +67,7 @@ let argIsInputFilePath (inputFilePath:string) : unit =
 (* Used by parse_with_error *)
 let print_position outx lexbuf =
   let pos = lexbuf.lex_curr_p in
-  fprintf outx "%s:%d:%d" pos.pos_fname pos.pos_lnum (pos.pos_cnum - pos.pos_bol+1)
+  fprintf outx "%d:%d" pos.pos_lnum (pos.pos_cnum - pos.pos_bol+1)
 
 (* parse_with_error handles exceptions when calling
 the parser and lexer *)
