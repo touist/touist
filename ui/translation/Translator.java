@@ -126,10 +126,11 @@ public class Translator {
 	 */
 	public boolean translate(String bigandFilePath) throws IOException, InterruptedException {
 		/* return_code from the Touistl translator :
-		 *  | OK -> 0
-  			| COMPILE_ERRORS -> 1
-  			| COMPILE_JUSTWARNINGS -> 2
-  			| ARGUMENTS_ERROR -> 3
+		    | OK -> 0
+  			| COMPILE_SYNTAX_ERROR -> 1
+  			| COMPILE_SEMANTIC_ERROR -> 2
+  			| COMPILE_JUSTWARNINGS -> 3
+  			| ARGUMENTS_ERROR -> 4
 		 */
 		String cmd =    CurrentPath+"/"+
 				translatorProgramFilePath
@@ -139,15 +140,34 @@ public class Translator {
 		this.p = Runtime.getRuntime().exec(cmd);
         System.out.println("translate(): cmd executed: "+cmd);
 		int return_code = p.waitFor();
-		BufferedReader reader = new BufferedReader(new InputStreamReader(
+		BufferedReader stdout = new BufferedReader(new InputStreamReader(
 				this.p.getInputStream()));
-		List<String> lines = new ArrayList<String>();
-		while (reader.ready()) {
-			lines.add(reader.readLine());
+		List<String> linesStdout = new ArrayList<String>();
+		while (stdout.ready()) {
+			linesStdout.add(stdout.readLine());
 		}
-		reader.close();
-
-		// TODO Parse the output from "List<String> lines"
+		BufferedReader stderr = new BufferedReader(new InputStreamReader(
+				this.p.getErrorStream()));
+		List<String> linesStdErr = new ArrayList<String>();
+		while (stderr.ready()) {
+			linesStdErr.add(stderr.readLine());
+		}
+		stderr.close();
+		stdout.close();
+		errors = new ArrayList<Error>();
+		if(return_code == 1 || return_code == 2) {
+			String file_name; int num_line; int num_col;
+			String message_error;
+			for (String errMessage : linesStdErr) {
+				System.err.println("translate(): "+errMessage);
+			//	StringTokenizer tokenizer = new StringTokenizer(errMessage,":");
+			//	file_name = tokenizer.nextToken();
+			//	num_line = Integer.parseInt(tokenizer.nextToken());
+			//	num_col = Integer.parseInt(tokenizer.nextToken());
+			//	message_error = tokenizer.nextToken();
+			//	errors.add(new Error(num_line,num_col,message_error));
+			}
+		}
 		if(return_code == 0) {
 			parseLiteralsMapFile(CurrentPath+"/"+outputTableFilePath);
 		}
