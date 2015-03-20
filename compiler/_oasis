@@ -1,0 +1,19 @@
+OASISFormat:  0.4
+OcamlVersion: >= 4.01.0
+Name:         TouiST Compiler
+Version:      0.1
+Synopsis:     This package is a compiler to the DIMACS file format
+Authors:      Olivier Lezaud
+License:      LGPL
+Plugins:      META (0.4), DevFiles (0.4)
+
+BuildType: ocamlbuild (0.4)
+AlphaFeatures: ocamlbuild_more_args
+XOCamlbuildExtraArgs: -use-menhir -package fileutils
+
+Executable touistc
+  Path:           src
+  BuildTools:     ocamlbuild
+  CompiledObject: best
+  MainIs:         touistc.ml
+  

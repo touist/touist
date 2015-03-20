@@ -1,3 +1,8 @@
+# Backup
+
+*.swp
+*.bak
+
 # OCaml
 
 *.annot
@@ -20,7 +25,12 @@ _build/
 # oasis generated files
 setup.data
 setup.log
+META
+*.mllib
+*.mldylib
 
+# menhir conflicts file
+*.conflicts
 
 # Java
 
@@ -34,3 +44,40 @@ setup.log
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
 
+/bin/
+
+.classpath
+
+.project
+/nbproject/private/
+/dist/
+/build/
+nbproject/project.xml
+
+nbproject/project.properties
+
+nbproject/genfiles.properties
+
+nbproject/build-impl.xml
+
+build.xml
+
+*.mf
+
+*.cnf
+
+*.table
+
+compiler/test/.foo_table
+
+compiler/test/.test_table
+
+*.ncf
+
+compiler/.foo_table
+
+bigAndFile-defaultname.txt
+
+*.table
+
+*.cnf
