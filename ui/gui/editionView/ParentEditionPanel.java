@@ -219,6 +219,8 @@ public class ParentEditionPanel extends AbstractComponentPanel {
 
     private State initResultView() {
         // Initialisation de BaseDeClause
+        getFrame().getClause().getFormules().clear();
+        getFrame().getClause().getSets().clear();
         getFrame().getClause().addFormules(editorPanelFormulas.getText());
         getFrame().getClause().addSets(editorPanelSets.getText());
         
@@ -233,7 +235,11 @@ public class ParentEditionPanel extends AbstractComponentPanel {
         String bigAndFilePath = "bigAndFile-defaultname.txt"; //TODO se mettre d'accord sur un nom standard ou ajouter a Translator et BaseDeClause des méthode pour s'échange de objets File
         try {
             getFrame().getClause().saveToFile(bigAndFilePath); //TODO gérer les IOException
-            getFrame().getTranslator().translate(bigAndFilePath); //TODO gérer les erreurs : return false ou IOException
+            if(! getFrame().getTranslator().translate(bigAndFilePath)) { //TODO gérer les erreurs : return false ou IOException
+                //TODO récupérer les erreurs que le traducteur a trouvé
+                System.out.println(getFrame().getTranslator().getErrors("").get(0).toString());
+                return State.EDITION;
+            }
             File f = new File(bigAndFilePath);
             f.deleteOnExit();
         } catch (Exception e) {
