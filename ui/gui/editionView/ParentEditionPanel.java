@@ -218,6 +218,10 @@ public class ParentEditionPanel extends AbstractComponentPanel {
     }
 
     private State initResultView() {
+        // Initialisation de BaseDeClause
+        getFrame().getClause().addFormules(editorPanelFormulas.getText());
+        getFrame().getClause().addSets(editorPanelSets.getText());
+        
         /*
         Faire appel au solveur avec les fichiers générés par le traducteur
         calculer un model
