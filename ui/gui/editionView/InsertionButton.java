@@ -10,6 +10,7 @@ import gui.State;
 import gui.editionView.editor.Editor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import javax.swing.JButton;
 
 /**
@@ -20,10 +21,12 @@ public class InsertionButton extends JButton {
     
     private final Editor editorTextArea;
     private final String codeToInsert;
+    private ArrayList<Integer> snipets;
     
-    public InsertionButton(Editor editorTextArea, String codeToInsert) {
+    public InsertionButton(Editor editorTextArea, String codeToInsert, ArrayList<Integer> snipets) {
         this.editorTextArea = editorTextArea;
         this.codeToInsert = codeToInsert;
+        this.snipets = snipets;
         
         this.setText(codeToInsert);
         
@@ -66,8 +69,8 @@ public class InsertionButton extends JButton {
         this.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
     }
     
-    public InsertionButton(Editor editorTextArea, String codeToInsert, String aide) {
-        this(editorTextArea, codeToInsert);
+    public InsertionButton(Editor editorTextArea, String codeToInsert, ArrayList<Integer> snipets, String aide) {
+        this(editorTextArea, codeToInsert, snipets);
         setToolTipText(aide);
         
     }
@@ -79,10 +82,16 @@ public class InsertionButton extends JButton {
      */
     private void insertAtCaret(String text) {
         if (editorTextArea.hasFocus()) {
-            String newText = editorTextArea.getText().substring(0, editorTextArea.getCaretPosition())
-                    + text
-                    + editorTextArea.getText().substring(editorTextArea.getCaretPosition());
-            editorTextArea.setText(newText);
+            
+            Integer caretPosition = editorTextArea.getCaretPosition();
+            
+            // insert is better than setText: setText entirely remove previous text then make an insert operation
+            editorTextArea.insert(text, caretPosition);
+
+            for(int snippetBegin = 0; snippetBegin < snipets.size(); snippetBegin+=2) {
+                int snippetEnd = snippetBegin + 1;
+                editorTextArea.addSnipet(caretPosition+snipets.get(snippetBegin),caretPosition+snipets.get(snippetEnd));
+            }
         }
         //TODO update latex schematic area
     }
