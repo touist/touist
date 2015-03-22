@@ -117,7 +117,7 @@ public class Editor extends RSyntaxTextArea  {
         
         public void actionPerformed(ActionEvent e) {
             int curr = E.getSelectionStart();
-            for(int i = 0; i < snipetsBegin.size(); i++) {
+            for(int i = snipetsBegin.size()-1; i >= 0; i--) {
                 if(snipetsBegin.get(i) < curr) {
                     E.setSelectionStart(snipetsBegin.get(i));
                     E.setSelectionEnd(snipetsEnd.get(i)+1);
@@ -158,7 +158,7 @@ public class Editor extends RSyntaxTextArea  {
         String leftKeyStrokeAndKey = "control LEFT";
         KeyStroke leftKeyStroke = KeyStroke.getKeyStroke(leftKeyStrokeAndKey);
         this.getInputMap().put(leftKeyStroke, leftKeyStrokeAndKey);
-        this.getActionMap().put(leftKeyStrokeAndKey, new SnippetRightAction(this));
+        this.getActionMap().put(leftKeyStrokeAndKey, new SnippetLeftAction(this));
         
 
     }
