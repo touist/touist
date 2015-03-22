@@ -47,11 +47,17 @@ public class PalettePanel extends javax.swing.JPanel {
             sections.add(section1);
             sections.add(section2);
 
-            section1.addInsertButton(new InsertionButton(editorTextArea, "$a and $b", "and"));
-            section1.addInsertButton(new InsertionButton(editorTextArea, "$a or $b", "or"));
-            section1.addInsertButton(new InsertionButton(editorTextArea, "not $a", "not"));
-            section2.addInsertButton(new InsertionButton(editorTextArea, "if $a \nthen \n\t$b \nelse \n\t$c\n", "if then else"));
-            section1.addInsertButton(new InsertionButton(editorTextArea, "bigand $i in $a: \n\tA($i) and B($i) \nend", "bigand"));
+            ArrayList<Integer> snippetsAnd = new ArrayList<Integer>(){{add(0);add(1);add(7);add(8);}};
+            ArrayList<Integer> snippetsOr = new ArrayList<Integer>(){{add(0);add(1);add(6);add(7);}};
+            ArrayList<Integer> snippetsNot = new ArrayList<Integer>(){{add(4);add(5);}};
+            ArrayList<Integer> snippetsIf = new ArrayList<Integer>(){{add(3);add(4);add(14);add(15);add(25);add(26);}};
+            ArrayList<Integer> snippetsBigand = new ArrayList<Integer>(){{add(7);add(8);add(13);add(14);}};
+            
+            section1.addInsertButton(new InsertionButton(editorTextArea, "$a and $b", snippetsAnd, "and"));
+            section1.addInsertButton(new InsertionButton(editorTextArea, "$a or $b", snippetsOr, "or"));
+            section1.addInsertButton(new InsertionButton(editorTextArea, "not $a", snippetsNot, "not"));
+            section2.addInsertButton(new InsertionButton(editorTextArea, "if $a \nthen \n\t$b \nelse \n\t$c\n", snippetsIf, "if then else"));
+            section1.addInsertButton(new InsertionButton(editorTextArea, "bigand $i in $a: \n\tA($i) and B($i) \nend", snippetsBigand, "bigand"));
 
             sectionsContainerPanel.setLayout(new BoxLayout(sectionsContainerPanel, BoxLayout.Y_AXIS));
             for(PaletteSectionPanel section : sections) {
@@ -61,8 +67,10 @@ public class PalettePanel extends javax.swing.JPanel {
             PaletteSectionPanel section1 = new PaletteSectionPanel("Section 3");
             sections.add(section1);
 
-            section1.addInsertButton(new InsertionButton(editorTextArea, "$a = [a,b,c]", ""));
-            section1.addInsertButton(new InsertionButton(editorTextArea, "$b = [a,d,e,f]", ""));
+            ArrayList<Integer> snippetsSet = new ArrayList<Integer>(){{add(0);add(1);}};
+            
+            section1.addInsertButton(new InsertionButton(editorTextArea, "$a = [a,b,c]", snippetsSet, ""));
+            section1.addInsertButton(new InsertionButton(editorTextArea, "$b = [a,d,e,f]", snippetsSet, ""));
 
             sectionsContainerPanel.setLayout(new BoxLayout(sectionsContainerPanel, BoxLayout.Y_AXIS));
             for(PaletteSectionPanel section : sections) {
