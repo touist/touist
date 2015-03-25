@@ -13,6 +13,7 @@ import java.io.File;
 import java.util.ListIterator;
 import java.util.Map;
 import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 import solution.SolverTestSAT4J;
 
 /**
@@ -41,7 +42,6 @@ public class ParentEditionPanel extends AbstractComponentPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jDialogErrorMessage = new javax.swing.JDialog();
         jFileChooser1 = new javax.swing.JFileChooser();
         jTabbedPane1 = new javax.swing.JTabbedPane();
         editorPanelFormulas = new gui.editionView.EditionPanel();
@@ -49,20 +49,6 @@ public class ParentEditionPanel extends AbstractComponentPanel {
         testButton = new javax.swing.JButton();
         importButton = new javax.swing.JButton();
         errorMessageLabel = new javax.swing.JLabel();
-
-        jDialogErrorMessage.setTitle("Erreur");
-        jDialogErrorMessage.setAlwaysOnTop(true);
-
-        javax.swing.GroupLayout jDialogErrorMessageLayout = new javax.swing.GroupLayout(jDialogErrorMessage.getContentPane());
-        jDialogErrorMessage.getContentPane().setLayout(jDialogErrorMessageLayout);
-        jDialogErrorMessageLayout.setHorizontalGroup(
-            jDialogErrorMessageLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 317, Short.MAX_VALUE)
-        );
-        jDialogErrorMessageLayout.setVerticalGroup(
-            jDialogErrorMessageLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 205, Short.MAX_VALUE)
-        );
 
         jTabbedPane1.setToolTipText("");
         jTabbedPane1.addTab("Formules", editorPanelFormulas);
@@ -179,7 +165,6 @@ public class ParentEditionPanel extends AbstractComponentPanel {
     private gui.editionView.EditionPanel editorPanelSets;
     private javax.swing.JLabel errorMessageLabel;
     private javax.swing.JButton importButton;
-    private javax.swing.JDialog jDialogErrorMessage;
     private javax.swing.JFileChooser jFileChooser1;
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JButton testButton;
@@ -235,9 +220,16 @@ public class ParentEditionPanel extends AbstractComponentPanel {
         String bigAndFilePath = "bigAndFile-defaultname.txt"; //TODO se mettre d'accord sur un nom standard ou ajouter a Translator et BaseDeClause des méthode pour s'échange de objets File
         try {
             getFrame().getClause().saveToFile(bigAndFilePath); //TODO gérer les IOException
-            if(! getFrame().getTranslator().translate(bigAndFilePath)) { //TODO gérer les erreurs : return false ou IOException
-                //TODO récupérer les erreurs que le traducteur a trouvé
-                System.out.println(getFrame().getTranslator().getErrors("").get(0).toString());
+            if(! getFrame().getTranslator().translate(bigAndFilePath)) { //TODO gérer les IOException
+                String errorMessage = "";
+                for(int i=0; i<getFrame().getTranslator().getErrors("").size(); i++) {
+                    errorMessage += (i+1) + ": " + getFrame().getTranslator().getErrors("").get(i) + "\n";
+                }
+                System.out.println("Erreur de traduction : " + "\n" + errorMessage + "\n");
+                JOptionPane.showMessageDialog(getParent(), 
+                        errorMessage, 
+                        "Erreur de traduction", 
+                        JOptionPane.ERROR_MESSAGE);
                 return State.EDITION;
             }
             File f = new File(bigAndFilePath);
