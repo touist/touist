@@ -1,6 +1,7 @@
 %{
   open Ast
-
+  
+  (* Avoid the use of the Set.of_list function which requires version 4.02.0 *)
   let intset_of_list =
     List.fold_left (fun acc x -> IntSet.add x acc) IntSet.empty
   
@@ -132,8 +133,9 @@ set_exp:
   | LBRACK i1 = int_exp RANGE i2 = int_exp RBRACK { Range (i1, i2) }
 
 set_decl:
-  | LBRACK i = separated_nonempty_list(COMMA, INT)   RBRACK { GenSet.IS (intset_of_list    i) }
-  | LBRACK f = separated_nonempty_list(COMMA, FLOAT) RBRACK { GenSet.FS (floatset_of_list  f) }
+  | LBRACK RBRACK { GenSet.Empty }
+  | LBRACK i = separated_nonempty_list(COMMA, int_exp)   RBRACK { GenSet.IS (intset_of_list (List.map Eval.eval_int i)) }
+  | LBRACK f = separated_nonempty_list(COMMA, float_exp) RBRACK { GenSet.FS (floatset_of_list (List.map Eval.eval_float f)) }
   | LBRACK s = separated_nonempty_list(COMMA, TERM)  RBRACK { GenSet.SS (stringset_of_list s) }
 
 clause_exp:

@@ -12,6 +12,7 @@ module StringSet = Set.Make(String)
 
 module GenSet = struct
   type t =
+    | Empty
     | IS of IntSet.t
     | FS of FloatSet.t
     | SS of StringSet.t
