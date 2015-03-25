@@ -3,12 +3,15 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package gui.editorView;
+package gui.editionView;
+
+import javax.swing.JTextArea;
 
 /**
  *
  * @author Skander
  */
-public enum FormulaPanelType {
-    FORMULA, SET
+public class CustomTextArea extends JTextArea {
+    private int lastCaretPosition = 0;
+
 }

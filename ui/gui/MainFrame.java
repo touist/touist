@@ -5,10 +5,12 @@
  */
 package gui;
 
-import gui.editorView.EditorPanel;
+import gui.editionView.EditionPanel;
+import gui.editionView.ParentEditionPanel;
 import gui.resultsView.ResultsPanel;
 
 import java.awt.CardLayout;
+import java.io.File;
 
 import javax.swing.JPanel;
 
@@ -24,7 +26,7 @@ import translation.Translator;
 public class MainFrame extends javax.swing.JFrame {
 
     private BaseDeClauses clause = new BaseDeClauses();
-    private Translator translator = new Translator("compiler/touistc.native");
+    private Translator translator = new Translator("compiler"+File.separatorChar+"touistc.native");
     private Solver solver;
     private ModelList models;
 
@@ -33,7 +35,7 @@ public class MainFrame extends javax.swing.JFrame {
     public final static String EDITOR_PANEL = "editor_panel";
     public final static String RESULTS_PANEL = "results_panel";
     private JPanel cards = new JPanel(new CardLayout());
-    private EditorPanel editorPanel1 = new EditorPanel();
+    private ParentEditionPanel editorPanel1 = new ParentEditionPanel();
     private ResultsPanel resultsPanel1 = new ResultsPanel();
     private int numberOfFormulas;
 
@@ -41,7 +43,7 @@ public class MainFrame extends javax.swing.JFrame {
      * Creates new form MainFrame
      */
     public MainFrame() {
-        state = State.EDIT_SINGLE;
+        state = State.EDITION;
 
         add(cards);
         cards.add(editorPanel1, EDITOR_PANEL);

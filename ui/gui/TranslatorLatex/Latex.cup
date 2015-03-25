@@ -1,0 +1,161 @@
+terminal BEGIN,END,SETS,FORMULA,IF,THEN,ELSE;
+terminal CONSTANT,SET,INT,FLOAT; 
+terminal BIGAND,BIGOR,IN,NOT,OR,AND,EMPTY,SUBSET,CARD,SQRT,MOD,WHITESPACE;
+terminal TRUE,FALSE,TOP,BOT,AFFECT,EQUAL,DIFFERENT,LESSER,LESSER_OR_EQUAL;
+terminal GREATER,GREATER_OR_EQUAL,BOOL_AND,BOOL_OR,IMPLIQUE,EQUIV,LPAR,RPAR;
+terminal ADD,MULTIPLY,SUBSTRACT,DIVIDE,LCRO,RCRO,DODOT,COMMA,TWODOT,XOR;
+terminal COMMENT,DOT,UNION,INTER,DIFF,WHEN,NEWLINE;
+
+
+
+terminal String VAR;
+terminal String INTEGER;
+terminal String DOUBLENUMBER;
+terminal String IDENTIFIER;
+terminal String ALPHA;
+terminal String ERROR_IDENTIFIER;
+terminal String LATEX;
+
+non terminal String formule;
+non terminal String set;
+non terminal String expr;
+non terminal String affect;
+non terminal String bool_expr;
+non terminal String set_expr;
+non terminal String num_expr;
+non terminal String nb;
+non terminal String bool;
+non terminal String set_decl;
+non terminal String atom;
+non terminal String clause_expr;
+non terminal String term_option;
+non terminal String big_body;
+non terminal String var_list;
+non terminal String set_list;
+non terminal String program;
+non terminal String var;
+
+precedence left GREATER,GREATER_OR_EQUAL,BOOL_AND,BOOL_OR,IMPLIQUE,EQUIV;
+precedence left ADD,MULTIPLY,SUBSTRACT,DIVIDE,MOD,XOR,AND,OR,IN,AFFECT;
+
+
+
+program ::= affect:a {: RESULT = new String(a); :}
+			|expr:f {: RESULT = new String(f); :}
+			|affect:a program:p {: RESULT = new String(a+"\\\\"+p); :}
+			|expr:f program:p {: RESULT = new String(f+"\\\\"+p); :}
+			|
+;
+
+
+affect ::= var:v AFFECT expr:e {: RESULT = new String(v+"="+e);:}
+;
+
+expr ::= var:v {: RESULT = new String(v); :}
+		|bool_expr:		b {: RESULT = b;:}
+		|num_expr:		n {: RESULT = n;:}
+		|set_expr:		s {: RESULT = s;:}
+		|clause_expr:	c {: RESULT = c;:}
+		|IF WHITESPACE bool_expr:b WHITESPACE THEN WHITESPACE expr:e1 ELSE WHITESPACE expr:e2  {: RESULT = new String("if "+b+" then"+e1+" else"+e2);:}
+		|set_expr:s DOT LPAR expr:e RPAR {: RESULT = new String(s+".("+e+")");:}
+;
+
+bool_expr ::= LPAR bool_expr:b RPAR {: RESULT = new String("("+b+")");:}
+			| bool: 	b {: RESULT = b;:}
+			| var:v {: RESULT = new String(v);:}
+			| expr:e IN set_expr:s {: RESULT = new String(e+" \\in "+s);:}
+
+
+			| SUBSET LPAR set_expr:s1 COMMA set_expr:s2 {: RESULT = new String(s1+" \\subset "+s2);:}
+			| num_expr:n1 EQUAL num_expr:n2 {: RESULT = new String(n1+" == "+n2);:}
+			| num_expr:n1 DIFFERENT num_expr:n2 {: RESULT = new String(n1+" != "+n2);:}
+			| num_expr:n1 LESSER num_expr:n2 {: RESULT = new String(n1+" < "+n2);:}
+			| num_expr:n1 LESSER_OR_EQUAL num_expr:n2 {: RESULT = new String(n1+" <= "+n2);:}
+			| num_expr:n1 GREATER num_expr:n2 {: RESULT = new String(n1+" > "+n2);:}
+			| num_expr:n1 GREATER_OR_EQUAL num_expr:n2 {: RESULT = new String(n1+" >= "+n2);:}
+			| EMPTY LPAR set_expr:s RPAR {: RESULT = new String("empty("+s+")");:}
+			| bool_expr:b1 BOOL_AND bool_expr:b2 {: RESULT = new String(b1+" \\&\\& "+b2);:}
+			| bool_expr:b1 BOOL_OR bool_expr:b2 {: RESULT = new String(b1+" || "+b2);:}
+			| NOT bool_expr:b2 {: RESULT = new String( "not "+b2);:}
+			| bool_expr:b1 XOR bool_expr:b2 {: RESULT = new String(b1+" \\oplus "+b2);:}
+			| bool_expr:b1 IMPLIQUE bool_expr:b2 {: RESULT = new String(b1+" \\Rightarrow "+b2);:}
+			| bool_expr:b1 EQUIV bool_expr:b2 {: RESULT = new String(b1+" \\Leftrightarrow "+b2);:}
+;
+
+bool ::= TRUE {: RESULT = new String("True");:}
+		| FALSE {: RESULT = new String("False");:}
+;
+
+num_expr ::= LPAR num_expr:n RPAR {: RESULT = new String("("+n+")");:}
+			| nb : n {: RESULT = n;:}
+			| var:v {: RESULT = new String(v);:}
+			| num_expr:n1 ADD num_expr:n2 {: RESULT = new String(n1+"+"+n2);:}
+			| num_expr:n1 MULTIPLY num_expr:n2 {: RESULT = new String(n1+"*"+n2);:}
+			| num_expr:n1 SUBSTRACT num_expr:n2 {: RESULT = new String(n1+"-"+n2);:}
+			| SUBSTRACT num_expr:n {: RESULT = new String("-"+n);:}
+			| num_expr:n1 DIVIDE num_expr:n2 {: RESULT = new String(n1+"/"+n2);:}
+			| num_expr:n1 MOD num_expr:n2 {: RESULT = new String(n1+" \\% "+n2);:}
+			| CARD LPAR set_expr:s RPAR {: RESULT = new String("card("+s+")");:}
+			| INT LPAR num_expr:n RPAR {: RESULT = new String("int("+n+")");:}
+			| FLOAT LPAR num_expr:n RPAR {: RESULT = new String("float("+n+")");:}
+			| SQRT LPAR num_expr:n RPAR {: RESULT = new String("\\sqrt{"+n+"}");:}
+;
+
+nb ::= INTEGER:n {: RESULT = new String(n);:} 
+		| DOUBLENUMBER:n {: RESULT = new String(n);:} 
+;
+
+set_expr ::= LPAR set_expr:s RPAR {: RESULT = new String("("+s+")");:}
+			| var:v {: RESULT = new String(v);:}
+			| LCRO set_decl:s RCRO {: RESULT = new String("["+s+"]");:}
+			| LCRO num_expr:n1 DODOT num_expr:n2 RCRO {: RESULT = new String("["+n1+".."+n2+"]");:}
+			| UNION LPAR set_expr:s1 COMMA set_expr:s2 RPAR {: RESULT = new String(s1+"\\cup"+s2);:}
+			| INTER LPAR set_expr:s1 COMMA set_expr:s2 RPAR {: RESULT = new String(s1+"\\cap"+s2);:}
+			| DIFF LPAR set_expr:s1 COMMA set_expr:s2 RPAR {: RESULT = new String(s1+"\\setminus"+s2);:}
+;
+
+set_decl ::= atom:a {: RESULT = a;:}
+			| atom:a COMMA set_decl:s {: RESULT = new String(a+","+s);:}
+;
+
+var ::= VAR:v {: RESULT = new String("\\"+v);:}
+		|VAR:v LPAR atom:a RPAR {: RESULT = new String("\\"+v+"("+a+")"); :}
+		|VAR:v LPAR var:v2 RPAR {: RESULT = new String("\\"+v+"("+v2+")"); :}
+;
+atom ::= IDENTIFIER:i {: RESULT = new String(i);:}
+		| bool:b {: RESULT = b;:}
+		| nb:n {: RESULT = n;:}
+;
+
+clause_expr ::= LPAR clause_expr:c RPAR {: RESULT = new String("("+c+")");:}
+				|TOP {: RESULT = new String("\\top");:}
+				|BOT {: RESULT = new String("\\bot");:}
+				|IDENTIFIER:i LPAR term_option:t RPAR {: RESULT = new String(i+"("+t+")");:}
+				|IDENTIFIER:i {: RESULT = new String(i);:}
+				|NOT clause_expr:c {: RESULT = new String("\\neg "+c);:}
+				|clause_expr:c1 AND clause_expr:c2 {: RESULT = new String(c1+" \\wedge "+c2);:}
+				|clause_expr:c1 OR clause_expr:c2 {: RESULT = new String(c1+" \\vee "+c2);:}
+				|clause_expr:c1 XOR clause_expr:c2 {: RESULT = new String(c1+" \\oplus "+c2);:}
+				|clause_expr:c1 IMPLIQUE clause_expr:c2 {: RESULT = new String(c1+" \\Rightarrow "+c2);:}
+				|clause_expr:c1 EQUIV clause_expr:c2 {: RESULT = new String(c1+" \\Leftrightarrow "+c2);:}
+				|BIGAND big_body:bb {: RESULT = new String("\\bigwedge"+bb);:}
+				|BIGOR big_body:bb {: RESULT = new String("\\bigvee "+bb);:}
+;
+
+term_option ::= IDENTIFIER:i {: RESULT = new String(i);:}
+				| expr:e {: RESULT = e;:}
+;
+
+big_body ::= var_list:v IN set_list:s WHEN bool_expr:b TWODOT expr:e END 
+					{: RESULT = new String("\\limits_{\\substack{"+v+"\\in"+s+"\\\\"+ b+"}}"+e);:}
+			| var_list:v IN set_list:s TWODOT expr:e END
+					{: RESULT = new String("\\limits_{"+v+"\\in"+s+"}"+e);:}
+;
+
+var_list ::= var:v {: RESULT = new String(v);:}
+			| var:v COMMA var_list:vl {: RESULT = new String(v+","+vl);:}
+;
+
+set_list ::= set_expr:s {: RESULT = new String(s);:}
+			| set_expr:s COMMA set_list:sl {:RESULT = new String(s+","+sl);:}
+;
