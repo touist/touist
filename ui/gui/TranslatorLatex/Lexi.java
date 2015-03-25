@@ -698,15 +698,15 @@ class Lexi implements java_cup.runtime.Scanner {
 
       switch (zzAction < 0 ? zzAction : ZZ_ACTION[zzAction]) {
         case 41: 
-          { System.out.println(yytext()+" BOT");return symbol(sym.BOT);
+          { return symbol(sym.BOT);
           }
         case 62: break;
         case 33: 
-          { System.out.println(yytext()+" END");return symbol(sym.END);
+          { return symbol(sym.END);
           }
         case 63: break;
         case 49: 
-          { System.out.println(yytext()+" WHEN");return symbol(sym.WHEN);
+          { return symbol(sym.WHEN);
           }
         case 64: break;
         case 1: 
@@ -714,159 +714,159 @@ class Lexi implements java_cup.runtime.Scanner {
           }
         case 65: break;
         case 34: 
-          { System.out.println(yytext()+" INT");return symbol(sym.INT);
+          { return symbol(sym.INT);
           }
         case 66: break;
         case 54: 
-          { System.out.println(yytext()+" INTER");return symbol(sym.INTER);
+          { return symbol(sym.INTER);
           }
         case 67: break;
         case 45: 
-          { System.out.println(yytext()+" SETS");return symbol(sym.SETS);
+          { return symbol(sym.SETS);
           }
         case 68: break;
         case 27: 
-          { System.out.println(yytext()+" DIFFERENT");return symbol(sym.DIFFERENT);
+          { return symbol(sym.DIFFERENT);
           }
         case 69: break;
         case 22: 
-          { System.out.println(yytext()+" IN");return symbol(sym.IN);
+          { return symbol(sym.IN);
           }
         case 70: break;
         case 53: 
-          { System.out.println(yytext()+" EMPTY");return symbol(sym.EMPTY);
+          { return symbol(sym.EMPTY);
           }
         case 71: break;
         case 17: 
-          { System.out.println(yytext()+" COMMA");return symbol(sym.COMMA);
+          { return symbol(sym.COMMA);
           }
         case 72: break;
         case 32: 
-          { System.out.println(yytext()+" DOUBLENUMBER");return symbol(sym.DOUBLENUMBER,new String(yytext()));
+          { return symbol(sym.DOUBLENUMBER,new String(yytext()));
           }
         case 73: break;
         case 24: 
-          { System.out.println(yytext()+" OR");return symbol(sym.OR);
+          { return symbol(sym.OR);
           }
         case 74: break;
         case 11: 
-          { System.out.println(yytext()+" ADD");return symbol(sym.ADD);
+          { return symbol(sym.ADD);
           }
         case 75: break;
         case 48: 
-          { System.out.println(yytext()+" THEN");return symbol(sym.THEN);
+          { return symbol(sym.THEN);
           }
         case 76: break;
         case 3: 
-          { System.out.println(yytext()+" IDENTIFIER");return symbol(sym.IDENTIFIER,new String(yytext()));
+          { return symbol(sym.IDENTIFIER,new String(yytext()));
           }
         case 77: break;
         case 6: 
-          { System.out.println(yytext()+" AFFECT");return symbol(sym.AFFECT);
+          { return symbol(sym.AFFECT);
           }
         case 78: break;
         case 10: 
-          { System.out.println(yytext()+" RPAR");return symbol(sym.RPAR);
+          { return symbol(sym.RPAR);
           }
         case 79: break;
         case 46: 
-          { System.out.println(yytext()+" SQRT");return symbol(sym.SQRT);
+          { return symbol(sym.SQRT);
           }
         case 80: break;
         case 16: 
-          { System.out.println(yytext()+" RCRO");return symbol(sym.RCRO);
+          { return symbol(sym.RCRO);
           }
         case 81: break;
         case 23: 
-          { System.out.println(yytext()+" IF");return symbol(sym.IF);
+          { return symbol(sym.IF);
           }
         case 82: break;
         case 57: 
-          { System.out.println(yytext()+" UNION");return symbol(sym.UNION);
+          { return symbol(sym.UNION);
           }
         case 83: break;
         case 61: 
-          { System.out.println(yytext()+" CONSTANT");return symbol(sym.CONSTANT);
+          { return symbol(sym.CONSTANT);
           }
         case 84: break;
         case 38: 
-          { System.out.println(yytext()+" AND");return symbol(sym.AND);
+          { return symbol(sym.AND);
           }
         case 85: break;
         case 58: 
-          { System.out.println(yytext()+" BIGAND");return symbol(sym.BIGAND);
+          { return symbol(sym.BIGAND);
           }
         case 86: break;
         case 13: 
-          { System.out.println(yytext()+" SUBSTRACT");return symbol(sym.SUBSTRACT);
+          { return symbol(sym.SUBSTRACT);
           }
         case 87: break;
         case 2: 
-          { System.out.println(yytext()+" INTEGER");return symbol(sym.INTEGER,new String(yytext()));
+          { return symbol(sym.INTEGER,new String(yytext()));
           }
         case 88: break;
         case 36: 
-          { System.out.println(yytext()+" SET");return symbol(sym.SET);
+          { return symbol(sym.SET);
           }
         case 89: break;
         case 42: 
-          { System.out.println(yytext()+" EQUIV");return symbol(sym.EQUIV);
+          { return symbol(sym.EQUIV);
           }
         case 90: break;
         case 39: 
-          { System.out.println(yytext()+" XOR");return symbol(sym.XOR);
+          { return symbol(sym.XOR);
           }
         case 91: break;
         case 51: 
-          { System.out.println(yytext()+" BEGIN");return symbol(sym.BEGIN);
+          { return symbol(sym.BEGIN);
           }
         case 92: break;
         case 20: 
-          { System.out.println(yytext()+" VAR");return symbol(sym.VAR,new String(yytext()));
+          { return symbol(sym.VAR,new String(yytext()));
           }
         case 93: break;
         case 9: 
-          { System.out.println(yytext()+" LPAR");return symbol(sym.LPAR);
+          { return symbol(sym.LPAR);
           }
         case 94: break;
         case 18: 
-          { System.out.println(yytext()+" TWODOT");return symbol(sym.TWODOT);
+          { return symbol(sym.TWODOT);
           }
         case 95: break;
         case 60: 
-          { System.out.println(yytext()+" FORMULA");return symbol(sym.FORMULA);
+          { return symbol(sym.FORMULA);
           }
         case 96: break;
         case 44: 
-          { System.out.println(yytext()+" DIFF");return symbol(sym.DIFF);
+          { return symbol(sym.DIFF);
           }
         case 97: break;
         case 12: 
-          { System.out.println(yytext()+" MULTIPLY");return symbol(sym.MULTIPLY);
+          { return symbol(sym.MULTIPLY);
           }
         case 98: break;
         case 52: 
-          { System.out.println(yytext()+" BIGOR");return symbol(sym.BIGOR);
+          { return symbol(sym.BIGOR);
           }
         case 99: break;
         case 15: 
-          { System.out.println(yytext()+" LCRO");return symbol(sym.LCRO);
+          { return symbol(sym.LCRO);
           }
         case 100: break;
         case 8: 
-          { System.out.println(yytext()+" GREATER");return symbol(sym.GREATER);
+          { return symbol(sym.GREATER);
           }
         case 101: break;
         case 25: 
-          { System.out.println(yytext()+" EQUAL");return symbol(sym.EQUAL);
+          { return symbol(sym.EQUAL);
           }
         case 102: break;
         case 7: 
-          { System.out.println(yytext()+" LESSER");return symbol(sym.LESSER);
+          { return symbol(sym.LESSER);
           }
         case 103: break;
         case 21: 
-          { System.out.println(yytext()+" COMMENT");return symbol(sym.COMMENT,new String(yytext()));
+          { return symbol(sym.COMMENT,new String(yytext()));
           }
         case 104: break;
         case 31: 
@@ -874,15 +874,15 @@ class Lexi implements java_cup.runtime.Scanner {
           }
         case 105: break;
         case 55: 
-          { System.out.println(yytext()+" FLOAT");return symbol(sym.FLOAT);
+          { return symbol(sym.FLOAT);
           }
         case 106: break;
         case 35: 
-          { System.out.println(yytext()+" NOT");return symbol(sym.NOT);
+          { return symbol(sym.NOT);
           }
         case 107: break;
         case 5: 
-          { System.out.println(yytext()+" DOT");return symbol(sym.DOT);
+          { return symbol(sym.DOT);
           }
         case 108: break;
         case 28: 
@@ -890,27 +890,27 @@ class Lexi implements java_cup.runtime.Scanner {
           }
         case 109: break;
         case 59: 
-          { System.out.println(yytext()+" SUBSET");return symbol(sym.SUBSET);
+          { return symbol(sym.SUBSET);
           }
         case 110: break;
         case 47: 
-          { System.out.println(yytext()+" TRUE");return symbol(sym.TRUE);
+          { return symbol(sym.TRUE);
           }
         case 111: break;
         case 40: 
-          { System.out.println(yytext()+" TOP");return symbol(sym.TOP);
+          { return symbol(sym.TOP);
           }
         case 112: break;
         case 14: 
-          { System.out.println(yytext()+" DIVIDE");return symbol(sym.DIVIDE);
+          { return symbol(sym.DIVIDE);
           }
         case 113: break;
         case 19: 
-          { System.out.println(yytext()+" DODOT");return symbol(sym.DODOT);
+          { return symbol(sym.DODOT);
           }
         case 114: break;
         case 50: 
-          { System.out.println(yytext()+" CARD");return symbol(sym.CARD);
+          { return symbol(sym.CARD);
           }
         case 115: break;
         case 29: 
@@ -918,11 +918,11 @@ class Lexi implements java_cup.runtime.Scanner {
           }
         case 116: break;
         case 26: 
-          { System.out.println(yytext()+" IMPLIQUE");return symbol(sym.IMPLIQUE);
+          { return symbol(sym.IMPLIQUE);
           }
         case 117: break;
         case 56: 
-          { System.out.println(yytext()+" FALSE");return symbol(sym.FALSE);
+          { return symbol(sym.FALSE);
           }
         case 118: break;
         case 30: 
@@ -930,11 +930,11 @@ class Lexi implements java_cup.runtime.Scanner {
           }
         case 119: break;
         case 37: 
-          { System.out.println(yytext()+" MOD");return symbol(sym.MOD);
+          { return symbol(sym.MOD);
           }
         case 120: break;
         case 43: 
-          { System.out.println(yytext()+" ELSE");return symbol(sym.ELSE);
+          { return symbol(sym.ELSE);
           }
         case 121: break;
         case 4: 

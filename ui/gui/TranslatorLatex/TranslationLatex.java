@@ -21,7 +21,7 @@ import org.scilab.forge.jlatexmath.TeXIcon;
  */
 public class TranslationLatex {
     
-    // Result of touistl string translation to Latex 
+    // Result of touistl string translation to Lat  ex 
     private String latexFormula;
     
     
@@ -50,7 +50,7 @@ public class TranslationLatex {
             TeXIcon ti = formula.createTeXIcon(TeXConstants.STYLE_DISPLAY, 20);
             JLabel label = new JLabel("",ti,JLabel.CENTER);
             JFrame frame = new JFrame();
-            frame.setSize(512,512);
+            frame.setSize(1024,1024);
             frame.add(label);
             frame.setVisible(true);
         }
