@@ -27,6 +27,7 @@ import entity.Model;
 import gui.MainFrame;
 
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.Iterator;
 import java.util.Scanner;
 
@@ -45,6 +46,8 @@ public class TouIST {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
+    	System.out.println("main(): running app from folder '"
+    			+ Paths.get("").toAbsolutePath().toString()+"'");
         MainFrame frame = new MainFrame();
         frame.setVisible(true);
     }
