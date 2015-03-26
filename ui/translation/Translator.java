@@ -59,19 +59,19 @@ public class Translator {
 	public class Message {
 		private int rowInCode;
 		private int columnInCode;
-		private String sampleOfCode;
+		private String errorMessage;
 
-		public Message(int rowInCode, int columnInCode, String sampleOfCode) {
+		public Message(int rowInCode, int columnInCode, String errorMessage) {
 			this.rowInCode = rowInCode;
 			this.columnInCode = columnInCode;
-			this.sampleOfCode = sampleOfCode;
+			this.errorMessage = errorMessage;
 		}
 
 		@Override
 		public String toString() {
-			// TODO enhance this message display
-			return "Message [rowInCode=" + rowInCode + ", columnInCode="
-					+ columnInCode + ", sampleOfCode=" + sampleOfCode + "]";
+			return "The Touistl translator returned an error:\n"
+					+"In line "+rowInCode+", column "+columnInCode+": "
+					+errorMessage;
 		}
 	}
 
@@ -81,8 +81,8 @@ public class Translator {
 	 * @author maelv
 	 */
 	public class Error extends Message {
-		public Error(int rowInCode, int columnInCode, String sampleOfCode) {
-			super(rowInCode, columnInCode, sampleOfCode);
+		public Error(int rowInCode, int columnInCode, String errorMessage) {
+			super(rowInCode, columnInCode, errorMessage);
 		}
 
 	}
