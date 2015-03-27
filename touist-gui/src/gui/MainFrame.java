@@ -5,7 +5,6 @@
  */
 package gui;
 
-import gui.editionView.EditionPanel;
 import gui.editionView.ParentEditionPanel;
 import gui.resultsView.ResultsPanel;
 
@@ -26,7 +25,7 @@ import translation.Translator;
 public class MainFrame extends javax.swing.JFrame {
 
     private BaseDeClauses clause = new BaseDeClauses();
-    private Translator translator = new Translator("compiler"+File.separatorChar+"touistc.native");
+    private Translator translator = new Translator("external"+File.separatorChar+"touistc");
     private Solver solver;
     private ModelList models;
 
