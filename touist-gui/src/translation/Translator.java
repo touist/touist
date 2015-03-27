@@ -130,8 +130,8 @@ public class Translator {
 				+ " -o " + outputFilePath
 				+ " -table " + outputTableFilePath
 				+ " " + bigandFilePath;
-		this.p = Runtime.getRuntime().exec(cmd);
         System.out.println("translate(): cmd executed: "+cmd);
+		this.p = Runtime.getRuntime().exec(cmd);
 		int return_code = p.waitFor();
 		BufferedReader stdout = new BufferedReader(new InputStreamReader(
 				this.p.getInputStream()));
