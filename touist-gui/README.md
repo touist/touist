@@ -20,7 +20,7 @@ To run the whole thing, check first what is the _running_ directory. In Eclipse 
 Now, check if the following external binaries/jars are at the right place:
 
 1. If you run `Touist.class` from `./` (the root project folder):
-  - you must have `./external/touistc` (copy it from `./touist-gui/external`)
+  - you must have `./external/touistc` (get it [from the Drive](https://drive.google.com/folderview?id=0B5mz8k-t6PT0cW5FSTBxNmgxUjQ&usp=sharing) and rename it `touistc`)
   - you must have `./external/minisat.jar` (copy it from `./touist-gui/external`)
   - you must have `./ressources/touistTheme.xml` (copy it from `./touist-gui/ressources`)
 2. If you run `Touist.class` from `./touist-gui/`, then there is no need to copy anything because `external` is already here.
