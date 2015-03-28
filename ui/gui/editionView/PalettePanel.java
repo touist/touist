@@ -5,6 +5,8 @@
  */
 package gui.editionView;
 
+import gui.AbstractComponentPanel;
+import gui.LanguagesController;
 import gui.editionView.editor.Editor;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
@@ -16,7 +18,12 @@ import javax.swing.BoxLayout;
  *
  * @author Skander
  */
-public class PalettePanel extends javax.swing.JPanel {
+public class PalettePanel extends AbstractComponentPanel {
+
+    @Override
+    public void updateLanguage() {
+        jLabel1.setText(getFrame().getLang().getWord(LanguagesController.PALETTE_TEXT));
+    }
 
     public static enum PaletteType {FORMULA, SET};
     
@@ -92,7 +99,7 @@ public class PalettePanel extends javax.swing.JPanel {
         sectionsContainerPanel = new javax.swing.JPanel();
 
         jLabel1.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
-        jLabel1.setText("Insérer");
+        jLabel1.setText("Insert");
 
         sectionsContainerPanel.setLayout(new javax.swing.BoxLayout(sectionsContainerPanel, javax.swing.BoxLayout.LINE_AXIS));
 

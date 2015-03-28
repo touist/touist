@@ -29,6 +29,8 @@ public abstract class AbstractComponentPanel extends javax.swing.JPanel {
     protected void setState(State state) {
         getFrame().state = state;
     }
+    
+    abstract public void updateLanguage();
 
     /**
      * This method is called from within the constructor to initialize the form.

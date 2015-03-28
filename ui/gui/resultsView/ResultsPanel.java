@@ -105,24 +105,21 @@ public class ResultsPanel extends AbstractComponentPanel {
 
         jButtonEditor.setText("Retour en édition");
         jButtonEditor.addActionListener(new java.awt.event.ActionListener() {
-            @Override
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButtonEditorActionPerformed(evt);
             }
         });
 
         jButtonPrevious.setText("Précédent");
         jButtonPrevious.addActionListener(new java.awt.event.ActionListener() {
-            @Override
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButtonPreviousActionPerformed(evt);
             }
         });
 
         jButtonNext.setText("Suivant");
         jButtonNext.addActionListener(new java.awt.event.ActionListener() {
-            @Override
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButtonNextActionPerformed(evt);
             }
         });
@@ -142,7 +139,7 @@ public class ResultsPanel extends AbstractComponentPanel {
                     .addComponent(jScrollPane1)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel1)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 370, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 329, Short.MAX_VALUE)
                         .addComponent(jButtonEditor))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jButtonPrevious)
@@ -159,7 +156,7 @@ public class ResultsPanel extends AbstractComponentPanel {
                     .addComponent(jLabel1)
                     .addComponent(jButtonEditor))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 310, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 291, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jButtonPrevious)
@@ -315,4 +312,12 @@ public class ResultsPanel extends AbstractComponentPanel {
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTextArea jTextArea1;
     // End of variables declaration//GEN-END:variables
+
+    @Override
+    public void updateLanguage() {
+        jLabel1.setText(getFrame().getLang().RESULTS_TEXT);
+        jButtonPrevious.setText(getFrame().getLang().RESULTS_PREVIOUS);
+        jButtonNext.setText(getFrame().getLang().RESULTS_NEXT);
+        jButtonEditor.setText(getFrame().getLang().RESULTS_RETURN);
+    }
 }

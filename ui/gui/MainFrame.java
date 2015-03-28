@@ -5,12 +5,12 @@
  */
 package gui;
 
-import gui.editionView.EditionPanel;
 import gui.editionView.ParentEditionPanel;
 import gui.resultsView.ResultsPanel;
 
 import java.awt.CardLayout;
 import java.io.File;
+import java.util.Locale;
 
 import javax.swing.JPanel;
 
@@ -37,7 +37,11 @@ public class MainFrame extends javax.swing.JFrame {
     private JPanel cards = new JPanel(new CardLayout());
     private ParentEditionPanel editorPanel1 = new ParentEditionPanel();
     private ResultsPanel resultsPanel1 = new ResultsPanel();
-    private int numberOfFormulas;
+    private LanguagesController languagesController = new LanguagesController(Locale.ENGLISH);
+
+    public LanguagesController getLang() {
+        return languagesController;
+    }
 
     /**
      * Creates new form MainFrame
@@ -49,9 +53,19 @@ public class MainFrame extends javax.swing.JFrame {
         cards.add(editorPanel1, EDITOR_PANEL);
         cards.add(resultsPanel1, RESULTS_PANEL);
         setViewToEditor();
-        this.setTitle("Touist Application/First Increment");
 
         initComponents();
+        
+        updateLanguage();
+    }
+    
+    private void updateLanguage() {
+        this.setTitle(languagesController.getWord(LanguagesController.FRAME_TITLE));
+        this.jMenu1.setText(languagesController.getWord(LanguagesController.FRAME_MENU_FILE));
+        this.jMenu2.setText(languagesController.getWord(LanguagesController.FRAME_MENU_HELP));
+        this.jMenu3.setText(languagesController.getWord(LanguagesController.FRAME_MENU_LANGUAGE));
+        editorPanel1.updateLanguage();
+        resultsPanel1.updateLanguage();
     }
 
     public BaseDeClauses getClause() {
@@ -77,14 +91,6 @@ public class MainFrame extends javax.swing.JFrame {
     public Translator getTranslator() {
         return translator;
     }
-
-    public int getNumberOfFormulas() {
-        return numberOfFormulas;
-    }
-
-    public void setNumberOfFormulas(int numberOfFormulas) {
-        this.numberOfFormulas = numberOfFormulas;
-    }
     
     public void updateResultsPanelIterator() {
         resultsPanel1.updateIterator();
@@ -103,6 +109,11 @@ public class MainFrame extends javax.swing.JFrame {
         resultsPanel1.setText(text);
     }
     
+    public void setLanguage(Locale language) {
+        languagesController.setLanguage(language);
+        this.repaint();
+    }
+    
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -115,6 +126,9 @@ public class MainFrame extends javax.swing.JFrame {
 
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
+        jMenu3 = new javax.swing.JMenu();
+        jMenuItem1 = new javax.swing.JMenuItem();
+        jMenuItem2 = new javax.swing.JMenuItem();
         jMenu2 = new javax.swing.JMenu();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -123,13 +137,45 @@ public class MainFrame extends javax.swing.JFrame {
         jMenu1.setText("File");
         jMenuBar1.add(jMenu1);
 
-        jMenu2.setText("A propos");
+        jMenu3.setText("Language");
+
+        jMenuItem1.setText("English");
+        jMenuItem1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem1ActionPerformed(evt);
+            }
+        });
+        jMenu3.add(jMenuItem1);
+
+        jMenuItem2.setText("Français");
+        jMenuItem2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem2ActionPerformed(evt);
+            }
+        });
+        jMenu3.add(jMenuItem2);
+
+        jMenuBar1.add(jMenu3);
+
+        jMenu2.setText("Help");
         jMenuBar1.add(jMenu2);
 
         setJMenuBar(jMenuBar1);
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
+        languagesController.setLanguage(Locale.ENGLISH);
+        updateLanguage();
+        System.out.println("Language set to English");
+    }//GEN-LAST:event_jMenuItem1ActionPerformed
+
+    private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem2ActionPerformed
+        languagesController.setLanguage(Locale.FRENCH);
+        updateLanguage();
+        System.out.println("Language set to French");
+    }//GEN-LAST:event_jMenuItem2ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -171,6 +217,9 @@ public class MainFrame extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
+    private javax.swing.JMenu jMenu3;
     private javax.swing.JMenuBar jMenuBar1;
+    private javax.swing.JMenuItem jMenuItem1;
+    private javax.swing.JMenuItem jMenuItem2;
     // End of variables declaration//GEN-END:variables
 }

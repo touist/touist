@@ -7,6 +7,7 @@ package gui.editionView;
 
 import entity.Model;
 import gui.AbstractComponentPanel;
+import gui.LanguagesController;
 import gui.MainFrame;
 import gui.State;
 import java.io.File;
@@ -27,7 +28,6 @@ public class ParentEditionPanel extends AbstractComponentPanel {
      */
     public ParentEditionPanel() {
         initComponents();
-        errorMessageLabel.setText("");
         editorPanelFormulas.initPalette(PalettePanel.PaletteType.FORMULA);
         editorPanelSets.initPalette(PalettePanel.PaletteType.SET);
         jFileChooser1.setCurrentDirectory(new File("."));
@@ -43,15 +43,15 @@ public class ParentEditionPanel extends AbstractComponentPanel {
     private void initComponents() {
 
         jFileChooser1 = new javax.swing.JFileChooser();
+        jOptionPane1 = new javax.swing.JOptionPane();
         jTabbedPane1 = new javax.swing.JTabbedPane();
         editorPanelFormulas = new gui.editionView.EditionPanel();
         editorPanelSets = new gui.editionView.EditionPanel();
         testButton = new javax.swing.JButton();
         importButton = new javax.swing.JButton();
-        errorMessageLabel = new javax.swing.JLabel();
 
         jTabbedPane1.setToolTipText("");
-        jTabbedPane1.addTab("Formules", editorPanelFormulas);
+        jTabbedPane1.addTab("Formulas", editorPanelFormulas);
         jTabbedPane1.addTab("Sets", editorPanelSets);
 
         testButton.setText("Test");
@@ -61,14 +61,12 @@ public class ParentEditionPanel extends AbstractComponentPanel {
             }
         });
 
-        importButton.setText("Importer");
+        importButton.setText("Import");
         importButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 importButtonActionPerformed(evt);
             }
         });
-
-        errorMessageLabel.setText("<Message d'erreur>");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -76,9 +74,7 @@ public class ParentEditionPanel extends AbstractComponentPanel {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jTabbedPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 713, Short.MAX_VALUE)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(errorMessageLabel)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(importButton)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(testButton)
@@ -91,8 +87,7 @@ public class ParentEditionPanel extends AbstractComponentPanel {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(testButton)
-                    .addComponent(importButton)
-                    .addComponent(errorMessageLabel))
+                    .addComponent(importButton))
                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -163,9 +158,9 @@ public class ParentEditionPanel extends AbstractComponentPanel {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private gui.editionView.EditionPanel editorPanelFormulas;
     private gui.editionView.EditionPanel editorPanelSets;
-    private javax.swing.JLabel errorMessageLabel;
     private javax.swing.JButton importButton;
     private javax.swing.JFileChooser jFileChooser1;
+    private javax.swing.JOptionPane jOptionPane1;
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JButton testButton;
     // End of variables declaration//GEN-END:variables
@@ -175,7 +170,7 @@ public class ParentEditionPanel extends AbstractComponentPanel {
         int returnVal;
         
         jFileChooser1.setFileSelectionMode(JFileChooser.FILES_ONLY);
-        returnVal = jFileChooser1.showDialog(this, "Importer fichier");
+        returnVal = jFileChooser1.showDialog(this, getFrame().getLang().getWord(LanguagesController.EDITION_FILE_CHOOSER));
         
         if (returnVal == JFileChooser.APPROVE_OPTION && jFileChooser1.getSelectedFile() != null) {
             path = jFileChooser1.getSelectedFile().getPath();
@@ -226,9 +221,9 @@ public class ParentEditionPanel extends AbstractComponentPanel {
                     errorMessage += (i+1) + ": " + getFrame().getTranslator().getErrors("").get(i) + "\n";
                 }
                 System.out.println("Erreur de traduction : " + "\n" + errorMessage + "\n");
-                JOptionPane.showMessageDialog(getParent(), 
+                jOptionPane1.showMessageDialog(getParent(), 
                         errorMessage, 
-                        "Erreur de traduction", 
+                        getFrame().getLang().getWord(LanguagesController.EDITION_OPTION_PANE), 
                         JOptionPane.ERROR_MESSAGE);
                 return State.EDITION;
             }
@@ -279,5 +274,16 @@ public class ParentEditionPanel extends AbstractComponentPanel {
             e.printStackTrace();
         }
         return State.NO_RESULT;
+    }
+
+    @Override
+    public void updateLanguage() {
+        importButton.setText(getFrame().getLang().getWord(LanguagesController.EDITION_IMPORT));
+        testButton.setText(getFrame().getLang().getWord(LanguagesController.EDITION_TEST));
+        editorPanelFormulas.updateLanguage();
+        editorPanelSets.updateLanguage();
+        jTabbedPane1.setTitleAt(0, getFrame().getLang().getWord(LanguagesController.EDITION_TAB_FORMULAS));
+        jTabbedPane1.setTitleAt(1, getFrame().getLang().getWord(LanguagesController.EDITION_TAB_SETS));
+        updateUI();
     }
 }

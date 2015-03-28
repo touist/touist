@@ -5,6 +5,7 @@
  */
 package gui.editionView;
 
+import gui.AbstractComponentPanel;
 import gui.editionView.editor.Editor;
 import java.awt.BorderLayout;
 import java.io.IOException;
@@ -14,7 +15,7 @@ import org.fife.ui.rtextarea.RTextScrollPane;
  *
  * @author Skander
  */
-public class EditionPanel extends javax.swing.JPanel {
+public class EditionPanel extends AbstractComponentPanel {
 
     private Editor editorTextArea;
     
@@ -108,4 +109,9 @@ public class EditionPanel extends javax.swing.JPanel {
     private javax.swing.JSplitPane jSplitPane2;
     private gui.editionView.PalettePanel palettePanel2;
     // End of variables declaration//GEN-END:variables
+
+    @Override
+    public void updateLanguage() {
+        palettePanel2.updateLanguage();
+    }
 }
