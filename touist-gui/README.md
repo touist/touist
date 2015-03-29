@@ -9,9 +9,9 @@ This folder contains the source code for the main program of the TouIST project.
 NOTE: if you run your project at the `./touist-gui/` parent folder (the touist-project-root-folder), you may have problems with paths
 NOTE: For now on, **I will write `./` instead of `./touist-gui`**.
 
-With Netbeans:
+Example with netbeans:
+
 ![image](http://img15.hostingpics.net/pics/611633Capturedcran20150329183200.png)
-Then go to 
 
 ## Build and run the touist-gui project
 ###1. Check the `classpath`
@@ -22,6 +22,9 @@ Make sure your IDE (eclipse, netbeans...) knows the right _classpath_:
 3. The `./ressources` folder (for the .xml file ressource)
 
 In Eclipse, you can check that in project properties > java build path > Build tab.
+In Netbeans, go to your project properties:
+
+![netbeans](http://img15.hostingpics.net/pics/705361Capturedcran20150329184627.png)
 
 ###2. Check `external` and `ressources` folders
 To run the whole thing, check first what is the _running_ directory. In Eclipse or Netbeans, the running directory is the root folder of your project. We will call it `./` from now on.
