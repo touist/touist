@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<project default="run-touist" name="Create the dist/ for end-users">
+<project default="run" name="Touist Project: Build or Run or Dist (for end-users)">
     <!-- Mael VALAIS for Touist project, 2015-->
     <!--ANT 1.7 is required -->
 	
