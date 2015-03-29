@@ -7,16 +7,22 @@ package gui.editionView.editor;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
-import org.fife.ui.rsyntaxtextarea.*;
-import javax.swing.*;
 import java.io.BufferedReader;
-import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+
+import javax.swing.AbstractAction;
+import javax.swing.JFrame;
+import javax.swing.KeyStroke;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+
+import org.fife.ui.rsyntaxtextarea.AbstractTokenMakerFactory;
+import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
+import org.fife.ui.rsyntaxtextarea.Theme;
+import org.fife.ui.rsyntaxtextarea.TokenMakerFactory;
 import org.fife.ui.rtextarea.RTextScrollPane;
 /**
  *
@@ -144,7 +150,7 @@ public class Editor extends RSyntaxTextArea  {
         this.setSyntaxEditingStyle("text/touistl");
         
         // Defines the color, font police and style of the different tokens
-        Theme t = Theme.load(new FileInputStream("ressources/touistTheme.xml"));
+        Theme t = Theme.load(this.getClass().getResourceAsStream("/touistTheme.xml"));
         t.apply(this);
         
         snipetsBegin = new ArrayList<Integer>();
