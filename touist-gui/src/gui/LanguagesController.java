@@ -20,8 +20,8 @@ public class LanguagesController {
 
     public LanguagesController(Locale language){
         supportedLanguages = new HashMap();
-        supportedLanguages.put(Locale.FRENCH, "ressources/lang/fr_FR");
-        supportedLanguages.put(Locale.ENGLISH, "ressources/lang/en_US");
+        supportedLanguages.put(Locale.FRENCH, "lang.fr_FR"); // "lang" is the package
+        supportedLanguages.put(Locale.ENGLISH, "lang.en_US");
         translation = ResourceBundle.getBundle(supportedLanguages.get(language));
     }
     
