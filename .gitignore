@@ -74,3 +74,4 @@ bigAndFile-defaultname.txt
 *.table
 
 *.cnf
+/touist-gui/nbproject/private/

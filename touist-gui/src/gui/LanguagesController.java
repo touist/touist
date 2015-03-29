@@ -44,7 +44,7 @@ public class LanguagesController {
     public static final String EDITION_TAB_FORMULAS = "ParentEditionPanel.editorPanelFormulas.TabConstraints.tabTitle";
     public static final String EDITION_TAB_SETS = "ParentEditionPanel.editorPanelSets.TabConstraints.tabTitle";
     public static final String PALETTE_TEXT = "PalettePanel.jLabel1.text";
-    public static final String RESULTS_NEXT = "esultsPanel.jButtonNext";
+    public static final String RESULTS_NEXT = "ResultsPanel.jButtonNext.text";
     public static final String RESULTS_PREVIOUS = "ResultsPanel.jButtonPrevious.text";
     public static final String RESULTS_RETURN = "ResultsPanel.jButtonEditor.text";
     public static final String RESULTS_TEXT = "ResultsPanel.jLabel1.text";
