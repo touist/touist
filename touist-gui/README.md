@@ -29,8 +29,15 @@ Now, check if the following external binaries/jars are at the right place:
   - you must have `./ressources/touistTheme.xml`
 2. If you run `Touist.class` from your touist-project-root-folder, then you might have to copy everything I just mentioned on the previous segment 
 
-##3. Use `build.xml` with Ant
+##3. Use `build.xml` with `Ant`
 The `build.xml` contains the different targets needed for compilation and distribution. I use it with Eclipse, but it can also be used by anybody (you must install `ant` though).
+
+To build: `ant build`
+To run: `ant run`
+To build the .jar: `ant build-jar`
+To prepare the `./dist` folder: `ant dist`
+
+Note: **`ant dist`** does almost nothing. It just copies the `touist.jar` file to `./dist` and then copies everything from `./external` into `./dist`.
 
 ## Conception/architecture
 ![conception](https://www.lucidchart.com/publicSegments/view/54f46f57-1ff4-46e0-b146-65000a009e9c/image.png)
