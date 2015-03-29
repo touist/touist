@@ -31,7 +31,7 @@
 	<!-- Clear dist/ content -->
 	<delete dir="${gui.dist.dir}"/>
 
-    <target depends="build" name="build-jar">
+	<target depends="build" name="build-jar">
         <jar destfile="${gui.dir}/touist.jar" filesetmanifest="mergewithoutmain">
             <manifest>
                 <attribute name="Main-Class" value="touist.TouIST"/>
@@ -49,7 +49,8 @@
     	<copy file="${gui.dir}/touist.jar" todir="${gui.dist.dir}"/>
     	<copy todir="${gui.dist.dir}/external" flatten="true">
     	    <fileset dir="${gui.external.dir}"/>
-    	</copy>
+		</copy>
+		<chmod dir="${gui.dist.dir}/external" perm="ugo+rx" includes="*"/>
     </target>
 	
     <property environment="env"/>
