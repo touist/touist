@@ -7,6 +7,7 @@ package gui.resultsView;
 
 import entity.Model;
 import gui.AbstractComponentPanel;
+import gui.LanguagesController;
 import gui.State;
 
 import java.util.ListIterator;
@@ -315,9 +316,9 @@ public class ResultsPanel extends AbstractComponentPanel {
 
     @Override
     public void updateLanguage() {
-        jLabel1.setText(getFrame().getLang().RESULTS_TEXT);
-        jButtonPrevious.setText(getFrame().getLang().RESULTS_PREVIOUS);
-        jButtonNext.setText(getFrame().getLang().RESULTS_NEXT);
-        jButtonEditor.setText(getFrame().getLang().RESULTS_RETURN);
+        jLabel1.setText(getFrame().getLang().getWord(LanguagesController.RESULTS_TEXT));
+        jButtonPrevious.setText(getFrame().getLang().getWord(LanguagesController.RESULTS_PREVIOUS));
+        jButtonNext.setText(getFrame().getLang().getWord(LanguagesController.RESULTS_NEXT));
+        jButtonEditor.setText(getFrame().getLang().getWord(LanguagesController.RESULTS_RETURN));
     }
 }
