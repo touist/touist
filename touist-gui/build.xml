@@ -69,13 +69,12 @@
 	
 	<!-- The build task -->
     <target name="build">
+    	<mkdir dir="${gui.build.dir}"/>
         <javac debug="true" debuglevel="${debuglevel}" destdir="${gui.build.dir}" includeantruntime="false" source="${source}" target="${target}">
-        	
         	<!-- Files I decided to exlude because they contain errors for now -->
         	<exclude name="**/LaTEX.java"/> 
         	<exclude name="**/TranslationLatex.java"/>
         	<exclude name="**/BaseDeClausesTest.java"/>
-        	
         	<src path="${gui.dir}/src"/>
             <classpath refid="touist.classpath"/>
         </javac>
