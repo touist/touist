@@ -47,8 +47,8 @@ class FormatException extends Exception {
 }
 
 public class BaseDeClauses {
-    private List<String> formules;
-    private List<String> sets;
+    private String formules;
+    private String sets;
 
     private static final String errorBeginFormula = "Syntax error at line %d"
                                        + ". Formula begin section already"
@@ -64,25 +64,39 @@ public class BaseDeClauses {
      * Construct a set of clauses
      */
     public BaseDeClauses() {
-        formules = new ArrayList<>();
-        sets = new ArrayList<>();
+        formules = new String();
+        sets = new String();
     }
 
     /**
      *
      * @return the list of formules
      */
-    public List<String> getFormules() {
+    public String getFormules() {
         return formules;
     }
 
     /**
      * @return the list of sets
      */
-    public List<String> getSets() {
+    public String getSets() {
         return sets;
     }
 
+    /**
+     * @return the index of the line of "begin formula"
+     */
+    public int getLineFormula(){
+        return sets.split("\n").length+3;
+    }
+    
+    /**
+     * @return the index of the line of "begin sets"
+     */
+    public int getLineSets(){
+        return 1;
+    }
+    
 
     /**
      * Import the list of formules from a file
@@ -164,16 +178,12 @@ public class BaseDeClauses {
 
 	if(!sets.isEmpty()) {
             writer.write("begin sets\n");
-            for(String set:sets) {
-                writer.write(set+"\n");
-            }
+            writer.write(sets);
             writer.write("end sets\n");
         }
         if(!formules.isEmpty()) {
             writer.write("begin formula\n");
-            for(String formule:formules) {
-                writer.write(formule+"\n");
-            }
+            writer.write(sets);
             writer.write("end formula\n");
         }
 
@@ -182,69 +192,39 @@ public class BaseDeClauses {
     }
 
     /**
-     * Add a formule to the current list of formules
+     * Add a formule to the current String of formules
      * @param A formule
      */
 
     public void addFormule(String formule) {
-        formules.add(formule);
+        formules = formules.concat(formule);
     }
 
     /**
-     * Add a set to the current list of sets
+     * Add a set to the current String of sets
      * @param A set
      */
 
     public void addSet(String set) {
-        sets.add(set);
+        sets = sets.concat(set);
     }
     
      /**
-     * Add all formules found in a string to the current list of formules
+     * Add all formules found in a string to the current String of formules
      * @param a String
      */
     
     public void addFormules(String text) {
-        String[] listeFormules = text.split("\n");
-        for (String f : listeFormules) {
-            f = f.trim();
-            if(!f.isEmpty()){
-                formules.add(f);
-            }
-        }
+        formules = formules.concat(text);
     }
 
     /**
-     * Add all sets found in a string to the current list of sets
+     * Add all sets found in a string to the current String of sets
      * @param a String
      */
     
     public void addSets(String text) {
-        String[] listeSets = text.split("\n");
-        for (String s : listeSets) {
-            s = s.trim();
-            if(!s.isEmpty()){
-                sets.add(s);
-            }
-        }
-    }
-    
-    /**
-     * Remove a formule at a given index
-     * @param index
-     * @return the formule removed
-     */
-    public String removeFormule(int index) {
-        return formules.remove(index);
-    }
-
-    /**
-     * Remove a set at a given index
-     * @param index
-     * @return the set removed
-     */
-    public String removeSet(int index) {
-        return sets.remove(index);
+        sets = sets.concat(text);
     }
 
     public static void main(String[] args) {
