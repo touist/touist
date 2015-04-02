@@ -11,10 +11,15 @@ import gui.LanguagesController;
 import gui.MainFrame;
 import gui.State;
 import java.io.File;
+import java.io.IOException;
 import java.util.ListIterator;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+import solution.NotSatisfiableException;
+import solution.SolverExecutionException;
 import solution.SolverTestSAT4J;
 
 /**
@@ -190,9 +195,15 @@ public class ParentEditionPanel extends AbstractComponentPanel {
             editorPanelSets.setText(text);
         }   
     }
+    
+    private void showErrorMessage(String message, String title) {
+        jOptionPane1.showMessageDialog(getParent(), 
+                        message, 
+                        title, 
+                        JOptionPane.ERROR_MESSAGE);
+    }
 
-    private State initResultView() {
-        // Initialisation de BaseDeClause
+    private State initResultView() {// Initialisation de BaseDeClause
         getFrame().getClause().setFormules("");
         getFrame().getClause().setFormules("");
         getFrame().getClause().addFormules(editorPanelFormulas.getText());
@@ -207,26 +218,42 @@ public class ParentEditionPanel extends AbstractComponentPanel {
         Si aucun model n'existe alors passer a l'état NO_RESULT
         */
         String bigAndFilePath = "bigAndFile-defaultname.txt"; //TODO se mettre d'accord sur un nom standard ou ajouter a Translator et BaseDeClause des méthode pour s'échange de objets File
+        String errorMessage;
+        
+        
         try {
             getFrame().getClause().saveToFile(bigAndFilePath); //TODO gérer les IOException
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            errorMessage = "Couldn't create file '" + bigAndFilePath + "'";
+            showErrorMessage(errorMessage, getFrame().getLang().getWord(LanguagesController.EDITION_OPTION_PANE));
+            System.exit(0);
+            return State.EDITION;
+        }
+        try {
             if(! getFrame().getTranslator().translate(bigAndFilePath)) { //TODO gérer les IOException
-                String errorMessage = "";
+                errorMessage = "";
                 for(int i=0; i<getFrame().getTranslator().getErrors("").size(); i++) {
                     errorMessage += (i+1) + ": " + getFrame().getTranslator().getErrors("").get(i) + "\n";
                 }
                 System.out.println("Erreur de traduction : " + "\n" + errorMessage + "\n");
-                jOptionPane1.showMessageDialog(getParent(), 
-                        errorMessage, 
-                        getFrame().getLang().getWord(LanguagesController.EDITION_OPTION_PANE), 
-                        JOptionPane.ERROR_MESSAGE);
+                showErrorMessage(errorMessage, getFrame().getLang().getWord(LanguagesController.EDITION_OPTION_PANE));
                 return State.EDITION;
             }
             File f = new File(bigAndFilePath);
             f.deleteOnExit();
-        } catch (Exception e) {
-            //TODO gérer proprement les exceptions
-            e.printStackTrace();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            errorMessage = "The translator returned an IOException";
+            showErrorMessage(errorMessage, getFrame().getLang().getWord(LanguagesController.EDITION_OPTION_PANE));
+            return State.EDITION;
+        } catch (InterruptedException ex) {
+            ex.printStackTrace();
+            errorMessage = "Translator has been interrupted.";
+            showErrorMessage(errorMessage, getFrame().getLang().getWord(LanguagesController.EDITION_OPTION_PANE));
+            return State.EDITION;
         }
+        
         //Add CurrentPath/dimacsFile
         String translatedFilePath = getFrame().getTranslator().getDimacsFilePath();
         Map<Integer, String> literalsMap = getFrame().getTranslator().getLiteralsMap();
@@ -234,15 +261,17 @@ public class ParentEditionPanel extends AbstractComponentPanel {
         
         try {
             getFrame().getSolver().launch(); //TODO gérer les IOException
-        } catch (Exception e) {
-            //TODO gérer proprement les exceptions
-            e.printStackTrace();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            errorMessage = "Couldn't launch solver.";
+            showErrorMessage(errorMessage, "Solver error");
+            return State.EDITION;
         }
         if(! getFrame().getSolver().isSatisfiable()) {
             System.out.println("Erreur : Clauses non satisfiable");
         }
          //Initialise l'iterator de ResultsPanel
-            getFrame().updateResultsPanelIterator();
+        getFrame().updateResultsPanelIterator();
             
         // Si il y a au moins un model
         try {
@@ -263,11 +292,18 @@ public class ParentEditionPanel extends AbstractComponentPanel {
             } else {
                 return State.SINGLE_RESULT;
             }
-        } catch (Exception e) {
-            //TODO gérer proprement les exceptions
-            e.printStackTrace();
+        } catch (NotSatisfiableException ex) {
+            ex.printStackTrace();
+            errorMessage = "There is no solution.";
+            showErrorMessage(errorMessage, "Solver error");
+            return State.EDITION;
+        } catch (SolverExecutionException ex) {
+            ex.printStackTrace();
+            errorMessage = "The solver encountered a problem.";
+            showErrorMessage(errorMessage, "Solver error");
+            return State.EDITION;
         }
-        return State.NO_RESULT;
+        //return State.NO_RESULT;
     }
 
     @Override
