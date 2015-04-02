@@ -29,6 +29,8 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -123,10 +125,17 @@ public class Translator {
 		 */
 		/*
 		 * Syntax of errors returned by translator:
-		 * num_row:num_col:message
+		 * num_row:num_col: message
 		 */
-		String cmd =    CurrentPath+File.separatorChar+
-				translatorProgramFilePath
+		
+		// Check if translatorProgramFilePath is there
+		Path path = Paths.get(CurrentPath+File.separatorChar+translatorProgramFilePath);
+		if (!Files.exists(path)) {
+			throw new IOException("translate(): the 'touistc' translator program has not been "
+					+ "found at '"+path.toString()+"'. Is it in the wrong directory?");
+		}
+		
+		String cmd = path.toString()
 				+ " -o " + outputFilePath
 				+ " -table " + outputTableFilePath
 				+ " " + bigandFilePath;
