@@ -39,7 +39,7 @@ public class TranslationLatex {
     public static void main(String args[]){
         BufferedReader in = null ;
         try {
-            in = new BufferedReader(new FileReader("compiler/test/latex.touistl"));
+            in = new BufferedReader(new FileReader("touist-translator/test/latex.touistl"));
             StringBuilder sb = new StringBuilder();
             String line;
             while((line = in.readLine()) != null) {
