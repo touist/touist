@@ -205,7 +205,7 @@ public class BaseDeClauses {
      */
 
     public void addFormule(String formule) {
-        formules = formules.concat(formule);
+        formules = formules.concat(formule+"\n");
     }
 
     /**
@@ -214,7 +214,7 @@ public class BaseDeClauses {
      */
 
     public void addSet(String set) {
-        sets = sets.concat(set);
+        sets = sets.concat(set+"\n");
     }
     
      /**
