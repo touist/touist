@@ -184,23 +184,17 @@ public class ParentEditionPanel extends AbstractComponentPanel {
             }
 
             //Réinitialisation des sets et des formules
-            String text = "";
-            for(String formula : getFrame().getClause().getFormules()) {
-                text += formula + "\n";
-            }
+            String text = getFrame().getClause().getFormules();
             editorPanelFormulas.setText(text);
-            text = "";
-            for(String set : getFrame().getClause().getSets()) {
-                text += set + "\n";
-            }
+            text = getFrame().getClause().getSets();
             editorPanelSets.setText(text);
         }   
     }
 
     private State initResultView() {
         // Initialisation de BaseDeClause
-        getFrame().getClause().getFormules().clear();
-        getFrame().getClause().getSets().clear();
+        getFrame().getClause().setFormules("");
+        getFrame().getClause().setFormules("");
         getFrame().getClause().addFormules(editorPanelFormulas.getText());
         getFrame().getClause().addSets(editorPanelSets.getText());
         

@@ -83,6 +83,14 @@ public class BaseDeClauses {
         return sets;
     }
 
+    public void setFormules(String formules) {
+        this.formules = formules;
+    }
+
+    public void setSets(String sets) {
+        this.sets = sets;
+    }
+
     /**
      * @return the index of the line of "begin formula"
      */
