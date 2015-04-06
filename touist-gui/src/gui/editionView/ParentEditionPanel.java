@@ -218,6 +218,8 @@ public class ParentEditionPanel extends AbstractComponentPanel {
         int row = error.getRowInCode();
         String sets = getFrame().getClause().getSets();
         int nbRowsInSets = 1;
+        int setShift = (getFrame().getClause().getSets().isEmpty()) ? 0 : -1; // -1 pour tenir compte de "begin sets";
+        int formulasShift = (getFrame().getClause().getSets().isEmpty()) ? 0 : -3; // -3 pour tenir compte de "begin sets", "end sets" et "begin formulas"
         
         for (int i=0; i<sets.length(); i++) {
             if (sets.charAt(i) == '\n') {
@@ -226,12 +228,12 @@ public class ParentEditionPanel extends AbstractComponentPanel {
         }
         if (row < nbRowsInSets) {
             // l'erreur est dans les sets
-            adaptedError = t.new Error(row - 1, // -1 pour tenir compte de "begin sets"
+            adaptedError = t.new Error(row - setShift,
                     error.getColumnInCode(), 
                     error.getErrorMessage() + getFrame().getLang().getWord(LanguagesController.ERROR_TRADUCTION_IN_SETS));
         } else {
             // l'erreur est dans les formules
-            adaptedError = t.new Error(row-nbRowsInSets - 3, // -3 pour tenir compte de "begin sets", "end sets" et "begin formulas"
+            adaptedError = t.new Error(row-nbRowsInSets - formulasShift, 
                     error.getColumnInCode(), 
                     error.getErrorMessage() + getFrame().getLang().getWord(LanguagesController.ERROR_TRADUCTION_IN_FORMULAS));
         }
