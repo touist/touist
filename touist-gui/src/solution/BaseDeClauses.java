@@ -187,12 +187,12 @@ public class BaseDeClauses {
 	if(!sets.isEmpty()) {
             writer.write("begin sets\n");
             writer.write(sets);
-            writer.write("end sets\n");
+            writer.write("\nend sets\n");
         }
         if(!formules.isEmpty()) {
             writer.write("begin formula\n");
             writer.write(formules);
-            writer.write("end formula\n");
+            writer.write("\nend formula\n");
         }
 
         writer.flush();
