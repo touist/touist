@@ -95,6 +95,7 @@ public class BaseDeClauses {
      * @return the index of the line of "begin formula"
      */
     public int getLineFormula(){
+        if(sets.isEmpty()) return 1;
         return sets.split("\n").length+3;
     }
     
