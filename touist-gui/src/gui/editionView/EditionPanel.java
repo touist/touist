@@ -8,7 +8,13 @@ package gui.editionView;
 import gui.AbstractComponentPanel;
 import gui.editionView.editor.Editor;
 import java.awt.BorderLayout;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.IOException;
+import javax.swing.JSplitPane;
+import javax.swing.plaf.basic.BasicSplitPaneUI;
 import org.fife.ui.rtextarea.RTextScrollPane;
 
 /**
@@ -18,6 +24,7 @@ import org.fife.ui.rtextarea.RTextScrollPane;
 public class EditionPanel extends AbstractComponentPanel {
 
     private Editor editorTextArea;
+    private int rightPanelWidth;
     
     /**
      * Creates new form EditorPanel
@@ -37,6 +44,16 @@ public class EditionPanel extends AbstractComponentPanel {
         editorContainer.add(sp, BorderLayout.CENTER);
         
         palettePanel2.setEditorTextArea(editorTextArea);
+        
+        rightPanelWidth = jSplitPane1.getWidth() - jSplitPane1.getDividerLocation();
+        
+        jSplitPane1.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, new PropertyChangeListener() {
+
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                rightPanelWidth = jSplitPane1.getWidth() - jSplitPane1.getDividerLocation();
+            }
+        });
     }
     
     public void initPalette(PalettePanel.PaletteType type) {
@@ -69,12 +86,19 @@ public class EditionPanel extends AbstractComponentPanel {
         jSplitPane1.setDividerLocation(500);
         jSplitPane1.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         jSplitPane1.setOneTouchExpandable(true);
+        jSplitPane1.addHierarchyBoundsListener(new java.awt.event.HierarchyBoundsListener() {
+            public void ancestorMoved(java.awt.event.HierarchyEvent evt) {
+            }
+            public void ancestorResized(java.awt.event.HierarchyEvent evt) {
+                jSplitPane1AncestorResized(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 98, Short.MAX_VALUE)
+            .addGap(0, 0, Short.MAX_VALUE)
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -101,7 +125,10 @@ public class EditionPanel extends AbstractComponentPanel {
         );
     }// </editor-fold>//GEN-END:initComponents
 
-
+    private void jSplitPane1AncestorResized(java.awt.event.HierarchyEvent evt) {//GEN-FIRST:event_jSplitPane1AncestorResized
+        jSplitPane1.setDividerLocation(jSplitPane1.getWidth() - rightPanelWidth);
+    }//GEN-LAST:event_jSplitPane1AncestorResized
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel editorContainer;
     private javax.swing.JPanel jPanel1;
