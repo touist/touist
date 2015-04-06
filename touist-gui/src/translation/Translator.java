@@ -212,7 +212,7 @@ public class Translator {
 	 * See the Error class.
 	 * @return the list of warnings
 	 */
-	public List<Error> getErrors(String stderr) {
+	public List<Error> getErrors() {
 		return errors;
 	}
 

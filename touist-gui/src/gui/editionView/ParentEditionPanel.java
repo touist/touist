@@ -271,8 +271,8 @@ public class ParentEditionPanel extends AbstractComponentPanel {
         try {
             if(! getFrame().getTranslator().translate(bigAndFilePath)) {
                 errorMessage = "";
-                for(int i=0; i<getFrame().getTranslator().getErrors("").size(); i++) {
-                    Translator.Error error = guiTranslationErrorAdapter(getFrame().getTranslator().getErrors("").get(i));
+                for(int i=0; i<getFrame().getTranslator().getErrors().size(); i++) {
+                    Translator.Error error = guiTranslationErrorAdapter(getFrame().getTranslator().getErrors().get(i));
                     errorMessage += (i+1) + ": " + error + "\n";
                     
                 }
