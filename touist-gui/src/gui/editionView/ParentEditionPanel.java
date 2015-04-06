@@ -11,6 +11,7 @@ import gui.LanguagesController;
 import gui.MainFrame;
 import gui.State;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ListIterator;
 import java.util.Map;
@@ -205,11 +206,23 @@ public class ParentEditionPanel extends AbstractComponentPanel {
     }
     
     private void showErrorMessage(Exception e, String message, String title) {
-        jOptionPane1.showMessageDialog(getParent(), 
-                        message, 
-                        title, 
-                        JOptionPane.ERROR_MESSAGE);
-        //File f = File.createTempFile("error", ".txt");
+        showErrorMessage(message, title);
+        FileWriter writer = null;
+        String texte = String.valueOf(e.getStackTrace()) + "\n" + "######################";
+        try{
+             writer = new FileWriter("log.txt", true);
+             writer.write(texte,0,texte.length());
+        }catch(IOException ex){
+            ex.printStackTrace();
+        }finally{
+          if(writer != null){
+              try {
+                  writer.close();
+              } catch (IOException ex) {
+                  e.printStackTrace();
+              }
+          }
+        }
     }
     
     private Translator.Error guiTranslationErrorAdapter(Translator.Error error) {
@@ -285,12 +298,12 @@ public class ParentEditionPanel extends AbstractComponentPanel {
         } catch (IOException ex) {
             ex.printStackTrace();
             errorMessage = "The translator returned an IOException";
-            showErrorMessage(errorMessage, getFrame().getLang().getWord(LanguagesController.ERROR_TRADUCTION));
+            showErrorMessage(ex, errorMessage, getFrame().getLang().getWord(LanguagesController.ERROR_TRADUCTION));
             return State.EDITION;
         } catch (InterruptedException ex) {
             ex.printStackTrace();
             errorMessage = "Translator has been interrupted.";
-            showErrorMessage(errorMessage, getFrame().getLang().getWord(LanguagesController.ERROR_TRADUCTION));
+            showErrorMessage(ex, errorMessage, getFrame().getLang().getWord(LanguagesController.ERROR_TRADUCTION));
             return State.EDITION;
         }
         
@@ -304,7 +317,7 @@ public class ParentEditionPanel extends AbstractComponentPanel {
         } catch (IOException ex) {
             ex.printStackTrace();
             errorMessage = "Couldn't launch solver.";
-            showErrorMessage(errorMessage, "Solver error");
+            showErrorMessage(ex, errorMessage, "Solver error");
             return State.EDITION;
         }
         if(! getFrame().getSolver().isSatisfiable()) {
@@ -335,12 +348,12 @@ public class ParentEditionPanel extends AbstractComponentPanel {
         } catch (NotSatisfiableException ex) {
             ex.printStackTrace();
             errorMessage = "There is no solution.";
-            showErrorMessage(errorMessage, "Solver error");
+            showErrorMessage(ex, errorMessage, "Solver error");
             return State.EDITION;
         } catch (SolverExecutionException ex) {
             ex.printStackTrace();
             errorMessage = "The solver encountered a problem.";
-            showErrorMessage(errorMessage, "Solver error");
+            showErrorMessage(ex, errorMessage, "Solver error");
             return State.EDITION;
         }
         //return State.NO_RESULT;
