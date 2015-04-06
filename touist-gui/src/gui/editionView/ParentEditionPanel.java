@@ -218,12 +218,12 @@ public class ParentEditionPanel extends AbstractComponentPanel {
             // l'erreur est dans les sets
             adaptedError = t.new Error(row -1, // -1 pour tenir compte de "begin sets"
                     error.getColumnInCode(), 
-                    error.getErrorMessage() + " in Sets");
+                    error.getErrorMessage() + getFrame().getLang().getWord(LanguagesController.ERROR_TRADUCTION_IN_SETS));
         } else {
             // l'erreur est dans les formules
             adaptedError = t.new Error(row-nbRowsInSets - 3, // -3 pour tenir compte de "begin sets", "end sets" et "begin formulas"
                     error.getColumnInCode(), 
-                    error.getErrorMessage() + " in Formulas");
+                    error.getErrorMessage() + getFrame().getLang().getWord(LanguagesController.ERROR_TRADUCTION_IN_FORMULAS));
         }
         return adaptedError;
     }
@@ -252,7 +252,7 @@ public class ParentEditionPanel extends AbstractComponentPanel {
         } catch (IOException ex) {
             ex.printStackTrace();
             errorMessage = "Couldn't create file '" + bigAndFilePath + "'";
-            showErrorMessage(errorMessage, getFrame().getLang().getWord(LanguagesController.EDITION_OPTION_PANE));
+            showErrorMessage(errorMessage, getFrame().getLang().getWord(LanguagesController.ERROR_TRADUCTION));
             System.exit(0);
             return State.EDITION;
         }
@@ -264,8 +264,8 @@ public class ParentEditionPanel extends AbstractComponentPanel {
                     errorMessage += (i+1) + ": " + error + "\n";
                     
                 }
-                System.out.println("Erreur de traduction : " + "\n" + errorMessage + "\n");
-                showErrorMessage(errorMessage, getFrame().getLang().getWord(LanguagesController.EDITION_OPTION_PANE));
+                System.out.println("Traduction error : " + "\n" + errorMessage + "\n");
+                showErrorMessage(errorMessage, getFrame().getLang().getWord(LanguagesController.ERROR_TRADUCTION));
                 return State.EDITION;
             }
             File f = new File(bigAndFilePath);
@@ -273,12 +273,12 @@ public class ParentEditionPanel extends AbstractComponentPanel {
         } catch (IOException ex) {
             ex.printStackTrace();
             errorMessage = "The translator returned an IOException";
-            showErrorMessage(errorMessage, getFrame().getLang().getWord(LanguagesController.EDITION_OPTION_PANE));
+            showErrorMessage(errorMessage, getFrame().getLang().getWord(LanguagesController.ERROR_TRADUCTION));
             return State.EDITION;
         } catch (InterruptedException ex) {
             ex.printStackTrace();
             errorMessage = "Translator has been interrupted.";
-            showErrorMessage(errorMessage, getFrame().getLang().getWord(LanguagesController.EDITION_OPTION_PANE));
+            showErrorMessage(errorMessage, getFrame().getLang().getWord(LanguagesController.ERROR_TRADUCTION));
             return State.EDITION;
         }
         
@@ -296,7 +296,7 @@ public class ParentEditionPanel extends AbstractComponentPanel {
             return State.EDITION;
         }
         if(! getFrame().getSolver().isSatisfiable()) {
-            System.out.println("Erreur : Clauses non satisfiable");
+            System.out.println("Erreur : unsatisfiable");
         }
          //Initialise l'iterator de ResultsPanel
         getFrame().updateResultsPanelIterator();
