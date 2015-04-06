@@ -8,13 +8,10 @@ package gui.editionView;
 import gui.AbstractComponentPanel;
 import gui.editionView.editor.Editor;
 import java.awt.BorderLayout;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import javax.swing.JSplitPane;
-import javax.swing.plaf.basic.BasicSplitPaneUI;
 import org.fife.ui.rtextarea.RTextScrollPane;
 
 /**
@@ -48,10 +45,13 @@ public class EditionPanel extends AbstractComponentPanel {
         rightPanelWidth = jSplitPane1.getWidth() - jSplitPane1.getDividerLocation();
         
         jSplitPane1.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, new PropertyChangeListener() {
-
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
-                rightPanelWidth = jSplitPane1.getWidth() - jSplitPane1.getDividerLocation();
+                if (jSplitPane1.getDividerLocation() < jSplitPane1.getWidth()) {
+                    rightPanelWidth = jSplitPane1.getWidth() - jSplitPane1.getDividerLocation();
+                    //when resizing the frame, the rightPanelWidth can end up < 0
+                    //System.out.println(rightPanelWidth + " : " + evt);
+                }
             }
         });
     }
@@ -83,16 +83,15 @@ public class EditionPanel extends AbstractComponentPanel {
         editorContainer = new javax.swing.JPanel();
         palettePanel2 = new gui.editionView.PalettePanel(editorTextArea);
 
+        addComponentListener(new java.awt.event.ComponentAdapter() {
+            public void componentResized(java.awt.event.ComponentEvent evt) {
+                formComponentResized(evt);
+            }
+        });
+
         jSplitPane1.setDividerLocation(500);
         jSplitPane1.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         jSplitPane1.setOneTouchExpandable(true);
-        jSplitPane1.addHierarchyBoundsListener(new java.awt.event.HierarchyBoundsListener() {
-            public void ancestorMoved(java.awt.event.HierarchyEvent evt) {
-            }
-            public void ancestorResized(java.awt.event.HierarchyEvent evt) {
-                jSplitPane1AncestorResized(evt);
-            }
-        });
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -125,9 +124,9 @@ public class EditionPanel extends AbstractComponentPanel {
         );
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jSplitPane1AncestorResized(java.awt.event.HierarchyEvent evt) {//GEN-FIRST:event_jSplitPane1AncestorResized
+    private void formComponentResized(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentResized
         jSplitPane1.setDividerLocation(jSplitPane1.getWidth() - rightPanelWidth);
-    }//GEN-LAST:event_jSplitPane1AncestorResized
+    }//GEN-LAST:event_formComponentResized
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel editorContainer;
