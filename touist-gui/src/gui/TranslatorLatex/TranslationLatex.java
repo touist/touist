@@ -6,7 +6,9 @@
 package gui.TranslatorLatex;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.StringReader;
 import javax.swing.JFrame;
@@ -33,6 +35,12 @@ public class TranslationLatex {
     
     public String getFormula(){
         return latexFormula;
+    }
+    
+    public void saveLatex(String path) throws IOException {
+        BufferedWriter out = new BufferedWriter(new FileWriter(path));
+        out.write(latexFormula);
+        out.close();
     }
     
     
