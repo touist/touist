@@ -5,7 +5,9 @@
  */
 package gui;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -19,9 +21,7 @@ public class LanguagesController {
     private ResourceBundle translation;
 
     public LanguagesController(Locale language){
-        supportedLanguages = new HashMap();
-        supportedLanguages.put(Locale.FRENCH, "lang.fr_FR"); // "lang" is the package
-        supportedLanguages.put(Locale.ENGLISH, "lang.en_US");
+        initSupportedLanguages();
         translation = ResourceBundle.getBundle(supportedLanguages.get(language));
     }
     
@@ -31,6 +31,18 @@ public class LanguagesController {
 
     public String getWord(String keyword){
         return translation.getString(keyword);
+    }
+    
+    public List<Locale> getSupportedLanguages() {
+        List<Locale> locales = new ArrayList<>();
+        locales.addAll(supportedLanguages.keySet());
+        return locales;
+    }
+    
+    private void initSupportedLanguages() {
+        supportedLanguages = new HashMap();
+        supportedLanguages.put(Locale.FRENCH, "lang.fr_FR"); // "lang" is the package
+        supportedLanguages.put(Locale.ENGLISH, "lang.en_US");
     }
     
     public static final String FRAME_TITLE = "MainFrame.title";

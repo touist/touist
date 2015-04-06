@@ -75,6 +75,18 @@ public class Translator {
 					+"In line "+rowInCode+", column "+columnInCode+": "
 					+errorMessage;
 		}
+                
+                public int getRowInCode() {
+                    return rowInCode;
+                }
+                
+                public int getColumnInCode() {
+                    return columnInCode;
+                }
+                
+                public String getErrorMessage() {
+                    return errorMessage;
+                }
 	}
 
 	/**

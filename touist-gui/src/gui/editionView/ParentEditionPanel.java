@@ -14,13 +14,12 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ListIterator;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import solution.NotSatisfiableException;
 import solution.SolverExecutionException;
 import solution.SolverTestSAT4J;
+import translation.Translator;
 
 /**
  *
@@ -35,7 +34,7 @@ public class ParentEditionPanel extends AbstractComponentPanel {
         initComponents();
         editorPanelFormulas.initPalette(PalettePanel.PaletteType.FORMULA);
         editorPanelSets.initPalette(PalettePanel.PaletteType.SET);
-        jFileChooser1.setCurrentDirectory(new File("."));
+        jFileChooser1.setCurrentDirectory(new File(".."));
     }
 
     /**
@@ -202,8 +201,35 @@ public class ParentEditionPanel extends AbstractComponentPanel {
                         title, 
                         JOptionPane.ERROR_MESSAGE);
     }
+    
+    private Translator.Error guiTranslationErrorAdapter(Translator.Error error) {
+        Translator t = new Translator("");
+        Translator.Error adaptedError;
+        int row = error.getRowInCode();
+        String sets = getFrame().getClause().getSets();
+        int nbRowsInSets = 1;
+        
+        for (int i=0; i<sets.length(); i++) {
+            if (sets.charAt(i) == '\n') {
+                nbRowsInSets++;
+            }
+        }
+        if (row < nbRowsInSets) {
+            // l'erreur est dans les sets
+            adaptedError = t.new Error(row -1, // -1 pour tenir compte de "begin sets"
+                    error.getColumnInCode(), 
+                    error.getErrorMessage() + " in Sets");
+        } else {
+            // l'erreur est dans les formules
+            adaptedError = t.new Error(row-nbRowsInSets - 3, // -3 pour tenir compte de "begin sets", "end sets" et "begin formulas"
+                    error.getColumnInCode(), 
+                    error.getErrorMessage() + " in Formulas");
+        }
+        return adaptedError;
+    }
 
-    private State initResultView() {// Initialisation de BaseDeClause
+    private State initResultView() {
+        // Initialisation de BaseDeClause
         getFrame().getClause().setFormules("");
         getFrame().getClause().setFormules("");
         getFrame().getClause().addFormules(editorPanelFormulas.getText());
@@ -231,10 +257,12 @@ public class ParentEditionPanel extends AbstractComponentPanel {
             return State.EDITION;
         }
         try {
-            if(! getFrame().getTranslator().translate(bigAndFilePath)) { //TODO gérer les IOException
+            if(! getFrame().getTranslator().translate(bigAndFilePath)) {
                 errorMessage = "";
                 for(int i=0; i<getFrame().getTranslator().getErrors("").size(); i++) {
-                    errorMessage += (i+1) + ": " + getFrame().getTranslator().getErrors("").get(i) + "\n";
+                    Translator.Error error = guiTranslationErrorAdapter(getFrame().getTranslator().getErrors("").get(i));
+                    errorMessage += (i+1) + ": " + error + "\n";
+                    
                 }
                 System.out.println("Erreur de traduction : " + "\n" + errorMessage + "\n");
                 showErrorMessage(errorMessage, getFrame().getLang().getWord(LanguagesController.EDITION_OPTION_PANE));
@@ -260,7 +288,7 @@ public class ParentEditionPanel extends AbstractComponentPanel {
         getFrame().setSolver(new SolverTestSAT4J(translatedFilePath, literalsMap));
         
         try {
-            getFrame().getSolver().launch(); //TODO gérer les IOException
+            getFrame().getSolver().launch();
         } catch (IOException ex) {
             ex.printStackTrace();
             errorMessage = "Couldn't launch solver.";
