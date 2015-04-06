@@ -30,7 +30,12 @@ public class LanguagesController {
     }
 
     public String getWord(String keyword){
-        return translation.getString(keyword);
+        try {
+            return translation.getString(keyword);
+        } catch (Exception e) {
+            System.out.println("Unknown key : '" + keyword + "'");
+        }
+        return keyword;
     }
     
     public List<Locale> getSupportedLanguages() {
