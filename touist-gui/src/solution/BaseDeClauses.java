@@ -191,7 +191,7 @@ public class BaseDeClauses {
         }
         if(!formules.isEmpty()) {
             writer.write("begin formula\n");
-            writer.write(sets);
+            writer.write(formules);
             writer.write("end formula\n");
         }
 
