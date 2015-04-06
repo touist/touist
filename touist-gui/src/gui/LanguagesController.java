@@ -49,7 +49,6 @@ public class LanguagesController {
     public static final String FRAME_MENU_FILE = "MainFrame.jMenu1.text";
     public static final String FRAME_MENU_HELP = "MainFrame.jMenu2.text";
     public static final String FRAME_MENU_LANGUAGE = "MainFrame.jMenu3.text";
-    public static final String EDITION_OPTION_PANE = "ParentEditionPanel.jOptionPane1.traductionError";
     public static final String EDITION_FILE_CHOOSER = "ParentEditionPanel.jFileChooser1.title";
     public static final String EDITION_IMPORT = "ParentEditionPanel.importButton.text";
     public static final String EDITION_TEST = "ParentEditionPanel.testButton.text";
@@ -60,4 +59,7 @@ public class LanguagesController {
     public static final String RESULTS_PREVIOUS = "ResultsPanel.jButtonPrevious.text";
     public static final String RESULTS_RETURN = "ResultsPanel.jButtonEditor.text";
     public static final String RESULTS_TEXT = "ResultsPanel.jLabel1.text";
+    public static final String ERROR_TRADUCTION = "ParentEditionPanel.jOptionPane1.traductionError";
+    public static final String ERROR_TRADUCTION_IN_SETS = "ParentEditionPanel.jOptionPane1.traductionErrorInSets";
+    public static final String ERROR_TRADUCTION_IN_FORMULAS = "ParentEditionPanel.jOptionPane1.traductionErrorInFormulas";
 }

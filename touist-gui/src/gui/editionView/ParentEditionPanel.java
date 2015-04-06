@@ -172,6 +172,8 @@ public class ParentEditionPanel extends AbstractComponentPanel {
     private void importHandler() {
         String path = "";
         int returnVal;
+        getFrame().getClause().setFormules("");
+        getFrame().getClause().setSets("");
         
         jFileChooser1.setFileSelectionMode(JFileChooser.FILES_ONLY);
         returnVal = jFileChooser1.showDialog(this, getFrame().getLang().getWord(LanguagesController.EDITION_FILE_CHOOSER));
@@ -202,6 +204,14 @@ public class ParentEditionPanel extends AbstractComponentPanel {
                         JOptionPane.ERROR_MESSAGE);
     }
     
+    private void showErrorMessage(Exception e, String message, String title) {
+        jOptionPane1.showMessageDialog(getParent(), 
+                        message, 
+                        title, 
+                        JOptionPane.ERROR_MESSAGE);
+        //File f = File.createTempFile("error", ".txt");
+    }
+    
     private Translator.Error guiTranslationErrorAdapter(Translator.Error error) {
         Translator t = new Translator("");
         Translator.Error adaptedError;
@@ -216,7 +226,7 @@ public class ParentEditionPanel extends AbstractComponentPanel {
         }
         if (row < nbRowsInSets) {
             // l'erreur est dans les sets
-            adaptedError = t.new Error(row -1, // -1 pour tenir compte de "begin sets"
+            adaptedError = t.new Error(row - 1, // -1 pour tenir compte de "begin sets"
                     error.getColumnInCode(), 
                     error.getErrorMessage() + getFrame().getLang().getWord(LanguagesController.ERROR_TRADUCTION_IN_SETS));
         } else {
