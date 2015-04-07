@@ -8,8 +8,6 @@ package gui.editionView;
 import gui.AbstractComponentPanel;
 import gui.LanguagesController;
 import gui.editionView.editor.Editor;
-import java.awt.FlowLayout;
-import java.awt.GridLayout;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.BoxLayout;
@@ -63,8 +61,8 @@ public class PalettePanel extends AbstractComponentPanel {
             section1.addInsertButton(new InsertionButton(editorTextArea, "$a and $b", snippetsAnd, "and"));
             section1.addInsertButton(new InsertionButton(editorTextArea, "$a or $b", snippetsOr, "or"));
             section1.addInsertButton(new InsertionButton(editorTextArea, "not $a", snippetsNot, "not"));
-            section2.addInsertButton(new InsertionButton(editorTextArea, "if $a \nthen \n\t$b \nelse \n\t$c\n", snippetsIf, "if then else"));
-            section1.addInsertButton(new InsertionButton(editorTextArea, "bigand $i in $a: \n\tA($i) and B($i) \nend", snippetsBigand, "bigand"));
+            section2.addInsertButton(new InsertionButton(editorTextArea, "if $a \nthen \n\t$b \nelse \n\t$c\n", snippetsIf, "if then else","if\\,\\$a \\\\ then\\\\\\quad\\$b \\\\ else\\\\\\quad\\$c"));
+            section1.addInsertButton(new InsertionButton(editorTextArea, "bigand $i in $a: \n\tA($i) and B($i) \nend", snippetsBigand,"bigand"));
 
             sectionsContainerPanel.setLayout(new BoxLayout(sectionsContainerPanel, BoxLayout.Y_AXIS));
             for(PaletteSectionPanel section : sections) {

@@ -7,11 +7,15 @@ package gui.editionView;
 
 import gui.MainFrame;
 import gui.State;
+import gui.TranslatorLatex.TranslationLatex;
 import gui.editionView.editor.Editor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import javax.swing.JButton;
+import org.scilab.forge.jlatexmath.TeXConstants;
+import org.scilab.forge.jlatexmath.TeXFormula;
+import org.scilab.forge.jlatexmath.TeXIcon;
 
 /**
  *
@@ -28,7 +32,7 @@ public class InsertionButton extends JButton {
         this.codeToInsert = codeToInsert;
         this.snipets = snipets;
         
-        this.setText(codeToInsert);
+        //this.setText(codeToInsert);
         
         addActionListener(new ActionListener() {
 
@@ -64,6 +68,16 @@ public class InsertionButton extends JButton {
             }
         });
         
+        try {
+            TranslationLatex toLatex = new TranslationLatex(codeToInsert);
+            TeXFormula formula = new TeXFormula(toLatex.getFormula());
+            TeXIcon ti = formula.createTeXIcon(TeXConstants.ALIGN_TOP, 15);
+            this.setIcon(ti);
+        } catch (Exception ex) {
+            System.err.println("Erreur lors de la traduction dun bouton "+codeToInsert);
+        }
+        
+        
         this.setFocusable(false);
         this.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         this.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
@@ -73,6 +87,13 @@ public class InsertionButton extends JButton {
         this(editorTextArea, codeToInsert, snipets);
         setToolTipText(aide);
         
+    }
+    
+    public InsertionButton(Editor editorTextArea, String codeToInsert, ArrayList<Integer> snipets, String aide, String latexFormula) {
+        this(editorTextArea, codeToInsert, snipets,aide);
+        TeXFormula formula = new TeXFormula(latexFormula);
+        TeXIcon ti = formula.createTeXIcon(TeXConstants.ALIGN_TOP, 15);
+        this.setIcon(ti);
     }
     
     
