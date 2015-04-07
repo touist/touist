@@ -107,3 +107,5 @@ clause:
 
 set_decl:
   | LBRACK separated_nonempty_list(COMMA, exp) RBRACK { $2 }
+  | LBRACK separated_nonempty_list(COMMA, TERM) RBRACK
+  { List.map (fun x -> Clause (Term (x,None))) $2 }
