@@ -10,14 +10,15 @@
                  pos_lnum = pos.pos_lnum + 1}
 }
 
-let digits     = ['0' - '9']
+let digit      = ['0' - '9']
 let alpha      = ['a' - 'z' 'A' - 'Z']
 let empty      = ['\t' ' ']
-let special    = [ '_' '(' ')']
+let special    = ['_']
 let newline    = '\r' | '\n' | "\r\n"
-let identifier = (special | digits)* alpha (alpha | special | digits)*
-let integer    = digits+
-let double     = digits+ '.' digits+
+let identifier = (special | digit)* alpha (alpha | special | digit)*
+let variable   = (special | digit)* alpha (alpha | special | digit | ['(' ')'])*
+let integer    = digit+
+let double     = digit+ '.' digit+
 
 rule lexer = parse
   | eof            { EOF          }
@@ -38,17 +39,15 @@ rule lexer = parse
   | "Top"          { TOP          }
   | "Bot"          { BOTTOM       }
   | "card"         { CARD         }
+  | "|"            { PIPE         }
   | "("            { LPAREN       }
   | "["            { LBRACK       }
   | "]"            { RBRACK       }
   | ")"            { RPAREN       }
-  | "."            { DOT          }
   | ".."           { RANGE        }
   | ","            { COMMA        }
   | "=="           { EQUAL        }
   | "!="           { NOTEQUAL     }
-  | "&&"           { BAND         }
-  | "||"           { BOR          }
   | "+"            { ADD          }
   | "-"            { SUB          }
   | "*"            { MUL          }
@@ -73,7 +72,7 @@ rule lexer = parse
   | "if"           { IF           }
   | "then"         { THEN         }
   | "else"         { ELSE         }
-  | '$' identifier { VAR    (lexeme lexbuf) }
+  | '$' variable   { VAR    (lexeme lexbuf) }
   | identifier     { TERM   (lexeme lexbuf) }
   | integer        { INT    (int_of_string   (lexeme lexbuf)) }
   | double         { FLOAT  (float_of_string (lexeme lexbuf)) }

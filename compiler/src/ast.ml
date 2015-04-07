@@ -19,7 +19,7 @@ module GenSet = struct
 end
 
 type prog =
-  | Begin of affect list option * exp list
+  | Begin of affect list option * clause_exp list
 and affect =
   | Affect of string * exp
 and exp =
@@ -29,8 +29,6 @@ and exp =
   | SetExp    of set_exp
   | BoolExp   of bool_exp
   | ClauseExp of clause_exp
-  | Dot       of set_exp * exp
-  | If        of bool_exp * exp * exp
 and int_exp =
   | IVar   of string
   | Int    of int
@@ -42,6 +40,7 @@ and int_exp =
   | Mod    of int_exp * int_exp
   | To_int of float_exp
   | Card   of set_exp
+  | IIf    of bool_exp * int_exp * int_exp
 and float_exp =
   | FVar     of string
   | Float    of float
@@ -52,6 +51,7 @@ and float_exp =
   | FDiv     of float_exp * float_exp
   | Sqrt     of float_exp
   | To_float of int_exp
+  | FIf      of bool_exp * float_exp * float_exp
 and bool_exp =
   | BVar              of string
   | Bool              of bool
@@ -77,6 +77,7 @@ and bool_exp =
   | Subset            of set_exp   * set_exp
   | SEqual            of set_exp   * set_exp
   | Empty             of set_exp
+  | BIf               of bool_exp * bool_exp * bool_exp
 and clause_exp =
   | Top
   | Bottom
@@ -87,8 +88,9 @@ and clause_exp =
   | Xor     of clause_exp  * clause_exp
   | Implies of clause_exp  * clause_exp
   | Equiv   of clause_exp  * clause_exp
-  | Bigand  of string list * set_exp list * bool_exp option * exp
-  | Bigor   of string list * set_exp list * bool_exp option * exp
+  | Bigand  of string list * set_exp list * bool_exp option * clause_exp
+  | Bigor   of string list * set_exp list * bool_exp option * clause_exp
+  | CIf     of bool_exp    * clause_exp   * clause_exp
 and set_exp =
   | SVar  of string
   | Set   of GenSet.t
@@ -96,6 +98,7 @@ and set_exp =
   | Inter of set_exp * set_exp
   | Diff  of set_exp * set_exp
   | Range of int_exp * int_exp
+  | SIf   of bool_exp * set_exp * set_exp
 and term_opt =
   | Str of string
   | Exp of exp

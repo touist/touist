@@ -18,6 +18,7 @@ let range min max step =
 
 let rec set_bin_op iop fop sop repr s1 s2 =
   match s1, s2 with
+  | GenSet.Empty, GenSet.Empty -> GenSet.Empty
   | GenSet.IS _, GenSet.Empty ->
       set_bin_op iop fop sop repr s1 (GenSet.IS IntSet.empty)
   | GenSet.Empty, GenSet.IS _ ->
@@ -37,6 +38,7 @@ let rec set_bin_op iop fop sop repr s1 s2 =
 
 let rec set_pred_op ipred fpred spred repr s1 s2 =
   match s1, s2 with
+  | GenSet.Empty, GenSet.Empty -> true
   | GenSet.Empty, GenSet.IS _ ->
       set_pred_op ipred fpred spred repr (GenSet.IS IntSet.empty) s2
   | GenSet.IS _, GenSet.Empty ->
@@ -62,9 +64,9 @@ let rec set_pred_op ipred fpred spred repr s1 s2 =
 let toplevel = Hashtbl.create 10
 
 let rec eval_prog = function
-  | Begin (None, exp) -> List.map (eval_exp ~env:[]) exp
+  | Begin (None, exp) -> List.map (fun x -> ClauseExp (eval_clause ~env:[] x)) exp
   | Begin (Some sets, exp) ->
-      List.iter eval_affect sets; List.map (eval_exp ~env:[]) exp
+      List.iter eval_affect sets; List.map (fun x -> ClauseExp (eval_clause ~env:[] x)) exp
 
 and eval_affect = function
   | Affect (str, exp) -> Hashtbl.replace toplevel str (eval_exp exp)
@@ -82,7 +84,7 @@ and eval_exp ?(env=[]) = function
   | SetExp    x -> SetExp (Set (eval_set x))
   | BoolExp   x -> BoolExp (Bool (eval_bool x))
   | ClauseExp x -> ClauseExp (eval_clause ~env:env x)
-  | Dot (x, y) ->
+  (*| Dot (x, y) ->
       begin
         match eval_set x, eval_exp ~env:env y with
         | GenSet.Empty, _ -> failwith "empty set"
@@ -107,7 +109,7 @@ and eval_exp ?(env=[]) = function
       if (eval_bool x) then
         eval_exp ~env:env y
       else
-        eval_exp ~env:env z
+        eval_exp ~env:env z*)
 
 and eval_int ?(env=[]) = function
   | IVar x ->
@@ -143,6 +145,11 @@ and eval_int ?(env=[]) = function
         | GenSet.FS a  -> FloatSet.cardinal  a
         | GenSet.SS a  -> StringSet.cardinal a
       end
+  | IIf (x, y, z) ->
+      if (eval_bool x) then
+        eval_int ~env:env y
+      else
+        eval_int ~env:env z
 
 and eval_float = function
   | FVar x ->
@@ -163,8 +170,13 @@ and eval_float = function
   | FDiv (x, y) -> (eval_float x) /. (eval_float y)
   | Sqrt x -> sqrt (eval_float x)
   | To_float x -> float_of_int (eval_int x)
+  | FIf (x, y, z) ->
+      if (eval_bool x) then
+        eval_float y
+      else
+        eval_float z
 
-and eval_bool ?env = function
+and eval_bool = function
   | BVar x ->
       begin
         try 
@@ -215,6 +227,11 @@ and eval_bool ?env = function
         | GenSet.FS f  -> FloatSet.is_empty f
         | GenSet.SS s  -> StringSet.is_empty s
       end
+  | BIf (x, y, z) ->
+      if (eval_bool x) then
+        eval_bool y
+      else
+        eval_bool z
 
 and eval_set = function
   | SVar x ->
@@ -232,6 +249,11 @@ and eval_set = function
   | Inter (x, y) -> set_bin_op (IntSet.inter) (FloatSet.inter) (StringSet.inter) "union" (eval_set x) (eval_set y)
   | Diff  (x, y) -> set_bin_op (IntSet.diff)  (FloatSet.diff)  (StringSet.diff)  "union" (eval_set x) (eval_set y)
   | Range (x, y) -> GenSet.IS (IntSet.of_list (range (eval_int x) (eval_int y) 1))
+  | SIf (x, y, z) ->
+      if (eval_bool x) then
+        eval_set y
+      else
+        eval_set z
 
 and eval_clause ?(env=[]) = function
   | Top    -> Top
@@ -239,6 +261,7 @@ and eval_clause ?(env=[]) = function
   | Term (x, None)  -> Term (x, None)
   | Term (x, Some (Str y)) -> Term ((x ^ "(" ^ y ^ ")"), None)
   | Term (x, Some (Exp y)) ->
+      (*Term ((x ^ "(" ^ string_of_int (eval_int ~env:env y) ^ ")"), None)*)
       let opt =
         match eval_exp ~env:env y with
         | IntExp (Int a) -> string_of_int a
@@ -270,7 +293,7 @@ and eval_clause ?(env=[]) = function
               | GenSet.SS a  -> bigand_str env x (StringSet.elements a) test e
             end
         | x::xs,y::ys ->
-            eval_clause ~env:env (Bigand ([x],[y],None,ClauseExp(Bigand (xs,ys,t,e))))
+            eval_clause ~env:env (Bigand ([x],[y],None,(Bigand (xs,ys,t,e))))
       end
   | Bigor (v, s, t, e) ->
       let test =
@@ -290,8 +313,14 @@ and eval_clause ?(env=[]) = function
               | GenSet.SS a  -> bigor_str env x (StringSet.elements a) test e
             end
         | x::xs,y::ys ->
-            eval_clause ~env:env (Bigor ([x],[y],None,ClauseExp (Bigor (xs,ys,t,e))))
+            eval_clause ~env:env (Bigor ([x],[y],None,(Bigor (xs,ys,t,e))))
       end
+  | CIf (x, y, z) ->
+      if (eval_bool x) then
+        eval_clause ~env:env y
+      else
+        eval_clause ~env:env z
+
 and bigand_int env var values test exp =
   List.fold_left (fun acc x ->
     if eval_bool test then
@@ -328,10 +357,10 @@ and bigor_str env var values test exp =
       Or (acc, eval_bigbody ((var, ClauseExp (Term (x, None)))::env) exp)
     else
       acc) Bottom values
-and eval_bigbody env exp =
-  match eval_exp ~env:env exp with
+and eval_bigbody env exp = eval_clause ~env:env exp
+  (*match eval_exp ~env:env exp with
   | ClauseExp a -> a
-  | _ -> failwith "expected clause expression"
+  | _ -> failwith "expected clause expression"*)
 
 let eval exp =
   List.fold_left (fun acc x ->

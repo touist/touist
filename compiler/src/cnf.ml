@@ -9,7 +9,8 @@ let to_cnf p =
     | Xor     (x, y) -> Xor (remove_impl x, remove_impl y)
     | Implies (x, y) -> Or (Not (remove_impl x), remove_impl y)
     | Equiv   (x, y) -> Not (Xor (remove_impl x, remove_impl y))
-    | Bigand _ | Bigor _ -> failwith "all bigor and bigand should have been eliminated"
+    | Bigand _ | Bigor _ | CIf _ ->
+        failwith "all bigor, bigand and if should have been eliminated"
   in
   let rec remove_xor = function
     | Top | Bottom | Term _ as x -> x
@@ -18,7 +19,8 @@ let to_cnf p =
     | Or   (x, y)         -> Or (remove_xor x, remove_xor y)
     | Xor  (x, y)         -> And (Or (remove_xor x, remove_xor y), Not (And (remove_xor x, remove_xor y)))
     | Implies _ | Equiv _ -> failwith "there shouldn't be any implies/equiv left"
-    | Bigand _ | Bigor _  -> failwith "all bigor and bigand should have been eliminated"
+    | Bigand _ | Bigor _ | CIf _  ->
+        failwith "all bigor, bigand and if should have been eliminated"
   in
   let rec push_neg_in = function
     | Top | Bottom | Term _ as x -> x
@@ -32,7 +34,8 @@ let to_cnf p =
     | Or   (x, y)         -> Or (push_neg_in x, push_neg_in y)
     | Xor     _           -> failwith "there shouldn't be any xors left"
     | Implies _ | Equiv _ -> failwith "there shouldn't be any implies/equiv left"
-    | Bigand _ | Bigor _  -> failwith "all bigor and bigand should have been eliminated"
+    | Bigand _ | Bigor _ | CIf _  ->
+        failwith "all bigor, bigand and if should have been eliminated"
   in
   let rec push_disj_in = function
     | Top | Bottom | Term _ as x -> x
@@ -41,7 +44,8 @@ let to_cnf p =
     | And (x, y)          -> And (push_disj_in x, push_disj_in y)
     | Xor     _           -> failwith "there shouldn't be any xors left"
     | Implies _ | Equiv _ -> failwith "there shouldn't be any implies left"
-    | Bigand _ | Bigor _  -> failwith "all bigor and bigand should have been eliminated"
+    | Bigand _ | Bigor _ | CIf _  ->
+        failwith "all bigor, bigand and if should have been eliminated"
   and dist x y =
     match x, y with
     | And (x, y), z -> And (push_disj_in (Or (x, z)), push_disj_in (Or (y, z)))
