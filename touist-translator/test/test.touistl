@@ -4,6 +4,6 @@ end sets
 
 begin formula
     bigand $i in $a:
-        A($i) and B($i)
+        A|$i| and B|$i|
     end
 end formula
