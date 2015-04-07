@@ -21,6 +21,7 @@ _build/
 # ocamlbuild targets
 *.byte
 *.native
+**/touist*
 
 # oasis generated files
 setup.data
@@ -49,17 +50,9 @@ hs_err_pid*
 .classpath
 
 .project
-/nbproject/private/
-/dist/
-/build/
-nbproject/project.xml
-
-nbproject/project.properties
-
-nbproject/genfiles.properties
-
-nbproject/build-impl.xml
-
+**/dist/
+**/build/
+nbproject/*
 build.xml
 
 *.mf
@@ -81,3 +74,4 @@ bigAndFile-defaultname.txt
 *.table
 
 *.cnf
+/touist-gui/nbproject/private/

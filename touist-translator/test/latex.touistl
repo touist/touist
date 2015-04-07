@@ -1,0 +1,52 @@
+    $length = 10 
+    $F = [a,b,c,d] 
+    $O = [A,B] 
+    $I = [a,c] 
+    $G = [a,d] 
+    $Prec(A) = [a] 
+    $Add(A) = [b] 
+    $Del(A) = [a] 
+    $Prec(B) = [b,c] 
+    $Add(B) = [a,d] 
+    $Del(B) = [a] 
+
+bigand $f in $I: $f(0) end 
+bigand $f in (diff($F,$I)): $f and $g end
+
+
+bigand $f in $I: $f(0) end 
+bigand $f in $G: $f($length) end 
+bigand $i in [1..$length]: 
+    (bigand $a in $O: 
+        ($a($i) => 
+            ( 
+                (bigand $f in $Prec($a): $f($i-1) end)
+                and 
+                (bigand $f in $Add($a): $f($i) end) 
+            ) 
+        ) 
+        and (bigand $f in $Del($a): (not $f) end) 
+       
+     end) 
+end 
+bigand $i in [1..$length]: 
+    bigand $f in $F: 
+        ((not $f($i-1)) and $f($i)) 
+        => (bigor $a in $O when $f in $Del($a): $a($i) end) 
+    end 
+end 
+bigand $i in [1..$length]: 
+    bigand $f in $F: 
+        (not $f($i-1) and not $f($i)) 
+        => (bigor $a in $O when $f in $Add($a): $a($i) end) 
+    end 
+end 
+bigand $i in [1..$length]: 
+    bigand $a1 in $O: 
+        bigand $f in $Prec($a1): 
+            bigand $a2 in $O when ($a1 <> $a2) and ($f in $Del($a2)):
+                 (not $a1($i) or not $a2($i)) 
+            end 
+        end 
+    end
+end 
