@@ -55,7 +55,7 @@ public class TranslationLatex {
             }
             TranslationLatex T = new TranslationLatex(sb.toString());
             TeXFormula formula = new TeXFormula(T.getFormula());
-            TeXIcon ti = formula.createTeXIcon(TeXConstants.STYLE_DISPLAY, 20);
+            TeXIcon ti = formula.createTeXIcon(TeXConstants.ALIGN_CENTER, 20);
             JLabel label = new JLabel("",ti,JLabel.CENTER);
             JFrame frame = new JFrame();
             frame.setSize(1024,1024);
