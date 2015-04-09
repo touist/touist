@@ -33,93 +33,94 @@ Comment     = ";;"[^\n]*
 
 %%
 
-	"begin"			{ System.out.println(yytext()+" BEGIN");return symbol(sym.BEGIN); }
-	"end"			{ System.out.println(yytext()+" END");return symbol(sym.END); }
-	"sets"			{ System.out.println(yytext()+" SETS");return symbol(sym.SETS); }
-	"formula"		{ System.out.println(yytext()+" FORMULA");return symbol(sym.FORMULA); }
-	"if"			{ System.out.println(yytext()+" IF");return symbol(sym.IF); }
-	"then"			{ System.out.println(yytext()+" THEN");return symbol(sym.THEN); }
-	"else"			{ System.out.println(yytext()+" ELSE");return symbol(sym.ELSE); }
-    "when" 			{ System.out.println(yytext()+" WHEN");return symbol(sym.WHEN); }
+	"begin"			{return symbol(sym.BEGIN); }
+	"end"			{ return symbol(sym.END); }
+	"sets"			{ return symbol(sym.SETS); }
+	"formula"		{ return symbol(sym.FORMULA); }
+	"if"			{ return symbol(sym.IF); }
+	"then"			{ return symbol(sym.THEN); }
+	"else"			{ return symbol(sym.ELSE); }
+    "when" 			{ return symbol(sym.WHEN); }
    
 	/* Data types */   
-	"constant"		{ System.out.println(yytext()+" CONSTANT");return symbol(sym.CONSTANT); }
-	"set"			{ System.out.println(yytext()+" SET");return symbol(sym.SET); }
-	"float"			{ System.out.println(yytext()+" FLOAT");return symbol(sym.FLOAT); }
-	"int"			{ System.out.println(yytext()+" INT");return symbol(sym.INT); }
+	"constant"		{ return symbol(sym.CONSTANT); }
+	"set"			{ return symbol(sym.SET); }
+	"float"			{ return symbol(sym.FLOAT); }
+	"int"			{ return symbol(sym.INT); }
    
    
 	/* Functions */   
-	"bigand"		{ System.out.println(yytext()+" BIGAND");return symbol(sym.BIGAND); }
-	"bigor"			{ System.out.println(yytext()+" BIGOR");return symbol(sym.BIGOR); }
-	"in"			{ System.out.println(yytext()+" IN");return symbol(sym.IN); }
-	"not"			{ System.out.println(yytext()+" NOT");return symbol(sym.NOT); }
-	"or"			{ System.out.println(yytext()+" OR");return symbol(sym.OR); }
-	"xor" 			{ System.out.println(yytext()+" XOR");return symbol(sym.XOR); }
-	"and"			{ System.out.println(yytext()+" AND");return symbol(sym.AND); }
-	"empty"			{ System.out.println(yytext()+" EMPTY");return symbol(sym.EMPTY); }
-	"subset"		{ System.out.println(yytext()+" SUBSET");return symbol(sym.SUBSET); }
-	"card"			{ System.out.println(yytext()+" CARD");return symbol(sym.CARD); }
-	"sqrt"			{ System.out.println(yytext()+" SQRT");return symbol(sym.SQRT); }
-	"mod"			{ System.out.println(yytext()+" MOD");return symbol(sym.MOD); }
-   	"union"			{ System.out.println(yytext()+" UNION");return symbol(sym.UNION); }
-   	"inter"			{ System.out.println(yytext()+" INTER");return symbol(sym.INTER); }
-   	"diff"			{ System.out.println(yytext()+" DIFF");return symbol(sym.DIFF); }
+	"bigand"		{ return symbol(sym.BIGAND); }
+	"bigor"			{ return symbol(sym.BIGOR); }
+	"in"			{ return symbol(sym.IN); }
+	"not"			{ return symbol(sym.NOT); }
+	"or"			{ return symbol(sym.OR); }
+	"xor" 			{ return symbol(sym.XOR); }
+	"and"			{ return symbol(sym.AND); }
+	"empty"			{ return symbol(sym.EMPTY); }
+	"subset"		{ return symbol(sym.SUBSET); }
+	"card"			{ return symbol(sym.CARD); }
+	"sqrt"			{ return symbol(sym.SQRT); }
+	"mod"			{ return symbol(sym.MOD); }
+   	"union"			{ return symbol(sym.UNION); }
+   	"inter"			{ return symbol(sym.INTER); }
+   	"diff"			{ return symbol(sym.DIFF); }
 
    
-	{Empty}			{  }
-    //{Newline} 		{ System.out.println(yytext()+" NEWLINE");return symbol(sym.NEWLINE); }
+   	";;"[^\n]*		{}
+	{Empty}			{ }
+    //{Newline} 		{ return symbol(sym.NEWLINE); }
    
-	"true"			{ System.out.println(yytext()+" TRUE");return symbol(sym.TRUE); }
-	"false"			{ System.out.println(yytext()+" FALSE");return symbol(sym.FALSE); }
-	"Top"			{ System.out.println(yytext()+" TOP");return symbol(sym.TOP); }
-	"Bot"			{ System.out.println(yytext()+" BOT");return symbol(sym.BOT); }
+	"true"			{ return symbol(sym.TRUE); }
+	"false"			{ return symbol(sym.FALSE); }
+	"Top"			{ return symbol(sym.TOP); }
+	"Bot"			{ return symbol(sym.BOT); }
 
 
-   	{Var}			{ System.out.println(yytext()+" VAR");return symbol(sym.VAR,new String(yytext())); }
+   	{Var}			{ return symbol(sym.VAR,new String(yytext())); }
 
 
-   	"."				{ System.out.println(yytext()+" DOT");return symbol(sym.DOT); }
-   	"="				{ System.out.println(yytext()+" AFFECT");return symbol(sym.AFFECT); }
-   	"=="			{ System.out.println(yytext()+" EQUAL");return symbol(sym.EQUAL); }
-   	"!="			{ System.out.println(yytext()+" DIFFERENT");return symbol(sym.DIFFERENT);}
-   	"<"				{ System.out.println(yytext()+" LESSER");return symbol(sym.LESSER);}
-   	"<="			{ System.out.println(yytext()+" LESSER_OR_EQUAL");return symbol(sym.LESSER_OR_EQUAL);}
-   	">"				{ System.out.println(yytext()+" GREATER");return symbol(sym.GREATER);}
-   	">="			{ System.out.println(yytext()+" GREATER_OR_EQUAL");return symbol(sym.GREATER_OR_EQUAL);}
-   	"&&"			{ System.out.println(yytext()+" BOOL_AND");return symbol(sym.BOOL_AND);}
-   	"||"			{ System.out.println(yytext()+" BOOL_OR");return symbol(sym.BOOL_OR);}
-   	"=>"			{ System.out.println(yytext()+" IMPLIQUE");return symbol(sym.IMPLIQUE);}
-   	"<=>"			{ System.out.println(yytext()+" EQUIV");return symbol(sym.EQUIV);}
-   	"("				{ System.out.println(yytext()+" LPAR");return symbol(sym.LPAR);}
-   	")"				{ System.out.println(yytext()+" RPAR");return symbol(sym.RPAR);}
-   	"+"				{ System.out.println(yytext()+" ADD");return symbol(sym.ADD);}
-   	"*"				{ System.out.println(yytext()+" MULTIPLY");return symbol(sym.MULTIPLY);}
-   	"-"				{ System.out.println(yytext()+" SUBSTRACT");return symbol(sym.SUBSTRACT);}
-   	"/"				{ System.out.println(yytext()+" DIVIDE");return symbol(sym.DIVIDE);}
-   	"["				{ System.out.println(yytext()+" LCRO");return symbol(sym.LCRO);}
-   	"]"				{ System.out.println(yytext()+" RCRO");return symbol(sym.RCRO);}
-   	".."			{ System.out.println(yytext()+" DODOT");return symbol(sym.DODOT);}
-   	","				{ System.out.println(yytext()+" COMMA");return symbol(sym.COMMA);}
-   	":"				{ System.out.println(yytext()+" TWODOT");return symbol(sym.TWODOT);}		// todo: verify twodot term
+   	"."				{ return symbol(sym.DOT); }
+   	"="				{ return symbol(sym.AFFECT); }
+   	"=="			{ return symbol(sym.EQUAL); }
+   	"!="			{ return symbol(sym.DIFFERENT);}
+   	"<"				{ return symbol(sym.LESSER);}
+   	"<="			{ return symbol(sym.LESSER_OR_EQUAL);}
+   	">"				{ return symbol(sym.GREATER);}
+   	">="			{ return symbol(sym.GREATER_OR_EQUAL);}
+   	"&&"			{ return symbol(sym.BOOL_AND);}
+   	"||"			{ return symbol(sym.BOOL_OR);}
+   	"=>"			{ return symbol(sym.IMPLIQUE);}
+   	"<=>"			{ return symbol(sym.EQUIV);}
+   	"("				{ return symbol(sym.LPAR);}
+   	")"				{ return symbol(sym.RPAR);}
+   	"+"				{ return symbol(sym.ADD);}
+   	"*"				{ return symbol(sym.MULTIPLY);}
+   	"-"				{ return symbol(sym.SUBSTRACT);}
+   	"/"				{ return symbol(sym.DIVIDE);}
+   	"["				{ return symbol(sym.LCRO);}
+   	"]"				{ return symbol(sym.RCRO);}
+   	".."			{ return symbol(sym.DODOT);}
+   	","				{ return symbol(sym.COMMA);}
+   	":"				{ return symbol(sym.TWODOT);}		// todo: verify twodot term
 
    
 	/* Numbers */   
-	{Integer}			{ System.out.println(yytext()+" INTEGER");return symbol(sym.INTEGER,new String(yytext())); }
+	{Integer}			{ return symbol(sym.INTEGER,new String(yytext())); }
    
-   	{Double}			{ System.out.println(yytext()+" DOUBLENUMBER");return symbol(sym.DOUBLENUMBER,new String(yytext())); }
+   	{Double}			{ return symbol(sym.DOUBLENUMBER,new String(yytext())); }
    
 
 
-   	{Comment}			{ System.out.println(yytext()+" COMMENT");return symbol(sym.COMMENT,new String(yytext())); }
+   	{Comment}			{ return symbol(sym.COMMENT,new String(yytext())); }
 
 
-	{Identifier}			{ System.out.println(yytext()+" IDENTIFIER");return symbol(sym.IDENTIFIER,new String(yytext())); }
+	{Identifier}			{ return symbol(sym.IDENTIFIER,new String(yytext())); }
 
 
  	<<EOF>>						{ return symbol(sym.EOF); }
 	/* Catch any other (unhandled) characters. */   
 
-	{Alpha}				{ System.out.println(yytext()+" ALPHA");return symbol(sym.ALPHA,new String(yytext())); }
+	{Alpha}				{ return symbol(sym.ALPHA,new String(yytext())); }
    
-    .					{ System.out.println(yytext()+" ERROR_IDENTIFIER");return symbol(sym.ERROR_IDENTIFIER,new String(yytext())); }
+    .					{ return symbol(sym.ERROR_IDENTIFIER,new String(yytext())); }
