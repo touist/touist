@@ -5,12 +5,18 @@
  */
 package gui.resultsView;
 
+import entity.Literal;
 import entity.Model;
 import gui.AbstractComponentPanel;
 import gui.LanguagesController;
 import gui.State;
+import java.util.ArrayList;
 
 import java.util.ListIterator;
+import java.util.regex.Pattern;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.table.DefaultTableModel;
 
 import solution.NotSatisfiableException;
 import solution.SolverExecutionException;
@@ -21,8 +27,27 @@ import solution.SolverExecutionException;
  */
 public class ResultsPanel extends AbstractComponentPanel {
 
+    class RegexListener implements DocumentListener {
+        
+         @Override
+        public void insertUpdate(DocumentEvent e) {
+            setResult();
+        }
+
+        @Override
+        public void removeUpdate(DocumentEvent e) {
+            setResult();
+        }
+        
+        @Override
+        public void changedUpdate(DocumentEvent e) {
+            setResult();
+        }
+    }
+    
     private int currentModelIndex = 0;
     ListIterator<Model> iter;
+    Model actModel;
 
     /**
      * Creates new form ResultsPanel
@@ -34,17 +59,39 @@ public class ResultsPanel extends AbstractComponentPanel {
     /**
      * Update the models iterator
      */
-    public void updateIterator() {
-        try {
-            iter = getFrame().getSolver().getModelList().iterator();
-        } catch (NotSatisfiableException | SolverExecutionException e) {
-            //TODO gérer proprement l'exception
-            e.printStackTrace();
-        }
+    public void updateIterator(ListIterator<Model> iter) {
+        this.iter = iter;
+    }
+    
+    public void setActModel(Model m) {
+        actModel = m;
     }
 
-    public void setText(String text) {
-        jTextArea1.setText(text);
+    public void setResult() {
+        
+        boolean falseLiterals = falseCheckBox.isSelected();
+        boolean trueLiterals = trueCheckBox.isSelected();
+        
+        String regex = searchTextField.getText();
+        Pattern pattern = Pattern.compile(regex);
+        
+        DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
+        model.setNumRows(0);
+        
+        ArrayList<Literal> literals = (ArrayList<Literal>) actModel.literals;
+        for(int i = 0; i < literals.size(); i++) {
+            String name = literals.get(i).getLiteral();
+            boolean value = literals.get(i).isLiteral_positivity();
+            
+            if(regex!="" && !pattern.matcher(name).find()){
+                continue;
+            }
+            if(falseLiterals && !value){
+                model.addRow(new String[]{name,"False"});
+            } else if(trueLiterals && value){
+                model.addRow(new String[]{name,"True"});
+            }
+        }
     }
 
     /**
@@ -61,7 +108,6 @@ public class ResultsPanel extends AbstractComponentPanel {
             case NO_RESULT :
                 jButtonNext.setEnabled(false);
                 jButtonPrevious.setEnabled(false);
-                jTextArea1.setText("Aucune solution n'a été trouvée");
                 break;
             case SINGLE_RESULT :
                 jButtonNext.setEnabled(false);
@@ -97,8 +143,11 @@ public class ResultsPanel extends AbstractComponentPanel {
         jButtonEditor = new javax.swing.JButton();
         jButtonPrevious = new javax.swing.JButton();
         jButtonNext = new javax.swing.JButton();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        jTextArea1 = new javax.swing.JTextArea();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        jTable1 = new javax.swing.JTable();
+        trueCheckBox = new javax.swing.JCheckBox();
+        falseCheckBox = new javax.swing.JCheckBox();
+        searchTextField = new javax.swing.JTextField();
 
         setMinimumSize(new java.awt.Dimension(400, 300));
 
@@ -125,24 +174,51 @@ public class ResultsPanel extends AbstractComponentPanel {
             }
         });
 
-        jTextArea1.setEditable(false);
-        jTextArea1.setColumns(20);
-        jTextArea1.setRows(5);
-        jScrollPane1.setViewportView(jTextArea1);
+        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+            new String [] {
+                "Name", "Value"
+            },0
+        ));
+        jTable1.setAutoCreateRowSorter(true);
+        jScrollPane2.setViewportView(jTable1);
+
+        trueCheckBox.setSelected(true);
+        trueCheckBox.setText("true");
+        trueCheckBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                trueCheckBoxActionPerformed(evt);
+            }
+        });
+
+        falseCheckBox.setSelected(true);
+        falseCheckBox.setText("false");
+        falseCheckBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                falseCheckBoxActionPerformed(evt);
+            }
+        });
+
+        searchTextField.getDocument().addDocumentListener(new RegexListener());
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1)
-                    .addGroup(layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 627, Short.MAX_VALUE)
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
                         .addComponent(jLabel1)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 329, Short.MAX_VALUE)
+                        .addGap(32, 32, 32)
+                        .addComponent(trueCheckBox)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(falseCheckBox)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(searchTextField)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jButtonEditor))
-                    .addGroup(layout.createSequentialGroup()
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
                         .addComponent(jButtonPrevious)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jButtonNext)
@@ -155,9 +231,12 @@ public class ResultsPanel extends AbstractComponentPanel {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel1)
-                    .addComponent(jButtonEditor))
+                    .addComponent(jButtonEditor)
+                    .addComponent(trueCheckBox)
+                    .addComponent(falseCheckBox)
+                    .addComponent(searchTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 291, Short.MAX_VALUE)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 291, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jButtonPrevious)
@@ -213,9 +292,8 @@ public class ResultsPanel extends AbstractComponentPanel {
     sinon à INTER_RESULT
     */
     private State previousButtonHandler() {
-
-        Model m = iter.previous();
-        jTextArea1.setText(m.toString());
+        this.setActModel(iter.previous());
+        this.setResult();
         if (iter.hasPrevious()) {
             return State.MIDDLE_RESULT;
         } else {
@@ -263,8 +341,9 @@ public class ResultsPanel extends AbstractComponentPanel {
         sinon on passe en INTER_RESULT
     */
     private State nextButtonHandler() {
-        Model m = iter.next();
-        jTextArea1.setText(m.toString());
+        this.setActModel(iter.next());
+        this.setResult();
+        
         if (iter.hasNext()){
             return State.MIDDLE_RESULT;
         } else {
@@ -304,14 +383,67 @@ public class ResultsPanel extends AbstractComponentPanel {
         this.updateUI();
     }//GEN-LAST:event_jButtonNextActionPerformed
 
+    private void falseCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_falseCheckBoxActionPerformed
+        switch(getState()) {
+            case EDITION :
+                // impossible
+                break;
+            case EDITION_ERROR :
+                // impossible
+                break;
+            case NO_RESULT :
+                // interdit
+                break;
+            case SINGLE_RESULT :
+                // interdit
+                break;
+            case FIRST_RESULT :
+            case MIDDLE_RESULT :
+            case LAST_RESULT :
+                this.setResult();
+                break;
+            default :
+                System.out.println("Undefined action set for the state : " + getState());
+        }
+        this.updateUI();
+    }//GEN-LAST:event_falseCheckBoxActionPerformed
+
+    private void trueCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_trueCheckBoxActionPerformed
+        switch(getState()) {
+            case EDITION :
+                // impossible
+                break;
+            case EDITION_ERROR :
+                // impossible
+                break;
+            case NO_RESULT :
+                // interdit
+                break;
+            case SINGLE_RESULT :
+                // interdit
+                break;
+            case FIRST_RESULT :
+            case MIDDLE_RESULT :
+            case LAST_RESULT :
+                this.setResult();
+                break;
+            default :
+                System.out.println("Undefined action set for the state : " + getState());
+        }
+        this.updateUI();
+    }//GEN-LAST:event_trueCheckBoxActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JCheckBox falseCheckBox;
     private javax.swing.JButton jButtonEditor;
     private javax.swing.JButton jButtonNext;
     private javax.swing.JButton jButtonPrevious;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTextArea jTextArea1;
+    private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JTable jTable1;
+    private javax.swing.JTextField searchTextField;
+    private javax.swing.JCheckBox trueCheckBox;
     // End of variables declaration//GEN-END:variables
 
     @Override
@@ -320,5 +452,9 @@ public class ResultsPanel extends AbstractComponentPanel {
         jButtonPrevious.setText(getFrame().getLang().getWord(LanguagesController.RESULTS_PREVIOUS));
         jButtonNext.setText(getFrame().getLang().getWord(LanguagesController.RESULTS_NEXT));
         jButtonEditor.setText(getFrame().getLang().getWord(LanguagesController.RESULTS_RETURN));
+        //trueCheckBox.setText(getFrame().getLang().getWord(LanguagesController.RESULTS_TRUE));
+        //falseCheckBox.setText(getFrame().getLang().getWord(LanguagesController.RESULTS_FALSE));
+        jTable1.getColumnModel().getColumn(0).setHeaderValue(getFrame().getLang().getWord(LanguagesController.RESULTS_NAME));
+        jTable1.getColumnModel().getColumn(1).setHeaderValue(getFrame().getLang().getWord(LanguagesController.RESULTS_VALUE));
     }
 }

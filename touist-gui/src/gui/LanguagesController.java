@@ -64,6 +64,8 @@ public class LanguagesController {
     public static final String RESULTS_PREVIOUS = "ResultsPanel.jButtonPrevious.text";
     public static final String RESULTS_RETURN = "ResultsPanel.jButtonEditor.text";
     public static final String RESULTS_TEXT = "ResultsPanel.jLabel1.text";
+    public static final String RESULTS_NAME = "ResultsPanel.jTable1.name";
+    public static final String RESULTS_VALUE = "ResultsPanel.jTable1.value";
     public static final String ERROR_TRADUCTION = "ParentEditionPanel.jOptionPane1.traductionError";
     public static final String ERROR_TRADUCTION_IN_SETS = "ParentEditionPanel.jOptionPane1.traductionErrorInSets";
     public static final String ERROR_TRADUCTION_IN_FORMULAS = "ParentEditionPanel.jOptionPane1.traductionErrorInFormulas";

@@ -322,19 +322,18 @@ public class ParentEditionPanel extends AbstractComponentPanel {
         }
         if(! getFrame().getSolver().isSatisfiable()) {
             System.out.println("Erreur : unsatisfiable");
-        }
-         //Initialise l'iterator de ResultsPanel
-        getFrame().updateResultsPanelIterator();
+        }        
             
         // Si il y a au moins un model
         try {
             ListIterator<Model> iter = (ListIterator<Model>) getFrame().getSolver().getModelList().iterator();
+            getFrame().updateResultsPanelIterator(iter);
             /**
              * Si il y a plus d'un model, alors passer à l'état FIRST_RESULT
              * sinon passer à l'état SINGLE_RESULT
              */
             if (iter.hasNext()) {
-                getFrame().setResultViewText(iter.next().toString());
+                getFrame().setResultView(iter.next());
                 if (iter.hasNext()) {
                    //iter.previous();
                     return State.FIRST_RESULT;

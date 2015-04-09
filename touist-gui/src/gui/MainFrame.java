@@ -5,11 +5,13 @@
  */
 package gui;
 
+import entity.Model;
 import gui.editionView.ParentEditionPanel;
 import gui.resultsView.ResultsPanel;
 
 import java.awt.CardLayout;
 import java.io.File;
+import java.util.ListIterator;
 import java.util.Locale;
 
 import javax.swing.JPanel;
@@ -92,8 +94,8 @@ public class MainFrame extends javax.swing.JFrame {
         return translator;
     }
     
-    public void updateResultsPanelIterator() {
-        resultsPanel1.updateIterator();
+    public void updateResultsPanelIterator(ListIterator<Model> iter) {
+        resultsPanel1.updateIterator(iter);
     }
 
     public void setViewToEditor() {
@@ -105,8 +107,9 @@ public class MainFrame extends javax.swing.JFrame {
         ((CardLayout)cards.getLayout()).show(cards, RESULTS_PANEL);
     }
     
-    public void setResultViewText(String text) {
-        resultsPanel1.setText(text);
+    public void setResultView(Model m) {
+        resultsPanel1.setActModel(m);
+        resultsPanel1.setResult();
     }
     
     public void setLanguage(Locale language) {
