@@ -10,12 +10,19 @@ import entity.Model;
 import gui.AbstractComponentPanel;
 import gui.LanguagesController;
 import gui.State;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 
 import java.util.ListIterator;
 import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
+import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableModel;
 
 import solution.NotSatisfiableException;
@@ -73,7 +80,13 @@ public class ResultsPanel extends AbstractComponentPanel {
         boolean trueLiterals = trueCheckBox.isSelected();
         
         String regex = searchTextField.getText();
-        Pattern pattern = Pattern.compile(regex);
+        Pattern pattern = null;
+        try {
+            pattern = Pattern.compile(regex);
+        } catch (PatternSyntaxException e) {
+            regex = "";
+        }
+        
         
         DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
         model.setNumRows(0);
@@ -91,6 +104,30 @@ public class ResultsPanel extends AbstractComponentPanel {
             } else if(trueLiterals && value){
                 model.addRow(new String[]{name,"True"});
             }
+        }
+    }
+    
+    public void exportModel() throws IOException {
+        final JFileChooser fc = new JFileChooser();
+        fc.setFileFilter(new FileNameExtensionFilter("Text files(txt, text)","txt","text"));
+        fc.addChoosableFileFilter(new FileNameExtensionFilter("Latex files(latex)","tex"));
+        fc.setAcceptAllFileFilterUsed(false);
+        int returnVal = fc.showOpenDialog(this);
+        
+        if(returnVal == JFileChooser.APPROVE_OPTION){
+            String filename = fc.getSelectedFile().getName();
+            String extension = (filename.contains(".")?filename.substring(filename.lastIndexOf("."),filename.length()):"txt");
+            
+            StringBuilder sb = new StringBuilder();
+            
+            ArrayList<Literal> literals = (ArrayList<Literal>) actModel.literals;
+            for(int i = 0; i < literals.size(); i++) {
+                sb.append(literals.get(i).getLiteral()+" valuted to "+(literals.get(i).isLiteral_positivity()?"true":"false")+"\n");
+            }
+            
+            BufferedWriter out = new BufferedWriter(new FileWriter(fc.getSelectedFile().getAbsolutePath()));
+            out.write(sb.toString());
+            out.close();
         }
     }
 
@@ -148,6 +185,7 @@ public class ResultsPanel extends AbstractComponentPanel {
         trueCheckBox = new javax.swing.JCheckBox();
         falseCheckBox = new javax.swing.JCheckBox();
         searchTextField = new javax.swing.JTextField();
+        jButton1 = new javax.swing.JButton();
 
         setMinimumSize(new java.awt.Dimension(400, 300));
 
@@ -200,6 +238,13 @@ public class ResultsPanel extends AbstractComponentPanel {
 
         searchTextField.getDocument().addDocumentListener(new RegexListener());
 
+        jButton1.setText("Exporter");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -222,7 +267,8 @@ public class ResultsPanel extends AbstractComponentPanel {
                         .addComponent(jButtonPrevious)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jButtonNext)
-                        .addGap(0, 0, Short.MAX_VALUE)))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jButton1)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -240,7 +286,8 @@ public class ResultsPanel extends AbstractComponentPanel {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jButtonPrevious)
-                    .addComponent(jButtonNext))
+                    .addComponent(jButtonNext)
+                    .addComponent(jButton1))
                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -433,9 +480,37 @@ public class ResultsPanel extends AbstractComponentPanel {
         this.updateUI();
     }//GEN-LAST:event_trueCheckBoxActionPerformed
 
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+         switch(getState()) {
+            case EDITION :
+                // impossible
+                break;
+            case EDITION_ERROR :
+                // impossible
+                break;
+            case NO_RESULT :
+                // interdit
+                break;
+            case SINGLE_RESULT :
+            case FIRST_RESULT :
+            case MIDDLE_RESULT :
+            case LAST_RESULT :
+                try {
+                    this.exportModel();
+                } catch(IOException e) {
+                    JOptionPane.showMessageDialog(this, "Error during export","Export failure",JOptionPane.ERROR_MESSAGE);
+                }
+                break;
+            default :
+                System.out.println("Undefined action set for the state : " + getState());
+        }
+        this.updateUI();
+    }//GEN-LAST:event_jButton1ActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JCheckBox falseCheckBox;
+    private javax.swing.JButton jButton1;
     private javax.swing.JButton jButtonEditor;
     private javax.swing.JButton jButtonNext;
     private javax.swing.JButton jButtonPrevious;
