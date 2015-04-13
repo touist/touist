@@ -88,10 +88,10 @@ public class ParentEditionPanel extends AbstractComponentPanel {
             .addComponent(jTabbedPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 713, Short.MAX_VALUE)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jLabelErrorMessage)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jLabelCaretPosition)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabelErrorMessage)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(importButton)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(testButton)
@@ -338,7 +338,7 @@ public class ParentEditionPanel extends AbstractComponentPanel {
             return State.EDITION;
         }
         if(! getFrame().getSolver().isSatisfiable()) {
-            System.out.println("Erreur : unsatisfiable");
+            System.out.println("Error : unsatisfiable");
         }        
             
         // Si il y a au moins un model

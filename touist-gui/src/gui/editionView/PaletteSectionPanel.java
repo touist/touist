@@ -5,8 +5,6 @@
  */
 package gui.editionView;
 
-import gui.editionView.InsertionButton;
-import java.awt.GridLayout;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.BoxLayout;
