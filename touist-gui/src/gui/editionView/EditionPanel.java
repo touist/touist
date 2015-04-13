@@ -15,6 +15,8 @@ import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import javax.swing.JLabel;
 import javax.swing.JSplitPane;
+import javax.swing.event.CaretEvent;
+import javax.swing.event.CaretListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import org.fife.ui.rtextarea.RTextScrollPane;
@@ -47,7 +49,7 @@ public class EditionPanel extends AbstractComponentPanel {
                 latexLabel.setIcon(ti);
             }
             catch (Exception exc) {
-                System.err.println("Ereur lors de la conversion latex");
+                System.err.println("Erreur lors de la conversion latex");
             }
         }
         
@@ -65,8 +67,7 @@ public class EditionPanel extends AbstractComponentPanel {
         public void changedUpdate(DocumentEvent e) {
             UpdateLatexLabel();
         }
-    }
-    
+    }    
     
     public EditionPanel() {
         initComponents();
@@ -81,6 +82,20 @@ public class EditionPanel extends AbstractComponentPanel {
         jPanel1.setLayout(new FlowLayout());
         jPanel1.add(latexLabel = new JLabel(),FlowLayout.LEFT);
         latexLabel.setVisible(true);
+        
+        
+        editorTextArea.addCaretListener(new CaretListener() {
+
+            @Override
+            public void caretUpdate(CaretEvent e) {
+                System.out.println("==> "+editorTextArea.getCaretLineNumber() + ":" + editorTextArea.getCaretOffsetFromLineStart());
+                ((ParentEditionPanel)getParent().getParent()).setJLabelCaretPositionText(
+                        editorTextArea.getCaretLineNumber()
+                        + ":"
+                        + editorTextArea.getCaretOffsetFromLineStart()
+                );
+            }
+        });
         
         
         RTextScrollPane sp = new RTextScrollPane(editorTextArea);

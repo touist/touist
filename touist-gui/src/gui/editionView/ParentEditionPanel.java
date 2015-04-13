@@ -36,6 +36,7 @@ public class ParentEditionPanel extends AbstractComponentPanel {
         editorPanelFormulas.initPalette(PalettePanel.PaletteType.FORMULA);
         editorPanelSets.initPalette(PalettePanel.PaletteType.SET);
         jFileChooser1.setCurrentDirectory(new File(".."));
+        jLabelErrorMessage.setText("");
     }
 
     /**
@@ -54,6 +55,8 @@ public class ParentEditionPanel extends AbstractComponentPanel {
         editorPanelSets = new gui.editionView.EditionPanel();
         testButton = new javax.swing.JButton();
         importButton = new javax.swing.JButton();
+        jLabelErrorMessage = new javax.swing.JLabel();
+        jLabelCaretPosition = new javax.swing.JLabel();
 
         jTabbedPane1.setToolTipText("");
         jTabbedPane1.addTab("Formulas", editorPanelFormulas);
@@ -73,13 +76,22 @@ public class ParentEditionPanel extends AbstractComponentPanel {
             }
         });
 
+        jLabelErrorMessage.setForeground(new java.awt.Color(255, 0, 0));
+        jLabelErrorMessage.setText("<Error message>");
+
+        jLabelCaretPosition.setText("0:0");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jTabbedPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 713, Short.MAX_VALUE)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap()
+                .addComponent(jLabelErrorMessage)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jLabelCaretPosition)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(importButton)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(testButton)
@@ -92,7 +104,9 @@ public class ParentEditionPanel extends AbstractComponentPanel {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(testButton)
-                    .addComponent(importButton))
+                    .addComponent(importButton)
+                    .addComponent(jLabelCaretPosition)
+                    .addComponent(jLabelErrorMessage))
                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -130,6 +144,7 @@ public class ParentEditionPanel extends AbstractComponentPanel {
     private void testButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_testButtonActionPerformed
         switch(((MainFrame)(getRootPane().getParent())).state) {
             case EDITION :
+                jLabelErrorMessage.setText("");
                 State state = initResultView();
                 if (state != State.EDITION) {
                     setState(state);
@@ -165,6 +180,8 @@ public class ParentEditionPanel extends AbstractComponentPanel {
     private gui.editionView.EditionPanel editorPanelSets;
     private javax.swing.JButton importButton;
     private javax.swing.JFileChooser jFileChooser1;
+    private javax.swing.JLabel jLabelCaretPosition;
+    private javax.swing.JLabel jLabelErrorMessage;
     private javax.swing.JOptionPane jOptionPane1;
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JButton testButton;
@@ -287,8 +304,8 @@ public class ParentEditionPanel extends AbstractComponentPanel {
                 for(int i=0; i<getFrame().getTranslator().getErrors().size(); i++) {
                     Translator.Error error = guiTranslationErrorAdapter(getFrame().getTranslator().getErrors().get(i));
                     errorMessage += (i+1) + ": " + error + "\n";
-                    
                 }
+                jLabelErrorMessage.setText(errorMessage);
                 System.out.println("Traduction error : " + "\n" + errorMessage + "\n");
                 showErrorMessage(errorMessage, getFrame().getLang().getWord(Lang.ERROR_TRADUCTION));
                 return State.EDITION;
@@ -356,6 +373,10 @@ public class ParentEditionPanel extends AbstractComponentPanel {
             return State.EDITION;
         }
         //return State.NO_RESULT;
+    }
+    
+    public void setJLabelCaretPositionText(String text) {
+        jLabelCaretPosition.setText(text);
     }
 
     @Override
