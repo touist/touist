@@ -6,7 +6,7 @@
 package gui.editionView;
 
 import gui.AbstractComponentPanel;
-import gui.LanguagesController;
+import gui.Lang;
 import gui.editionView.editor.Editor;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,7 +20,7 @@ public class PalettePanel extends AbstractComponentPanel {
 
     @Override
     public void updateLanguage() {
-        jLabel1.setText(getFrame().getLang().getWord(LanguagesController.PALETTE_TEXT));
+        jLabel1.setText(getFrame().getLang().getWord(Lang.PALETTE_TEXT));
     }
 
     public static enum PaletteType {FORMULA, SET};

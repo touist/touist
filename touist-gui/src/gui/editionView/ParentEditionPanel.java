@@ -7,7 +7,7 @@ package gui.editionView;
 
 import entity.Model;
 import gui.AbstractComponentPanel;
-import gui.LanguagesController;
+import gui.Lang;
 import gui.MainFrame;
 import gui.State;
 import java.io.File;
@@ -177,7 +177,7 @@ public class ParentEditionPanel extends AbstractComponentPanel {
         getFrame().getClause().setSets("");
         
         jFileChooser1.setFileSelectionMode(JFileChooser.FILES_ONLY);
-        returnVal = jFileChooser1.showDialog(this, getFrame().getLang().getWord(LanguagesController.EDITION_FILE_CHOOSER));
+        returnVal = jFileChooser1.showDialog(this, getFrame().getLang().getWord(Lang.EDITION_FILE_CHOOSER));
         
         if (returnVal == JFileChooser.APPROVE_OPTION && jFileChooser1.getSelectedFile() != null) {
             path = jFileChooser1.getSelectedFile().getPath();
@@ -243,12 +243,12 @@ public class ParentEditionPanel extends AbstractComponentPanel {
             // l'erreur est dans les sets
             adaptedError = t.new Error(row - setShift,
                     error.getColumnInCode(), 
-                    error.getErrorMessage() + getFrame().getLang().getWord(LanguagesController.ERROR_TRADUCTION_IN_SETS));
+                    error.getErrorMessage() + getFrame().getLang().getWord(Lang.ERROR_TRADUCTION_IN_SETS));
         } else {
             // l'erreur est dans les formules
             adaptedError = t.new Error(row-nbRowsInSets - formulasShift, 
                     error.getColumnInCode(), 
-                    error.getErrorMessage() + getFrame().getLang().getWord(LanguagesController.ERROR_TRADUCTION_IN_FORMULAS));
+                    error.getErrorMessage() + getFrame().getLang().getWord(Lang.ERROR_TRADUCTION_IN_FORMULAS));
         }
         return adaptedError;
     }
@@ -277,7 +277,7 @@ public class ParentEditionPanel extends AbstractComponentPanel {
         } catch (IOException ex) {
             ex.printStackTrace();
             errorMessage = "Couldn't create file '" + bigAndFilePath + "'";
-            showErrorMessage(errorMessage, getFrame().getLang().getWord(LanguagesController.ERROR_TRADUCTION));
+            showErrorMessage(errorMessage, getFrame().getLang().getWord(Lang.ERROR_TRADUCTION));
             System.exit(0);
             return State.EDITION;
         }
@@ -290,7 +290,7 @@ public class ParentEditionPanel extends AbstractComponentPanel {
                     
                 }
                 System.out.println("Traduction error : " + "\n" + errorMessage + "\n");
-                showErrorMessage(errorMessage, getFrame().getLang().getWord(LanguagesController.ERROR_TRADUCTION));
+                showErrorMessage(errorMessage, getFrame().getLang().getWord(Lang.ERROR_TRADUCTION));
                 return State.EDITION;
             }
             File f = new File(bigAndFilePath);
@@ -298,12 +298,12 @@ public class ParentEditionPanel extends AbstractComponentPanel {
         } catch (IOException ex) {
             ex.printStackTrace();
             errorMessage = "The translator returned an IOException";
-            showErrorMessage(ex, errorMessage, getFrame().getLang().getWord(LanguagesController.ERROR_TRADUCTION));
+            showErrorMessage(ex, errorMessage, getFrame().getLang().getWord(Lang.ERROR_TRADUCTION));
             return State.EDITION;
         } catch (InterruptedException ex) {
             ex.printStackTrace();
             errorMessage = "Translator has been interrupted.";
-            showErrorMessage(ex, errorMessage, getFrame().getLang().getWord(LanguagesController.ERROR_TRADUCTION));
+            showErrorMessage(ex, errorMessage, getFrame().getLang().getWord(Lang.ERROR_TRADUCTION));
             return State.EDITION;
         }
         
@@ -360,12 +360,12 @@ public class ParentEditionPanel extends AbstractComponentPanel {
 
     @Override
     public void updateLanguage() {
-        importButton.setText(getFrame().getLang().getWord(LanguagesController.EDITION_IMPORT));
-        testButton.setText(getFrame().getLang().getWord(LanguagesController.EDITION_TEST));
+        importButton.setText(getFrame().getLang().getWord(Lang.EDITION_IMPORT));
+        testButton.setText(getFrame().getLang().getWord(Lang.EDITION_TEST));
         editorPanelFormulas.updateLanguage();
         editorPanelSets.updateLanguage();
-        jTabbedPane1.setTitleAt(0, getFrame().getLang().getWord(LanguagesController.EDITION_TAB_FORMULAS));
-        jTabbedPane1.setTitleAt(1, getFrame().getLang().getWord(LanguagesController.EDITION_TAB_SETS));
+        jTabbedPane1.setTitleAt(0, getFrame().getLang().getWord(Lang.EDITION_TAB_FORMULAS));
+        jTabbedPane1.setTitleAt(1, getFrame().getLang().getWord(Lang.EDITION_TAB_SETS));
         updateUI();
     }
 }

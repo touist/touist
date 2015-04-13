@@ -39,10 +39,10 @@ public class MainFrame extends javax.swing.JFrame {
     private JPanel cards = new JPanel(new CardLayout());
     private ParentEditionPanel editorPanel1 = new ParentEditionPanel();
     private ResultsPanel resultsPanel1 = new ResultsPanel();
-    private LanguagesController languagesController = new LanguagesController(Locale.ENGLISH);
+    private Lang lang = new Lang(Locale.ENGLISH);
 
-    public LanguagesController getLang() {
-        return languagesController;
+    public Lang getLang() {
+        return lang;
     }
 
     /**
@@ -62,10 +62,10 @@ public class MainFrame extends javax.swing.JFrame {
     }
     
     private void updateLanguage() {
-        this.setTitle(languagesController.getWord(LanguagesController.FRAME_TITLE));
-        this.jMenu1.setText(languagesController.getWord(LanguagesController.FRAME_MENU_FILE));
-        this.jMenu2.setText(languagesController.getWord(LanguagesController.FRAME_MENU_HELP));
-        this.jMenu3.setText(languagesController.getWord(LanguagesController.FRAME_MENU_LANGUAGE));
+        this.setTitle(lang.getWord(Lang.FRAME_TITLE));
+        this.jMenu1.setText(lang.getWord(Lang.FRAME_MENU_FILE));
+        this.jMenu2.setText(lang.getWord(Lang.FRAME_MENU_HELP));
+        this.jMenu3.setText(lang.getWord(Lang.FRAME_MENU_LANGUAGE));
         editorPanel1.updateLanguage();
         resultsPanel1.updateLanguage();
     }
@@ -113,7 +113,7 @@ public class MainFrame extends javax.swing.JFrame {
     }
     
     public void setLanguage(Locale language) {
-        languagesController.setLanguage(language);
+        lang.setLanguage(language);
         this.repaint();
     }
     
@@ -169,13 +169,13 @@ public class MainFrame extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
-        languagesController.setLanguage(Locale.ENGLISH);
+        lang.setLanguage(Locale.ENGLISH);
         updateLanguage();
         System.out.println("Language set to English");
     }//GEN-LAST:event_jMenuItem1ActionPerformed
 
     private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem2ActionPerformed
-        languagesController.setLanguage(Locale.FRENCH);
+        lang.setLanguage(Locale.FRENCH);
         updateLanguage();
         System.out.println("Language set to French");
     }//GEN-LAST:event_jMenuItem2ActionPerformed

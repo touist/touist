@@ -8,7 +8,7 @@ package gui.resultsView;
 import entity.Literal;
 import entity.Model;
 import gui.AbstractComponentPanel;
-import gui.LanguagesController;
+import gui.Lang;
 import gui.State;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -523,13 +523,13 @@ public class ResultsPanel extends AbstractComponentPanel {
 
     @Override
     public void updateLanguage() {
-        jLabel1.setText(getFrame().getLang().getWord(LanguagesController.RESULTS_TEXT));
-        jButtonPrevious.setText(getFrame().getLang().getWord(LanguagesController.RESULTS_PREVIOUS));
-        jButtonNext.setText(getFrame().getLang().getWord(LanguagesController.RESULTS_NEXT));
-        jButtonEditor.setText(getFrame().getLang().getWord(LanguagesController.RESULTS_RETURN));
-        //trueCheckBox.setText(getFrame().getLang().getWord(LanguagesController.RESULTS_TRUE));
-        //falseCheckBox.setText(getFrame().getLang().getWord(LanguagesController.RESULTS_FALSE));
-        jTable1.getColumnModel().getColumn(0).setHeaderValue(getFrame().getLang().getWord(LanguagesController.RESULTS_NAME));
-        jTable1.getColumnModel().getColumn(1).setHeaderValue(getFrame().getLang().getWord(LanguagesController.RESULTS_VALUE));
+        jLabel1.setText(getFrame().getLang().getWord(Lang.RESULTS_TEXT));
+        jButtonPrevious.setText(getFrame().getLang().getWord(Lang.RESULTS_PREVIOUS));
+        jButtonNext.setText(getFrame().getLang().getWord(Lang.RESULTS_NEXT));
+        jButtonEditor.setText(getFrame().getLang().getWord(Lang.RESULTS_RETURN));
+        //trueCheckBox.setText(getFrame().getLang().getWord(Lang.RESULTS_TRUE));
+        //falseCheckBox.setText(getFrame().getLang().getWord(Lang.RESULTS_FALSE));
+        jTable1.getColumnModel().getColumn(0).setHeaderValue(getFrame().getLang().getWord(Lang.RESULTS_NAME));
+        jTable1.getColumnModel().getColumn(1).setHeaderValue(getFrame().getLang().getWord(Lang.RESULTS_VALUE));
     }
 }
