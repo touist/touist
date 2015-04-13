@@ -20,7 +20,6 @@
 %token TOP BOTTOM
 %token BIGAND BIGOR
 %token BEGIN SETS FORMULA
-%token PIPE
 %token EOF
 
 %start <Syntax.prog> prog
@@ -43,15 +42,21 @@ prog:
   | BEGIN FORMULA clause+ END FORMULA EOF
   { Prog (None, $3) }
 
+var_decl:
+  | VAR { ($1, None) }
+  | VAR LPAREN separated_nonempty_list(COMMA, exp) RPAREN { ($1, Some $3) }
+  | VAR LPAREN separated_nonempty_list(COMMA, TERM) RPAREN
+  { ($1, Some (List.map (fun e -> Clause (Term (e,None))) $3)) } 
+
 affect:
-  | VAR AFFECT exp { Affect ($1, $3) }
+  | var_decl AFFECT exp { Affect ($1, $3) }
 
 exp:
   | LPAREN exp RPAREN { $2 }
   | INT   { Int   $1 }
   | FLOAT { Float $1 }
   | BOOL  { Bool  $1 }
-  | VAR   { Var   $1 }
+  | var_decl { Var      $1 }
   | set_decl { Set_decl $1 }
   | exp ADD exp { Add ($1, $3) }
   | exp SUB exp { Sub ($1, $3) }
@@ -85,10 +90,11 @@ exp:
 
 clause:
   | LPAREN clause RPAREN { $2 }
+  | var_decl { CVar $1 }
   | TOP    { Top    }
   | BOTTOM { Bottom }
-  | TERM { Term ($1, None) }
-  | TERM PIPE exp PIPE { Term ($1, Some $3) }
+  | TERM   { Term ($1, None) }
+  | TERM LPAREN separated_nonempty_list(COMMA, exp) RPAREN { Term ($1, Some $3) }
   | NOT clause { CNot $2 }
   | clause AND     clause { CAnd     ($1, $3) }
   | clause OR      clause { COr      ($1, $3) }
@@ -106,6 +112,7 @@ clause:
   | IF exp THEN clause ELSE clause END { CIf ($2, $4, $6) }
 
 set_decl:
+  | LBRACK RBRACK { [] } 
   | LBRACK separated_nonempty_list(COMMA, exp) RBRACK { $2 }
   | LBRACK separated_nonempty_list(COMMA, TERM) RBRACK
   { List.map (fun x -> Clause (Term (x,None))) $2 }

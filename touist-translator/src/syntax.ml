@@ -36,12 +36,13 @@ end
 type prog =
   | Prog of affect list option * clause list
 and affect =
-  | Affect of string * exp
+  | Affect of var * exp
+and var = string * exp list option
 and exp =
   | Int              of int
   | Float            of float
   | Bool             of bool
-  | Var              of string
+  | Var              of var
   | Set              of GenSet.t
   | Set_decl         of exp list
   | Clause           of clause
@@ -78,7 +79,8 @@ and exp =
 and clause =
   | Top
   | Bottom
-  | Term     of string * exp option
+  | Term     of var
+  | CVar     of var
   | CNot     of clause
   | CAnd     of clause * clause
   | COr      of clause * clause
@@ -93,9 +95,10 @@ let rec string_of_exp = function
   | Int    x -> string_of_int x
   | Float  x -> string_of_float x
   | Bool   x -> string_of_bool x
-  | Var    x -> x
+  | Var (x,None)   -> x
+  | Var (x,Some y) -> x ^ "(" ^ (string_of_exp_list ", " y) ^ ")" 
   | Clause x -> string_of_clause x
-  | Set    x -> "<set>"
+  | Set    x -> string_of_set x
   | Set_decl x -> "<set-decl>"
   | Neg x     -> "- " ^ (string_of_exp x)
   | Add (x,y) -> (string_of_exp x) ^ " + "   ^ (string_of_exp y)
@@ -134,8 +137,10 @@ let rec string_of_exp = function
 and string_of_clause = function
   | Top    -> "top"
   | Bottom -> "bot"
+  | CVar (x,None)   -> x
+  | CVar (x,Some y) -> x ^ "(" ^ (string_of_exp_list ", " y) ^ ")"
   | Term (x,None)   -> x
-  | Term (x,Some y) -> x ^ "(" ^ (string_of_exp y) ^ ")"
+  | Term (x,Some y) -> x ^ "(" ^ (string_of_exp_list ", " y) ^ ")"
   | CNot x -> "not " ^ (string_of_clause x)
   | CAnd     (x,y) -> (string_of_clause x) ^ " and " ^ (string_of_clause y)
   | COr      (x,y) -> (string_of_clause x) ^ " or "  ^ (string_of_clause y)
@@ -170,4 +175,26 @@ and string_of_clause = function
       ^ "\nelse\n" ^ (string_of_clause z)
       ^ "\nend\n"
 
+and string_of_set = function
+  | GenSet.Empty  -> "[]"
+  | GenSet.ISet s -> (*string_of_a_list string_of_int (IntSet.elements s)*)
+      string_of_intset s
+  | GenSet.FSet s -> (*string_of_a_list string_of_float (FloatSet.elements s)*)
+      string_of_floatset s
+  | GenSet.SSet s -> (*string_of_a_list (fun x -> x) (StringSet.elements s)*)
+      string_of_strset s
+
 and string_of_exp_list sep el = String.concat sep (List.map string_of_exp el)
+
+and string_of_a_list to_string il =
+  "[" ^ (String.concat ", " (List.map to_string il)) ^ "]"
+
+and string_of_intset s =
+  "[" ^ (String.concat ", " (List.map string_of_int (IntSet.elements s))) ^ "]"
+
+and string_of_floatset s =
+  "[" ^ (String.concat ", " (List.map string_of_float (FloatSet.elements s))) ^ "]"
+
+and string_of_strset s =
+  "[" ^ (String.concat ", " (StringSet.elements s)) ^ "]"
+

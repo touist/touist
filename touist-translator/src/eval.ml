@@ -85,7 +85,6 @@ let unwrap_str = function
   | Clause (Term (x,Some _)) -> failwith ("unevaluated term: " ^ x)
   | x -> raise (TypeError ("expected term, got " ^ (string_of_exp x)))
 
-
 let extenv = Hashtbl.create 10
 
 let rec eval exp env =
@@ -100,7 +99,8 @@ and eval_prog exp env =
 
 and eval_affect exp env =
   match exp with
-  | Affect (x,y) -> Hashtbl.replace extenv x (eval_exp y env)
+  | Affect (x,y) -> 
+      Hashtbl.replace extenv (expand_term_name x env) (eval_exp y env)
 
 and eval_exp exp env =
   match exp with
@@ -108,11 +108,12 @@ and eval_exp exp env =
   | Float x -> Float x
   | Bool x  -> Bool x
   | Var x ->
+      let name = expand_var_name x env in
       begin
-        try List.assoc x env
+        try List.assoc name env
         with Not_found ->
-          try Hashtbl.find extenv x
-          with Not_found -> raise (NameError (string_of_exp exp))
+          try Hashtbl.find extenv name
+          with Not_found -> raise (NameError name)
       end
   | Set x -> Set x
   | Set_decl x -> eval_set x env
@@ -254,6 +255,9 @@ and eval_exp exp env =
         | Int x', Set (GenSet.ISet y') -> Bool (IntSet.mem x' y')
         | Float x', Set (GenSet.FSet y') -> Bool (FloatSet.mem x' y')
         | Clause (Term (x',None)), Set (GenSet.SSet y') -> Bool (StringSet.mem x' y')
+        | Int _, Set (GenSet.Empty) -> Bool false
+        | Float _, Set (GenSet.Empty) -> Bool false
+        | Clause _, Set (GenSet.Empty) -> Bool false
         | _,_ -> raise (TypeError (string_of_exp exp))
       end
   | Equal (x,y) ->
@@ -261,6 +265,7 @@ and eval_exp exp env =
         match eval_exp x env, eval_exp y env with
         | Int x', Int y' -> Bool (x' = y')
         | Float x', Float y' -> Bool (x' = y')
+        | Clause (Term (x',None)), Clause (Term (y',None)) -> Bool (x' = y')
         | Set x', Set y' ->
             Bool (set_pred_op (IntSet.equal)
                               (FloatSet.equal)
@@ -276,20 +281,34 @@ and eval_exp exp env =
 and eval_set set_decl env =
   let eval_form = List.map (fun x -> eval_exp x env) set_decl in
   match eval_form with
+  | [] -> Set (GenSet.Empty)
   | (Int _)::xs ->
       Set (GenSet.ISet (IntSet.of_list (List.map unwrap_int eval_form)))
   | (Float _)::xs ->
       Set (GenSet.FSet (FloatSet.of_list (List.map unwrap_float eval_form)))
   | (Clause (Term (_,None)))::xs ->
       Set (GenSet.SSet (StringSet.of_list (List.map unwrap_str eval_form)))
-  | _ -> raise (TypeError "malformed set")
+  | _ -> raise (TypeError ("set: " ^ (string_of_exp_list ", " eval_form)))
 
 and eval_clause exp env =
   match exp with
   | Top    -> Top
   | Bottom -> Bottom
-  | Term (x,None)   -> Term (x,None)
-  | Term (x,Some y) -> Term (x ^ "(" ^ string_of_exp (eval_exp y env) ^ ")", None)
+  | Term x -> Term ((expand_term_name x env),None)
+  | CVar (x,None) ->
+      begin
+        try (match List.assoc x env with
+             | Clause x' -> x'
+             | _ -> raise (TypeError (x ^ ": expected a clause")))
+        with Not_found -> raise (NameError x)
+      end
+  | CVar (x,Some y) -> (*Term ((expand_var_name x env),None)*)
+      begin
+        try eval_clause (Term (string_of_clause (match List.assoc x env with
+             | Clause x' -> x'
+             | _ -> failwith "blabla"), Some y)) env
+        with Not_found -> raise (NameError "foo")
+      end
   | CNot     x     -> CNot     (eval_clause x env)
   | CAnd     (x,y) -> CAnd     (eval_clause x env, eval_clause y env)
   | COr      (x,y) -> COr      (eval_clause x env, eval_clause y env)
@@ -308,8 +327,7 @@ and eval_clause exp env =
         | [x],[y] ->
             begin
               match eval_exp y env with
-              | Set (GenSet.Empty) ->
-                  raise (ArgumentError ("empty set: " ^ (string_of_clause exp)))
+              | Set (GenSet.Empty)  -> bigand_empty env x [] test e
               | Set (GenSet.ISet a) -> bigand_int   env x (IntSet.elements a)    test e
               | Set (GenSet.FSet a) -> bigand_float env x (FloatSet.elements a)  test e
               | Set (GenSet.SSet a) -> bigand_str   env x (StringSet.elements a) test e
@@ -330,8 +348,7 @@ and eval_clause exp env =
         | [x],[y] ->
             begin
               match eval_exp y env with
-              | Set (GenSet.Empty) ->
-                  raise (ArgumentError ("empty set: " ^ (string_of_clause exp)))
+              | Set (GenSet.Empty)  -> bigor_empty env x [] test e
               | Set (GenSet.ISet a) -> bigor_int   env x (IntSet.elements a)    test e
               | Set (GenSet.FSet a) -> bigor_float env x (FloatSet.elements a)  test e
               | Set (GenSet.SSet a) -> bigor_str   env x (StringSet.elements a) test e
@@ -344,39 +361,51 @@ and eval_clause exp env =
       let test = eval_test x env in
       if test then eval_clause y env else eval_clause z env
 
-and bigand_int env var values test exp =
+and bigand_empty env var values test exp =
   List.fold_left (fun acc x ->
     if eval_test test env then
+      CAnd (acc, eval_clause exp env)
+    else
+      acc) Top values
+and bigand_int env var values test exp =
+  List.fold_left (fun acc x ->
+    if eval_test test ((var, Int x)::env) then
       CAnd (acc, eval_clause exp ((var, Int x)::env))
     else
       acc) Top values
 and bigand_float env var values test exp =
   List.fold_left (fun acc x ->
-    if eval_test test env then
+    if eval_test test ((var, Float x)::env) then
       CAnd (acc, eval_clause exp ((var, Float x)::env))
     else
       acc) Top values
 and bigand_str env var values test exp =
   List.fold_left (fun acc x ->
-    if eval_test test env then
+    if eval_test test ((var, Clause (Term (x,None)))::env) then
       CAnd (acc, eval_clause exp ((var, Clause (Term (x,None)))::env))
     else
       acc) Top values
-and bigor_int env var values test exp =
+and bigor_empty env var values test exp =
   List.fold_left (fun acc x ->
     if eval_test test env then
+      COr (acc, eval_clause exp env)
+    else
+      acc) Bottom values
+and bigor_int env var values test exp =
+  List.fold_left (fun acc x ->
+    if eval_test test ((var, Int x)::env) then
       COr (acc, eval_clause exp ((var, Int x)::env))
     else
       acc) Bottom values
 and bigor_float env var values test exp =
   List.fold_left (fun acc x ->
-    if eval_test test env then
+    if eval_test test ((var, Float x)::env) then
       COr (acc, eval_clause exp ((var, Float x)::env))
     else
       acc) Bottom values
 and bigor_str env var values test exp =
   List.fold_left (fun acc x ->
-    if eval_test test env then
+    if eval_test test ((var, Clause (Term (x,None)))::env) then
       COr (acc, eval_clause exp ((var, Clause (Term (x, None)))::env))
     else
       acc) Bottom values
@@ -385,3 +414,20 @@ and eval_test exp env =
   match eval_exp exp env with
   | Bool x -> x
   | _ -> raise (TypeError (string_of_exp exp))
+
+and expand_var_name var env =
+  match var with
+  | (x,None)   -> x
+  | (x,Some y) ->
+       (x
+        ^ "("
+        ^ (string_of_exp_list ", " (List.map (fun e -> eval_exp e env) y))
+        ^ ")")
+
+and expand_term_name term env =
+  match term with
+  | (x,None)   -> x
+  | (x,Some y) ->
+      x ^ "("
+        ^ (string_of_exp_list ", " (List.map (fun e -> eval_exp e env) y))
+        ^ ")"
