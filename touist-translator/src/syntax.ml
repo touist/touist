@@ -1,29 +1,14 @@
-module IntSet = struct
-  include Set.Make(struct
-    type t = int
-    let compare = Pervasives.compare
-  end)
+module IntSet = Set_ext.Make(struct
+  type t = int
+  let compare = Pervasives.compare
+end)
 
-  let of_list =
-    List.fold_left (fun acc x -> add x acc) empty
-end
+module FloatSet = Set_ext.Make(struct
+  type t = float
+  let compare = Pervasives.compare
+end)
 
-module FloatSet = struct
-  include Set.Make(struct
-    type t = float
-    let compare = Pervasives.compare
-  end)
-
-  let of_list =
-    List.fold_left (fun acc x -> add x acc) empty
-end
-
-module StringSet = struct
-  include Set.Make(String)
-
-  let of_list =
-    List.fold_left (fun acc x -> add x acc) empty
-end
+module StringSet = Set_ext.Make(String)
 
 module GenSet = struct
   type t =
@@ -77,6 +62,18 @@ and exp =
   | In               of exp * exp
   | If               of exp * exp * exp
 and clause =
+  | CInt              of int
+  | CFloat            of float
+  | CAdd              of clause * clause 
+  | CSub              of clause * clause 
+  | CMul              of clause * clause 
+  | CDiv              of clause * clause 
+  | CEqual            of clause * clause 
+  | CNot_equal        of clause * clause 
+  | CLesser_than      of clause * clause 
+  | CLesser_or_equal  of clause * clause 
+  | CGreater_than     of clause * clause 
+  | CGreater_or_equal of clause * clause 
   | Top
   | Bottom
   | Term     of var
@@ -87,6 +84,9 @@ and clause =
   | CXor     of clause * clause
   | CImplies of clause * clause
   | CEquiv   of clause * clause
+  | Exact    of exp * exp
+  | Atleast  of exp * exp
+  | Atmost   of exp * exp
   | Bigand   of string list * exp list * exp option * clause
   | Bigor    of string list * exp list * exp option * clause
   | CIf      of exp * clause * clause
@@ -142,8 +142,8 @@ and string_of_clause = function
   | Term (x,None)   -> x
   | Term (x,Some y) -> x ^ "(" ^ (string_of_exp_list ", " y) ^ ")"
   | CNot x -> "not " ^ (string_of_clause x)
-  | CAnd     (x,y) -> (string_of_clause x) ^ " and " ^ (string_of_clause y)
-  | COr      (x,y) -> (string_of_clause x) ^ " or "  ^ (string_of_clause y)
+  | CAnd     (x,y) -> "(" ^ (string_of_clause x) ^ " and " ^ (string_of_clause y) ^ ")"
+  | COr      (x,y) -> "(" ^ (string_of_clause x) ^ " or "  ^ (string_of_clause y) ^ ")"
   | CXor     (x,y) -> (string_of_clause x) ^ " xor " ^ (string_of_clause y)
   | CImplies (x,y) -> (string_of_clause x) ^ " => "  ^ (string_of_clause y)
   | CEquiv   (x,y) -> (string_of_clause x) ^ " <=> " ^ (string_of_clause y)

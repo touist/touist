@@ -33,6 +33,9 @@ rule lexer = parse
   | "union"        { UNION        }
   | "inter"        { INTER        }
   | "diff"         { DIFF         }
+  | "exact"        { EXACT        }
+  | "atmost"       { ATMOST       }
+  | "atleast"      { ATLEAST      }
   | "bigand"       { BIGAND       }
   | "bigor"        { BIGOR        }
   | "when"         { WHEN         }

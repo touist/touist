@@ -17,6 +17,7 @@
 %token LPAREN RPAREN
 %token COMMA COLON AFFECT
 %token IF THEN ELSE END
+%token EXACT ATLEAST ATMOST
 %token TOP BOTTOM
 %token BIGAND BIGOR
 %token BEGIN SETS FORMULA
@@ -90,6 +91,18 @@ exp:
 
 clause:
   | LPAREN clause RPAREN { $2 }
+  | INT   { CInt   $1 }
+  | FLOAT { CFloat $1 }
+  | clause ADD      clause { CAdd              ($1, $3) }
+  | clause SUB      clause { CSub              ($1, $3) }
+  | clause MUL      clause { CMul              ($1, $3) }
+  | clause DIV      clause { CDiv              ($1, $3) }
+  | clause EQUAL    clause { CEqual            ($1, $3) }
+  | clause NOTEQUAL clause { CNot_equal        ($1, $3) }
+  | clause LT       clause { CLesser_than      ($1, $3) }
+  | clause LE       clause { CLesser_or_equal  ($1, $3) }
+  | clause GT       clause { CGreater_than     ($1, $3) }
+  | clause GE       clause { CGreater_or_equal ($1, $3) }
   | var_decl { CVar $1 }
   | TOP    { Top    }
   | BOTTOM { Bottom }
@@ -101,6 +114,9 @@ clause:
   | clause XOR     clause { CXor     ($1, $3) }
   | clause IMPLIES clause { CImplies ($1, $3) }
   | clause EQUIV   clause { CEquiv   ($1, $3) }
+  | EXACT   LPAREN exp COMMA exp RPAREN { Exact   ($3, $5) }
+  | ATLEAST LPAREN exp COMMA exp LPAREN { Atleast ($3, $5) }
+  | ATMOST  LPAREN exp COMMA exp LPAREN { Atmost  ($3, $5) }
   | BIGAND separated_nonempty_list(COMMA,VAR) IN separated_nonempty_list(COMMA,exp) COLON clause END
   { Bigand ($2, $4, None, $6) }
   | BIGAND separated_nonempty_list(COMMA,VAR) IN separated_nonempty_list(COMMA,exp) WHEN exp COLON clause END
