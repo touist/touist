@@ -50,6 +50,51 @@ let to_cnf p =
     match x, y with
     | CAnd (x, y), z -> CAnd (push_disj_in (COr (x, z)), push_disj_in (COr (y, z)))
     | x, CAnd (y, z) -> CAnd (push_disj_in (COr (x, y)), push_disj_in (COr (x, z)))
-    | x, y          -> COr (push_disj_in x, push_disj_in y)
+    | x, y           -> COr (push_disj_in x, push_disj_in y)
+  and simplify = function
+    (*| CAnd (x, Top) -> simplify x
+    | CAnd (Top, x) -> simplify x
+    | CAnd (x, Bottom) -> Bottom
+    | CAnd (Bottom, x) -> Bottom
+    | CAnd (CNot (Term (x, None)), Term (y, None)) as p -> if x = y then Bottom else p
+    | CAnd (Term (x, None), CNot (Term (y, None))) as p -> if x = y then Bottom else p
+    | CAnd (x, y) -> if x = y then simplify x else CAnd (simplify x, simplify y)
+    | COr (x, Top) -> Top
+    | COr (Top, x) -> Top
+    | COr (x, Bottom) -> simplify x
+    | COr (Bottom, x) -> simplify x
+    | COr (CNot (Term (x, None)), Term (y, None)) as p -> if x = y then Top else p
+    | COr (Term (x, None), CNot (Term (y, None))) as p -> if x = y then Top else p
+    | COr (COr (Term (x, None), y), CNot (Term (z, None))) as p -> if x = z then simplify y else p
+    | COr (COr (x, Term (y, None)), CNot (Term (z, None))) as p -> if y = z then simplify x else p
+    | COr (COr (CNot (Term (x, None)), y), Term (z, None)) as p -> if x = z then simplify y else p
+    | COr (COr (x, CNot (Term (y, None))), Term (z, None)) as p -> if y = z then simplify x else p
+    | COr (COr (Term (x, None), CNot (Term (y, None))), z) as p -> if x = y then simplify z else p
+    | COr (COr (CNot (Term (x, None)), Term (y, None)), z) as p -> if x = y then simplify z else p
+    | COr (x, y) -> if x = y then simplify x else COr (simplify x, simplify y)
+    | x -> x*)
+    | Top -> Top
+    | Bottom -> Bottom
+    | CAnd (x,y) -> simplify_and x y
+    | COr (x,y) -> simplify_or x y
+    | CNot x -> simplify_not (CNot x)
+    | x -> x
+  and simplify_and x y =
+    match simplify x, simplify y with
+    | Top,Top             -> Top
+    | x,Top | Top,x       -> simplify x
+    | _,Bottom | Bottom,_ -> Bottom
+    | x',y' -> if x' = y' then x' else (CAnd (simplify x',simplify y'))
+  and simplify_or x y =
+    match simplify x, simplify y with
+    | Bottom,Bottom       -> Bottom
+    | x,Bottom | Bottom,x -> simplify x
+    | Top,_ | _,Top       -> Top
+    | x',y' -> if x' = y' then x' else (COr (simplify x', simplify y'))
+  and simplify_not = function
+    | CNot Top    -> Bottom
+    | CNot Bottom -> Top
+    | CNot x      -> (CNot (simplify x))
   in
-  remove_impl p |> remove_xor |> push_neg_in |> push_disj_in
+  let res = remove_impl p |> remove_xor |> push_neg_in |> push_disj_in |> simplify in
+  Printf.printf "%s\n" (string_of_clause res); res
