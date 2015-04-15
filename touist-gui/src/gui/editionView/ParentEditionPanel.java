@@ -283,7 +283,7 @@ public class ParentEditionPanel extends AbstractComponentPanel {
     private State initResultView() {
         // Initialisation de BaseDeClause
         getFrame().getClause().setFormules("");
-        getFrame().getClause().setFormules("");
+        getFrame().getClause().setSets("");
         getFrame().getClause().addFormules(editorPanelFormulas.getText());
         getFrame().getClause().addSets(editorPanelSets.getText());
         
