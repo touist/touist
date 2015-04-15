@@ -96,5 +96,4 @@ let to_cnf p =
     | CNot Bottom -> Top
     | CNot x      -> (CNot (simplify x))
   in
-  let res = remove_impl p |> remove_xor |> push_neg_in |> push_disj_in |> simplify in
-  Printf.printf "%s\n" (string_of_clause res); res
+  remove_impl p |> remove_xor |> push_neg_in |> push_disj_in |> simplify
