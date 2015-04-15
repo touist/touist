@@ -4,12 +4,12 @@ exception TypeError     of string
 exception NameError     of string
 exception ArgumentError of string
 
-(* return the list of integers between min and max-1
+(* return the list of integers between min and max
  * with an increment of step
  *)
 let range min max step =
   let rec loop acc cpt =
-    if cpt = max then
+    if cpt = max+1 then
       acc
     else
       loop (cpt::acc) (cpt+1)
@@ -100,7 +100,7 @@ and eval_prog exp env =
 and eval_affect exp env =
   match exp with
   | Affect (x,y) -> 
-      Hashtbl.replace extenv (expand_term_name x env) (eval_exp y env)
+      Hashtbl.replace extenv (expand_var_name x env) (eval_exp y env)
 
 and eval_exp exp env =
   match exp with
@@ -292,9 +292,45 @@ and eval_set set_decl env =
 
 and eval_clause exp env =
   match exp with
+  | CInt x   -> CInt x
+  | CFloat x -> CFloat x
+  | CAdd (x,y) ->
+      begin
+        match eval_clause x env, eval_clause y env with
+        | CInt x', CInt y'     -> CInt   (x' +  y')
+        | CFloat x', CFloat y' -> CFloat (x' +. y')
+        | _,_ -> raise (TypeError (string_of_clause exp))
+      end
+  | CSub (x,y) ->
+      begin
+        match eval_clause x env, eval_clause y env with
+        | CInt x', CInt y'     -> CInt   (x' -  y')
+        | CFloat x', CFloat y' -> CFloat (x' -. y')
+        | _,_ -> raise (TypeError (string_of_clause exp))
+      end
+  | CMul (x,y) ->
+      begin
+        match eval_clause x env, eval_clause y env with
+        | CInt x', CInt y'     -> CInt   (x' *  y')
+        | CFloat x', CFloat y' -> CFloat (x' *. y')
+        | _,_ -> raise (TypeError (string_of_clause exp))
+      end
+  | CDiv (x,y) ->
+      begin
+        match eval_clause x env, eval_clause y env with
+        | CInt x', CInt y'     -> CInt   (x' /  y')
+        | CFloat x', CFloat y' -> CFloat (x' /. y')
+        | _,_ -> raise (TypeError (string_of_clause exp))
+      end
+  | CEqual            (x,y) -> CEqual            (eval_clause x env, eval_clause y env)
+  | CNot_equal        (x,y) -> CNot_equal        (eval_clause x env, eval_clause y env)
+  | CLesser_than      (x,y) -> CLesser_than      (eval_clause x env, eval_clause y env)
+  | CLesser_or_equal  (x,y) -> CLesser_or_equal  (eval_clause x env, eval_clause y env)
+  | CGreater_than     (x,y) -> CGreater_than     (eval_clause x env, eval_clause y env)
+  | CGreater_or_equal (x,y) -> CGreater_or_equal (eval_clause x env, eval_clause y env)
   | Top    -> Top
   | Bottom -> Bottom
-  | Term x -> Term ((expand_term_name x env),None)
+  | Term x -> Term ((expand_var_name x env),None)
   | CVar (x,None) ->
       begin
         try (match List.assoc x env with
@@ -306,8 +342,8 @@ and eval_clause exp env =
       begin
         try eval_clause (Term (string_of_clause (match List.assoc x env with
              | Clause x' -> x'
-             | _ -> failwith "blabla"), Some y)) env
-        with Not_found -> raise (NameError "foo")
+             | _ -> raise (TypeError (string_of_clause exp))), Some y)) env
+        with Not_found -> raise (NameError ("clause variable undefined: " ^ x))
       end
   | CNot     x     -> CNot     (eval_clause x env)
   | CAnd     (x,y) -> CAnd     (eval_clause x env, eval_clause y env)
@@ -315,6 +351,33 @@ and eval_clause exp env =
   | CXor     (x,y) -> CXor     (eval_clause x env, eval_clause y env)
   | CImplies (x,y) -> CImplies (eval_clause x env, eval_clause y env)
   | CEquiv   (x,y) -> CEquiv   (eval_clause x env, eval_clause y env)
+  | Exact (x,y) ->
+      begin
+        match eval_exp y env with
+        (*| Set (GenSet.ISet s) ->
+            IntSet.exact (unwrap_int (eval_exp x env)) s
+        | Set (GenSet.FSet s) ->
+            FloatSet.exact (unwrap_int (eval_exp x env)) s*)
+        | Set (GenSet.SSet s) ->
+            exact_str (StringSet.exact (unwrap_int (eval_exp x env)) s)
+        | _ -> raise (TypeError (string_of_exp y))
+      end
+  (*| Atleast (x,y) ->
+      begin
+        match eval_exp y env with
+        | Set (GenSet.SSet s) ->
+            atleast_str (StringSet.atleast (unwrap_int (eval_exp x env)) s)
+        | _ ->
+            raise (TypeError (string_of_exp y))
+      end
+  | Atmost (x,y) ->
+      begin
+        match eval_exp y env with
+        | Set (GenSet.SSet s) ->
+            atmost_str (StringSet.atmost (unwrap_int (eval_exp x env)) s)
+        | _ ->
+            raise (TypeError (string_of_exp y))
+      end*)
   | Bigand (v,s,t,e) ->
       let test =
         match t with
@@ -360,6 +423,35 @@ and eval_clause exp env =
   | CIf (x,y,z) ->
       let test = eval_test x env in
       if test then eval_clause y env else eval_clause z env
+
+(*
+and exact_str lst =
+  List.fold_left (fun acc (ts,fs) ->
+    COr (acc,
+          CAnd (clause_of_string_list ts, 
+                and_of_term_list (List.map (fun str ->
+                  CNot (Term (str,None))) fs)))) Bottom lst*)
+
+and exact_str lst =
+  let rec go = function
+    | [],[]       -> Top
+    | t::ts,[]    -> CAnd (CAnd (Term (t,None), Top), go (ts,[]))
+    | [],f::fs    -> CAnd (CAnd (Top, CNot (Term (f,None))), go ([],fs))
+    | t::ts,f::fs -> CAnd (CAnd (Term (t,None), CNot (Term (f,None))), go (ts,fs))
+  in
+  match lst with
+  | []    -> Bottom
+  | x::xs -> COr (go x, exact_str xs)
+(*
+and atleast_str = clause_of_string_list
+
+and atmost_str =
+  List.fold_left (fun acc str -> CAnd (acc, CNot (Term (str,None)))) Top*)
+and clause_of_string_list =
+  List.fold_left (fun acc str -> CAnd (acc, Term (str,None))) Top
+
+and and_of_term_list =
+  List.fold_left (fun acc t -> CAnd (acc, t)) Top
 
 and bigand_empty env var values test exp =
   List.fold_left (fun acc x ->
@@ -419,15 +511,6 @@ and expand_var_name var env =
   match var with
   | (x,None)   -> x
   | (x,Some y) ->
-       (x
-        ^ "("
-        ^ (string_of_exp_list ", " (List.map (fun e -> eval_exp e env) y))
-        ^ ")")
-
-and expand_term_name term env =
-  match term with
-  | (x,None)   -> x
-  | (x,Some y) ->
-      x ^ "("
-        ^ (string_of_exp_list ", " (List.map (fun e -> eval_exp e env) y))
-        ^ ")"
+       x ^ "("
+         ^ (string_of_exp_list ", " (List.map (fun e -> eval_exp e env) y))
+         ^ ")"
