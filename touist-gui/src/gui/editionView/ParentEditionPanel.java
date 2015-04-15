@@ -53,14 +53,17 @@ public class ParentEditionPanel extends AbstractComponentPanel {
         jTabbedPane1 = new javax.swing.JTabbedPane();
         editorPanelFormulas = new gui.editionView.EditionPanel();
         editorPanelSets = new gui.editionView.EditionPanel();
+        solverSelectionPanel1 = new gui.editionView.solverSelection.SolverSelectionPanel();
         testButton = new javax.swing.JButton();
         importButton = new javax.swing.JButton();
         jLabelErrorMessage = new javax.swing.JLabel();
         jLabelCaretPosition = new javax.swing.JLabel();
+        jComboBox1 = new javax.swing.JComboBox();
 
         jTabbedPane1.setToolTipText("");
         jTabbedPane1.addTab("Formulas", editorPanelFormulas);
         jTabbedPane1.addTab("Sets", editorPanelSets);
+        jTabbedPane1.addTab("Solver", solverSelectionPanel1);
 
         testButton.setText("Test");
         testButton.addActionListener(new java.awt.event.ActionListener() {
@@ -79,7 +82,9 @@ public class ParentEditionPanel extends AbstractComponentPanel {
         jLabelErrorMessage.setForeground(new java.awt.Color(255, 0, 0));
         jLabelErrorMessage.setText("<Error message>");
 
-        jLabelCaretPosition.setText("0:0");
+        jLabelCaretPosition.setText("1:1");
+
+        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "SAT", "SMT" }));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -95,6 +100,8 @@ public class ParentEditionPanel extends AbstractComponentPanel {
                 .addComponent(importButton)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(testButton)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -106,7 +113,8 @@ public class ParentEditionPanel extends AbstractComponentPanel {
                     .addComponent(testButton)
                     .addComponent(importButton)
                     .addComponent(jLabelCaretPosition)
-                    .addComponent(jLabelErrorMessage))
+                    .addComponent(jLabelErrorMessage)
+                    .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -179,11 +187,13 @@ public class ParentEditionPanel extends AbstractComponentPanel {
     private gui.editionView.EditionPanel editorPanelFormulas;
     private gui.editionView.EditionPanel editorPanelSets;
     private javax.swing.JButton importButton;
+    private javax.swing.JComboBox jComboBox1;
     private javax.swing.JFileChooser jFileChooser1;
     private javax.swing.JLabel jLabelCaretPosition;
     private javax.swing.JLabel jLabelErrorMessage;
     private javax.swing.JOptionPane jOptionPane1;
     private javax.swing.JTabbedPane jTabbedPane1;
+    private gui.editionView.solverSelection.SolverSelectionPanel solverSelectionPanel1;
     private javax.swing.JButton testButton;
     // End of variables declaration//GEN-END:variables
 
@@ -303,7 +313,7 @@ public class ParentEditionPanel extends AbstractComponentPanel {
                 errorMessage = "";
                 for(int i=0; i<getFrame().getTranslator().getErrors().size(); i++) {
                     Translator.Error error = guiTranslationErrorAdapter(getFrame().getTranslator().getErrors().get(i));
-                    errorMessage += (i+1) + ": " + error + "\n";
+                    errorMessage += error + "\n";
                 }
                 jLabelErrorMessage.setText(errorMessage);
                 System.out.println("Traduction error : " + "\n" + errorMessage + "\n");

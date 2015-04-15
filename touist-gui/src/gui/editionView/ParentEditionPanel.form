@@ -34,6 +34,8 @@
               <EmptySpace max="-2" attributes="0"/>
               <Component id="testButton" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
+              <Component id="jComboBox1" min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -47,6 +49,7 @@
                   <Component id="importButton" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="jLabelCaretPosition" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="jLabelErrorMessage" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="jComboBox1" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
@@ -79,6 +82,15 @@
             </Constraint>
           </Constraints>
         </Component>
+        <Component class="gui.editionView.solverSelection.SolverSelectionPanel" name="solverSelectionPanel1">
+          <Constraints>
+            <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
+              <JTabbedPaneConstraints tabName="Solver">
+                <Property name="tabTitle" type="java.lang.String" value="Solver"/>
+              </JTabbedPaneConstraints>
+            </Constraint>
+          </Constraints>
+        </Component>
       </SubComponents>
     </Container>
     <Component class="javax.swing.JButton" name="testButton">
@@ -107,7 +119,17 @@
     </Component>
     <Component class="javax.swing.JLabel" name="jLabelCaretPosition">
       <Properties>
-        <Property name="text" type="java.lang.String" value="0:0"/>
+        <Property name="text" type="java.lang.String" value="1:1"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JComboBox" name="jComboBox1">
+      <Properties>
+        <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
+          <StringArray count="2">
+            <StringItem index="0" value="SAT"/>
+            <StringItem index="1" value="SMT"/>
+          </StringArray>
+        </Property>
       </Properties>
     </Component>
   </SubComponents>

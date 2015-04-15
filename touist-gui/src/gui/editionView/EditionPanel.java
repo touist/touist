@@ -88,10 +88,11 @@ public class EditionPanel extends AbstractComponentPanel {
 
             @Override
             public void caretUpdate(CaretEvent e) {
+                // +1 car par défaut, on compte à partir de 0.
                 ((ParentEditionPanel)getParent().getParent()).setJLabelCaretPositionText(
-                        editorTextArea.getCaretLineNumber()
+                        (editorTextArea.getCaretLineNumber() + 1)
                         + ":"
-                        + editorTextArea.getCaretOffsetFromLineStart()
+                        + (editorTextArea.getCaretOffsetFromLineStart() + 1)
                 );
             }
         });

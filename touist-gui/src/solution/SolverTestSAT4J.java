@@ -168,7 +168,7 @@ public class SolverTestSAT4J extends Solver {
 				e.printStackTrace();
 			}
 		}
-		final int WAIT_FOR_MODEL_TIMEOUT = 500; // ms
+		final int WAIT_FOR_MODEL_TIMEOUT = 5000; // ms
 		if (p == null) // Should not happen
 			throw new SolverExecutionException("nextModel(): exception: launch() has not been called");
 		if (!p.isAlive()) { // The solver is already done

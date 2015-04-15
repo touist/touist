@@ -66,6 +66,8 @@ public class Lang {
     public static final String RESULTS_TEXT = "ResultsPanel.jLabel1.text";
     public static final String RESULTS_NAME = "ResultsPanel.jTable1.name";
     public static final String RESULTS_VALUE = "ResultsPanel.jTable1.value";
+    public static final String SOLVER_SAT_NAME = "SAT";
+    public static final String SOLVER_SAT_DESCRIPTION = "A basic solver.";
     public static final String ERROR_TRADUCTION = "ParentEditionPanel.jOptionPane1.traductionError";
     public static final String ERROR_TRADUCTION_IN_SETS = "ParentEditionPanel.jOptionPane1.traductionErrorInSets";
     public static final String ERROR_TRADUCTION_IN_FORMULAS = "ParentEditionPanel.jOptionPane1.traductionErrorInFormulas";
