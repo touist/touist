@@ -16,7 +16,7 @@ let empty      = ['\t' ' ']
 let special    = ['_']
 let newline    = '\r' | '\n' | "\r\n"
 let identifier = (special | digit)* alpha (alpha | special | digit)*
-let variable   = (special | digit)* alpha (alpha | special | digit | ['(' ')'])*
+let variable   = (special | digit)* alpha (alpha | special | digit (*| ['('')']*))*
 let integer    = digit+
 let double     = digit+ '.' digit+
 
@@ -33,17 +33,19 @@ rule lexer = parse
   | "union"        { UNION        }
   | "inter"        { INTER        }
   | "diff"         { DIFF         }
+  | "exact"        { EXACT        }
+  | "atmost"       { ATMOST       }
+  | "atleast"      { ATLEAST      }
   | "bigand"       { BIGAND       }
   | "bigor"        { BIGOR        }
   | "when"         { WHEN         }
   | "Top"          { TOP          }
   | "Bot"          { BOTTOM       }
   | "card"         { CARD         }
-  | "|"            { PIPE         }
   | "("            { LPAREN       }
+  | ")"            { RPAREN       }
   | "["            { LBRACK       }
   | "]"            { RBRACK       }
-  | ")"            { RPAREN       }
   | ".."           { RANGE        }
   | ","            { COMMA        }
   | "=="           { EQUAL        }

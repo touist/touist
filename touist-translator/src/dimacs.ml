@@ -1,17 +1,23 @@
-open Ast
+open Syntax
 
 let to_dimacs prop =
   let table    = Hashtbl.create 10
   and num_sym  = ref 1
   and nbclause = ref 0 in
   let rec go acc = function
-    | Top                     -> acc (*failwith "clause is always true"*)
-    | Bottom                  -> acc (*failwith "clause is always false"*)
-    | Term   (x, None)        -> acc ^ string_of_int (gensym x)
-    | Term   (x, _)           -> failwith ("unevaluated term: " ^ x)
-    | Not    (Term (x, None)) -> acc ^ string_of_int (- (gensym x))
-    | And    (x, y)           -> incr nbclause; (go acc x) ^ " 0\n" ^ (go acc y)
-    | Or     (x, y)           -> (go acc x) ^ " " ^ (go acc y)
+    | Top -> failwith "Clause is always true"
+        (*incr nbclause;
+        acc ^ string_of_int (gensym "top") ^ " "
+            ^ string_of_int (- (gensym "top"))*)
+    | Bottom -> failwith "Clause is alway false"
+        (*incr nbclause;
+        acc ^ string_of_int (gensym "bot") ^ " 0\n"
+            ^ string_of_int (- (gensym "bot"))*)
+    | Term (x, None)        -> acc ^ string_of_int (gensym x)
+    | Term (x, _)           -> failwith ("unevaluated term: " ^ x)
+    | CNot (Term (x, None)) -> acc ^ string_of_int (- (gensym x))
+    | CAnd (x, y) -> incr nbclause; (go acc x) ^ " 0\n" ^ (go acc y)
+    | COr  (x, y) -> (go acc x) ^ " " ^ (go acc y)
     | _ -> failwith "non CNF clause"
   and gensym x =
     try Hashtbl.find table x

@@ -15,7 +15,6 @@ Then you can open the FilePath module:
   open FilePath;;
 *)
 
-
 type mode = SMTLIB2 | SAT_DIMACS
 type error =
   | OK
@@ -87,7 +86,7 @@ let translateToSATDIMACS
   (outputTableFilePath:string)
   : unit =
   let exp =
-    Eval.eval (parse_with_error (Lexing.from_channel (open_in inputFilePath)))
+    Eval.eval (parse_with_error (Lexing.from_channel (open_in inputFilePath))) []
   in
   let c,t = Cnf.to_cnf exp |> Dimacs.to_dimacs in
   write_to_file outputFilePath c;
@@ -133,13 +132,15 @@ let _ =
 
   exit (get_code OK)
 
-(* Quick testing main function
- * let _ =
+(* Quick testing main function *)
+(*
+let () =
   let input_file = FilePath.basename Sys.argv.(1) in
   let out_file = FilePath.replace_extension input_file "cnf" in
   let table_file = "." ^ (FilePath.chop_extension input_file) ^ "_table" in
-  let exp = Eval.eval (Parser.prog Lexer.lexer (Lexing.from_channel (open_in Sys.argv.(1)))) in
+  let exp = Eval.eval (Parser.prog Lexer.lexer (Lexing.from_channel (open_in Sys.argv.(1)))) [] in
   let c,t = Cnf.to_cnf exp |> Dimacs.to_dimacs in
   write_to_file out_file c;
   write_to_file table_file (Dimacs.string_of_table t)
 *)
+

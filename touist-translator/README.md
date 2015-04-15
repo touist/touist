@@ -63,11 +63,11 @@ end sets
 
 begin formula
   bigand $i in $A do
-    A($i) and B($i)
+    A|$i| and B|$i|
   end
 
   bigand $i in $A when ($B > 2) do
-    not B($i) and C($i)
+    not B|$i| and C|$i|
   end
 end formula
 ```

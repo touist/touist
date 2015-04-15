@@ -21,7 +21,6 @@ _build/
 # ocamlbuild targets
 *.byte
 *.native
-**/touist*
 
 # oasis generated files
 setup.data
@@ -59,19 +58,8 @@ build.xml
 
 *.cnf
 
-*.table
-
-compiler/test/.foo_table
-
-compiler/test/.test_table
-
-*.ncf
-
-compiler/.foo_table
+*._table
 
 bigAndFile-defaultname.txt
 
-*.table
-
-*.cnf
 /touist-gui/nbproject/private/
