@@ -237,9 +237,9 @@ public class Translator {
 		String line = "";
 		while (br.ready()) {
 			line = br.readLine();
-			String[] splitted = line.split(" ");
-			String literalString = splitted[0];
-			int literalCode = Integer.parseInt(splitted[1]);
+                        int sep = line.lastIndexOf(' ');
+			String literalString = line.substring(0,sep);
+			int literalCode = Integer.parseInt(line.substring(sep+1));
 			literalsMap.put(literalCode, literalString);
 		}
 		br.close();
