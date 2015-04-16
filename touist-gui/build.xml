@@ -52,7 +52,7 @@
         	<zipfileset src= "${gui.libs.dir}/jlatexmath-1.0.3.jar"/>
         </jar>
     </target>
-    <target depends="build" name="dist">
+    <target depends="build-jar" name="dist">
     	<!-- Copy the external binaries into dist/ -->
     	<copy file="${gui.dir}/touist.jar" todir="${gui.dist.dir}"/>
     	<copy todir="${gui.dist.dir}/external" flatten="true">
@@ -60,6 +60,8 @@
 		</copy>
 		<chmod dir="${gui.dist.dir}/external" perm="ugo+rx" includes="*"/>
     </target>
+    <target depends="build-jar" name="jar"/>
+
 	
     <property environment="env"/>
     <property name="debuglevel" value="source,lines,vars"/>
