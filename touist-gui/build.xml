@@ -20,6 +20,10 @@
 	`ant `
 	 -->
 	
+	<!-- Touist properties -->
+	<property name="version" value="1.23"/>
+	
+	
     <property name="gui.dir" value="${basedir}"/>
 	<property name="gui.build.dir" value="${gui.dir}/build"/>
 	<!-- gui.dist.dir : the folder that will be "distributed" (given to users) -->
@@ -37,11 +41,15 @@
                 <attribute name="Main-Class" value="touist.TouIST"/>
                 <attribute name="Class-Path" value="."/>
             	<attribute name="compress" value="no"/>
+            	<attribute name="Implementation-Title" value="Touist"/>
+            	<attribute name="Implementation-Version" value="${version}"/>
+            	<attribute name="Implementation-Vendor" value="Institut de Recherche en Informatique de Toulouse"/>
             </manifest>
         	<zipfileset dir="${gui.dir}/ressources"/>
             <zipfileset dir="${gui.build.dir}"/>
         	<zipfileset src= "${gui.libs.dir}/java-cup-11b.jar"/>
         	<zipfileset src= "${gui.libs.dir}/rsyntaxtextarea-2.5.6.jar"/>
+        	<zipfileset src= "${gui.libs.dir}/jlatexmath-1.0.3.jar"/>
         </jar>
     </target>
     <target depends="build" name="dist">
@@ -62,6 +70,7 @@
         <pathelement location="${gui.dir}/ressources"/>
         <pathelement location="${gui.libs.dir}/rsyntaxtextarea-2.5.6.jar"/>
         <pathelement location="${gui.libs.dir}/java-cup-11b.jar"/>
+        <pathelement location="${gui.libs.dir}/jlatexmath-1.0.3.jar"/>
     </path>
 	
     <target name="clean">
@@ -73,8 +82,6 @@
     	<mkdir dir="${gui.build.dir}"/>
         <javac debug="true" debuglevel="${debuglevel}" destdir="${gui.build.dir}" includeantruntime="false" source="${source}" target="${target}">
         	<!-- Files I decided to exlude because they contain errors for now -->
-        	<exclude name="**/LaTEX.java"/> 
-        	<exclude name="**/TranslationLatex.java"/>
         	<exclude name="**/BaseDeClausesTest.java"/>
         	<src path="${gui.dir}/src"/>
             <classpath refid="touist.classpath"/>
