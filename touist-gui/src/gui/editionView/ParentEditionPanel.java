@@ -10,13 +10,16 @@ import gui.AbstractComponentPanel;
 import gui.Lang;
 import gui.MainFrame;
 import gui.State;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ListIterator;
 import java.util.Map;
+
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+
 import solution.NotSatisfiableException;
 import solution.SolverExecutionException;
 import solution.SolverTestSAT4J;
@@ -324,7 +327,7 @@ public class ParentEditionPanel extends AbstractComponentPanel {
             f.deleteOnExit();
         } catch (IOException ex) {
             ex.printStackTrace();
-            errorMessage = "The translator returned an IOException";
+            errorMessage = "The translator returned an IOException: \n"+ex.getMessage();
             showErrorMessage(ex, errorMessage, getFrame().getLang().getWord(Lang.ERROR_TRADUCTION));
             return State.EDITION;
         } catch (InterruptedException ex) {
