@@ -63,3 +63,8 @@ build.xml
 bigAndFile-defaultname.txt
 
 /touist-gui/nbproject/private/
+/touist-gui/nbproject/build-impl.xml
+/touist-gui/nbproject/genfiles.properties
+/touist-gui/nbproject/project.properties
+/touist-gui/nbproject/project.xml
+/touist-gui/nbbuild.xml
