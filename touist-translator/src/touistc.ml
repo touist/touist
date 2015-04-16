@@ -56,7 +56,7 @@ outputFilePath name using the inputFilePath name *)
 let defaultOutputTable (inputFilePath:string) : string =
   let inputBase = (FilePath.basename inputFilePath) in
   let inputBaseNoExt = (FilePath.chop_extension inputBase) in
-  "." ^ inputBaseNoExt ^ "_table"
+  inputBaseNoExt ^ ".table"
 
 (* Used in Arg.parse when a parameter without any preceeding -flag (-f, -x...)
 Here, this kind of parameter is considered as an inputFilePath *)
