@@ -7,7 +7,7 @@ package gui.editionView.solverSelection;
 
 import solution.BaseDeClauses;
 import solution.Solver;
-import translation.Translator;
+import translation.TranslatorSAT;
 
 /**
  *
@@ -34,7 +34,7 @@ public enum SupportedSolver {
     }
     
     // is s needed in parameter ?
-    public void solve(BaseDeClauses b, Translator t, Solver s) {
+    public void solve(BaseDeClauses b, TranslatorSAT t, Solver s) {
         switch(this) {
             case SAT :
                 //TODO

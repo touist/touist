@@ -19,7 +19,7 @@ import javax.swing.JPanel;
 import solution.BaseDeClauses;
 import solution.ModelList;
 import solution.Solver;
-import translation.Translator;
+import translation.TranslatorSAT;
 
 /**
  *
@@ -28,7 +28,7 @@ import translation.Translator;
 public class MainFrame extends javax.swing.JFrame {
 
     private BaseDeClauses clause = new BaseDeClauses();
-    private Translator translator = new Translator("external"+File.separatorChar+"touistc");
+    private TranslatorSAT translator = new TranslatorSAT("external"+File.separatorChar+"touistc");
     private Solver solver;
     private ModelList models;
 
@@ -90,7 +90,7 @@ public class MainFrame extends javax.swing.JFrame {
         this.models = models;
     }
 
-    public Translator getTranslator() {
+    public TranslatorSAT getTranslator() {
         return translator;
     }
     

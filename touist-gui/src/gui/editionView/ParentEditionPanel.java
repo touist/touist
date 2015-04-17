@@ -23,7 +23,8 @@ import javax.swing.JOptionPane;
 import solution.NotSatisfiableException;
 import solution.SolverExecutionException;
 import solution.SolverTestSAT4J;
-import translation.Translator;
+import translation.TranslationError;
+import translation.TranslatorSAT;
 
 /**
  *
@@ -255,9 +256,9 @@ public class ParentEditionPanel extends AbstractComponentPanel {
         }
     }
     
-    private Translator.Error guiTranslationErrorAdapter(Translator.Error error) {
-        Translator t = new Translator("");
-        Translator.Error adaptedError;
+    private TranslationError guiTranslationErrorAdapter(TranslationError error) {
+        TranslatorSAT t = new TranslatorSAT("");
+        TranslationError adaptedError;
         int row = error.getRowInCode();
         String sets = getFrame().getClause().getSets();
         int nbRowsInSets = 1;
@@ -271,12 +272,12 @@ public class ParentEditionPanel extends AbstractComponentPanel {
         }
         if (row < nbRowsInSets) {
             // l'erreur est dans les sets
-            adaptedError = t.new Error(row - setShift,
+            adaptedError = new TranslationError(row - setShift,
                     error.getColumnInCode(), 
                     error.getErrorMessage() + getFrame().getLang().getWord(Lang.ERROR_TRADUCTION_IN_SETS));
         } else {
             // l'erreur est dans les formules
-            adaptedError = t.new Error(row-nbRowsInSets - formulasShift, 
+            adaptedError = new TranslationError(row-nbRowsInSets - formulasShift, 
                     error.getColumnInCode(), 
                     error.getErrorMessage() + getFrame().getLang().getWord(Lang.ERROR_TRADUCTION_IN_FORMULAS));
         }
@@ -315,7 +316,7 @@ public class ParentEditionPanel extends AbstractComponentPanel {
             if(! getFrame().getTranslator().translate(bigAndFilePath)) {
                 errorMessage = "";
                 for(int i=0; i<getFrame().getTranslator().getErrors().size(); i++) {
-                    Translator.Error error = guiTranslationErrorAdapter(getFrame().getTranslator().getErrors().get(i));
+                    TranslationError error = guiTranslationErrorAdapter(getFrame().getTranslator().getErrors().get(i));
                     errorMessage += error + "\n";
                 }
                 jLabelErrorMessage.setText(errorMessage);

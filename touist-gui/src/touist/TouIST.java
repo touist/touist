@@ -34,7 +34,7 @@ import java.util.Scanner;
 import solution.NotSatisfiableException;
 import solution.SolverExecutionException;
 import solution.SolverTestSAT4J;
-import translation.Translator;
+import translation.TranslatorSAT;
 
 /**
  *
@@ -60,7 +60,7 @@ public class TouIST {
 		/*
 		 * TRANSLATOR Tests
 		 */
-		Translator translator = new Translator("compiler/touistc.native");
+		TranslatorSAT translator = new TranslatorSAT("compiler/touistc.native");
 		boolean worked = false;
 		try {
 			worked = translator.translate("compiler/test/foo.touistl");
