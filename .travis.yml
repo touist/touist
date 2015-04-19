@@ -7,3 +7,5 @@ install:
     - ant build-jar
 script:
     - echo "Bravo ! On n'a meme pas fait de tests unitaires..."
+notifications:
+  email: false
