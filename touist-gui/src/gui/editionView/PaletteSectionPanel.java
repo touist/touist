@@ -7,6 +7,7 @@ package gui.editionView;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.swing.BoxLayout;
 
 /**
@@ -24,7 +25,7 @@ public class PaletteSectionPanel extends javax.swing.JPanel {
     public PaletteSectionPanel() {
         initComponents();
         jLabelName.setText("");
-        buttons = new ArrayList<>();
+        buttons = new ArrayList<InsertionButton>();
         isFold = true;
     }
     
@@ -35,7 +36,7 @@ public class PaletteSectionPanel extends javax.swing.JPanel {
     public PaletteSectionPanel(String name) {
         initComponents();
         jLabelName.setText(name);
-        buttons = new ArrayList<>();
+        buttons = new ArrayList<InsertionButton>();
         isFold = true;
     }
 
