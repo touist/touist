@@ -29,8 +29,13 @@ public class TranslationLatex {
     
     
     public TranslationLatex(String touistl) throws Exception {
-        parser p = new parser(new Lexi(new StringReader(touistl)));
-        latexFormula = p.parse().value.toString();
+        if(touistl.length() == 0) {
+            latexFormula = "";
+        }
+        else {
+            parser p = new parser(new Lexi(new StringReader(touistl)));
+            latexFormula = p.parse().value.toString();
+        }
     }
     
     public String getFormula(){
