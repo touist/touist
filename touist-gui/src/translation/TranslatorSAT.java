@@ -29,9 +29,6 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -48,7 +45,7 @@ public class TranslatorSAT {
 	private String translatorProgramFilePath;
 	private Map<Integer,String> literalsMap = new HashMap<Integer,String>();
 	private List<TranslationError> errors;
-    private String CurrentPath=Paths.get("").toAbsolutePath().toString();
+    private String currentPath = System.getProperty("user.dir");
 	private Process p;
 
 	public TranslatorSAT(String translatorProgramFilePath) {
@@ -91,12 +88,7 @@ public class TranslatorSAT {
 		 */
 		
 		// Check if translatorProgramFilePath is there
-		Path path = Paths.get(CurrentPath+File.separatorChar+translatorProgramFilePath);
-		if (!Files.exists(path)) {
-			throw new IOException("translate(): the 'touistc' translator program has not been "
-					+ "found at '"+path.toString()+"'. Is it in the wrong directory?");
-		}
-		
+		String path = currentPath + File.separatorChar + translatorProgramFilePath;
 		String cmd = path.toString()
 				+ " -o " + outputFilePath
 				+ " -table " + outputTableFilePath
@@ -133,7 +125,7 @@ public class TranslatorSAT {
 			}
 		}
 		if(return_code == 0) {
-			parseLiteralsMapFile(CurrentPath+File.separatorChar+outputTableFilePath);
+			parseLiteralsMapFile(currentPath+File.separatorChar+outputTableFilePath);
 		}
 		return return_code==0;
 	}
@@ -154,7 +146,7 @@ public class TranslatorSAT {
 	 * @return the file path
 	 */
 	public String getDimacsFilePath() {
-		return CurrentPath+File.separatorChar+outputFilePath;
+		return currentPath+File.separatorChar+outputFilePath;
 	}
 
 	/**
