@@ -10,6 +10,8 @@ import entity.Model;
 import gui.AbstractComponentPanel;
 import gui.Lang;
 import gui.State;
+import java.awt.Color;
+import java.awt.Component;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -20,10 +22,13 @@ import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+import javax.swing.JTable;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellRenderer;
 
 import solution.NotSatisfiableException;
 import solution.SolverExecutionException;
@@ -50,6 +55,31 @@ public class ResultsPanel extends AbstractComponentPanel {
         public void changedUpdate(DocumentEvent e) {
             setResult();
         }
+    }
+    
+    class ResultTableCellRenderer extends DefaultTableCellRenderer {
+        @Override
+        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+            Component composant =  super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+            if(row%2 == 0){
+                composant.setBackground(Color.WHITE);
+            }
+            else {
+                composant.setBackground(new Color(236,247,249));
+            }
+            return composant;
+        }
+    }
+    
+    class ResultTableModel extends DefaultTableModel
+    {
+        public ResultTableModel(Object []o, int n){
+            super(o,n);
+        }
+        @Override
+        public boolean isCellEditable(int rowIndex,int columnIndex){
+		return false;
+	}
     }
     
     private int currentModelIndex = 0;
@@ -88,9 +118,8 @@ public class ResultsPanel extends AbstractComponentPanel {
         }
         
         
-        DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
+        ResultTableModel model = (ResultTableModel) jTable1.getModel();
         model.setNumRows(0);
-        
         ArrayList<Literal> literals = (ArrayList<Literal>) actModel.literals;
         for(int i = 0; i < literals.size(); i++) {
             String name = literals.get(i).getLiteral();
@@ -212,12 +241,16 @@ public class ResultsPanel extends AbstractComponentPanel {
             }
         });
 
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+        jTable1.setModel(new ResultTableModel(
             new String [] {
                 "Name", "Value"
             },0
         ));
         jTable1.setAutoCreateRowSorter(true);
+        jTable1.setDefaultRenderer(Object.class, new ResultTableCellRenderer());
+        jTable1.setGridColor(Color.BLACK);
+        jTable1.setShowGrid(true);
+        jTable1.getRowSorter().toggleSortOrder(0);
         jScrollPane2.setViewportView(jTable1);
 
         trueCheckBox.setSelected(true);
@@ -249,21 +282,21 @@ public class ResultsPanel extends AbstractComponentPanel {
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+            .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 627, Short.MAX_VALUE)
-                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane2)
+                    .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel1)
                         .addGap(32, 32, 32)
                         .addComponent(trueCheckBox)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(falseCheckBox)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(searchTextField)
+                        .addComponent(searchTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 333, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jButtonEditor))
-                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                    .addGroup(layout.createSequentialGroup()
                         .addComponent(jButtonPrevious)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jButtonNext)

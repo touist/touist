@@ -22,10 +22,10 @@
   <Layout>
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Group type="102" alignment="1" attributes="0">
+          <Group type="102" alignment="0" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="1" attributes="0">
-                  <Component id="jScrollPane2" pref="627" max="32767" attributes="0"/>
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Component id="jScrollPane2" max="32767" attributes="0"/>
                   <Group type="102" alignment="0" attributes="0">
                       <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
                       <EmptySpace min="-2" pref="32" max="-2" attributes="0"/>
@@ -33,7 +33,7 @@
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="falseCheckBox" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="searchTextField" max="32767" attributes="0"/>
+                      <Component id="searchTextField" pref="333" max="32767" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="jButtonEditor" min="-2" max="-2" attributes="0"/>
                   </Group>
@@ -113,11 +113,11 @@
         <Component class="javax.swing.JTable" name="jTable1">
           <Properties>
             <Property name="model" type="javax.swing.table.TableModel" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-              <Connection code="new javax.swing.table.DefaultTableModel(&#xa;    new String [] {&#xa;        &quot;Name&quot;, &quot;Value&quot;&#xa;    },0&#xa;)" type="code"/>
+              <Connection code="new ResultTableModel(&#xa;    new String [] {&#xa;        &quot;Name&quot;, &quot;Value&quot;&#xa;    },0&#xa;)" type="code"/>
             </Property>
           </Properties>
           <AuxValues>
-            <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="jTable1.setAutoCreateRowSorter(true);"/>
+            <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="jTable1.setAutoCreateRowSorter(true);&#xa;jTable1.setDefaultRenderer(Object.class, new ResultTableCellRenderer());&#xa;jTable1.setGridColor(Color.BLACK);&#xa;jTable1.setShowGrid(true);&#xa;jTable1.getRowSorter().toggleSortOrder(0);"/>
           </AuxValues>
         </Component>
       </SubComponents>
