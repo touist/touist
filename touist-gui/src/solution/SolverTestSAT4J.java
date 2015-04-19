@@ -119,8 +119,10 @@ public class SolverTestSAT4J extends Solver {
 
 		try {
 			// We check if the solver program has been actually launched:
-			p.wait(10) ;
-			if (isRunning(p) && p.exitValue() > 1) {
+			synchronized(p) {
+				p.wait(10);
+			}
+			if (!isRunning(p) && p.exitValue() > 1) {
 				String error = "launch(): Error while launching external solver\n";
 				error += "launch(): external solver returned "
 						+ Integer.toString(p.exitValue()) + "\n";
@@ -170,7 +172,9 @@ public class SolverTestSAT4J extends Solver {
 		// This fixes the "two hasNext() in a row" issue:
 		if(lastHasNextCall!=0 && System.currentTimeMillis() > lastHasNextCall + 1000) {
 			try {
-				p.wait(100);
+				synchronized(p) {
+					p.wait(100);
+				}
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
