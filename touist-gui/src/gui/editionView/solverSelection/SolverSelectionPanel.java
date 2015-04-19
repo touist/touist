@@ -6,13 +6,13 @@
 package gui.editionView.solverSelection;
 
 import gui.AbstractComponentPanel;
+
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
-import javax.swing.AbstractButton;
+
 import javax.swing.ButtonGroup;
-import javax.swing.ButtonModel;
 import javax.swing.JRadioButton;
 
 /**
@@ -22,7 +22,7 @@ import javax.swing.JRadioButton;
 public class SolverSelectionPanel extends AbstractComponentPanel {
 
     private ButtonGroup group;
-    private List<JRadioButton> buttons = new ArrayList<>();
+    private List<JRadioButton> buttons = new ArrayList<JRadioButton>();
     
     /**
      * Creates new form SolverSelectionPanel

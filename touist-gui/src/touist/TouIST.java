@@ -27,7 +27,6 @@ import entity.Model;
 import gui.MainFrame;
 
 import java.io.IOException;
-import java.nio.file.Paths;
 import java.util.Iterator;
 import java.util.Scanner;
 
@@ -47,7 +46,7 @@ public class TouIST {
      */
     public static void main(String[] args) {
     	System.out.println("main(): running app from folder '"
-    			+ Paths.get("").toAbsolutePath().toString()+"'");
+    			+ System.getProperty("user.dir")+"'");
         MainFrame frame = new MainFrame();
         frame.setVisible(true);
     }
@@ -105,7 +104,10 @@ public class TouIST {
 		Iterator<Model> it = null;
 		try {
 			it = solver.getModelList().iterator();
-		} catch (NotSatisfiableException | SolverExecutionException e) {
+		} catch (NotSatisfiableException e) {
+			e.printStackTrace();
+		} catch (SolverExecutionException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		while (it.hasNext() && continuer) {
