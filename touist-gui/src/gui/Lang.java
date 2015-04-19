@@ -39,7 +39,7 @@ public class Lang {
     }
     
     public List<Locale> getSupportedLanguages() {
-        List<Locale> locales = new ArrayList<>();
+        List<Locale> locales = new ArrayList<Locale>();
         locales.addAll(supportedLanguages.keySet());
         return locales;
     }
