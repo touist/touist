@@ -104,7 +104,10 @@ public class TouIST {
 		Iterator<Model> it = null;
 		try {
 			it = solver.getModelList().iterator();
-		} catch (NotSatisfiableException | SolverExecutionException e) {
+		} catch (NotSatisfiableException e) {
+			e.printStackTrace();
+		} catch (SolverExecutionException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		while (it.hasNext() && continuer) {
