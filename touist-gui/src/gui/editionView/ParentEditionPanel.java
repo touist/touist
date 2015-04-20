@@ -252,7 +252,7 @@ public class ParentEditionPanel extends AbstractComponentPanel {
         getFrame().getClause().setFormules("");
         getFrame().getClause().setSets("");
         
-        returnVal = jFileChooser1.showDialog(this, getFrame().getLang().getWord(Lang.EDITION_FILE_CHOOSER));
+        returnVal = jFileChooser1.showOpenDialog(this);
         
         if (returnVal == JFileChooser.APPROVE_OPTION && jFileChooser1.getSelectedFile() != null) {
             path = jFileChooser1.getSelectedFile().getPath();
@@ -279,7 +279,7 @@ public class ParentEditionPanel extends AbstractComponentPanel {
         getFrame().getClause().addFormules(editorPanelFormulas.getText());
         getFrame().getClause().addSets(editorPanelSets.getText());
         
-        int returnVal = jFileChooser1.showOpenDialog(this);
+        int returnVal = jFileChooser1.showDialog(this,getFrame().getLang().getWord(Lang.EDITION_FILE_CHOOSER));
         try {
             if(returnVal == JFileChooser.APPROVE_OPTION){
                 getFrame().getClause().saveToFile(jFileChooser1.getSelectedFile().getPath());

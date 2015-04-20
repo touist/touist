@@ -148,7 +148,7 @@ public class ResultsPanel extends AbstractComponentPanel {
         fc.setFileFilter(new FileNameExtensionFilter("Text files(txt, text)","txt","text"));
         fc.addChoosableFileFilter(new FileNameExtensionFilter("Latex files(latex)","tex"));
         fc.setAcceptAllFileFilterUsed(false);
-        int returnVal = fc.showOpenDialog(this);
+        int returnVal = fc.showDialog(this,getFrame().getLang().getWord(Lang.EDITION_FILE_CHOOSER));
         
         if(returnVal == JFileChooser.APPROVE_OPTION){
             String filename = fc.getSelectedFile().getName();
@@ -291,7 +291,7 @@ public class ResultsPanel extends AbstractComponentPanel {
 
         searchTextField.getDocument().addDocumentListener(new RegexListener());
 
-        jButtonExport.setText("Exporter");
+        jButtonExport.setText("Export");
         jButtonExport.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButtonExportActionPerformed(evt);
