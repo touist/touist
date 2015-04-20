@@ -69,6 +69,9 @@ public class ParentEditionPanel extends AbstractComponentPanel {
         jComboBox1 = new javax.swing.JComboBox();
         exportButton = new javax.swing.JButton();
 
+        jFileChooser1.setFileSelectionMode(JFileChooser.FILES_ONLY);
+        jFileChooser1.addChoosableFileFilter(new FileNameExtensionFilter("Touistl files(touistl)","touistl"));
+
         jTabbedPane1.setToolTipText("");
         jTabbedPane1.addTab("Formulas", editorPanelFormulas);
         jTabbedPane1.addTab("Sets", editorPanelSets);
@@ -252,7 +255,6 @@ public class ParentEditionPanel extends AbstractComponentPanel {
         getFrame().getClause().setFormules("");
         getFrame().getClause().setSets("");
         
-        jFileChooser1.setFileSelectionMode(JFileChooser.FILES_ONLY);
         returnVal = jFileChooser1.showDialog(this, getFrame().getLang().getWord(Lang.EDITION_FILE_CHOOSER));
         
         if (returnVal == JFileChooser.APPROVE_OPTION && jFileChooser1.getSelectedFile() != null) {
@@ -279,12 +281,11 @@ public class ParentEditionPanel extends AbstractComponentPanel {
         getFrame().getClause().setSets("");
         getFrame().getClause().addFormules(editorPanelFormulas.getText());
         getFrame().getClause().addSets(editorPanelSets.getText());
-        final JFileChooser fc = new JFileChooser();
-        fc.addChoosableFileFilter(new FileNameExtensionFilter("Touistl files(touistl)","touistl"));
-        int returnVal = fc.showOpenDialog(this);
+        
+        int returnVal = jFileChooser1.showOpenDialog(this);
         try {
             if(returnVal == JFileChooser.APPROVE_OPTION){
-                getFrame().getClause().saveToFile(fc.getSelectedFile().getPath());
+                getFrame().getClause().saveToFile(jFileChooser1.getSelectedFile().getPath());
             }
         } catch (IOException e) {
             String warningWindowTitle = getFrame().getLang().getWord(Lang.EDITION_EXPORT_FAILURE_TITLE);

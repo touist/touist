@@ -3,6 +3,9 @@
 <Form version="1.5" maxVersion="1.9" type="org.netbeans.modules.form.forminfo.JPanelFormInfo">
   <NonVisualComponents>
     <Component class="javax.swing.JFileChooser" name="jFileChooser1">
+      <AuxValues>
+        <AuxValue name="JavaCodeGenerator_InitCodePre" type="java.lang.String" value="jFileChooser1.setFileSelectionMode(JFileChooser.FILES_ONLY);&#xa;jFileChooser1.addChoosableFileFilter(new FileNameExtensionFilter(&quot;Touistl files(touistl)&quot;,&quot;touistl&quot;));"/>
+      </AuxValues>
     </Component>
     <Component class="javax.swing.JOptionPane" name="jOptionPane1">
     </Component>
