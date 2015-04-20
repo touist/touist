@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project default="run" name="Touist Project: Build or Run or Dist (for end-users)">
+    <!-- Mael VALAIS for Touist project, 2015-->
+    <!--ANT 1.7 is required -->
+	
+	<!--
+	Algorithme :
+	Prérequis :
+	- external/ doit contenir touistc et minisat.jar
+	Tout a déjà été compilé. On a plus qu'à distribuer, càd
+	- créer un dossier dist/ qui va être le dossier de distribution
+	- faire un touist.jar et le mettre dans dist/
+	- créer external/ dans dist/ 
+	- mettre touistc dans dist/
+	- mettre minisat.jar dans dist/
+	- compresser le contenu de dist vers une archive "touist.zip"
+	 qui se dé-archivera sous le nom de "touist-win32" ou "touist-osx64"
+	
+	Faire un touist.jar:
+	`ant `
+	 -->
+	
+	<!-- Touist properties -->
+	<property name="version" value="1.23"/>
+	<property name="source" value="1.6"/>
+	<property name="target" value="1.6"/>
+	
+    <property name="gui.dir" value="${basedir}"/>
+	<property name="gui.build.dir" value="${gui.dir}/build"/>
+	<!-- gui.dist.dir : the folder that will be "distributed" (given to users) -->
+	<property name="gui.dist.dir" value="${gui.dir}/dist"/>
+	<!-- gui.external.dir : the project folder in which external bins are (touistc, solver)-->
+	<property name="gui.external.dir" value="${gui.dir}/external"/>
+	<property name="gui.libs.dir" value="${gui.dir}/libs"/>
+
+	<!-- Clear dist/ content -->
+	<delete dir="${gui.dist.dir}"/>
+
+	<target depends="build" name="build-jar">
+        <jar destfile="${gui.dir}/touist.jar" filesetmanifest="mergewithoutmain">
+            <manifest>
+                <attribute name="Main-Class" value="touist.TouIST"/>
+                <attribute name="Class-Path" value="."/>
+            	<attribute name="compress" value="no"/>
+            	<attribute name="Implementation-Title" value="Touist"/>
+            	<attribute name="Implementation-Version" value="${version}"/>
+            	<attribute name="Implementation-Vendor" value="Institut de Recherche en Informatique de Toulouse"/>
+            </manifest>
+        	<zipfileset dir="${gui.dir}/ressources"/>
+            <zipfileset dir="${gui.build.dir}"/>
+        	<zipfileset src= "${gui.libs.dir}/java-cup-11b.jar"/>
+        	<zipfileset src= "${gui.libs.dir}/rsyntaxtextarea-2.5.6.jar"/>
+        	<zipfileset src= "${gui.libs.dir}/jlatexmath-1.0.3.jar"/>
+        </jar>
+    </target>
+    <target depends="build-jar" name="dist">
+    	<!-- Copy the external binaries into dist/ -->
+    	<copy file="${gui.dir}/touist.jar" todir="${gui.dist.dir}"/>
+    	<copy todir="${gui.dist.dir}/external" flatten="true">
+    	    <fileset dir="${gui.external.dir}"/>
+		</copy>
+		<chmod dir="${gui.dist.dir}/external" perm="ugo+rx" includes="*"/>
+    </target>
+    <target depends="build-jar" name="jar"/>
+
+	
+    <property environment="env"/>
+    <property name="debuglevel" value="source,lines,vars"/>
+    <property name="target" value="1.8"/>
+    <property name="source" value="1.8"/>
+    <path id="touist.classpath">
+        <pathelement location="${gui.build.dir}"/>
+        <pathelement location="${gui.dir}/ressources"/>
+        <pathelement location="${gui.libs.dir}/rsyntaxtextarea-2.5.6.jar"/>
+        <pathelement location="${gui.libs.dir}/java-cup-11b.jar"/>
+        <pathelement location="${gui.libs.dir}/jlatexmath-1.0.3.jar"/>
+    </path>
+	
+    <target name="clean">
+        <delete dir="${gui.build.dir}"/>
+    </target>
+	
+	<!-- The build task -->
+    <target name="build">
+    	<mkdir dir="${gui.build.dir}"/>
+        <javac debug="true" debuglevel="${debuglevel}" destdir="${gui.build.dir}" includeantruntime="false" source="${source}" target="${target}">
+        	<!-- Files I decided to exlude because they contain errors for now -->
+        	<exclude name="**/BaseDeClausesTest.java"/>
+        	<src path="${gui.dir}/src"/>
+            <classpath refid="touist.classpath"/>
+        </javac>
+    </target>
+    <target depends="build" name="build-project"/>
+
+	<!-- The "launching" target to debug Touist -->
+    <target name="run">
+        <java classname="touist.TouIST" failonerror="false" fork="yes">
+            <classpath refid="touist.classpath"/>
+        </java>
+    </target>
+</project>

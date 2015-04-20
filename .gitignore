@@ -44,40 +44,28 @@ META
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
 
-/bin/
+**/bin/
 
 .classpath
 
 .project
-/nbproject/private/
-/dist/
-/build/
-nbproject/project.xml
-
-nbproject/project.properties
-
-nbproject/genfiles.properties
-
-nbproject/build-impl.xml
-
+**/dist/
+**/build/
+nbproject/*
 build.xml
 
 *.mf
 
 *.cnf
 
-*.table
-
-compiler/test/.foo_table
-
-compiler/test/.test_table
-
-*.ncf
-
-compiler/.foo_table
+*._table
 
 bigAndFile-defaultname.txt
 
-*.table
-
-*.cnf
+/touist-gui/nbproject/private/
+/touist-gui/nbproject/build-impl.xml
+/touist-gui/nbproject/genfiles.properties
+/touist-gui/nbproject/project.properties
+/touist-gui/nbproject/project.xml
+/touist-gui/nbbuild.xml
+*.prefs

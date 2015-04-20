@@ -1,0 +1,37 @@
+Comment utiliser la classe "Lang.java" pour choisir le texte en fonction de la langue.
+
+Initialiser la langue :
+	Lang l = new Lang(Locale.ENGLISH);
+
+Actuellement, seulement "Locale.ENGLISH" et "Locale.FRENCH" sont supportés.
+Selon la langue choisie, la classe cherchera dans les fichiers : 
+	en_US.properties
+	fr_FR.properties
+
+Le fichier est de la forme :
+	# Commentaire
+	<clé>=<texte traduit>
+
+Pour récupérer le String correspondant au mot traduit :
+	String text = Lang.getWord(<clé>);
+
+Pour faciliter la maintenance, les clés sont définies en constantes static dans la classe :
+	String title = Lang.getWord(Lang.FRAME_TITLE);
+
+Si vous rajouter des champs dans un .properties,
+il est recommandé d'ajouter une constante correspondant à la clé choisie.
+UNE CLE DOIT ETRE UNIQUE.
+
+Si la clé passé en paramètre à getWord() n'est pas définie dans le .properties,
+alors la clé est retournée.
+
+################################################################################
+
+Par supporter une nouvelle langue,
+Il faut ajouter dans Lang.initSupportedLanguages() la langue est le fichier correspondant.
+Exemple :
+	...
+    supportedLanguages.put(Locale.ENGLISH, "lang.en_US");
+    supportedLanguages.put(Locale.ITALIAN, "lang.it_IT");
+    ...
+et ajouter un fichier "it_IT.properties" dans "touist-gui/ressources/lang".
