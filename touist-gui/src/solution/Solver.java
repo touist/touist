@@ -52,12 +52,6 @@ public abstract class Solver {
 	public abstract void launch() throws IOException;
 
 	/**
-	 * Asks the solver if any models exist. The user MUST check
-	 * that before getting the model list.
-	 * @return the satisfiability
-	 */
-	public abstract boolean isSatisfiable();
-	/**
 	 * Close the solver program process.
 	 */
 	public abstract void close();

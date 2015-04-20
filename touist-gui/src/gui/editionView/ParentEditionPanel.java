@@ -412,14 +412,14 @@ public class ParentEditionPanel extends AbstractComponentPanel {
             errorMessage = "Couldn't launch solver.";
             showErrorMessage(ex, errorMessage, "Solver error");
             return State.EDITION;
-        }
-        if(! getFrame().getSolver().isSatisfiable()) {
-            System.out.println("Error : unsatisfiable");
-        }        
+        }    
             
         // Si il y a au moins un model
         try {
-            ListIterator<Model> iter = (ListIterator<Model>) getFrame().getSolver().getModelList().iterator();
+            ListIterator<Model> iter = getFrame().getSolver().getModelList().iterator();
+            if(!iter.hasNext()) {
+                System.out.println("Error : unsatisfiable");
+            }    
             getFrame().updateResultsPanelIterator(iter);
             /**
              * Si il y a plus d'un model, alors passer à l'état FIRST_RESULT
