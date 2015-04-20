@@ -251,6 +251,7 @@ public class ResultsPanel extends AbstractComponentPanel {
         jTable1.setGridColor(Color.BLACK);
         jTable1.setShowGrid(true);
         jTable1.getRowSorter().toggleSortOrder(0);
+        jTable1.setRowSelectionAllowed(false);
         jScrollPane2.setViewportView(jTable1);
 
         trueCheckBox.setSelected(true);
