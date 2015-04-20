@@ -85,7 +85,7 @@ public class Minisat {
             System.out.println("Error StreamReader");
             System.exit(4);
         } catch (ContradictionException e) {
-            System.out.println("Unsatisfiable (trivial)!");
+            //System.out.println("Unsatisfiable (trivial)!");
             System.exit(1);
         }catch (org.sat4j.specs.TimeoutException ex) {
             System.out.println("Timeout Solver/Please Restart");
