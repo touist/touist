@@ -21,7 +21,6 @@ import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-import solution.NotSatisfiableException;
 import solution.SolverExecutionException;
 import solution.SolverTestSAT4J;
 import translation.TranslationError;
@@ -412,15 +411,17 @@ public class ParentEditionPanel extends AbstractComponentPanel {
             errorMessage = "Couldn't launch solver.";
             showErrorMessage(ex, errorMessage, "Solver error");
             return State.EDITION;
-        }
-        if(! getFrame().getSolver().isSatisfiable()) {
-            System.out.println("Error : unsatisfiable");
-            getFrame().setResultsPanelEmpty();
-        }        
+        }    
             
         // Si il y a au moins un model
         try {
-            ListIterator<Model> iter = (ListIterator<Model>) getFrame().getSolver().getModelList().iterator();
+            ListIterator<Model> iter = getFrame().getSolver().getModelList().iterator();
+            if(!iter.hasNext()) {
+                System.out.println("Error : unsatisfiable");
+                errorMessage = "There is no solution.";
+                showErrorMessage(errorMessage, "Solver error");
+                return State.EDITION;
+            }    
             getFrame().updateResultsPanelIterator(iter);
             /**
              * Si il y a plus d'un model, alors passer à l'état FIRST_RESULT
@@ -436,14 +437,8 @@ public class ParentEditionPanel extends AbstractComponentPanel {
                     return State.SINGLE_RESULT;
                 }
             } else {
-                getFrame().setResultsPanelEmpty();
-                return State.NO_RESULT;
+                return State.SINGLE_RESULT;
             }
-        } catch (NotSatisfiableException ex) {
-            ex.printStackTrace();
-            errorMessage = "There is no solution.";
-            showErrorMessage(ex, errorMessage, "Solver error");
-            return State.EDITION;
         } catch (SolverExecutionException ex) {
             ex.printStackTrace();
             errorMessage = "The solver encountered a problem.";
