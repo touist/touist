@@ -214,7 +214,7 @@ public class ResultsPanel extends AbstractComponentPanel {
         trueCheckBox = new javax.swing.JCheckBox();
         falseCheckBox = new javax.swing.JCheckBox();
         searchTextField = new javax.swing.JTextField();
-        jButton1 = new javax.swing.JButton();
+        jButtonExport = new javax.swing.JButton();
 
         setMinimumSize(new java.awt.Dimension(400, 300));
 
@@ -271,10 +271,10 @@ public class ResultsPanel extends AbstractComponentPanel {
 
         searchTextField.getDocument().addDocumentListener(new RegexListener());
 
-        jButton1.setText("Exporter");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        jButtonExport.setText("Exporter");
+        jButtonExport.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+                jButtonExportActionPerformed(evt);
             }
         });
 
@@ -301,7 +301,7 @@ public class ResultsPanel extends AbstractComponentPanel {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jButtonNext)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jButton1)))
+                        .addComponent(jButtonExport)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -320,7 +320,7 @@ public class ResultsPanel extends AbstractComponentPanel {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jButtonPrevious)
                     .addComponent(jButtonNext)
-                    .addComponent(jButton1))
+                    .addComponent(jButtonExport))
                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -513,7 +513,7 @@ public class ResultsPanel extends AbstractComponentPanel {
         this.updateUI();
     }//GEN-LAST:event_trueCheckBoxActionPerformed
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+    private void jButtonExportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonExportActionPerformed
          switch(getState()) {
             case EDITION :
                 // impossible
@@ -538,13 +538,13 @@ public class ResultsPanel extends AbstractComponentPanel {
                 System.out.println("Undefined action set for the state : " + getState());
         }
         this.updateUI();
-    }//GEN-LAST:event_jButton1ActionPerformed
+    }//GEN-LAST:event_jButtonExportActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JCheckBox falseCheckBox;
-    private javax.swing.JButton jButton1;
     private javax.swing.JButton jButtonEditor;
+    private javax.swing.JButton jButtonExport;
     private javax.swing.JButton jButtonNext;
     private javax.swing.JButton jButtonPrevious;
     private javax.swing.JLabel jLabel1;
@@ -560,9 +560,11 @@ public class ResultsPanel extends AbstractComponentPanel {
         jButtonPrevious.setText(getFrame().getLang().getWord(Lang.RESULTS_PREVIOUS));
         jButtonNext.setText(getFrame().getLang().getWord(Lang.RESULTS_NEXT));
         jButtonEditor.setText(getFrame().getLang().getWord(Lang.RESULTS_RETURN));
+        jButtonExport.setText(getFrame().getLang().getWord(Lang.RESULTS_EXPORT));
         //trueCheckBox.setText(getFrame().getLang().getWord(Lang.RESULTS_TRUE));
         //falseCheckBox.setText(getFrame().getLang().getWord(Lang.RESULTS_FALSE));
         jTable1.getColumnModel().getColumn(0).setHeaderValue(getFrame().getLang().getWord(Lang.RESULTS_NAME));
         jTable1.getColumnModel().getColumn(1).setHeaderValue(getFrame().getLang().getWord(Lang.RESULTS_VALUE));
+    
     }
 }
