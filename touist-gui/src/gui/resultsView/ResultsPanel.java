@@ -162,11 +162,13 @@ public class ResultsPanel extends AbstractComponentPanel {
                 String prefix = exportDialog.getPrefixValue();
                 String separator = exportDialog.getSeparatorValue();
                 String suffix = exportDialog.getSuffixValue();
-                System.err.println(prefix);
+                
                 
                 ArrayList<Literal> literals = (ArrayList<Literal>) actModel.literals;
                 for(int i = 0; i < literals.size(); i++) {
-                    sb.append(prefix+literals.get(i).getLiteral()+separator+(literals.get(i).isLiteral_positivity()?"true":"false")+suffix+"\n");
+                    String left = exportDialog.getLeftValue()=="litteral"?literals.get(i).getLiteral():(literals.get(i).isLiteral_positivity()?"true":"false");
+                    String right = exportDialog.getRightValue()=="litteral"?literals.get(i).getLiteral():(literals.get(i).isLiteral_positivity()?"true":"false");
+                    sb.append(prefix+left+separator+right+suffix+"\n");
                 }
 
                 BufferedWriter out = new BufferedWriter(new FileWriter(fc.getSelectedFile().getAbsolutePath()));
