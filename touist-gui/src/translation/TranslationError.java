@@ -18,8 +18,7 @@ public class TranslationError {
 
 	@Override
 	public String toString() {
-		return "The Touistl translator returned an error:\n"
-				+"In line "+rowInCode+", column "+columnInCode+": "
+		return "Line "+rowInCode+", column "+columnInCode+": "
 				+errorMessage;
 	}
 
