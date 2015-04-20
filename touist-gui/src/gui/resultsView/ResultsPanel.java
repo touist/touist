@@ -85,11 +85,13 @@ public class ResultsPanel extends AbstractComponentPanel {
     private int currentModelIndex = 0;
     ListIterator<Model> iter;
     Model actModel;
+    ExportDialog exportDialog;
 
     /**
      * Creates new form ResultsPanel
      */
     public ResultsPanel() {
+        exportDialog = new ExportDialog();
         initComponents();
     }
 
@@ -136,6 +138,11 @@ public class ResultsPanel extends AbstractComponentPanel {
         }
     }
     
+    public void setEmpty(){
+        ResultTableModel model = (ResultTableModel) jTable1.getModel();
+        model.setNumRows(0);
+    }
+    
     public void exportModel() throws IOException {
         final JFileChooser fc = new JFileChooser();
         fc.setFileFilter(new FileNameExtensionFilter("Text files(txt, text)","txt","text"));
@@ -146,17 +153,29 @@ public class ResultsPanel extends AbstractComponentPanel {
         if(returnVal == JFileChooser.APPROVE_OPTION){
             String filename = fc.getSelectedFile().getName();
             String extension = (filename.contains(".")?filename.substring(filename.lastIndexOf("."),filename.length()):"txt");
-            
-            StringBuilder sb = new StringBuilder();
-            
-            ArrayList<Literal> literals = (ArrayList<Literal>) actModel.literals;
-            for(int i = 0; i < literals.size(); i++) {
-                sb.append(literals.get(i).getLiteral()+" valuted to "+(literals.get(i).isLiteral_positivity()?"true":"false")+"\n");
+            Object[] options1 = { "Try This Number", "Choose A Random Number",
+                "Quit" };
+            int result = JOptionPane.showConfirmDialog(null, exportDialog,"Format d'export",JOptionPane.DEFAULT_OPTION);
+            if(result == JOptionPane.YES_OPTION){
+                StringBuilder sb = new StringBuilder();
+                
+                String prefix = exportDialog.getPrefixValue();
+                String separator = exportDialog.getSeparatorValue();
+                String suffix = exportDialog.getSuffixValue();
+                
+                
+                ArrayList<Literal> literals = (ArrayList<Literal>) actModel.literals;
+                for(int i = 0; i < literals.size(); i++) {
+                    String left = exportDialog.getLeftValue()=="litteral"?literals.get(i).getLiteral():(literals.get(i).isLiteral_positivity()?"true":"false");
+                    String right = exportDialog.getRightValue()=="litteral"?literals.get(i).getLiteral():(literals.get(i).isLiteral_positivity()?"true":"false");
+                    sb.append(prefix+left+separator+right+suffix+"\n");
+                }
+
+                BufferedWriter out = new BufferedWriter(new FileWriter(fc.getSelectedFile().getAbsolutePath()));
+                out.write(sb.toString());
+                out.close();
             }
             
-            BufferedWriter out = new BufferedWriter(new FileWriter(fc.getSelectedFile().getAbsolutePath()));
-            out.write(sb.toString());
-            out.close();
         }
     }
 
@@ -214,7 +233,7 @@ public class ResultsPanel extends AbstractComponentPanel {
         trueCheckBox = new javax.swing.JCheckBox();
         falseCheckBox = new javax.swing.JCheckBox();
         searchTextField = new javax.swing.JTextField();
-        jButton1 = new javax.swing.JButton();
+        jButtonExport = new javax.swing.JButton();
 
         setMinimumSize(new java.awt.Dimension(400, 300));
 
@@ -251,6 +270,7 @@ public class ResultsPanel extends AbstractComponentPanel {
         jTable1.setGridColor(Color.BLACK);
         jTable1.setShowGrid(true);
         jTable1.getRowSorter().toggleSortOrder(0);
+        jTable1.setRowSelectionAllowed(false);
         jScrollPane2.setViewportView(jTable1);
 
         trueCheckBox.setSelected(true);
@@ -271,10 +291,10 @@ public class ResultsPanel extends AbstractComponentPanel {
 
         searchTextField.getDocument().addDocumentListener(new RegexListener());
 
-        jButton1.setText("Exporter");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        jButtonExport.setText("Exporter");
+        jButtonExport.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+                jButtonExportActionPerformed(evt);
             }
         });
 
@@ -301,7 +321,7 @@ public class ResultsPanel extends AbstractComponentPanel {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jButtonNext)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jButton1)))
+                        .addComponent(jButtonExport)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -320,7 +340,7 @@ public class ResultsPanel extends AbstractComponentPanel {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jButtonPrevious)
                     .addComponent(jButtonNext)
-                    .addComponent(jButton1))
+                    .addComponent(jButtonExport))
                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -513,7 +533,7 @@ public class ResultsPanel extends AbstractComponentPanel {
         this.updateUI();
     }//GEN-LAST:event_trueCheckBoxActionPerformed
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+    private void jButtonExportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonExportActionPerformed
          switch(getState()) {
             case EDITION :
                 // impossible
@@ -538,13 +558,13 @@ public class ResultsPanel extends AbstractComponentPanel {
                 System.out.println("Undefined action set for the state : " + getState());
         }
         this.updateUI();
-    }//GEN-LAST:event_jButton1ActionPerformed
+    }//GEN-LAST:event_jButtonExportActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JCheckBox falseCheckBox;
-    private javax.swing.JButton jButton1;
     private javax.swing.JButton jButtonEditor;
+    private javax.swing.JButton jButtonExport;
     private javax.swing.JButton jButtonNext;
     private javax.swing.JButton jButtonPrevious;
     private javax.swing.JLabel jLabel1;
@@ -560,9 +580,11 @@ public class ResultsPanel extends AbstractComponentPanel {
         jButtonPrevious.setText(getFrame().getLang().getWord(Lang.RESULTS_PREVIOUS));
         jButtonNext.setText(getFrame().getLang().getWord(Lang.RESULTS_NEXT));
         jButtonEditor.setText(getFrame().getLang().getWord(Lang.RESULTS_RETURN));
+        jButtonExport.setText(getFrame().getLang().getWord(Lang.RESULTS_EXPORT));
         //trueCheckBox.setText(getFrame().getLang().getWord(Lang.RESULTS_TRUE));
         //falseCheckBox.setText(getFrame().getLang().getWord(Lang.RESULTS_FALSE));
         jTable1.getColumnModel().getColumn(0).setHeaderValue(getFrame().getLang().getWord(Lang.RESULTS_NAME));
         jTable1.getColumnModel().getColumn(1).setHeaderValue(getFrame().getLang().getWord(Lang.RESULTS_VALUE));
+    
     }
 }

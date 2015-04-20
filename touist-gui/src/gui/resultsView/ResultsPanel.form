@@ -42,7 +42,7 @@
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="jButtonNext" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="32767" attributes="0"/>
-                      <Component id="jButton1" min="-2" max="-2" attributes="0"/>
+                      <Component id="jButtonExport" min="-2" max="-2" attributes="0"/>
                   </Group>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
@@ -66,7 +66,7 @@
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="jButtonPrevious" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="jButtonNext" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="jButton1" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="jButtonExport" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
@@ -117,7 +117,7 @@
             </Property>
           </Properties>
           <AuxValues>
-            <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="jTable1.setAutoCreateRowSorter(true);&#xa;jTable1.setDefaultRenderer(Object.class, new ResultTableCellRenderer());&#xa;jTable1.setGridColor(Color.BLACK);&#xa;jTable1.setShowGrid(true);&#xa;jTable1.getRowSorter().toggleSortOrder(0);"/>
+            <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="jTable1.setAutoCreateRowSorter(true);&#xa;jTable1.setDefaultRenderer(Object.class, new ResultTableCellRenderer());&#xa;jTable1.setGridColor(Color.BLACK);&#xa;jTable1.setShowGrid(true);&#xa;jTable1.getRowSorter().toggleSortOrder(0);&#xa;jTable1.setRowSelectionAllowed(false);"/>
           </AuxValues>
         </Component>
       </SubComponents>
@@ -147,12 +147,12 @@
         <AuxValue name="JavaCodeGenerator_InitCodePre" type="java.lang.String" value="searchTextField.getDocument().addDocumentListener(new RegexListener());"/>
       </AuxValues>
     </Component>
-    <Component class="javax.swing.JButton" name="jButton1">
+    <Component class="javax.swing.JButton" name="jButtonExport">
       <Properties>
         <Property name="text" type="java.lang.String" value="Exporter"/>
       </Properties>
       <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton1ActionPerformed"/>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButtonExportActionPerformed"/>
       </Events>
     </Component>
   </SubComponents>
