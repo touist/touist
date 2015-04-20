@@ -1,5 +1,6 @@
 TouIST main program
 ===================
+![](https://travis-ci.org/olzd/touist.svg?branch=develop)
 
 This folder contains the source code for the main program of the TouIST project. It is named "ui" because of it's main feature : be the user interface for the solver and "bigand" translator.
 
