@@ -5,18 +5,15 @@
  */
 package gui.editionView;
 
-import entity.Literal;
 import entity.Model;
 import gui.AbstractComponentPanel;
 import gui.Lang;
 import gui.MainFrame;
 import gui.State;
-import java.io.BufferedWriter;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.ListIterator;
 import java.util.Map;
 
