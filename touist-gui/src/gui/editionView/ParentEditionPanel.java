@@ -415,6 +415,7 @@ public class ParentEditionPanel extends AbstractComponentPanel {
         }
         if(! getFrame().getSolver().isSatisfiable()) {
             System.out.println("Error : unsatisfiable");
+            getFrame().setResultsPanelEmpty();
         }        
             
         // Si il y a au moins un model
@@ -435,7 +436,8 @@ public class ParentEditionPanel extends AbstractComponentPanel {
                     return State.SINGLE_RESULT;
                 }
             } else {
-                return State.SINGLE_RESULT;
+                getFrame().setResultsPanelEmpty();
+                return State.NO_RESULT;
             }
         } catch (NotSatisfiableException ex) {
             ex.printStackTrace();

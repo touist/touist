@@ -128,6 +128,10 @@ public class MainFrame extends javax.swing.JFrame {
         resultsPanel1.setResult();
     }
     
+    public void setResultsPanelEmpty() {
+       resultsPanel1.setEmpty();
+    }
+    
     public void setLanguage(Locale language) {
         lang.setLanguage(language);
         this.repaint();

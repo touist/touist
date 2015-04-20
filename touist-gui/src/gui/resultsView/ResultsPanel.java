@@ -136,6 +136,11 @@ public class ResultsPanel extends AbstractComponentPanel {
         }
     }
     
+    public void setEmpty(){
+        ResultTableModel model = (ResultTableModel) jTable1.getModel();
+        model.setNumRows(0);
+    }
+    
     public void exportModel() throws IOException {
         final JFileChooser fc = new JFileChooser();
         fc.setFileFilter(new FileNameExtensionFilter("Text files(txt, text)","txt","text"));
