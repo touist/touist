@@ -53,8 +53,6 @@ public class SolverTestSAT4J extends Solver {
 	private Map<Integer, String> literalsMap; // "table de correspondance"
 
 	private ModelList models;
-	private boolean hasFoundModels = false;
-	private long lastHasNextCall = 0;
 
 	/**
 	 * This is the main constructor used by the user after he translated the
@@ -133,16 +131,6 @@ public class SolverTestSAT4J extends Solver {
 
 	@Override
 	protected Model nextModel() throws IOException, NotSatisfiableException, SolverExecutionException {
-		// This fixes the "two hasNext() in a row" issue:
-		if(lastHasNextCall!=0 && System.currentTimeMillis() > lastHasNextCall + 1000) {
-			try {
-				synchronized(this) {
-					this.wait(100);
-				}
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-		}
 		final int WAIT_FOR_MODEL_TIMEOUT = 50000; // ms
 		if (p == null) // Should not happen
 			throw new SolverExecutionException("nextModel(): exception: launch() has not been called");
@@ -169,7 +157,6 @@ public class SolverTestSAT4J extends Solver {
 					+ "the solver didn't give any output (timeout = "
 					+Integer.toString(WAIT_FOR_MODEL_TIMEOUT)+"ms)");
 		}
-		lastHasNextCall = System.currentTimeMillis();
 		return modelParsed;
 	}
 
