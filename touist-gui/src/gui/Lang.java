@@ -62,6 +62,8 @@ public class Lang {
     public static final String EDITION_TAB_SETS = "ParentEditionPanel.editorPanelSets.TabConstraints.tabTitle";
     public static final String EDITION_EXPORT_FAILURE_TITLE = "ParentEditionPanel.exportFailure.title";
     public static final String EDITION_EXPORT_FAILURE_TEXT = "ParentEditionPanel.exportFailure.text";
+    public static final String EDITION_MENUITEM_SAVEFILE = "EditionMenuBar.jMenuItemSaveFile.text";
+    public static final String EDITION_MENUITEM_HELPEDITION = "EditionMenuBar.jMenuItemHelpEdition.text";
     public static final String PALETTE_TEXT = "PalettePanel.jLabel1.text";
     public static final String RESULTS_NEXT = "ResultsPanel.jButtonNext.text";
     public static final String RESULTS_PREVIOUS = "ResultsPanel.jButtonPrevious.text";
@@ -70,6 +72,8 @@ public class Lang {
     public static final String RESULTS_TEXT = "ResultsPanel.jLabel1.text";
     public static final String RESULTS_NAME = "ResultsPanel.jTable1.name";
     public static final String RESULTS_VALUE = "ResultsPanel.jTable1.value";
+    public static final String RESULTS_MENUITEM_SAVEMODEL = "ResultsMenuBar.jMenuItemSaveModel.text";
+    public static final String RESULTS_MENUITEM_HELPRESULTS = "ResultsMenuBar.jMenuItemHelpResults.text";
     public static final String SOLVER_SAT_NAME = "SAT";
     public static final String SOLVER_SAT_DESCRIPTION = "A basic solver.";
     public static final String ERROR_TRADUCTION = "ParentEditionPanel.jOptionPane1.traductionError";

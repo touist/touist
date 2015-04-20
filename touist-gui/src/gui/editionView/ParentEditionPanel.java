@@ -273,7 +273,7 @@ public class ParentEditionPanel extends AbstractComponentPanel {
         }   
     }
     
-    private void exportHandler() {
+    public void exportHandler() {
         getFrame().getClause().setFormules("");
         getFrame().getClause().setSets("");
         getFrame().getClause().addFormules(editorPanelFormulas.getText());
