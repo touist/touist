@@ -5,20 +5,24 @@
  */
 package gui.editionView;
 
+import entity.Literal;
 import entity.Model;
 import gui.AbstractComponentPanel;
 import gui.Lang;
 import gui.MainFrame;
 import gui.State;
+import java.io.BufferedWriter;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.ListIterator;
 import java.util.Map;
 
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 import solution.NotSatisfiableException;
 import solution.SolverExecutionException;
@@ -63,6 +67,7 @@ public class ParentEditionPanel extends AbstractComponentPanel {
         jLabelErrorMessage = new javax.swing.JLabel();
         jLabelCaretPosition = new javax.swing.JLabel();
         jComboBox1 = new javax.swing.JComboBox();
+        exportButton = new javax.swing.JButton();
 
         jTabbedPane1.setToolTipText("");
         jTabbedPane1.addTab("Formulas", editorPanelFormulas);
@@ -90,6 +95,13 @@ public class ParentEditionPanel extends AbstractComponentPanel {
 
         jComboBox1.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "SAT", "SMT" }));
 
+        exportButton.setText("Export");
+        exportButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                exportButtonActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -101,6 +113,8 @@ public class ParentEditionPanel extends AbstractComponentPanel {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabelErrorMessage)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(exportButton)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(importButton)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(testButton)
@@ -118,7 +132,8 @@ public class ParentEditionPanel extends AbstractComponentPanel {
                     .addComponent(importButton)
                     .addComponent(jLabelCaretPosition)
                     .addComponent(jLabelErrorMessage)
-                    .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(exportButton))
                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -186,10 +201,40 @@ public class ParentEditionPanel extends AbstractComponentPanel {
         }
     }//GEN-LAST:event_testButtonActionPerformed
 
+    private void exportButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exportButtonActionPerformed
+        switch(((MainFrame)(getRootPane().getParent())).state) {
+            case EDITION :
+                setState(State.EDITION);
+                exportHandler();
+                break;
+            case EDITION_ERROR :
+                setState(State.EDITION_ERROR);
+                exportHandler();
+                break;
+            case NO_RESULT :
+                // impossible
+                break;
+            case SINGLE_RESULT :
+                // impossible
+                break;
+            case FIRST_RESULT :
+                // impossible
+                break;
+            case MIDDLE_RESULT :
+                // impossible
+                break;
+            case LAST_RESULT :
+                // impossible
+                break;
+            default : 
+                System.out.println("Undefined action set for the state : " + getState());
+        }    }//GEN-LAST:event_exportButtonActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private gui.editionView.EditionPanel editorPanelFormulas;
     private gui.editionView.EditionPanel editorPanelSets;
+    private javax.swing.JButton exportButton;
     private javax.swing.JButton importButton;
     private javax.swing.JComboBox jComboBox1;
     private javax.swing.JFileChooser jFileChooser1;
@@ -227,6 +272,25 @@ public class ParentEditionPanel extends AbstractComponentPanel {
             text = getFrame().getClause().getSets();
             editorPanelSets.setText(text);
         }   
+    }
+    
+    private void exportHandler() {
+        getFrame().getClause().setFormules("");
+        getFrame().getClause().setSets("");
+        getFrame().getClause().addFormules(editorPanelFormulas.getText());
+        getFrame().getClause().addSets(editorPanelSets.getText());
+        final JFileChooser fc = new JFileChooser();
+        fc.addChoosableFileFilter(new FileNameExtensionFilter("Touistl files(touistl)","touistl"));
+        int returnVal = fc.showOpenDialog(this);
+        try {
+            if(returnVal == JFileChooser.APPROVE_OPTION){
+                getFrame().getClause().saveToFile(fc.getSelectedFile().getPath());
+            }
+        } catch (IOException e) {
+            String warningWindowTitle = getFrame().getLang().getWord(Lang.EDITION_EXPORT_FAILURE_TITLE);
+            String warningWindowText = getFrame().getLang().getWord(Lang.EDITION_EXPORT_FAILURE_TEXT);
+            JOptionPane.showMessageDialog(this,warningWindowText,warningWindowTitle,JOptionPane.ERROR_MESSAGE);
+        }
     }
     
     private void showErrorMessage(String message, String title) {
@@ -396,6 +460,7 @@ public class ParentEditionPanel extends AbstractComponentPanel {
     @Override
     public void updateLanguage() {
         importButton.setText(getFrame().getLang().getWord(Lang.EDITION_IMPORT));
+        exportButton.setText(getFrame().getLang().getWord(Lang.EDITION_EXPORT));
         testButton.setText(getFrame().getLang().getWord(Lang.EDITION_TEST));
         editorPanelFormulas.updateLanguage();
         editorPanelSets.updateLanguage();
