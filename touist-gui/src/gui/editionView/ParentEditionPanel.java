@@ -21,7 +21,6 @@ import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-import solution.NotSatisfiableException;
 import solution.SolverExecutionException;
 import solution.SolverTestSAT4J;
 import translation.TranslationError;
@@ -419,6 +418,9 @@ public class ParentEditionPanel extends AbstractComponentPanel {
             ListIterator<Model> iter = getFrame().getSolver().getModelList().iterator();
             if(!iter.hasNext()) {
                 System.out.println("Error : unsatisfiable");
+                errorMessage = "There is no solution.";
+                showErrorMessage(errorMessage, "Solver error");
+                return State.EDITION;
             }    
             getFrame().updateResultsPanelIterator(iter);
             /**
@@ -437,11 +439,6 @@ public class ParentEditionPanel extends AbstractComponentPanel {
             } else {
                 return State.SINGLE_RESULT;
             }
-        } catch (NotSatisfiableException ex) {
-            ex.printStackTrace();
-            errorMessage = "There is no solution.";
-            showErrorMessage(ex, errorMessage, "Solver error");
-            return State.EDITION;
         } catch (SolverExecutionException ex) {
             ex.printStackTrace();
             errorMessage = "The solver encountered a problem.";

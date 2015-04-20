@@ -119,8 +119,7 @@ public class SolverTestSAT4J extends Solver {
 	}
 
 	@Override
-	public ModelList getModelList() throws NotSatisfiableException,
-			SolverExecutionException {
+	public ModelList getModelList() throws SolverExecutionException {
 		return models;
 	}
 

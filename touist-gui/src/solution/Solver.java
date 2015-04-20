@@ -57,16 +57,15 @@ public abstract class Solver {
 	public abstract void close();
 
 	/**
-	 * WARNING: you must run isSatisfiable() BEFORE using this method.
 	 * Gives the list of models on which the user can iterate. The only way to
 	 * get the "next" models is to iterate. The size of Models is not known
 	 * unless hasNext() returns false.
 	 * Use this method after using launch().
+	 * @note You must use hasNext() to know the satisfiability
 	 * @return the models
-	 * @throws NotSatisfiableException if not satisfiable
 	 * @throws SolverExecutionException if any error happened
 	 */
-	public abstract ModelList getModelList() throws NotSatisfiableException,SolverExecutionException;
+	public abstract ModelList getModelList() throws SolverExecutionException;
 
 	/**
 	 * ONLY used by ModelsIterator.
