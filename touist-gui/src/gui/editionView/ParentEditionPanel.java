@@ -246,7 +246,7 @@ public class ParentEditionPanel extends AbstractComponentPanel {
     private javax.swing.JButton testButton;
     // End of variables declaration//GEN-END:variables
 
-    private void importHandler() {
+    public void importHandler() {
         String path = "";
         int returnVal;
         getFrame().getClause().setFormules("");
