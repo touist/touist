@@ -85,11 +85,13 @@ public class ResultsPanel extends AbstractComponentPanel {
     private int currentModelIndex = 0;
     ListIterator<Model> iter;
     Model actModel;
+    ExportDialog exportDialog;
 
     /**
      * Creates new form ResultsPanel
      */
     public ResultsPanel() {
+        exportDialog = new ExportDialog();
         initComponents();
     }
 
@@ -151,17 +153,27 @@ public class ResultsPanel extends AbstractComponentPanel {
         if(returnVal == JFileChooser.APPROVE_OPTION){
             String filename = fc.getSelectedFile().getName();
             String extension = (filename.contains(".")?filename.substring(filename.lastIndexOf("."),filename.length()):"txt");
-            
-            StringBuilder sb = new StringBuilder();
-            
-            ArrayList<Literal> literals = (ArrayList<Literal>) actModel.literals;
-            for(int i = 0; i < literals.size(); i++) {
-                sb.append(literals.get(i).getLiteral()+" valuted to "+(literals.get(i).isLiteral_positivity()?"true":"false")+"\n");
+            Object[] options1 = { "Try This Number", "Choose A Random Number",
+                "Quit" };
+            int result = JOptionPane.showConfirmDialog(null, exportDialog,"Format d'export",JOptionPane.DEFAULT_OPTION);
+            if(result == JOptionPane.YES_OPTION){
+                StringBuilder sb = new StringBuilder();
+                
+                String prefix = exportDialog.getPrefixValue();
+                String separator = exportDialog.getSeparatorValue();
+                String suffix = exportDialog.getSuffixValue();
+                System.err.println(prefix);
+                
+                ArrayList<Literal> literals = (ArrayList<Literal>) actModel.literals;
+                for(int i = 0; i < literals.size(); i++) {
+                    sb.append(prefix+literals.get(i).getLiteral()+separator+(literals.get(i).isLiteral_positivity()?"true":"false")+suffix+"\n");
+                }
+
+                BufferedWriter out = new BufferedWriter(new FileWriter(fc.getSelectedFile().getAbsolutePath()));
+                out.write(sb.toString());
+                out.close();
             }
             
-            BufferedWriter out = new BufferedWriter(new FileWriter(fc.getSelectedFile().getAbsolutePath()));
-            out.write(sb.toString());
-            out.close();
         }
     }
 
