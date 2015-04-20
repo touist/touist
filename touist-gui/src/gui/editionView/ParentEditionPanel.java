@@ -417,8 +417,8 @@ public class ParentEditionPanel extends AbstractComponentPanel {
         try {
             ListIterator<Model> iter = getFrame().getSolver().getModelList().iterator();
             if(!iter.hasNext()) {
-                System.out.println("Error : unsatisfiable");
-                errorMessage = "There is no solution.";
+                System.out.println("This model is unsatisfiable");
+                errorMessage = "There is no solution";
                 showErrorMessage(errorMessage, "Solver error");
                 return State.EDITION;
             }    
