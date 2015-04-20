@@ -1,0 +1,11 @@
+language: java
+jdk: 
+    - openjdk6
+install:
+    - cd touist-gui
+    - ant build
+    - ant build-jar
+script:
+    - echo "Bravo ! On n'a meme pas fait de tests unitaires..."
+notifications:
+  email: false
