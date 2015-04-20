@@ -69,3 +69,5 @@ bigAndFile-defaultname.txt
 /touist-gui/nbproject/project.xml
 /touist-gui/nbbuild.xml
 *.prefs
+
+touist-gui/external/touistc
