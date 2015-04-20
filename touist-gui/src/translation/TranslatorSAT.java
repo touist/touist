@@ -75,18 +75,20 @@ public class TranslatorSAT {
 	 * @throws InterruptedException
 	 */
 	public boolean translate(String bigandFilePath) throws IOException, InterruptedException {
-		/* return_code from the Touistl translator :
-		    | OK -> 0
-  			| COMPILE_SYNTAX_ERROR -> 1
-  			| COMPILE_SEMANTIC_ERROR -> 2
-  			| COMPILE_JUSTWARNINGS -> 3
-  			| ARGUMENTS_ERROR -> 4
+		/* return_code from the Touistl translator (see touistc.ml):
+  		| OK -> 0
+  		| COMPILE_WITH_LINE_NUMBER_ERROR -> 1
+  		| COMPILE_NO_LINE_NUMBER_ERROR -> 2
+  		| OTHER -> 3
 		 */
+		final int OK = 0;
+		final int COMPILE_WITH_LINE_NUMBER_ERROR = 1;
+		final int COMPILE_NO_LINE_NUMBER_ERROR = 2;
+		final int OTHER = 3;
 		/*
-		 * Syntax of errors returned by translator:
+		 * Syntax of errors COMPILE_WITH_LINE_NUMBER_ERROR:
 		 * num_row:num_col: message
 		 */
-		
 		// Check if translatorProgramFilePath is there
 		String path = currentPath + File.separatorChar + translatorProgramFilePath;
 		String cmd = path.toString()
@@ -111,7 +113,7 @@ public class TranslatorSAT {
 		stderr.close();
 		stdout.close();
 		errors = new ArrayList<TranslationError>();
-		if(return_code == 1 || return_code == 2) {
+		if(return_code == 1 || return_code == 2) { // TODO should match COMPILE_NO_LINE_NUMBER_ERROR
 			System.err.println("translate(): the translator returned errors");
 			String file_name; int num_line; int num_col;
 			String message_error;
