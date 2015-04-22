@@ -75,6 +75,7 @@ public class Lang {
     public static final String RESULTS_VALUE = "ResultsPanel.jTable1.value";
     public static final String RESULTS_MENUITEM_SAVEMODEL = "ResultsMenuBar.jMenuItemSaveModel.text";
     public static final String RESULTS_MENUITEM_HELPRESULTS = "ResultsMenuBar.jMenuItemHelpResults.text";
+    public static final String RESULTS_FILE_CHOOSER = "ResultsPanel.jFileChooser.title";
     public static final String SOLVER_SAT_NAME = "SAT";
     public static final String SOLVER_SAT_DESCRIPTION = "A basic solver.";
     public static final String ERROR_TRADUCTION = "ParentEditionPanel.jOptionPane1.traductionError";
