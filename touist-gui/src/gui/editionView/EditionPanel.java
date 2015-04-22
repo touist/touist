@@ -10,6 +10,8 @@ import gui.TranslatorLatex.TranslationLatex;
 import gui.editionView.editor.Editor;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.IOException;
@@ -33,25 +35,26 @@ public class EditionPanel extends AbstractComponentPanel {
     private Editor editorTextArea;
     private int rightPanelWidth;
     private JLabel latexLabel;
+    private int zoom = 0;
     
     /**
      * Creates new form EditorPanel
      */
     
-    class UpdateLatexListener implements DocumentListener {
-        
-        
-        private void UpdateLatexLabel(){
+    public void UpdateLatexLabel()
+    {
             try {
                 TranslationLatex T = new TranslationLatex(editorTextArea.getText());
                 TeXFormula formula = new TeXFormula(T.getFormula());
-                TeXIcon ti = formula.createTeXIcon(TeXConstants.ALIGN_TOP, 20);
+                TeXIcon ti = formula.createTeXIcon(TeXConstants.ALIGN_TOP, 20+zoom);
                 latexLabel.setIcon(ti);
             }
             catch (Exception exc) {
                 System.err.println("Erreur lors de la conversion latex");
             }
-        }
+    }
+    
+    class UpdateLatexListener implements DocumentListener {
         
          @Override
         public void insertUpdate(DocumentEvent e) {
@@ -69,6 +72,23 @@ public class EditionPanel extends AbstractComponentPanel {
         }
     }    
     
+    class ScaleLatexListener implements MouseWheelListener {
+        
+        @Override
+        public void mouseWheelMoved(MouseWheelEvent e) {
+            if(e.paramString().contains("modifiers=Ctrl")) {
+                zoom -= e.getWheelRotation();
+                zoom = Math.min(200,zoom);
+                zoom = Math.max(-19,zoom);
+                UpdateLatexLabel();
+            }
+            else {
+                jScrollPane1.getMouseWheelListeners()[0].mouseWheelMoved(e);
+            }
+        }
+        
+    }    
+    
     public EditionPanel() {
         initComponents();
         // Editor textArea set-up
@@ -79,6 +99,9 @@ public class EditionPanel extends AbstractComponentPanel {
         catch (IOException e) {
             System.err.println("Erreur lancement éditeur");
         }
+        
+        jPanel1.addMouseWheelListener(new ScaleLatexListener());
+        
         jPanel1.setLayout(new FlowLayout());
         jPanel1.add(latexLabel = new JLabel(),FlowLayout.LEFT);
         latexLabel.setVisible(true);
@@ -164,7 +187,7 @@ public class EditionPanel extends AbstractComponentPanel {
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 164, Short.MAX_VALUE)
+            .addGap(0, 324, Short.MAX_VALUE)
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -182,7 +205,7 @@ public class EditionPanel extends AbstractComponentPanel {
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jSplitPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 215, Short.MAX_VALUE)
+            .addComponent(jSplitPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 527, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
