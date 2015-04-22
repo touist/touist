@@ -142,6 +142,10 @@ public class TranslatorSAT {
 	public Map<Integer,String> getLiteralsMap() {
 		return literalsMap;
 	}
+        
+        public Process getP(){
+            return p;
+        }
 
 	/**
 	 * Allows the user to get the path of the generated DIMACS file.

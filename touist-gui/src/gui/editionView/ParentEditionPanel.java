@@ -32,11 +32,17 @@ import translation.TranslatorSAT;
  */
 public class ParentEditionPanel extends AbstractComponentPanel {
 
+    
+    private Thread testThread;
+
     /**
      * Creates new form FormulasPanel
      */
     public ParentEditionPanel() {
         initComponents();
+        
+        testThread = new Thread();
+        
         editorPanelFormulas.initPalette(PalettePanel.PaletteType.FORMULA);
         editorPanelSets.initPalette(PalettePanel.PaletteType.SET);
         jFileChooser1.setCurrentDirectory(new File(".."));
@@ -167,15 +173,41 @@ public class ParentEditionPanel extends AbstractComponentPanel {
         }
     }//GEN-LAST:event_importButtonActionPerformed
 
+    
+    
+    
     private void testButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_testButtonActionPerformed
         switch(((MainFrame)(getRootPane().getParent())).state) {
             case EDITION :
                 jLabelErrorMessage.setText("");
-                State state = initResultView();
-                if (state != State.EDITION) {
-                    setState(state);
-                    getFrame().setViewToResults();
+                
+                this.testButton.setText(this.testButton.getText()=="Stop"?"Test":"Stop");
+                
+                if(testThread.isAlive()) {
+                    testThread.stop();
                 }
+                Process p = getFrame().getTranslator().getP();
+                if(p != null && p.isAlive()){
+                    p.destroy();
+                }
+                
+                if(this.testButton.getText() == "Test") break;
+                
+                Runnable r = new Runnable() {
+                    public void run() {
+                        State state = initResultView();
+                        if (state != State.EDITION) {
+                            setState(state);
+                            getFrame().setViewToResults();
+                            testButton.setText("Test");
+                        }
+                    }
+                };
+                
+                
+                testThread = new Thread(r);
+                testThread.start();
+                
                 break;
             case EDITION_ERROR :
                 // interdit
