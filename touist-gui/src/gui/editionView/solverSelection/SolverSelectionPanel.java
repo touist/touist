@@ -6,6 +6,7 @@
 package gui.editionView.solverSelection;
 
 import gui.AbstractComponentPanel;
+import gui.MainFrame;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
