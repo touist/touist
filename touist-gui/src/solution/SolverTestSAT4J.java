@@ -84,7 +84,10 @@ public class SolverTestSAT4J extends Solver {
 		models = new ModelList(this);
 	}
 
-	private boolean isRunning(Process process) {
+    /**
+     * For Java RE 6 compatibility (p.isAlive() is JavaRE7)
+     */
+	private boolean isAlive(Process process) {
 	    try {
 	        process.exitValue();
 	        return false;
@@ -134,7 +137,7 @@ public class SolverTestSAT4J extends Solver {
 		final int WAIT_FOR_MODEL_TIMEOUT = 50000; // ms
 		if (p == null) // Should not happen
 			throw new SolverExecutionException("nextModel(): exception: launch() has not been called");
-		if (!isRunning(p)) { // The solver is already done
+		if (!isAlive(p)) { // The solver is already done
 			return null;
 		}
 		String[] rawLiterals;
@@ -143,7 +146,7 @@ public class SolverTestSAT4J extends Solver {
 		stdin.flush();
 		// We wait for any output from the solver unless we get a timeout
 		final long timeout = System.currentTimeMillis() + WAIT_FOR_MODEL_TIMEOUT;
-		while(!stdout.ready() && isRunning(p) && System.currentTimeMillis() < timeout){
+		while(!stdout.ready() && isAlive(p) && System.currentTimeMillis() < timeout){
 			// Active waiting (I know, it is a bad way to do it!)
 		}
 		// Case 1 : we got some text to read from stdout

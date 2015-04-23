@@ -173,8 +173,17 @@ public class ParentEditionPanel extends AbstractComponentPanel {
         }
     }//GEN-LAST:event_importButtonActionPerformed
 
-    
-    
+    /**
+     * For Java RE 6 compatibility (p.isAlive() is JavaRE7)
+     */
+	private boolean isAlive(Process process) {
+	    try {
+	        process.exitValue();
+	        return false;
+	    } catch (Exception e) {
+	        return true;
+	    }
+	}
     
     private void testButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_testButtonActionPerformed
         switch(((MainFrame)(getRootPane().getParent())).state) {
@@ -187,7 +196,7 @@ public class ParentEditionPanel extends AbstractComponentPanel {
                     testThread.stop();
                 }
                 Process p = getFrame().getTranslator().getP();
-                if(p != null && p.isAlive()){
+                if(p != null && isAlive(p)){
                     p.destroy();
                 }
                 
