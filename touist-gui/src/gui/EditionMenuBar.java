@@ -146,7 +146,8 @@ public class EditionMenuBar extends JMenuBar {
         jEditorPane.setText(text);
 
         // now add it all to a frame
-        JFrame j = new JFrame("Help");
+        JFrame j = new JFrame(parent.getLang().getWord(Lang.HELP_PANEL_TITLE));
+        
         j.getContentPane().add(scrollPane, BorderLayout.CENTER);
 
         // make it easy to close the application
