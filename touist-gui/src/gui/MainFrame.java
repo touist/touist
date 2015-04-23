@@ -73,6 +73,10 @@ public class MainFrame extends javax.swing.JFrame {
         }
         
         this.setJMenuBar(editionMenuBar);
+       
+        setLanguage(
+        		(lang.getSupportedLanguages().contains(Locale.getDefault()))
+        		?Locale.getDefault():Locale.ENGLISH);
         updateLanguage();
     }
     

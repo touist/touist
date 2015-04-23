@@ -47,6 +47,7 @@ public class Lang {
     private void initSupportedLanguages() {
         supportedLanguages = new HashMap<Locale,String>();
         supportedLanguages.put(Locale.FRENCH, "lang.fr_FR"); // "lang" is the package
+        supportedLanguages.put(Locale.FRANCE, "lang.fr_FR");
         supportedLanguages.put(Locale.ENGLISH, "lang.en_US");
     }
     
