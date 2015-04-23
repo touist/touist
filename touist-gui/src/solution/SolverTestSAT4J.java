@@ -148,6 +148,14 @@ public class SolverTestSAT4J extends Solver {
 		final long timeout = System.currentTimeMillis() + WAIT_FOR_MODEL_TIMEOUT;
 		while(!stdout.ready() && isAlive(p) && System.currentTimeMillis() < timeout){
 			// Active waiting (I know, it is a bad way to do it!)
+			try {
+				synchronized (this) { // for JavaRE6 compliance
+					this.wait(10);
+				}
+			} catch (InterruptedException e) {
+				// TODO I added this wait to avoid active complete waiting
+				e.printStackTrace();
+			}
 		}
 		// Case 1 : we got some text to read from stdout
 		if(stdout.ready()) {
