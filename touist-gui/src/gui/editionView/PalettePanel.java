@@ -49,8 +49,8 @@ public class PalettePanel extends AbstractComponentPanel {
     
     public void initPaletteContent(PaletteType type) {
         if (type == PaletteType.FORMULA) {
-            PaletteSectionPanel section1 = new PaletteSectionPanel("Section 1");
-            PaletteSectionPanel section2 = new PaletteSectionPanel("Section 2");
+            PaletteSectionPanel section1 = new PaletteSectionPanel(getFrame().getLang().getWord("PaletteSectionPanel.Connectors"));
+            PaletteSectionPanel section2 = new PaletteSectionPanel(getFrame().getLang().getWord("PaletteSectionPanel.Examples"));
             sections.add(section1);
             sections.add(section2);
 
