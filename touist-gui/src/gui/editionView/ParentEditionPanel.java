@@ -193,7 +193,7 @@ public class ParentEditionPanel extends AbstractComponentPanel {
                 this.testButton.setText(this.testButton.getText()=="Stop"?"Test":"Stop");
                 
                 if(testThread.isAlive()) {
-                    testThread.stop();
+                    testThread.interrupt();
                 }
                 Process p = getFrame().getTranslator().getP();
                 if(p != null && isAlive(p)){
