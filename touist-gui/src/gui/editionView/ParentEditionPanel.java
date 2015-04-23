@@ -73,19 +73,24 @@ public class ParentEditionPanel extends AbstractComponentPanel {
 
         jFileChooser1.setFileSelectionMode(JFileChooser.FILES_ONLY);
         jFileChooser1.addChoosableFileFilter(new FileNameExtensionFilter("Touistl files(touistl)","touistl"));
+        jFileChooser1.setToolTipText(""); // TODO
 
         jTabbedPane1.setToolTipText("");
-        jTabbedPane1.addTab("Formulas", editorPanelFormulas);
-        jTabbedPane1.addTab("Sets", editorPanelSets);
+        jTabbedPane1.addTab(getFrame().getLang().getWord("ParentEditionPanel.editorPanelFormulas.TabConstraints.tabTitle"), editorPanelFormulas);
+        editorPanelFormulas.setToolTipText("ParentEditionPanel.editorPanelFormulas.TabConstraints.tabTooltip");
+        
+        jTabbedPane1.addTab(getFrame().getLang().getWord("ParentEditionPanel.editorPanelSets.TabConstraints.tabTitle"), editorPanelSets);        
+        editorPanelSets.setToolTipText(getFrame().getLang().getWord("ParentEditionPanel.editorPanelSets.TabConstraints.tabTooltip"));
 
         testButton.setText(getFrame().getLang().getWord("ParentEditionPanel.testButton.text"));
+        testButton.setToolTipText(getFrame().getLang().getWord("ParentEditionPanel.testButton.tooltip"));
         testButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 testButtonActionPerformed(evt);
             }
         });
 
-        importButton.setText("Import");
+        importButton.setText(getFrame().getLang().getWord("ParentEditionPanel.importButton.text"));
         importButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 importButtonActionPerformed(evt);
@@ -99,7 +104,7 @@ public class ParentEditionPanel extends AbstractComponentPanel {
 
         jComboBox1.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "SAT", "SMT" }));
 
-        exportButton.setText("Export");
+        exportButton.setText(getFrame().getLang().getWord("ParentEditionPanel.exportButton.text"));
         exportButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 exportButtonActionPerformed(evt);
@@ -189,7 +194,9 @@ public class ParentEditionPanel extends AbstractComponentPanel {
             case EDITION :
                 jLabelErrorMessage.setText("");
                 
-                this.testButton.setText(this.testButton.getText()=="Stop"?"Test":"Stop");
+                this.testButton.setText(this.testButton.getText()==getFrame().getLang().getWord("ParentEditionPanel.stopButton.text")
+                		?getFrame().getLang().getWord("ParentEditionPanel.testButton.text")
+                				:getFrame().getLang().getWord("ParentEditionPanel.stopButton.text"));
                 
                 if(testThread.isAlive()) {
                     testThread.interrupt();
@@ -199,7 +206,8 @@ public class ParentEditionPanel extends AbstractComponentPanel {
                     p.destroy();
                 }
                 
-                if(this.testButton.getText() == "Test") break;
+                if(this.testButton.getText() == getFrame().getLang().getWord("ParentEditionPanel.testButton.text")) 
+                	break;
                 
                 Runnable r = new Runnable() {
                     public void run() {
@@ -207,7 +215,7 @@ public class ParentEditionPanel extends AbstractComponentPanel {
                         if (state != State.EDITION) {
                             setState(state);
                             getFrame().setViewToResults();
-                            testButton.setText("Test");
+                            testButton.setText(getFrame().getLang().getWord("ParentEditionPanel.testButton.text"));
                         }
                     }
                 };
