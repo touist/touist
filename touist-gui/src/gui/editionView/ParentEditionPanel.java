@@ -63,7 +63,6 @@ public class ParentEditionPanel extends AbstractComponentPanel {
         jTabbedPane1 = new javax.swing.JTabbedPane();
         editorPanelFormulas = new gui.editionView.EditionPanel();
         editorPanelSets = new gui.editionView.EditionPanel();
-        solverSelectionPanel1 = new gui.editionView.solverSelection.SolverSelectionPanel();
         testButton = new javax.swing.JButton();
         importButton = new javax.swing.JButton();
         jLabelErrorMessage = new javax.swing.JLabel();
@@ -77,7 +76,6 @@ public class ParentEditionPanel extends AbstractComponentPanel {
         jTabbedPane1.setToolTipText("");
         jTabbedPane1.addTab("Formulas", editorPanelFormulas);
         jTabbedPane1.addTab("Sets", editorPanelSets);
-        jTabbedPane1.addTab("Solver", solverSelectionPanel1);
 
         testButton.setText("Test");
         testButton.addActionListener(new java.awt.event.ActionListener() {
@@ -282,7 +280,6 @@ public class ParentEditionPanel extends AbstractComponentPanel {
     private javax.swing.JLabel jLabelErrorMessage;
     private javax.swing.JOptionPane jOptionPane1;
     private javax.swing.JTabbedPane jTabbedPane1;
-    private gui.editionView.solverSelection.SolverSelectionPanel solverSelectionPanel1;
     private javax.swing.JButton testButton;
     // End of variables declaration//GEN-END:variables
 

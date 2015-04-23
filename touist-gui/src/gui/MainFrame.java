@@ -11,8 +11,10 @@ import gui.resultsView.ResultsPanel;
 
 import java.awt.CardLayout;
 import java.io.File;
+import java.io.IOException;
 import java.util.ListIterator;
 import java.util.Locale;
+import javax.imageio.ImageIO;
 
 import javax.swing.JPanel;
 
@@ -63,6 +65,12 @@ public class MainFrame extends javax.swing.JFrame {
         setViewToEditor();
 
         initComponents();
+        
+        try {
+            setIconImage(ImageIO.read(new File("touist-gui/ressources/images/logo64.png")));
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
         
         this.setJMenuBar(editionMenuBar);
         updateLanguage();
