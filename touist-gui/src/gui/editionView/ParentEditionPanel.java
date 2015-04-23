@@ -78,7 +78,7 @@ public class ParentEditionPanel extends AbstractComponentPanel {
         jTabbedPane1.addTab("Formulas", editorPanelFormulas);
         jTabbedPane1.addTab("Sets", editorPanelSets);
 
-        testButton.setText("Test");
+        testButton.setText(getFrame().getLang().getWord("ParentEditionPanel.testButton.text"));
         testButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 testButtonActionPerformed(evt);
