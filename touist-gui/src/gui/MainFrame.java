@@ -67,7 +67,7 @@ public class MainFrame extends javax.swing.JFrame {
         initComponents();
         
         try {
-            setIconImage(ImageIO.read(new File("touist-gui/ressources/images/logo64.png")));
+            setIconImage(ImageIO.read(this.getClass().getResourceAsStream("/images/logo64.png")));
         } catch (IOException ex) {
             ex.printStackTrace();
         }
