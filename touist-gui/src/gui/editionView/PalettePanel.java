@@ -7,6 +7,7 @@ package gui.editionView;
 
 import gui.AbstractComponentPanel;
 import gui.Lang;
+import gui.MainFrame;
 import gui.editionView.editor.Editor;
 import java.util.ArrayList;
 import java.util.List;

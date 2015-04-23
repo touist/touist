@@ -9,6 +9,7 @@ import entity.Literal;
 import entity.Model;
 import gui.AbstractComponentPanel;
 import gui.Lang;
+import gui.MainFrame;
 import gui.State;
 import java.awt.Color;
 import java.awt.Component;
@@ -28,10 +29,6 @@ import javax.swing.event.DocumentListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableCellRenderer;
-
-import solution.NotSatisfiableException;
-import solution.SolverExecutionException;
 
 /**
  *
