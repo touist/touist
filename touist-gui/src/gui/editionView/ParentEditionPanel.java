@@ -189,14 +189,16 @@ public class ParentEditionPanel extends AbstractComponentPanel {
 	    }
 	}
     
+	private boolean isStopInsteadOfTest = false;
     private void testButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_testButtonActionPerformed
         switch(((MainFrame)(getRootPane().getParent())).state) {
             case EDITION :
                 jLabelErrorMessage.setText("");
                 
-                this.testButton.setText(this.testButton.getText()==getFrame().getLang().getWord("ParentEditionPanel.stopButton.text")
+                this.testButton.setText(isStopInsteadOfTest
                 		?getFrame().getLang().getWord("ParentEditionPanel.testButton.text")
-                				:getFrame().getLang().getWord("ParentEditionPanel.stopButton.text"));
+                		:getFrame().getLang().getWord("ParentEditionPanel.stopButton.text"));
+                isStopInsteadOfTest = (isStopInsteadOfTest)?false:true;
                 
                 if(testThread.isAlive()) {
                     testThread.interrupt();
@@ -206,7 +208,7 @@ public class ParentEditionPanel extends AbstractComponentPanel {
                     p.destroy();
                 }
                 
-                if(this.testButton.getText() == getFrame().getLang().getWord("ParentEditionPanel.testButton.text")) 
+                if(!isStopInsteadOfTest)
                 	break;
                 
                 Runnable r = new Runnable() {
