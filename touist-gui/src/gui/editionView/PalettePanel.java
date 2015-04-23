@@ -28,7 +28,8 @@ public class PalettePanel extends AbstractComponentPanel {
     private Editor editorTextArea;
     private List<PaletteSectionPanel> sections = new ArrayList<PaletteSectionPanel>();
     
-    public PalettePanel() {
+    public PalettePanel(MainFrame parent) {
+    	super(parent);
         initComponents();
     }
     
@@ -36,7 +37,8 @@ public class PalettePanel extends AbstractComponentPanel {
      * Creates new form PalettePanel
      * @param editorTextArea
      */
-    public PalettePanel(Editor editorTextArea) {
+    public PalettePanel(MainFrame parent, Editor editorTextArea) {
+    	super(parent);
         initComponents();
         this.editorTextArea = editorTextArea;
     }

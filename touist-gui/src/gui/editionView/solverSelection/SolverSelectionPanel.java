@@ -27,7 +27,8 @@ public class SolverSelectionPanel extends AbstractComponentPanel {
     /**
      * Creates new form SolverSelectionPanel
      */
-    public SolverSelectionPanel() {
+    public SolverSelectionPanel(MainFrame parent) {
+    	super(parent);
         initComponents();
         group = new ButtonGroup();
         initSupportedSolvers();

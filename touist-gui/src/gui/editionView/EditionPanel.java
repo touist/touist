@@ -89,7 +89,8 @@ public class EditionPanel extends AbstractComponentPanel {
         
     }    
     
-    public EditionPanel() {
+    public EditionPanel(MainFrame parent) {
+    	super(parent);
         initComponents();
         // Editor textArea set-up
         try {
@@ -168,7 +169,7 @@ public class EditionPanel extends AbstractComponentPanel {
         editorContainer = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         jPanel1 = new javax.swing.JPanel();
-        palettePanel2 = new gui.editionView.PalettePanel(editorTextArea);
+        palettePanel2 = new gui.editionView.PalettePanel(parent, editorTextArea);
 
         addComponentListener(new java.awt.event.ComponentAdapter() {
             public void componentResized(java.awt.event.ComponentEvent evt) {

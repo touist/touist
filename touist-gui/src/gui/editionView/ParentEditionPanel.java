@@ -38,7 +38,8 @@ public class ParentEditionPanel extends AbstractComponentPanel {
     /**
      * Creates new form FormulasPanel
      */
-    public ParentEditionPanel() {
+    public ParentEditionPanel(MainFrame parent) {
+    	super(parent);
         initComponents();
         
         testThread = new Thread();
@@ -61,8 +62,8 @@ public class ParentEditionPanel extends AbstractComponentPanel {
         jFileChooser1 = new javax.swing.JFileChooser();
         jOptionPane1 = new javax.swing.JOptionPane();
         jTabbedPane1 = new javax.swing.JTabbedPane();
-        editorPanelFormulas = new gui.editionView.EditionPanel();
-        editorPanelSets = new gui.editionView.EditionPanel();
+        editorPanelFormulas = new gui.editionView.EditionPanel(parent);
+        editorPanelSets = new gui.editionView.EditionPanel(parent);
         testButton = new javax.swing.JButton();
         importButton = new javax.swing.JButton();
         jLabelErrorMessage = new javax.swing.JLabel();

@@ -90,7 +90,8 @@ public class ResultsPanel extends AbstractComponentPanel {
     /**
      * Creates new form ResultsPanel
      */
-    public ResultsPanel() {
+    public ResultsPanel(MainFrame parent) {
+    	super(parent);
         exportDialog = new ExportDialog();
         initComponents();
     }

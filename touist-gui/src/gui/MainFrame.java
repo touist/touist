@@ -38,10 +38,10 @@ public class MainFrame extends javax.swing.JFrame {
 
     public final static String EDITOR_PANEL = "editor_panel";
     public final static String RESULTS_PANEL = "results_panel";
-    private JPanel cards = new JPanel(new CardLayout());
-    private ParentEditionPanel editorPanel1 = new ParentEditionPanel();
-    private ResultsPanel resultsPanel1 = new ResultsPanel();
-    private Lang lang = new Lang(Locale.ENGLISH);
+    private JPanel cards;
+    private ParentEditionPanel editorPanel1;
+    private ResultsPanel resultsPanel1;
+    private Lang lang;
     
     private ResultsMenuBar resultsMenuBar;
     private EditionMenuBar editionMenuBar;
@@ -55,6 +55,10 @@ public class MainFrame extends javax.swing.JFrame {
      */
     public MainFrame() {
         
+        lang = new Lang(Locale.ENGLISH);
+    	cards = new JPanel(new CardLayout());
+    	editorPanel1 = new ParentEditionPanel(this);
+        resultsPanel1 = new ResultsPanel(this);
         resultsMenuBar = new ResultsMenuBar(this);
         editionMenuBar = new EditionMenuBar(this);
         
