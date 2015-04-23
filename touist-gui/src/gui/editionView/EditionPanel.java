@@ -6,6 +6,7 @@
 package gui.editionView;
 
 import gui.AbstractComponentPanel;
+import gui.MainFrame;
 import gui.TranslatorLatex.TranslationLatex;
 import gui.editionView.editor.Editor;
 import java.awt.BorderLayout;
