@@ -56,6 +56,10 @@ public class MainFrame extends javax.swing.JFrame {
     public MainFrame() {
         
         lang = new Lang(Locale.ENGLISH);
+        setLanguage(
+        		(lang.getSupportedLanguages().contains(Locale.getDefault()))
+        		?Locale.getDefault():Locale.ENGLISH);
+        
     	cards = new JPanel(new CardLayout());
     	editorPanel1 = new ParentEditionPanel(this);
         resultsPanel1 = new ResultsPanel(this);
@@ -77,10 +81,6 @@ public class MainFrame extends javax.swing.JFrame {
         }
         
         this.setJMenuBar(editionMenuBar);
-       
-        setLanguage(
-        		(lang.getSupportedLanguages().contains(Locale.getDefault()))
-        		?Locale.getDefault():Locale.ENGLISH);
         updateLanguage();
     }
     
