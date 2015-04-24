@@ -41,7 +41,8 @@ public class ParentEditionPanel extends AbstractComponentPanel {
     /**
      * Creates new form FormulasPanel
      */
-    public ParentEditionPanel() {
+    public ParentEditionPanel(MainFrame parent) {
+    	super(parent);
         initComponents();
         
         testThread = new Thread();
@@ -64,9 +65,8 @@ public class ParentEditionPanel extends AbstractComponentPanel {
         jFileChooser1 = new javax.swing.JFileChooser();
         jOptionPane1 = new javax.swing.JOptionPane();
         jTabbedPane1 = new javax.swing.JTabbedPane();
-        editorPanelFormulas = new gui.editionView.EditionPanel();
-        editorPanelSets = new gui.editionView.EditionPanel();
-        solverSelectionPanel1 = new gui.editionView.solverSelection.SolverSelectionPanel();
+        editorPanelFormulas = new gui.editionView.EditionPanel(parent);
+        editorPanelSets = new gui.editionView.EditionPanel(parent);
         testButton = new javax.swing.JButton();
         importButton = new javax.swing.JButton();
         jLabelErrorMessage = new javax.swing.JLabel();
@@ -76,20 +76,24 @@ public class ParentEditionPanel extends AbstractComponentPanel {
 
         jFileChooser1.setFileSelectionMode(JFileChooser.FILES_ONLY);
         jFileChooser1.addChoosableFileFilter(new FileNameExtensionFilter("Touistl files(touistl)","touistl"));
+        jFileChooser1.setToolTipText(""); // TODO
 
         jTabbedPane1.setToolTipText("");
-        jTabbedPane1.addTab("Formulas", editorPanelFormulas);
-        jTabbedPane1.addTab("Sets", editorPanelSets);
-        jTabbedPane1.addTab("Solver", solverSelectionPanel1);
+        jTabbedPane1.addTab(getFrame().getLang().getWord("ParentEditionPanel.editorPanelFormulas.TabConstraints.tabTitle"), editorPanelFormulas);
+        editorPanelFormulas.setToolTipText("ParentEditionPanel.editorPanelFormulas.TabConstraints.tabTooltip");
+        
+        jTabbedPane1.addTab(getFrame().getLang().getWord("ParentEditionPanel.editorPanelSets.TabConstraints.tabTitle"), editorPanelSets);        
+        editorPanelSets.setToolTipText(getFrame().getLang().getWord("ParentEditionPanel.editorPanelSets.TabConstraints.tabTooltip"));
 
-        testButton.setText("Test");
+        testButton.setText(getFrame().getLang().getWord("ParentEditionPanel.testButton.text"));
+        testButton.setToolTipText(getFrame().getLang().getWord("ParentEditionPanel.testButton.tooltip"));
         testButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 testButtonActionPerformed(evt);
             }
         });
 
-        importButton.setText("Import");
+        importButton.setText(getFrame().getLang().getWord("ParentEditionPanel.importButton.text"));
         importButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 importButtonActionPerformed(evt);
@@ -103,7 +107,7 @@ public class ParentEditionPanel extends AbstractComponentPanel {
 
         jComboBox1.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "SAT", "SMT" }));
 
-        exportButton.setText("Export");
+        exportButton.setText(getFrame().getLang().getWord("ParentEditionPanel.exportButton.text"));
         exportButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 exportButtonActionPerformed(evt);
@@ -176,25 +180,39 @@ public class ParentEditionPanel extends AbstractComponentPanel {
         }
     }//GEN-LAST:event_importButtonActionPerformed
 
+    /**
+     * For Java RE 6 compatibility (p.isAlive() is JavaRE7)
+     */
+	private boolean isAlive(Process process) {
+	    try {
+	        process.exitValue();
+	        return false;
+	    } catch (Exception e) {
+	        return true;
+	    }
+	}
     
-    
-    
+	private boolean isStopInsteadOfTest = false;
     private void testButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_testButtonActionPerformed
         switch(((MainFrame)(getRootPane().getParent())).state) {
             case EDITION :
                 jLabelErrorMessage.setText("");
                 
-                this.testButton.setText(this.testButton.getText()=="Stop"?"Test":"Stop");
+                this.testButton.setText(isStopInsteadOfTest
+                		?getFrame().getLang().getWord("ParentEditionPanel.testButton.text")
+                		:getFrame().getLang().getWord("ParentEditionPanel.stopButton.text"));
+                isStopInsteadOfTest = (isStopInsteadOfTest)?false:true;
                 
                 if(testThread.isAlive()) {
-                    testThread.stop();
+                    testThread.interrupt();
                 }
                 Process p = getFrame().getTranslator().getP();
-                if(p != null && p.isAlive()){
+                if(p != null && isAlive(p)){
                     p.destroy();
                 }
                 
-                if(this.testButton.getText() == "Test") break;
+                if(!isStopInsteadOfTest)
+                	break;
                 
                 Runnable r = new Runnable() {
                     public void run() {
@@ -202,7 +220,7 @@ public class ParentEditionPanel extends AbstractComponentPanel {
                         if (state != State.EDITION) {
                             setState(state);
                             getFrame().setViewToResults();
-                            testButton.setText("Test");
+                            testButton.setText(getFrame().getLang().getWord("ParentEditionPanel.testButton.text"));
                         }
                     }
                 };
@@ -276,7 +294,6 @@ public class ParentEditionPanel extends AbstractComponentPanel {
     private javax.swing.JLabel jLabelErrorMessage;
     private javax.swing.JOptionPane jOptionPane1;
     private javax.swing.JTabbedPane jTabbedPane1;
-    private gui.editionView.solverSelection.SolverSelectionPanel solverSelectionPanel1;
     private javax.swing.JButton testButton;
     // End of variables declaration//GEN-END:variables
 
@@ -395,7 +412,7 @@ public class ParentEditionPanel extends AbstractComponentPanel {
         sinon passer à l'état SINGLE_RESULT
         Si aucun model n'existe alors passer a l'état NO_RESULT
         */
-        String bigAndFilePath = "bigAndFile-defaultname.txt"; //TODO se mettre d'accord sur un nom standard ou ajouter a Translator et BaseDeClause des méthode pour s'échange de objets File
+        String bigAndFilePath = "temp.touistl"; //TODO se mettre d'accord sur un nom standard ou ajouter a Translator et BaseDeClause des méthode pour s'échange de objets File
         String errorMessage;
         
         

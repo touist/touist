@@ -6,6 +6,7 @@
 package gui.editionView.solverSelection;
 
 import gui.AbstractComponentPanel;
+import gui.MainFrame;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -27,7 +28,8 @@ public class SolverSelectionPanel extends AbstractComponentPanel {
     /**
      * Creates new form SolverSelectionPanel
      */
-    public SolverSelectionPanel() {
+    public SolverSelectionPanel(MainFrame parent) {
+    	super(parent);
         initComponents();
         group = new ButtonGroup();
         initSupportedSolvers();

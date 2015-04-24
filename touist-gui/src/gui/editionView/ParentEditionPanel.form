@@ -88,15 +88,6 @@
             </Constraint>
           </Constraints>
         </Component>
-        <Component class="gui.editionView.solverSelection.SolverSelectionPanel" name="solverSelectionPanel1">
-          <Constraints>
-            <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
-              <JTabbedPaneConstraints tabName="Solver">
-                <Property name="tabTitle" type="java.lang.String" value="Solver"/>
-              </JTabbedPaneConstraints>
-            </Constraint>
-          </Constraints>
-        </Component>
       </SubComponents>
     </Container>
     <Component class="javax.swing.JButton" name="testButton">

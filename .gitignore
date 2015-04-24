@@ -71,3 +71,8 @@ bigAndFile-defaultname.txt
 *.prefs
 
 touist-gui/external/touistc
+
+touist-gui/*.touistl
+touist-gui/*.table
+touist-gui/*.txt
+touist-gui/touist-*

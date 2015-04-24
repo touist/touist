@@ -45,8 +45,9 @@ public class Lang {
     }
     
     private void initSupportedLanguages() {
-        supportedLanguages = new HashMap();
+        supportedLanguages = new HashMap<Locale,String>();
         supportedLanguages.put(Locale.FRENCH, "lang.fr_FR"); // "lang" is the package
+        supportedLanguages.put(Locale.FRANCE, "lang.fr_FR");
         supportedLanguages.put(Locale.ENGLISH, "lang.en_US");
     }
     
@@ -90,5 +91,6 @@ public class Lang {
     public static final String ERROR_TRADUCTION = "ParentEditionPanel.jOptionPane1.traductionError";
     public static final String ERROR_TRADUCTION_IN_SETS = "ParentEditionPanel.jOptionPane1.traductionErrorInSets";
     public static final String ERROR_TRADUCTION_IN_FORMULAS = "ParentEditionPanel.jOptionPane1.traductionErrorInFormulas";
+    public static final String HELP_PANEL_TITLE = "HelpPanel.title";
     
 }
