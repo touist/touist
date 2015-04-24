@@ -10,6 +10,9 @@ import gui.AbstractComponentPanel;
 import gui.Lang;
 import gui.MainFrame;
 import gui.State;
+import java.awt.AWTException;
+import java.awt.Robot;
+import java.awt.event.KeyEvent;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -484,6 +487,37 @@ public class ParentEditionPanel extends AbstractComponentPanel {
         jLabelCaretPosition.setText(text);
     }
 
+    public void undo() {
+        try {
+            Robot robot = new Robot();
+            robot.keyPress(KeyEvent.VK_CONTROL);
+            robot.keyPress(KeyEvent.VK_Z);
+            robot.keyRelease(KeyEvent.VK_CONTROL);
+            robot.keyRelease(KeyEvent.VK_Z);
+        } catch (AWTException e) {
+            e.printStackTrace();
+        }
+    }
+    
+    public void redo() {
+        try {
+            Robot robot = new Robot();
+            robot.keyPress(KeyEvent.VK_CONTROL);
+            robot.keyPress(KeyEvent.VK_Y);
+            robot.keyRelease(KeyEvent.VK_CONTROL);
+            robot.keyRelease(KeyEvent.VK_Y);
+        } catch (AWTException e) {
+            e.printStackTrace();
+        }
+    }
+    
+    public void zoom(int n) {
+        System.err.println(jTabbedPane1.getSelectedIndex());
+        if(jTabbedPane1.getSelectedIndex() <= 1) {
+            ((EditionPanel)jTabbedPane1.getSelectedComponent()).zoom(n);
+        }
+    }
+    
     @Override
     public void updateLanguage() {
         importButton.setText(getFrame().getLang().getWord(Lang.EDITION_IMPORT));

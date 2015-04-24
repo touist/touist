@@ -37,6 +37,7 @@ public class EditionPanel extends AbstractComponentPanel {
     private JLabel latexLabel;
     private int zoom = 0;
     
+    
     /**
      * Creates new form EditorPanel
      */
@@ -52,6 +53,13 @@ public class EditionPanel extends AbstractComponentPanel {
             catch (Exception exc) {
                 System.err.println("Erreur lors de la conversion latex");
             }
+    }
+    
+    public void zoom(int step) {
+        zoom += step;
+        zoom = Math.min(200,zoom);
+        zoom = Math.max(-19,zoom);
+        UpdateLatexLabel();
     }
     
     class UpdateLatexListener implements DocumentListener {
@@ -77,10 +85,7 @@ public class EditionPanel extends AbstractComponentPanel {
         @Override
         public void mouseWheelMoved(MouseWheelEvent e) {
             if(e.paramString().contains("modifiers=Ctrl")) {
-                zoom -= e.getWheelRotation();
-                zoom = Math.min(200,zoom);
-                zoom = Math.max(-19,zoom);
-                UpdateLatexLabel();
+                zoom(-e.getWheelRotation());
             }
             else {
                 jScrollPane1.getMouseWheelListeners()[0].mouseWheelMoved(e);
