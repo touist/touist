@@ -217,10 +217,11 @@ public class ParentEditionPanel extends AbstractComponentPanel {
                 Runnable r = new Runnable() {
                     public void run() {
                         State state = initResultView();
+                        testButton.setText(getFrame().getLang().getWord("ParentEditionPanel.testButton.text"));
+                        isStopInsteadOfTest = false;
                         if (state != State.EDITION) {
                             setState(state);
                             getFrame().setViewToResults();
-                            testButton.setText(getFrame().getLang().getWord("ParentEditionPanel.testButton.text"));
                         }
                     }
                 };
@@ -529,7 +530,6 @@ public class ParentEditionPanel extends AbstractComponentPanel {
     }
     
     public void zoom(int n) {
-        System.err.println(jTabbedPane1.getSelectedIndex());
         if(jTabbedPane1.getSelectedIndex() <= 1) {
             ((EditionPanel)jTabbedPane1.getSelectedComponent()).zoom(n);
         }
