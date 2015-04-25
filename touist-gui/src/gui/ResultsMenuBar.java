@@ -105,9 +105,9 @@ public class ResultsMenuBar extends JMenuBar {
     }
     
     public void updateLanguage() {
-        this.jMenuFile.setText(parent.getLang().getWord(Lang.FRAME_MENU_FILE));
-        this.jMenuHelp.setText(parent.getLang().getWord(Lang.FRAME_MENU_HELP));
-        this.jMenuLanguage.setText(parent.getLang().getWord(Lang.FRAME_MENU_LANGUAGE));
+        this.jMenuFile.setText(parent.getLang().getWord(Lang.RESULTS_MENU_FILE));
+        this.jMenuHelp.setText(parent.getLang().getWord(Lang.RESULTS_MENU_HELP));
+        this.jMenuLanguage.setText(parent.getLang().getWord(Lang.RESULTS_MENU_LANGUAGE));
         this.jMenuItemSaveModel.setText(parent.getLang().getWord(Lang.RESULTS_MENUITEM_SAVEMODEL));
         this.jMenuItemHelpResults.setText(parent.getLang().getWord(Lang.RESULTS_MENUITEM_HELPRESULTS));
     }
