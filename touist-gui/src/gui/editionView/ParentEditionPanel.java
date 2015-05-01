@@ -11,6 +11,9 @@ import gui.Lang;
 import gui.MainFrame;
 import gui.State;
 
+import java.awt.AWTException;
+import java.awt.Robot;
+import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -32,11 +35,17 @@ import translation.TranslatorSAT;
  */
 public class ParentEditionPanel extends AbstractComponentPanel {
 
+    
+    private Thread testThread;
+
     /**
      * Creates new form FormulasPanel
      */
     public ParentEditionPanel() {
         initComponents();
+        
+        testThread = new Thread();
+        
         editorPanelFormulas.initPalette(PalettePanel.PaletteType.FORMULA);
         editorPanelSets.initPalette(PalettePanel.PaletteType.SET);
         jFileChooser1.setCurrentDirectory(new File(".."));
@@ -57,7 +66,6 @@ public class ParentEditionPanel extends AbstractComponentPanel {
         jTabbedPane1 = new javax.swing.JTabbedPane();
         editorPanelFormulas = new gui.editionView.EditionPanel();
         editorPanelSets = new gui.editionView.EditionPanel();
-        solverSelectionPanel1 = new gui.editionView.solverSelection.SolverSelectionPanel();
         testButton = new javax.swing.JButton();
         importButton = new javax.swing.JButton();
         jLabelErrorMessage = new javax.swing.JLabel();
@@ -68,19 +76,15 @@ public class ParentEditionPanel extends AbstractComponentPanel {
         jFileChooser1.setFileSelectionMode(JFileChooser.FILES_ONLY);
         jFileChooser1.addChoosableFileFilter(new FileNameExtensionFilter("Touistl files(touistl)","touistl"));
 
-        jTabbedPane1.setToolTipText("");
-        jTabbedPane1.addTab("Formulas", editorPanelFormulas);
-        jTabbedPane1.addTab("Sets", editorPanelSets);
-        jTabbedPane1.addTab("Solver", solverSelectionPanel1);
+        jTabbedPane1.addTab("", editorPanelFormulas);
+        jTabbedPane1.addTab("", editorPanelSets);
 
-        testButton.setText("Test");
         testButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 testButtonActionPerformed(evt);
             }
         });
 
-        importButton.setText("Import");
         importButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 importButtonActionPerformed(evt);
@@ -94,7 +98,6 @@ public class ParentEditionPanel extends AbstractComponentPanel {
 
         jComboBox1.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "SAT", "SMT" }));
 
-        exportButton.setText("Export");
         exportButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 exportButtonActionPerformed(evt);
@@ -105,7 +108,7 @@ public class ParentEditionPanel extends AbstractComponentPanel {
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jTabbedPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 713, Short.MAX_VALUE)
+            .addComponent(jTabbedPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 992, Short.MAX_VALUE)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jLabelCaretPosition)
@@ -167,15 +170,56 @@ public class ParentEditionPanel extends AbstractComponentPanel {
         }
     }//GEN-LAST:event_importButtonActionPerformed
 
+    /**
+     * For Java RE 6 compatibility (p.isAlive() is JavaRE7)
+     */
+	private boolean isAlive(Process process) {
+	    try {
+	        process.exitValue();
+	        return false;
+	    } catch (Exception e) {
+	        return true;
+	    }
+	}
+    
+	private boolean isStopInsteadOfTest = false;
     private void testButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_testButtonActionPerformed
         switch(((MainFrame)(getRootPane().getParent())).state) {
             case EDITION :
                 jLabelErrorMessage.setText("");
-                State state = initResultView();
-                if (state != State.EDITION) {
-                    setState(state);
-                    getFrame().setViewToResults();
+                
+                this.testButton.setText(isStopInsteadOfTest
+                		?getFrame().getLang().getWord("ParentEditionPanel.testButton.text")
+                		:getFrame().getLang().getWord("ParentEditionPanel.stopButton.text"));
+                isStopInsteadOfTest = (isStopInsteadOfTest)?false:true;
+                
+                if(testThread.isAlive()) {
+                    testThread.interrupt();
                 }
+                Process p = getFrame().getTranslator().getP();
+                if(p != null && isAlive(p)){
+                    p.destroy();
+                }
+                
+                if(!isStopInsteadOfTest)
+                	break;
+                
+                Runnable r = new Runnable() {
+                    public void run() {
+                        State state = initResultView();
+                        testButton.setText(getFrame().getLang().getWord("ParentEditionPanel.testButton.text"));
+                        isStopInsteadOfTest = false;
+                        if (state != State.EDITION) {
+                            setState(state);
+                            getFrame().setViewToResults();
+                        }
+                    }
+                };
+                
+                
+                testThread = new Thread(r);
+                testThread.start();
+                
                 break;
             case EDITION_ERROR :
                 // interdit
@@ -241,7 +285,6 @@ public class ParentEditionPanel extends AbstractComponentPanel {
     private javax.swing.JLabel jLabelErrorMessage;
     private javax.swing.JOptionPane jOptionPane1;
     private javax.swing.JTabbedPane jTabbedPane1;
-    private gui.editionView.solverSelection.SolverSelectionPanel solverSelectionPanel1;
     private javax.swing.JButton testButton;
     // End of variables declaration//GEN-END:variables
 
@@ -360,7 +403,7 @@ public class ParentEditionPanel extends AbstractComponentPanel {
         sinon passer à l'état SINGLE_RESULT
         Si aucun model n'existe alors passer a l'état NO_RESULT
         */
-        String bigAndFilePath = "bigAndFile-defaultname.txt"; //TODO se mettre d'accord sur un nom standard ou ajouter a Translator et BaseDeClause des méthode pour s'échange de objets File
+        String bigAndFilePath = "temp.touistl"; //TODO se mettre d'accord sur un nom standard ou ajouter a Translator et BaseDeClause des méthode pour s'échange de objets File
         String errorMessage;
         
         
@@ -376,10 +419,13 @@ public class ParentEditionPanel extends AbstractComponentPanel {
         try {
             if(! getFrame().getTranslator().translate(bigAndFilePath)) {
                 errorMessage = "";
-                for(int i=0; i<getFrame().getTranslator().getErrors().size(); i++) {
-                    TranslationError error = guiTranslationErrorAdapter(getFrame().getTranslator().getErrors().get(i));
-                    errorMessage += error + "\n";
-                }
+				for (TranslationError error : getFrame().getTranslator().getErrors()) {
+					if(error.hasRowAndColumn()) {
+						errorMessage += guiTranslationErrorAdapter(error) + "\n";
+					} else { 
+						errorMessage += error + "\n";
+					}
+				}
                 jLabelErrorMessage.setText(errorMessage);
                 System.out.println("Traduction error : " + "\n" + errorMessage + "\n");
                 showErrorMessage(errorMessage, getFrame().getLang().getWord(Lang.ERROR_TRADUCTION));
@@ -417,7 +463,7 @@ public class ParentEditionPanel extends AbstractComponentPanel {
         try {
             ListIterator<Model> iter = getFrame().getSolver().getModelList().iterator();
             if(!iter.hasNext()) {
-                System.out.println("This model is unsatisfiable");
+                System.out.println("This problem is unsatisfiable");
                 errorMessage = "There is no solution";
                 showErrorMessage(errorMessage, "Solver error");
                 return State.EDITION;
@@ -452,15 +498,50 @@ public class ParentEditionPanel extends AbstractComponentPanel {
         jLabelCaretPosition.setText(text);
     }
 
+    public void undo() {
+        try {
+            Robot robot = new Robot();
+            robot.keyPress(KeyEvent.VK_CONTROL);
+            robot.keyPress(KeyEvent.VK_Z);
+            robot.keyRelease(KeyEvent.VK_CONTROL);
+            robot.keyRelease(KeyEvent.VK_Z);
+        } catch (AWTException e) {
+            e.printStackTrace();
+        }
+    }
+    
+    public void redo() {
+        try {
+            Robot robot = new Robot();
+            robot.keyPress(KeyEvent.VK_CONTROL);
+            robot.keyPress(KeyEvent.VK_Y);
+            robot.keyRelease(KeyEvent.VK_CONTROL);
+            robot.keyRelease(KeyEvent.VK_Y);
+        } catch (AWTException e) {
+            e.printStackTrace();
+        }
+    }
+    
+    public void zoom(int n) {
+        if(jTabbedPane1.getSelectedIndex() <= 1) {
+            ((EditionPanel)jTabbedPane1.getSelectedComponent()).zoom(n);
+        }
+    }
+    
     @Override
     public void updateLanguage() {
+        jTabbedPane1.setToolTipText("");
+        editorPanelFormulas.setToolTipText("ParentEditionPanel.editorPanelFormulas.TabConstraints.tabTooltip");
+        editorPanelSets.setToolTipText(getFrame().getLang().getWord("ParentEditionPanel.editorPanelSets.TabConstraints.tabTooltip"));
         importButton.setText(getFrame().getLang().getWord(Lang.EDITION_IMPORT));
         exportButton.setText(getFrame().getLang().getWord(Lang.EDITION_EXPORT));
         testButton.setText(getFrame().getLang().getWord(Lang.EDITION_TEST));
+        testButton.setToolTipText(getFrame().getLang().getWord("ParentEditionPanel.testButton.tooltip")); 
         editorPanelFormulas.updateLanguage();
         editorPanelSets.updateLanguage();
         jTabbedPane1.setTitleAt(0, getFrame().getLang().getWord(Lang.EDITION_TAB_FORMULAS));
         jTabbedPane1.setTitleAt(1, getFrame().getLang().getWord(Lang.EDITION_TAB_SETS));
+        
         updateUI();
     }
 }

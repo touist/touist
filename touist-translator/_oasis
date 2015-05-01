@@ -9,7 +9,7 @@ Plugins:      META (0.4), DevFiles (0.4)
 
 BuildType: ocamlbuild (0.4)
 AlphaFeatures: ocamlbuild_more_args
-XOCamlbuildExtraArgs: -use-menhir -package fileutils
+XOCamlbuildExtraArgs: -use-menhir -pkg fileutils
 
 Executable touistc
   Path:           src

@@ -28,10 +28,6 @@ import javax.swing.event.DocumentListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableCellRenderer;
-
-import solution.NotSatisfiableException;
-import solution.SolverExecutionException;
 
 /**
  *
@@ -148,13 +144,11 @@ public class ResultsPanel extends AbstractComponentPanel {
         fc.setFileFilter(new FileNameExtensionFilter("Text files(txt, text)","txt","text"));
         fc.addChoosableFileFilter(new FileNameExtensionFilter("Latex files(latex)","tex"));
         fc.setAcceptAllFileFilterUsed(false);
-        int returnVal = fc.showDialog(this,getFrame().getLang().getWord(Lang.EDITION_FILE_CHOOSER));
+        int returnVal = fc.showDialog(this,getFrame().getLang().getWord(Lang.RESULTS_FILE_CHOOSER));
         
         if(returnVal == JFileChooser.APPROVE_OPTION){
             String filename = fc.getSelectedFile().getName();
             String extension = (filename.contains(".")?filename.substring(filename.lastIndexOf("."),filename.length()):"txt");
-            Object[] options1 = { "Try This Number", "Choose A Random Number",
-                "Quit" };
             int result = JOptionPane.showConfirmDialog(null, exportDialog,"Format d'export",JOptionPane.DEFAULT_OPTION);
             if(result == JOptionPane.YES_OPTION){
                 StringBuilder sb = new StringBuilder();

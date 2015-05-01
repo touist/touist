@@ -77,19 +77,19 @@ let parse_and_eval_with_error lexbuf =
       fprintf stderr "%a: %s\n" print_position lexbuf msg;
       exit (get_code COMPILE_WITH_LINE_NUMBER_ERROR) (* Should be "None" *)
   | Parser.Error ->
-      fprintf stderr "%a: unkwown syntax error\n" print_position lexbuf;
+      fprintf stderr "unkwown syntax error\n";
       exit (get_code COMPILE_NO_LINE_NUMBER_ERROR)
   | Eval.NameError msg ->
-      fprintf stderr "%a: name error with '%s'\n" print_position lexbuf msg;
+      fprintf stderr "name error with '%s'\n" msg;
       exit (get_code COMPILE_NO_LINE_NUMBER_ERROR)
   | Eval.TypeError msg ->
-      fprintf stderr "%a: type error with '%s'\n" print_position lexbuf msg;
+      fprintf stderr "type error with '%s'\n" msg;
       exit (get_code COMPILE_NO_LINE_NUMBER_ERROR)
   | Eval.ArgumentError msg ->
-      fprintf stderr "%a: argument error: '%s'\n" print_position lexbuf msg;
+      fprintf stderr "argument error: '%s'\n" msg;
       exit (get_code COMPILE_NO_LINE_NUMBER_ERROR)
   | _ ->
-      fprintf stderr "%a: unkwown error\n" print_position lexbuf;
+      fprintf stderr "unkwown error\n";
       exit (get_code COMPILE_NO_LINE_NUMBER_ERROR)
 
     

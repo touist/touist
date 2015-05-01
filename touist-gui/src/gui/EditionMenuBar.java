@@ -5,13 +5,21 @@
  */
 package gui;
 
-import java.io.IOException;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.util.Locale;
+import java.util.Scanner;
+
+import javax.swing.JEditorPane;
+import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
 import javax.swing.KeyStroke;
+import javax.swing.text.Document;
+import javax.swing.text.html.HTMLEditorKit;
+import javax.swing.text.html.StyleSheet;
 
 /**
  *
@@ -23,26 +31,48 @@ public class EditionMenuBar extends JMenuBar {
     JMenu jMenuFile;
     JMenu jMenuLanguage;
     JMenu jMenuHelp;
+    JMenu jMenuEdit;
+    JMenu jMenuView;
     JMenuItem jMenuItemEnglish;
     JMenuItem jMenuItemFrench;
     JMenuItem jMenuItemSaveFile;
     JMenuItem jMenuItemLoadFile;
     JMenuItem jMenuItemHelpEditor;
-    
+    JMenuItem jMenuItemUndo;
+    JMenuItem jMenuItemRedo;
+    JMenuItem jMenuItemZoomMore;
+    JMenuItem jMenuItemZoomLess;
     
     
     public EditionMenuBar(MainFrame parent){
         this.parent = parent;
-        jMenuFile = new JMenu();
+        jMenuFile = new JMenu();    
         jMenuLanguage = new JMenu();
         jMenuHelp = new JMenu();
+        jMenuEdit = new JMenu();
+        jMenuView = new JMenu();
+        
         
         jMenuItemEnglish = new JMenuItem("English");
-        jMenuItemFrench = new JMenuItem("French");
+        jMenuItemFrench = new JMenuItem("Français");
+        
         jMenuItemSaveFile = new JMenuItem();
         jMenuItemSaveFile.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_S, java.awt.Event.CTRL_MASK));
         jMenuItemLoadFile = new JMenuItem();
         jMenuItemLoadFile.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_O, java.awt.Event.CTRL_MASK));
+        
+        jMenuItemUndo = new JMenuItem();
+        jMenuItemUndo.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_Z, java.awt.Event.CTRL_MASK));
+        jMenuItemRedo = new JMenuItem();
+        jMenuItemRedo.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_Y, java.awt.Event.CTRL_MASK));
+        
+        jMenuItemZoomMore = new JMenuItem();
+        jMenuItemZoomMore.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_PLUS, java.awt.Event.CTRL_MASK));
+        jMenuItemZoomLess = new JMenuItem();
+        jMenuItemZoomLess.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_MINUS, java.awt.Event.CTRL_MASK));
+        
+        
+        
         jMenuItemHelpEditor = new JMenuItem();
         
         jMenuItemEnglish.addActionListener(new java.awt.event.ActionListener() {
@@ -75,13 +105,45 @@ public class EditionMenuBar extends JMenuBar {
             }
         });
         
+        jMenuItemUndo.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItemUndoActionPerformed(evt);
+            }
+        });
+        
+        jMenuItemRedo.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItemRedoActionPerformed(evt);
+            }
+        });
+        
+        jMenuItemZoomMore.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItemZoomMoreActionPerformed(evt);
+            }
+        });
+        
+        jMenuItemZoomLess.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItemZoomLessActionPerformed(evt);
+            }
+        });
+        
+        
+        
         jMenuFile.add(jMenuItemSaveFile);
         jMenuFile.add(jMenuItemLoadFile);
         jMenuLanguage.add(jMenuItemFrench);
         jMenuLanguage.add(jMenuItemEnglish);
         jMenuHelp.add(jMenuItemHelpEditor);
-                
+        jMenuEdit.add(jMenuItemUndo);
+        jMenuEdit.add(jMenuItemRedo);
+        jMenuView.add(jMenuItemZoomMore);
+        jMenuView.add(jMenuItemZoomLess);
+        
         this.add(jMenuFile);
+        this.add(jMenuEdit);
+        //this.add(jMenuView);
         this.add(jMenuLanguage);
         this.add(jMenuHelp);
         
@@ -111,16 +173,80 @@ public class EditionMenuBar extends JMenuBar {
     }
     
     private void jMenuItemHelpEditorActionPerformed(java.awt.event.ActionEvent evt) {  
+		// create jeditorpane
+        JEditorPane jEditorPane = new JEditorPane();
         
+        // make it read-only
+        jEditorPane.setEditable(false);
+        
+        // create a scrollpane; modify its attributes as desired
+        JScrollPane scrollPane = new JScrollPane(jEditorPane);
+        
+        // add an html editor kit
+        HTMLEditorKit kit = new HTMLEditorKit();
+        jEditorPane.setEditorKit(kit);
+        
+        // add some styles to the html
+        StyleSheet styleSheet = kit.getStyleSheet();
+        styleSheet.addRule("body {color:#000; font-family:times; margin: 4px; }");
+        styleSheet.addRule("h1 {color: blue;}");
+        styleSheet.addRule("h2 {color: #ff0000;}");
+        styleSheet.addRule("pre {font : 10px monaco; color : black; background-color : #fafafa; }");
+
+        // create a document, set it on the jeditorpane, then add the html
+        Document doc = kit.createDefaultDocument();
+        jEditorPane.setDocument(doc);
+        String text = new Scanner(this.getClass().getResourceAsStream("/help/help.html"), "UTF-8").useDelimiter("\\A").next();
+        jEditorPane.setText(text);
+
+        // now add it all to a frame
+        JFrame j = new JFrame(parent.getLang().getWord(Lang.HELP_PANEL_TITLE));
+        
+        j.getContentPane().add(scrollPane, BorderLayout.CENTER);
+
+        // make it easy to close the application
+        //j.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        
+        // display the frame
+        j.setSize(new Dimension(500,600));
+        
+        // pack it, if you prefer
+        j.pack();
+        
+        // center the jframe, then make it visible
+        j.setLocationRelativeTo(null);
+        j.setVisible(true);
+    }
+    
+    private void jMenuItemUndoActionPerformed(java.awt.event.ActionEvent evt) {  
+        parent.getEditorPanel1().undo();
+    }
+    
+    private void jMenuItemRedoActionPerformed(java.awt.event.ActionEvent evt) {  
+        parent.getEditorPanel1().redo();
+    }
+    
+    private void jMenuItemZoomMoreActionPerformed(java.awt.event.ActionEvent evt) {  
+        parent.getEditorPanel1().zoom(1);
+    }
+    
+    private void jMenuItemZoomLessActionPerformed(java.awt.event.ActionEvent evt) {  
+        parent.getEditorPanel1().zoom(-1);
     }
     
     public void updateLanguage() {
-        this.jMenuFile.setText(parent.getLang().getWord(Lang.FRAME_MENU_FILE));
-        this.jMenuHelp.setText(parent.getLang().getWord(Lang.FRAME_MENU_HELP));
-        this.jMenuLanguage.setText(parent.getLang().getWord(Lang.FRAME_MENU_LANGUAGE));
+        this.jMenuFile.setText(parent.getLang().getWord(Lang.EDITION_MENU_FILE));
+        this.jMenuEdit.setText(parent.getLang().getWord(Lang.EDITION_MENU_EDIT));
+        this.jMenuView.setText(parent.getLang().getWord(Lang.EDITION_MENU_VIEW));
+        this.jMenuLanguage.setText(parent.getLang().getWord(Lang.EDITION_MENU_LANGUAGE));
+        this.jMenuHelp.setText(parent.getLang().getWord(Lang.EDITION_MENU_HELP));
         this.jMenuItemSaveFile.setText(parent.getLang().getWord(Lang.EDITION_MENUITEM_SAVEFILE));
         this.jMenuItemLoadFile.setText(parent.getLang().getWord(Lang.EDITION_MENUITEM_LOADFILE));
         this.jMenuItemHelpEditor.setText(parent.getLang().getWord(Lang.EDITION_MENUITEM_HELPEDITION));
+        this.jMenuItemUndo.setText(parent.getLang().getWord(Lang.EDITION_MENUITEM_UNDO));
+        this.jMenuItemRedo.setText(parent.getLang().getWord(Lang.EDITION_MENUITEM_REDO));
+        this.jMenuItemZoomMore.setText(parent.getLang().getWord(Lang.EDITION_MENUITEM_ZOOMMORE));
+        this.jMenuItemZoomLess.setText(parent.getLang().getWord(Lang.EDITION_MENUITEM_ZOOMLESS));
     }
     
 }

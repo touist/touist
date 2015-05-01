@@ -8,20 +8,32 @@ package translation;
 public class TranslationError {
 	private int rowInCode;
 	private int columnInCode;
+	private boolean rowAndColumnKnown;
 	private String errorMessage;
 
 	public TranslationError(int rowInCode, int columnInCode, String errorMessage) {
 		this.rowInCode = rowInCode;
 		this.columnInCode = columnInCode;
 		this.errorMessage = errorMessage;
+		rowAndColumnKnown = true;
+	}
+	
+	public TranslationError(String errorMessage) {
+		this.errorMessage = errorMessage;
+		rowAndColumnKnown = false;
 	}
 
 	@Override
 	public String toString() {
-		return "Line "+rowInCode+", column "+columnInCode+": "
-				+errorMessage;
+		return (hasRowAndColumn())
+				?"Line "+rowInCode+", column "+columnInCode+": "+errorMessage
+				:errorMessage;
 	}
 
+	public boolean hasRowAndColumn() {
+		return rowAndColumnKnown;
+	}
+	
 	public int getRowInCode() {
 		return rowInCode;
 	}

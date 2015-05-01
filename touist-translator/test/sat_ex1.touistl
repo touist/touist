@@ -10,8 +10,8 @@ $Del(A)  = [a]
 $Prec(B) = [b,c]
 $Add(B)  = [a,d]
 $Del(B)  = []
-end sets
 
+end sets
 begin formula
 bigand $f in $I: $f(0) end
 bigand $f in diff($F,$I): not $f(0) end
@@ -23,18 +23,18 @@ bigand $i in [1..$length]:
         and
         (bigand $f in $Add($a): $f($i) end)))
     and
-    (bigand $f in $Del($a): (not $f) end)
+    (bigand $f in $Del($a): (not $f($i)) end)
   end
 end
 bigand $i in [1..$length]:
   bigand $f in $F:
-    ((not $f($i-1)) and $f($i))
+    (($f($i-1)) and $f($i))
     => (bigor $a in $O when $f in $Del($a): $a($i) end)
   end
 end
 bigand $i in [1..$length]:
   bigand $f in $F:
-    (not $f($i-1) and not $f($i))
+    (not $f($i-1) and $f($i))
     => (bigor $a in $O when $f in $Add($a): $a($i) end)
   end
 end

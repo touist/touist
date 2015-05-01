@@ -8,8 +8,9 @@ package gui.editionView;
 import gui.AbstractComponentPanel;
 import gui.Lang;
 import gui.editionView.editor.Editor;
+
 import java.util.ArrayList;
-import java.util.List;
+
 import javax.swing.BoxLayout;
 
 /**
@@ -21,12 +22,14 @@ public class PalettePanel extends AbstractComponentPanel {
     @Override
     public void updateLanguage() {
         jLabel1.setText(getFrame().getLang().getWord(Lang.PALETTE_TEXT));
+        if(section1!=null) section1.setText(getFrame().getLang().getWord("PaletteSectionPanel.FormulasSection1"));
+        if(section2!=null) section2.setText(getFrame().getLang().getWord("PaletteSectionPanel.FormulasSection2"));
+        if(section3!=null) section3.setText(getFrame().getLang().getWord("PaletteSectionPanel.SetsSection1"));
     }
 
     public static enum PaletteType {FORMULA, SET};
     
     private Editor editorTextArea;
-    private List<PaletteSectionPanel> sections = new ArrayList<PaletteSectionPanel>();
     
     public PalettePanel() {
         initComponents();
@@ -45,12 +48,14 @@ public class PalettePanel extends AbstractComponentPanel {
         this.editorTextArea = editorTextArea;
     }
     
+    private PaletteSectionPanel section1;
+    private PaletteSectionPanel section2;
+    private PaletteSectionPanel section3;
+    
     public void initPaletteContent(PaletteType type) {
         if (type == PaletteType.FORMULA) {
-            PaletteSectionPanel section1 = new PaletteSectionPanel("Section 1");
-            PaletteSectionPanel section2 = new PaletteSectionPanel("Section 2");
-            sections.add(section1);
-            sections.add(section2);
+            section1 = new PaletteSectionPanel("");
+            section2 = new PaletteSectionPanel("");
 
             ArrayList<Integer> snippetsAnd = new ArrayList<Integer>(){{add(0);add(1);add(7);add(8);}};
             ArrayList<Integer> snippetsOr = new ArrayList<Integer>(){{add(0);add(1);add(6);add(7);}};
@@ -65,22 +70,18 @@ public class PalettePanel extends AbstractComponentPanel {
             section1.addInsertButton(new InsertionButton(editorTextArea, "bigand $i in $a: \n\tA($i) and B($i) \nend", snippetsBigand,"bigand"));
 
             sectionsContainerPanel.setLayout(new BoxLayout(sectionsContainerPanel, BoxLayout.Y_AXIS));
-            for(PaletteSectionPanel section : sections) {
-                sectionsContainerPanel.add(section);
-            }
+            sectionsContainerPanel.add(section1);
+            sectionsContainerPanel.add(section2);
         } else if (type == PaletteType.SET) {
-            PaletteSectionPanel section1 = new PaletteSectionPanel("Section 3");
-            sections.add(section1);
+            section3 = new PaletteSectionPanel("KzdaljahdjlAJHJAZDHAZH zadh azmohozudhazoudhazoduhaou");
 
             ArrayList<Integer> snippetsSet = new ArrayList<Integer>(){{add(0);add(1);}};
             
-            section1.addInsertButton(new InsertionButton(editorTextArea, "$a = [a,b,c]", snippetsSet, ""));
-            section1.addInsertButton(new InsertionButton(editorTextArea, "$b = [a,d,e,f]", snippetsSet, ""));
+            section3.addInsertButton(new InsertionButton(editorTextArea, "$a = [a,b,c]", snippetsSet, ""));
+            section3.addInsertButton(new InsertionButton(editorTextArea, "$b = [a,d,e,f]", snippetsSet, ""));
 
             sectionsContainerPanel.setLayout(new BoxLayout(sectionsContainerPanel, BoxLayout.Y_AXIS));
-            for(PaletteSectionPanel section : sections) {
-                sectionsContainerPanel.add(section);
-            }            
+            sectionsContainerPanel.add(section3);
         }
     }
 

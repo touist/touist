@@ -113,7 +113,7 @@ public class TranslatorSAT {
 		stderr.close();
 		stdout.close();
 		errors = new ArrayList<TranslationError>();
-		if(return_code == 1 || return_code == 2) { // TODO should match COMPILE_NO_LINE_NUMBER_ERROR
+		if(return_code == COMPILE_WITH_LINE_NUMBER_ERROR) {
 			System.err.println("translate(): the translator returned errors");
 			String file_name; int num_line; int num_col;
 			String message_error;
@@ -124,6 +124,13 @@ public class TranslatorSAT {
 				num_col = Integer.parseInt(tokenizer.nextToken());
 				message_error = tokenizer.nextToken();
 				errors.add(new TranslationError(num_line,num_col,message_error));
+			}
+		}
+		if(return_code == COMPILE_NO_LINE_NUMBER_ERROR) {
+			System.err.println("translate(): the translator returned errors");
+			for (String errMessage : linesStdErr) {
+				System.err.println("translate(): "+errMessage);
+				errors.add(new TranslationError(errMessage));
 			}
 		}
 		if(return_code == 0) {
@@ -142,6 +149,10 @@ public class TranslatorSAT {
 	public Map<Integer,String> getLiteralsMap() {
 		return literalsMap;
 	}
+        
+        public Process getP(){
+            return p;
+        }
 
 	/**
 	 * Allows the user to get the path of the generated DIMACS file.

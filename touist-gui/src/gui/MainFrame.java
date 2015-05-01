@@ -11,8 +11,10 @@ import gui.resultsView.ResultsPanel;
 
 import java.awt.CardLayout;
 import java.io.File;
+import java.io.IOException;
 import java.util.ListIterator;
 import java.util.Locale;
+import javax.imageio.ImageIO;
 
 import javax.swing.JPanel;
 
@@ -36,10 +38,10 @@ public class MainFrame extends javax.swing.JFrame {
 
     public final static String EDITOR_PANEL = "editor_panel";
     public final static String RESULTS_PANEL = "results_panel";
-    private JPanel cards = new JPanel(new CardLayout());
-    private ParentEditionPanel editorPanel1 = new ParentEditionPanel();
-    private ResultsPanel resultsPanel1 = new ResultsPanel();
-    private Lang lang = new Lang(Locale.ENGLISH);
+    private JPanel cards;
+    private ParentEditionPanel editorPanel1;
+    private ResultsPanel resultsPanel1;
+    private Lang lang;
     
     private ResultsMenuBar resultsMenuBar;
     private EditionMenuBar editionMenuBar;
@@ -53,6 +55,14 @@ public class MainFrame extends javax.swing.JFrame {
      */
     public MainFrame() {
         
+        lang = new Lang(Locale.ENGLISH);
+        setLanguage(
+        		(lang.getSupportedLanguages().contains(Locale.getDefault()))
+        		?Locale.getDefault():Locale.ENGLISH);
+        
+    	cards = new JPanel(new CardLayout());
+    	editorPanel1 = new ParentEditionPanel();
+        resultsPanel1 = new ResultsPanel();
         resultsMenuBar = new ResultsMenuBar(this);
         editionMenuBar = new EditionMenuBar(this);
         
@@ -63,6 +73,12 @@ public class MainFrame extends javax.swing.JFrame {
         setViewToEditor();
 
         initComponents();
+        
+        try {
+            setIconImage(ImageIO.read(this.getClass().getResourceAsStream("/images/logo64.png")));
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
         
         this.setJMenuBar(editionMenuBar);
         updateLanguage();
