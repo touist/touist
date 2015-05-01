@@ -1,10 +1,11 @@
 open Syntax
+open Pprint
 
 exception TypeError     of string
 exception NameError     of string
 exception ArgumentError of string
 
-(* return the list of integers between min and max
+(* Return the list of integers between min and max
  * with an increment of step
  *)
 let range min max step =
@@ -88,7 +89,12 @@ let unwrap_str = function
 let extenv = Hashtbl.create 10
 
 let rec eval exp env =
-  List.fold_left (fun acc x -> CAnd (acc, x)) Top (eval_prog exp env)
+  (*List.fold_left (fun acc x -> (CAnd (acc, x))) Top (eval_prog exp env)*)
+  let rec loop = function
+    | [] -> failwith "no clauses"
+    | [x] -> x
+    | x::xs -> CAnd (x, loop xs)
+  in loop (eval_prog exp env)
 
 and eval_prog exp env =
   match exp with
@@ -345,24 +351,30 @@ and eval_clause exp env =
              | _ -> raise (TypeError (string_of_clause exp))), Some y)) env
         with Not_found -> raise (NameError ("clause variable undefined: " ^ x))
       end
+  | CNot Top    -> Bottom
+  | CNot Bottom -> Top
   | CNot     x     -> CNot     (eval_clause x env)
+  | CAnd (Top,x)
+  | CAnd (x,Top) -> eval_clause x env
   | CAnd     (x,y) -> CAnd     (eval_clause x env, eval_clause y env)
-  | COr      (x,y) -> COr      (eval_clause x env, eval_clause y env)
-  | CXor     (x,y) -> CXor     (eval_clause x env, eval_clause y env)
+  | COr (Bottom,x)
+  | COr (x,Bottom) -> eval_clause x env
+  | COr      (x,y) -> COr  (eval_clause x env, eval_clause y env)
+  | CXor     (x,y) -> CXor (eval_clause x env, eval_clause y env)
+  | CImplies (_,Top)
+  | CImplies (Bottom,_) -> Top
+  | CImplies (x,Bottom) -> eval_clause (CNot x) env
+  | CImplies (Top,x) -> eval_clause x env
   | CImplies (x,y) -> CImplies (eval_clause x env, eval_clause y env)
-  | CEquiv   (x,y) -> CEquiv   (eval_clause x env, eval_clause y env)
+  | CEquiv   (x,y) -> CEquiv (eval_clause x env, eval_clause y env)
   | Exact (x,y) ->
       begin
         match eval_exp y env with
-        (*| Set (GenSet.ISet s) ->
-            IntSet.exact (unwrap_int (eval_exp x env)) s
-        | Set (GenSet.FSet s) ->
-            FloatSet.exact (unwrap_int (eval_exp x env)) s*)
         | Set (GenSet.SSet s) ->
             exact_str (StringSet.exact (unwrap_int (eval_exp x env)) s)
         | _ -> raise (TypeError (string_of_exp y))
       end
-  (*| Atleast (x,y) ->
+  | Atleast (x,y) ->
       begin
         match eval_exp y env with
         | Set (GenSet.SSet s) ->
@@ -377,7 +389,7 @@ and eval_clause exp env =
             atmost_str (StringSet.atmost (unwrap_int (eval_exp x env)) s)
         | _ ->
             raise (TypeError (string_of_exp y))
-      end*)
+      end
   | Bigand (v,s,t,e) ->
       let test =
         match t with
@@ -424,14 +436,6 @@ and eval_clause exp env =
       let test = eval_test x env in
       if test then eval_clause y env else eval_clause z env
 
-(*
-and exact_str lst =
-  List.fold_left (fun acc (ts,fs) ->
-    COr (acc,
-          CAnd (clause_of_string_list ts, 
-                and_of_term_list (List.map (fun str ->
-                  CNot (Term (str,None))) fs)))) Bottom lst*)
-
 and exact_str lst =
   let rec go = function
     | [],[]       -> Top
@@ -442,65 +446,63 @@ and exact_str lst =
   match lst with
   | []    -> Bottom
   | x::xs -> COr (go x, exact_str xs)
-(*
-and atleast_str = clause_of_string_list
+
+and atleast_str lst =
+  List.fold_left (fun acc str -> COr (acc, clause_of_string_list str)) Bottom lst
 
 and atmost_str =
-  List.fold_left (fun acc str -> CAnd (acc, CNot (Term (str,None)))) Top*)
+  List.fold_left (fun acc str ->
+    COr (acc, List.fold_left (fun acc' str' ->
+      CAnd (acc, CNot (Term (str',None)))) Top str)) Bottom
+
 and clause_of_string_list =
   List.fold_left (fun acc str -> CAnd (acc, Term (str,None))) Top
 
 and and_of_term_list =
   List.fold_left (fun acc t -> CAnd (acc, t)) Top
 
-and bigand_empty env var values test exp =
-  List.fold_left (fun acc x ->
-    if eval_test test env then
-      CAnd (acc, eval_clause exp env)
-    else
-      acc) Top values
+and bigand_empty env var values test exp = Top
+  (*match values with
+  | []    -> Top
+  | [x]   -> eval_clause exp env
+  | x::xs -> CAnd (eval_clause exp env, bigand_empty env var xs test exp)*)
 and bigand_int env var values test exp =
-  List.fold_left (fun acc x ->
-    if eval_test test ((var, Int x)::env) then
-      CAnd (acc, eval_clause exp ((var, Int x)::env))
-    else
-      acc) Top values
+  match values with
+  | []    -> Top
+  | [x]   -> eval_clause exp ((var, Int x)::env)
+  | x::xs -> CAnd (eval_clause exp ((var, Int x)::env), bigand_int env var xs test exp)
 and bigand_float env var values test exp =
-  List.fold_left (fun acc x ->
-    if eval_test test ((var, Float x)::env) then
-      CAnd (acc, eval_clause exp ((var, Float x)::env))
-    else
-      acc) Top values
+  match values with
+  | []    -> Top
+  | [x]   -> eval_clause exp ((var, Float x)::env)
+  | x::xs -> CAnd (eval_clause exp ((var, Float x)::env), bigand_float env var xs test exp)
 and bigand_str env var values test exp =
-  List.fold_left (fun acc x ->
-    if eval_test test ((var, Clause (Term (x,None)))::env) then
-      CAnd (acc, eval_clause exp ((var, Clause (Term (x,None)))::env))
-    else
-      acc) Top values
-and bigor_empty env var values test exp =
-  List.fold_left (fun acc x ->
-    if eval_test test env then
-      COr (acc, eval_clause exp env)
-    else
-      acc) Bottom values
+  match values with
+  | []    -> Top
+  | [x]   -> eval_clause exp ((var, Clause (Term  (x,None)))::env)
+  | x::xs ->
+      CAnd (eval_clause exp ((var, Clause (Term  (x,None)))::env), bigand_str env var xs test exp)
+and bigor_empty env var values test exp = Bottom
+  (*match values with
+  | [] -> Bottom
+  | [x] -> eval_clause exp env
+  | x::xs -> COr (eval_clause exp env, bigor_empty env var xs test exp)*)
 and bigor_int env var values test exp =
-  List.fold_left (fun acc x ->
-    if eval_test test ((var, Int x)::env) then
-      COr (acc, eval_clause exp ((var, Int x)::env))
-    else
-      acc) Bottom values
+  match values with
+  | []    -> Bottom
+  | [x]   -> eval_clause exp ((var, Int x)::env)
+  | x::xs -> COr (eval_clause exp ((var, Int x)::env), bigor_int env var xs test exp)
 and bigor_float env var values test exp =
-  List.fold_left (fun acc x ->
-    if eval_test test ((var, Float x)::env) then
-      COr (acc, eval_clause exp ((var, Float x)::env))
-    else
-      acc) Bottom values
+  match values with
+  | []    -> Bottom
+  | [x]   -> eval_clause exp ((var, Float x)::env)
+  | x::xs -> COr (eval_clause exp ((var, Float x)::env), bigor_float env var xs test exp)
 and bigor_str env var values test exp =
-  List.fold_left (fun acc x ->
-    if eval_test test ((var, Clause (Term (x,None)))::env) then
-      COr (acc, eval_clause exp ((var, Clause (Term (x, None)))::env))
-    else
-      acc) Bottom values
+  match values with
+  | []    -> Bottom
+  | [x]   -> eval_clause exp ((var, Clause (Term  (x,None)))::env)
+  | x::xs ->
+      COr (eval_clause exp ((var, Clause (Term (x,None)))::env), bigor_str env var xs test exp)
 
 and eval_test exp env =
   match eval_exp exp env with
