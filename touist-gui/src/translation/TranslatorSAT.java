@@ -126,14 +126,11 @@ public class TranslatorSAT {
 				errors.add(new TranslationError(num_line,num_col,message_error));
 			}
 		}
-		if(return_code == COMPILE_NO_LINE_NUMBER_ERROR) { // TODO should match COMPILE_NO_LINE_NUMBER_ERROR
+		if(return_code == COMPILE_NO_LINE_NUMBER_ERROR) {
 			System.err.println("translate(): the translator returned errors");
-			String message_error = "";
 			for (String errMessage : linesStdErr) {
 				System.err.println("translate(): "+errMessage);
-				StringTokenizer tokenizer = new StringTokenizer(errMessage,":");
-				message_error += tokenizer.nextToken();
-				errors.add(new TranslationError(0,0,message_error));
+				errors.add(new TranslationError(errMessage));
 			}
 		}
 		if(return_code == 0) {

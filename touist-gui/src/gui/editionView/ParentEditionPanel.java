@@ -416,10 +416,13 @@ public class ParentEditionPanel extends AbstractComponentPanel {
         try {
             if(! getFrame().getTranslator().translate(bigAndFilePath)) {
                 errorMessage = "";
-                for(int i=0; i<getFrame().getTranslator().getErrors().size(); i++) {
-                    TranslationError error = guiTranslationErrorAdapter(getFrame().getTranslator().getErrors().get(i));
-                    errorMessage += error + "\n";
-                }
+				for (TranslationError error : getFrame().getTranslator().getErrors()) {
+					if(error.hasRowAndColumn()) {
+						errorMessage += guiTranslationErrorAdapter(error) + "\n";
+					} else { 
+						errorMessage += error + "\n";
+					}
+				}
                 jLabelErrorMessage.setText(errorMessage);
                 System.out.println("Traduction error : " + "\n" + errorMessage + "\n");
                 showErrorMessage(errorMessage, getFrame().getLang().getWord(Lang.ERROR_TRADUCTION));
