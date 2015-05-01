@@ -234,22 +234,22 @@ public class TouIST {
 			File f;
 
 			//General Option
-			if(args[0]=="--help" || args[0]=="-h") {
+			if(args[0].equals("--help") || args[0].equals("-h")) {
 				help();System.exit(0);
 			}
-			else if(args[0]=="--version" || args[0]=="-v") {
+			else if(args[0].equals("--version") || args[0].equals("-v")) {
 				version();System.exit(0);
 			}
 			//Solver Option SAT:
 			//Using TouIST Language
-			else if(args[0]=="--t") {   
+			else if(args[0].equals("--t")) {   
 				path=CurrentPath+File.separatorChar+args[1];
 				f=new File(path);
 				if(f.isFile() && path.endsWith(".touistl"))
 					translate(path,args[3],args[4]);
 				System.exit(0);
 			}
-			else if(args[0]== "--s") {
+			else if(args[0].equals("--s")) {
 				if(args.length==3){ 
 					path=CurrentPath+File.separatorChar+args[1];
 					f=new File(path);
@@ -261,7 +261,7 @@ public class TouIST {
 				else empty(args[0],3);System.exit(0);
 			}
 			//Using CNF format
-			else if(args[0]=="--cnf") { 
+			else if(args[0].equals("--cnf")) { 
 				if( args.length==3 || args.length==5){
 					path=CurrentPath+File.separatorChar+args[1];
 					f=new File(path);
@@ -283,7 +283,7 @@ public class TouIST {
 				System.exit(0);
 			}	
 			//Solver Option SMT
-			else if(args[0]=="--smt") {
+			else if(args[0].equals("--smt")) {
 				System.exit(0);
 			}
 			else if(args.length==0) empty(null,1);else empty(args[0],2);System.exit(0);
