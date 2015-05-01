@@ -76,6 +76,9 @@ public class ParentEditionPanel extends AbstractComponentPanel {
         jFileChooser1.setFileSelectionMode(JFileChooser.FILES_ONLY);
         jFileChooser1.addChoosableFileFilter(new FileNameExtensionFilter("Touistl files(touistl)","touistl"));
 
+        jTabbedPane1.addTab("", editorPanelFormulas);
+        jTabbedPane1.addTab("", editorPanelSets);
+
         testButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 testButtonActionPerformed(evt);
@@ -528,22 +531,12 @@ public class ParentEditionPanel extends AbstractComponentPanel {
     @Override
     public void updateLanguage() {
         jTabbedPane1.setToolTipText("");
-        jTabbedPane1.addTab(getFrame().getLang().getWord("ParentEditionPanel.editorPanelFormulas.TabConstraints.tabTitle"), editorPanelFormulas);
         editorPanelFormulas.setToolTipText("ParentEditionPanel.editorPanelFormulas.TabConstraints.tabTooltip");
-        
-        jTabbedPane1.addTab(getFrame().getLang().getWord("ParentEditionPanel.editorPanelSets.TabConstraints.tabTitle"), editorPanelSets);        
         editorPanelSets.setToolTipText(getFrame().getLang().getWord("ParentEditionPanel.editorPanelSets.TabConstraints.tabTooltip"));
-
-        testButton.setText(getFrame().getLang().getWord("ParentEditionPanel.testButton.text"));
-        testButton.setToolTipText(getFrame().getLang().getWord("ParentEditionPanel.testButton.tooltip")); 
-    	
-        importButton.setText(getFrame().getLang().getWord("ParentEditionPanel.importButton.text")); 
-        
-        exportButton.setText(getFrame().getLang().getWord("ParentEditionPanel.exportButton.text"));
-        
         importButton.setText(getFrame().getLang().getWord(Lang.EDITION_IMPORT));
         exportButton.setText(getFrame().getLang().getWord(Lang.EDITION_EXPORT));
         testButton.setText(getFrame().getLang().getWord(Lang.EDITION_TEST));
+        testButton.setToolTipText(getFrame().getLang().getWord("ParentEditionPanel.testButton.tooltip")); 
         editorPanelFormulas.updateLanguage();
         editorPanelSets.updateLanguage();
         jTabbedPane1.setTitleAt(0, getFrame().getLang().getWord(Lang.EDITION_TAB_FORMULAS));
