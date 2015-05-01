@@ -1,2 +1,0 @@
-[Ljava.lang.StackTraceElement;@6476d27a
-######################
