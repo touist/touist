@@ -6,13 +6,7 @@ let to_dimacs prop =
   and nbclause = ref 0 in
   let rec go acc = function
     | Top -> failwith "Clause is always true"
-        (*incr nbclause;
-        acc ^ string_of_int (gensym "top") ^ " "
-            ^ string_of_int (- (gensym "top"))*)
     | Bottom -> failwith "Clause is alway false"
-        (*incr nbclause;
-        acc ^ string_of_int (gensym "bot") ^ " 0\n"
-            ^ string_of_int (- (gensym "bot"))*)
     | Term (x, None)        -> acc ^ string_of_int (gensym x)
     | Term (x, _)           -> failwith ("unevaluated term: " ^ x)
     | CNot (Term (x, None)) -> acc ^ string_of_int (- (gensym x))
