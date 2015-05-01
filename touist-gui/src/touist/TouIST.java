@@ -24,7 +24,30 @@
 package touist;
 
 import gui.MainFrame;
+<<<<<<< Updated upstream
 import javax.swing.JOptionPane;
+=======
+import gui.State;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+
+import java.io.IOException;
+import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.ListIterator;
+import java.util.Map;
+import java.util.Scanner;
+
+import solution.NotSatisfiableException;
+import solution.SolverExecutionException;
+import solution.SolverTestSAT4J;
+import translation.TranslatorSAT;
+>>>>>>> Stashed changes
 
 /**
  *
@@ -35,6 +58,7 @@ public class TouIST {
     /**
      * @param args the command line arguments
      */
+<<<<<<< Updated upstream
     public static void main(String[] args) {
         String version = System.getProperty("java.version");
         if(Float.valueOf(version.substring(0,3)) < 1.6) {
@@ -42,8 +66,238 @@ public class TouIST {
             return;
         }
     	System.out.println("main(): running app from folder '"
+=======
+    private static String CurrentPath=Paths.get("").toAbsolutePath().toString();
+     public static void help(){
+        
+        System.out.println("* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *");
+        System.out.println("* Usage: TouistSol [Options...] filename                                    *");
+        System.out.println("* General options:                                                          *");
+        System.out.println("*  --cnf          read & resolve CNF problem in DIMACS format               *");
+        System.out.println("*  --s            read & resolve TouIST problem in TOUISTL format           *");
+        System.out.println("*  --t            read TouIST problem in TOUISTL format and build           *");
+        System.out.println("*                 (DIMACS format, Hash CNF table)                           *");
+        System.out.println("*  -o filename,--output filename                                            *\n"
+                +          "*                 write solution to filename in printable format            *");
+        
+        
+        
+        System.out.println("*  -h, --help     display this help information and exit                    *");
+        System.out.println("*  -v, --version  display program version and exit                          *");
+        System.out.println("*                                                                           *");
+        System.out.println("*  -v, --version  display program version and exit                          *");
+        System.out.println("* TouISTSOL v1.0,2015. Easily formalize and solve real-world sized problems *\n" +
+                           "* using propositional logic and linear theory of reals                      *");
+        System.out.println("* See TouIST web page at : www.irit.fr/softwave/.../touIST.html             *");
+        System.out.println("*                                                                           *");
+        System.out.println("* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *");
+    }
+    public static void version(){
+        System.out.println("* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *");
+        System.out.println("* TouISTSOL: TouIST Propositional logic/Linear Theory of reals Solver, v1.0   *\n"
+                         + "*                                                                             *\n" +
+                           "* Copyright (C) 2015. Toulouse Institute of Computer Science Research,France. *\n" +
+                           "* All rights reserved.Email:<.....@irit.fr>                                   *\n"+
+                           "* Contributors:                                                               *\n" +
+                           "*     Khaled Skander Ben Slimane, Alexis Comte, Olivier Gasquet,              *\n" +
+                           "*     Abdelwahab Heba, Olivier Lezaud, Frédéric Maris, Maël Valais            *\n"
+                        +  "*                                                                             *");
+        
+        System.out.println("* This program is free software; you may re-distrubute it under the terme of  *\n"+
+                           "* the GNU Lesser General Public License (LGPL) version 2.1 which accompanies  *\n"
+                         + "* this distribution, and is available at :                                    *\n"
+                         + "* http://www.gnu.org/licenses/lgpl-2.1.html                                   *");
+        System.out.println("* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *");
+    }
+    public static void empty(String arg,int number){
+    if(number==1){
+    System.out.println("TouISTSOL v1.0,2015.");
+    System.out.println("No input option; try TouISTSol --help                             ");
+    }
+    else{
+        if(number==2)
+        {
+    System.out.println("TouISTSOL v1.0,2015.");
+    System.out.println("Invalid option '"+arg+"'; try TouISTSol --help                             ");   
+        }
+        if(number==3)
+        {
+    System.out.println("TouISTSOL v1.0,2015.");
+    System.out.println("Parameter(s) specified in the command line:\n "+arg);
+    System.out.println("No input problem file specified; try TouISTSol --help                             ");
+        }
+        if(number==4){
+         System.out.println("No output solution file specified");
+        }
+    }
+    }
+        public static void solvetouISTL(String path,int nb,boolean control,String pathSave) throws IOException, InterruptedException{
+        TranslatorSAT translator = new TranslatorSAT("compiler"+File.separatorChar+"touistc.native");
+        if(translator.translate(path))
+        {
+           // Minisat solver= new Minisat(translator.getDimacsFilePath(),nb,translator.getLiteralsMap());
+           // Models m=solver.resolveTouISTLProblem();
+            StringBuilder str=new StringBuilder();
+//            for (Model m1: m.getModels()){
+//                str.append(m1.toString()+"\n");
+//            }
+             if(control)
+                System.out.println(str.toString());
+             else
+                Output(pathSave,str.toString());
+        }
+        //File f=new File(translator.getDimacsFilePath());
+        //f.delete();
+        //File f1=new File()
+    }
+    
+    public static void solveCNF(String path,int nb,boolean control,String pathSave) throws FileNotFoundException, IOException, NotSatisfiableException, SolverExecutionException{
+                //Add CurrentPath/dimacsFile
+
+        SolverTestSAT4J solver=new SolverTestSAT4J(path);
+        
+        try {
+            solver.launch();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            String errorMessage = "Couldn't launch solver.";
+            System.out.println("Solver error "+ errorMessage);
+            System.exit(0);
+        }       
+            
+        // Si il y a au moins un model
+            ListIterator<Model> iter = (ListIterator<Model>) solver.getModelList().iterator();
+            /**
+             * Si il y a plus d'un model, alors passer à l'état FIRST_RESULT
+             * sinon passer à l'état SINGLE_RESULT
+             */
+            System.out.println("eoo je suis ici");
+            if (iter.hasNext())
+                System.out.println(iter.next().toString());
+//                if (iter.hasNext()) {
+//                   //iter.previous();
+//                    return State.FIRST_RESULT;
+//                } else {
+//                    //iter.previous();
+//                    return State.SINGLE_RESULT;
+//                }
+//            } else {
+//                getFrame().setResultsPanelEmpty();
+//                return State.NO_RESULT;
+//            }
+//        
+        
+//        Map<Integer,String> mp=new HashMap<Integer,String>();
+//        File f=new File(path);
+//        BufferedReader br=new BufferedReader(new FileReader(f));
+//        String line="";
+//        br.readLine();
+//        br.readLine();
+//        while((line=br.readLine())!=null){
+//            String[] line1=line.split(" ");
+//            for (String line2:line1)
+//            {
+//                int number=Integer.parseInt(line2);
+//                number=(number>0? number:number*(-1));
+//                if(number!=0 && !mp.containsKey(number))
+//                    mp.put(number,"P("+number+")");
+//            }
+//        }
+//        
+//       // Minisat solver=new Minisat(path,nb,mp);
+//        
+//        //Models m=solver.resolveTouISTLProblem();
+//        StringBuilder str=new StringBuilder();
+////        for (Model m1: m.getModels()){
+////                str.append(m1.toString()+"\n");
+////            }
+//        if(control)
+//            System.out.println(str.toString());
+//        else
+//           Output(pathSave,str.toString());
+    }
+    public static void translate(String path,String nameCnf,String nameTable) throws IOException, InterruptedException{
+        TranslatorSAT translator = new TranslatorSAT("compiler"+File.separatorChar+"touistc.native");
+        //translator.setOutputFilePath(nameCnf);
+        //translator.setOutputTableFilePath(nameTable);
+        if(translator.translate(path))
+        {
+         System.out.println("Translate done..");
+         //System.out.println("CNF FILE :"+translator.getDimacsFilePath());
+         //System.out.println("<Key,Literal>: \n");
+         // while(translator.getLiteralsMap().entrySet().iterator().hasNext()){
+           //   Map.Entry<Integer, String> e= translator.getLiteralsMap().entrySet().iterator().next();
+            //  System.out.println(e.getKey()+" "+e.getValue());
+          //}
+        }
+    }
+    
+    public static void Output(String nameFile,String out) throws IOException{
+        BufferedWriter wr=new BufferedWriter(new FileWriter(nameFile));
+        wr.write(out);
+        wr.flush();
+        wr.close();
+    }
+    public static void main(String[] args) throws IOException, InterruptedException, FileNotFoundException, NotSatisfiableException, SolverExecutionException {
+    	if(args.length==0)
+        {System.out.println("main(): running app from folder '"
+>>>>>>> Stashed changes
     			+ System.getProperty("user.dir")+"'");
         MainFrame frame = new MainFrame();
-        frame.setVisible(true);
+        frame.setVisible(true);}
+        else{
+         String path="";
+         File f;
+            switch(args[0]){
+                //General Option
+                case "--help": help();System.exit(0);
+                case "-h": help();System.exit(0);
+                case "--version": version();System.exit(0);
+                case "-v": version();System.exit(0);
+                //Solver Option SAT:
+                //Using TouIST Language
+                case "--t":   
+                    path=CurrentPath+File.separatorChar+args[1];
+                    f=new File(path);
+                    if(f.isFile() && path.endsWith(".touistl"))
+                        translate(path,args[3],args[4]);
+                    System.exit(0);
+                case "--s": if(args.length==3){ 
+                    path=CurrentPath+File.separatorChar+args[1];
+                    f=new File(path);
+                    if(f.isFile() && path.endsWith(".touistl"))
+                    solvetouISTL(CurrentPath+File.separatorChar+args[1],Integer.parseInt(args[2]),true,null);
+                    else
+                       System.out.println("le fichier doit etre d'extension .touisl");
+                    }
+                    else empty(args[0],3);System.exit(0);
+               //Using CNF format
+                case "--cnf":  
+                    if( args.length==3 || args.length==5){
+                         path=CurrentPath+File.separatorChar+args[1];
+                          f=new File(path);
+                            if(f.isFile() && path.endsWith(".cnf"))
+                            {  if(args.length==3)
+                                 solveCNF(CurrentPath+File.separatorChar+args[1],Integer.parseInt(args[2]),true,null);
+                                else
+                                 solveCNF(CurrentPath+File.separatorChar+args[1],Integer.parseInt(args[2]),false,CurrentPath+File.separatorChar+args[4]);
+                            }else
+                                 System.out.println("le fichier doit etre d'extension .cnf");
+                    }else{
+                        //System.out.println("eo"+a.length);
+                        if(args.length==4)
+                        {if(args[3].equals("-o") || args[3].equals("--output"))
+                                empty(null,4);
+                            else
+                            empty(args[3],3);}            
+                    }
+                      System.exit(0);
+                //Solver Option SMT
+                case "--smt":
+                            System.exit(0);
+                default: if(args.length==0) empty(null,1);else empty(args[0],2);System.exit(0);
+            }
+
+        }
     }
 }

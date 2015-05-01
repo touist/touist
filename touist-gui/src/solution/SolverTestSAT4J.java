@@ -145,8 +145,15 @@ public class SolverTestSAT4J extends Solver {
 		stdin.println("1"); // tells the solver to give the next model 
 		stdin.flush();
 		// We wait for any output from the solver unless we get a timeout
+<<<<<<< Updated upstream
 		final long timeout = System.currentTimeMillis() + WAIT_FOR_MODEL_TIMEOUT;
 		while(!stdout.ready() && isAlive(p) && System.currentTimeMillis() < timeout){
+=======
+		final long start = System.currentTimeMillis();
+		final long timeout = start + WAIT_FOR_MODEL_TIMEOUT;
+		while(!stdout.ready() && System.currentTimeMillis() < timeout && isRunning(p)){
+               // while(stdout.readLine()==null)
+>>>>>>> Stashed changes
 			// Active waiting (I know, it is a bad way to do it!)
 			try {
 				synchronized (this) { // for JavaRE6 compliance
@@ -167,6 +174,23 @@ public class SolverTestSAT4J extends Solver {
 			throw new SolverExecutionException("nextModel(): exception: "
 					+ "the solver didn't give any output (timeout = "
 					+Integer.toString(WAIT_FOR_MODEL_TIMEOUT)+"ms)");
+<<<<<<< Updated upstream
+=======
+		} else { // Something has been read
+			rawLiterals = stdout.readLine().split(" ");
+			if(getLiteralsMap()!=null)
+                        modelParsed = parseModel(rawLiterals);
+                        else
+                        {modelParsed=new Model();
+                        for (String rawLiteral : rawLiterals) {
+			int literalInt = Integer.parseInt(rawLiteral);
+			if (literalInt != 0) { // '0' means 'end of model'
+				int literalCode = (literalInt > 0 ? literalInt : literalInt * (-1));
+					modelParsed.addLiteral(new Literal(rawLiteral, literalInt > 0));
+			}
+                        }
+                        }
+>>>>>>> Stashed changes
 		}
 		return modelParsed;
 	}
