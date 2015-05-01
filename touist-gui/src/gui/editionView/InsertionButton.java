@@ -9,10 +9,13 @@ import gui.MainFrame;
 import gui.State;
 import gui.TranslatorLatex.TranslationLatex;
 import gui.editionView.editor.Editor;
+
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+
 import javax.swing.JButton;
+
 import org.scilab.forge.jlatexmath.TeXConstants;
 import org.scilab.forge.jlatexmath.TeXFormula;
 import org.scilab.forge.jlatexmath.TeXIcon;
@@ -27,7 +30,7 @@ public class InsertionButton extends JButton {
     private final String codeToInsert;
     private ArrayList<Integer> snipets;
     
-    public InsertionButton(Editor editorTextArea, String codeToInsert, ArrayList<Integer> snipets) {
+    public InsertionButton(Editor editorTextArea, final String codeToInsert, ArrayList<Integer> snipets) {
         this.editorTextArea = editorTextArea;
         this.codeToInsert = codeToInsert;
         this.snipets = snipets;

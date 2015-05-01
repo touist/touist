@@ -7,6 +7,7 @@ package gui.editionView;
 
 import gui.AbstractComponentPanel;
 import gui.Lang;
+import gui.MainFrame;
 import gui.editionView.editor.Editor;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +29,8 @@ public class PalettePanel extends AbstractComponentPanel {
     private Editor editorTextArea;
     private List<PaletteSectionPanel> sections = new ArrayList<PaletteSectionPanel>();
     
-    public PalettePanel() {
+    public PalettePanel(MainFrame parent) {
+    	super(parent);
         initComponents();
     }
     
@@ -36,7 +38,8 @@ public class PalettePanel extends AbstractComponentPanel {
      * Creates new form PalettePanel
      * @param editorTextArea
      */
-    public PalettePanel(Editor editorTextArea) {
+    public PalettePanel(MainFrame parent, Editor editorTextArea) {
+    	super(parent);
         initComponents();
         this.editorTextArea = editorTextArea;
     }
@@ -47,8 +50,8 @@ public class PalettePanel extends AbstractComponentPanel {
     
     public void initPaletteContent(PaletteType type) {
         if (type == PaletteType.FORMULA) {
-            PaletteSectionPanel section1 = new PaletteSectionPanel("Section 1");
-            PaletteSectionPanel section2 = new PaletteSectionPanel("Section 2");
+            PaletteSectionPanel section1 = new PaletteSectionPanel(getFrame().getLang().getWord("PaletteSectionPanel.FormulasSection1"));
+            PaletteSectionPanel section2 = new PaletteSectionPanel(getFrame().getLang().getWord("PaletteSectionPanel.FormulasSection2"));
             sections.add(section1);
             sections.add(section2);
 
@@ -69,7 +72,7 @@ public class PalettePanel extends AbstractComponentPanel {
                 sectionsContainerPanel.add(section);
             }
         } else if (type == PaletteType.SET) {
-            PaletteSectionPanel section1 = new PaletteSectionPanel("Section 3");
+            PaletteSectionPanel section1 = new PaletteSectionPanel(getFrame().getLang().getWord("PaletteSectionPanel.SetsSection1"));
             sections.add(section1);
 
             ArrayList<Integer> snippetsSet = new ArrayList<Integer>(){{add(0);add(1);}};

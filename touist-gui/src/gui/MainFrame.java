@@ -11,15 +11,17 @@ import gui.resultsView.ResultsPanel;
 
 import java.awt.CardLayout;
 import java.io.File;
+import java.io.IOException;
 import java.util.ListIterator;
 import java.util.Locale;
+import javax.imageio.ImageIO;
 
 import javax.swing.JPanel;
 
 import solution.BaseDeClauses;
 import solution.ModelList;
 import solution.Solver;
-import translation.Translator;
+import translation.TranslatorSAT;
 
 /**
  *
@@ -28,7 +30,7 @@ import translation.Translator;
 public class MainFrame extends javax.swing.JFrame {
 
     private BaseDeClauses clause = new BaseDeClauses();
-    private Translator translator = new Translator("external"+File.separatorChar+"touistc");
+    private TranslatorSAT translator = new TranslatorSAT("external"+File.separatorChar+"touistc");
     private Solver solver;
     private ModelList models;
 
@@ -36,10 +38,13 @@ public class MainFrame extends javax.swing.JFrame {
 
     public final static String EDITOR_PANEL = "editor_panel";
     public final static String RESULTS_PANEL = "results_panel";
-    private JPanel cards = new JPanel(new CardLayout());
-    private ParentEditionPanel editorPanel1 = new ParentEditionPanel();
-    private ResultsPanel resultsPanel1 = new ResultsPanel();
-    private Lang lang = new Lang(Locale.ENGLISH);
+    private JPanel cards;
+    private ParentEditionPanel editorPanel1;
+    private ResultsPanel resultsPanel1;
+    private Lang lang;
+    
+    private ResultsMenuBar resultsMenuBar;
+    private EditionMenuBar editionMenuBar;
 
     public Lang getLang() {
         return lang;
@@ -49,8 +54,19 @@ public class MainFrame extends javax.swing.JFrame {
      * Creates new form MainFrame
      */
     public MainFrame() {
+        
+        lang = new Lang(Locale.ENGLISH);
+        setLanguage(
+        		(lang.getSupportedLanguages().contains(Locale.getDefault()))
+        		?Locale.getDefault():Locale.ENGLISH);
+        
+    	cards = new JPanel(new CardLayout());
+    	editorPanel1 = new ParentEditionPanel(this);
+        resultsPanel1 = new ResultsPanel(this);
+        resultsMenuBar = new ResultsMenuBar(this);
+        editionMenuBar = new EditionMenuBar(this);
+        
         state = State.EDITION;
-
         add(cards);
         cards.add(editorPanel1, EDITOR_PANEL);
         cards.add(resultsPanel1, RESULTS_PANEL);
@@ -58,16 +74,22 @@ public class MainFrame extends javax.swing.JFrame {
 
         initComponents();
         
+        try {
+            setIconImage(ImageIO.read(this.getClass().getResourceAsStream("/images/logo64.png")));
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+        
+        this.setJMenuBar(editionMenuBar);
         updateLanguage();
     }
     
-    private void updateLanguage() {
+    public void updateLanguage() {
         this.setTitle(lang.getWord(Lang.FRAME_TITLE));
-        this.jMenu1.setText(lang.getWord(Lang.FRAME_MENU_FILE));
-        this.jMenu2.setText(lang.getWord(Lang.FRAME_MENU_HELP));
-        this.jMenu3.setText(lang.getWord(Lang.FRAME_MENU_LANGUAGE));
         editorPanel1.updateLanguage();
         resultsPanel1.updateLanguage();
+        resultsMenuBar.updateLanguage();
+        editionMenuBar.updateLanguage();
     }
 
     public BaseDeClauses getClause() {
@@ -90,8 +112,16 @@ public class MainFrame extends javax.swing.JFrame {
         this.models = models;
     }
 
-    public Translator getTranslator() {
+    public TranslatorSAT getTranslator() {
         return translator;
+    }
+    
+    public ResultsPanel getResultsPanel1() {
+        return resultsPanel1;
+    }
+    
+    public ParentEditionPanel getEditorPanel1() {
+        return editorPanel1;
     }
     
     public void updateResultsPanelIterator(ListIterator<Model> iter) {
@@ -99,10 +129,12 @@ public class MainFrame extends javax.swing.JFrame {
     }
 
     public void setViewToEditor() {
+        this.setJMenuBar(editionMenuBar);
         ((CardLayout)cards.getLayout()).show(cards, EDITOR_PANEL);
     }
 
     public void setViewToResults() {
+        this.setJMenuBar(resultsMenuBar);
         resultsPanel1.applyRestrictions();
         ((CardLayout)cards.getLayout()).show(cards, RESULTS_PANEL);
     }
@@ -110,6 +142,10 @@ public class MainFrame extends javax.swing.JFrame {
     public void setResultView(Model m) {
         resultsPanel1.setActModel(m);
         resultsPanel1.setResult();
+    }
+    
+    public void setResultsPanelEmpty() {
+       resultsPanel1.setEmpty();
     }
     
     public void setLanguage(Locale language) {
@@ -127,58 +163,11 @@ public class MainFrame extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jMenuBar1 = new javax.swing.JMenuBar();
-        jMenu1 = new javax.swing.JMenu();
-        jMenu3 = new javax.swing.JMenu();
-        jMenuItem1 = new javax.swing.JMenuItem();
-        jMenuItem2 = new javax.swing.JMenuItem();
-        jMenu2 = new javax.swing.JMenu();
-
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         getContentPane().setLayout(new java.awt.CardLayout());
 
-        jMenu1.setText("File");
-        jMenuBar1.add(jMenu1);
-
-        jMenu3.setText("Language");
-
-        jMenuItem1.setText("English");
-        jMenuItem1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItem1ActionPerformed(evt);
-            }
-        });
-        jMenu3.add(jMenuItem1);
-
-        jMenuItem2.setText("Français");
-        jMenuItem2.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItem2ActionPerformed(evt);
-            }
-        });
-        jMenu3.add(jMenuItem2);
-
-        jMenuBar1.add(jMenu3);
-
-        jMenu2.setText("Help");
-        jMenuBar1.add(jMenu2);
-
-        setJMenuBar(jMenuBar1);
-
         pack();
     }// </editor-fold>//GEN-END:initComponents
-
-    private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
-        lang.setLanguage(Locale.ENGLISH);
-        updateLanguage();
-        System.out.println("Language set to English");
-    }//GEN-LAST:event_jMenuItem1ActionPerformed
-
-    private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem2ActionPerformed
-        lang.setLanguage(Locale.FRENCH);
-        updateLanguage();
-        System.out.println("Language set to French");
-    }//GEN-LAST:event_jMenuItem2ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -218,11 +207,5 @@ public class MainFrame extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JMenu jMenu1;
-    private javax.swing.JMenu jMenu2;
-    private javax.swing.JMenu jMenu3;
-    private javax.swing.JMenuBar jMenuBar1;
-    private javax.swing.JMenuItem jMenuItem1;
-    private javax.swing.JMenuItem jMenuItem2;
     // End of variables declaration//GEN-END:variables
 }

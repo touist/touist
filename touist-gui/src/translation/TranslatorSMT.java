@@ -21,29 +21,13 @@
  *
  */
 
-package touist;
+package translation;
 
-import gui.MainFrame;
-import javax.swing.JOptionPane;
 
 /**
- *
- * @author Skander
+ * @author Abdel
+ * @Modified by Mael
  */
-public class TouIST {
+public class TranslatorSMT {
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String[] args) {
-        String version = System.getProperty("java.version");
-        if(Float.valueOf(version.substring(0,3)) < 1.6) {
-            JOptionPane.showMessageDialog(null, "Your java version is "+version+" but version higher or equal to 1.6 is required");
-            return;
-        }
-    	System.out.println("main(): running app from folder '"
-    			+ System.getProperty("user.dir")+"'");
-        MainFrame frame = new MainFrame();
-        frame.setVisible(true);
-    }
 }

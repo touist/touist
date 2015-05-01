@@ -1,15 +1,15 @@
 begin sets
-    $length  = 10
-    $F       = [a,b,c,d]
-    $O       = [A,B]
-    $I       = [a,c]
-    $G       = [a,d]
-    $Prec(A) = [a]
-    $Add(A)  = [b]
-    $Del(A)  = [a]
-    $Prec(B) = [b,c]
-    $Add(B)  = [a,d]
-    $Del(B)  = []
+$length  = 10
+$F       = [a,b,c,d]
+$O       = [A,B]
+$I       = [a,c]
+$G       = [a,d]
+$Prec(A) = [a]
+$Add(A)  = [b]
+$Del(A)  = [a]
+$Prec(B) = [b,c]
+$Add(B)  = [a,d]
+$Del(B)  = []
 end sets
 
 begin formula

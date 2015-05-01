@@ -194,7 +194,6 @@ Comment     = ";;"[^\n]*
    
 	/* Keywords */   
 	"begin" |   
-	"end" |   
 	"sets" |   
 	"formula" |
 	"if" |
@@ -221,7 +220,11 @@ Comment     = ";;"[^\n]*
 	"card" |
 	"int" |	
 	"sqrt" |
-	"mod" 	{ addToken(Token.FUNCTION); }   
+	"mod"|
+	"end" |
+	"atleast" |
+	"exact" |
+	"atmost"	{ addToken(Token.FUNCTION); }   
    
    
 	{Empty}				{ addToken(Token.WHITESPACE); }   

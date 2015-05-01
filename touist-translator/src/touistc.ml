@@ -18,16 +18,17 @@ Then you can open the FilePath module:
 type mode = SMTLIB2 | SAT_DIMACS
 type error =
   | OK
-  | COMPILE_SYNTAX_ERROR
-  | COMPILE_SEMANTIC_ERROR
-  | COMPILE_JUSTWARNINGS
-  | ARGUMENTS_ERROR
+  | COMPILE_WITH_LINE_NUMBER_ERROR
+  | COMPILE_NO_LINE_NUMBER_ERROR
+  | OTHER
+
+(* COMPILE_WITH_LINE_NUMBER_ERROR == `num_row:num_col:message`*)
+(* COMPILE_NO_LINE_NUMBER_ERROR == `Any other message format` *)
 let get_code (e : error) : int = match e with
   | OK -> 0
-  | COMPILE_SYNTAX_ERROR -> 1
-  | COMPILE_SEMANTIC_ERROR -> 2
-  | COMPILE_JUSTWARNINGS -> 3
-  | ARGUMENTS_ERROR -> 4
+  | COMPILE_WITH_LINE_NUMBER_ERROR -> 1
+  | COMPILE_NO_LINE_NUMBER_ERROR -> 2
+  | OTHER -> 3
 
 let input_file_path = ref ""
 let output_file_path = ref ""
@@ -56,7 +57,7 @@ outputFilePath name using the inputFilePath name *)
 let defaultOutputTable (inputFilePath:string) : string =
   let inputBase = (FilePath.basename inputFilePath) in
   let inputBaseNoExt = (FilePath.chop_extension inputBase) in
-  "." ^ inputBaseNoExt ^ "_table"
+  inputBaseNoExt ^ ".table"
 
 (* Used in Arg.parse when a parameter without any preceeding -flag (-f, -x...)
 Here, this kind of parameter is considered as an inputFilePath *)
@@ -70,14 +71,28 @@ let print_position outx lexbuf =
 
 (* parse_with_error handles exceptions when calling
 the parser and lexer *)
-let parse_with_error lexbuf =
-  try Parser.prog Lexer.lexer lexbuf with
-  | SyntaxError msg ->
+let parse_and_eval_with_error lexbuf =
+  try Eval.eval (Parser.prog Lexer.lexer lexbuf) [] with
+  | SyntaxError msg -> 
       fprintf stderr "%a: %s\n" print_position lexbuf msg;
-      exit (get_code COMPILE_SYNTAX_ERROR) (* Should be "None" *)
+      exit (get_code COMPILE_WITH_LINE_NUMBER_ERROR) (* Should be "None" *)
   | Parser.Error ->
-      fprintf stderr "%a: syntax error\n" print_position lexbuf;
-      exit (get_code COMPILE_SEMANTIC_ERROR)
+      fprintf stderr "%a: unkwown syntax error\n" print_position lexbuf;
+      exit (get_code COMPILE_NO_LINE_NUMBER_ERROR)
+  | Eval.NameError msg ->
+      fprintf stderr "%a: name error with '%s'\n" print_position lexbuf msg;
+      exit (get_code COMPILE_NO_LINE_NUMBER_ERROR)
+  | Eval.TypeError msg ->
+      fprintf stderr "%a: type error with '%s'\n" print_position lexbuf msg;
+      exit (get_code COMPILE_NO_LINE_NUMBER_ERROR)
+  | Eval.ArgumentError msg ->
+      fprintf stderr "%a: argument error: '%s'\n" print_position lexbuf msg;
+      exit (get_code COMPILE_NO_LINE_NUMBER_ERROR)
+  | _ ->
+      fprintf stderr "%a: unkwown error\n" print_position lexbuf;
+      exit (get_code COMPILE_NO_LINE_NUMBER_ERROR)
+
+    
 
 (* Main parsing/lexing function *)
 let translateToSATDIMACS
@@ -86,7 +101,7 @@ let translateToSATDIMACS
   (outputTableFilePath:string)
   : unit =
   let exp =
-    Eval.eval (parse_with_error (Lexing.from_channel (open_in inputFilePath))) []
+    parse_and_eval_with_error (Lexing.from_channel (open_in inputFilePath))
   in
   let c,t = Cnf.to_cnf exp |> Dimacs.to_dimacs in
   write_to_file outputFilePath c;
@@ -116,7 +131,7 @@ let _ =
   if ((String.length !input_file_path) == 0)(* NOTE: !var is like *var in C *)
   then (
     print_endline (cmd^": you must give an input file");
-    exit (get_code ARGUMENTS_ERROR)
+    exit (get_code OTHER)
     );
 
   if ((String.length !output_file_path) == 0)
