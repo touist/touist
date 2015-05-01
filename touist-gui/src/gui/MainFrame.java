@@ -61,8 +61,8 @@ public class MainFrame extends javax.swing.JFrame {
         		?Locale.getDefault():Locale.ENGLISH);
         
     	cards = new JPanel(new CardLayout());
-    	editorPanel1 = new ParentEditionPanel(this);
-        resultsPanel1 = new ResultsPanel(this);
+    	editorPanel1 = new ParentEditionPanel();
+        resultsPanel1 = new ResultsPanel();
         resultsMenuBar = new ResultsMenuBar(this);
         editionMenuBar = new EditionMenuBar(this);
         

@@ -39,6 +39,10 @@ public class PaletteSectionPanel extends javax.swing.JPanel {
         buttons = new ArrayList<InsertionButton>();
         isFold = true;
     }
+    
+    public void setText(String name) {
+    	jLabelName.setText(name);
+    }
 
     /**
      * This method is called from within the constructor to initialize the form.

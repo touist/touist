@@ -10,17 +10,16 @@ package gui;
  * @author Skander
  */
 public abstract class AbstractComponentPanel extends javax.swing.JPanel {
-	protected MainFrame parent;
+
     /**
      * Creates new form AbstractMainPanel
      */
-    public AbstractComponentPanel(MainFrame parent) {
-    	this.parent = parent;
+    public AbstractComponentPanel() {
         initComponents();
     }
     
     protected MainFrame getFrame() {
-        return parent;
+        return (MainFrame) getRootPane().getParent();
     }
     
     protected State getState() {

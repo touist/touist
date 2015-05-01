@@ -6,7 +6,6 @@
 package gui.editionView;
 
 import gui.AbstractComponentPanel;
-import gui.MainFrame;
 import gui.TranslatorLatex.TranslationLatex;
 import gui.editionView.editor.Editor;
 import java.awt.BorderLayout;
@@ -37,7 +36,6 @@ public class EditionPanel extends AbstractComponentPanel {
     private int rightPanelWidth;
     private JLabel latexLabel;
     private int zoom = 0;
-    
     
     /**
      * Creates new form EditorPanel
@@ -95,8 +93,7 @@ public class EditionPanel extends AbstractComponentPanel {
         
     }    
     
-    public EditionPanel(MainFrame parent) {
-    	super(parent);
+    public EditionPanel() {
         initComponents();
         // Editor textArea set-up
         try {
@@ -175,7 +172,7 @@ public class EditionPanel extends AbstractComponentPanel {
         editorContainer = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         jPanel1 = new javax.swing.JPanel();
-        palettePanel2 = new gui.editionView.PalettePanel(parent, editorTextArea);
+        palettePanel2 = new gui.editionView.PalettePanel(editorTextArea);
 
         addComponentListener(new java.awt.event.ComponentAdapter() {
             public void componentResized(java.awt.event.ComponentEvent evt) {

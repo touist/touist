@@ -10,10 +10,10 @@ import gui.AbstractComponentPanel;
 import gui.Lang;
 import gui.MainFrame;
 import gui.State;
+
 import java.awt.AWTException;
 import java.awt.Robot;
 import java.awt.event.KeyEvent;
-
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -41,8 +41,7 @@ public class ParentEditionPanel extends AbstractComponentPanel {
     /**
      * Creates new form FormulasPanel
      */
-    public ParentEditionPanel(MainFrame parent) {
-    	super(parent);
+    public ParentEditionPanel() {
         initComponents();
         
         testThread = new Thread();
@@ -65,8 +64,8 @@ public class ParentEditionPanel extends AbstractComponentPanel {
         jFileChooser1 = new javax.swing.JFileChooser();
         jOptionPane1 = new javax.swing.JOptionPane();
         jTabbedPane1 = new javax.swing.JTabbedPane();
-        editorPanelFormulas = new gui.editionView.EditionPanel(parent);
-        editorPanelSets = new gui.editionView.EditionPanel(parent);
+        editorPanelFormulas = new gui.editionView.EditionPanel();
+        editorPanelSets = new gui.editionView.EditionPanel();
         testButton = new javax.swing.JButton();
         importButton = new javax.swing.JButton();
         jLabelErrorMessage = new javax.swing.JLabel();
@@ -76,24 +75,13 @@ public class ParentEditionPanel extends AbstractComponentPanel {
 
         jFileChooser1.setFileSelectionMode(JFileChooser.FILES_ONLY);
         jFileChooser1.addChoosableFileFilter(new FileNameExtensionFilter("Touistl files(touistl)","touistl"));
-        jFileChooser1.setToolTipText(""); // TODO
 
-        jTabbedPane1.setToolTipText("");
-        jTabbedPane1.addTab(getFrame().getLang().getWord("ParentEditionPanel.editorPanelFormulas.TabConstraints.tabTitle"), editorPanelFormulas);
-        editorPanelFormulas.setToolTipText("ParentEditionPanel.editorPanelFormulas.TabConstraints.tabTooltip");
-        
-        jTabbedPane1.addTab(getFrame().getLang().getWord("ParentEditionPanel.editorPanelSets.TabConstraints.tabTitle"), editorPanelSets);        
-        editorPanelSets.setToolTipText(getFrame().getLang().getWord("ParentEditionPanel.editorPanelSets.TabConstraints.tabTooltip"));
-
-        testButton.setText(getFrame().getLang().getWord("ParentEditionPanel.testButton.text"));
-        testButton.setToolTipText(getFrame().getLang().getWord("ParentEditionPanel.testButton.tooltip"));
         testButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 testButtonActionPerformed(evt);
             }
         });
 
-        importButton.setText(getFrame().getLang().getWord("ParentEditionPanel.importButton.text"));
         importButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 importButtonActionPerformed(evt);
@@ -107,7 +95,6 @@ public class ParentEditionPanel extends AbstractComponentPanel {
 
         jComboBox1.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "SAT", "SMT" }));
 
-        exportButton.setText(getFrame().getLang().getWord("ParentEditionPanel.exportButton.text"));
         exportButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 exportButtonActionPerformed(evt);
@@ -537,6 +524,20 @@ public class ParentEditionPanel extends AbstractComponentPanel {
     
     @Override
     public void updateLanguage() {
+        jTabbedPane1.setToolTipText("");
+        jTabbedPane1.addTab(getFrame().getLang().getWord("ParentEditionPanel.editorPanelFormulas.TabConstraints.tabTitle"), editorPanelFormulas);
+        editorPanelFormulas.setToolTipText("ParentEditionPanel.editorPanelFormulas.TabConstraints.tabTooltip");
+        
+        jTabbedPane1.addTab(getFrame().getLang().getWord("ParentEditionPanel.editorPanelSets.TabConstraints.tabTitle"), editorPanelSets);        
+        editorPanelSets.setToolTipText(getFrame().getLang().getWord("ParentEditionPanel.editorPanelSets.TabConstraints.tabTooltip"));
+
+        testButton.setText(getFrame().getLang().getWord("ParentEditionPanel.testButton.text"));
+        testButton.setToolTipText(getFrame().getLang().getWord("ParentEditionPanel.testButton.tooltip")); 
+    	
+        importButton.setText(getFrame().getLang().getWord("ParentEditionPanel.importButton.text")); 
+        
+        exportButton.setText(getFrame().getLang().getWord("ParentEditionPanel.exportButton.text"));
+        
         importButton.setText(getFrame().getLang().getWord(Lang.EDITION_IMPORT));
         exportButton.setText(getFrame().getLang().getWord(Lang.EDITION_EXPORT));
         testButton.setText(getFrame().getLang().getWord(Lang.EDITION_TEST));
@@ -544,6 +545,7 @@ public class ParentEditionPanel extends AbstractComponentPanel {
         editorPanelSets.updateLanguage();
         jTabbedPane1.setTitleAt(0, getFrame().getLang().getWord(Lang.EDITION_TAB_FORMULAS));
         jTabbedPane1.setTitleAt(1, getFrame().getLang().getWord(Lang.EDITION_TAB_SETS));
+        
         updateUI();
     }
 }

@@ -9,7 +9,6 @@ import entity.Literal;
 import entity.Model;
 import gui.AbstractComponentPanel;
 import gui.Lang;
-import gui.MainFrame;
 import gui.State;
 import java.awt.Color;
 import java.awt.Component;
@@ -87,8 +86,7 @@ public class ResultsPanel extends AbstractComponentPanel {
     /**
      * Creates new form ResultsPanel
      */
-    public ResultsPanel(MainFrame parent) {
-    	super(parent);
+    public ResultsPanel() {
         exportDialog = new ExportDialog();
         initComponents();
     }
