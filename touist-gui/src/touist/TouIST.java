@@ -23,10 +23,9 @@
 
 package touist;
 
+import entity.Model;
 import gui.MainFrame;
-<<<<<<< Updated upstream
 import javax.swing.JOptionPane;
-=======
 import gui.State;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -47,8 +46,6 @@ import solution.NotSatisfiableException;
 import solution.SolverExecutionException;
 import solution.SolverTestSAT4J;
 import translation.TranslatorSAT;
->>>>>>> Stashed changes
-
 /**
  *
  * @author Skander
@@ -58,15 +55,6 @@ public class TouIST {
     /**
      * @param args the command line arguments
      */
-<<<<<<< Updated upstream
-    public static void main(String[] args) {
-        String version = System.getProperty("java.version");
-        if(Float.valueOf(version.substring(0,3)) < 1.6) {
-            JOptionPane.showMessageDialog(null, "Your java version is "+version+" but version higher or equal to 1.6 is required");
-            return;
-        }
-    	System.out.println("main(): running app from folder '"
-=======
     private static String CurrentPath=Paths.get("").toAbsolutePath().toString();
      public static void help(){
         
@@ -241,7 +229,6 @@ public class TouIST {
     public static void main(String[] args) throws IOException, InterruptedException, FileNotFoundException, NotSatisfiableException, SolverExecutionException {
     	if(args.length==0)
         {System.out.println("main(): running app from folder '"
->>>>>>> Stashed changes
     			+ System.getProperty("user.dir")+"'");
         MainFrame frame = new MainFrame();
         frame.setVisible(true);}
