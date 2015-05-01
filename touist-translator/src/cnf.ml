@@ -22,8 +22,9 @@ let rec to_cnf = function
         match x with
         | Term a -> CNot (Term a)
         | CNot y -> to_cnf y
+        | CAnd (x',y') -> to_cnf (COr (CNot x', CNot y'))
         | COr (x',y') -> CAnd (to_cnf (CNot x'), to_cnf (CNot y'))
-        | _ -> failwith "Failed to transform to CNF"
+        | x -> failwith ("Failed to transform to CNF: " ^ (string_of_clause x))
       end
   | COr (x,y) ->
       begin
