@@ -21,7 +21,7 @@
 	 -->
 	
 	<!-- Touist properties -->
-	<property name="version" value="1.23"/>
+	<!-- <property name="version" value="1.23"/> -->
 	<property name="source" value="1.6"/>
 	<property name="target" value="1.6"/>
 	
@@ -32,6 +32,7 @@
 	<!-- gui.external.dir : the project folder in which external bins are (touistc, solver)-->
 	<property name="gui.external.dir" value="${gui.dir}/external"/>
 	<property name="gui.libs.dir" value="${gui.dir}/libs"/>
+	<property name="gui.ressources.dir" value="${gui.dir}/ressources"/>	
 
 	<!-- Clear dist/ content -->
 	<delete dir="${gui.dist.dir}"/>
@@ -81,7 +82,7 @@
     </target>
 	
 	<!-- The build task -->
-    <target name="build">
+    <target depends="update-version-string" name="build">
     	<mkdir dir="${gui.build.dir}"/>
         <javac debug="true" debuglevel="${debuglevel}" destdir="${gui.build.dir}" includeantruntime="false" source="${source}" target="${target}">
         	<!-- Files I decided to exlude because they contain errors for now -->
@@ -97,5 +98,47 @@
         <java classname="touist.TouIST" failonerror="false" fork="yes">
             <classpath refid="touist.classpath"/>
         </java>
-    </target>
+	</target>
+
+	<!-- These three ant tasks take care of the version number 
+		 and produce a version.properties file on each build
+		 SOURCE: http://llbit.se/?p=1876 -->
+
+	<target name="-timestamp">
+        <tstamp>
+                <format property="timestamp" pattern="yyyy-MM-dd'T'HH:mm'Z'"/>
+                <format property="build.date" pattern="yyyy-MM-dd"/>
+        </tstamp>
+	</target>
+
+	<target name="-store-version-string" depends="-timestamp" if="version">
+        <!-- store the new  version string in the correct property file -->
+        <echo message="version=${version}"/>
+        <propertyfile file="${gui.ressources.dir}/version.properties">
+                <entry key="version" value="${version}"/>
+                <entry key="timestamp" value="${timestamp}"/>
+                <entry key="build.date" value="${build.date}"/>
+				<entry key="minimum_java_version" value="${target}"/>
+        </propertyfile>
+        <exec executable="git">
+                <arg value="update-index"/>
+                <arg value="--assume-unchanged"/>
+                <arg value="${gui.ressources.dir}/version.properties"/>
+        </exec>
+	</target>
+
+	<!-- this target is only run if the 'version' property is undefined -->
+	<target name="update-version-string" depends="-timestamp" unless="version">
+        <!-- get a new version string using git describe if possible -->
+        <echo message="Updating version string..."/>
+        <exec executable="git" outputproperty="version"
+                failifexecutionfails="false">
+				<arg value="describe"/>
+				<arg value="--tags"/>
+        </exec>
+        <antcall target="-store-version-string"/>
+        <!-- ensure version is defined even if git was not available -->
+        <property file="${gui.ressources.dir}/version.properties"/>
+	</target>
+
 </project>
