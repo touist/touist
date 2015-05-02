@@ -598,8 +598,9 @@ public class ResultsPanel extends AbstractComponentPanel {
         jButtonNext.setText(getFrame().getLang().getWord(Lang.RESULTS_NEXT));
         jButtonEditor.setText(getFrame().getLang().getWord(Lang.RESULTS_RETURN));
         jButtonExport.setText(getFrame().getLang().getWord(Lang.RESULTS_EXPORT));
-        //trueCheckBox.setText(getFrame().getLang().getWord(Lang.RESULTS_TRUE));
-        //falseCheckBox.setText(getFrame().getLang().getWord(Lang.RESULTS_FALSE));
+        jButtonExport.setToolTipText(getFrame().getLang().getWord("ResultsPanel.jButtonExport.tooltip"));
+        trueCheckBox.setText(getFrame().getLang().getWord("ResultsPanel.trueText"));
+        falseCheckBox.setText(getFrame().getLang().getWord("ResultsPanel.falseText"));
         jTable1.getColumnModel().getColumn(0).setHeaderValue(getFrame().getLang().getWord(Lang.RESULTS_NAME));
         jTable1.getColumnModel().getColumn(1).setHeaderValue(getFrame().getLang().getWord(Lang.RESULTS_VALUE));
         falseCheckBox.setText(getFrame().getLang().getWord("ResultsPanel.falseText"));
