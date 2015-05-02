@@ -30,6 +30,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ListIterator;
 
+import javax.swing.JOptionPane;
+
 import solution.NotSatisfiableException;
 import solution.SolverExecutionException;
 import solution.SolverTestSAT4J;
@@ -215,6 +217,11 @@ public class TouIST {
 		wr.close();
 	}
 	public static void main(String[] args) throws IOException, InterruptedException, FileNotFoundException, NotSatisfiableException, SolverExecutionException {
+		String version = System.getProperty("java.version");
+		if(Float.valueOf(version.substring(0,3)) < 1.6) {
+			JOptionPane.showMessageDialog(null, "Your java version is "+version+" but version higher or equal to 1.6 is required");
+			return;
+		}
 		if(args.length==0) {
 			System.out.println("main(): running app from folder '"
 					+ System.getProperty("user.dir")+"'");
