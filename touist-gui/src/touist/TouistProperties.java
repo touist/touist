@@ -7,6 +7,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
+/**
+ * Note: to use that class, write:
+ * 		public static TouistProperties properties;
+ * @author maelv
+ *
+ */
 public class TouistProperties {
 	private static Map<String,String> properties = new HashMap<String,String>();
 	
