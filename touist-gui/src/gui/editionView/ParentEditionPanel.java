@@ -549,8 +549,6 @@ public class ParentEditionPanel extends AbstractComponentPanel {
     @Override
     public void updateLanguage() {
         jTabbedPane1.setToolTipText("");
-        editorPanelFormulas.setToolTipText("ParentEditionPanel.editorPanelFormulas.TabConstraints.tabTooltip");
-        editorPanelSets.setToolTipText(getFrame().getLang().getWord("ParentEditionPanel.editorPanelSets.TabConstraints.tabTooltip"));
         importButton.setText(getFrame().getLang().getWord(Lang.EDITION_IMPORT));
         exportButton.setText(getFrame().getLang().getWord(Lang.EDITION_EXPORT));
         testButton.setText(getFrame().getLang().getWord(Lang.EDITION_TEST));
@@ -559,6 +557,8 @@ public class ParentEditionPanel extends AbstractComponentPanel {
         editorPanelSets.updateLanguage();
         jTabbedPane1.setTitleAt(0, getFrame().getLang().getWord(Lang.EDITION_TAB_FORMULAS));
         jTabbedPane1.setTitleAt(1, getFrame().getLang().getWord(Lang.EDITION_TAB_SETS));
+        jTabbedPane1.setToolTipTextAt(0, getFrame().getLang().getWord("ParentEditionPanel.editorPanelFormulas.TabConstraints.tabTooltip"));
+        jTabbedPane1.setToolTipTextAt(1, getFrame().getLang().getWord("ParentEditionPanel.editorPanelSets.TabConstraints.tabTooltip"));
         
         updateUI();
     }
