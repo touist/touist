@@ -1,6 +1,7 @@
 package touist;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Properties;
 
 /**
@@ -13,14 +14,16 @@ public class TouistProperties {
 	private static Properties prop = new Properties();
 	public TouistProperties() {
 		try {
-			prop.load(this.getClass().getClassLoader().getResourceAsStream("version.properties"));
+			InputStream in = this.getClass().getClassLoader().getResourceAsStream("version.properties");
+			if(in == null) throw new IOException();
+			else prop.load(in);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.out.println("Warning: the property file version.properties was not found");
 		}
 	}
     
 	public String getProperty(String property) {
-		return prop.getProperty(property);
+		String res = prop.getProperty(property);
+		return (res != null)?res:"";
 	}
 }
