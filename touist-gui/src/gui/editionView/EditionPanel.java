@@ -151,20 +151,8 @@ public class EditionPanel extends AbstractComponentPanel {
         sp.setFoldIndicatorEnabled(true);
         editorContainer.add(sp, BorderLayout.CENTER);
         
-        palettePanel2.setEditorTextArea(editorTextArea);
-        
-        rightPanelWidth = jSplitPane1.getWidth() - jSplitPane1.getDividerLocation();
-        
-        jSplitPane1.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, new PropertyChangeListener() {
-            @Override
-            public void propertyChange(PropertyChangeEvent evt) {
-                if (jSplitPane1.getDividerLocation() < jSplitPane1.getWidth()) {
-                    rightPanelWidth = jSplitPane1.getWidth() - jSplitPane1.getDividerLocation();
-                    //when resizing the frame, the rightPanelWidth can end up < 0
-                    //System.out.println(rightPanelWidth + " : " + evt);
-                }
-            }
-        });
+        palettePanel2.setEditorTextArea(editorTextArea);  
+        jSplitPane1.setResizeWeight(0.5);
     }
     
     public void initPalette(PalettePanel.PaletteType type) {
@@ -195,13 +183,7 @@ public class EditionPanel extends AbstractComponentPanel {
         jPanel1 = new javax.swing.JPanel();
         palettePanel2 = new gui.editionView.PalettePanel(editorTextArea);
 
-        addComponentListener(new java.awt.event.ComponentAdapter() {
-            public void componentResized(java.awt.event.ComponentEvent evt) {
-                formComponentResized(evt);
-            }
-        });
-
-        jSplitPane1.setDividerLocation(500);
+        jSplitPane1.setDividerLocation(400);
         jSplitPane1.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         jSplitPane1.setOneTouchExpandable(true);
 
@@ -230,17 +212,13 @@ public class EditionPanel extends AbstractComponentPanel {
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jSplitPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 527, Short.MAX_VALUE)
+            .addComponent(jSplitPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 600, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jSplitPane2, javax.swing.GroupLayout.Alignment.TRAILING)
         );
     }// </editor-fold>//GEN-END:initComponents
-
-    private void formComponentResized(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentResized
-        jSplitPane1.setDividerLocation(jSplitPane1.getWidth() - rightPanelWidth);
-    }//GEN-LAST:event_formComponentResized
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel editorContainer;
