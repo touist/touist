@@ -134,6 +134,8 @@ public class ResultsPanel extends AbstractComponentPanel {
             regex = "";
         }
         
+        String trueText = getFrame().getLang().getWord("ResultsPanel.trueText");
+        String falseText = getFrame().getLang().getWord("ResultsPanel.falseText");
         
         ResultTableModel model = (ResultTableModel) jTable1.getModel();
         model.setNumRows(0);
@@ -145,10 +147,11 @@ public class ResultsPanel extends AbstractComponentPanel {
             if(regex!="" && !pattern.matcher(name).find()){
                 continue;
             }
+
             if(falseLiterals && !value){
-                model.addRow(new String[]{name,"False"});
+                model.addRow(new String[]{name,falseText});
             } else if(trueLiterals && value){
-                model.addRow(new String[]{name,"True"});
+                model.addRow(new String[]{name,trueText});
             }
         }
     }
@@ -165,6 +168,9 @@ public class ResultsPanel extends AbstractComponentPanel {
         fc.setAcceptAllFileFilterUsed(false);
         int returnVal = fc.showDialog(this,getFrame().getLang().getWord(Lang.RESULTS_FILE_CHOOSER));
         
+        String trueText = getFrame().getLang().getWord("ResultsPanel.trueText");
+        String falseText = getFrame().getLang().getWord("ResultsPanel.falseText");
+        
         if(returnVal == JFileChooser.APPROVE_OPTION){
             String filename = fc.getSelectedFile().getName();
             String extension = (filename.contains(".")?filename.substring(filename.lastIndexOf("."),filename.length()):"txt");
@@ -179,8 +185,8 @@ public class ResultsPanel extends AbstractComponentPanel {
                 
                 ArrayList<Literal> literals = (ArrayList<Literal>) actModel.literals;
                 for(int i = 0; i < literals.size(); i++) {
-                    String left = exportDialog.getLeftValue()=="litteral"?literals.get(i).getLiteral():(literals.get(i).isLiteral_positivity()?"true":"false");
-                    String right = exportDialog.getRightValue()=="litteral"?literals.get(i).getLiteral():(literals.get(i).isLiteral_positivity()?"true":"false");
+                    String left = exportDialog.getLeftValue()=="litteral"?literals.get(i).getLiteral():(literals.get(i).isLiteral_positivity()?trueText:falseText);
+                    String right = exportDialog.getRightValue()=="litteral"?literals.get(i).getLiteral():(literals.get(i).isLiteral_positivity()?trueText:falseText);
                     sb.append(prefix+left+separator+right+suffix+"\n");
                 }
 
@@ -287,7 +293,6 @@ public class ResultsPanel extends AbstractComponentPanel {
         jScrollPane2.setViewportView(jTable1);
 
         trueCheckBox.setSelected(true);
-        trueCheckBox.setText("true");
         trueCheckBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 trueCheckBoxActionPerformed(evt);
@@ -295,7 +300,6 @@ public class ResultsPanel extends AbstractComponentPanel {
         });
 
         falseCheckBox.setSelected(true);
-        falseCheckBox.setText("false");
         falseCheckBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 falseCheckBoxActionPerformed(evt);
@@ -598,6 +602,7 @@ public class ResultsPanel extends AbstractComponentPanel {
         //falseCheckBox.setText(getFrame().getLang().getWord(Lang.RESULTS_FALSE));
         jTable1.getColumnModel().getColumn(0).setHeaderValue(getFrame().getLang().getWord(Lang.RESULTS_NAME));
         jTable1.getColumnModel().getColumn(1).setHeaderValue(getFrame().getLang().getWord(Lang.RESULTS_VALUE));
-    
+        falseCheckBox.setText(getFrame().getLang().getWord("ResultsPanel.falseText"));
+        trueCheckBox.setText(getFrame().getLang().getWord("ResultsPanel.trueText"));
     }
 }
