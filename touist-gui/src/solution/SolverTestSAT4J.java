@@ -134,7 +134,7 @@ public class SolverTestSAT4J extends Solver {
 
 	@Override
 	protected Model nextModel() throws IOException, NotSatisfiableException, SolverExecutionException {
-		final int WAIT_FOR_MODEL_TIMEOUT = 50000; // ms
+		final int WAIT_FOR_MODEL_TIMEOUT = 5000000; // ms
 		if (p == null) // Should not happen
 			throw new SolverExecutionException("nextModel(): exception: launch() has not been called");
 		if (!isAlive(p)) { // The solver is already done
