@@ -604,5 +604,6 @@ public class ResultsPanel extends AbstractComponentPanel {
         jTable1.getColumnModel().getColumn(1).setHeaderValue(getFrame().getLang().getWord(Lang.RESULTS_VALUE));
         falseCheckBox.setText(getFrame().getLang().getWord("ResultsPanel.falseText"));
         trueCheckBox.setText(getFrame().getLang().getWord("ResultsPanel.trueText"));
+        searchTextField.setToolTipText(getFrame().getLang().getWord("ResultsPanel.searchTextField.tooltip"));
     }
 }
