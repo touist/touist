@@ -133,7 +133,7 @@ public class SolverTestSAT4J extends Solver {
 	}
 
 	@Override
-	protected Model nextModel() throws IOException, NotSatisfiableException, SolverExecutionException {
+	protected Model nextModel() throws IOException, SolverExecutionException {
 		final int WAIT_FOR_MODEL_TIMEOUT = 5000000; // ms
 		if (p == null) // Should not happen
 			throw new SolverExecutionException("nextModel(): exception: launch() has not been called");
@@ -172,8 +172,7 @@ public class SolverTestSAT4J extends Solver {
 	}
 
 	@Override
-	protected Model parseModel(String[] rawModelOutput)
-			throws NotSatisfiableException {
+	protected Model parseModel(String[] rawModelOutput) {
 		// TODO The parser should be able to handle the "-3" (negation)
 		Model model = new Model();
 		for (String rawLiteral : rawModelOutput) {

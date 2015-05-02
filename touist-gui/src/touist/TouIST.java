@@ -32,7 +32,6 @@ import java.util.ListIterator;
 
 import javax.swing.JOptionPane;
 
-import solution.NotSatisfiableException;
 import solution.SolverExecutionException;
 import solution.SolverTestSAT4J;
 import translation.TranslatorSAT;
@@ -129,7 +128,7 @@ public class TouIST {
 		//File f1=new File()
 	}
 
-	public static void solveCNF(String path,int nb,boolean control,String pathSave) throws FileNotFoundException, IOException, NotSatisfiableException, SolverExecutionException{
+	public static void solveCNF(String path,int nb,boolean control,String pathSave) throws FileNotFoundException, IOException, SolverExecutionException{
 		//Add CurrentPath/dimacsFile
 
 		SolverTestSAT4J solver=new SolverTestSAT4J(path);
@@ -216,7 +215,7 @@ public class TouIST {
 		wr.flush();
 		wr.close();
 	}
-	public static void main(String[] args) throws IOException, InterruptedException, FileNotFoundException, NotSatisfiableException, SolverExecutionException {
+	public static void main(String[] args) throws IOException, InterruptedException, FileNotFoundException, SolverExecutionException {
 		String version = System.getProperty("java.version");
 		if(Float.valueOf(version.substring(0,3)) < 1.6) {
 			JOptionPane.showMessageDialog(null, "Your java version is "+version+" but version higher or equal to 1.6 is required");

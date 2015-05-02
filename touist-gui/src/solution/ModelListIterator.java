@@ -56,10 +56,6 @@ public class ModelListIterator implements ListIterator<Model> {
 			} catch (IOException e) {
 				System.err.println("hasNext(): I/O exception: "+e.getMessage());
 				return false;
-			} catch (NotSatisfiableException e) {
-				System.err.println("hasNext(): you shouldn't use that "
-								+ "because the prob. is unsatisfiable");
-				return false;
 			} catch (SolverExecutionException e) {
 				System.err.println("hasNext(): "+e.getMessage());
 			}
