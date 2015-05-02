@@ -14,13 +14,14 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ListIterator;
 import java.util.Locale;
-import javax.imageio.ImageIO;
 
+import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 
 import solution.BaseDeClauses;
 import solution.ModelList;
 import solution.Solver;
+import touist.TouistProperties;
 import translation.TranslatorSAT;
 
 /**
@@ -28,7 +29,7 @@ import translation.TranslatorSAT;
  * @author Skander
  */
 public class MainFrame extends javax.swing.JFrame {
-
+	private TouistProperties properties = new TouistProperties();
     private BaseDeClauses clause = new BaseDeClauses();
     private TranslatorSAT translator = new TranslatorSAT("external"+File.separatorChar+"touistc");
     private Solver solver;
@@ -45,7 +46,7 @@ public class MainFrame extends javax.swing.JFrame {
     
     private ResultsMenuBar resultsMenuBar;
     private EditionMenuBar editionMenuBar;
-
+    
     public Lang getLang() {
         return lang;
     }
@@ -54,7 +55,6 @@ public class MainFrame extends javax.swing.JFrame {
      * Creates new form MainFrame
      */
     public MainFrame() {
-        
         lang = new Lang(Locale.ENGLISH);
         setLanguage(
         		(lang.getSupportedLanguages().contains(Locale.getDefault()))
@@ -85,7 +85,7 @@ public class MainFrame extends javax.swing.JFrame {
     }
     
     public void updateLanguage() {
-        this.setTitle(lang.getWord(Lang.FRAME_TITLE));
+        this.setTitle(lang.getWord(Lang.FRAME_TITLE) +" "+ properties.getProperty("version"));
         editorPanel1.updateLanguage();
         resultsPanel1.updateLanguage();
         resultsMenuBar.updateLanguage();
@@ -152,7 +152,6 @@ public class MainFrame extends javax.swing.JFrame {
         lang.setLanguage(language);
         this.repaint();
     }
-    
 
     /**
      * This method is called from within the constructor to initialize the form.

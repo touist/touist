@@ -30,8 +30,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ListIterator;
 
-import javax.swing.JOptionPane;
-
 import solution.NotSatisfiableException;
 import solution.SolverExecutionException;
 import solution.SolverTestSAT4J;
@@ -43,13 +41,14 @@ import gui.MainFrame;
  * @author Skander
  */
 public class TouIST {
-
+	private static TouistProperties properties = new TouistProperties();
+	
 	/**
 	 * @param args the command line arguments
 	 */
 	private static String CurrentPath=System.getProperty("user.dir");
 	public static void help(){
-
+		
 		System.out.println("* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *");
 		System.out.println("* Usage: TouistSol [Options...] filename                                    *");
 		System.out.println("* General options:                                                          *");
@@ -57,52 +56,49 @@ public class TouIST {
 		System.out.println("*  --s            read & resolve TouIST problem in TOUISTL format           *");
 		System.out.println("*  --t            read TouIST problem in TOUISTL format and build           *");
 		System.out.println("*                 (DIMACS format, Hash CNF table)                           *");
-		System.out.println("*  -o filename,--output filename                                            *\n"
-				+          "*                 write solution to filename in printable format            *");
-
-
-
+		System.out.println("*  -o filename,--output filename                                            *");
+		System.out.println("*                 write solution to filename in printable format            *");
 		System.out.println("*  -h, --help     display this help information and exit                    *");
 		System.out.println("*  -v, --version  display program version and exit                          *");
 		System.out.println("*                                                                           *");
 		System.out.println("*  -v, --version  display program version and exit                          *");
-		System.out.println("* TouISTSOL v1.0,2015. Easily formalize and solve real-world sized problems *\n" +
-				"* using propositional logic and linear theory of reals                      *");
+		System.out.println("* TouISTSOL "+properties.getProperty("version")+", 2015					    *");
+		System.out.println("* Easily formalize and solve real-world sized problems                      *");
+		System.out.println("* using propositional logic and linear theory of reals                      *");
 		System.out.println("* See TouIST web page at : www.irit.fr/softwave/.../touIST.html             *");
 		System.out.println("*                                                                           *");
 		System.out.println("* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *");
 	}
 	public static void version(){
 		System.out.println("* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *");
-		System.out.println("* TouISTSOL: TouIST Propositional logic/Linear Theory of reals Solver, v1.0   *\n"
-				+ "*                                                                             *\n" +
-				"* Copyright (C) 2015. Toulouse Institute of Computer Science Research,France. *\n" +
-				"* All rights reserved.Email:<.....@irit.fr>                                   *\n"+
-				"* Contributors:                                                               *\n" +
-				"*     Khaled Skander Ben Slimane, Alexis Comte, Olivier Gasquet,              *\n" +
-				"*     Abdelwahab Heba, Olivier Lezaud, Frédéric Maris, Maël Valais            *\n"
-				+  "*                                                                             *");
-
-		System.out.println("* This program is free software; you may re-distrubute it under the terme of  *\n"+
-				"* the GNU Lesser General Public License (LGPL) version 2.1 which accompanies  *\n"
-				+ "* this distribution, and is available at :                                    *\n"
-				+ "* http://www.gnu.org/licenses/lgpl-2.1.html                                   *");
+		System.out.println("* TouISTSOL: TouIST Propositional logic/Linear Theory of reals Solver, "+properties.getProperty("version")+"	*");
+		System.out.println("*                                                                             *");
+		System.out.println("* Copyright (C) 2015. Institut de Recherche en Informatique de Toulouse, FR   *");
+		System.out.println("* All rights reserved.Email:<.....@irit.fr>                                   *");
+		System.out.println("* Contributors:                                                               *");
+		System.out.println("*     Khaled Skander Ben Slimane, Alexis Comte, Olivier Gasquet,              *");
+		System.out.println("*     Abdelwahab Heba, Olivier Lezaud, Frédéric Maris, Maël Valais            *");
+		System.out.println("*                                                                             *");
+		System.out.println("* This program is free software; you may re-distrubute it under the terme of  *");
+		System.out.println("* the GNU Lesser General Public License (LGPL) version 2.1 which accompanies  *");
+		System.out.println("* this distribution, and is available at :                                    *");
+		System.out.println("* http://www.gnu.org/licenses/lgpl-2.1.html                                   *");
 		System.out.println("* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *");
 	}
 	public static void empty(String arg,int number){
 		if(number==1){
-			System.out.println("TouISTSOL v1.0,2015.");
+			System.out.println("TouISTSOL "+properties.getProperty("version")+", 2015.");
 			System.out.println("No input option; try TouISTSol --help                             ");
 		}
 		else{
 			if(number==2)
 			{
-				System.out.println("TouISTSOL v1.0,2015.");
+				System.out.println("TouISTSOL "+properties.getProperty("version")+", 2015.");
 				System.out.println("Invalid option '"+arg+"'; try TouISTSol --help                             ");   
 			}
 			if(number==3)
 			{
-				System.out.println("TouISTSOL v1.0,2015.");
+				System.out.println("TouISTSOL "+properties.getProperty("version")+", 2015.");
 				System.out.println("Parameter(s) specified in the command line:\n "+arg);
 				System.out.println("No input problem file specified; try TouISTSol --help                             ");
 			}
@@ -219,16 +215,12 @@ public class TouIST {
 		wr.close();
 	}
 	public static void main(String[] args) throws IOException, InterruptedException, FileNotFoundException, NotSatisfiableException, SolverExecutionException {
-		String version = System.getProperty("java.version");
-		if(Float.valueOf(version.substring(0,3)) < 1.6) {
-			JOptionPane.showMessageDialog(null, "Your java version is "+version+" but version higher or equal to 1.6 is required");
-			return;
+		if(args.length==0) {
+			System.out.println("main(): running app from folder '"
+					+ System.getProperty("user.dir")+"'");
+			MainFrame frame = new MainFrame();
+			frame.setVisible(true);
 		}
-		if(args.length==0)
-		{System.out.println("main(): running app from folder '"
-				+ System.getProperty("user.dir")+"'");
-		MainFrame frame = new MainFrame();
-		frame.setVisible(true);}
 		else{
 			String path="";
 			File f;
@@ -288,7 +280,6 @@ public class TouIST {
 			}
 			else if(args.length==0) empty(null,1);else empty(args[0],2);System.exit(0);
 		}
-
 	}
 }
 
