@@ -21,10 +21,13 @@
  *
  */
 
-package gui;
+package gui.menu;
 
+import gui.Lang;
+import gui.MainFrame;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.event.ActionEvent;
 import java.util.Locale;
 import java.util.Scanner;
 
@@ -33,6 +36,7 @@ import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.KeyStroke;
 import javax.swing.text.Document;
@@ -56,6 +60,7 @@ public class EditionMenuBar extends JMenuBar {
     JMenuItem jMenuItemSaveFile;
     JMenuItem jMenuItemLoadFile;
     JMenuItem jMenuItemHelpEditor;
+    JMenuItem jMenuItemAbout;
     JMenuItem jMenuItemUndo;
     JMenuItem jMenuItemRedo;
     JMenuItem jMenuItemZoomMore;
@@ -90,8 +95,8 @@ public class EditionMenuBar extends JMenuBar {
         jMenuItemZoomLess.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_MINUS, java.awt.Event.CTRL_MASK));
         
         
-        
         jMenuItemHelpEditor = new JMenuItem();
+        jMenuItemAbout = new JMenuItem();
         
         jMenuItemEnglish.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -120,6 +125,12 @@ public class EditionMenuBar extends JMenuBar {
         jMenuItemHelpEditor.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jMenuItemHelpEditorActionPerformed(evt);
+            }
+        });
+        
+        jMenuItemAbout.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                jMenuItemAboutActionPerformed(evt);
             }
         });
         
@@ -154,6 +165,7 @@ public class EditionMenuBar extends JMenuBar {
         jMenuLanguage.add(jMenuItemFrench);
         jMenuLanguage.add(jMenuItemEnglish);
         jMenuHelp.add(jMenuItemHelpEditor);
+        jMenuHelp.add(jMenuItemAbout);
         jMenuEdit.add(jMenuItemUndo);
         jMenuEdit.add(jMenuItemRedo);
         jMenuView.add(jMenuItemZoomMore);
@@ -236,6 +248,13 @@ public class EditionMenuBar extends JMenuBar {
         j.setVisible(true);
     }
     
+    private void jMenuItemAboutActionPerformed(java.awt.event.ActionEvent evt) {
+        JOptionPane.showMessageDialog(this, 
+                new AboutPanel(), 
+                parent.getLang().getWord(Lang.EDITION_MENUITEM_ABOUT), 
+                JOptionPane.PLAIN_MESSAGE);
+    }
+    
     private void jMenuItemUndoActionPerformed(java.awt.event.ActionEvent evt) {  
         parent.getEditorPanel1().undo();
     }
@@ -261,6 +280,7 @@ public class EditionMenuBar extends JMenuBar {
         this.jMenuItemSaveFile.setText(parent.getLang().getWord(Lang.EDITION_MENUITEM_SAVEFILE));
         this.jMenuItemLoadFile.setText(parent.getLang().getWord(Lang.EDITION_MENUITEM_LOADFILE));
         this.jMenuItemHelpEditor.setText(parent.getLang().getWord(Lang.EDITION_MENUITEM_HELPEDITION));
+        this.jMenuItemAbout.setText(parent.getLang().getWord(Lang.EDITION_MENUITEM_ABOUT));
         this.jMenuItemUndo.setText(parent.getLang().getWord(Lang.EDITION_MENUITEM_UNDO));
         this.jMenuItemRedo.setText(parent.getLang().getWord(Lang.EDITION_MENUITEM_REDO));
         this.jMenuItemZoomMore.setText(parent.getLang().getWord(Lang.EDITION_MENUITEM_ZOOMMORE));

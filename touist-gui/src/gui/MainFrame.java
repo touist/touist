@@ -23,6 +23,8 @@
 
 package gui;
 
+import gui.menu.ResultsMenuBar;
+import gui.menu.EditionMenuBar;
 import entity.Model;
 import gui.editionView.ParentEditionPanel;
 import gui.resultsView.ResultsPanel;

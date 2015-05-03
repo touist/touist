@@ -35,6 +35,8 @@ import javax.swing.ImageIcon;
 public class PaletteSectionPanel extends javax.swing.JPanel {
 
     private List<InsertionButton> buttons;
+    private ImageIcon foldedIcon = new ImageIcon("touist-gui/ressources/images/paletteSectionFolded.png");
+    private ImageIcon unfoldedIcon = new ImageIcon("touist-gui/ressources/images/paletteSectionUnfolded.png");
     private boolean isFold;
     
     /**
@@ -44,7 +46,7 @@ public class PaletteSectionPanel extends javax.swing.JPanel {
         initComponents();
         jLabelName.setText("");
         jButtonFold.setText("");
-        jButtonFold.setIcon(new ImageIcon("touist-gui/ressources/images/folded.png"));
+        jButtonFold.setIcon(foldedIcon);
         buttons = new ArrayList<InsertionButton>();
         isFold = true;
     }
@@ -57,7 +59,7 @@ public class PaletteSectionPanel extends javax.swing.JPanel {
         initComponents();
         jLabelName.setText(name);
         jButtonFold.setText("");
-        jButtonFold.setIcon(new ImageIcon("touist-gui/ressources/images/folded.png"));
+        jButtonFold.setIcon(foldedIcon);
         buttons = new ArrayList<InsertionButton>();
         isFold = true;
     }
@@ -127,11 +129,11 @@ public class PaletteSectionPanel extends javax.swing.JPanel {
     private void jButtonFoldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonFoldActionPerformed
         isFold = !isFold;
         if (isFold) {
-            jButtonFold.setIcon(new ImageIcon("touist-gui/ressources/images/folded.png"));
+            jButtonFold.setIcon(foldedIcon);
             jPanelsContent.removeAll();
             jPanelsContent.updateUI();
         } else {
-            jButtonFold.setIcon(new ImageIcon("touist-gui/ressources/images/unfolded.png"));
+            jButtonFold.setIcon(unfoldedIcon);
             jPanelsContent.setLayout(new GridLayout(buttons.size(), 1));
             for (InsertionButton button : buttons) {
                 jPanelsContent.add(button);

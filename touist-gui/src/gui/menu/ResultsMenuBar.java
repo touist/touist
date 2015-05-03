@@ -21,8 +21,10 @@
  *
  */
 
-package gui;
+package gui.menu;
 
+import gui.Lang;
+import gui.MainFrame;
 import java.io.IOException;
 import java.util.Locale;
 

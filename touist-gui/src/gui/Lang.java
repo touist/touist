@@ -86,6 +86,7 @@ public class Lang {
     public static final String EDITION_MENUITEM_SAVEFILE = "EditionMenuBar.jMenuItemSaveFile.text";
     public static final String EDITION_MENUITEM_LOADFILE = "EditionMenuBar.jMenuItemLoadFile.text";
     public static final String EDITION_MENUITEM_HELPEDITION = "EditionMenuBar.jMenuItemHelpEdition.text";
+    public static final String EDITION_MENUITEM_ABOUT = "EditionMenuBar.jMenuItemAbout.text";
     public static final String EDITION_MENUITEM_UNDO = "EditionMenuBar.jMenuItemUndo.text";
     public static final String EDITION_MENUITEM_REDO = "EditionMenuBar.jMenuItemRedo.text";
     public static final String EDITION_MENUITEM_ZOOMMORE = "EditionMenuBar.jMenuItemZoomMore.text";
