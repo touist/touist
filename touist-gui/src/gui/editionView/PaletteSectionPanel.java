@@ -23,10 +23,9 @@
 
 package gui.editionView;
 
+import java.awt.GridLayout;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.swing.BoxLayout;
 
 /**
  *
@@ -61,6 +60,10 @@ public class PaletteSectionPanel extends javax.swing.JPanel {
     public void setText(String name) {
     	jLabelName.setText(name);
     }
+    
+    public List<InsertionButton> getButtons() {
+        return buttons;
+    }
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -88,7 +91,7 @@ public class PaletteSectionPanel extends javax.swing.JPanel {
             }
         });
 
-        jPanelsContent.setLayout(new java.awt.GridLayout(1, 0));
+        jPanelsContent.setLayout(new java.awt.GridLayout(1, 1));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -97,7 +100,7 @@ public class PaletteSectionPanel extends javax.swing.JPanel {
             .addComponent(jPanelsContent, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(layout.createSequentialGroup()
                 .addComponent(jLabelName)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jButtonFold))
         );
         layout.setVerticalGroup(
@@ -118,7 +121,7 @@ public class PaletteSectionPanel extends javax.swing.JPanel {
             jPanelsContent.removeAll();
         } else {
             jButtonFold.setText("V");
-            jPanelsContent.setLayout(new BoxLayout(jPanelsContent, BoxLayout.Y_AXIS));
+            jPanelsContent.setLayout(new GridLayout(buttons.size(), 1));
             for (InsertionButton button : buttons) {
                 jPanelsContent.add(button);
             }

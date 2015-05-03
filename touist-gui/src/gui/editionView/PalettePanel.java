@@ -26,6 +26,7 @@ package gui.editionView;
 import gui.AbstractComponentPanel;
 import gui.Lang;
 import gui.editionView.editor.Editor;
+import java.awt.Component;
 
 import java.util.ArrayList;
 
@@ -101,6 +102,18 @@ public class PalettePanel extends AbstractComponentPanel {
             sectionsContainerPanel.setLayout(new BoxLayout(sectionsContainerPanel, BoxLayout.Y_AXIS));
             sectionsContainerPanel.add(section3);
         }
+    }
+    
+    public int getRecommendWidth() {
+        int width = 0;
+        for (Component section : sectionsContainerPanel.getComponents()) {
+            if (section instanceof PaletteSectionPanel) {
+                for (InsertionButton button : ((PaletteSectionPanel)section).getButtons()) {
+                    width = Math.max(width, button.getIcon().getIconWidth() + 40);
+                }
+            }
+        }
+        return width;
     }
 
     /**

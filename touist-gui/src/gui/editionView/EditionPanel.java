@@ -31,12 +31,9 @@ import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.io.IOException;
 
 import javax.swing.JLabel;
-import javax.swing.JSplitPane;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import javax.swing.event.DocumentEvent;
@@ -157,6 +154,7 @@ public class EditionPanel extends AbstractComponentPanel {
     
     public void initPalette(PalettePanel.PaletteType type) {
         palettePanel2.initPaletteContent(type);
+        jSplitPane2.setDividerLocation(palettePanel2.getRecommendWidth());
     }
 
     public String getText() {

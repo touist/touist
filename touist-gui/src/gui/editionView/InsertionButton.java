@@ -53,7 +53,8 @@ public class InsertionButton extends JButton {
         this.codeToInsert = codeToInsert;
         this.snipets = snipets;
         
-        //this.setText(codeToInsert);
+        this.setContentAreaFilled(false);
+        //this.setBorderPainted(false);
         
         addActionListener(new ActionListener() {
 

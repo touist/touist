@@ -26,7 +26,7 @@
           <Component id="jPanelsContent" max="32767" attributes="0"/>
           <Group type="102" attributes="0">
               <Component id="jLabelName" min="-2" max="-2" attributes="0"/>
-              <EmptySpace max="-2" attributes="0"/>
+              <EmptySpace max="32767" attributes="0"/>
               <Component id="jButtonFold" min="-2" max="-2" attributes="0"/>
           </Group>
       </Group>
@@ -65,7 +65,7 @@
     <Container class="javax.swing.JPanel" name="jPanelsContent">
 
       <Layout class="org.netbeans.modules.form.compat2.layouts.DesignGridLayout">
-        <Property name="columns" type="int" value="0"/>
+        <Property name="columns" type="int" value="1"/>
         <Property name="rows" type="int" value="1"/>
       </Layout>
     </Container>
