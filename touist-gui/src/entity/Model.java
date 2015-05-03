@@ -45,7 +45,7 @@ public class Model implements Iterable<Literal>{
 		// TODO Please write a proper toString
 		String out = "";
 		for (Literal s : literals) {
-			out = out + " " + s.getLiteral()+ " Valuated : "+s.isLiteral_positivity()+"\n";
+			out = out + " ("+ s.getLiteral()+" "+s.isLiteral_positivity()+") ";
 		}
 		return out;
 	}
