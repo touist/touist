@@ -59,6 +59,11 @@ public class ModelListIterator implements ListIterator<Model> {
 			} catch (SolverExecutionException e) {
 				System.err.println("hasNext(): "+e.getMessage());
 			}
+			
+			// Added for filtering '&45' literals
+			if(models.contains(nextModel)) {
+				return hasNext();
+			}
 
 			if (nextModel == null) { // No models left
 				solverInterface.close();

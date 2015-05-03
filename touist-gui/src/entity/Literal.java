@@ -30,6 +30,16 @@ package entity;
 public class Literal {
     private String literal;
     private boolean literal_positivity;
+    
+    /**
+     * Added for filtering '&45' literals (issue #88)
+     */
+    @Override
+	public boolean equals(Object obj) {
+		Literal l = (Literal)obj;
+		return this.literal_positivity == l.literal_positivity
+				&& this.literal == l.literal;
+	}
 
     public Literal(String get, boolean b) {
        literal=get;
