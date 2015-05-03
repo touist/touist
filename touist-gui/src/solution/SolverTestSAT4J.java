@@ -179,9 +179,13 @@ public class SolverTestSAT4J extends Solver {
 			int literalInt = Integer.parseInt(rawLiteral);
 			if (literalInt != 0) { // '0' means 'end of model'
 				int literalCode = (literalInt > 0 ? literalInt : literalInt * (-1));
-				if (getLiteralsMap().get(literalCode) != null) {
-					model.addLiteral(new Literal(getLiteralsMap().get(
-							literalCode), literalInt > 0));
+				String literalString = getLiteralsMap().get(literalCode);
+				if (literalString != null) {
+					// Added for filtering '&45' literals (issue #88)
+					if(literalString.charAt(0) != '&') {
+						model.addLiteral(new Literal(getLiteralsMap().get(
+								literalCode), literalInt > 0));
+					}
 				} else {
 					model.addLiteral(new Literal(rawLiteral, literalInt > 0));
 				}
