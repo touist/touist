@@ -28,10 +28,13 @@ import java.util.List;
 import java.util.ListIterator;
 
 import entity.Model;
+import entity.LexicographicalTree;
+import java.util.Set;
 
 public class ModelListIterator implements ListIterator<Model> {
 	private Solver solverInterface;
 	private List<Model> models;
+        private LexicographicalTree alreadyPresent;
 	private int currentPosition;
 
 	/**
@@ -44,6 +47,7 @@ public class ModelListIterator implements ListIterator<Model> {
 		this.models = models;
 		this.solverInterface = solverInterface;
 		currentPosition = -1;
+                this.alreadyPresent = new LexicographicalTree();
 	}
 
 	@Override
@@ -59,6 +63,11 @@ public class ModelListIterator implements ListIterator<Model> {
 			} catch (SolverExecutionException e) {
 				System.err.println("hasNext(): "+e.getMessage());
 			}
+			
+			// Added for filtering '&45' literals
+			if(nextModel != null && alreadyPresent.contains(nextModel)) {
+				return hasNext();
+			}
 
 			if (nextModel == null) { // No models left
 				solverInterface.close();
@@ -67,6 +76,7 @@ public class ModelListIterator implements ListIterator<Model> {
 			} else {
 				hasNext = true;
 				models.add(nextModel);
+                                alreadyPresent.add(nextModel);
 			}
 		} else { // Models have already been retrieved (e.g. because of
 					// previous())
