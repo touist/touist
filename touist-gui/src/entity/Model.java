@@ -54,9 +54,6 @@ public class Model implements Iterable<Literal>{
 				areEqual = false;
 			}
 		}
-		System.out.println("");
-		System.out.println(this.toString());
-		System.out.println(m.toString());
 		return areEqual;
 	}
 
