@@ -65,6 +65,10 @@ Comment     = ";;"[^\n]*
    	"union"			{ return symbol(sym.UNION); }
    	"inter"			{ return symbol(sym.INTER); }
    	"diff"			{ return symbol(sym.DIFF); }
+	"exact"			{ return symbol(sym.EXACT); }
+	"atleast"		{ return symbol(sym.ATLEAST); }
+	"atmost"		{ return symbol(sym.ATMOST); }
+	
 
    
    	";;"[^\n]*		{}

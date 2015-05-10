@@ -1,10 +1,30 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ *
+ * Project TouIST, 2015. Easily formalize and solve real-world sized problems
+ * using propositional logic and linear theory of reals with a nice GUI.
+ *
+ * https://github.com/olzd/touist
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the GNU Lesser General Public License
+ * (LGPL) version 2.1 which accompanies this distribution, and is available at
+ * http://www.gnu.org/licenses/lgpl-2.1.html
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * Contributors:
+ *     Alexis Comte, Abdelwahab Heba, Olivier Lezaud,
+ *     Skander Ben Slimane, Maël Valais
+ *
  */
+
 package gui;
 
+import gui.menu.ResultsMenuBar;
+import gui.menu.EditionMenuBar;
 import entity.Model;
 import gui.editionView.ParentEditionPanel;
 import gui.resultsView.ResultsPanel;
@@ -14,13 +34,14 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ListIterator;
 import java.util.Locale;
-import javax.imageio.ImageIO;
 
+import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 
 import solution.BaseDeClauses;
 import solution.ModelList;
 import solution.Solver;
+import touist.TouistProperties;
 import translation.TranslatorSAT;
 
 /**
@@ -28,7 +49,7 @@ import translation.TranslatorSAT;
  * @author Skander
  */
 public class MainFrame extends javax.swing.JFrame {
-
+	private TouistProperties properties = new TouistProperties();
     private BaseDeClauses clause = new BaseDeClauses();
     private TranslatorSAT translator = new TranslatorSAT("external"+File.separatorChar+"touistc");
     private Solver solver;
@@ -45,7 +66,7 @@ public class MainFrame extends javax.swing.JFrame {
     
     private ResultsMenuBar resultsMenuBar;
     private EditionMenuBar editionMenuBar;
-
+    
     public Lang getLang() {
         return lang;
     }
@@ -54,15 +75,14 @@ public class MainFrame extends javax.swing.JFrame {
      * Creates new form MainFrame
      */
     public MainFrame() {
-        
         lang = new Lang(Locale.ENGLISH);
         setLanguage(
         		(lang.getSupportedLanguages().contains(Locale.getDefault()))
         		?Locale.getDefault():Locale.ENGLISH);
         
     	cards = new JPanel(new CardLayout());
-    	editorPanel1 = new ParentEditionPanel(this);
-        resultsPanel1 = new ResultsPanel(this);
+    	editorPanel1 = new ParentEditionPanel();
+        resultsPanel1 = new ResultsPanel();
         resultsMenuBar = new ResultsMenuBar(this);
         editionMenuBar = new EditionMenuBar(this);
         
@@ -85,7 +105,7 @@ public class MainFrame extends javax.swing.JFrame {
     }
     
     public void updateLanguage() {
-        this.setTitle(lang.getWord(Lang.FRAME_TITLE));
+        this.setTitle(lang.getWord(Lang.FRAME_TITLE) +" "+ properties.getProperty("version"));
         editorPanel1.updateLanguage();
         resultsPanel1.updateLanguage();
         resultsMenuBar.updateLanguage();
@@ -152,7 +172,6 @@ public class MainFrame extends javax.swing.JFrame {
         lang.setLanguage(language);
         this.repaint();
     }
-    
 
     /**
      * This method is called from within the constructor to initialize the form.

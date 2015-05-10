@@ -74,7 +74,7 @@ public abstract class Solver {
 	 * @throws NotSatisfiableException
 	 * @throws SolverExecutionException
 	 */
-	protected abstract Model nextModel() throws IOException, NotSatisfiableException, SolverExecutionException;
+	protected abstract Model nextModel() throws IOException, SolverExecutionException;
 
 	/**
 	 * ONLY used by ModelsIterator
@@ -84,5 +84,5 @@ public abstract class Solver {
 	 * solver (an integer).
 	 * @throws NotSatisfiableException if not satisfiable
 	 */
-	protected abstract Model parseModel(String[] rawModelOutput) throws NotSatisfiableException;
+	protected abstract Model parseModel(String[] rawModelOutput);
 }

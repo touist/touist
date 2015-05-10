@@ -1,27 +1,44 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ *
+ * Project TouIST, 2015. Easily formalize and solve real-world sized problems
+ * using propositional logic and linear theory of reals with a nice GUI.
+ *
+ * https://github.com/olzd/touist
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the GNU Lesser General Public License
+ * (LGPL) version 2.1 which accompanies this distribution, and is available at
+ * http://www.gnu.org/licenses/lgpl-2.1.html
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * Contributors:
+ *     Alexis Comte, Abdelwahab Heba, Olivier Lezaud,
+ *     Skander Ben Slimane, Maël Valais
+ *
  */
+
 package gui.editionView;
 
 import gui.AbstractComponentPanel;
-import gui.MainFrame;
 import gui.TranslatorLatex.TranslationLatex;
 import gui.editionView.editor.Editor;
+
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.io.IOException;
+
 import javax.swing.JLabel;
-import javax.swing.JSplitPane;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+
 import org.fife.ui.rtextarea.RTextScrollPane;
 import org.scilab.forge.jlatexmath.TeXConstants;
 import org.scilab.forge.jlatexmath.TeXFormula;
@@ -37,7 +54,6 @@ public class EditionPanel extends AbstractComponentPanel {
     private int rightPanelWidth;
     private JLabel latexLabel;
     private int zoom = 0;
-    
     
     /**
      * Creates new form EditorPanel
@@ -95,8 +111,7 @@ public class EditionPanel extends AbstractComponentPanel {
         
     }    
     
-    public EditionPanel(MainFrame parent) {
-    	super(parent);
+    public EditionPanel() {
         initComponents();
         // Editor textArea set-up
         try {
@@ -133,24 +148,13 @@ public class EditionPanel extends AbstractComponentPanel {
         sp.setFoldIndicatorEnabled(true);
         editorContainer.add(sp, BorderLayout.CENTER);
         
-        palettePanel2.setEditorTextArea(editorTextArea);
-        
-        rightPanelWidth = jSplitPane1.getWidth() - jSplitPane1.getDividerLocation();
-        
-        jSplitPane1.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, new PropertyChangeListener() {
-            @Override
-            public void propertyChange(PropertyChangeEvent evt) {
-                if (jSplitPane1.getDividerLocation() < jSplitPane1.getWidth()) {
-                    rightPanelWidth = jSplitPane1.getWidth() - jSplitPane1.getDividerLocation();
-                    //when resizing the frame, the rightPanelWidth can end up < 0
-                    //System.out.println(rightPanelWidth + " : " + evt);
-                }
-            }
-        });
+        palettePanel2.setEditorTextArea(editorTextArea);  
+        jSplitPane1.setResizeWeight(0.5);
     }
     
     public void initPalette(PalettePanel.PaletteType type) {
         palettePanel2.initPaletteContent(type);
+        jSplitPane2.setDividerLocation(palettePanel2.getRecommendWidth());
     }
 
     public String getText() {
@@ -175,15 +179,9 @@ public class EditionPanel extends AbstractComponentPanel {
         editorContainer = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         jPanel1 = new javax.swing.JPanel();
-        palettePanel2 = new gui.editionView.PalettePanel(parent, editorTextArea);
+        palettePanel2 = new gui.editionView.PalettePanel(editorTextArea);
 
-        addComponentListener(new java.awt.event.ComponentAdapter() {
-            public void componentResized(java.awt.event.ComponentEvent evt) {
-                formComponentResized(evt);
-            }
-        });
-
-        jSplitPane1.setDividerLocation(500);
+        jSplitPane1.setDividerLocation(400);
         jSplitPane1.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         jSplitPane1.setOneTouchExpandable(true);
 
@@ -212,17 +210,13 @@ public class EditionPanel extends AbstractComponentPanel {
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jSplitPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 527, Short.MAX_VALUE)
+            .addComponent(jSplitPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 600, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jSplitPane2, javax.swing.GroupLayout.Alignment.TRAILING)
         );
     }// </editor-fold>//GEN-END:initComponents
-
-    private void formComponentResized(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentResized
-        jSplitPane1.setDividerLocation(jSplitPane1.getWidth() - rightPanelWidth);
-    }//GEN-LAST:event_formComponentResized
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel editorContainer;

@@ -133,8 +133,8 @@ public class SolverTestSAT4J extends Solver {
 	}
 
 	@Override
-	protected Model nextModel() throws IOException, NotSatisfiableException, SolverExecutionException {
-		final int WAIT_FOR_MODEL_TIMEOUT = 50000; // ms
+	protected Model nextModel() throws IOException, SolverExecutionException {
+		final int WAIT_FOR_MODEL_TIMEOUT = 5000000; // ms
 		if (p == null) // Should not happen
 			throw new SolverExecutionException("nextModel(): exception: launch() has not been called");
 		if (!isAlive(p)) { // The solver is already done
@@ -172,17 +172,20 @@ public class SolverTestSAT4J extends Solver {
 	}
 
 	@Override
-	protected Model parseModel(String[] rawModelOutput)
-			throws NotSatisfiableException {
+	protected Model parseModel(String[] rawModelOutput) {
 		// TODO The parser should be able to handle the "-3" (negation)
 		Model model = new Model();
 		for (String rawLiteral : rawModelOutput) {
 			int literalInt = Integer.parseInt(rawLiteral);
 			if (literalInt != 0) { // '0' means 'end of model'
 				int literalCode = (literalInt > 0 ? literalInt : literalInt * (-1));
-				if (getLiteralsMap().get(literalCode) != null) {
-					model.addLiteral(new Literal(getLiteralsMap().get(
-							literalCode), literalInt > 0));
+				String literalString = getLiteralsMap().get(literalCode);
+				if (literalString != null) {
+					// Added for filtering '&45' literals (issue #88)
+					if(literalString.charAt(0) != '&') {
+						model.addLiteral(new Literal(getLiteralsMap().get(
+								literalCode), literalInt > 0));
+					}
 				} else {
 					model.addLiteral(new Literal(rawLiteral, literalInt > 0));
 				}

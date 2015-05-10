@@ -1,14 +1,32 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ *
+ * Project TouIST, 2015. Easily formalize and solve real-world sized problems
+ * using propositional logic and linear theory of reals with a nice GUI.
+ *
+ * https://github.com/olzd/touist
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the GNU Lesser General Public License
+ * (LGPL) version 2.1 which accompanies this distribution, and is available at
+ * http://www.gnu.org/licenses/lgpl-2.1.html
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * Contributors:
+ *     Alexis Comte, Abdelwahab Heba, Olivier Lezaud,
+ *     Skander Ben Slimane, Maël Valais
+ *
  */
+
 package gui.editionView;
 
+import java.awt.GridLayout;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
 
 /**
  *
@@ -17,6 +35,8 @@ import javax.swing.BoxLayout;
 public class PaletteSectionPanel extends javax.swing.JPanel {
 
     private List<InsertionButton> buttons;
+    private ImageIcon foldedIcon = new ImageIcon("touist-gui/ressources/images/paletteSectionFolded.png");
+    private ImageIcon unfoldedIcon = new ImageIcon("touist-gui/ressources/images/paletteSectionUnfolded.png");
     private boolean isFold;
     
     /**
@@ -25,6 +45,8 @@ public class PaletteSectionPanel extends javax.swing.JPanel {
     public PaletteSectionPanel() {
         initComponents();
         jLabelName.setText("");
+        jButtonFold.setText("");
+        jButtonFold.setIcon(foldedIcon);
         buttons = new ArrayList<InsertionButton>();
         isFold = true;
     }
@@ -36,8 +58,18 @@ public class PaletteSectionPanel extends javax.swing.JPanel {
     public PaletteSectionPanel(String name) {
         initComponents();
         jLabelName.setText(name);
+        jButtonFold.setText("");
+        jButtonFold.setIcon(foldedIcon);
         buttons = new ArrayList<InsertionButton>();
         isFold = true;
+    }
+    
+    public void setText(String name) {
+    	jLabelName.setText(name);
+    }
+    
+    public List<InsertionButton> getButtons() {
+        return buttons;
     }
 
     /**
@@ -59,6 +91,8 @@ public class PaletteSectionPanel extends javax.swing.JPanel {
         jLabelName.setText("<Section name>");
 
         jButtonFold.setText(">");
+        jButtonFold.setBorderPainted(false);
+        jButtonFold.setContentAreaFilled(false);
         jButtonFold.setFocusable(false);
         jButtonFold.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -66,7 +100,7 @@ public class PaletteSectionPanel extends javax.swing.JPanel {
             }
         });
 
-        jPanelsContent.setLayout(new java.awt.GridLayout(1, 0));
+        jPanelsContent.setLayout(new java.awt.GridLayout(1, 1));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -74,17 +108,20 @@ public class PaletteSectionPanel extends javax.swing.JPanel {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jPanelsContent, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
                 .addComponent(jLabelName)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jButtonFold))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabelName)
-                    .addComponent(jButtonFold))
-                .addGap(10, 10, 10)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jButtonFold)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jLabelName)))
+                .addGap(0, 0, 0)
                 .addComponent(jPanelsContent, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -92,14 +129,16 @@ public class PaletteSectionPanel extends javax.swing.JPanel {
     private void jButtonFoldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonFoldActionPerformed
         isFold = !isFold;
         if (isFold) {
-            jButtonFold.setText(">");
+            jButtonFold.setIcon(foldedIcon);
             jPanelsContent.removeAll();
+            jPanelsContent.updateUI();
         } else {
-            jButtonFold.setText("V");
-            jPanelsContent.setLayout(new BoxLayout(jPanelsContent, BoxLayout.Y_AXIS));
+            jButtonFold.setIcon(unfoldedIcon);
+            jPanelsContent.setLayout(new GridLayout(buttons.size(), 1));
             for (InsertionButton button : buttons) {
                 jPanelsContent.add(button);
             }
+            jPanelsContent.updateUI();
         }
     }//GEN-LAST:event_jButtonFoldActionPerformed
 
