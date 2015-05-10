@@ -13,8 +13,8 @@ let rec push_lit lit = function
   | x -> failwith ("push_lit: unexpected value " ^ (string_of_clause x)) 
 
 let rec to_cnf = function
-  | Top    -> failwith "Clause always true"
-  | Bottom -> failwith "Clause always false"
+  | Top    -> failwith "Formula is always true"
+  | Bottom -> failwith "Formula is always false"
   | Term x -> Term x
   | CAnd (x,y) -> CAnd (to_cnf x, to_cnf y)
   | CNot x ->
