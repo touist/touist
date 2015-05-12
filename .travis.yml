@@ -5,4 +5,5 @@ install:
     - cd touist-gui
     - ant build
     - ant build-jar
-
+script:
+    - echo "Build succeded... Now, run `ant dist` or `ant zip`"
