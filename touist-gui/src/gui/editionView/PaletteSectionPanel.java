@@ -24,8 +24,11 @@
 package gui.editionView;
 
 import java.awt.GridLayout;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 
 /**
@@ -35,21 +38,10 @@ import javax.swing.ImageIcon;
 public class PaletteSectionPanel extends javax.swing.JPanel {
 
     private List<InsertionButton> buttons;
-    private ImageIcon foldedIcon = new ImageIcon("touist-gui/ressources/images/paletteSectionFolded.png");
-    private ImageIcon unfoldedIcon = new ImageIcon("touist-gui/ressources/images/paletteSectionUnfolded.png");
+    private ImageIcon foldedIcon;
+    private ImageIcon unfoldedIcon;
     private boolean isFold;
-    
-    /**
-     * Creates new form NewPaletteSectionPanel
-     */
-    public PaletteSectionPanel() {
-        initComponents();
-        jLabelName.setText("");
-        jButtonFold.setText("");
-        jButtonFold.setIcon(foldedIcon);
-        buttons = new ArrayList<InsertionButton>();
-        isFold = true;
-    }
+
     
     /**
      * Creates new form NewPaletteSectionPanel
@@ -59,6 +51,13 @@ public class PaletteSectionPanel extends javax.swing.JPanel {
         initComponents();
         jLabelName.setText(name);
         jButtonFold.setText("");
+        try {
+			foldedIcon = new ImageIcon(ImageIO.read(getClass().getResourceAsStream("/images/paletteSectionFolded.png")));
+	        unfoldedIcon = new ImageIcon(ImageIO.read(getClass().getResourceAsStream("/images/paletteSectionUnfolded.png")));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
         jButtonFold.setIcon(foldedIcon);
         buttons = new ArrayList<InsertionButton>();
         isFold = true;
