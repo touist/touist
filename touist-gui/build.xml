@@ -4,41 +4,40 @@
     <!--ANT 1.7 is required -->
 	
 	<!--
-	Algorithme :
-	Prérequis :
-	- external/ doit contenir touistc et minisat.jar
-	Tout a déjà été compilé. On a plus qu'à distribuer, càd
-	- créer un dossier dist/ qui va être le dossier de distribution
-	- faire un touist.jar et le mettre dans dist/
-	- créer external/ dans dist/ 
-	- mettre touistc dans dist/
-	- mettre minisat.jar dans dist/
-	- compresser le contenu de dist vers une archive "touist.zip"
-	 qui se dé-archivera sous le nom de "touist-win32" ou "touist-osx64"
-	
-	Faire un touist.jar:
-	`ant `
+	How to use `ant` and `build.xml`:
+	- `ant build` to build
+	- `ant jar` to make the touist.jar
+	- `ant dist` to prepare a release
+	- `ant zip` to make a .zip ready for release
 	 -->
 	
 	<!-- Touist properties -->
 	<!-- <property name="version" value="1.23"/> -->
 	<property name="source" value="1.6"/>
 	<property name="target" value="1.6"/>
+    <property environment="env"/>
+	<property name="debuglevel" value="source,lines,vars"/>
+    <path id="touist.classpath">
+        <pathelement location="${touist.build.dir}"/>
+        <pathelement location="${touist.dir}/ressources"/>
+        <pathelement location="${touist.libs.dir}/rsyntaxtextarea-2.5.6.jar"/>
+        <pathelement location="${touist.libs.dir}/java-cup-11b.jar"/>
+        <pathelement location="${touist.libs.dir}/jlatexmath-1.0.3.jar"/>
+    </path>
 	
-    <property name="gui.dir" value="${basedir}"/>
-	<property name="gui.build.dir" value="${gui.dir}/build"/>
-	<!-- gui.dist.dir : the folder that will be "distributed" (given to users) -->
-	<property name="gui.dist.dir" value="${gui.dir}/dist"/>
-	<!-- gui.external.dir : the project folder in which external bins are (touistc, solver)-->
-	<property name="gui.external.dir" value="${gui.dir}/external"/>
-	<property name="gui.libs.dir" value="${gui.dir}/libs"/>
-	<property name="gui.ressources.dir" value="${gui.dir}/ressources"/>	
+    <property name="touist.dir" value="${basedir}"/>
+	<property name="touist.build.dir" value="${touist.dir}/build"/>
+	<!-- touist.external.dir : the project folder in which external bins are (touistc, solver)-->
+	<property name="touist.dist.dir" value="${touist.dir}/dist"/>
+	<property name="touist.external.dir" value="${touist.dir}/external"/>
+	<property name="touist.libs.dir" value="${touist.dir}/libs"/>
+	<property name="touist.ressources.dir" value="${touist.dir}/ressources"/>
 
 	<!-- Clear dist/ content -->
-	<delete dir="${gui.dist.dir}"/>
+	<delete dir="${touist.dist.dir}"/>
 
 	<target depends="build" name="build-jar">
-        <jar destfile="${gui.dir}/touist.jar" filesetmanifest="mergewithoutmain">
+        <jar destfile="${touist.dir}/touist.jar" filesetmanifest="mergewithoutmain">
             <manifest>
                 <attribute name="Main-Class" value="touist.TouIST"/>
                 <attribute name="Class-Path" value="."/>
@@ -47,47 +46,50 @@
             	<attribute name="Implementation-Version" value="${version}"/>
             	<attribute name="Implementation-Vendor" value="Institut de Recherche en Informatique de Toulouse"/>
             </manifest>
-        	<zipfileset dir="${gui.dir}/ressources"/>
-            <zipfileset dir="${gui.build.dir}"/>
-        	<zipfileset src= "${gui.libs.dir}/java-cup-11b.jar"/>
-        	<zipfileset src= "${gui.libs.dir}/rsyntaxtextarea-2.5.6.jar"/>
-        	<zipfileset src= "${gui.libs.dir}/jlatexmath-1.0.3.jar"/>
+        	<zipfileset dir="${touist.dir}/ressources"/>
+            <zipfileset dir="${touist.build.dir}"/>
+        	<zipfileset src= "${touist.libs.dir}/java-cup-11b.jar"/>
+        	<zipfileset src= "${touist.libs.dir}/rsyntaxtextarea-2.5.6.jar"/>
+        	<zipfileset src= "${touist.libs.dir}/jlatexmath-1.0.3.jar"/>
         </jar>
     </target>
     <target depends="build-jar" name="dist">
     	<!-- Copy the external binaries into dist/ -->
-    	<copy file="${gui.dir}/touist.jar" todir="${gui.dist.dir}"/>
-    	<copy todir="${gui.dist.dir}/external" flatten="true">
-    	    <fileset dir="${gui.external.dir}"/>
+    	<copy file="${touist.dir}/touist.jar" todir="${touist.dist.dir}"/>
+    	<copy todir="${touist.dist.dir}/external" flatten="true">
+    	    <fileset dir="${touist.external.dir}"/>
 		</copy>
-		<chmod dir="${gui.dist.dir}/external" perm="ugo+rx" includes="*"/>
-    </target>
-    <target depends="build-jar" name="jar"/>
+		<chmod dir="${touist.dist.dir}/external" perm="ugo+rx" includes="*"/>
+	</target>
 
+	<target name="zip" depends="dist">
+		<property name="touist.dist.zip.name" value="${touist.dir}/touist-${version}-${os.name}-${os.arch}"/>
+	    <echo message="${touist.dist.zip.name}" file="some.tmp.file" />
+	    <loadfile property="touist.dist.zip.name.filtered" srcFile="some.tmp.file">
+	        <filterchain>
+	            <tokenfilter>
+	                <replaceregex pattern=" " replace="_" flags="g"/>
+	            </tokenfilter>
+	        </filterchain>
+	    </loadfile>
+		<delete dir="some.tmp.file"/>
+    	<move file="${touist.dist.dir}" todir="${touist.dist.zip.name.filtered}"/>
+		<zip destfile="${touist.dist.zip.name.filtered}.zip" basedir="${touist.dist.zip.name.filtered}" />
+	</target>
 	
-    <property environment="env"/>
-    <property name="debuglevel" value="source,lines,vars"/>
-    <property name="target" value="1.8"/>
-    <property name="source" value="1.8"/>
-    <path id="touist.classpath">
-        <pathelement location="${gui.build.dir}"/>
-        <pathelement location="${gui.dir}/ressources"/>
-        <pathelement location="${gui.libs.dir}/rsyntaxtextarea-2.5.6.jar"/>
-        <pathelement location="${gui.libs.dir}/java-cup-11b.jar"/>
-        <pathelement location="${gui.libs.dir}/jlatexmath-1.0.3.jar"/>
-    </path>
+	<target depends="build-jar" name="jar"/>
 	
     <target name="clean">
-        <delete dir="${gui.build.dir}"/>
+        <delete dir="${touist.build.dir}"/>
     </target>
 	
 	<!-- The build task -->
     <target depends="update-version-string" name="build">
-    	<mkdir dir="${gui.build.dir}"/>
-        <javac debug="true" debuglevel="${debuglevel}" destdir="${gui.build.dir}" includeantruntime="false" source="${source}" target="${target}">
+    	<mkdir dir="${touist.build.dir}"/>
+        <javac debug="true" debuglevel="${debuglevel}" destdir="${touist.build.dir}" includeantruntime="false" source="${source}" target="${target}">
         	<!-- Files I decided to exlude because they contain errors for now -->
         	<exclude name="**/BaseDeClausesTest.java"/>
-        	<src path="${gui.dir}/src"/>
+        	<src path="${touist.dir}/src"/>
             <classpath refid="touist.classpath"/>
         </javac>
     </target>
@@ -114,7 +116,7 @@
 	<target name="-store-version-string" depends="-timestamp" if="version">
         <!-- store the new  version string in the correct property file -->
         <echo message="version=${version}"/>
-        <propertyfile file="${gui.ressources.dir}/version.properties">
+        <propertyfile file="${touist.ressources.dir}/version.properties">
                 <entry key="version" value="${version}"/>
                 <entry key="timestamp" value="${timestamp}"/>
                 <entry key="build.date" value="${build.date}"/>
@@ -123,7 +125,7 @@
         <exec executable="git">
                 <arg value="update-index"/>
                 <arg value="--assume-unchanged"/>
-                <arg value="${gui.ressources.dir}/version.properties"/>
+                <arg value="${touist.ressources.dir}/version.properties"/>
         </exec>
 	</target>
 
@@ -138,7 +140,60 @@
         </exec>
         <antcall target="-store-version-string"/>
         <!-- ensure version is defined even if git was not available -->
-        <property file="${gui.ressources.dir}/version.properties"/>
+        <property file="${touist.ressources.dir}/version.properties"/>
 	</target>
+	
+    <!-- Properties set: unix-like (if it is unix or linux), x64 (if it is 64-bits),
+         register- size (32 or 64) -->
+    <target name="check-architecture" depends="check-family,check-register" >
+        <echo>Register size: ${register-size}</echo>
+        <echo>OS Family: ${os-family}</echo>
+    </target>
+
+    <target name="check-family" >
+        <condition property="os-family" value="unix" else="windows">
+            <os family="unix" />
+        </condition>
+
+        <condition property="unix">
+            <os family="unix" />
+        </condition>
+    </target>
+
+    <target name="check-register" depends="reg-unix,reg-windows">
+    </target>
+
+    <!-- Test under GNU/Linux -->
+    <target name="reg-unix" if="unix">
+        <exec dir="." executable="uname" outputproperty="result">
+            <arg line="-m"/>
+        </exec>
+
+        <!-- String ends in 64 -->
+        <condition property="x64">
+            <matches string="${result}" pattern="^.*64$"/>
+        </condition>
+
+        <condition property="register-size" value="64" else="32">
+            <isset property="x64"/>
+        </condition>
+    </target>
+
+    <!-- Test under MS/Windows-->
+    <target name="reg-windows" unless="unix">
+        <!-- 64 bit Windows versions have the variable "ProgramFiles(x86)" -->
+        <exec dir="." executable="cmd" outputproperty="result">
+            <arg line="/c SET ProgramFiles(x86)"/>
+        </exec>
+
+    <!-- String ends in "Program Files (x86)" -->
+        <condition property="x64">
+            <matches string="${result}" pattern="^.*=.*Program Files \(x86\)"/>
+        </condition>
+
+        <condition property="register-size" value="64" else="32">
+            <isset property="x64"/>
+        </condition>
+    </target> 
 
 </project>
