@@ -17,13 +17,6 @@
 	<property name="target" value="1.6"/>
     <property environment="env"/>
 	<property name="debuglevel" value="source,lines,vars"/>
-    <path id="touist.classpath">
-        <pathelement location="${touist.build.dir}"/>
-        <pathelement location="${touist.dir}/ressources"/>
-        <pathelement location="${touist.libs.dir}/rsyntaxtextarea-2.5.6.jar"/>
-        <pathelement location="${touist.libs.dir}/java-cup-11b.jar"/>
-        <pathelement location="${touist.libs.dir}/jlatexmath-1.0.3.jar"/>
-    </path>
 	
     <property name="touist.dir" value="${basedir}"/>
 	<property name="touist.build.dir" value="${touist.dir}/build"/>
@@ -33,6 +26,14 @@
 	<property name="touist.libs.dir" value="${touist.dir}/libs"/>
 	<property name="touist.ressources.dir" value="${touist.dir}/ressources"/>
 
+    <path id="touist.classpath">
+        <pathelement location="${touist.build.dir}"/>
+        <pathelement location="${touist.dir}/ressources"/>
+        <pathelement location="${touist.libs.dir}/rsyntaxtextarea-2.5.6.jar"/>
+        <pathelement location="${touist.libs.dir}/java-cup-11b.jar"/>
+        <pathelement location="${touist.libs.dir}/jlatexmath-1.0.3.jar"/>
+    </path>
+	
 	<!-- Clear dist/ content -->
 	<delete dir="${touist.dist.dir}"/>
 
