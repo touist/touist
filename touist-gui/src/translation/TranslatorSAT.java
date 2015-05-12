@@ -58,7 +58,7 @@ public class TranslatorSAT {
 	 * parsing methods parseErrors and (if the translation actually
 	 * passed) parseLiteralsMapFile.
 	 *
-	 * @param bigandFilePath is the name of the file that the
+	 * @param touistlFilePath is the name of the file that the
 	 * translator/compiler is going to compute. The translation is handled by a
 	 * third-part program called by an system "exec" command. The translator can
 	 * return three kind of things : - A ".dimacs" file and a "mapping" file if
@@ -74,7 +74,7 @@ public class TranslatorSAT {
 	 * @throws IOException
 	 * @throws InterruptedException
 	 */
-	public boolean translate(String bigandFilePath) throws IOException, InterruptedException {
+	public boolean translate(String touistlFilePath) throws IOException, InterruptedException {
 		/* return_code from the Touistl translator (see touistc.ml):
   		| OK -> 0
   		| COMPILE_WITH_LINE_NUMBER_ERROR -> 1
@@ -94,7 +94,7 @@ public class TranslatorSAT {
 		String cmd = path.toString()
 				+ " -o " + outputFilePath
 				+ " -table " + outputTableFilePath
-				+ " " + bigandFilePath;
+				+ " " + touistlFilePath;
         System.out.println("translate(): cmd executed: "+cmd);
 		this.p = Runtime.getRuntime().exec(cmd);
 		int return_code = p.waitFor();
