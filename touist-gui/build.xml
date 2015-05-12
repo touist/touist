@@ -123,11 +123,13 @@
                 <entry key="build.date" value="${build.date}"/>
 				<entry key="minimum_java_version" value="${target}"/>
         </propertyfile>
+		<!--
         <exec executable="git">
                 <arg value="update-index"/>
-                <arg value="--assume-unchanged"/>
+                <arg value="-\-assume-unchanged"/>
                 <arg value="${touist.ressources.dir}/version.properties"/>
         </exec>
+        -->
 	</target>
 
 	<!-- this target is only run if the 'version' property is undefined -->
