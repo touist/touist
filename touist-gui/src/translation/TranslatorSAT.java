@@ -92,8 +92,9 @@ public class TranslatorSAT {
 		// Check if translatorProgramFilePath is there
 		String path = currentPath + File.separatorChar + translatorProgramFilePath;
 		String cmd = path.toString()
-				+ " -o " + outputFilePath
+				+ " -sat" 
 				+ " -table " + outputTableFilePath
+				+ " -o " + outputFilePath
 				+ " " + touistlFilePath;
         System.out.println("translate(): cmd executed: "+cmd);
 		this.p = Runtime.getRuntime().exec(cmd);
