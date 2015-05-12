@@ -134,10 +134,10 @@ public class TranslatorSAT {
 				errors.add(new TranslationError(errMessage));
 			}
 		}
-		if(return_code == 0) {
+		if(return_code == OK) {
 			parseLiteralsMapFile(currentPath+File.separatorChar+outputTableFilePath);
 		}
-		return return_code==0;
+		return return_code == OK;
 	}
 
 	/**
