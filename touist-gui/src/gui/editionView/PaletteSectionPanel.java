@@ -146,6 +146,22 @@ public void addInsertButton(InsertionButton button) {
     updateUI();
 }
 
+public void fold() {
+    isFold = true;
+    jButtonFold.setIcon(foldedIcon);
+    jPanelsContent.removeAll();
+    jPanelsContent.updateUI();
+}
+
+public void unfold() {
+    isFold = false;
+    jButtonFold.setIcon(unfoldedIcon);
+    jPanelsContent.setLayout(new GridLayout(buttons.size(), 1));
+    for (InsertionButton button : buttons) {
+        jPanelsContent.add(button);
+    }
+    updateUI();
+}
 
     
     // Variables declaration - do not modify//GEN-BEGIN:variables

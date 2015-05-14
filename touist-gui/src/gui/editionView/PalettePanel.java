@@ -91,6 +91,9 @@ public class PalettePanel extends AbstractComponentPanel {
             sectionsContainerPanel.setLayout(new BoxLayout(sectionsContainerPanel, BoxLayout.Y_AXIS));
             sectionsContainerPanel.add(section1);
             sectionsContainerPanel.add(section2);
+            
+            section1.unfold();
+            section2.unfold();
         } else if (type == PaletteType.SET) {
             section3 = new PaletteSectionPanel("KzdaljahdjlAJHJAZDHAZH zadh azmohozudhazoudhazoduhaou");
 
@@ -101,6 +104,8 @@ public class PalettePanel extends AbstractComponentPanel {
 
             sectionsContainerPanel.setLayout(new BoxLayout(sectionsContainerPanel, BoxLayout.Y_AXIS));
             sectionsContainerPanel.add(section3);
+            
+            section3.unfold();
         }
     }
     
