@@ -562,6 +562,8 @@ public class ParentEditionPanel extends AbstractComponentPanel {
         jTabbedPane1.setToolTipTextAt(0, getFrame().getLang().getWord("ParentEditionPanel.editorPanelFormulas.TabConstraints.tabTooltip"));
         jTabbedPane1.setToolTipTextAt(1, getFrame().getLang().getWord("ParentEditionPanel.editorPanelSets.TabConstraints.tabTooltip"));
         jComboBox1.setToolTipText(getFrame().getLang().getWord("ParentEditionPanel.comboBoxSATSMT.tooltip"));
+        jLabelCaretPosition.setToolTipText(getFrame().getLang().getWord("ParentEditionPanel.jLabelCaretPosition.tooltip"));
+        jLabelErrorMessage.setToolTipText(getFrame().getLang().getWord("ParentEditionPanel.jLabelErrorMessage.tooltip"));
         updateUI();
     }
 }
