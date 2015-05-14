@@ -86,7 +86,7 @@ public class PalettePanel extends AbstractComponentPanel {
             section1.addInsertButton(new InsertionButton(editorTextArea, "$a or $b", snippetsOr, "or"));
             section1.addInsertButton(new InsertionButton(editorTextArea, "not $a", snippetsNot, "not"));
             section2.addInsertButton(new InsertionButton(editorTextArea, "if $a \nthen \n\t$b \nelse \n\t$c\n", snippetsIf, "if then else","if\\,\\$a \\\\ then\\\\\\quad\\$b \\\\ else\\\\\\quad\\$c"));
-            section1.addInsertButton(new InsertionButton(editorTextArea, "bigand $i in $a: \n\tA($i) and B($i) \nend", snippetsBigand,"bigand"));
+            section1.addInsertButton(new InsertionButton(editorTextArea, "bigand $i in $a: \n\tA($i) \nend", snippetsBigand,"bigand"));
 
             sectionsContainerPanel.setLayout(new BoxLayout(sectionsContainerPanel, BoxLayout.Y_AXIS));
             sectionsContainerPanel.add(section1);
