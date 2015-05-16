@@ -68,6 +68,26 @@ let to_smt2 logic formula =
     | CEqual            (CFloat _, Term (x,None))
     | CNot_equal        (Term (x,None), CFloat _)
     | CNot_equal        (CFloat _, Term (x,None)) -> add_var (sanitize_var x) "Real"
+    | CAdd              (Term (x,None), Term (y,None))
+    | CSub              (Term (x,None), Term (y,None))
+    | CMul              (Term (x,None), Term (y,None))
+    | CDiv              (Term (x,None), Term (y,None))
+    | CLesser_than      (Term (x,None), Term (y,None))
+    | CLesser_or_equal  (Term (x,None), Term (y,None))
+    | CGreater_than     (Term (x,None), Term (y,None))
+    | CGreater_or_equal (Term (x,None), Term (y,None))
+    | CEqual            (Term (x,None), Term (y,None))
+    | CNot_equal        (Term (x,None), Term (y,None)) ->
+        begin
+          try
+            let x_type = Hashtbl.find vtbl x in
+            add_var (sanitize_var y) x_type
+          with Not_found ->
+            try
+              let y_type = Hashtbl.find vtbl y in
+              add_var (sanitize_var x) y_type
+            with Not_found -> failwith ("unknown type: " ^ x ^ ", " ^ y)
+        end
     | CNot x -> gen_var x
     | CAnd     (x,y)
     | COr      (x,y)
