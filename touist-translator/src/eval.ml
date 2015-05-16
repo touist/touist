@@ -462,47 +462,45 @@ and and_of_term_list =
   List.fold_left (fun acc t -> CAnd (acc, t)) Top
 
 and bigand_empty env var values test exp = Top
-  (*match values with
-  | []    -> Top
-  | [x]   -> eval_clause exp env
-  | x::xs -> CAnd (eval_clause exp env, bigand_empty env var xs test exp)*)
 and bigand_int env var values test exp =
+  let exp' = CIf (test,exp,Top) in
   match values with
   | []    -> Top
-  | [x]   -> eval_clause exp ((var, Int x)::env)
-  | x::xs -> CAnd (eval_clause exp ((var, Int x)::env), bigand_int env var xs test exp)
+  | [x]   -> eval_clause exp' ((var, Int x)::env)
+  | x::xs -> CAnd (eval_clause exp' ((var, Int x)::env) ,bigand_int env var xs test exp)
 and bigand_float env var values test exp =
+  let exp' = CIf (test,exp,Top) in
   match values with
   | []    -> Top
-  | [x]   -> eval_clause exp ((var, Float x)::env)
-  | x::xs -> CAnd (eval_clause exp ((var, Float x)::env), bigand_float env var xs test exp)
+  | [x]   -> eval_clause exp' ((var, Float x)::env)
+  | x::xs -> CAnd (eval_clause exp' ((var, Float x)::env) ,bigand_float env var xs test exp)
 and bigand_str env var values test exp =
+  let exp' = CIf (test,exp,Top) in
   match values with
   | []    -> Top
-  | [x]   -> eval_clause exp ((var, Clause (Term  (x,None)))::env)
+  | [x]   -> eval_clause exp' ((var, Clause (Term  (x,None)))::env)
   | x::xs ->
-      CAnd (eval_clause exp ((var, Clause (Term  (x,None)))::env), bigand_str env var xs test exp)
+      CAnd (eval_clause exp' ((var, Clause (Term  (x,None)))::env), bigand_str env var xs test exp)
 and bigor_empty env var values test exp = Bottom
-  (*match values with
-  | [] -> Bottom
-  | [x] -> eval_clause exp env
-  | x::xs -> COr (eval_clause exp env, bigor_empty env var xs test exp)*)
 and bigor_int env var values test exp =
+  let exp' = CIf (test,exp,Bottom) in
   match values with
   | []    -> Bottom
-  | [x]   -> eval_clause exp ((var, Int x)::env)
-  | x::xs -> COr (eval_clause exp ((var, Int x)::env), bigor_int env var xs test exp)
+  | [x]   -> eval_clause exp' ((var, Int x)::env)
+  | x::xs -> COr (eval_clause exp' ((var, Int x)::env), bigor_int env var xs test exp)
 and bigor_float env var values test exp =
+  let exp' = CIf (test,exp,Bottom) in
   match values with
   | []    -> Bottom
-  | [x]   -> eval_clause exp ((var, Float x)::env)
-  | x::xs -> COr (eval_clause exp ((var, Float x)::env), bigor_float env var xs test exp)
+  | [x]   -> eval_clause exp' ((var, Float x)::env)
+  | x::xs -> COr (eval_clause exp' ((var, Float x)::env), bigor_float env var xs test exp)
 and bigor_str env var values test exp =
+  let exp' = CIf (test,exp,Bottom) in
   match values with
   | []    -> Bottom
-  | [x]   -> eval_clause exp ((var, Clause (Term  (x,None)))::env)
+  | [x]   -> eval_clause exp' ((var, Clause (Term  (x,None)))::env)
   | x::xs ->
-      COr (eval_clause exp ((var, Clause (Term (x,None)))::env), bigor_str env var xs test exp)
+      COr (eval_clause exp' ((var, Clause (Term (x,None)))::env), bigor_str env var xs test exp)
 
 and eval_test exp env =
   match eval_exp exp env with
