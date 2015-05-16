@@ -16,10 +16,14 @@ let rec to_cnf = function
   | Top    -> failwith "Formula is always true"
   | Bottom -> failwith "Formula is always false"
   | Term x -> Term x
+  | CAnd (Top,x) | CAnd (x,Top) -> to_cnf x
+  | CAnd (Bottom,_) | CAnd (_,Bottom) -> Bottom
   | CAnd (x,y) -> CAnd (to_cnf x, to_cnf y)
   | CNot x ->
       begin
         match x with
+        | Top -> Bottom
+        | Bottom -> Top
         | Term a -> CNot (Term a)
         | CNot y -> to_cnf y
         | CAnd (x',y') -> to_cnf (COr (CNot x', CNot y'))
@@ -29,6 +33,8 @@ let rec to_cnf = function
   | COr (x,y) ->
       begin
         match x,y with
+        | Bottom, x' | x', Bottom -> to_cnf x'
+        | Top, _ | _, Top -> Top
         | Term a, Term b               -> COr (Term a, Term b)
         | CNot (Term a), Term b        -> COr (CNot (Term a), Term b)
         | CNot (Term a), CNot (Term b) -> COr (CNot (Term a), CNot (Term b))
