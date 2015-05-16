@@ -1,6 +1,6 @@
 TouIST main program
 ===================
-![](https://travis-ci.org/olzd/touist.svg?branch=develop)
+![The Travis build state: says if the java project can be built of not](https://travis-ci.org/olzd/touist.svg?branch=develop)
 
 This folder contains the source code for the main program of the TouIST project. It is named "ui" because of it's main feature : be the user interface for the solver and "bigand" translator.
 
@@ -44,6 +44,7 @@ To build: `ant build`
 To run: `ant run`
 To build the .jar: `ant build-jar`
 To prepare the `./dist` folder: `ant dist`
+To prepare the `touist-architecture-32bits.zip`: `ant zip`
 
 Note: **`ant dist`** does almost nothing. It just copies the `touist.jar` file to `./dist` and then copies everything from `./external` into `./dist`.
 
@@ -61,3 +62,8 @@ But for now, changing the solver requires to:
 It shouldn't be really hard to re-implement a new `SolverWithYourExternalSolver`, the only big problem is the multiple problems that the `exec()` environment brings in terms of communication between an external program and your own code.
 
 We fixed that in our own implementation of `Solver`, called `SolverTestSAT4J` that uses `minisat.jar` using multiple `wait(100ms)` and so on. It drew a lot of problems like how to know when to write into `stdin`...
+
+## Notes and tips
+### Errors with Netbeans
+While doing the GUI, we have had a lot of issues the the `.form` used by netbeans. We didn't know it first, but you must not change the parts of code where it is writen _Do NOT modify this code_. We were using other IDEs like Eclipse, and unlike Netbeans, Eclipse does not "gray out" the parts of code you should not edit.
+Other problem with Netbeans: sometimes, it cannot load classes. Just rebuild, it should work.

@@ -10,17 +10,22 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+import touist.TouistProperties;
+
 /**
  *
  * @author Skander
  */
 public class AboutPanel extends javax.swing.JPanel {
+	public static TouistProperties properties = new TouistProperties();
+
 
     /**
      * Creates new form About
      */
     public AboutPanel() {
         initComponents();
+        jLabel5.setText(properties.getProperty("version"));
     }
 
     /**
@@ -39,7 +44,7 @@ public class AboutPanel extends javax.swing.JPanel {
         jButton1 = new javax.swing.JButton();
         jLabel5 = new javax.swing.JLabel();
 
-        jLabel1.setIcon(new javax.swing.ImageIcon("C:\\Users\\Skander\\Documents\\NetBeansProjects\\touist\\touist-gui\\ressources\\images\\logo.png")); // NOI18N
+        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/logo.png"))); // NOI18N
 
         jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/irit.png"))); // NOI18N
 
