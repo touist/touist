@@ -66,6 +66,10 @@
 	<target name="zip" depends="dist">
 		<property name="touist.dist.zip.name" value="${touist.dir}/touist-${version}-${os.name}-${os.arch}"/>
 	    <echo message="${touist.dist.zip.name}" file="some.tmp.file" />
+		<!-- This some.tmp.file manipulation is just a hack to do a simple `sed "s/\ //g"`
+			 which is kind of impossible without any third-party ant scripts. So here is the
+			 hack: we use the replaceregex for filenames, creating a fake file and 
+			 then getting the new name filtered -->
 	    <loadfile property="touist.dist.zip.name.filtered" srcFile="some.tmp.file">
 	        <filterchain>
 	            <tokenfilter>
@@ -74,7 +78,7 @@
 	        </filterchain>
 	    </loadfile>
 		<delete dir="some.tmp.file"/>
-    	<move file="${touist.dist.dir}" todir="${touist.dist.zip.name.filtered}"/>
+		<rename src="${touist.dist.dir}" dest="${touist.dist.zip.name.filtered}"/>
 		<zip destfile="${touist.dist.zip.name.filtered}.zip" basedir="${touist.dist.zip.name.filtered}" />
 	</target>
 	
