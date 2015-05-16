@@ -51,7 +51,7 @@ let to_smt2 logic formula =
     | CEqual            (Term (x,None), CInt _)
     | CEqual            (CInt _, Term (x,None))
     | CNot_equal        (Term (x,None), CInt _)
-    | CNot_equal        (CInt _, Term (x,None)) -> add_var (sanitize_var x) "Int"
+    | CNot_equal        (CInt _, Term (x,None)) -> add_var x "Int"
     | CAdd              (Term (x,None), CFloat _)
     | CAdd              (CFloat _, Term (x,None))
     | CSub              (Term (x,None), CFloat _)
@@ -71,7 +71,7 @@ let to_smt2 logic formula =
     | CEqual            (Term (x,None), CFloat _)
     | CEqual            (CFloat _, Term (x,None))
     | CNot_equal        (Term (x,None), CFloat _)
-    | CNot_equal        (CFloat _, Term (x,None)) -> add_var (sanitize_var x) "Real"
+    | CNot_equal        (CFloat _, Term (x,None)) -> add_var x "Real"
     | CAdd              (Term (x,None), Term (y,None))
     | CSub              (Term (x,None), Term (y,None))
     | CMul              (Term (x,None), Term (y,None))
@@ -85,11 +85,11 @@ let to_smt2 logic formula =
         begin
           try
             let x_type = Hashtbl.find vtbl x in
-            add_var (sanitize_var y) x_type
+            add_var y x_type
           with Not_found ->
             try
               let y_type = Hashtbl.find vtbl y in
-              add_var (sanitize_var x) y_type
+              add_var x y_type
             with Not_found -> failwith ("unknown type: " ^ x ^ ", " ^ y)
         end
     | CNot x -> gen_var x
