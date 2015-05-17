@@ -340,7 +340,7 @@ public class ParentEditionPanel extends AbstractComponentPanel {
     // End of variables declaration//GEN-END:variables
 
     public void importHandler() {
-        String path = "";
+        String path = getFrame().getDefaultDirectoryPath();
         int returnVal;
         getFrame().getClause().setFormules("");
         getFrame().getClause().setSets("");

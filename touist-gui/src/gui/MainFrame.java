@@ -49,13 +49,14 @@ import translation.TranslatorSAT;
  * @author Skander
  */
 public class MainFrame extends javax.swing.JFrame {
-	private TouistProperties properties = new TouistProperties();
+    private TouistProperties properties = new TouistProperties();
     private BaseDeClauses clause = new BaseDeClauses();
     private TranslatorSAT translator = new TranslatorSAT("external"+File.separatorChar+"touistc");
     private Solver solver;
     private ModelList models;
 
     public State state;
+    private String defaultDirectoryPath = ".";
 
     public final static String EDITOR_PANEL = "editor_panel";
     public final static String RESULTS_PANEL = "results_panel";
@@ -69,6 +70,15 @@ public class MainFrame extends javax.swing.JFrame {
     
     public Lang getLang() {
         return lang;
+    }
+    
+    public String getDefaultDirectoryPath() {
+        return defaultDirectoryPath;
+    }
+    
+    public void setDefaultDirectoryPath(String path) {
+        defaultDirectoryPath = path;
+        //TODO save the path in a config file
     }
 
     /**
