@@ -3,6 +3,7 @@ open Lexing
 open Arg (* Parses the arguments *)
 open FilePath (* Operations on file names *)
 open Printf
+open Version
 
 
 (* NOTE for utop or ocaml users: to open the FilePath module
@@ -31,6 +32,7 @@ let get_code (e : error) : int = match e with
   | OTHER -> 3
 
 let sat_mode = ref false
+let version_asked = ref false
 let smt_logic = ref ""
 let input_file_path = ref ""
 let output_file_path = ref ""
@@ -120,7 +122,8 @@ let () =
     ("-o", Arg.Set_string (output_file_path), "The translated file");
     ("-table", Arg.Set_string (output_table_file_path), "The literals table table (for SAT_DIMACS)");
     ("-sat", Arg.Set sat_mode, "Use the SAT solver");
-    ("-smt2", Arg.Set_string smt_logic, "Use the SMT solver with the specified logic")
+    ("-smt2", Arg.Set_string (smt_logic), "Use the SMT solver with the specified logic");
+    ("--version", Arg.Set version_asked, "display version number")
   ]
   in
   let usage = "TouistL compiles files from the TouIST Language \
@@ -135,12 +138,20 @@ let () =
    * it is a inputFilePath *)
   Arg.parse argspecs argIsInputFilePath usage; (* parses the arguments *)
 
+  (* Step 1.5: if we are asked the version number 
+   * NOTE: !version_asked means like in C, *version_asked. 
+   * It doesn't mean "not version_asked" *)
+  if !version_asked then (
+    print_endline (Version.version);
+    exit (get_code OK)
+  ); 
+
   (* Step 2: we see if we got every parameter we need *)
   if ((String.length !input_file_path) == 0)(* NOTE: !var is like *var in C *)
   then (
     print_endline (cmd ^ ": you must give an input file");
     exit (get_code OTHER)
-    );
+  );
 
   if (String.length !output_file_path) == 0 && !sat_mode then
     output_file_path := (defaultOutput !input_file_path SAT_DIMACS);
@@ -180,4 +191,3 @@ let () =
   write_to_file out_file c;
   write_to_file table_file (Dimacs.string_of_table t)
 *)
-
