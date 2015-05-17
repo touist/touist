@@ -54,12 +54,20 @@ public class SolverSMT extends Solver {
                 String[] LiterralValuation=Token.split("\n");
                 for(String getLV : LiterralValuation){
                 String[] separateLV= getLV.split(" ");
-                if(separateLV.length==2){
+                //if(separateLV.length==2){
                     //if(separateLV[1].i)
-                    smt.addLiteral(new Literal(separateLV[0],separateLV[1].matches("true")));
+                //    smt.addLiteral(new Literal(separateLV[0],separateLV[1].matches("true")));
+                //}
+                if(!getLV.equals(" "))
+                {System.out.println(getLV);
+                try{
+                    float real=Float.parseFloat(separateLV[1]);
+                    smt.addLiteral(new Literal(separateLV[0],separateLV[1]));
+                }catch (NumberFormatException e){
+                    boolean valuated =separateLV[1].matches("true");
+                    smt.addLiteral(new Literal(separateLV[0],valuated));
                 }
-                //if(!getLV.equals(" "))
-                //System.out.println(getLV);
+                }
                 
                     }
                 }

@@ -47,6 +47,10 @@ public class Literal {
        literal_positivity=b;
     }
 
+    public Literal(String get, String b) {
+       literal=get;
+       arithmetic_value=b;
+    }
     public Literal(String rawLiteral) {
         literal=rawLiteral;
     }
