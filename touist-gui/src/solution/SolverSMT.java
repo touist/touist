@@ -30,6 +30,19 @@ public class SolverSMT extends Solver {
         else
           throw new FileNotFoundException();
     }
+    
+    /**
+     * For Java RE 6 compatibility (p.isAlive() is JavaRE7)
+     */
+	private boolean isAlive(Process process) {
+	    try {
+	        process.exitValue();
+	        return false;
+	    } catch (Exception e) {
+	        return true;
+	    }
+	}
+    
      public Model getresult() throws IOException, SolverExecutionException{
       // String command="bin"+File.separatorChar+"yices-smt2"+" "+this.smtpath;
         Model smt=null;
@@ -39,7 +52,7 @@ public class SolverSMT extends Solver {
         this.p = Runtime.getRuntime().exec(command);
 	stdout = new BufferedReader(new InputStreamReader(p.getInputStream()));
         String line="";
-        while((line=stdout.readLine())!=null && p.isAlive()){
+        while((line=stdout.readLine())!=null && isAlive(p)){
             br.append(line);
         }
         StringTokenizer tokenizer = new StringTokenizer(br.toString(),"()");
@@ -95,12 +108,12 @@ public class SolverSMT extends Solver {
     }
 
     @Override
-    protected Model nextModel() throws IOException, NotSatisfiableException, SolverExecutionException {
+    protected Model nextModel() throws IOException, SolverExecutionException {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    protected Model parseModel(String[] rawModelOutput) throws NotSatisfiableException {
+    protected Model parseModel(String[] rawModelOutput) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     
