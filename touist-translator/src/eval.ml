@@ -8,12 +8,20 @@ exception ArgumentError of string
 (* Return the list of integers between min and max
  * with an increment of step
  *)
-let range min max step =
+let irange min max step =
   let rec loop acc cpt =
     if cpt = max+1 then
       acc
     else
       loop (cpt::acc) (cpt+1)
+  in loop [] min |> List.rev
+
+let frange min max step =
+  let rec loop acc cpt =
+    if cpt = max +. 1. then
+      acc
+    else
+      loop (cpt::acc) (cpt+.1.)
   in loop [] min |> List.rev
 
 let rec set_bin_op iop fop sop repr s1 s2 =
@@ -217,7 +225,8 @@ and eval_exp exp env =
   | Range (x,y) ->
       begin
         match eval_exp x env, eval_exp y env with
-        | Int x', Int y' -> Set (GenSet.ISet (IntSet.of_list (range x' y' 1)))
+        | Int x', Int y'     -> Set (GenSet.ISet (IntSet.of_list (irange x' y' 1)))
+        | Float x', Float y' -> Set (GenSet.FSet (FloatSet.of_list (frange x' y' 1.)))
         | _,_ -> raise (ArgumentError (string_of_exp exp))
       end
   | Empty x ->
@@ -305,6 +314,8 @@ and eval_clause exp env =
         match eval_clause x env, eval_clause y env with
         | CInt x', CInt y'     -> CInt   (x' +  y')
         | CFloat x', CFloat y' -> CFloat (x' +. y')
+        | CInt _, Term _
+        | Term _, CInt _ -> CAdd (x,y)
         | _,_ -> raise (TypeError (string_of_clause exp))
       end
   | CSub (x,y) ->
@@ -336,11 +347,13 @@ and eval_clause exp env =
   | CGreater_or_equal (x,y) -> CGreater_or_equal (eval_clause x env, eval_clause y env)
   | Top    -> Top
   | Bottom -> Bottom
-  | Term x -> Term ((expand_var_name x env),None)
+  | Term x -> Term ((expand_var_name x env), None)
   | CVar (x,None) ->
       begin
         try (match List.assoc x env with
              | Clause x' -> x'
+             | Int    x' -> CInt   x'
+             | Float  x' -> CFloat x'
              | _ -> raise (TypeError (x ^ ": expected a clause")))
         with Not_found -> raise (NameError x)
       end
@@ -348,15 +361,26 @@ and eval_clause exp env =
       begin
         try eval_clause (Term (string_of_clause (match List.assoc x env with
              | Clause x' -> x'
+             | Int    x' -> CInt   x'
+             | Float  x' -> CFloat x'
              | _ -> raise (TypeError (string_of_clause exp))), Some y)) env
-        with Not_found -> raise (NameError ("clause variable undefined: " ^ x))
+        with Not_found ->
+          begin
+            try eval_clause (Term (string_of_clause (match Hashtbl.find extenv x
+              with
+              | Clause x' -> x'
+              | Int    x' -> CInt   x'
+              | Float  x' -> CFloat x'
+              | _ -> raise (TypeError (string_of_clause exp))), Some y)) env
+            with Not_found -> raise (NameError ("clause variable undefined: " ^ x))
+          end
       end
   | CNot Top    -> Bottom
   | CNot Bottom -> Top
-  | CNot     x     -> CNot     (eval_clause x env)
+  | CNot x      -> CNot (eval_clause x env)
   | CAnd (Top,x)
   | CAnd (x,Top) -> eval_clause x env
-  | CAnd     (x,y) -> CAnd     (eval_clause x env, eval_clause y env)
+  | CAnd     (x,y) -> CAnd (eval_clause x env, eval_clause y env)
   | COr (Bottom,x)
   | COr (x,Bottom) -> eval_clause x env
   | COr      (x,y) -> COr  (eval_clause x env, eval_clause y env)
