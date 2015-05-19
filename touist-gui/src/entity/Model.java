@@ -66,7 +66,7 @@ public class Model implements Iterable<Literal>{
 		// TODO Please write a proper toString
 		String out = "";
 		for (Literal s : literals) {
-			out = out + " ("+ s.getLiteral()+" "+s.isLiteral_positivity()+") ";
+			out = out + " ("+ s.getLiteral()+" "+((s.getArithmetic_value()==null)?s.isLiteral_positivity():s.getArithmetic_value())+") ";
 		}
 		return out;
 	}

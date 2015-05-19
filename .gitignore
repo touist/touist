@@ -82,3 +82,5 @@ touist-gui/touist-*
 >>>>>>> Stashed changes
 
 touist-gui/ressources/version.properties
+
+touist-translator/src/version.ml

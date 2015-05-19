@@ -53,7 +53,8 @@ import translation.TranslatorSAT;
  */
 public class ParentEditionPanel extends AbstractComponentPanel {
 
-    
+    private static final int ERROR_MESSAGE_MAX_LENGTH = 60;
+    private String jLabelErrorMessageText;
     private Thread testThread;
 
     /**
@@ -67,7 +68,21 @@ public class ParentEditionPanel extends AbstractComponentPanel {
         editorPanelFormulas.initPalette(PalettePanel.PaletteType.FORMULA);
         editorPanelSets.initPalette(PalettePanel.PaletteType.SET);
         jFileChooser1.setCurrentDirectory(new File(".."));
-        jLabelErrorMessage.setText("");
+        jLabelErrorMessageText = "";
+        jLabelErrorMessage.setText(jLabelErrorMessageText);
+    }
+    
+    /**
+     * Update jLabelErrorMessage's text and keep it at ERROR_MESSAGE_MAX_LENGTH.
+     * @param text The text used to set the label's text.
+     */
+    private void setJLabelErrorMessageText(String text) {
+        jLabelErrorMessageText = text;
+        if (text.length() < ERROR_MESSAGE_MAX_LENGTH) {
+            jLabelErrorMessage.setText(text);
+        } else {
+            jLabelErrorMessage.setText(text.substring(0, ERROR_MESSAGE_MAX_LENGTH) + "...");
+        }
     }
 
     /**
@@ -94,15 +109,18 @@ public class ParentEditionPanel extends AbstractComponentPanel {
         jFileChooser1.setFileSelectionMode(JFileChooser.FILES_ONLY);
         jFileChooser1.addChoosableFileFilter(new FileNameExtensionFilter("Touistl files(touistl)","touistl"));
 
-        jTabbedPane1.addTab("", editorPanelFormulas);
-        jTabbedPane1.addTab("", editorPanelSets);
+        jTabbedPane1.setToolTipText("");
+        jTabbedPane1.addTab("Formulas", editorPanelFormulas);
+        jTabbedPane1.addTab("Sets", editorPanelSets);
 
+        testButton.setText("Test");
         testButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 testButtonActionPerformed(evt);
             }
         });
 
+        importButton.setText("Import");
         importButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 importButtonActionPerformed(evt);
@@ -111,11 +129,17 @@ public class ParentEditionPanel extends AbstractComponentPanel {
 
         jLabelErrorMessage.setForeground(new java.awt.Color(255, 0, 0));
         jLabelErrorMessage.setText("<Error message>");
+        jLabelErrorMessage.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jLabelErrorMessageMouseClicked(evt);
+            }
+        });
 
         jLabelCaretPosition.setText("1:1");
 
         jComboBox1.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "SAT", "SMT" }));
 
+        exportButton.setText("Export");
         exportButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 exportButtonActionPerformed(evt);
@@ -204,7 +228,7 @@ public class ParentEditionPanel extends AbstractComponentPanel {
     private void testButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_testButtonActionPerformed
         switch(((MainFrame)(getRootPane().getParent())).state) {
             case EDITION :
-                jLabelErrorMessage.setText("");
+                setJLabelErrorMessageText("");
                 
                 this.testButton.setText(isStopInsteadOfTest
                 		?getFrame().getLang().getWord("ParentEditionPanel.testButton.text")
@@ -291,6 +315,15 @@ public class ParentEditionPanel extends AbstractComponentPanel {
                 System.out.println("Undefined action set for the state : " + getState());
         }    }//GEN-LAST:event_exportButtonActionPerformed
 
+    private void jLabelErrorMessageMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabelErrorMessageMouseClicked
+        if (jLabelErrorMessageText.length() > ERROR_MESSAGE_MAX_LENGTH) {
+            JOptionPane.showMessageDialog(this,
+                    jLabelErrorMessageText, 
+                    getFrame().getLang().getWord(Lang.ERROR_MESSAGE_TITLE), 
+                    JOptionPane.ERROR_MESSAGE);
+        }
+    }//GEN-LAST:event_jLabelErrorMessageMouseClicked
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private gui.editionView.EditionPanel editorPanelFormulas;
@@ -307,7 +340,7 @@ public class ParentEditionPanel extends AbstractComponentPanel {
     // End of variables declaration//GEN-END:variables
 
     public void importHandler() {
-        String path = "";
+        String path = getFrame().getDefaultDirectoryPath();
         int returnVal;
         getFrame().getClause().setFormules("");
         getFrame().getClause().setSets("");
@@ -437,16 +470,18 @@ public class ParentEditionPanel extends AbstractComponentPanel {
         try {
             if(! getFrame().getTranslator().translate(bigAndFilePath)) {
                 errorMessage = "";
-				for (TranslationError error : getFrame().getTranslator().getErrors()) {
-					if(error.hasRowAndColumn()) {
-						errorMessage += guiTranslationErrorAdapter(error) + "\n";
-					} else { 
-						errorMessage += error + "\n";
-					}
-				}
-                jLabelErrorMessage.setText(errorMessage);
+                for (TranslationError error : getFrame().getTranslator().getErrors()) {
+                        if(error.hasRowAndColumn()) {
+                                errorMessage += guiTranslationErrorAdapter(error) + "\n";
+                        } else { 
+                                errorMessage += error + "\n";
+                        }
+                }
+                setJLabelErrorMessageText(errorMessage);
+                
                 System.out.println("Traduction error : " + "\n" + errorMessage + "\n");
-                showErrorMessage(errorMessage, getFrame().getLang().getWord(Lang.ERROR_TRADUCTION));
+                /*uncomment the following line to have a popup once an error is detected*/
+                //showErrorMessage(errorMessage, getFrame().getLang().getWord(Lang.ERROR_TRADUCTION));
                 return State.EDITION;
             }
             File f = new File(bigAndFilePath);

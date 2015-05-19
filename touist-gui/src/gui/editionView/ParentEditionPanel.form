@@ -113,6 +113,9 @@
         </Property>
         <Property name="text" type="java.lang.String" value="&lt;Error message&gt;"/>
       </Properties>
+      <Events>
+        <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="jLabelErrorMessageMouseClicked"/>
+      </Events>
     </Component>
     <Component class="javax.swing.JLabel" name="jLabelCaretPosition">
       <Properties>

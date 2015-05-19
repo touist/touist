@@ -27,9 +27,11 @@ import gui.Lang;
 import gui.MainFrame;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.util.Locale;
 import java.util.Scanner;
+import javax.swing.JDialog;
 
 import javax.swing.JEditorPane;
 import javax.swing.JFrame;
@@ -65,6 +67,7 @@ public class EditionMenuBar extends JMenuBar {
     JMenuItem jMenuItemRedo;
     JMenuItem jMenuItemZoomMore;
     JMenuItem jMenuItemZoomLess;
+    JMenuItem jMenuItemSettings;
     
     
     public EditionMenuBar(MainFrame parent){
@@ -97,6 +100,8 @@ public class EditionMenuBar extends JMenuBar {
         
         jMenuItemHelpEditor = new JMenuItem();
         jMenuItemAbout = new JMenuItem();
+        
+        jMenuItemSettings = new JMenuItem();
         
         jMenuItemEnglish.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -158,6 +163,12 @@ public class EditionMenuBar extends JMenuBar {
             }
         });
         
+        jMenuItemSettings.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItemSettingsActionPerformed(evt);
+            }
+        });
+        
         
         
         jMenuFile.add(jMenuItemSaveFile);
@@ -165,6 +176,7 @@ public class EditionMenuBar extends JMenuBar {
         jMenuLanguage.add(jMenuItemFrench);
         jMenuLanguage.add(jMenuItemEnglish);
         jMenuHelp.add(jMenuItemHelpEditor);
+        jMenuHelp.add(jMenuItemSettings);
         jMenuHelp.add(jMenuItemAbout);
         jMenuEdit.add(jMenuItemUndo);
         jMenuEdit.add(jMenuItemRedo);
@@ -270,6 +282,16 @@ public class EditionMenuBar extends JMenuBar {
     private void jMenuItemZoomLessActionPerformed(java.awt.event.ActionEvent evt) {  
         parent.getEditorPanel1().zoom(-1);
     }
+
+
+    private void jMenuItemSettingsActionPerformed(ActionEvent evt) {
+        SettingsPanel settingsPanel = new SettingsPanel(parent);
+        settingsPanel.updateLanguage();
+        JOptionPane.showMessageDialog(parent, 
+                settingsPanel, 
+                parent.getLang().getWord(Lang.SETTINGS_TITLE), 
+                JOptionPane.PLAIN_MESSAGE);
+    }
     
     public void updateLanguage() {
         this.jMenuFile.setText(parent.getLang().getWord(Lang.EDITION_MENU_FILE));
@@ -285,6 +307,7 @@ public class EditionMenuBar extends JMenuBar {
         this.jMenuItemRedo.setText(parent.getLang().getWord(Lang.EDITION_MENUITEM_REDO));
         this.jMenuItemZoomMore.setText(parent.getLang().getWord(Lang.EDITION_MENUITEM_ZOOMMORE));
         this.jMenuItemZoomLess.setText(parent.getLang().getWord(Lang.EDITION_MENUITEM_ZOOMLESS));
+        this.jMenuItemSettings.setText(parent.getLang().getWord(Lang.SETTINGS_TITLE));
     }
     
 }
