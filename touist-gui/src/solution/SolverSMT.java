@@ -11,6 +11,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.StringTokenizer;
 
 /**
@@ -22,7 +23,7 @@ public class SolverSMT extends Solver {
     private BufferedReader stdout;
     private String smtpath;
     private static String CurrentPath=System.getProperty("user.dir");
-    
+    public static String pathsolver=CurrentPath+File.separatorChar+"external"+File.separatorChar+"yices-smt2";
     public SolverSMT(String smtpath) throws FileNotFoundException{
         File testfile=new File(smtpath);
         if (testfile.isFile())
@@ -30,6 +31,14 @@ public class SolverSMT extends Solver {
         else
           throw new FileNotFoundException();
     }
+<<<<<<< Updated upstream
+=======
+
+    public void setSolverPath(String path){
+        pathsolver=path;
+    }
+
+>>>>>>> Stashed changes
     
     /**
      * For Java RE 6 compatibility (p.isAlive() is JavaRE7)
@@ -43,10 +52,14 @@ public class SolverSMT extends Solver {
 	    }
 	}
     
+<<<<<<< Updated upstream
+=======
+
+>>>>>>> Stashed changes
      public Model getresult() throws IOException, SolverExecutionException{
       // String command="bin"+File.separatorChar+"yices-smt2"+" "+this.smtpath;
         Model smt=null;
-         String command=CurrentPath+File.separatorChar+"external"+File.separatorChar+"yices-smt2"+" "+this.smtpath;
+         String command=pathsolver+" "+this.smtpath;
         System.out.println("launch(): cmd executed: "+command);
         StringBuffer br=new StringBuffer();
         this.p = Runtime.getRuntime().exec(command);
@@ -55,6 +68,7 @@ public class SolverSMT extends Solver {
         while((line=stdout.readLine())!=null && isAlive(p)){
             br.append(line);
         }
+        System.out.println("xd:"+br.toString());
         StringTokenizer tokenizer = new StringTokenizer(br.toString(),"()");
         if(tokenizer.hasMoreTokens()){
             if(tokenizer.nextToken().equals("unsat"))
@@ -62,31 +76,37 @@ public class SolverSMT extends Solver {
             else
             {
                 smt=new Model();
+                ArrayList<String> result=new ArrayList<String>();
                 while(tokenizer.hasMoreTokens()){
-                String Token=tokenizer.nextToken();
-                String[] LiterralValuation=Token.split("\n");
-                for(String getLV : LiterralValuation){
-                String[] separateLV= getLV.split(" ");
-                //if(separateLV.length==2){
-                    //if(separateLV[1].i)
-                //    smt.addLiteral(new Literal(separateLV[0],separateLV[1].matches("true")));
-                //}
-                if(!getLV.equals(" "))
-                {System.out.println(getLV);
-                try{
-                    float real=Float.parseFloat(separateLV[1]);
-                    smt.addLiteral(new Literal(separateLV[0],separateLV[1]));
-                }catch (NumberFormatException e){
-                    boolean valuated =separateLV[1].matches("true");
-                    smt.addLiteral(new Literal(separateLV[0],valuated));
-                }
-                }
-                
+                    String Token=tokenizer.nextToken();
+                        if(!Token.equals(" "))
+                        {
+                            if(Token.startsWith("/")){
+                                String operand1=tokenizer.nextToken();
+                                String operand2=tokenizer.nextToken();
+                                result.add(operand1+"/"+operand2);
+                            }
+                            else{
+                                result.add(Token);
+                            }
+                         }
+                         
+              }
+                for(int i=0;i<result.size()-1;i++)
+                {
+                    if(result.get(i).contains("true") || result.get(i).contains("false"))
+                    { String[] separateLV=result.get(i).split(" ");
+                        smt.addLiteral(new Literal(separateLV[0],separateLV[1].matches("true")));
                     }
-                }
+                    else{
+                        //System.out.println(result.get(i)+"eo"+result.get(i+1));
+                        smt.addLiteral(new Literal(result.get(i),result.get(i+1)));
+                        i++;
+                    }
+                 }
             }
-        }
-        
+      }
+
         this.close();
         return smt;
     }
@@ -120,10 +140,19 @@ public class SolverSMT extends Solver {
     
     public static void main(String[] args) throws IOException, SolverExecutionException {
         // TODO code application logic here
-      SolverSMT smt=new SolverSMT(CurrentPath+File.separatorChar+"test.smt2");
+     //appel dans ton parametre
+      // smt.setSolverPath("/Users/blida/Documents/M1-UPS/Yices/exec/bin/yices-smt2");
+        //instance dans main
+        SolverSMT smt=new SolverSMT(CurrentPath+File.separatorChar+"test.smt2");
+        //appel lors de la réussit du traducteur
         Model model=smt.getresult();
         if(model!=null)
-        System.out.println(model.toString());
+        { System.out.println(model.toString());
+         }
+        else{
+            //pas de model
+            System.out.println("pas de modele");
+        }
     }
     
 }

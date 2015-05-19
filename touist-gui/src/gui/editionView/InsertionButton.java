@@ -63,11 +63,11 @@ public class InsertionButton extends JButton {
                 switch(((MainFrame)(getRootPane().getParent())).state) {
                     case EDITION :
                         ((MainFrame)(getRootPane().getParent())).state = State.EDITION;
-                        insertAtCaret(codeToInsert);
+                        insertAtCaret(codeToInsert + "\n");
                         break;
                     case EDITION_ERROR :
                         ((MainFrame)(getRootPane().getParent())).state = State.EDITION_ERROR;
-                        insertAtCaret(codeToInsert);
+                        insertAtCaret(codeToInsert + "\n");
                         break;
                     case NO_RESULT :
                         // impossible

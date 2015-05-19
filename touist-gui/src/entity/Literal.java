@@ -30,7 +30,7 @@ package entity;
 public class Literal {
     private String literal;
     private boolean literal_positivity;
-    private String arithmetic_value;
+    private String arithmetic_value=null;
     
     /**
      * Added for filtering '&45' literals (issue #88)

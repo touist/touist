@@ -128,8 +128,10 @@ public class BaseDeClauses {
         while((line = in.readLine()) != null) {
 
             indexLine ++;
-
+            System.out.println(line);
             String []words = line.replace("\\s+"," ").split(" ");
+            for(String x:words)
+                System.out.println("\t"+x);
             if(words.length == 2) {
                 words[0] = words[0].toLowerCase();
                 words[1] = words[1].toLowerCase();
@@ -170,7 +172,9 @@ public class BaseDeClauses {
                         setSection = false;
                     }
                 }
-
+//Alexis: attention
+//probleme de 2 words genre not b  à la fin ne marche pas
+//                addFormule(line);
             }
             else if(formulaSection) {
                 addFormule(line);
