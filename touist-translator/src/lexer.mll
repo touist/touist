@@ -13,10 +13,10 @@
 let digit      = ['0' - '9']
 let alpha      = ['a' - 'z' 'A' - 'Z']
 let empty      = ['\t' ' ']
-let special    = ['_']
+let special    = ['_' '-']
 let newline    = '\r' | '\n' | "\r\n"
 let identifier = (special | digit)* alpha (alpha | special | digit)*
-let variable   = (special | digit)* alpha (alpha | special | digit (*| ['('')']*))*
+let variable   = (special | digit)* alpha (alpha | special | digit)*
 let integer    = digit+
 let double     = digit+ '.' digit+
 
