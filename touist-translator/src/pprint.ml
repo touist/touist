@@ -44,6 +44,18 @@ let rec string_of_exp = function
       ^ "\nelse\n" ^ (string_of_exp z)
       ^ "\nend\n"
 and string_of_clause = function
+  | CInt x -> string_of_int x
+  | CFloat x -> string_of_float x
+  | CAdd (x,y) -> "(" ^ (string_of_clause x) ^ " + " ^ (string_of_clause y) ^ ")"
+  | CSub (x,y) -> "(" ^ (string_of_clause x) ^ " - " ^ (string_of_clause y) ^ ")"
+  | CMul (x,y) -> "(" ^ (string_of_clause x) ^ " * " ^ (string_of_clause y) ^ ")"
+  | CDiv (x,y) -> "(" ^ (string_of_clause x) ^ " / " ^ (string_of_clause y) ^ ")"
+  | CEqual            (x,y) -> "(" ^ (string_of_clause x) ^ " == " ^ (string_of_clause y) ^ ")"
+  | CNot_equal        (x,y) -> "(" ^ (string_of_clause x) ^ " != " ^ (string_of_clause y) ^ ")"
+  | CLesser_than      (x,y) -> "(" ^ (string_of_clause x) ^ " < "  ^ (string_of_clause y) ^ ")"
+  | CLesser_or_equal  (x,y) -> "(" ^ (string_of_clause x) ^ " <= " ^ (string_of_clause y) ^ ")"
+  | CGreater_than     (x,y) -> "(" ^ (string_of_clause x) ^ " > "  ^ (string_of_clause y) ^ ")"
+  | CGreater_or_equal (x,y) -> "(" ^ (string_of_clause x) ^ " >= " ^ (string_of_clause y) ^ ")"
   | Top    -> "top"
   | Bottom -> "bot"
   | CVar (x,None)   -> x
