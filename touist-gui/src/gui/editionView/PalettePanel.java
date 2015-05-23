@@ -42,7 +42,8 @@ public class PalettePanel extends AbstractComponentPanel {
     public void updateLanguage() {
         jLabel1.setText(getFrame().getLang().getWord(Lang.PALETTE_TEXT));
         if(sectionConnect!=null) sectionConnect.setText(getFrame().getLang().getWord("PaletteSectionPanel.FormulasSection1"));
-        if(sectionOthers!=null) sectionOthers.setText(getFrame().getLang().getWord("PaletteSectionPanel.FormulasSection2"));
+        if(sectionCard!=null) sectionCard.setText(getFrame().getLang().getWord("PaletteSectionPanel.FormulasSection2"));
+        if(sectionOthers!=null) sectionOthers.setText(getFrame().getLang().getWord("PaletteSectionPanel.FormulasSection3"));
         if(sectionSets!=null) sectionSets.setText(getFrame().getLang().getWord("PaletteSectionPanel.SetsSection1"));
     }
 
@@ -101,7 +102,7 @@ public class PalettePanel extends AbstractComponentPanel {
             sectionConnect.addInsertButton(new InsertionButton(editorTextArea, "bigor $i in $a: \n\tp($i) \nend", snippetsBigor,"bigor"));
             
             sectionCard.addInsertButton(new InsertionButton(editorTextArea, "atmost($n,$i,$s,$p)", snippetsAtMost, "at most"));
-            sectionCard.addInsertButton(new InsertionButton(editorTextArea, "atleast($n,$i,$s,$p)", snippetsAtLeast, "at leastt"));
+            sectionCard.addInsertButton(new InsertionButton(editorTextArea, "atleast($n,$i,$s,$p)", snippetsAtLeast, "at least"));
             sectionCard.addInsertButton(new InsertionButton(editorTextArea, "exact($n,$i,$s,$p)", snippetsExact, "exact"));
             
             sectionOthers.addInsertButton(new InsertionButton(editorTextArea, "if $a \nthen \n\t$b \nelse \n\t$c\n", snippetsIf, "if then else","if\\,\\$a \\\\ then\\\\\\quad\\$b \\\\ else\\\\\\quad\\$c"));
