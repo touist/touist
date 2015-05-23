@@ -83,13 +83,13 @@ public class PalettePanel extends AbstractComponentPanel {
             ArrayList<Integer> snippetsNot = new ArrayList<Integer>(){{add(4);add(5);}};
             ArrayList<Integer> snippetsIf = new ArrayList<Integer>(){{add(3);add(4);add(14);add(15);add(25);add(26);}};
             ArrayList<Integer> snippetsBigand = new ArrayList<Integer>(){{add(7);add(8);add(13);add(14);}};
-            ArrayList<Integer> snippetsXor = new ArrayList<Integer>(){{/*TODO*/}};
-            ArrayList<Integer> snippetsImply = new ArrayList<Integer>(){{/*TODO*/}};
-            ArrayList<Integer> snippetsEquivalent = new ArrayList<Integer>(){{/*TODO*/}};
-            ArrayList<Integer> snippetsBigor = new ArrayList<Integer>(){{/*TODO*/}};
-            ArrayList<Integer> snippetsAtMost = new ArrayList<Integer>(){{/*TODO*/}};
-            ArrayList<Integer> snippetsAtLeast = new ArrayList<Integer>(){{/*TODO*/}};
-            ArrayList<Integer> snippetsExact = new ArrayList<Integer>(){{/*TODO*/}};
+            ArrayList<Integer> snippetsXor = new ArrayList<Integer>(){{add(0);add(1);add(7);add(8);}};
+            ArrayList<Integer> snippetsImply = new ArrayList<Integer>(){{add(0);add(1);add(6);add(7);}};
+            ArrayList<Integer> snippetsEquivalent = new ArrayList<Integer>(){{add(0);add(1);add(7);add(8);}};
+            ArrayList<Integer> snippetsBigor = new ArrayList<Integer>(){{add(6);add(7);add(12);add(13);}};
+            ArrayList<Integer> snippetsAtMost = new ArrayList<Integer>(){{add(7);add(8);add(10);add(11);add(13);add(14);add(16);add(17);}};
+            ArrayList<Integer> snippetsAtLeast = new ArrayList<Integer>(){{add(8);add(9);add(11);add(12);add(14);add(15);add(17);add(18);}};
+            ArrayList<Integer> snippetsExact = new ArrayList<Integer>(){{add(6);add(7);add(9);add(10);add(12);add(13);add(15);add(16);}};
             
             sectionConnect.addInsertButton(new InsertionButton(editorTextArea, "$a and $b", snippetsAnd, "and"));
             sectionConnect.addInsertButton(new InsertionButton(editorTextArea, "$a or $b", snippetsOr, "or"));
@@ -100,9 +100,9 @@ public class PalettePanel extends AbstractComponentPanel {
             sectionConnect.addInsertButton(new InsertionButton(editorTextArea, "bigand $i in $a: \n\tp($i) \nend", snippetsBigand,"bigand"));
             sectionConnect.addInsertButton(new InsertionButton(editorTextArea, "bigor $i in $a: \n\tp($i) \nend", snippetsBigor,"bigor"));
             
-            sectionCard.addInsertButton(new InsertionButton(editorTextArea, /*TODO*/"", snippetsAtMost, "at most"));
-            sectionCard.addInsertButton(new InsertionButton(editorTextArea, /*TODO*/"", snippetsAtLeast, "at leastt"));
-            sectionCard.addInsertButton(new InsertionButton(editorTextArea, /*TODO*/"", snippetsExact, "exact"));
+            sectionCard.addInsertButton(new InsertionButton(editorTextArea, "atmost($n,$i,$s,$p)", snippetsAtMost, "at most"));
+            sectionCard.addInsertButton(new InsertionButton(editorTextArea, "atleast($n,$i,$s,$p)", snippetsAtLeast, "at leastt"));
+            sectionCard.addInsertButton(new InsertionButton(editorTextArea, "exact($n,$i,$s,$p)", snippetsExact, "exact"));
             
             sectionOthers.addInsertButton(new InsertionButton(editorTextArea, "if $a \nthen \n\t$b \nelse \n\t$c\n", snippetsIf, "if then else","if\\,\\$a \\\\ then\\\\\\quad\\$b \\\\ else\\\\\\quad\\$c"));
             
