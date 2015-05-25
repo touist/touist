@@ -179,6 +179,7 @@ public class EditionPanel extends AbstractComponentPanel {
         editorContainer = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         jPanel1 = new javax.swing.JPanel();
+        jScrollPane2 = new javax.swing.JScrollPane();
         palettePanel2 = new gui.editionView.PalettePanel(editorTextArea);
 
         jSplitPane1.setDividerLocation(400);
@@ -204,7 +205,10 @@ public class EditionPanel extends AbstractComponentPanel {
         jSplitPane1.setRightComponent(jScrollPane1);
 
         jSplitPane2.setRightComponent(jSplitPane1);
-        jSplitPane2.setLeftComponent(palettePanel2);
+
+        jScrollPane2.setViewportView(palettePanel2);
+
+        jSplitPane2.setLeftComponent(jScrollPane2);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -222,6 +226,7 @@ public class EditionPanel extends AbstractComponentPanel {
     private javax.swing.JPanel editorContainer;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JSplitPane jSplitPane1;
     private javax.swing.JSplitPane jSplitPane2;
     private gui.editionView.PalettePanel palettePanel2;

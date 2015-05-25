@@ -124,18 +124,14 @@ public class InsertionButton extends JButton {
      * @param text 
      */
     private void insertAtCaret(String text) {
-        if (editorTextArea.hasFocus()) {
-            
-            Integer caretPosition = editorTextArea.getCaretPosition();
-            
-            // insert is better than setText: setText entirely remove previous text then make an insert operation
-            editorTextArea.insert(text, caretPosition);
+        Integer caretPosition = editorTextArea.getCaretPosition();
 
-            for(int snippetBegin = 0; snippetBegin < snipets.size(); snippetBegin+=2) {
-                int snippetEnd = snippetBegin + 1;
-                editorTextArea.addSnipet(caretPosition+snipets.get(snippetBegin),caretPosition+snipets.get(snippetEnd));
-            }
+        // insert is better than setText: setText entirely remove previous text then make an insert operation
+        editorTextArea.insert(text, caretPosition);
+
+        for(int snippetBegin = 0; snippetBegin < snipets.size(); snippetBegin+=2) {
+            int snippetEnd = snippetBegin + 1;
+            editorTextArea.addSnipet(caretPosition+snipets.get(snippetBegin),caretPosition+snipets.get(snippetEnd));
         }
-        //TODO update latex schematic area
     }
 }

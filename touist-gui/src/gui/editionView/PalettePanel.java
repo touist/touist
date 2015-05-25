@@ -41,9 +41,10 @@ public class PalettePanel extends AbstractComponentPanel {
     @Override
     public void updateLanguage() {
         jLabel1.setText(getFrame().getLang().getWord(Lang.PALETTE_TEXT));
-        if(section1!=null) section1.setText(getFrame().getLang().getWord("PaletteSectionPanel.FormulasSection1"));
-        if(section2!=null) section2.setText(getFrame().getLang().getWord("PaletteSectionPanel.FormulasSection2"));
-        if(section3!=null) section3.setText(getFrame().getLang().getWord("PaletteSectionPanel.SetsSection1"));
+        if(sectionConnect!=null) sectionConnect.setText(getFrame().getLang().getWord("PaletteSectionPanel.FormulasSection1"));
+        if(sectionCard!=null) sectionCard.setText(getFrame().getLang().getWord("PaletteSectionPanel.FormulasSection2"));
+        if(sectionOthers!=null) sectionOthers.setText(getFrame().getLang().getWord("PaletteSectionPanel.FormulasSection3"));
+        if(sectionSets!=null) sectionSets.setText(getFrame().getLang().getWord("PaletteSectionPanel.SetsSection1"));
     }
 
     public static enum PaletteType {FORMULA, SET};
@@ -67,54 +68,76 @@ public class PalettePanel extends AbstractComponentPanel {
         this.editorTextArea = editorTextArea;
     }
     
-    private PaletteSectionPanel section1;
-    private PaletteSectionPanel section2;
-    private PaletteSectionPanel section3;
+    private PaletteSectionPanel sectionConnect;
+    private PaletteSectionPanel sectionOthers;
+    private PaletteSectionPanel sectionCard;
+    private PaletteSectionPanel sectionSets;
     
     public void initPaletteContent(PaletteType type) {
         if (type == PaletteType.FORMULA) {
-            section1 = new PaletteSectionPanel("");
-            section2 = new PaletteSectionPanel("");
+            sectionConnect = new PaletteSectionPanel("Connectors");
+            sectionCard = new PaletteSectionPanel("Cardinality");
+            sectionOthers = new PaletteSectionPanel("Others");
 
             ArrayList<Integer> snippetsAnd = new ArrayList<Integer>(){{add(0);add(1);add(7);add(8);}};
             ArrayList<Integer> snippetsOr = new ArrayList<Integer>(){{add(0);add(1);add(6);add(7);}};
             ArrayList<Integer> snippetsNot = new ArrayList<Integer>(){{add(4);add(5);}};
             ArrayList<Integer> snippetsIf = new ArrayList<Integer>(){{add(3);add(4);add(14);add(15);add(25);add(26);}};
             ArrayList<Integer> snippetsBigand = new ArrayList<Integer>(){{add(7);add(8);add(13);add(14);}};
+            ArrayList<Integer> snippetsXor = new ArrayList<Integer>(){{add(0);add(1);add(7);add(8);}};
+            ArrayList<Integer> snippetsImply = new ArrayList<Integer>(){{add(0);add(1);add(6);add(7);}};
+            ArrayList<Integer> snippetsEquivalent = new ArrayList<Integer>(){{add(0);add(1);add(7);add(8);}};
+            ArrayList<Integer> snippetsBigor = new ArrayList<Integer>(){{add(6);add(7);add(12);add(13);}};
+            ArrayList<Integer> snippetsAtMost = new ArrayList<Integer>(){{add(7);add(8);add(10);add(11);add(13);add(14);add(16);add(17);}};
+            ArrayList<Integer> snippetsAtLeast = new ArrayList<Integer>(){{add(8);add(9);add(11);add(12);add(14);add(15);add(17);add(18);}};
+            ArrayList<Integer> snippetsExact = new ArrayList<Integer>(){{add(6);add(7);add(9);add(10);add(12);add(13);add(15);add(16);}};
             
-            section1.addInsertButton(new InsertionButton(editorTextArea, "$a and $b", snippetsAnd, "and"));
-            section1.addInsertButton(new InsertionButton(editorTextArea, "$a or $b", snippetsOr, "or"));
-            section1.addInsertButton(new InsertionButton(editorTextArea, "not $a", snippetsNot, "not"));
-            section2.addInsertButton(new InsertionButton(editorTextArea, "if $a \nthen \n\t$b \nelse \n\t$c\n", snippetsIf, "if then else","if\\,\\$a \\\\ then\\\\\\quad\\$b \\\\ else\\\\\\quad\\$c"));
-            section1.addInsertButton(new InsertionButton(editorTextArea, "bigand $i in $a: \n\tA($i) \nend", snippetsBigand,"bigand"));
+            sectionConnect.addInsertButton(new InsertionButton(editorTextArea, "$a and $b", snippetsAnd, "and"));
+            sectionConnect.addInsertButton(new InsertionButton(editorTextArea, "$a or $b", snippetsOr, "or"));
+            sectionConnect.addInsertButton(new InsertionButton(editorTextArea, "not $a", snippetsNot, "not"));
+            sectionConnect.addInsertButton(new InsertionButton(editorTextArea, "$a xor $b", snippetsXor, "xor"));
+            sectionConnect.addInsertButton(new InsertionButton(editorTextArea, "$a => $b", snippetsImply, "imply"));
+            sectionConnect.addInsertButton(new InsertionButton(editorTextArea, "$a <=> $b", snippetsEquivalent, "is equivalent to"));
+            sectionConnect.addInsertButton(new InsertionButton(editorTextArea, "bigand $i in $a: \n\tp($i) \nend", snippetsBigand,"bigand"));
+            sectionConnect.addInsertButton(new InsertionButton(editorTextArea, "bigor $i in $a: \n\tp($i) \nend", snippetsBigor,"bigor"));
+            
+            sectionCard.addInsertButton(new InsertionButton(editorTextArea, "atmost($n,$i,$s,$p)", snippetsAtMost, "at most"));
+            sectionCard.addInsertButton(new InsertionButton(editorTextArea, "atleast($n,$i,$s,$p)", snippetsAtLeast, "at least"));
+            sectionCard.addInsertButton(new InsertionButton(editorTextArea, "exact($n,$i,$s,$p)", snippetsExact, "exact"));
+            
+            sectionOthers.addInsertButton(new InsertionButton(editorTextArea, "if $a \nthen \n\t$b \nelse \n\t$c\n", snippetsIf, "if then else","if\\,\\$a \\\\ then\\\\\\quad\\$b \\\\ else\\\\\\quad\\$c"));
+            
 
             sectionsContainerPanel.setLayout(new BoxLayout(sectionsContainerPanel, BoxLayout.Y_AXIS));
-            sectionsContainerPanel.add(section1);
-            sectionsContainerPanel.add(section2);
+            sectionsContainerPanel.add(sectionConnect);
+            sectionsContainerPanel.add(sectionCard);
+            sectionsContainerPanel.add(sectionOthers);
             
-            section1.unfold();
-            section2.unfold();
+            sectionConnect.unfold();
         } else if (type == PaletteType.SET) {
-            section3 = new PaletteSectionPanel("KzdaljahdjlAJHJAZDHAZH zadh azmohozudhazoudhazoduhaou");
+            sectionSets = new PaletteSectionPanel("Sets");
 
             ArrayList<Integer> snippetsSet = new ArrayList<Integer>(){{add(0);add(1);}};
             
-            section3.addInsertButton(new InsertionButton(editorTextArea, "$a = [a,b,c]", snippetsSet, ""));
-            section3.addInsertButton(new InsertionButton(editorTextArea, "$b = [a,d,e,f]", snippetsSet, ""));
+            sectionSets.addInsertButton(new InsertionButton(editorTextArea, "$a = true", snippetsSet, ""));
+            sectionSets.addInsertButton(new InsertionButton(editorTextArea, "$a = false", snippetsSet, ""));
+            sectionSets.addInsertButton(new InsertionButton(editorTextArea, "$v = 0", snippetsSet, ""));
+            sectionSets.addInsertButton(new InsertionButton(editorTextArea, "$v = 0.0", snippetsSet, ""));
+            sectionSets.addInsertButton(new InsertionButton(editorTextArea, "$a = [a,b,c]", snippetsSet, ""));
 
             sectionsContainerPanel.setLayout(new BoxLayout(sectionsContainerPanel, BoxLayout.Y_AXIS));
-            sectionsContainerPanel.add(section3);
+            sectionsContainerPanel.add(sectionSets);
             
-            section3.unfold();
+            sectionSets.unfold();
         }
     }
     
     public int getRecommendWidth() {
-        int width = 0;
+        int width = 160;
         for (Component section : sectionsContainerPanel.getComponents()) {
             if (section instanceof PaletteSectionPanel) {
                 for (InsertionButton button : ((PaletteSectionPanel)section).getButtons()) {
-                    width = Math.max(width, button.getIcon().getIconWidth() + 40);
+                    width = (int) Math.max(width, button.getIcon().getIconWidth() * 2.5);
                 }
             }
         }
