@@ -43,6 +43,7 @@ import solution.ModelList;
 import solution.Solver;
 import touist.TouistProperties;
 import translation.TranslatorSAT;
+import translation.TranslatorSMT;
 
 /**
  *
@@ -51,7 +52,8 @@ import translation.TranslatorSAT;
 public class MainFrame extends javax.swing.JFrame {
     private TouistProperties properties = new TouistProperties();
     private BaseDeClauses clause = new BaseDeClauses();
-    private TranslatorSAT translator = new TranslatorSAT("external"+File.separatorChar+"touistc");
+    private TranslatorSAT translatorSAT = new TranslatorSAT("external"+File.separatorChar+"touistc");
+    private TranslatorSMT translatorSMT = new TranslatorSMT("external"+File.separatorChar+"touistc");
     private Solver solver;
     private ModelList models;
     private SolverSelection solverSelection = new SolverSelection();
@@ -142,8 +144,12 @@ public class MainFrame extends javax.swing.JFrame {
         this.models = models;
     }
 
-    public TranslatorSAT getTranslator() {
-        return translator;
+    public TranslatorSAT getTranslatorSAT() {
+        return translatorSAT;
+    }
+    
+    public TranslatorSMT getTranslatorSMT() {
+        return translatorSMT;
     }
     
     public ResultsPanel getResultsPanel1() {
