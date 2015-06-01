@@ -54,6 +54,7 @@ public class MainFrame extends javax.swing.JFrame {
     private TranslatorSAT translator = new TranslatorSAT("external"+File.separatorChar+"touistc");
     private Solver solver;
     private ModelList models;
+    private SolverSelection solverSelection = new SolverSelection();
 
     public State state;
     private String defaultDirectoryPath = ".";
@@ -104,6 +105,8 @@ public class MainFrame extends javax.swing.JFrame {
 
         initComponents();
         
+        editorPanel1.updateComboBoxSelectedSolver();
+        
         try {
             setIconImage(ImageIO.read(this.getClass().getResourceAsStream("/images/logo64.png")));
         } catch (IOException ex) {
@@ -152,6 +155,10 @@ public class MainFrame extends javax.swing.JFrame {
     
     public ParentEditionPanel getEditorPanel1() {
         return editorPanel1;
+    }
+
+    public SolverSelection getSolverSelection() {
+        return solverSelection;
     }
     
     public void updateResultsPanelIterator(ListIterator<Model> iter) {

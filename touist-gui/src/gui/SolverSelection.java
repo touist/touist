@@ -28,6 +28,10 @@ public class SolverSelection {
         return selectedSolver;
     }
     
+    public void setSelectedSolver(SolverType solverType) {
+        this.selectedSolver = solverType;
+    }    
+    
     public SolverType[] getSupportedSolvers() {
         return SolverType.values();
     }

@@ -27,6 +27,8 @@ import entity.Model;
 import gui.AbstractComponentPanel;
 import gui.Lang;
 import gui.MainFrame;
+import gui.SolverSelection;
+import gui.SolverSelection.SolverType;
 import gui.State;
 
 import java.awt.AWTException;
@@ -70,6 +72,15 @@ public class ParentEditionPanel extends AbstractComponentPanel {
         jFileChooser1.setCurrentDirectory(new File(".."));
         jLabelErrorMessageText = "";
         jLabelErrorMessage.setText(jLabelErrorMessageText);
+        
+        jComboBox1.removeAllItems();
+        for (SolverType solverType : SolverSelection.SolverType.values()) {
+            jComboBox1.addItem(solverType);
+        }
+    }
+    
+    public void updateComboBoxSelectedSolver() {
+        jComboBox1.setSelectedItem(getFrame().getSolverSelection().getSelectedSolver());
     }
     
     /**
@@ -138,6 +149,11 @@ public class ParentEditionPanel extends AbstractComponentPanel {
         jLabelCaretPosition.setText("1:1");
 
         jComboBox1.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "SAT", "SMT" }));
+        jComboBox1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jComboBox1ActionPerformed(evt);
+            }
+        });
 
         exportButton.setText("Export");
         exportButton.addActionListener(new java.awt.event.ActionListener() {
@@ -323,6 +339,15 @@ public class ParentEditionPanel extends AbstractComponentPanel {
                     JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_jLabelErrorMessageMouseClicked
+
+    private void jComboBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox1ActionPerformed
+        try {
+            if (jComboBox1.getSelectedItem() instanceof SolverType) {
+                getFrame().getSolverSelection().setSelectedSolver((SolverType)(jComboBox1.getSelectedItem()));
+            }
+        } catch (NullPointerException ex) {
+        }
+    }//GEN-LAST:event_jComboBox1ActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

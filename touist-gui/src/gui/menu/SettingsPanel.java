@@ -8,6 +8,7 @@ package gui.menu;
 import gui.AbstractComponentPanel;
 import gui.Lang;
 import gui.MainFrame;
+import gui.SolverSelection;
 import java.io.File;
 import java.util.Locale;
 import javax.swing.JDialog;
@@ -31,6 +32,29 @@ public class SettingsPanel extends AbstractComponentPanel {
         buttonGroup2.add(jRadioButtonSMTLQFLIA);
         buttonGroup2.add(jRadioButtonSMTLQFRDL);
         buttonGroup2.add(jRadioButtonSMTLQFIDL);
+        
+        switch(parent.getSolverSelection().getSelectedSolver()) {
+            case SAT4J : 
+                jRadioButtonSAT4J.setSelected(true);
+                break;
+            case SMT_QF_LRA : 
+                jRadioButtonYCES.setSelected(true);
+                jRadioButtonSMTLQFLRA.setSelected(true);
+                break;
+            case SMT_QF_LIA : 
+                jRadioButtonYCES.setSelected(true);
+                jRadioButtonSMTLQFLIA.setSelected(true);
+                break;
+            case SMT_QF_RDL : 
+                jRadioButtonYCES.setSelected(true);
+                jRadioButtonSMTLQFRDL.setSelected(true);
+                break;
+            case SMT_QF_IDL : 
+                jRadioButtonYCES.setSelected(true);
+                jRadioButtonSMTLQFIDL.setSelected(true);
+                break;
+            default :
+        }
         updateRadioButtons();
         
         jComboBoxLanguages.removeAllItems();
@@ -39,8 +63,6 @@ public class SettingsPanel extends AbstractComponentPanel {
         }
     }
     
-    public enum SolverType {SAT4J, SMT_QF_LRA, SMT_QF_LIA, SMT_QF_RDL, SMT_QF_IDL}
-    private SolverType solverType = SolverType.SAT4J;
     private MainFrame parent = null;
     
     /**
@@ -301,7 +323,7 @@ public class SettingsPanel extends AbstractComponentPanel {
     }//GEN-LAST:event_jComboBoxLanguagesActionPerformed
 
     private void jRadioButtonSAT4JActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButtonSAT4JActionPerformed
-        solverType = SolverType.SAT4J;
+        parent.getSolverSelection().setSelectedSolver(SolverSelection.SolverType.SAT4J);
         jRadioButtonSMTLQFLRA.setSelected(false);
         jRadioButtonSMTLQFLIA.setSelected(false);
         jRadioButtonSMTLQFRDL.setSelected(false);
@@ -310,28 +332,28 @@ public class SettingsPanel extends AbstractComponentPanel {
     }//GEN-LAST:event_jRadioButtonSAT4JActionPerformed
 
     private void jRadioButtonYCESActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButtonYCESActionPerformed
-        solverType = SolverType.SMT_QF_LRA;
+        parent.getSolverSelection().setSelectedSolver(SolverSelection.SolverType.SMT_QF_LRA);
         jRadioButtonSMTLQFLRA.setSelected(true);
         updateRadioButtons();
     }//GEN-LAST:event_jRadioButtonYCESActionPerformed
 
     private void jRadioButtonSMTLQFLIAActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButtonSMTLQFLIAActionPerformed
-        solverType = SolverType.SMT_QF_LIA;
+        parent.getSolverSelection().setSelectedSolver(SolverSelection.SolverType.SMT_QF_LIA);
         updateRadioButtons();
     }//GEN-LAST:event_jRadioButtonSMTLQFLIAActionPerformed
 
     private void jRadioButtonSMTLQFLRAActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButtonSMTLQFLRAActionPerformed
-        solverType = SolverType.SMT_QF_LRA;
+        parent.getSolverSelection().setSelectedSolver(SolverSelection.SolverType.SMT_QF_LRA);
         updateRadioButtons();
     }//GEN-LAST:event_jRadioButtonSMTLQFLRAActionPerformed
 
     private void jRadioButtonSMTLQFRDLActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButtonSMTLQFRDLActionPerformed
-        solverType = SolverType.SMT_QF_RDL;
+        parent.getSolverSelection().setSelectedSolver(SolverSelection.SolverType.SMT_QF_RDL);
         updateRadioButtons();
     }//GEN-LAST:event_jRadioButtonSMTLQFRDLActionPerformed
 
     private void jRadioButtonSMTLQFIDLActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButtonSMTLQFIDLActionPerformed
-        solverType = SolverType.SMT_QF_IDL;
+        parent.getSolverSelection().setSelectedSolver(SolverSelection.SolverType.SMT_QF_IDL);
         updateRadioButtons();
     }//GEN-LAST:event_jRadioButtonSMTLQFIDLActionPerformed
 
