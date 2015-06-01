@@ -20,6 +20,13 @@ import javax.swing.JFileChooser;
  */
 public class SettingsPanel extends AbstractComponentPanel {
 
+    /*
+    Adding items in jComboBoxLanguages launches an ActionEvent,
+    to prevent that, we will set jComboBoxLanguagesEnable to true
+    once all items are added.
+     */
+    private boolean jComboBoxLanguagesEnabled = false;
+    
     public SettingsPanel(MainFrame parent) {
         initComponents();
         
@@ -61,6 +68,8 @@ public class SettingsPanel extends AbstractComponentPanel {
         for (Locale locale : parent.getLang().getSupportedLanguages()) {
             jComboBoxLanguages.addItem(locale);
         }
+        jComboBoxLanguagesEnabled = true; 
+        jComboBoxLanguages.setSelectedItem(parent.getLang().getLanguage());
     }
     
     private MainFrame parent = null;
@@ -82,7 +91,6 @@ public class SettingsPanel extends AbstractComponentPanel {
         jComboBoxLanguages.removeAllItems();
         for (Locale locale : parent.getLang().getSupportedLanguages()) {
             jComboBoxLanguages.addItem(locale);
-            System.out.println(locale.getDisplayLanguage());
         }
     }
     
@@ -313,8 +321,7 @@ public class SettingsPanel extends AbstractComponentPanel {
     }//GEN-LAST:event_jButtonChangeDirectoryActionPerformed
 
     private void jComboBoxLanguagesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBoxLanguagesActionPerformed
-        System.out.println(jComboBoxLanguages.getSelectedIndex());
-        if (jComboBoxLanguages.getSelectedIndex() >= 0) {
+        if (jComboBoxLanguagesEnabled && jComboBoxLanguages.getSelectedIndex() >= 0) {
             Locale selectedLanguage = (Locale)jComboBoxLanguages.getSelectedItem();
             parent.setLanguage(selectedLanguage);
             parent.updateLanguage();

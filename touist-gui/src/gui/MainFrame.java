@@ -87,9 +87,6 @@ public class MainFrame extends javax.swing.JFrame {
      */
     public MainFrame() {
         lang = new Lang(Locale.ENGLISH);
-        setLanguage(
-        		(lang.getSupportedLanguages().contains(Locale.getDefault()))
-        		?Locale.getDefault():Locale.ENGLISH);
         
     	cards = new JPanel(new CardLayout());
     	editorPanel1 = new ParentEditionPanel();
@@ -111,7 +108,7 @@ public class MainFrame extends javax.swing.JFrame {
             setIconImage(ImageIO.read(this.getClass().getResourceAsStream("/images/logo64.png")));
         } catch (IOException ex) {
             ex.printStackTrace();
-        }
+        }  
         
         this.setJMenuBar(editionMenuBar);
         updateLanguage();
