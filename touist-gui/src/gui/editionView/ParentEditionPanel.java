@@ -27,6 +27,8 @@ import entity.Model;
 import gui.AbstractComponentPanel;
 import gui.Lang;
 import gui.MainFrame;
+import gui.SolverSelection;
+import gui.SolverSelection.SolverType;
 import gui.State;
 
 import java.awt.AWTException;
@@ -41,8 +43,10 @@ import java.util.Map;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import solution.ModelList;
 
 import solution.SolverExecutionException;
+import solution.SolverSMT;
 import solution.SolverTestSAT4J;
 import translation.TranslationError;
 import translation.TranslatorSAT;
@@ -70,6 +74,15 @@ public class ParentEditionPanel extends AbstractComponentPanel {
         jFileChooser1.setCurrentDirectory(new File(".."));
         jLabelErrorMessageText = "";
         jLabelErrorMessage.setText(jLabelErrorMessageText);
+        
+        jComboBox1.removeAllItems();
+        for (SolverType solverType : SolverSelection.SolverType.values()) {
+            jComboBox1.addItem(solverType);
+        }
+    }
+    
+    public void updateComboBoxSelectedSolver() {
+        jComboBox1.setSelectedItem(getFrame().getSolverSelection().getSelectedSolver());
     }
     
     /**
@@ -113,7 +126,7 @@ public class ParentEditionPanel extends AbstractComponentPanel {
         jTabbedPane1.addTab("Formulas", editorPanelFormulas);
         jTabbedPane1.addTab("Sets", editorPanelSets);
 
-        testButton.setText("Test");
+        testButton.setText("Solve");
         testButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 testButtonActionPerformed(evt);
@@ -138,6 +151,11 @@ public class ParentEditionPanel extends AbstractComponentPanel {
         jLabelCaretPosition.setText("1:1");
 
         jComboBox1.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "SAT", "SMT" }));
+        jComboBox1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jComboBox1ActionPerformed(evt);
+            }
+        });
 
         exportButton.setText("Export");
         exportButton.addActionListener(new java.awt.event.ActionListener() {
@@ -238,14 +256,22 @@ public class ParentEditionPanel extends AbstractComponentPanel {
                 if(testThread.isAlive()) {
                     testThread.interrupt();
                 }
-                Process p = getFrame().getTranslator().getP();
+                
+                Process p = null;
+                
+                if (getFrame().getSolverSelection().getSelectedSolver() == SolverSelection.SolverType.SAT4J) {
+                    p = getFrame().getTranslatorSAT().getP();
+                } else {
+                    p = getFrame().getTranslatorSMT().getP();                    
+                }
+                
                 if(p != null && isAlive(p)){
                     p.destroy();
                 }
-                
+
                 if(!isStopInsteadOfTest)
-                	break;
-                
+                        break;
+
                 Runnable r = new Runnable() {
                     public void run() {
                         State state = initResultView();
@@ -257,11 +283,9 @@ public class ParentEditionPanel extends AbstractComponentPanel {
                         }
                     }
                 };
-                
-                
+
                 testThread = new Thread(r);
                 testThread.start();
-                
                 break;
             case EDITION_ERROR :
                 // interdit
@@ -323,6 +347,15 @@ public class ParentEditionPanel extends AbstractComponentPanel {
                     JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_jLabelErrorMessageMouseClicked
+
+    private void jComboBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox1ActionPerformed
+        try {
+            if (jComboBox1.getSelectedItem() instanceof SolverType) {
+                getFrame().getSolverSelection().setSelectedSolver((SolverType)(jComboBox1.getSelectedItem()));
+            }
+        } catch (NullPointerException ex) {
+        }
+    }//GEN-LAST:event_jComboBox1ActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -459,7 +492,7 @@ public class ParentEditionPanel extends AbstractComponentPanel {
         
         
         try {
-            getFrame().getClause().saveToFile(bigAndFilePath); //TODO gérer les IOException
+            getFrame().getClause().saveToFile(bigAndFilePath);
         } catch (IOException ex) {
             ex.printStackTrace();
             errorMessage = "Couldn't create file '" + bigAndFilePath + "'";
@@ -467,84 +500,149 @@ public class ParentEditionPanel extends AbstractComponentPanel {
             System.exit(0);
             return State.EDITION;
         }
-        try {
-            if(! getFrame().getTranslator().translate(bigAndFilePath)) {
-                errorMessage = "";
-                for (TranslationError error : getFrame().getTranslator().getErrors()) {
-                        if(error.hasRowAndColumn()) {
-                                errorMessage += guiTranslationErrorAdapter(error) + "\n";
-                        } else { 
-                                errorMessage += error + "\n";
-                        }
+        
+        if (getFrame().getSolverSelection().getSelectedSolver() == SolverSelection.SolverType.SAT4J) {
+           
+            try {
+                if(! getFrame().getTranslatorSAT().translate(bigAndFilePath)) {
+                    errorMessage = "";
+                    for (TranslationError error : getFrame().getTranslatorSAT().getErrors()) {
+                            if(error.hasRowAndColumn()) {
+                                    errorMessage += guiTranslationErrorAdapter(error) + "\n";
+                            } else { 
+                                    errorMessage += error + "\n";
+                            }
+                    }
+                    setJLabelErrorMessageText(errorMessage);
+
+                    System.out.println("Traduction error : " + "\n" + errorMessage + "\n");
+                    /*uncomment the following line to have a popup once an error is detected*/
+                    //showErrorMessage(errorMessage, getFrame().getLang().getWord(Lang.ERROR_TRADUCTION));
+                    return State.EDITION;
                 }
-                setJLabelErrorMessageText(errorMessage);
-                
-                System.out.println("Traduction error : " + "\n" + errorMessage + "\n");
-                /*uncomment the following line to have a popup once an error is detected*/
-                //showErrorMessage(errorMessage, getFrame().getLang().getWord(Lang.ERROR_TRADUCTION));
+                File f = new File(bigAndFilePath);
+                f.deleteOnExit();
+            } catch (IOException ex) {
+                ex.printStackTrace();
+                errorMessage = "The translator returned an IOException: \n"+ex.getMessage();
+                showErrorMessage(ex, errorMessage, getFrame().getLang().getWord(Lang.ERROR_TRADUCTION));
+                return State.EDITION;
+            } catch (InterruptedException ex) {
+                ex.printStackTrace();
+                errorMessage = "Translator has been interrupted.";
+                showErrorMessage(ex, errorMessage, getFrame().getLang().getWord(Lang.ERROR_TRADUCTION));
                 return State.EDITION;
             }
-            File f = new File(bigAndFilePath);
-            f.deleteOnExit();
-        } catch (IOException ex) {
-            ex.printStackTrace();
-            errorMessage = "The translator returned an IOException: \n"+ex.getMessage();
-            showErrorMessage(ex, errorMessage, getFrame().getLang().getWord(Lang.ERROR_TRADUCTION));
-            return State.EDITION;
-        } catch (InterruptedException ex) {
-            ex.printStackTrace();
-            errorMessage = "Translator has been interrupted.";
-            showErrorMessage(ex, errorMessage, getFrame().getLang().getWord(Lang.ERROR_TRADUCTION));
-            return State.EDITION;
-        }
-        
-        //Add CurrentPath/dimacsFile
-        String translatedFilePath = getFrame().getTranslator().getDimacsFilePath();
-        Map<Integer, String> literalsMap = getFrame().getTranslator().getLiteralsMap();
-        getFrame().setSolver(new SolverTestSAT4J(translatedFilePath, literalsMap));
-        
-        try {
-            getFrame().getSolver().launch();
-        } catch (IOException ex) {
-            ex.printStackTrace();
-            errorMessage = "Couldn't launch solver.";
-            showErrorMessage(ex, errorMessage, "Solver error");
-            return State.EDITION;
-        }    
-            
-        // Si il y a au moins un model
-        try {
-            ListIterator<Model> iter = getFrame().getSolver().getModelList().iterator();
-            if(!iter.hasNext()) {
-                System.out.println("This problem is unsatisfiable");
-                errorMessage = "There is no solution";
-                showErrorMessage(errorMessage, "Solver error");
+
+            //Add CurrentPath/dimacsFile
+            String translatedFilePath = getFrame().getTranslatorSAT().getDimacsFilePath();
+            Map<Integer, String> literalsMap = getFrame().getTranslatorSAT().getLiteralsMap();
+            getFrame().setSolver(new SolverTestSAT4J(translatedFilePath, literalsMap));
+
+            try {
+                getFrame().getSolver().launch();
+            } catch (IOException ex) {
+                ex.printStackTrace();
+                errorMessage = "Couldn't launch solver.";
+                showErrorMessage(ex, errorMessage, "Solver error");
                 return State.EDITION;
             }    
-            getFrame().updateResultsPanelIterator(iter);
-            /**
-             * Si il y a plus d'un model, alors passer à l'état FIRST_RESULT
-             * sinon passer à l'état SINGLE_RESULT
-             */
-            if (iter.hasNext()) {
-                getFrame().setResultView(iter.next());
+
+            // Si il y a au moins un model
+            try {
+                ListIterator<Model> iter = getFrame().getSolver().getModelList().iterator();
+                if(!iter.hasNext()) {
+                    System.out.println("This problem is unsatisfiable");
+                    errorMessage = "There is no solution";
+                    showErrorMessage(errorMessage, "Solver error");
+                    return State.EDITION;
+                }    
+                getFrame().updateResultsPanelIterator(iter);
+                /**
+                 * Si il y a plus d'un model, alors passer à l'état FIRST_RESULT
+                 * sinon passer à l'état SINGLE_RESULT
+                 */
                 if (iter.hasNext()) {
-                   //iter.previous();
-                    return State.FIRST_RESULT;
+                    getFrame().setResultView(iter.next());
+                    if (iter.hasNext()) {
+                       //iter.previous();
+                        return State.FIRST_RESULT;
+                    } else {
+                        //iter.previous();
+                        return State.SINGLE_RESULT;
+                    }
                 } else {
-                    //iter.previous();
                     return State.SINGLE_RESULT;
                 }
-            } else {
-                return State.SINGLE_RESULT;
+            } catch (SolverExecutionException ex) {
+                ex.printStackTrace();
+                errorMessage = "The solver encountered a problem.";
+                showErrorMessage(ex, errorMessage, "Solver error");
+                return State.EDITION;
             }
-        } catch (SolverExecutionException ex) {
-            ex.printStackTrace();
-            errorMessage = "The solver encountered a problem.";
-            showErrorMessage(ex, errorMessage, "Solver error");
-            return State.EDITION;
+        } else {
+            try {
+                String logic = "";
+                switch(getFrame().getSolverSelection().getSelectedSolver()) {
+                    case QF_IDL : 
+                        logic = "QF_IDL";
+                        break;
+                    case QF_LIA :
+                        logic = "QF_LIA";
+                        break;
+                    case QF_LRA :
+                        logic = "QF_LRA";
+                        break;
+                    case QF_RDL :
+                        logic = "QF_RDL";
+                        break;
+                    default :
+                }
+                
+                if(! getFrame().getTranslatorSMT().translate(bigAndFilePath, logic)) {
+                    errorMessage = "";
+                    for (TranslationError error : getFrame().getTranslatorSAT().getErrors()) {
+                            if(error.hasRowAndColumn()) {
+                                    errorMessage += guiTranslationErrorAdapter(error) + "\n";
+                            } else { 
+                                    errorMessage += error + "\n";
+                            }
+                    }
+                    setJLabelErrorMessageText(errorMessage);
+
+                    System.out.println("Traduction error : " + "\n" + errorMessage + "\n");
+                    /*uncomment the following line to have a popup once an error is detected*/
+                    //showErrorMessage(errorMessage, getFrame().getLang().getWord(Lang.ERROR_TRADUCTION));
+                    return State.EDITION;
+                }
+                File f = new File(bigAndFilePath);
+                f.deleteOnExit();
+            } catch (IOException ex) {
+                ex.printStackTrace();
+                errorMessage = "The translator returned an IOException: \n"+ex.getMessage();
+                showErrorMessage(ex, errorMessage, getFrame().getLang().getWord(Lang.ERROR_TRADUCTION));
+                return State.EDITION;
+            } catch (InterruptedException ex) {
+                ex.printStackTrace();
+                errorMessage = "Translator has been interrupted.";
+                showErrorMessage(ex, errorMessage, getFrame().getLang().getWord(Lang.ERROR_TRADUCTION));
+                return State.EDITION;
+            }
+            try {
+                System.out.println(getFrame().getTranslatorSMT().getSMTFilePath());
+                getFrame().setSolver(new SolverSMT(getFrame().getTranslatorSMT().getSMTFilePath()));
+                //appel lors de la réussit du traducteur
+                Model model = ((SolverSMT)(getFrame().getSolver())).getresult();
+                System.out.println("eoo le model : "+model.toString());
+                getFrame().setResultView(model);
+                return State.SINGLE_RESULT;
+            } catch (Exception e) {
+                //TODO handle exceptions
+                
+            }
         }
-        //return State.NO_RESULT;
+        
+        return State.EDITION;
     }
     
     public void setJLabelCaretPositionText(String text) {

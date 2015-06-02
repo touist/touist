@@ -27,11 +27,9 @@ import gui.Lang;
 import gui.MainFrame;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.util.Locale;
 import java.util.Scanner;
-import javax.swing.JDialog;
 
 import javax.swing.JEditorPane;
 import javax.swing.JFrame;

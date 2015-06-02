@@ -10,7 +10,8 @@ Plugins:      META (0.4), DevFiles (0.4)
 BuildType: ocamlbuild (0.4)
 AlphaFeatures: ocamlbuild_more_args
 XOCamlbuildExtraArgs: -use-menhir -pkg fileutils
-PreBuildCommand: echo let version=\"`if which git > /dev/null; then git describe --tags; else echo "n/a"; fi;`\" > src/version.ml
+PreBuildCommand: sh generate-version-number.sh
+
 Executable touistc
   Path:           src
   BuildTools:     ocamlbuild

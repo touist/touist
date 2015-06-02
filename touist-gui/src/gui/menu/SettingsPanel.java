@@ -8,6 +8,7 @@ package gui.menu;
 import gui.AbstractComponentPanel;
 import gui.Lang;
 import gui.MainFrame;
+import gui.SolverSelection;
 import java.io.File;
 import java.util.Locale;
 import javax.swing.JDialog;
@@ -19,6 +20,13 @@ import javax.swing.JFileChooser;
  */
 public class SettingsPanel extends AbstractComponentPanel {
 
+    /*
+    Adding items in jComboBoxLanguages launches an ActionEvent,
+    to prevent that, we will set jComboBoxLanguagesEnable to true
+    once all items are added.
+     */
+    private boolean jComboBoxLanguagesEnabled = false;
+    
     public SettingsPanel(MainFrame parent) {
         initComponents();
         
@@ -31,16 +39,39 @@ public class SettingsPanel extends AbstractComponentPanel {
         buttonGroup2.add(jRadioButtonSMTLQFLIA);
         buttonGroup2.add(jRadioButtonSMTLQFRDL);
         buttonGroup2.add(jRadioButtonSMTLQFIDL);
+        
+        switch(parent.getSolverSelection().getSelectedSolver()) {
+            case SAT4J : 
+                jRadioButtonSAT4J.setSelected(true);
+                break;
+            case QF_LRA : 
+                jRadioButtonYCES.setSelected(true);
+                jRadioButtonSMTLQFLRA.setSelected(true);
+                break;
+            case QF_LIA : 
+                jRadioButtonYCES.setSelected(true);
+                jRadioButtonSMTLQFLIA.setSelected(true);
+                break;
+            case QF_RDL : 
+                jRadioButtonYCES.setSelected(true);
+                jRadioButtonSMTLQFRDL.setSelected(true);
+                break;
+            case QF_IDL : 
+                jRadioButtonYCES.setSelected(true);
+                jRadioButtonSMTLQFIDL.setSelected(true);
+                break;
+            default :
+        }
         updateRadioButtons();
         
         jComboBoxLanguages.removeAllItems();
         for (Locale locale : parent.getLang().getSupportedLanguages()) {
             jComboBoxLanguages.addItem(locale);
         }
+        jComboBoxLanguagesEnabled = true; 
+        jComboBoxLanguages.setSelectedItem(parent.getLang().getLanguage());
     }
     
-    public enum SolverType {SAT4J, SMT_QF_LRA, SMT_QF_LIA, SMT_QF_RDL, SMT_QF_IDL}
-    private SolverType solverType = SolverType.SAT4J;
     private MainFrame parent = null;
     
     /**
@@ -60,7 +91,6 @@ public class SettingsPanel extends AbstractComponentPanel {
         jComboBoxLanguages.removeAllItems();
         for (Locale locale : parent.getLang().getSupportedLanguages()) {
             jComboBoxLanguages.addItem(locale);
-            System.out.println(locale.getDisplayLanguage());
         }
     }
     
@@ -291,8 +321,7 @@ public class SettingsPanel extends AbstractComponentPanel {
     }//GEN-LAST:event_jButtonChangeDirectoryActionPerformed
 
     private void jComboBoxLanguagesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBoxLanguagesActionPerformed
-        System.out.println(jComboBoxLanguages.getSelectedIndex());
-        if (jComboBoxLanguages.getSelectedIndex() >= 0) {
+        if (jComboBoxLanguagesEnabled && jComboBoxLanguages.getSelectedIndex() >= 0) {
             Locale selectedLanguage = (Locale)jComboBoxLanguages.getSelectedItem();
             parent.setLanguage(selectedLanguage);
             parent.updateLanguage();
@@ -301,7 +330,7 @@ public class SettingsPanel extends AbstractComponentPanel {
     }//GEN-LAST:event_jComboBoxLanguagesActionPerformed
 
     private void jRadioButtonSAT4JActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButtonSAT4JActionPerformed
-        solverType = SolverType.SAT4J;
+        parent.getSolverSelection().setSelectedSolver(SolverSelection.SolverType.SAT4J);
         jRadioButtonSMTLQFLRA.setSelected(false);
         jRadioButtonSMTLQFLIA.setSelected(false);
         jRadioButtonSMTLQFRDL.setSelected(false);
@@ -310,28 +339,28 @@ public class SettingsPanel extends AbstractComponentPanel {
     }//GEN-LAST:event_jRadioButtonSAT4JActionPerformed
 
     private void jRadioButtonYCESActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButtonYCESActionPerformed
-        solverType = SolverType.SMT_QF_LRA;
+        parent.getSolverSelection().setSelectedSolver(SolverSelection.SolverType.QF_LRA);
         jRadioButtonSMTLQFLRA.setSelected(true);
         updateRadioButtons();
     }//GEN-LAST:event_jRadioButtonYCESActionPerformed
 
     private void jRadioButtonSMTLQFLIAActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButtonSMTLQFLIAActionPerformed
-        solverType = SolverType.SMT_QF_LIA;
+        parent.getSolverSelection().setSelectedSolver(SolverSelection.SolverType.QF_LIA);
         updateRadioButtons();
     }//GEN-LAST:event_jRadioButtonSMTLQFLIAActionPerformed
 
     private void jRadioButtonSMTLQFLRAActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButtonSMTLQFLRAActionPerformed
-        solverType = SolverType.SMT_QF_LRA;
+        parent.getSolverSelection().setSelectedSolver(SolverSelection.SolverType.QF_LRA);
         updateRadioButtons();
     }//GEN-LAST:event_jRadioButtonSMTLQFLRAActionPerformed
 
     private void jRadioButtonSMTLQFRDLActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButtonSMTLQFRDLActionPerformed
-        solverType = SolverType.SMT_QF_RDL;
+        parent.getSolverSelection().setSelectedSolver(SolverSelection.SolverType.QF_RDL);
         updateRadioButtons();
     }//GEN-LAST:event_jRadioButtonSMTLQFRDLActionPerformed
 
     private void jRadioButtonSMTLQFIDLActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButtonSMTLQFIDLActionPerformed
-        solverType = SolverType.SMT_QF_IDL;
+        parent.getSolverSelection().setSelectedSolver(SolverSelection.SolverType.QF_IDL);
         updateRadioButtons();
     }//GEN-LAST:event_jRadioButtonSMTLQFIDLActionPerformed
 

@@ -150,6 +150,7 @@ public class EditionPanel extends AbstractComponentPanel {
         
         palettePanel2.setEditorTextArea(editorTextArea);  
         jSplitPane1.setResizeWeight(0.5);
+        jSplitPane2.setDividerSize(3);
     }
     
     public void initPalette(PalettePanel.PaletteType type) {

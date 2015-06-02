@@ -37,13 +37,16 @@ import java.util.ResourceBundle;
 public class Lang {
     private Map<Locale, String> supportedLanguages;
     private ResourceBundle translation;
+    private Locale language;
 
     public Lang(Locale language){
         initSupportedLanguages();
+        this.language = language;
         translation = ResourceBundle.getBundle(supportedLanguages.get(language));
     }
     
     public void setLanguage(Locale language){
+        this.language = language;
         translation = ResourceBundle.getBundle(supportedLanguages.get(language));
     }
 
@@ -62,9 +65,12 @@ public class Lang {
         return locales;
     }
     
+    public Locale getLanguage() {
+        return language;
+    }
+    
     private void initSupportedLanguages() {
         supportedLanguages = new HashMap<Locale,String>();
-        //supportedLanguages.put(Locale.FRANCE, "lang.fr_FR");
         supportedLanguages.put(Locale.ENGLISH, "lang.en_US"); // "lang" is the package
         supportedLanguages.put(Locale.FRENCH, "lang.fr_FR");
     }

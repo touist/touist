@@ -81,8 +81,8 @@ let parse_and_eval_with_error lexbuf =
       fprintf stderr "%a: %s\n" print_position lexbuf msg;
       exit (get_code COMPILE_WITH_LINE_NUMBER_ERROR) (* Should be "None" *)
   | Parser.Error ->
-      fprintf stderr "unkwown syntax error\n";
-      exit (get_code COMPILE_NO_LINE_NUMBER_ERROR)
+      fprintf stderr "%a: syntax error\n" print_position lexbuf;
+      exit (get_code COMPILE_WITH_LINE_NUMBER_ERROR)
   | Eval.NameError msg ->
       fprintf stderr "name error with '%s'\n" msg;
       exit (get_code COMPILE_NO_LINE_NUMBER_ERROR)
@@ -92,9 +92,13 @@ let parse_and_eval_with_error lexbuf =
   | Eval.ArgumentError msg ->
       fprintf stderr "argument error: '%s'\n" msg;
       exit (get_code COMPILE_NO_LINE_NUMBER_ERROR)
-  | _ ->
+(*  XXX: Mael: I removed this part to avoid "skipping" 
+ *  some exceptions we could have forgotten to handle
+ *  
+ *  | _ ->
       fprintf stderr "unkwown error\n";
       exit (get_code COMPILE_NO_LINE_NUMBER_ERROR)
+*)
 
     
 
@@ -131,7 +135,7 @@ let () =
     Usage: " ^ cmd ^ " -sat [-o translatedFile] [-table tableFile] file \n\
     Usage: " ^ cmd ^ " -smt2 logic [-o translatedFile] file \n\
     Note: if either tableFile or translatedFile is missing, \n\
-    artibrary names will be given."
+    an artibrary name will be given."
   in
 
   (* Step 1: we parse the args. If an arg. is "alone", we suppose
@@ -149,7 +153,7 @@ let () =
   (* Step 2: we see if we got every parameter we need *)
   if ((String.length !input_file_path) == 0)(* NOTE: !var is like *var in C *)
   then (
-    print_endline (cmd ^ ": you must give an input file");
+    print_endline (cmd^": you must give an input file (try --help)");
     exit (get_code OTHER)
   );
 
@@ -164,11 +168,11 @@ let () =
     output_table_file_path := (defaultOutputTable !input_file_path);
   
   if (!sat_mode && (!smt_logic <> "")) then
-    (print_endline "Cannot use both SAT and SMT solvers";
+    (print_endline (cmd^": cannot use both SAT and SMT solvers (try --help)");
      exit (get_code OTHER));
 
   if (not !sat_mode) && (!smt_logic = "") then
-    (print_endline "You must choose a solver to use (-sat or -smt2)";
+    (print_endline (cmd^": you must choose a solver to use: -sat or -smt2 (try --help)");
      exit (get_code OTHER));
 
   (* Step 3: translation *)

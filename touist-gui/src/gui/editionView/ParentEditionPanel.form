@@ -92,7 +92,7 @@
     </Container>
     <Component class="javax.swing.JButton" name="testButton">
       <Properties>
-        <Property name="text" type="java.lang.String" value="Test"/>
+        <Property name="text" type="java.lang.String" value="Solve"/>
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="testButtonActionPerformed"/>
@@ -131,6 +131,9 @@
           </StringArray>
         </Property>
       </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jComboBox1ActionPerformed"/>
+      </Events>
     </Component>
     <Component class="javax.swing.JButton" name="exportButton">
       <Properties>
