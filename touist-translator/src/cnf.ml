@@ -5,6 +5,19 @@ let dummy_term_count = ref 0
 let genterm () =
   incr dummy_term_count; Term ("&" ^ (string_of_int !dummy_term_count), None)
 
+let rec is_clause = function
+  | Top | Bottom | Term _ | CNot (Term _) -> true
+  | CNot x -> is_conj x
+  | CAnd _ -> false
+  | COr (x,y) -> is_clause x && is_clause y
+  | x -> failwith ("is_clause: unexpected value " ^ (string_of_clause x))
+and is_conj = function
+  | Top | Bottom | Term _ | CNot (Term _) -> true
+  | CNot x -> is_clause x
+  | COr _  -> false
+  | CAnd (x,y) -> is_conj x && is_conj y
+  | x -> failwith ("is_conj: unexpected value " ^ (string_of_clause x))
+
 let rec push_lit lit = function
   | Term x -> COr (lit, Term x)
   | CNot (Term x) -> COr (lit, CNot (Term x))
@@ -13,12 +26,20 @@ let rec push_lit lit = function
   | x -> failwith ("push_lit: unexpected value " ^ (string_of_clause x)) 
 
 let rec to_cnf = function
-  | Top    -> failwith "Formula is always true"
-  | Bottom -> failwith "Formula is always false"
+  | Top    -> Top
+  | Bottom -> Bottom
   | Term x -> Term x
   | CAnd (Top,x) | CAnd (x,Top) -> to_cnf x
   | CAnd (Bottom,_) | CAnd (_,Bottom) -> Bottom
-  | CAnd (x,y) -> CAnd (to_cnf x, to_cnf y)
+  | CAnd (x,y) ->
+      begin
+        let x' = to_cnf x in
+        let y' = to_cnf y in
+        match x',y' with 
+        | Top,_ -> y'
+        | _,Top -> x'
+        | _,_   -> CAnd (x',y')
+      end
   | CNot x ->
       begin
         match x with
@@ -42,9 +63,18 @@ let rec to_cnf = function
         | Term a, y' | y', Term a -> push_lit (Term a) (to_cnf y')
         | CNot (Term a), y' | y', CNot (Term a) -> push_lit (CNot (Term a)) (to_cnf y')
         | _,_ ->
-            let (new1, new2) = (genterm (), genterm ()) in
-            CAnd (COr (new1, new2), CAnd (push_lit (CNot new1) (to_cnf x),
-                                          push_lit (CNot new2) (to_cnf y)))
+            let x' = to_cnf x in
+            let y' = to_cnf y in
+            match x',y' with
+            | Bottom,_ -> y'
+            | _,Bottom -> x'
+            | _,_ ->
+                if is_clause x && is_clause y then
+                  COr (to_cnf x, to_cnf y)
+                else
+                  let (new1, new2) = (genterm (), genterm ()) in
+                  CAnd (COr (new1, new2), CAnd (push_lit (CNot new1) (to_cnf x),
+                                                push_lit (CNot new2) (to_cnf y)))
       end
   | CImplies (x,y) -> to_cnf (COr (CNot x, y))
   | CEquiv (x,y) -> to_cnf (CAnd (CImplies (x,y), CImplies (y,x)))
