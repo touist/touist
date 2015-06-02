@@ -106,7 +106,9 @@ let to_smt2 logic formula =
     | Bottom                     -> "false"
     | Term              (x,None) -> sanitize_var x
     | CInt              x        -> string_of_int   x
-    | CFloat            x        -> string_of_float x
+    | CFloat x ->
+        let x' = string_of_float x in
+        if x'.[String.length x' - 1] = '.' then x' ^ "0" else x'
     | CNot              x        -> decl_un_op  "not" (write x)
     | CAnd              (x,y)    -> decl_bin_op "and" (write x) (write y)
     | COr               (x,y)    -> decl_bin_op "or"  (write x) (write y)
