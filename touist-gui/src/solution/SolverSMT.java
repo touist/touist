@@ -31,15 +31,11 @@ public class SolverSMT extends Solver {
         else
           throw new FileNotFoundException();
     }
-<<<<<<< Updated upstream
-=======
 
     public void setSolverPath(String path){
         pathsolver=path;
     }
 
->>>>>>> Stashed changes
-    
     /**
      * For Java RE 6 compatibility (p.isAlive() is JavaRE7)
      */
@@ -52,10 +48,6 @@ public class SolverSMT extends Solver {
 	    }
 	}
     
-<<<<<<< Updated upstream
-=======
-
->>>>>>> Stashed changes
      public Model getresult() throws IOException, SolverExecutionException{
       // String command="bin"+File.separatorChar+"yices-smt2"+" "+this.smtpath;
         Model smt=null;
@@ -71,40 +63,46 @@ public class SolverSMT extends Solver {
         System.out.println("xd:"+br.toString());
         StringTokenizer tokenizer = new StringTokenizer(br.toString(),"()");
         if(tokenizer.hasMoreTokens()){
-            if(tokenizer.nextToken().equals("unsat"))
+            String tokken=tokenizer.nextToken();
+            if(!tokken.equals("sat"))
                 throw new SolverExecutionException("SMT: "+br.toString());
             else
-            {
-                smt=new Model();
+            { 
+             smt=new Model();
                 ArrayList<String> result=new ArrayList<String>();
                 while(tokenizer.hasMoreTokens()){
                     String Token=tokenizer.nextToken();
                         if(!Token.equals(" "))
-                        {
+                        {  
                             if(Token.startsWith("/")){
-                                String operand1=tokenizer.nextToken();
-                                String operand2=tokenizer.nextToken();
+                                 System.out.println("wizz123"+Token);
+                                 String[] abcd=Token.split(" ");
+                                String operand1=abcd[1];
+                                String operand2=abcd[2];
                                 result.add(operand1+"/"+operand2);
                             }
                             else{
                                 result.add(Token);
                             }
                          }
-                         
-              }
-                for(int i=0;i<result.size()-1;i++)
-                {
+                }
+                for(int i=0;i<result.size();i++)
+                {   System.out.println(result.get(i));
                     if(result.get(i).contains("true") || result.get(i).contains("false"))
                     { String[] separateLV=result.get(i).split(" ");
                         smt.addLiteral(new Literal(separateLV[0],separateLV[1].matches("true")));
                     }
                     else{
-                        //System.out.println(result.get(i)+"eo"+result.get(i+1));
+                        //System.out.println(result.get(i)+"beug");
+                        //String[] abc=result.get(i).split(" ");
+                       // System.out.println(result.get(i+1)+"beug");
                         smt.addLiteral(new Literal(result.get(i),result.get(i+1)));
+                        System.out.println("xd12");
                         i++;
                     }
                  }
             }
+        
       }
 
         this.close();
@@ -144,6 +142,7 @@ public class SolverSMT extends Solver {
       // smt.setSolverPath("/Users/blida/Documents/M1-UPS/Yices/exec/bin/yices-smt2");
         //instance dans main
         SolverSMT smt=new SolverSMT(CurrentPath+File.separatorChar+"test.smt2");
+      //  SolverSMT smt=new SolverSMT(CurrentPath+File.separatorChar+"test.smt2");
         //appel lors de la réussit du traducteur
         Model model=smt.getresult();
         if(model!=null)

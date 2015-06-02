@@ -38,7 +38,7 @@ import java.util.StringTokenizer;
  * @Modified by Mael
  */
 public class TranslatorSMT {
-	final private String outputFilePath = "out.cnf";
+	final private String outputFilePath = "out.smt2";
 	final private String outputTableFilePath = "out.table";
 	private String translatorProgramFilePath;
 	private Map<Integer,String> literalsMap = new HashMap<Integer,String>();
@@ -72,6 +72,7 @@ public class TranslatorSMT {
   		| COMPILE_NO_LINE_NUMBER_ERROR -> 2
   		| OTHER -> 3
 		 */
+                 System.out.println("le fichier ...."+touistlFilePath);
 		final int OK = 0;
 		final int COMPILE_WITH_LINE_NUMBER_ERROR = 1;
 		final int COMPILE_NO_LINE_NUMBER_ERROR = 2;

@@ -12,10 +12,10 @@ package gui;
 public class SolverSelection {
     public enum SolverType {
             SAT4J, 
-            SMT_QF_LRA, 
-            SMT_QF_LIA, 
-            SMT_QF_RDL, 
-            SMT_QF_IDL
+            QF_LRA, 
+            QF_LIA, 
+            QF_RDL, 
+            QF_IDL
     };
     
     private SolverType selectedSolver = SolverType.SAT4J;

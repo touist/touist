@@ -108,6 +108,7 @@ public class ResultsPanel extends AbstractComponentPanel {
     public ResultsPanel() {
         exportDialog = new ExportDialog();
         initComponents();
+        jTable1.setCellSelectionEnabled(true);
     }
 
     /**
@@ -142,16 +143,22 @@ public class ResultsPanel extends AbstractComponentPanel {
         ArrayList<Literal> literals = (ArrayList<Literal>) actModel.literals;
         for(int i = 0; i < literals.size(); i++) {
             String name = literals.get(i).getLiteral();
-            boolean value = literals.get(i).isLiteral_positivity();
-            
-            if(regex!="" && !pattern.matcher(name).find()){
-                continue;
-            }
+            if(literals.get(i).getArithmetic_value()==null){
+                boolean value = literals.get(i).isLiteral_positivity();
 
-            if(falseLiterals && !value){
-                model.addRow(new String[]{name,falseText});
-            } else if(trueLiterals && value){
-                model.addRow(new String[]{name,trueText});
+               if(regex!="" && !pattern.matcher(name).find()){
+                   continue;
+               }
+
+               if(falseLiterals && !value){
+                   model.addRow(new String[]{name,falseText});
+               } else if(trueLiterals && value){
+                   model.addRow(new String[]{name,trueText});
+               }   
+            }
+            else{
+                System.out.println(literals.get(i).getArithmetic_value());
+              model.addRow(new String[]{name,literals.get(i).getArithmetic_value()});
             }
         }
     }

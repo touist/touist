@@ -584,17 +584,17 @@ public class ParentEditionPanel extends AbstractComponentPanel {
             try {
                 String logic = "";
                 switch(getFrame().getSolverSelection().getSelectedSolver()) {
-                    case SMT_QF_IDL : 
-                        logic = "SMT_QF_IDL";
+                    case QF_IDL : 
+                        logic = "QF_IDL";
                         break;
-                    case SMT_QF_LIA :
-                        logic = "SMT_QF_LIA";
+                    case QF_LIA :
+                        logic = "QF_LIA";
                         break;
-                    case SMT_QF_LRA :
-                        logic = "SMT_QF_LRA";
+                    case QF_LRA :
+                        logic = "QF_LRA";
                         break;
-                    case SMT_QF_RDL :
-                        logic = "SMT_QF_RDL";
+                    case QF_RDL :
+                        logic = "QF_RDL";
                         break;
                     default :
                 }
@@ -629,13 +629,16 @@ public class ParentEditionPanel extends AbstractComponentPanel {
                 return State.EDITION;
             }
             try {
-                getFrame().setSolver(new SolverSMT("."+File.separatorChar+"test.smt2"));
+                System.out.println(getFrame().getTranslatorSMT().getSMTFilePath());
+                getFrame().setSolver(new SolverSMT(getFrame().getTranslatorSMT().getSMTFilePath()));
                 //appel lors de la réussit du traducteur
                 Model model = ((SolverSMT)(getFrame().getSolver())).getresult();
+                System.out.println("eoo le model : "+model.toString());
                 getFrame().setResultView(model);
                 return State.SINGLE_RESULT;
             } catch (Exception e) {
                 //TODO handle exceptions
+                
             }
         }
         
