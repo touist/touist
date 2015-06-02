@@ -97,12 +97,6 @@ let unwrap_str = function
 let extenv = Hashtbl.create 10
 
 let rec eval exp env =
-  (*List.fold_left (fun acc x -> (CAnd (acc, x))) Top (eval_prog exp env)*)
-  (*let rec loop = function
-    | [] -> failwith "no clauses"
-    | [x] -> x
-    | x::xs -> CAnd (x, loop xs)
-  in loop (eval_prog exp env)*)
   eval_prog exp env
 
 and eval_prog exp env =
@@ -116,13 +110,7 @@ and eval_prog exp env =
   | Prog (Some decl, clauses) ->
       List.iter (fun x -> eval_affect x env) decl;
       eval_clause (loop clauses) env
-  (*
-  match exp with
-  | Prog (None, clauses) -> List.map (fun x -> eval_clause x env) clauses
-  | Prog (Some decl, clauses) ->
-      List.iter (fun x -> eval_affect x env) decl;
-      List.map (fun x -> eval_clause x env) clauses
-  *)
+
 and eval_affect exp env =
   match exp with
   | Affect (x,y) -> 
@@ -383,41 +371,14 @@ and eval_clause exp env =
                  | _ -> failwith "baz"),Some y')) env
             with Not_found -> failwith "none"
       end
-(*
-  | CVar (x,None) ->
-      begin
-        try (match List.assoc x env with
-             | Clause x' -> x'
-             | Int    x' -> CInt   x'
-             | Float  x' -> CFloat x'
-             | _ -> raise (TypeError (x ^ ": expected a clause")))
-        with Not_found -> raise (NameError x)
-      end
-  | CVar (x,Some y) -> (*Term ((expand_var_name x env),None)*)
-      begin
-        try eval_clause (Term (string_of_clause (match List.assoc x env with
-             | Clause x' -> x'
-             | Int    x' -> CInt   x'
-             | Float  x' -> CFloat x'
-             | _ -> raise (TypeError (string_of_clause exp))), Some y)) env
-        with Not_found ->
-          begin
-            try eval_clause (Term (string_of_clause (match Hashtbl.find extenv x
-              with
-              | Clause x' -> x'
-              | Int    x' -> CInt   x'
-              | Float  x' -> CFloat x'
-              | _ -> raise (TypeError (string_of_clause exp))), Some y)) env
-            with Not_found -> raise (NameError ("clause variable undefined: " ^ x))
-          end
-      end
-*)
   | CNot Top    -> Bottom
   | CNot Bottom -> Top
   | CNot x      -> CNot (eval_clause x env)
+  | CAnd (Bottom, _) | CAnd (_, Bottom) -> Bottom
   | CAnd (Top,x)
   | CAnd (x,Top) -> eval_clause x env
   | CAnd     (x,y) -> CAnd (eval_clause x env, eval_clause y env)
+  | COr (Top, _) | COr (_, Top) -> Top
   | COr (Bottom,x)
   | COr (x,Bottom) -> eval_clause x env
   | COr      (x,y) -> COr  (eval_clause x env, eval_clause y env)
