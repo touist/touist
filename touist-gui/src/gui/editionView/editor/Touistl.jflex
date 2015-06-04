@@ -198,7 +198,8 @@ Comment     = ";;"[^\n]*
 	"formula" |
 	"if" |
 	"then" |
-	"else" 
+	"else"  |
+	"when"
 			{ addToken(Token.RESERVED_WORD); }   
    
 	/* Data types */   
@@ -224,7 +225,8 @@ Comment     = ";;"[^\n]*
 	"end" |
 	"atleast" |
 	"exact" |
-	"atmost"	{ addToken(Token.FUNCTION); }   
+	"atmost" |
+	"diff" { addToken(Token.FUNCTION); }   
    
    
 	{Empty}				{ addToken(Token.WHITESPACE); }   

@@ -5,6 +5,7 @@ terminal TRUE,FALSE,TOP,BOT,AFFECT,EQUAL,DIFFERENT,LESSER,LESSER_OR_EQUAL;
 terminal GREATER,GREATER_OR_EQUAL,BOOL_AND,BOOL_OR,IMPLIQUE,EQUIV,LPAR,RPAR;
 terminal ADD,MULTIPLY,SUBSTRACT,DIVIDE,LCRO,RCRO,DODOT,COMMA,TWODOT,XOR;
 terminal COMMENT,DOT,UNION,INTER,DIFF,WHEN,NEWLINE;
+terminal ATLEAST,EXACT,ATMOST;
 
 
 
@@ -59,8 +60,8 @@ program ::= affect:a {: RESULT = new String(a); :}
 			|expr:f {: RESULT = new String(f); :}
 			|affect:a program:p {: RESULT = new String(a+"\\\\"+p); :}
 			|expr:f program:p {: RESULT = new String(f+"\\\\"+p); :}
-			|error
 			|
+			|error
 ;
 
 
@@ -113,6 +114,9 @@ expr ::=|IF expr:b THEN expr:e1 ELSE expr:e2  {: RESULT = new String("if\\;"+b+"
 		| UNION LPAR expr:s1 COMMA expr:s2 RPAR {: RESULT = new String(s1+"\\cup"+s2);:}
 		| INTER LPAR expr:s1 COMMA expr:s2 RPAR {: RESULT = new String(s1+"\\cap"+s2);:}
 		| DIFF LPAR expr:s1 COMMA expr:s2 RPAR {: RESULT = new String(s1+"\\setminus"+s2);:}
+		| ATLEAST LPAR expr:s1 COMMA expr:s2 COMMA expr:s3 COMMA expr:s4 RPAR  {: RESULT = new String("(\\geqslant_{"+s2+" \\in "+s3+"}^{"+s1+"}"+s4+")");:}
+		| EXACT LPAR expr:s1 COMMA expr:s2 COMMA expr:s3 COMMA expr:s4 RPAR  {: RESULT = new String("(=_{"+s2+" \\in "+s3+"}^{"+s1+"}"+s4+")");:}
+		| ATMOST LPAR expr:s1 COMMA expr:s2 COMMA expr:s3 COMMA expr:s4 RPAR  {: RESULT = new String("(\\leqslant_{"+s2+" \\in "+s3+"}^{"+s1+"}"+s4+")");:}
 ;
 
 
@@ -133,6 +137,7 @@ set_decl ::= atom:a {: RESULT = a;:}
 			
 term_option ::= IDENTIFIER:i {: RESULT = new String(i);:}
 				| expr:e {: RESULT = e;:}
+				| expr:e COMMA term_option:t {: RESULT = new String(e+","+t);:}
 ;
 
 big_body ::= var_list:v IN set_list:s WHEN expr:b TWODOT expr:e END 
@@ -142,7 +147,7 @@ big_body ::= var_list:v IN set_list:s WHEN expr:b TWODOT expr:e END
 ;
 
 var ::= VAR:v {: RESULT = new String("\\"+v);:}
-		|VAR:v LPAR expr:b RPAR {: RESULT = new String("\\"+v+"("+b+")"); :}
+		|VAR:v LPAR term_option:t RPAR {: RESULT = new String("\\"+v+"("+t+")"); :}
 		|VAR:v LPAR IDENTIFIER:i RPAR {: RESULT = new String("\\"+v+"("+i+")"); :}
 ;
 atom ::= IDENTIFIER:i {: RESULT = new String(i);:}

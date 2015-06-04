@@ -36,6 +36,27 @@ public class Model implements Iterable<Literal>{
 
 	public List<Literal> literals = new ArrayList<Literal>();
 
+	/**
+	 * WARNING: two models are equals only
+	 * when the literals are at the same place
+	 * in the arraylist
+	 * @note Added for filtering '&45' literals (issue #88)
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		Model m = (Model)obj;
+		boolean areEqual = true; 
+		if(this.literals.size() != m.literals.size()) {
+			areEqual = false;
+		}
+		for (int i = 0; i < this.literals.size() && areEqual; i++) {
+			if(!this.literals.get(i).equals(m.literals.get(i))) {
+				areEqual = false;
+			}
+		}
+		return areEqual;
+	}
+
 	public void addLiteral(Literal literal) {
                 literals.add(literal);
 	}
@@ -45,7 +66,7 @@ public class Model implements Iterable<Literal>{
 		// TODO Please write a proper toString
 		String out = "";
 		for (Literal s : literals) {
-			out = out + " " + s.getLiteral()+ " Valuated : "+s.isLiteral_positivity()+"\n";
+			out = out + " ("+ s.getLiteral()+" "+((s.getArithmetic_value()==null)?s.isLiteral_positivity():s.getArithmetic_value())+") ";
 		}
 		return out;
 	}

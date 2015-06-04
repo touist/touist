@@ -28,6 +28,7 @@
 %left IN
 %left ADD SUB
 %left MUL DIV
+%nonassoc neg
 %left MOD
 %right EQUIV IMPLIES
 %left OR
@@ -59,6 +60,7 @@ exp:
   | BOOL  { Bool  $1 }
   | var_decl { Var      $1 }
   | set_decl { Set_decl $1 }
+  | SUB exp { Neg $2 } %prec neg
   | exp ADD exp { Add ($1, $3) }
   | exp SUB exp { Sub ($1, $3) }
   | exp MUL exp { Mul ($1, $3) }
@@ -93,6 +95,7 @@ clause:
   | LPAREN clause RPAREN { $2 }
   | INT   { CInt   $1 }
   | FLOAT { CFloat $1 }
+  | SUB clause { CNeg $2 } %prec neg
   | clause ADD      clause { CAdd              ($1, $3) }
   | clause SUB      clause { CSub              ($1, $3) }
   | clause MUL      clause { CMul              ($1, $3) }
@@ -107,7 +110,7 @@ clause:
   | TOP    { Top    }
   | BOTTOM { Bottom }
   | TERM   { Term ($1, None) }
-  | TERM LPAREN separated_nonempty_list(COMMA, exp) RPAREN { Term ($1, Some $3) }
+  | TERM LPAREN separated_nonempty_list(COMMA, term_or_exp) RPAREN { Term ($1, Some $3) }
   | NOT clause { CNot $2 }
   | clause AND     clause { CAnd     ($1, $3) }
   | clause OR      clause { COr      ($1, $3) }
@@ -126,6 +129,10 @@ clause:
   | BIGOR separated_nonempty_list(COMMA,VAR) IN separated_nonempty_list(COMMA,exp) WHEN exp COLON clause END
   { Bigor ($2, $4, Some $6, $8) }
   | IF exp THEN clause ELSE clause END { CIf ($2, $4, $6) }
+
+term_or_exp:
+  | TERM { Clause (Term ($1,None)) }
+  | exp { $1 }
 
 set_decl:
   | LBRACK RBRACK { [] } 

@@ -1,8 +1,26 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ *
+ * Project TouIST, 2015. Easily formalize and solve real-world sized problems
+ * using propositional logic and linear theory of reals with a nice GUI.
+ *
+ * https://github.com/olzd/touist
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the GNU Lesser General Public License
+ * (LGPL) version 2.1 which accompanies this distribution, and is available at
+ * http://www.gnu.org/licenses/lgpl-2.1.html
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * Contributors:
+ *     Alexis Comte, Abdelwahab Heba, Olivier Lezaud,
+ *     Skander Ben Slimane, Maël Valais
+ *
  */
+
 package gui.editionView;
 
 import gui.MainFrame;
@@ -35,7 +53,8 @@ public class InsertionButton extends JButton {
         this.codeToInsert = codeToInsert;
         this.snipets = snipets;
         
-        //this.setText(codeToInsert);
+        this.setContentAreaFilled(false);
+        //this.setBorderPainted(false);
         
         addActionListener(new ActionListener() {
 
@@ -44,11 +63,11 @@ public class InsertionButton extends JButton {
                 switch(((MainFrame)(getRootPane().getParent())).state) {
                     case EDITION :
                         ((MainFrame)(getRootPane().getParent())).state = State.EDITION;
-                        insertAtCaret(codeToInsert);
+                        insertAtCaret(codeToInsert + "\n");
                         break;
                     case EDITION_ERROR :
                         ((MainFrame)(getRootPane().getParent())).state = State.EDITION_ERROR;
-                        insertAtCaret(codeToInsert);
+                        insertAtCaret(codeToInsert + "\n");
                         break;
                     case NO_RESULT :
                         // impossible
@@ -105,18 +124,14 @@ public class InsertionButton extends JButton {
      * @param text 
      */
     private void insertAtCaret(String text) {
-        if (editorTextArea.hasFocus()) {
-            
-            Integer caretPosition = editorTextArea.getCaretPosition();
-            
-            // insert is better than setText: setText entirely remove previous text then make an insert operation
-            editorTextArea.insert(text, caretPosition);
+        Integer caretPosition = editorTextArea.getCaretPosition();
 
-            for(int snippetBegin = 0; snippetBegin < snipets.size(); snippetBegin+=2) {
-                int snippetEnd = snippetBegin + 1;
-                editorTextArea.addSnipet(caretPosition+snipets.get(snippetBegin),caretPosition+snipets.get(snippetEnd));
-            }
+        // insert is better than setText: setText entirely remove previous text then make an insert operation
+        editorTextArea.insert(text, caretPosition);
+
+        for(int snippetBegin = 0; snippetBegin < snipets.size(); snippetBegin+=2) {
+            int snippetEnd = snippetBegin + 1;
+            editorTextArea.addSnipet(caretPosition+snipets.get(snippetBegin),caretPosition+snipets.get(snippetEnd));
         }
-        //TODO update latex schematic area
     }
 }

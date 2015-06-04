@@ -1,8 +1,26 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ *
+ * Project TouIST, 2015. Easily formalize and solve real-world sized problems
+ * using propositional logic and linear theory of reals with a nice GUI.
+ *
+ * https://github.com/olzd/touist
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the GNU Lesser General Public License
+ * (LGPL) version 2.1 which accompanies this distribution, and is available at
+ * http://www.gnu.org/licenses/lgpl-2.1.html
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * Contributors:
+ *     Alexis Comte, Abdelwahab Heba, Olivier Lezaud,
+ *     Skander Ben Slimane, Maël Valais
+ *
  */
+
 package gui;
 
 import java.util.ArrayList;
@@ -19,13 +37,16 @@ import java.util.ResourceBundle;
 public class Lang {
     private Map<Locale, String> supportedLanguages;
     private ResourceBundle translation;
+    private Locale language;
 
     public Lang(Locale language){
         initSupportedLanguages();
+        this.language = language;
         translation = ResourceBundle.getBundle(supportedLanguages.get(language));
     }
     
     public void setLanguage(Locale language){
+        this.language = language;
         translation = ResourceBundle.getBundle(supportedLanguages.get(language));
     }
 
@@ -44,11 +65,14 @@ public class Lang {
         return locales;
     }
     
+    public Locale getLanguage() {
+        return language;
+    }
+    
     private void initSupportedLanguages() {
         supportedLanguages = new HashMap<Locale,String>();
-        supportedLanguages.put(Locale.FRENCH, "lang.fr_FR"); // "lang" is the package
-        supportedLanguages.put(Locale.FRANCE, "lang.fr_FR");
-        supportedLanguages.put(Locale.ENGLISH, "lang.en_US");
+        supportedLanguages.put(Locale.ENGLISH, "lang.en_US"); // "lang" is the package
+        supportedLanguages.put(Locale.FRENCH, "lang.fr_FR");
     }
     
     public static final String FRAME_TITLE = "MainFrame.title";
@@ -68,6 +92,7 @@ public class Lang {
     public static final String EDITION_MENUITEM_SAVEFILE = "EditionMenuBar.jMenuItemSaveFile.text";
     public static final String EDITION_MENUITEM_LOADFILE = "EditionMenuBar.jMenuItemLoadFile.text";
     public static final String EDITION_MENUITEM_HELPEDITION = "EditionMenuBar.jMenuItemHelpEdition.text";
+    public static final String EDITION_MENUITEM_ABOUT = "EditionMenuBar.jMenuItemAbout.text";
     public static final String EDITION_MENUITEM_UNDO = "EditionMenuBar.jMenuItemUndo.text";
     public static final String EDITION_MENUITEM_REDO = "EditionMenuBar.jMenuItemRedo.text";
     public static final String EDITION_MENUITEM_ZOOMMORE = "EditionMenuBar.jMenuItemZoomMore.text";
@@ -91,6 +116,15 @@ public class Lang {
     public static final String ERROR_TRADUCTION = "ParentEditionPanel.jOptionPane1.traductionError";
     public static final String ERROR_TRADUCTION_IN_SETS = "ParentEditionPanel.jOptionPane1.traductionErrorInSets";
     public static final String ERROR_TRADUCTION_IN_FORMULAS = "ParentEditionPanel.jOptionPane1.traductionErrorInFormulas";
+    public static final String ERROR_MESSAGE_TITLE = "ParentEditionPanel.jLabelErrorMessage.title";
     public static final String HELP_PANEL_TITLE = "HelpPanel.title";
+    public static final String SETTINGS_TITLE = "SettingsPanel.title";
+    public static final String SETTINGS_GENERAL_TITLE = "SettingsPanel.general.title";
+    public static final String SETTINGS_GENERAL_TEXT = "SettingsPanel.general.jLabelDefaultDirectory.text";
+    public static final String SETTINGS_GENERAL_BUTTON = "SettingsPanel.general.jButtonChangeDirectory.text";
+    public static final String SETTINGS_SOLVER_TITLE = "SettingsPanel.solver.title";
+    public static final String SETTINGS_SOLVER_TEXT = "SettingsPanel.solver.jLabelSolver.text";
+    public static final String SETTINGS_LANGUAGE_TITLE = "SettingsPanel.language.title";
+    public static final String SETTINGS_LANGUAGE_TEXT = "SettingsPanel.language.jLabelLanguage.text";
     
 }

@@ -111,22 +111,29 @@ A(a) 9
 A(c) 7
 ```
 
-## Build
-
+## What you need to build it
 Before you go, make sure you have the following installed:
 - `ocaml` **4.01.0** (or latest)
 - `menhir` (equivalent of ocamlyacc)
 - `fileutils` (for reading/writing POSIX files)
 
-You can install them with `opam` (`opam` is an `apt-get`-like package manager for OCaml):
-```
+### Build it on linux
+```shell
+$ apt-get install opam
 $ opam install menhir fileutils
+$ make
 ```
-
-Then, to build the compiler just run `make`.
-You can also run `make install` to install it to the `/usr/local/bin/` directory
-and `make uninstall` to remove it.
-To clean up, use `make clean` and `make distclean`.
-
+### Build it on Mac OS X
+```shell
+$ ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+$ brew install opam
+$ opam install menhir fileutils
+$ make
+```
+### Build it on windows
+First, you need to install `wodi`. 
+Then, in `wodi`, you must install `menhir` and `fileutils`.
+Then, just launch `make` in `touist-translator`.
+### Build it without `make`
 Alternatively, you can build by using `ocamlbuild -use-menhir -package fileutils
-touistc.native`.
+touistc.native`
