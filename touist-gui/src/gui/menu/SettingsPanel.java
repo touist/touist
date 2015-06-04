@@ -41,7 +41,7 @@ public class SettingsPanel extends AbstractComponentPanel {
         buttonGroup2.add(jRadioButtonSMTLQFIDL);
         
         switch(parent.getSolverSelection().getSelectedSolver()) {
-            case SAT4J : 
+            case SAT : 
                 jRadioButtonSAT4J.setSelected(true);
                 break;
             case QF_LRA : 
@@ -330,7 +330,7 @@ public class SettingsPanel extends AbstractComponentPanel {
     }//GEN-LAST:event_jComboBoxLanguagesActionPerformed
 
     private void jRadioButtonSAT4JActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButtonSAT4JActionPerformed
-        parent.getSolverSelection().setSelectedSolver(SolverSelection.SolverType.SAT4J);
+        parent.getSolverSelection().setSelectedSolver(SolverSelection.SolverType.SAT);
         jRadioButtonSMTLQFLRA.setSelected(false);
         jRadioButtonSMTLQFLIA.setSelected(false);
         jRadioButtonSMTLQFRDL.setSelected(false);

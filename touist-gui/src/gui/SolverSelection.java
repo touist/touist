@@ -11,14 +11,14 @@ package gui;
  */
 public class SolverSelection {
     public enum SolverType {
-            SAT4J, 
+            SAT, 
             QF_LRA, 
             QF_LIA, 
             QF_RDL, 
             QF_IDL
     };
     
-    private SolverType selectedSolver = SolverType.SAT4J;
+    private SolverType selectedSolver = SolverType.SAT;
     
     public SolverSelection() {
         

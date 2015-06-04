@@ -259,7 +259,7 @@ public class ParentEditionPanel extends AbstractComponentPanel {
                 
                 Process p = null;
                 
-                if (getFrame().getSolverSelection().getSelectedSolver() == SolverSelection.SolverType.SAT4J) {
+                if (getFrame().getSolverSelection().getSelectedSolver() == SolverSelection.SolverType.SAT) {
                     p = getFrame().getTranslatorSAT().getP();
                 } else {
                     p = getFrame().getTranslatorSMT().getP();                    
@@ -501,7 +501,7 @@ public class ParentEditionPanel extends AbstractComponentPanel {
             return State.EDITION;
         }
         
-        if (getFrame().getSolverSelection().getSelectedSolver() == SolverSelection.SolverType.SAT4J) {
+        if (getFrame().getSolverSelection().getSelectedSolver() == SolverSelection.SolverType.SAT) {
            
             try {
                 if(! getFrame().getTranslatorSAT().translate(bigAndFilePath)) {
