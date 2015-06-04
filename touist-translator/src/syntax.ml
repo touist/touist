@@ -64,6 +64,7 @@ and exp =
 and clause =
   | CInt              of int
   | CFloat            of float
+  | CNeg              of clause
   | CAdd              of clause * clause 
   | CSub              of clause * clause 
   | CMul              of clause * clause 

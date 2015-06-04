@@ -309,6 +309,13 @@ and eval_clause exp env =
   match exp with
   | CInt x   -> CInt x
   | CFloat x -> CFloat x
+  | CNeg x ->
+      begin
+        match eval_clause x env with
+        | CInt   x' -> CInt   (- x')
+        | CFloat x' -> CFloat (-. x')
+        | _ -> raise (TypeError (string_of_clause exp))
+      end
   | CAdd (x,y) ->
       begin
         match eval_clause x env, eval_clause y env with
