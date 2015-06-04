@@ -72,17 +72,59 @@ public class SolverSMT extends Solver {
                 ArrayList<String> result=new ArrayList<String>();
                 while(tokenizer.hasMoreTokens()){
                     String Token=tokenizer.nextToken();
+                    System.out.println("+++"+Token);
                         if(!Token.equals(" "))
                         {  
-                            if(Token.startsWith("/")){
-                                 System.out.println("wizz123"+Token);
-                                 String[] abcd=Token.split(" ");
-                                String operand1=abcd[1];
-                                String operand2=abcd[2];
+                            
+                            if(Token.startsWith("/") && Token.split(" ").length==1){
+                                System.out.println("je rentre1"+Token+Token.length());
+                                String operand1;
+                                String operand2;
+                                String a=tokenizer.nextToken();
+                                System.out.println("a"+a);
+                                 String[] ab=a.split(" ");
+                                 if(ab.length==2)
+                                 {  
+                                    operand1=ab[0]+ab[1];
+                                    System.out.println("b"+operand1);
+                                    operand2=(tokenizer.hasMoreTokens() == true)? tokenizer.nextToken() : null;
+                                    System.out.println("wizz12");
+                                 }
+                                 else{
+                                     System.out.println("wizz213"+ab[0]+ab[1]);
+                                     operand1=ab[0];
+                                     String[] abcd2 = (tokenizer.hasMoreTokens() == true)? tokenizer.nextToken().split(" ") : null;
+                                     operand2=abcd2[0]+abcd2[1];
+                                     
+                                 }
                                 result.add(operand1+"/"+operand2);
                             }
                             else{
-                                result.add(Token);
+                                System.out.println("je rentre2");
+                                if(Token.startsWith("/")){
+                                 String[] abcd=Token.split(" ");
+                                String operand1=abcd[1];                                
+                                String operand2=abcd[2];
+                                result.add(operand1+abcd[0]+operand2);
+                                }
+                                else{
+                                if(Token.startsWith("-")){
+                               String[] abcd=Token.split(" ");
+                                String operator=abcd[0];
+                                String operand1=abcd[1];
+                                result.add(operator+operand1);
+                                }
+                                else
+                                { if(Token.split(" ").length==2)
+                                    { String[] tt=Token.split(" ");
+                                    result.add(tt[0]);
+                                    result.add(tt[1]);
+                                    }
+                                    else{
+                                    result.add(Token);
+                                    }
+                                }
+                                }
                             }
                          }
                 }
@@ -93,7 +135,7 @@ public class SolverSMT extends Solver {
                         smt.addLiteral(new Literal(separateLV[0],separateLV[1].matches("true")));
                     }
                     else{
-                        //System.out.println(result.get(i)+"beug");
+                        System.out.println(result.get(i)+"beug");
                         //String[] abc=result.get(i).split(" ");
                        // System.out.println(result.get(i+1)+"beug");
                         smt.addLiteral(new Literal(result.get(i),result.get(i+1)));
