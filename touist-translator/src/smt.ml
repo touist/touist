@@ -45,8 +45,8 @@ let to_smt2 logic formula =
     | _ -> false
   in
 
-  let rec gen_var = function
-    | Term (x,None) -> add_var (sanitize_var x) "Bool"
+  let rec gen_var typ = function
+    | Term (x,None) -> add_var (sanitize_var x) typ
     | CAdd              (Term (x,None), CInt _)
     | CAdd              (CInt _, Term (x,None))
     | CSub              (Term (x,None), CInt _)
@@ -66,7 +66,7 @@ let to_smt2 logic formula =
     | CEqual            (Term (x,None), CInt _)
     | CEqual            (CInt _, Term (x,None))
     | CNot_equal        (Term (x,None), CInt _)
-    | CNot_equal        (CInt _, Term (x,None)) -> add_var x "Int"
+    | CNot_equal        (CInt _, Term (x,None)) -> add_var x typ
     | CAdd              (Term (x,None), CFloat _)
     | CAdd              (CFloat _, Term (x,None))
     | CSub              (Term (x,None), CFloat _)
@@ -86,7 +86,7 @@ let to_smt2 logic formula =
     | CEqual            (Term (x,None), CFloat _)
     | CEqual            (CFloat _, Term (x,None))
     | CNot_equal        (Term (x,None), CFloat _)
-    | CNot_equal        (CFloat _, Term (x,None)) -> add_var x "Real"
+    | CNot_equal        (CFloat _, Term (x,None)) -> add_var x typ
     | CAdd              (Term (x,None), Term (y,None))
     | CSub              (Term (x,None), Term (y,None))
     | CMul              (Term (x,None), Term (y,None))
@@ -107,12 +107,12 @@ let to_smt2 logic formula =
               add_var x y_type
             with Not_found -> failwith ("unknown type: " ^ x ^ ", " ^ y)
         end
-    | CNot x -> gen_var x
+    | CNot x -> gen_var typ x
     | CAnd     (x,y)
     | COr      (x,y)
     | CXor     (x,y)
     | CImplies (x,y)
-    | CEquiv   (x,y) -> gen_var x; gen_var y
+    | CEquiv   (x,y) -> gen_var typ x; gen_var typ y
     | CAdd              (x, CInt _) 
     | CAdd              (CInt _, x) 
     | CSub              (x, CInt _) 
@@ -134,7 +134,7 @@ let to_smt2 logic formula =
     | CGreater_or_equal (x, CInt _)
     | CGreater_or_equal (CInt _, x)->
         let rec go = function
-          | Term (x,None) -> add_var x "Int"
+          | Term (x,None) -> add_var x typ
           | CAdd (x,y)
           | CSub (x,y)
           | CMul (x,y)
@@ -163,7 +163,7 @@ let to_smt2 logic formula =
     | CGreater_or_equal (x, CFloat _)
     | CGreater_or_equal (CFloat _, x) ->
         let rec go = function
-          | Term (x,None) -> add_var x "Real"
+          | Term (x,None) -> add_var x typ
           | CAdd (x,y)
           | CSub (x,y)
           | CMul (x,y)
@@ -171,8 +171,117 @@ let to_smt2 logic formula =
           | _ -> failwith "not a term exp"
         in
         if term_expr x then go x else ()
+    | CAdd              (x, y) 
+    | CSub              (x, y) 
+    | CMul              (x, y) 
+    | CDiv              (x, y) 
+    | CEqual            (x, y)
+    | CNot_equal        (x, y)
+    | CLesser_than      (x, y)
+    | CLesser_or_equal  (x, y)
+    | CGreater_than     (x, y)
+    | CGreater_or_equal (x, y) -> gen_var typ x; gen_var typ y
     | _ -> ()
   in
+
+  let rec parse = function
+    | CEqual            (x, CInt y) -> gen_var "Int" x(*; CEqual (x, CInt y)*)
+    | CEqual            (CInt x, y) -> gen_var "Int" y(*; CEqual (CInt x, y)*)
+    | CNot_equal        (x, CInt y) -> gen_var "Int" x(*; CNot_equal (x, CInt
+    y)*)
+    | CNot_equal        (CInt x, y) -> gen_var "Int" y(*; CNot_equal (CInt x,
+    y)*)
+    | CLesser_than      (x, CInt y) -> gen_var "Int" x(*; CLesser_than (x, CInt
+    y)*)
+    | CLesser_than      (CInt x, y) -> gen_var "Int" y(*; CLesser_than (CInt x,
+    y)*)
+    | CLesser_or_equal  (x, CInt y) -> gen_var "Int" x(*; CLesser_or_equal (x,
+    CInt y)*)
+    | CLesser_or_equal  (CInt x, y) -> gen_var "Int" y(*; CLesser_or_equal (CInt
+    x, y)*)
+    | CGreater_than     (x, CInt y) -> gen_var "Int" x(*; CGreater_than (x, CInt
+    y)*)
+    | CGreater_than     (CInt x, y) -> gen_var "Int" y(*; CGreater_than (CInt x,
+    y)*)
+    | CGreater_or_equal (x, CInt y) -> gen_var "Int" x(*; CGreater_or_equal (x,
+    CInt y)*)
+    | CGreater_or_equal (CInt x, y) -> gen_var "Int" y(*; CGreater_or_equal
+    (CInt x, y)*)
+    | CEqual            (x, CFloat y) -> gen_var "Real" x(*; CEqual (x, CFloat
+    y)*)
+    | CEqual            (CFloat x, y) -> gen_var "Real" y(*; CEqual (CFloat x,
+    y)*)
+    | CNot_equal        (x, CFloat y) -> gen_var "Real" x(*; CNot_equal (x,
+    CFloat y)*)
+    | CNot_equal        (CFloat x, y) -> gen_var "Real" y(*; CNot_equal (CFloat
+    x, y)*)
+    | CLesser_than      (x, CFloat y) -> gen_var "Real" x(*; CLesser_than (x,
+    CFloat y)*)
+    | CLesser_than      (CFloat x, y) -> gen_var "Real" y(*; CLesser_than
+    (CFloat x, y)*)
+    | CLesser_or_equal  (x, CFloat y) -> gen_var "Real" x(*; CLesser_or_equal
+    (x, CFloat y)*)
+    | CLesser_or_equal  (CFloat x, y) -> gen_var "Real" y(*; CLesser_or_equal
+    (CFloat x, y)*)
+    | CGreater_than     (x, CFloat y) -> gen_var "Real" x(*; CGreater_than (x,
+    CFloat y)*)
+    | CGreater_than     (CFloat x, y) -> gen_var "Real" y(*; CGreater_than
+    (CFloat x, y)*)
+    | CGreater_or_equal (x, CFloat y) -> gen_var "Real" x(*; CGreater_or_equal
+    (x, CFloat y)*)
+    | CGreater_or_equal (CFloat x, y) -> gen_var "Real" y(*; CGreater_or_equal
+    (CFloat x, y)*)
+    | CAnd     (x, y) -> gen_var "Bool" x; gen_var "Bool" y(*; CAnd (x, y)*)
+    | COr      (x, y) -> gen_var "Bool" x; gen_var "Bool" y(*; COr  (x, y)*)
+    | CXor     (x, y) -> gen_var "Bool" x; gen_var "Bool" y(*; CXor (x, y)*)
+    | CImplies (x, y) -> gen_var "Bool" x; gen_var "Bool" y(*; CImplies (x, y)*)
+    | CEquiv   (x, y) -> gen_var "Bool" x; gen_var "Bool" y(*; CEquiv (x, y)*)
+    | _ -> failwith "parse error"
+  in
+  (*
+  let rec gen = function
+    | CAdd              (x, CInt y) -> gen_var x; CAdd (x, CInt y) 
+    | CAdd              (CInt x, y) -> gen_var y; CAdd (CInt x, y)
+    | CSub              (x, CInt y) -> gen_var x; CSub (x, CInt y)
+    | CSub              (CInt x, y) -> gen_var y; CSub (CInt x, y)
+    | CMul              (x, CInt y) -> gen_var x; CMul (x, CInt y) 
+    | CMul              (CInt x, y) -> gen_var y; CMul (CInt x, y)
+    | CDiv              (x, CInt y) -> gen_var x; CDiv (x, CInt y) 
+    | CDiv              (CInt x, y) -> gen_var y; CDiv (CInt x, y)
+    | CEqual            (x, CInt y) -> gen_var x; CEqual (x, CInt y)
+    | CEqual            (CInt x, y) -> gen_var y; CEqual (CInt x, y)
+    | CNot_equal        (x, CInt y) -> gen_var x; CNot_equal (x, CInt y)
+    | CNot_equal        (CInt x, y) -> gen_var y; CNot_equal (CInt x, y)
+    | CLesser_than      (x, CInt y) -> gen_var x; CLesser_than (x, CInt y)
+    | CLesser_than      (CInt x, y) -> gen_var y; CLesser_than (CInt x, y)
+    | CLesser_or_equal  (x, CInt y) -> gen_var x; CLesser_or_equal (x, CInt y)
+    | CLesser_or_equal  (CInt x, y) -> gen_var y; CLesser_or_equal (CInt x, y)
+    | CGreater_than     (x, CInt y) -> gen_var x; CGreater_than (x, CInt y)
+    | CGreater_than     (CInt x, y) -> gen_var y; CGreater_than (CInt x, y)
+    | CGreater_or_equal (x, CInt y) -> gen_var x; CGreater_or_equal (x, CInt y)
+    | CGreater_or_equal (CInt x, y) -> gen_var y; CGreater_or_equal (CInt x, y)
+    | CAdd              (x, CFloat y) -> gen_var x; CAdd (x, CFloat y) 
+    | CAdd              (CFloat x, y) -> gen_var y; CAdd (CFloat x, y)
+    | CSub              (x, CFloat y) -> gen_var x; CSub (x, CFloat y)
+    | CSub              (CFloat x, y) -> gen_var y; CSub (CFloat x, y)
+    | CMul              (x, CFloat y) -> gen_var x; CMul (x, CFloat y) 
+    | CMul              (CFloat x, y) -> gen_var y; CMul (CFloat x, y)
+    | CDiv              (x, CFloat y) -> gen_var x; CDiv (x, CFloat y) 
+    | CDiv              (CFloat x, y) -> gen_var y; CDiv (CFloat x, y)
+    | CEqual            (x, CFloat y) -> gen_var x; CEqual (x, CFloat y)
+    | CEqual            (CFloat x, y) -> gen_var y; CEqual (CFloat x, y)
+    | CNot_equal        (x, CFloat y) -> gen_var x; CNot_equal (x, CFloat y)
+    | CNot_equal        (CFloat x, y) -> gen_var y; CNot_equal (CFloat x, y)
+    | CLesser_than      (x, CFloat y) -> gen_var x; CLesser_than (x, CFloat y)
+    | CLesser_than      (CFloat x, y) -> gen_var y; CLesser_than (CFloat x, y)
+    | CLesser_or_equal  (x, CFloat y) -> gen_var x; CLesser_or_equal (x, CFloat y)
+    | CLesser_or_equal  (CFloat x, y) -> gen_var y; CLesser_or_equal (CFloat x, y)
+    | CGreater_than     (x, CFloat y) -> gen_var x; CGreater_than (x, CFloat y)
+    | CGreater_than     (CFloat x, y) -> gen_var y; CGreater_than (CFloat x, y)
+    | CGreater_or_equal (x, CFloat y) -> gen_var x; CGreater_or_equal (x, CFloat y)
+    | CGreater_or_equal (CFloat x, y) -> gen_var y; CGreater_or_equal (CFloat x, y)
+    | x -> gen_var x; x
+  in*)
 
   let rec write = function
     | Top                        -> "true"
@@ -201,7 +310,9 @@ let to_smt2 logic formula =
     | _ -> failwith "error smt write"
   in
   
-  gen_var formula;
+  (*gen_var formula;*)
+  (*gen formula;*)
+  parse formula;
   Hashtbl.iter (fun k v -> write_to_buf (decl_var k v)) vtbl;
   decl_assert (write formula) |> write_to_buf;
   write_to_buf "(check-sat)\n(get-value (";
