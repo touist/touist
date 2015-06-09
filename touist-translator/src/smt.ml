@@ -106,7 +106,7 @@ let to_smt2 logic formula =
             try
               let y_type = Hashtbl.find vtbl y in
               add_var x y_type
-            with Not_found -> failwith ("unknown type: " ^ x ^ ", " ^ y)
+            with Not_found -> add_var x typ; add_var y typ
         end
     | CNot x -> gen_var typ x
     | CAnd     (x,y)
