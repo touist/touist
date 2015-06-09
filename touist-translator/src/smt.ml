@@ -30,6 +30,21 @@ let to_smt2 logic formula =
     with Not_found -> name
   in
   
+  let rec term_expr = function
+    | Term (_,None)
+    | CNeg (Term _)
+    | CAdd (Term _, Term _)
+    | CSub (Term _, Term _)
+    | CMul (Term _, Term _)
+    | CDiv (Term _, Term _) -> true
+    | CNeg x -> term_expr x
+    | CAdd (x,y)
+    | CSub (x,y)
+    | CMul (x,y)
+    | CDiv (x,y) -> term_expr x && term_expr y
+    | _ -> false
+  in
+
   let rec gen_var = function
     | Term (x,None) -> add_var (sanitize_var x) "Bool"
     | CAdd              (Term (x,None), CInt _)
@@ -98,6 +113,64 @@ let to_smt2 logic formula =
     | CXor     (x,y)
     | CImplies (x,y)
     | CEquiv   (x,y) -> gen_var x; gen_var y
+    | CAdd              (x, CInt _) 
+    | CAdd              (CInt _, x) 
+    | CSub              (x, CInt _) 
+    | CSub              (CInt _, x) 
+    | CMul              (x, CInt _) 
+    | CMul              (CInt _, x) 
+    | CDiv              (x, CInt _) 
+    | CDiv              (CInt _, x)
+    | CEqual            (x, CInt _)
+    | CEqual            (CInt _, x)
+    | CNot_equal        (x, CInt _)
+    | CNot_equal        (CInt _, x)
+    | CLesser_than      (x, CInt _)
+    | CLesser_than      (CInt _, x)
+    | CLesser_or_equal  (x, CInt _)
+    | CLesser_or_equal  (CInt _, x)
+    | CGreater_than     (x, CInt _)
+    | CGreater_than     (CInt _, x)
+    | CGreater_or_equal (x, CInt _)
+    | CGreater_or_equal (CInt _, x)->
+        let rec go = function
+          | Term (x,None) -> add_var x "Int"
+          | CAdd (x,y)
+          | CSub (x,y)
+          | CMul (x,y)
+          | CDiv (x,y) -> go x; go y
+          | _ -> failwith "not a term exp"
+        in
+        if term_expr x then go x else ()
+    | CAdd              (x, CFloat _) 
+    | CAdd              (CFloat _, x) 
+    | CSub              (x, CFloat _) 
+    | CSub              (CFloat _, x) 
+    | CMul              (x, CFloat _) 
+    | CMul              (CFloat _, x) 
+    | CDiv              (x, CFloat _) 
+    | CDiv              (CFloat _, x)
+    | CEqual            (x, CFloat _)
+    | CEqual            (CFloat _, x)
+    | CNot_equal        (x, CFloat _)
+    | CNot_equal        (CFloat _, x)
+    | CLesser_than      (x, CFloat _)
+    | CLesser_than      (CFloat _, x)
+    | CLesser_or_equal  (x, CFloat _)
+    | CLesser_or_equal  (CFloat _, x)
+    | CGreater_than     (x, CFloat _)
+    | CGreater_than     (CFloat _, x)
+    | CGreater_or_equal (x, CFloat _)
+    | CGreater_or_equal (CFloat _, x) ->
+        let rec go = function
+          | Term (x,None) -> add_var x "Real"
+          | CAdd (x,y)
+          | CSub (x,y)
+          | CMul (x,y)
+          | CDiv (x,y) -> go x; go y
+          | _ -> failwith "not a term exp"
+        in
+        if term_expr x then go x else ()
     | _ -> ()
   in
 

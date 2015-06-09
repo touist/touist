@@ -314,7 +314,8 @@ and eval_clause exp env =
         match eval_clause x env with
         | CInt   x' -> CInt   (- x')
         | CFloat x' -> CFloat (-. x')
-        | _ -> raise (TypeError (string_of_clause exp))
+        | x' -> CNeg x'
+        (*| _ -> raise (TypeError (string_of_clause exp))*)
       end
   | CAdd (x,y) ->
       begin
@@ -323,28 +324,33 @@ and eval_clause exp env =
         | CFloat x', CFloat y' -> CFloat (x' +. y')
         | CInt _, Term _
         | Term _, CInt _ -> CAdd (x,y)
-        | _,_ -> raise (TypeError (string_of_clause exp))
+        | x', y' -> CAdd (x', y')
+        (*| _,_ -> raise (TypeError (string_of_clause exp))*)
       end
   | CSub (x,y) ->
       begin
         match eval_clause x env, eval_clause y env with
         | CInt x', CInt y'     -> CInt   (x' -  y')
         | CFloat x', CFloat y' -> CFloat (x' -. y')
-        | _,_ -> raise (TypeError (string_of_clause exp))
+        (*| Term x', Term y' -> CSub (Term x', Term y')*)
+        | x', y' -> CSub (x', y')
+        (*| _,_ -> raise (TypeError (string_of_clause exp))*)
       end
   | CMul (x,y) ->
       begin
         match eval_clause x env, eval_clause y env with
         | CInt x', CInt y'     -> CInt   (x' *  y')
         | CFloat x', CFloat y' -> CFloat (x' *. y')
-        | _,_ -> raise (TypeError (string_of_clause exp))
+        | x', y' -> CMul (x', y')
+        (*| _,_ -> raise (TypeError (string_of_clause exp))*)
       end
   | CDiv (x,y) ->
       begin
         match eval_clause x env, eval_clause y env with
         | CInt x', CInt y'     -> CInt   (x' /  y')
         | CFloat x', CFloat y' -> CFloat (x' /. y')
-        | _,_ -> raise (TypeError (string_of_clause exp))
+        | x', y' -> CDiv (x', y')
+        (*| _,_ -> raise (TypeError (string_of_clause exp))*)
       end
   | CEqual            (x,y) -> CEqual            (eval_clause x env, eval_clause y env)
   | CNot_equal        (x,y) -> CNot_equal        (eval_clause x env, eval_clause y env)
