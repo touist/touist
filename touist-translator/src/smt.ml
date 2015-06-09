@@ -7,6 +7,11 @@ let to_smt2 logic formula =
  
   let write_to_buf = Buffer.add_string out in
 
+  let add_var name typ =
+    if not (Hashtbl.mem vtbl name) then
+      Hashtbl.replace vtbl name typ
+  in
+
   let decl_var name typ =
     "(declare-fun " ^ name ^ " () " ^ typ ^ ")\n"
   in
@@ -26,11 +31,6 @@ let to_smt2 logic formula =
     with Not_found -> name
   in
   
-  let add_var name typ =
-    if not (Hashtbl.mem vtbl name) then
-      Hashtbl.add vtbl (sanitize_var name) typ
-  in
-
   let rec term_expr = function
     | Term (_,None)
     | CNeg (Term _)
@@ -316,7 +316,7 @@ let to_smt2 logic formula =
   (*gen_var formula;*)
   (*gen formula;*)
   parse formula;
-  Hashtbl.iter (fun k v -> write_to_buf (decl_var k v)) vtbl;
+  Hashtbl.iter (fun k v -> write_to_buf (decl_var (sanitize_var k) v)) vtbl;
   decl_assert (write formula) |> write_to_buf;
   write_to_buf "(check-sat)\n(get-value (";
   Hashtbl.iter (fun k _ -> write_to_buf (k ^ " ")) vtbl;
