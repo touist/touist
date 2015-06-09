@@ -26,6 +26,7 @@ let to_smt2 logic formula =
       Bytes.set name lparen_index '_';
       Bytes.set name rparen_index '_';
       String.iteri (fun i c -> if (c = ',') then Bytes.set name i '_';) name;
+      String.iteri (fun i c -> if (c = ' ') then Bytes.set name i '_';)  name;
       name
     with Not_found -> name
   in
