@@ -47,7 +47,7 @@ let to_smt2 logic formula =
   in
 
   let rec gen_var typ = function
-    | Term (x,None) -> add_var x "Bool"
+    | Term (x,None) -> add_var x typ
     | CAdd              (Term (x,None), CInt _)
     | CAdd              (CInt _, Term (x,None))
     | CSub              (Term (x,None), CInt _)
