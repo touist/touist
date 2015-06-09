@@ -7,11 +7,6 @@ let to_smt2 logic formula =
  
   let write_to_buf = Buffer.add_string out in
 
-  let add_var name typ =
-    if not (Hashtbl.mem vtbl name) then
-      Hashtbl.add vtbl name typ
-  in
-
   let decl_var name typ =
     "(declare-fun " ^ name ^ " () " ^ typ ^ ")\n"
   in
@@ -31,6 +26,11 @@ let to_smt2 logic formula =
     with Not_found -> name
   in
   
+  let add_var name typ =
+    if not (Hashtbl.mem vtbl name) then
+      Hashtbl.add vtbl (sanitize_var name) typ
+  in
+
   let rec term_expr = function
     | Term (_,None)
     | CNeg (Term _)
@@ -47,7 +47,7 @@ let to_smt2 logic formula =
   in
 
   let rec gen_var typ = function
-    | Term (x,None) -> add_var (sanitize_var x) typ
+    | Term (x,None) -> add_var x "Bool"
     | CAdd              (Term (x,None), CInt _)
     | CAdd              (CInt _, Term (x,None))
     | CSub              (Term (x,None), CInt _)
@@ -67,7 +67,7 @@ let to_smt2 logic formula =
     | CEqual            (Term (x,None), CInt _)
     | CEqual            (CInt _, Term (x,None))
     | CNot_equal        (Term (x,None), CInt _)
-    | CNot_equal        (CInt _, Term (x,None)) -> add_var x typ
+    | CNot_equal        (CInt _, Term (x,None)) -> add_var x "Int"
     | CAdd              (Term (x,None), CFloat _)
     | CAdd              (CFloat _, Term (x,None))
     | CSub              (Term (x,None), CFloat _)
@@ -87,7 +87,7 @@ let to_smt2 logic formula =
     | CEqual            (Term (x,None), CFloat _)
     | CEqual            (CFloat _, Term (x,None))
     | CNot_equal        (Term (x,None), CFloat _)
-    | CNot_equal        (CFloat _, Term (x,None)) -> add_var x typ
+    | CNot_equal        (CFloat _, Term (x,None)) -> add_var x "Float"
     | CAdd              (Term (x,None), Term (y,None))
     | CSub              (Term (x,None), Term (y,None))
     | CMul              (Term (x,None), Term (y,None))
@@ -106,14 +106,16 @@ let to_smt2 logic formula =
             try
               let y_type = Hashtbl.find vtbl y in
               add_var x y_type
-            with Not_found -> add_var x typ; add_var y typ
+            with Not_found ->
+              add_var x typ;
+              add_var y typ
         end
     | CNot x -> gen_var typ x
     | CAnd     (x,y)
     | COr      (x,y)
     | CXor     (x,y)
     | CImplies (x,y)
-    | CEquiv   (x,y) -> gen_var typ x; gen_var typ y
+    | CEquiv   (x,y) -> gen_var "Bool" x; gen_var "Bool" y
     | CAdd              (x, CInt _) 
     | CAdd              (CInt _, x) 
     | CSub              (x, CInt _) 
@@ -135,7 +137,7 @@ let to_smt2 logic formula =
     | CGreater_or_equal (x, CInt _)
     | CGreater_or_equal (CInt _, x)->
         let rec go = function
-          | Term (x,None) -> add_var x typ
+          | Term (x,None) -> add_var x "Int"
           | CAdd (x,y)
           | CSub (x,y)
           | CMul (x,y)
@@ -164,7 +166,7 @@ let to_smt2 logic formula =
     | CGreater_or_equal (x, CFloat _)
     | CGreater_or_equal (CFloat _, x) ->
         let rec go = function
-          | Term (x,None) -> add_var x typ
+          | Term (x,None) -> add_var x "Real"
           | CAdd (x,y)
           | CSub (x,y)
           | CMul (x,y)
