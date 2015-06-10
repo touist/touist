@@ -9,7 +9,7 @@ let to_smt2 logic formula =
 
   let add_var name typ =
     if not (Hashtbl.mem vtbl name) then
-      Hashtbl.add vtbl name typ
+      Hashtbl.replace vtbl name typ
   in
 
   let decl_var name typ =
@@ -26,12 +26,28 @@ let to_smt2 logic formula =
       Bytes.set name lparen_index '_';
       Bytes.set name rparen_index '_';
       String.iteri (fun i c -> if (c = ',') then Bytes.set name i '_';) name;
+      String.iteri (fun i c -> if (c = ' ') then Bytes.set name i '_';)  name;
       name
     with Not_found -> name
   in
   
-  let rec gen_var = function
-    | Term (x,None) -> add_var (sanitize_var x) "Bool"
+  let rec term_expr = function
+    | Term (_,None)
+    | CNeg (Term _)
+    | CAdd (Term _, Term _)
+    | CSub (Term _, Term _)
+    | CMul (Term _, Term _)
+    | CDiv (Term _, Term _) -> true
+    | CNeg x -> term_expr x
+    | CAdd (x,y)
+    | CSub (x,y)
+    | CMul (x,y)
+    | CDiv (x,y) -> term_expr x && term_expr y
+    | _ -> false
+  in
+
+  let rec gen_var typ = function
+    | Term (x,None) -> add_var x typ
     | CAdd              (Term (x,None), CInt _)
     | CAdd              (CInt _, Term (x,None))
     | CSub              (Term (x,None), CInt _)
@@ -71,7 +87,7 @@ let to_smt2 logic formula =
     | CEqual            (Term (x,None), CFloat _)
     | CEqual            (CFloat _, Term (x,None))
     | CNot_equal        (Term (x,None), CFloat _)
-    | CNot_equal        (CFloat _, Term (x,None)) -> add_var x "Real"
+    | CNot_equal        (CFloat _, Term (x,None)) -> add_var x "Float"
     | CAdd              (Term (x,None), Term (y,None))
     | CSub              (Term (x,None), Term (y,None))
     | CMul              (Term (x,None), Term (y,None))
@@ -90,31 +106,166 @@ let to_smt2 logic formula =
             try
               let y_type = Hashtbl.find vtbl y in
               add_var x y_type
-            with Not_found -> failwith ("unknown type: " ^ x ^ ", " ^ y)
+            with Not_found ->
+              add_var x typ;
+              add_var y typ
         end
-    | CNot x -> gen_var x
+    | CNot x -> gen_var typ x
     | CAnd     (x,y)
     | COr      (x,y)
     | CXor     (x,y)
     | CImplies (x,y)
-    | CEquiv   (x,y) -> gen_var x; gen_var y
+    | CEquiv   (x,y) -> gen_var "Bool" x; gen_var "Bool" y
+    | CAdd              (x, CInt _) 
+    | CAdd              (CInt _, x) 
+    | CSub              (x, CInt _) 
+    | CSub              (CInt _, x) 
+    | CMul              (x, CInt _) 
+    | CMul              (CInt _, x) 
+    | CDiv              (x, CInt _) 
+    | CDiv              (CInt _, x)
+    | CEqual            (x, CInt _)
+    | CEqual            (CInt _, x)
+    | CNot_equal        (x, CInt _)
+    | CNot_equal        (CInt _, x)
+    | CLesser_than      (x, CInt _)
+    | CLesser_than      (CInt _, x)
+    | CLesser_or_equal  (x, CInt _)
+    | CLesser_or_equal  (CInt _, x)
+    | CGreater_than     (x, CInt _)
+    | CGreater_than     (CInt _, x)
+    | CGreater_or_equal (x, CInt _)
+    | CGreater_or_equal (CInt _, x)->
+        let rec go = function
+          | Term (x,None) -> add_var x "Int"
+          | CAdd (x,y)
+          | CSub (x,y)
+          | CMul (x,y)
+          | CDiv (x,y) -> go x; go y
+          | _ -> failwith "not a term exp"
+        in
+        if term_expr x then go x else ()
+    | CAdd              (x, CFloat _) 
+    | CAdd              (CFloat _, x) 
+    | CSub              (x, CFloat _) 
+    | CSub              (CFloat _, x) 
+    | CMul              (x, CFloat _) 
+    | CMul              (CFloat _, x) 
+    | CDiv              (x, CFloat _) 
+    | CDiv              (CFloat _, x)
+    | CEqual            (x, CFloat _)
+    | CEqual            (CFloat _, x)
+    | CNot_equal        (x, CFloat _)
+    | CNot_equal        (CFloat _, x)
+    | CLesser_than      (x, CFloat _)
+    | CLesser_than      (CFloat _, x)
+    | CLesser_or_equal  (x, CFloat _)
+    | CLesser_or_equal  (CFloat _, x)
+    | CGreater_than     (x, CFloat _)
+    | CGreater_than     (CFloat _, x)
+    | CGreater_or_equal (x, CFloat _)
+    | CGreater_or_equal (CFloat _, x) ->
+        let rec go = function
+          | Term (x,None) -> add_var x "Real"
+          | CAdd (x,y)
+          | CSub (x,y)
+          | CMul (x,y)
+          | CDiv (x,y) -> go x; go y
+          | _ -> failwith "not a term exp"
+        in
+        if term_expr x then go x else ()
+    | CAdd              (x, y) 
+    | CSub              (x, y) 
+    | CMul              (x, y) 
+    | CDiv              (x, y) 
+    | CEqual            (x, y)
+    | CNot_equal        (x, y)
+    | CLesser_than      (x, y)
+    | CLesser_or_equal  (x, y)
+    | CGreater_than     (x, y)
+    | CGreater_or_equal (x, y) -> gen_var typ x; gen_var typ y
     | _ -> ()
   in
 
+  let rec parse = function
+    | CEqual            (x, CInt y) -> gen_var "Int" x(*; CEqual (x, CInt y)*)
+    | CEqual            (CInt x, y) -> gen_var "Int" y(*; CEqual (CInt x, y)*)
+    | CNot_equal        (x, CInt y) -> gen_var "Int" x(*; CNot_equal (x, CInt
+    y)*)
+    | CNot_equal        (CInt x, y) -> gen_var "Int" y(*; CNot_equal (CInt x,
+    y)*)
+    | CLesser_than      (x, CInt y) -> gen_var "Int" x(*; CLesser_than (x, CInt
+    y)*)
+    | CLesser_than      (CInt x, y) -> gen_var "Int" y(*; CLesser_than (CInt x,
+    y)*)
+    | CLesser_or_equal  (x, CInt y) -> gen_var "Int" x(*; CLesser_or_equal (x,
+    CInt y)*)
+    | CLesser_or_equal  (CInt x, y) -> gen_var "Int" y(*; CLesser_or_equal (CInt
+    x, y)*)
+    | CGreater_than     (x, CInt y) -> gen_var "Int" x(*; CGreater_than (x, CInt
+    y)*)
+    | CGreater_than     (CInt x, y) -> gen_var "Int" y(*; CGreater_than (CInt x,
+    y)*)
+    | CGreater_or_equal (x, CInt y) -> gen_var "Int" x(*; CGreater_or_equal (x,
+    CInt y)*)
+    | CGreater_or_equal (CInt x, y) -> gen_var "Int" y(*; CGreater_or_equal
+    (CInt x, y)*)
+    | CEqual            (x, CFloat y) -> gen_var "Real" x(*; CEqual (x, CFloat
+    y)*)
+    | CEqual            (CFloat x, y) -> gen_var "Real" y(*; CEqual (CFloat x,
+    y)*)
+    | CNot_equal        (x, CFloat y) -> gen_var "Real" x(*; CNot_equal (x,
+    CFloat y)*)
+    | CNot_equal        (CFloat x, y) -> gen_var "Real" y(*; CNot_equal (CFloat
+    x, y)*)
+    | CLesser_than      (x, CFloat y) -> gen_var "Real" x(*; CLesser_than (x,
+    CFloat y)*)
+    | CLesser_than      (CFloat x, y) -> gen_var "Real" y(*; CLesser_than
+    (CFloat x, y)*)
+    | CLesser_or_equal  (x, CFloat y) -> gen_var "Real" x(*; CLesser_or_equal
+    (x, CFloat y)*)
+    | CLesser_or_equal  (CFloat x, y) -> gen_var "Real" y(*; CLesser_or_equal
+    (CFloat x, y)*)
+    | CGreater_than     (x, CFloat y) -> gen_var "Real" x(*; CGreater_than (x,
+    CFloat y)*)
+    | CGreater_than     (CFloat x, y) -> gen_var "Real" y(*; CGreater_than
+    (CFloat x, y)*)
+    | CGreater_or_equal (x, CFloat y) -> gen_var "Real" x(*; CGreater_or_equal
+    (x, CFloat y)*)
+    | CGreater_or_equal (CFloat x, y) -> gen_var "Real" y(*; CGreater_or_equal
+    (CFloat x, y)*)
+    | CAnd     (x, y) -> gen_var "Bool" x; gen_var "Bool" y(*; CAnd (x, y)*)
+    | COr      (x, y) -> gen_var "Bool" x; gen_var "Bool" y(*; COr  (x, y)*)
+    | CXor     (x, y) -> gen_var "Bool" x; gen_var "Bool" y(*; CXor (x, y)*)
+    | CImplies (x, y) -> gen_var "Bool" x; gen_var "Bool" y(*; CImplies (x, y)*)
+    | CEquiv   (x, y) -> gen_var "Bool" x; gen_var "Bool" y(*; CEquiv (x, y)*)
+    | _ -> failwith "parse error"
+  in
+  
   let rec write = function
     | Top                        -> "true"
     | Bottom                     -> "false"
     | Term              (x,None) -> sanitize_var x
-    | CInt              x        -> string_of_int   x
+    | CInt x -> 
+        if x < 0 then
+          "(- " ^ string_of_int (-x) ^ ")"
+        else
+          string_of_int   x
     | CFloat x ->
-        let x' = string_of_float x in
-        if x'.[String.length x' - 1] = '.' then x' ^ "0" else x'
+        let x'  = string_of_float x in
+        let x'' = if x'.[String.length x' - 1] = '.' then x' ^ "0" else x' in
+        if x''.[0] = '-' then
+          "(- " ^ String.sub x'' 1 (String.length x'' - 1) ^ ")"
+        else
+          x''
     | CNot              x        -> decl_un_op  "not" (write x)
     | CAnd              (x,y)    -> decl_bin_op "and" (write x) (write y)
     | COr               (x,y)    -> decl_bin_op "or"  (write x) (write y)
     | CXor              (x,y)    -> decl_bin_op "xor" (write x) (write y)
     | CImplies          (x,y)    -> decl_bin_op "=>" (write x) (write y)
     | CEquiv            (x,y)    -> write (CAnd (CImplies (x,y), CImplies (y,x)))
+    | CNeg              (CInt x) -> "(- " ^ string_of_int (-x) ^ ")"
+    | CNeg              (CFloat x) -> "(- " ^ string_of_float (-.x) ^ ")"
     | CAdd              (x,y)    -> decl_bin_op "+" (write x) (write y)
     | CSub              (x,y)    -> decl_bin_op "-" (write x) (write y)
     | CMul              (x,y)    -> decl_bin_op "*" (write x) (write y)
@@ -128,8 +279,10 @@ let to_smt2 logic formula =
     | _ -> failwith "error smt write"
   in
   
-  gen_var formula;
-  Hashtbl.iter (fun k v -> write_to_buf (decl_var k v)) vtbl;
+  (*gen_var formula;*)
+  (*gen formula;*)
+  parse formula;
+  Hashtbl.iter (fun k v -> write_to_buf (decl_var (sanitize_var k) v)) vtbl;
   decl_assert (write formula) |> write_to_buf;
   write_to_buf "(check-sat)\n(get-value (";
   Hashtbl.iter (fun k _ -> write_to_buf (k ^ " ")) vtbl;

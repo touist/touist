@@ -19,10 +19,12 @@ and is_conj = function
   | x -> failwith ("is_conj: unexpected value " ^ (string_of_clause x))
 
 let rec push_lit lit = function
-  | Term x -> COr (lit, Term x)
+  | Top           -> Top
+  | Bottom        -> lit
+  | Term x        -> COr (lit, Term x)
   | CNot (Term x) -> COr (lit, CNot (Term x))
-  | CAnd (x,y) -> CAnd (push_lit lit x, push_lit lit y)
-  | COr (x,y) -> COr (lit, COr (x,y))
+  | CAnd (x,y)    -> CAnd (push_lit lit x, push_lit lit y)
+  | COr (x,y)     -> COr (lit, COr (x,y))
   | x -> failwith ("push_lit: unexpected value " ^ (string_of_clause x)) 
 
 let rec to_cnf = function
