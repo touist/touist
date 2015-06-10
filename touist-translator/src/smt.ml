@@ -241,51 +241,7 @@ let to_smt2 logic formula =
     | CEquiv   (x, y) -> gen_var "Bool" x; gen_var "Bool" y(*; CEquiv (x, y)*)
     | _ -> failwith "parse error"
   in
-  (*
-  let rec gen = function
-    | CAdd              (x, CInt y) -> gen_var x; CAdd (x, CInt y) 
-    | CAdd              (CInt x, y) -> gen_var y; CAdd (CInt x, y)
-    | CSub              (x, CInt y) -> gen_var x; CSub (x, CInt y)
-    | CSub              (CInt x, y) -> gen_var y; CSub (CInt x, y)
-    | CMul              (x, CInt y) -> gen_var x; CMul (x, CInt y) 
-    | CMul              (CInt x, y) -> gen_var y; CMul (CInt x, y)
-    | CDiv              (x, CInt y) -> gen_var x; CDiv (x, CInt y) 
-    | CDiv              (CInt x, y) -> gen_var y; CDiv (CInt x, y)
-    | CEqual            (x, CInt y) -> gen_var x; CEqual (x, CInt y)
-    | CEqual            (CInt x, y) -> gen_var y; CEqual (CInt x, y)
-    | CNot_equal        (x, CInt y) -> gen_var x; CNot_equal (x, CInt y)
-    | CNot_equal        (CInt x, y) -> gen_var y; CNot_equal (CInt x, y)
-    | CLesser_than      (x, CInt y) -> gen_var x; CLesser_than (x, CInt y)
-    | CLesser_than      (CInt x, y) -> gen_var y; CLesser_than (CInt x, y)
-    | CLesser_or_equal  (x, CInt y) -> gen_var x; CLesser_or_equal (x, CInt y)
-    | CLesser_or_equal  (CInt x, y) -> gen_var y; CLesser_or_equal (CInt x, y)
-    | CGreater_than     (x, CInt y) -> gen_var x; CGreater_than (x, CInt y)
-    | CGreater_than     (CInt x, y) -> gen_var y; CGreater_than (CInt x, y)
-    | CGreater_or_equal (x, CInt y) -> gen_var x; CGreater_or_equal (x, CInt y)
-    | CGreater_or_equal (CInt x, y) -> gen_var y; CGreater_or_equal (CInt x, y)
-    | CAdd              (x, CFloat y) -> gen_var x; CAdd (x, CFloat y) 
-    | CAdd              (CFloat x, y) -> gen_var y; CAdd (CFloat x, y)
-    | CSub              (x, CFloat y) -> gen_var x; CSub (x, CFloat y)
-    | CSub              (CFloat x, y) -> gen_var y; CSub (CFloat x, y)
-    | CMul              (x, CFloat y) -> gen_var x; CMul (x, CFloat y) 
-    | CMul              (CFloat x, y) -> gen_var y; CMul (CFloat x, y)
-    | CDiv              (x, CFloat y) -> gen_var x; CDiv (x, CFloat y) 
-    | CDiv              (CFloat x, y) -> gen_var y; CDiv (CFloat x, y)
-    | CEqual            (x, CFloat y) -> gen_var x; CEqual (x, CFloat y)
-    | CEqual            (CFloat x, y) -> gen_var y; CEqual (CFloat x, y)
-    | CNot_equal        (x, CFloat y) -> gen_var x; CNot_equal (x, CFloat y)
-    | CNot_equal        (CFloat x, y) -> gen_var y; CNot_equal (CFloat x, y)
-    | CLesser_than      (x, CFloat y) -> gen_var x; CLesser_than (x, CFloat y)
-    | CLesser_than      (CFloat x, y) -> gen_var y; CLesser_than (CFloat x, y)
-    | CLesser_or_equal  (x, CFloat y) -> gen_var x; CLesser_or_equal (x, CFloat y)
-    | CLesser_or_equal  (CFloat x, y) -> gen_var y; CLesser_or_equal (CFloat x, y)
-    | CGreater_than     (x, CFloat y) -> gen_var x; CGreater_than (x, CFloat y)
-    | CGreater_than     (CFloat x, y) -> gen_var y; CGreater_than (CFloat x, y)
-    | CGreater_or_equal (x, CFloat y) -> gen_var x; CGreater_or_equal (x, CFloat y)
-    | CGreater_or_equal (CFloat x, y) -> gen_var y; CGreater_or_equal (CFloat x, y)
-    | x -> gen_var x; x
-  in*)
-
+  
   let rec write = function
     | Top                        -> "true"
     | Bottom                     -> "false"
@@ -296,11 +252,12 @@ let to_smt2 logic formula =
         else
           string_of_int   x
     | CFloat x ->
-        if x < 0.0 then
-          "(- " ^ string_of_float (-.x) ^ ")"
+        let x'  = string_of_float x in
+        let x'' = if x'.[String.length x' - 1] = '.' then x' ^ "0" else x' in
+        if x''.[0] = '-' then
+          "(- " ^ String.sub x'' 1 (String.length x'' - 1) ^ ")"
         else
-          let x' = string_of_float x in
-          if x'.[String.length x' - 1] = '.' then x' ^ "0" else x'
+          "(" ^ x'' ^ ")"
     | CNot              x        -> decl_un_op  "not" (write x)
     | CAnd              (x,y)    -> decl_bin_op "and" (write x) (write y)
     | COr               (x,y)    -> decl_bin_op "or"  (write x) (write y)
