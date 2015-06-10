@@ -20,15 +20,10 @@ let to_smt2 logic formula =
   let decl_un_op  op x   = "(" ^ op ^ " " ^ x ^ ")" in
   
   let sanitize_var name =
-    try
-      let lparen_index = String.index name '(' in
-      let rparen_index = String.index name ')' in
-      Bytes.set name lparen_index '_';
-      Bytes.set name rparen_index '_';
-      String.iteri (fun i c -> if (c = ',') then Bytes.set name i '_';) name;
-      String.iteri (fun i c -> if (c = ' ') then Bytes.set name i '_';)  name;
-      name
-    with Not_found -> name
+    String.map (fun c ->
+      if (c = '(') ||
+         (c = ')') ||
+         (c = ',') || (c = ' ') then '_' else c) name
   in
   
   let rec term_expr = function
@@ -285,6 +280,6 @@ let to_smt2 logic formula =
   Hashtbl.iter (fun k v -> write_to_buf (decl_var (sanitize_var k) v)) vtbl;
   decl_assert (write formula) |> write_to_buf;
   write_to_buf "(check-sat)\n(get-value (";
-  Hashtbl.iter (fun k _ -> write_to_buf (k ^ " ")) vtbl;
+  Hashtbl.iter (fun k _ -> write_to_buf (sanitize_var k ^ " ")) vtbl;
   write_to_buf "))";
   out
