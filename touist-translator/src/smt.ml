@@ -290,18 +290,25 @@ let to_smt2 logic formula =
     | Top                        -> "true"
     | Bottom                     -> "false"
     | Term              (x,None) -> sanitize_var x
-    | CInt              x        -> string_of_int   x
+    | CInt x -> 
+        if x < 0 then
+          "(- " ^ string_of_int (-x) ^ ")"
+        else
+          string_of_int   x
     | CFloat x ->
-        let x' = string_of_float x in
-        if x'.[String.length x' - 1] = '.' then x' ^ "0" else x'
+        if x < 0.0 then
+          "(- " ^ string_of_float (-.x) ^ ")"
+        else
+          let x' = string_of_float x in
+          if x'.[String.length x' - 1] = '.' then x' ^ "0" else x'
     | CNot              x        -> decl_un_op  "not" (write x)
     | CAnd              (x,y)    -> decl_bin_op "and" (write x) (write y)
     | COr               (x,y)    -> decl_bin_op "or"  (write x) (write y)
     | CXor              (x,y)    -> decl_bin_op "xor" (write x) (write y)
     | CImplies          (x,y)    -> decl_bin_op "=>" (write x) (write y)
     | CEquiv            (x,y)    -> write (CAnd (CImplies (x,y), CImplies (y,x)))
-    | CNeg              (CInt x) -> string_of_int x
-    | CNeg              (CFloat x) -> string_of_float x
+    | CNeg              (CInt x) -> "(- " ^ string_of_int (-x) ^ ")"
+    | CNeg              (CFloat x) -> "(- " ^ string_of_float (-.x) ^ ")"
     | CAdd              (x,y)    -> decl_bin_op "+" (write x) (write y)
     | CSub              (x,y)    -> decl_bin_op "-" (write x) (write y)
     | CMul              (x,y)    -> decl_bin_op "*" (write x) (write y)
