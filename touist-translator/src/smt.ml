@@ -257,7 +257,7 @@ let to_smt2 logic formula =
         if x''.[0] = '-' then
           "(- " ^ String.sub x'' 1 (String.length x'' - 1) ^ ")"
         else
-          "(" ^ x'' ^ ")"
+          x''
     | CNot              x        -> decl_un_op  "not" (write x)
     | CAnd              (x,y)    -> decl_bin_op "and" (write x) (write y)
     | COr               (x,y)    -> decl_bin_op "or"  (write x) (write y)
