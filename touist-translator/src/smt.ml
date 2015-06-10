@@ -300,6 +300,8 @@ let to_smt2 logic formula =
     | CXor              (x,y)    -> decl_bin_op "xor" (write x) (write y)
     | CImplies          (x,y)    -> decl_bin_op "=>" (write x) (write y)
     | CEquiv            (x,y)    -> write (CAnd (CImplies (x,y), CImplies (y,x)))
+    | CNeg              (CInt x) -> string_of_int x
+    | CNeg              (CFloat x) -> string_of_float x
     | CAdd              (x,y)    -> decl_bin_op "+" (write x) (write y)
     | CSub              (x,y)    -> decl_bin_op "-" (write x) (write y)
     | CMul              (x,y)    -> decl_bin_op "*" (write x) (write y)
