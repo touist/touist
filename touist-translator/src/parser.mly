@@ -25,16 +25,18 @@
 
 %start <Syntax.prog> prog
 
-%left IN
-%left ADD SUB
-%left MUL DIV
-%nonassoc neg
-%left MOD
+%left LE GE LT GT EQUAL NOTEQUAL
 %right EQUIV IMPLIES
 %left OR
 %left AND
 %left XOR
 %left NOT
+left IN
+%left SUB
+%left ADD
+%left MUL DIV
+%left MOD
+%nonassoc neg
 
 %%
 
