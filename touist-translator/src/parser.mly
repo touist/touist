@@ -30,7 +30,7 @@
 %left AND
 %left XOR
 %left NOT
-left IN
+%left IN
 %left LE GE LT GT EQUAL NOTEQUAL
 %left SUB
 %left ADD
