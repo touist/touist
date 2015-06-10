@@ -9,12 +9,12 @@ let rec string_of_exp = function
   | Clause x -> string_of_clause x
   | Set    x -> string_of_set x
   | Set_decl x -> "<set-decl>"
-  | Neg x     -> "- " ^ (string_of_exp x)
-  | Add (x,y) -> (string_of_exp x) ^ " + "   ^ (string_of_exp y)
-  | Sub (x,y) -> (string_of_exp x) ^ " - "   ^ (string_of_exp y)
-  | Mul (x,y) -> (string_of_exp x) ^ " * "   ^ (string_of_exp y)
-  | Div (x,y) -> (string_of_exp x) ^ " / "   ^ (string_of_exp y)
-  | Mod (x,y) -> (string_of_exp x) ^ " mod " ^ (string_of_exp y)
+  | Neg x     -> "(- " ^ (string_of_exp x) ^ ")"
+  | Add (x,y) -> "(" ^ (string_of_exp x) ^ " + "   ^ (string_of_exp y) ^ ")"
+  | Sub (x,y) -> "(" ^ (string_of_exp x) ^ " - "   ^ (string_of_exp y) ^ ")"
+  | Mul (x,y) -> "(" ^ (string_of_exp x) ^ " * "   ^ (string_of_exp y) ^ ")"
+  | Div (x,y) -> "(" ^ (string_of_exp x) ^ " / "   ^ (string_of_exp y) ^ ")"
+  | Mod (x,y) -> "(" ^ (string_of_exp x) ^ " mod " ^ (string_of_exp y) ^ ")"
   | Sqrt     x -> "sqrt("  ^ (string_of_exp x) ^ ")"
   | To_int   x -> "int("   ^ (string_of_exp x) ^ ")"
   | To_float x -> "float(" ^ (string_of_exp x) ^ ")"
@@ -46,6 +46,7 @@ let rec string_of_exp = function
 and string_of_clause = function
   | CInt x -> string_of_int x
   | CFloat x -> string_of_float x
+  | CNeg x -> "(-" ^ (string_of_clause x) ^ ")"
   | CAdd (x,y) -> "(" ^ (string_of_clause x) ^ " + " ^ (string_of_clause y) ^ ")"
   | CSub (x,y) -> "(" ^ (string_of_clause x) ^ " - " ^ (string_of_clause y) ^ ")"
   | CMul (x,y) -> "(" ^ (string_of_clause x) ^ " * " ^ (string_of_clause y) ^ ")"
