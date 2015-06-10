@@ -280,6 +280,6 @@ let to_smt2 logic formula =
   Hashtbl.iter (fun k v -> write_to_buf (decl_var (sanitize_var k) v)) vtbl;
   decl_assert (write formula) |> write_to_buf;
   write_to_buf "(check-sat)\n(get-value (";
-  Hashtbl.iter (fun k _ -> write_to_buf (k ^ " ")) vtbl;
+  Hashtbl.iter (fun k _ -> write_to_buf (sanitize_var k ^ " ")) vtbl;
   write_to_buf "))";
   out
