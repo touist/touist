@@ -1,9 +1,35 @@
 language: java
-jdk: 
-    - openjdk6
+os:
+  - linux
+  - osx
+# Install packages using apt-get on linux environment
+addons:
+  apt:
+    sources:
+    - avsm
+    packages:
+    - opam
+before_install:
+  # Install packages using brew on osx environment
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update && brew install opam ant; fi
+  - opam init --auto-setup
+  - eval `opam config env`
+  - opam install --yes ocamlfind menhir fileutils
 install:
-    - cd touist-gui
-    - ant build
-    - ant build-jar
+  - cd touist-translator
+  - ./configure --bindir ../touist-gui/external
+  - make && make install
+  - cd ../touist-gui
+  - chmod ugo+x external/touistc  
+  - ant zip
+  - zip=$(ls | grep 'touist.*\.zip' | head -1)
 script:
-    - echo "Build succeded... Now, run `ant dist` or `ant zip`"
+  - echo "Build succeded. No tests yet."
+deploy:
+  skip_cleanup: true
+  provider: releases
+  api_key:
+    secure: VRD3mGBKw4BJ/4IPqKGg9c5Iscxz3cDAG2W7cj78FiTYlEtSZT3P0WZVJZdrGFI4aIq9KaHbHjpmtqRR3B30Nv/dFecaTwhnDbn4No/K/YYmOGwe0jiEQcYst/uSThWg1cNk0ml4mbfCZGgZNIdHnF77lchbfmsm3e85vNc43+UsIMTxc3OHkFe6L4sRsf4yjcdNwQgIQzEGsy1A5EkEnVkbLXxAbRI3Q49R0vTGWf8WlECiU8tBX8CyMKb5kny5ZJQG35KxGG3TSRhAqXl43yRbUlmc/21T3Wz69ceBx/gqF6Di88mnLJAzOtr9EhEp4eCGt4Q+d4Q66NWlZsivRK+FnYKnLKxHbb1esxwlz+PqYIUIT4HQfzfzZ5EBWNvbh9DmPSPG1LC2zbDAQFErufjbe+acrNNGNcw3zRlSsWetqtIobGNupdw/tudrkBFXhQc5IovnhNQKmZztDAaDfX9WC8aseXDrjZqq+4Wt03WgbEspscwow8xGP8BYjZe5co1Titu8S3vI6O84exLZoukQ1owFcLACrppFwsYRSPAe3cFdM4LjYbw/579gk2iOCasamiGSk56Wzc5Ik9emDEa2lEVYUGdcQ+dUGhnbzg8jpN1YPqSzxCz0TLf8gACoBYxWFSgg2rSEQmkDVFLpfo4tQGSh3W3vB6MxBxOrXb0=
+  file: $zip
+  on:
+    tags: true

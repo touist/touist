@@ -54,17 +54,6 @@
 
 
 	<!-- 
-		 Commands executed before any target is executed
-
-		 Here we chose to remove the `./touist-gui/dist` 
-		 directory to be sure the new builds will produce 
-		 a clean dist (= program distributed for users)
-	-->
-	<delete dir="${touist.dist.dir}"/>
-
-
-
-	<!-- 
 		`ant build`
 
 		Builds all the .java files in `src`
@@ -142,13 +131,14 @@
 		It basically creates the directory and copies the `touist.jar` and
 		`external/` into it.
 	-->
-	<target depends="build-jar" name="dist">
+	<target name="dist" depends="build-jar">
 		<!-- Copy the external binaries into dist/ -->
 		<copy file="${touist.dir}/touist.jar" todir="${touist.dist.dir}"/>
 		<copy todir="${touist.dist.dir}/external" flatten="true">
-			<fileset dir="${touist.external.dir}"/>
+			<fileset dir="${touist.external.dir}">
+				<exclude name="**/*.zip"/><!--Ignore the yices-smt2.zip--> 
+			</fileset>
 		</copy>
-		<chmod dir="${touist.dist.dir}/external" perm="ugo+rx" includes="*"/>
 	</target>
 
 
@@ -158,8 +148,11 @@
 
 		After calling `build`, `build-jar` and `dist`, this target
 		basically renames the `dist` folder to something like 
-			"touist-v1.1-Mac_OS_X-x86_64"
+			   "touist-v1.1-Mac_OS_X-x86_64"
+			or "touist-v1.1-17-g8e47c99-Linux-amd64"
 		and then zips this folder.
+		
+		NOTE: g8e47c99 means that it is the git revision 8e47c99
 
 		This result of this target will be distributed to end-users.
 	-->
@@ -178,15 +171,30 @@
 				</tokenfilter>
 			</filterchain>
 		</loadfile>
-		<delete dir="some.tmp.file"/>
-		<rename src="${touist.dist.dir}" 
-			dest="${touist.dist.zip.name.filtered}"/>
-		<zip destfile="${touist.dist.zip.name.filtered}.zip" 
-			basedir="${touist.dist.zip.name.filtered}" />
+		<delete file="some.tmp.file"/>
+		<zip destfile="${touist.dist.dir}.zip" basedir="${touist.dist.dir}">
+			<!-- Binaries in zip loose their permissions. Set them to 755 -->
+			<zipfileset filemode="755" dir="${touist.dist.dir}" 
+				includes="external/*"/>
+		</zip>
+		<copy file="${touist.dist.dir}.zip" 
+			toFile="${touist.dist.zip.name.filtered}.zip"/>
 	</target>
 
+
+	<!--
+		 `ant clean`
+		 
+		 Cleans the touist-gui directory from build/dist files.
+	-->
 	<target name="clean">
-		<delete dir="${touist.build.dir}"/>
+		<delete includeEmptyDirs="true" failonerror="false">
+			<fileset dir="${touist.build.dir}"/>
+			<fileset dir="${touist.dist.dir}"/>
+			<fileset dir="${touist.dir}" includes="**/touist*.zip"/>
+			<fileset dir="${touist.dir}" includes="**/dist*.zip"/>		
+			<fileset dir="${touist.dir}" includes="**/touist.jar"/>						
+		</delete>
 	</target>
 
 
@@ -236,6 +244,12 @@
 			<entry key="build.date" value="${build.date}"/>
 			<entry key="minimum_java_version" value="${target}"/>
 		</propertyfile>
+		<!-- Prevent git from saying the repo is dirty -->
+		<exec executable="git" failifexecutionfails="false"> 
+             <arg value="update-index"/>
+             <arg value="--assume-unchanged"/>
+             <arg value="${touist.resources.dir}/version.properties"/>
+        </exec>
 	</target>
 
 
@@ -337,3 +351,5 @@
 	</target> 
 
 </project>
+
+
