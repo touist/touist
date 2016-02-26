@@ -1,7 +1,7 @@
 TouIST main program
 ===================
 ![The Travis build state: says if the java project can be built of not](
-https://travis-ci.org/olzd/touist.svg?branch=develop)
+https://travis-ci.org/FredMaris/touist.svg?branch=master)
 
 This folder contains the source code for the main program of the TouIST 
 project. It is named GUI because of it's main feature: be the user 
