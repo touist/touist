@@ -1,7 +1,7 @@
 TouIST, the IDE for propositional logic
 =======================================
 
-![The Travis build state: says if the java project can be built of not](https://travis-ci.org/FredMaris/touist.svg?branch=master)
+[![The gravis build stage](https://travis-ci.org/FredMaris/touist.svg?branch=master)](https://travis-ci.org/FredMaris/touist)
 
 TouIST is a user-friendly tool for solving propositionnal logic problems using a high-level logic language (known as the _bigand_ format or syntax or language). This language allows complex expressions like _big and_, _sets_... 
 
