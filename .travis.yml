@@ -1,3 +1,16 @@
+#
+# Maël Valais <mael.valais@gmail.com>
+#
+# This Travis-ci configuration file has been writen to automate
+# the building process and make deploying the application easy.
+#
+# The travis-ci servers are going to run this script on any push
+# to the repo. Basically, it
+# - tells the author of a commit if his commit has broken the build,
+# - deploys two .zip containing the linux and osx apps, with the
+#   touistc compiled in it
+#
+
 language: java
 os:
   - linux
