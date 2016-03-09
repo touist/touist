@@ -55,7 +55,7 @@ public class AboutPanel extends javax.swing.JPanel {
         jLabel4.setText("TOUlouse Integrated Satisfiability Tool");
 
         jButton1.setForeground(new java.awt.Color(0, 0, 255));
-        jButton1.setText("github.com/olzd/touist");
+        jButton1.setText("github.com/FredMaris/touist");
         jButton1.setBorderPainted(false);
         jButton1.setContentAreaFilled(false);
         jButton1.addActionListener(new java.awt.event.ActionListener() {
@@ -119,7 +119,7 @@ public class AboutPanel extends javax.swing.JPanel {
             try {
                 URI uri = null;
                 try {
-                    uri = new URI("https://github.com/olzd/touist");
+                    uri = new URI("https://github.com/FredMaris/touist");
                 } catch (URISyntaxException ex) {
                     ex.printStackTrace();
                 }
