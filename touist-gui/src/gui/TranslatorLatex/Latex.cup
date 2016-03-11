@@ -147,9 +147,9 @@ big_body ::= var_list:v IN set_list:s WHEN expr:b TWODOT expr:e END
 					{: RESULT = new String("\\limits_{"+v+"\\in"+s+"}"+e);:}
 ;
 
-var ::= VAR:v {: RESULT = new String("\\"+v);:}
-		|VAR:v LPAR term_option:t RPAR {: RESULT = new String("\\"+v+"("+t+")"); :}
-		|VAR:v LPAR IDENTIFIER:i RPAR {: RESULT = new String("\\"+v+"("+i+")"); :}
+var ::= VAR:v {: RESULT = new String("\\textbf{"+v+"}");:}
+		|VAR:v LPAR term_option:t RPAR {: RESULT = new String("\\textbf{"+v+"}("+t+")"); :}
+		|VAR:v LPAR IDENTIFIER:i RPAR {: RESULT = new String("\\textbf{"+v+"}("+i+")"); :}
 ;
 atom ::= IDENTIFIER:i {: RESULT = new String(i);:}
 		| bool:b {: RESULT = b;:}
