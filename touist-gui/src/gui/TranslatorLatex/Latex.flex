@@ -1,3 +1,5 @@
+package gui.TranslatorLatex;
+
 import java_cup.runtime.*;
 %%
 %class Lexi
