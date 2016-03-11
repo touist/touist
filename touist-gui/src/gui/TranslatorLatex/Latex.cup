@@ -60,7 +60,6 @@ program ::= affect:a {: RESULT = new String(a); :}
 			|expr:f {: RESULT = new String(f); :}
 			|affect:a program:p {: RESULT = new String(a+"\\\\"+p); :}
 			|expr:f program:p {: RESULT = new String(f+"\\\\"+p); :}
-			|
 			|error
 ;
 
@@ -68,7 +67,7 @@ program ::= affect:a {: RESULT = new String(a); :}
 affect ::= var:v AFFECT expr:e {: RESULT = new String(v+"="+e);:}
 ;
 
-expr ::=|IF expr:b THEN expr:e1 ELSE expr:e2  {: RESULT = new String("if\\;"+b+"\\;then\\;"+e1+"\\;else\\;"+e2);:}
+expr ::=IF expr:b THEN expr:e1 ELSE expr:e2  {: RESULT = new String("if\\;"+b+"\\;then\\;"+e1+"\\;else\\;"+e2);:}
 		|LPAR expr:b RPAR {: RESULT = new String("("+b+")");:}
 		|expr:s DOT LPAR expr:e RPAR {: RESULT = new String(s+".("+e+")");:}
 		| bool:b {: RESULT = b;:}
