@@ -110,6 +110,7 @@ expr ::=IF expr:b THEN expr:e1 ELSE expr:e2  {: RESULT = new String("if\\;"+b+"\
 		| INT LPAR expr:n RPAR {: RESULT = new String("int("+n+")");:}
 		| FLOAT LPAR expr:n RPAR {: RESULT = new String("float("+n+")");:}
 		| SQRT LPAR expr:n RPAR {: RESULT = new String("\\sqrt{"+n+"}");:}
+		| LCRO RCRO {: RESULT = new String("[]");:}
 		| LCRO set_decl:s RCRO {: RESULT = new String("["+s+"]");:}
 		| LCRO expr:n1 DODOT expr:n2 RCRO {: RESULT = new String("["+n1+".."+n2+"]");:}
 		| UNION LPAR expr:s1 COMMA expr:s2 RPAR {: RESULT = new String(s1+"\\cup"+s2);:}
