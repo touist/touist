@@ -160,8 +160,8 @@ let () =
   let cmd = (FilePath.basename Sys.argv.(0)) in (* ./touistl exec. name *)
   let argspecs = (* This list enumerates the different flags (-x,-f...)*)
   [ (* "-flag", Arg.toSomething (ref var), "Usage for this flag"*)
-    ("-o", Arg.Set_string (output_file_path), "The translated file");
-    ("-table", Arg.Set_string (output_table_file_path), "The literals table table (for SAT_DIMACS)");
+    ("-o", Arg.Set_string (output_file_path), "file The translated file");
+    ("-table", Arg.Set_string (output_table_file_path), "file The literals table table (for SAT_DIMACS)");
     ("-sat", Arg.Set sat_mode, "Use the SAT solver");
     ("-smt2", Arg.Set_string (smt_logic), "Use the SMT solver with the specified logic");
     ("--version", Arg.Set version_asked, "display version number")
@@ -194,6 +194,7 @@ let () =
     exit (get_code OTHER)
   );
 
+  (* If no output file has been given, set to a default one *)
   if (String.length !output_file_path) == 0 && !sat_mode then
     output_file_path := (defaultOutput !input_file_path SAT_DIMACS);
   
@@ -204,6 +205,7 @@ let () =
   then
     output_table_file_path := (defaultOutputTable !input_file_path);
   
+  (* Check that either -smt2 or -sat have been selected *)
   if (!sat_mode && (!smt_logic <> "")) then
     (print_endline (cmd^": cannot use both SAT and SMT solvers (try --help)");
      exit (get_code OTHER));
