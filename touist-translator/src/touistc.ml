@@ -64,6 +64,10 @@ let get_code (e : error) : int = match e with
   | COMPILE_NO_LINE_NUMBER_ERROR -> 2
   | OTHER -> 3
 
+(* Here is the list of hard-coded accepted logics. There are many
+ * other logics that can be accepted. *)
+let smt_logic_avail = ["QF_IDL";"QF_LIA";"QF_LRA";"QF_RDL"]
+
 let sat_mode = ref false
 let version_asked = ref false
 let smt_logic = ref ""
@@ -206,6 +210,12 @@ let () =
 
   if (not !sat_mode) && (!smt_logic = "") then
     (print_endline (cmd^": you must choose a solver to use: -sat or -smt2 (try --help)");
+     exit (get_code OTHER));
+
+  (* SMT Mode: check if one of the available QF_? has been given after -smt2 *)
+  if (not !sat_mode) && (not (List.exists (fun x->x=(String.uppercase !smt_logic)) smt_logic_avail)) then 
+    (print_endline (cmd^": you must specify the logic used (-smt2 logic_name) (try --help)");
+     print_endline ("Example: -smt2 QF_IDL");
      exit (get_code OTHER));
 
   (* Step 3: translation *)
