@@ -1,3 +1,5 @@
+package gui.TranslatorLatex;
+
 import java_cup.runtime.*;
 %%
 %class Lexi
@@ -81,7 +83,7 @@ Comment     = ";;"[^\n]*
 	"Bot"			{ return symbol(sym.BOT); }
 
 
-   	{Var}			{ return symbol(sym.VAR,new String(yytext())); }
+   	{Var}			{ return symbol(sym.VAR,new String(yytext().substring(1))); }
 
 
    	"."				{ return symbol(sym.DOT); }
