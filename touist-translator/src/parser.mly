@@ -120,8 +120,8 @@ clause:
   | clause IMPLIES clause { CImplies ($1, $3) }
   | clause EQUIV   clause { CEquiv   ($1, $3) }
   | EXACT   LPAREN exp COMMA exp RPAREN { Exact   ($3, $5) }
-  | ATLEAST LPAREN exp COMMA exp LPAREN { Atleast ($3, $5) }
-  | ATMOST  LPAREN exp COMMA exp LPAREN { Atmost  ($3, $5) }
+  | ATLEAST LPAREN exp COMMA exp RPAREN { Atleast ($3, $5) }
+  | ATMOST  LPAREN exp COMMA exp RPAREN { Atmost  ($3, $5) }
   | BIGAND separated_nonempty_list(COMMA,VAR) IN separated_nonempty_list(COMMA,exp) COLON clause END
   { Bigand ($2, $4, None, $6) }
   | BIGAND separated_nonempty_list(COMMA,VAR) IN separated_nonempty_list(COMMA,exp) WHEN exp COLON clause END
