@@ -163,14 +163,21 @@ let () =
     ("-o", Arg.Set_string (output_file_path), "file The translated file");
     ("-table", Arg.Set_string (output_table_file_path), "file The literals table table (for SAT_DIMACS)");
     ("-sat", Arg.Set sat_mode, "Use the SAT solver");
-    ("-smt2", Arg.Set_string (smt_logic), "Use the SMT solver with the specified logic");
-    ("--version", Arg.Set version_asked, "display version number")
+    ("-smt2", Arg.Set_string (smt_logic), (
+        "logic Use the SMT solver with the specified logic
+        QF_IDL allows to deal with boolean and integer, E.g, x - y < b
+        QF_RDL is the same as QF_IDL but with reals
+        QF_LIA (not documented)
+        QF_LRA (not documented)
+    See http://smtlib.cs.uiowa.edu/logics.shtml for more info."
+    ));
+    ("--version", Arg.Set version_asked, "Display version number")
   ]
   in
   let usage = "TouistL compiles files from the TouIST Language \
     to SAT-DIMACS/SMT-LIB2 \n\
     Usage: " ^ cmd ^ " -sat [-o translatedFile] [-table tableFile] file \n\
-    Usage: " ^ cmd ^ " -smt2 logic [-o translatedFile] file \n\
+    Usage: " ^ cmd ^ " -smt2 (QF_IDL|QF_RDL|QF_LIA|QF_LRA) [-o translatedFile] file \n\
     Note: if either tableFile or translatedFile is missing, \n\
     an artibrary name will be given."
   in
