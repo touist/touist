@@ -488,7 +488,7 @@ and atleast_str lst =
 and atmost_str =
   List.fold_left (fun acc str ->
     COr (acc, List.fold_left (fun acc' str' ->
-      CAnd (acc, CNot (Term (str',None)))) Top str)) Bottom
+      CAnd (acc', CNot (Term (str',None)))) Top str)) Bottom
 
 and clause_of_string_list =
   List.fold_left (fun acc str -> CAnd (acc, Term (str,None))) Top
