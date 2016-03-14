@@ -485,10 +485,10 @@ and exact_str lst =
 and atleast_str lst =
   List.fold_left (fun acc str -> COr (acc, clause_of_string_list str)) Bottom lst
 
-and atmost_str =
+and atmost_str lst =
   List.fold_left (fun acc str ->
     COr (acc, List.fold_left (fun acc' str' ->
-      CAnd (acc', CNot (Term (str',None)))) Top str)) Bottom
+      CAnd (acc', CNot (Term (str',None)))) Top str)) Bottom lst
 
 and clause_of_string_list =
   List.fold_left (fun acc str -> CAnd (acc, Term (str,None))) Top
