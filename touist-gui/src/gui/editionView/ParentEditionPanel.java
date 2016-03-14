@@ -107,7 +107,7 @@ public class ParentEditionPanel extends AbstractComponentPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jFileChooser1 = new javax.swing.JFileChooser();
+        jFileChooser1 = new javax.swing.JFileChooser(new File(System.getProperty("user.dir")));
         jOptionPane1 = new javax.swing.JOptionPane();
         jTabbedPane1 = new javax.swing.JTabbedPane();
         editorPanelFormulas = new gui.editionView.EditionPanel();

@@ -32,6 +32,7 @@ import gui.State;
 import java.awt.Color;
 import java.awt.Component;
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -169,7 +170,7 @@ public class ResultsPanel extends AbstractComponentPanel {
     }
     
     public void exportModel() throws IOException {
-        final JFileChooser fc = new JFileChooser();
+        final JFileChooser fc = new JFileChooser(new File(System.getProperty("user.dir")));
         fc.setFileFilter(new FileNameExtensionFilter("Text files(txt, text)","txt","text"));
         fc.addChoosableFileFilter(new FileNameExtensionFilter("Latex files(latex)","tex"));
         fc.setAcceptAllFileFilterUsed(false);
