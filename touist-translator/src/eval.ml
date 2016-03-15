@@ -392,12 +392,12 @@ and eval_clause exp env =
                | Float x' -> CFloat x'
                | _ -> failwith "bar type error")
           with Not_found ->
-            let x',Some y' = x in
+            let (x',y') = x in
             try eval_clause (Term (string_of_clause (match List.assoc x' env with
                  | Clause x'' -> x''
                  | Int x'' -> CInt x''
                  | Float x'' -> CFloat x''
-                 | _ -> failwith "baz"),Some y')) env
+                 | _ -> failwith "baz"),y')) env
             with Not_found -> failwith "none"
       end
   | CNot Top    -> Bottom
