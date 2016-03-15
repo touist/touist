@@ -139,6 +139,8 @@
 				<exclude name="**/*.zip"/><!--Ignore the yices-smt2.zip--> 
 			</fileset>
 		</copy>
+		<!-- When copying, permissions often get lost... -->
+		<chmod dir="${touist.dist.dir}/external" perm="ugo+x" includes="*"/>
 	</target>
 
 
