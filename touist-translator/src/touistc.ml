@@ -124,6 +124,9 @@ let evaluate (ast:Syntax.prog) : Syntax.clause =
   | Eval.NameError msg ->
       Printf.fprintf stderr "name error with '%s'\n" msg;
       exit (get_code COMPILE_NO_LINE_NUMBER_ERROR)
+  | Eval.UnknownVar msg ->
+      fprintf stderr "the variable %s has not been declared\n" msg;
+      exit (get_code COMPILE_NO_LINE_NUMBER_ERROR)
   | Eval.TypeError msg ->
       Printf.fprintf stderr "type error with '%s'\n" msg;
       exit (get_code COMPILE_NO_LINE_NUMBER_ERROR)

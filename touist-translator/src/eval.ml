@@ -21,6 +21,10 @@ exception TypeError     of string
 exception NameError     of string
 exception ArgumentError of string
 
+(* This error informs the user that he tried to use a variable, e.g. $a 
+ * but that variable has not been declared in the set section *)
+exception UnknownVar    of string 
+
 (* Return the list of integers between min and max
  * with an increment of step
  *)
@@ -400,7 +404,7 @@ and eval_clause exp env =
                  | Int x'' -> CInt x''
                  | Float x'' -> CFloat x''
                  | _ -> failwith "baz"),y')) env
-            with Not_found -> failwith "none"
+            with Not_found -> raise (UnknownVar name)
       end
   | CNot Top    -> Bottom
   | CNot Bottom -> Top
