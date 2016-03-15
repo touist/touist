@@ -110,8 +110,6 @@ let print_position outx lexbuf =
   let pos = lexbuf.lex_curr_p in
   Printf.fprintf outx "%d:%d" pos.pos_lnum (pos.pos_cnum - pos.pos_bol+1)
 
-
-
 (* [evaluate] handles exceptions when calling the evaluation function [Eval.eval].
  * Eval.eval takes an abstract syntaxic tree and check that it is semantically correct,
  * creates the variables and everything.
@@ -121,11 +119,8 @@ let print_position outx lexbuf =
  *)
 let evaluate (ast:Syntax.prog) : Syntax.clause =
   try Eval.eval ast [] with
-  | Eval.NameError msg ->
-      Printf.fprintf stderr "name error with '%s'\n" msg;
-      exit (get_code COMPILE_NO_LINE_NUMBER_ERROR)
   | Eval.UnknownVar msg ->
-      fprintf stderr "the variable %s has not been declared\n" msg;
+      Printf.fprintf stderr "the variable %s has not been declared\n" msg;
       exit (get_code COMPILE_NO_LINE_NUMBER_ERROR)
   | Eval.TypeError msg ->
       Printf.fprintf stderr "type error with '%s'\n" msg;
