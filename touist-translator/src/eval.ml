@@ -18,7 +18,6 @@ open Syntax
 open Pprint
 
 exception TypeError     of string
-exception NameError     of string
 exception ArgumentError of string
 
 (* This error informs the user that he tried to use a variable, e.g. $a 
@@ -147,7 +146,7 @@ and eval_exp exp env =
         try List.assoc name env
         with Not_found ->
           try Hashtbl.find extenv name
-          with Not_found -> raise (NameError name)
+          with Not_found -> raise (UnknownVar name)
       end
   | Set x -> Set x
   | Set_decl x -> eval_set x env
