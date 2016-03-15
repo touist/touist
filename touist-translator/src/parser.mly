@@ -124,9 +124,9 @@
 
 (* [prog] is the entry point of the parser *)
 prog:
-  | BEGIN SETS affect+ END SETS BEGIN FORMULA clause+ END FORMULA EOF
+  | BEGIN SETS affect* END SETS BEGIN FORMULA clause* END FORMULA EOF
     { Prog (Some $3, $8) }
-  | BEGIN FORMULA clause+ END FORMULA EOF
+  | BEGIN FORMULA clause* END FORMULA EOF
     { Prog (None, $3) }
 
 var_decl:
