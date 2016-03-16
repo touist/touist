@@ -384,13 +384,15 @@ and eval_clause exp env =
              | Clause x' -> x'
              | Int x' -> CInt x'
              | Float x' -> CFloat x'
-             | _ -> failwith "foo type error")
+             | _ -> failwith (name ^ " has been declared but something went wrong"))
         with Not_found ->
+          (* Check if this variable name has been affected by something *)
           try (match Hashtbl.find extenv name with
                | Clause x' -> x'
                | Int x' -> CInt x'
                | Float x' -> CFloat x'
-               | _ -> failwith "bar type error")
+               | Set (_) -> failwith (name ^ " was expected to be a clause or a number, but it's a set")
+               | _ -> failwith (name ^ " has not the right content"))
           with Not_found ->
             let (x',y') = x in
             try eval_clause (Term (string_of_clause (match List.assoc x' env with
