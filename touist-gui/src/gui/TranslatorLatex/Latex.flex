@@ -83,7 +83,7 @@ Comment     = ";;"[^\n]*
 	"Bot"			{ return symbol(sym.BOT); }
 
 
-   	{Var}			{ return symbol(sym.VAR,new String(yytext().substring(1))); }
+   	{Var}			{ return symbol(sym.VAR,new String(yytext().substring(1).replace("_", "\\_"))); }
 
 
    	"."				{ return symbol(sym.DOT); }
@@ -121,7 +121,7 @@ Comment     = ";;"[^\n]*
    	{Comment}			{ return symbol(sym.COMMENT,new String(yytext())); }
 
 
-	{Identifier}			{ return symbol(sym.IDENTIFIER,new String(yytext())); }
+	{Identifier}			{ return symbol(sym.IDENTIFIER,new String(yytext().replace("_", "\\_"))); }
 
 
  	<<EOF>>						{ return symbol(sym.EOF); }
