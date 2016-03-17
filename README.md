@@ -3,6 +3,8 @@ TouIST, the IDE for propositional logic
 
 [![The gravis build stage](https://travis-ci.org/FredMaris/touist.svg?branch=master)](https://travis-ci.org/FredMaris/touist)
 
+[Get the latest release here](https://github.com/FredMaris/touist/releases). For now, Touist is compatible with osx 64 bits and linux 64 bits.
+
 TouIST is a user-friendly tool for solving propositionnal logic problems using a high-level logic language (known as the _bigand_ format or syntax or language). This language allows complex expressions like _big and_, _sets_... 
 
 We can for example solve the problem "Wolf, Sheep, Cabbage", or a sudoku, or any problem that can be expressed in propositionnal logic.
@@ -11,13 +13,11 @@ The TouIST has been initialized by Frederic Maris and Olivier Gasquet, associate
 
 The development is done by a team of five students in first year of master's degree at the _Université Toulouse III — Paul Sabatier_. This project is a part of their work at school. See [CONTRIBUTORS](https://github.com/FredMaris/touist/blob/master/CONTRIBUTORS.md).
 
-![Formulas](https://cloud.githubusercontent.com/assets/2195781/7631376/8b0a1e66-fa41-11e4-9d14-5fd39da7c494.png)
+Here is the main screen with the formulas:  
+![formulas](https://cloud.githubusercontent.com/assets/2195781/13850422/185bcf66-ec5a-11e5-9fee-59b5c2ae38b7.png)
 
-## Download it  
-[Get the latest release](https://github.com/FredMaris/touist/releases). For now, Touist is compatible with:
-
-- Mac OS X Intel 64 bits
-- Linux 64 bits
+And the screen with the sets:  
+![sets](https://cloud.githubusercontent.com/assets/2195781/13850431/20162d82-ec5a-11e5-884a-e8b6aaafe416.png)
 
 Touist is platform-specific because of the ocaml `touist` translator that translates the high-level `.touistl` (touist language files) into `SAT_DIMACS` or `SMT2` is compiled into an architecture-specific binary (for performances).
 
