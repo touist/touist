@@ -1,0 +1,74 @@
+#
+# Maël Valais <mael.valais@gmail.com>
+#
+# This AppVeyor configuration file has been writen to automate
+# the building process and make deploying the application easy
+# for the platform Windows.
+#
+# Like with the .travis.yml, this file will be executed
+# by the appveyor servers and will build the project.
+#
+
+# Operating system (build VM template)
+os: Windows Server 2012
+platform: x86
+
+# scripts that are called at very beginning, before repo cloning
+init: git config --global core.autocrlf input
+
+# clone directory
+clone_folder: c:\touist
+
+environment:
+  #JAVA_HOME: "C:\\Program Files (x86)\\Java\\jdk1.7.0"
+  ANT_HOME: C:\ant
+
+# build cache to preserve files/folders between builds
+# WARNING: the wodi32 folder, when unziped, weights 809 MB.
+# The limit for caching is 100 MB. So this thing won't help.
+cache:
+  - C:\wodi32
+  - C:\ant
+
+# scripts that run after cloning repository
+install:
+  - ps: mkdir c:\download
+  - ps: If(-Not(Test-Path c:\wodi32)){ Invoke-WebRequest https://dl.dropboxusercontent.com/u/41771140/wodi32.zip -OutFile c:\download\wodi32.zip }
+  - ps: If(-Not(Test-Path c:\wodi32)){ 7z x c:\download\wodi32.zip -oc:\ | Out-Null }
+  - ps: If(-Not(Test-Path c:\ant)){Invoke-WebRequest "http://www.us.apache.org/dist/ant/binaries/apache-ant-1.9.6-bin.zip" -OutFile c:\download\ant.zip}
+  - ps: If(-Not(Test-Path c:\ant)){ 7z x c:\download\ant.zip -oc:\ | Out-Null; mv c:\apache-ant* c:\ant }
+  - ps: ls c:\
+  - ps: $env:Path = $env:Path + ";C:\ant\bin"
+  - ps: echo $env:Path 
+
+# to run your custom scripts instead of automatic MSBuild
+build_script:
+  - ps: cd c:\wodi32\bin
+  # NOTE: I had to add the 2>&1 because when something writes to stderr, Powershell thinks there was an error... 
+  - ps: .\bash.exe --login -i -c 'cd /cygdrive/c/touist/touist-translator && ./configure --bindir ../touist-gui/external 2>&1'
+  - ps: .\bash.exe --login -i -c 'cd /cygdrive/c/touist/touist-translator && make 2>&1'
+  - ps: .\bash.exe --login -i -c 'cd /cygdrive/c/touist/touist-translator && make install 2>&1'
+  - ps: cd c:\touist\touist-gui
+  - ps: ant zip
+  - ps: $env:zip=$(Get-ChildItem -name -include touist*.zip)
+  - ps: $env:tag=$(git describe --tags --abbrev=0)
+  - ps: echo $env:zip $env:tag
+
+test: off
+
+artifacts:
+  - path: touist-gui\touist-*.zip
+
+skip_tags: false
+deploy:
+    # Deploy to GitHub Releases
+  - provider: GitHub
+    auth_token:
+      secure: dbw2kA9tfclht4rbKOT356VVs33ICxO202bRhFLAazPp9Lu39zH8YQ5KPpq+txn+
+    artifact: /touist-.*\.zip/          # upload all touist*.zip to release 
+    #draft: true
+    #prerelease: true
+    on:
+      branch: master                # release from master branch only
+      appveyor_repo_tag: true       # deploy on tag push only
+
