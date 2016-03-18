@@ -158,9 +158,9 @@
 
 		This result of this target will be distributed to end-users.
 	-->
-	<target name="zip" depends="dist">
+	<target name="zip" depends="dist,check-family,check-register">
 		<property name="touist.dist.zip.name" 
-			value="${touist.dir}/touist-${version}-${os.name}-${os.arch}"/>
+			value="${touist.dir}/touist-${version}-${os-family}-x${register-size}"/>
 		<echo message="${touist.dist.zip.name}" file="some.tmp.file" />
 		<!-- This some.tmp.file manipulation is just a hack to do a simple `sed "s/\ //g"`
 			 which is kind of impossible without any third-party ant scripts. So here is the
@@ -307,9 +307,15 @@
 	</target>
 
 	<target name="check-family" >
-		<condition property="os-family" value="unix" else="windows">
+		<condition property="os-family" value="mac">
+			<os family="mac" />
+		</condition>
+		<condition property="os-family" value="linux">
 			<os family="unix" />
 		</condition>
+	    <condition property="os-family" value="windows">
+			<os family="windows" />
+		</condition>	
 
 		<condition property="unix">
 			<os family="unix" />
@@ -353,5 +359,3 @@
 	</target> 
 
 </project>
-
-
