@@ -3,6 +3,7 @@
 #
 # This Travis-ci configuration file has been writen to automate
 # the building process and make deploying the application easy.
+# for the platforms Linux and Mac OS X.
 #
 # The travis-ci servers are going to run this script on any push
 # to the repo. Basically, it
