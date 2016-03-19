@@ -8,6 +8,17 @@
 # Like with the .travis.yml, this file will be executed
 # by the appveyor servers and will build the project.
 #
+# 1. Why do I download this wodi32.zip instead of installing
+#    ocaml-for-windows?
+#    Actually it's because I couldn't make work the installer given on
+#    protz.github.io/ocaml-installer/. The 64-bits version of the installer
+#    doesn't seem to work properly and most importantly it pops up a window
+#    that asks something to the user... which is impossible to deal in a CI env.
+# 2. What is wodi32.zip and what does it contain?
+#    It is a snapshot of the folder when I had wodi installed. Wodi has been
+#    discontinued, this is why I had to make a "frozen in time" version.
+#    It contains ocaml 4.02.1, fileutils, menhir and oasis.
+#
 
 # Operating system (build VM template)
 os: Windows Server 2012
@@ -33,6 +44,9 @@ cache:
 # scripts that run after cloning repository
 install:
   - ps: mkdir c:\download
+    # This step is a workaround based on a snapshot of wodi (ocaml+cygwin). Because installing ocaml+opam
+    # seems (for now) impossible, I chose to upload this wodi32.zip on my dropbox ; it contains everything
+    # needed for touist-translator.
   - ps: If(-Not(Test-Path c:\wodi32)){ Invoke-WebRequest https://dl.dropboxusercontent.com/u/41771140/wodi32.zip -OutFile c:\download\wodi32.zip }
   - ps: If(-Not(Test-Path c:\wodi32)){ 7z x c:\download\wodi32.zip -oc:\ | Out-Null }
   - ps: If(-Not(Test-Path c:\ant)){Invoke-WebRequest "http://www.us.apache.org/dist/ant/binaries/apache-ant-1.9.6-bin.zip" -OutFile c:\download\ant.zip}
