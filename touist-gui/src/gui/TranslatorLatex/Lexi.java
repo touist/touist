@@ -767,7 +767,7 @@ class Lexi implements java_cup.runtime.Scanner {
             }
           case 65: break;
           case 3: 
-            { return symbol(sym.IDENTIFIER,new String(yytext()));
+            { return symbol(sym.IDENTIFIER,new String(yytext().replace("_", "\\_")));
             }
           case 66: break;
           case 4: 
@@ -835,7 +835,7 @@ class Lexi implements java_cup.runtime.Scanner {
             }
           case 82: break;
           case 20: 
-            { return symbol(sym.VAR,new String(yytext().substring(1)));
+            { return symbol(sym.VAR,new String(yytext().substring(1).replace("_", "\\_")));
             }
           case 83: break;
           case 21: 
