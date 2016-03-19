@@ -1,7 +1,8 @@
 TouIST, the IDE for propositional logic
 =======================================
 
-[![The gravis build stage](https://travis-ci.org/FredMaris/touist.svg?branch=master)](https://travis-ci.org/FredMaris/touist)
+[![Travis (Linux/Mac) build state](https://travis-ci.org/FredMaris/touist.svg?branch=master)](https://travis-ci.org/FredMaris/touist)
+[![AppVeyor (Windows) build state](https://ci.appveyor.com/api/projects/status/86a45a9p159iqe5b/branch/master?svg=true)](https://ci.appveyor.com/project/maelvalais/touist-d8pkw/branch/master)
 
 [Get the latest release here](https://github.com/FredMaris/touist/releases). For now, Touist is compatible with osx 64 bits and linux 64 bits.
 
