@@ -11,6 +11,10 @@
 # - deploys two .zip containing the linux and osx apps, with the
 #   touistc compiled in it
 #
+# To allow Travis-ci to know that something has been pushed to the repo
+# the owner of the project (Olivier Lezaud back then) had had to link
+# the repo to the Travis-ci website.
+#
 
 language: java
 os:
@@ -23,27 +27,50 @@ addons:
     - avsm
     packages:
     - opam
+      
 before_install:
   # Install packages using brew on osx environment
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update && brew install opam ant; fi
   - opam init --auto-setup
   - eval `opam config env`
   - opam install --yes ocamlfind menhir fileutils
+    
 install:
+  # Build touistc (touist-translator)  
   - cd touist-translator
   - ./configure --bindir ../touist-gui/external
   - make && make install
+
+  # Build touist.jar (touist-gui)
   - cd ../touist-gui
   - chmod ugo+x external/touistc  
   - ant zip
-  - zip=$(ls | grep 'touist.*\.zip' | head -1)
+  - zip=$(ls | grep 'touist.*\.zip' | head -1) # The artifact's name for later use
+
+# This part is meant for unit tests (among others).
 script:
   - echo "Build succeded. No tests yet."
+
+
+# This is the part where the touist.zip is pushed to the Github
+# Releases. It will only do so when we create new tags, like v1.1.2.
 deploy:
   skip_cleanup: true
   provider: releases
   api_key:
+    # This is my (maelvalais) credentials. It has been ciphered by travis's 
+    # encryption system.
     secure: "YAimStqO6NDkMSn6W+e+V2D5EDtPl1GxxVeS1Fgqz2fneD0RyH08MOggDJDKhd3dvi1WVlfv1b+0PXB9QC1BsmKrNhEUjFtM/IkGsrMVnZ3Y4/GjvUtWmmgCHkv9q7XmOmyGaqDXt39pqux3/EyyLgqssLy8maggn+YpgtolPRk="
   file: $zip
   on:
+    branch: master
     tags: true
+
+# The commiter will be informed that one of his commits
+# broke the build. I didn't want us to receive an email
+# each time we did a new branch, so I changed to 
+#     on_success: never
+notifications:
+  email:
+    on_success: never # default: change
+    on_failure: always # default: always

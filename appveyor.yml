@@ -19,29 +19,30 @@
 #    discontinued, this is why I had to make a "frozen in time" version.
 #    It contains ocaml 4.02.1, fileutils, menhir and oasis.
 #
+# To allow AppVeyor knowing when things are pushed to the github repo,
+# the owner of the repo had to link the repo in the AppVeyor website.
+#
 
 # Operating system (build VM template)
-os: Windows Server 2012
-platform: x86
+# It's a x64 VM. There is no way to force it to x86 apparently.
+os: Windows Server 2012 
 
-# scripts that are called at very beginning, before repo cloning
+# Scripts that are called at very beginning, before repo cloning
 init: git config --global core.autocrlf input
 
-# clone directory
+# Clone directory
 clone_folder: c:\touist
 
 environment:
-  #JAVA_HOME: "C:\\Program Files (x86)\\Java\\jdk1.7.0"
+  JAVA_HOME: "C:\\Program Files (x86)\\Java\\jdk1.7.0"
   ANT_HOME: C:\ant
 
-# build cache to preserve files/folders between builds
-# WARNING: the wodi32 folder, when unziped, weights 809 MB.
-# The limit for caching is 100 MB. So this thing won't help.
+# Build cache to preserve files/folders between builds (saves time)
 cache:
   - C:\wodi32
   - C:\ant
 
-# scripts that run after cloning repository
+# Scripts that run after cloning repository. "ps:" means windows PowerShell
 install:
   - ps: mkdir c:\download
     # This step is a workaround based on a snapshot of wodi (ocaml+cygwin). Because installing ocaml+opam
@@ -49,35 +50,47 @@ install:
     # needed for touist-translator.
   - ps: If(-Not(Test-Path c:\wodi32)){ Invoke-WebRequest https://dl.dropboxusercontent.com/u/41771140/wodi32.zip -OutFile c:\download\wodi32.zip }
   - ps: If(-Not(Test-Path c:\wodi32)){ 7z x c:\download\wodi32.zip -oc:\ | Out-Null }
+    # I download apache-ant directly from the web because `choco install ant` was re-installing
+    # the jdk8 on each build, making them last much more time.
   - ps: If(-Not(Test-Path c:\ant)){Invoke-WebRequest "http://www.us.apache.org/dist/ant/binaries/apache-ant-1.9.6-bin.zip" -OutFile c:\download\ant.zip}
   - ps: If(-Not(Test-Path c:\ant)){ 7z x c:\download\ant.zip -oc:\ | Out-Null; mv c:\apache-ant* c:\ant }
-  - ps: ls c:\
   - ps: $env:Path = $env:Path + ";C:\ant\bin"
-  - ps: echo $env:Path 
 
 # to run your custom scripts instead of automatic MSBuild
 build_script:
   - ps: cd c:\wodi32\bin
-  # NOTE: I had to add the 2>&1 because when something writes to stderr, Powershell thinks there was an error... 
+
+  # Build touistc (touist-translator)
+  # NOTE: I had to add the 2>&1 because when something writes to stderr, Powershell thinks there was an error...
   - ps: .\bash.exe --login -i -c 'cd /cygdrive/c/touist/touist-translator && ./configure --bindir ../touist-gui/external 2>&1'
   - ps: .\bash.exe --login -i -c 'cd /cygdrive/c/touist/touist-translator && make 2>&1'
   - ps: .\bash.exe --login -i -c 'cd /cygdrive/c/touist/touist-translator && make install 2>&1'
+  
+  # Build touist.jar (touist-gui)
   - ps: cd c:\touist\touist-gui
   - ps: ant zip
-  - ps: $env:zip=$(Get-ChildItem -name -include touist*.zip)
-  - ps: $env:tag=$(git describe --tags --abbrev=0)
-  - ps: echo $env:zip $env:tag
+  - ps: $zip=$(Get-ChildItem -name -include touist*.zip) # The artifact's name for later use
+  - ps: echo $zip
 
 test: off
 
+# Important: to be able to use the artifact: /touist-.*\.zip/
+# in deploy:, it is mandatory to add every .zip or whatever
+# in here. 
+# The "deploy: artifact: " is actually using what you provided
+# here; it actually filters those "path:". If all the ".zip"
+# you want to upload have not been given in "path:", the 
+# deploy: artifact: thing will do nothing.
 artifacts:
   - path: touist-gui\touist-*.zip
 
 skip_tags: false
+
 deploy:
     # Deploy to GitHub Releases
   - provider: GitHub
     auth_token:
+      # maelvalais ciphered credetials using appveyor encryption
       secure: "HxU0eV4dnrn1w5WzCZ5LSE18RPYMSkpiWdZNmj6LrIpbVH5wn3tC0wOYDYqwLLxYZA09Qg6X/NVx4gr4nQAvfoxdYubV95hPWCcGsZmh3NpP9e/IAdwx+NAsoz8GEZqm3UzlaZL8JVPN5gGkAYbZNVpoudjf7b2EoXP4IUIIkRE="
     artifact: /touist-.*\.zip/          # upload all touist*.zip to release 
     #draft: true
@@ -85,4 +98,13 @@ deploy:
     on:
       branch: master                # release from master branch only
       appveyor_repo_tag: true       # deploy on tag push only
+
+# I set the same behaviour as for in .travis.yml: 
+# the commiter will only be emailed if his commit failed 
+# to build.
+notifications:
+  - provider: Email
+    on_build_success: false
+    on_build_failure: true
+    on_build_status_changed: false
 
