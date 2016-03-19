@@ -133,11 +133,11 @@ public class PalettePanel extends AbstractComponentPanel {
     }
     
     public int getRecommendWidth() {
-        int width = 160;
+        int width = 0;
         for (Component section : sectionsContainerPanel.getComponents()) {
             if (section instanceof PaletteSectionPanel) {
                 for (InsertionButton button : ((PaletteSectionPanel)section).getButtons()) {
-                    width = (int) Math.max(width, button.getIcon().getIconWidth() * 2.5);
+                    width = 8+(int) Math.max(width, button.getIcon().getIconWidth());
                 }
             }
         }
