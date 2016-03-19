@@ -64,7 +64,7 @@ deploy:
     # Deploy to GitHub Releases
   - provider: GitHub
     auth_token:
-      secure: dbw2kA9tfclht4rbKOT356VVs33ICxO202bRhFLAazPp9Lu39zH8YQ5KPpq+txn+
+      secure: "HxU0eV4dnrn1w5WzCZ5LSE18RPYMSkpiWdZNmj6LrIpbVH5wn3tC0wOYDYqwLLxYZA09Qg6X/NVx4gr4nQAvfoxdYubV95hPWCcGsZmh3NpP9e/IAdwx+NAsoz8GEZqm3UzlaZL8JVPN5gGkAYbZNVpoudjf7b2EoXP4IUIIkRE="
     artifact: /touist-.*\.zip/          # upload all touist*.zip to release 
     #draft: true
     #prerelease: true
