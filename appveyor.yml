@@ -22,6 +22,7 @@
 # To allow AppVeyor knowing when things are pushed to the github repo,
 # the owner of the repo had to link the repo in the AppVeyor website.
 #
+# vim:set et sw=2 ts=2:
 
 # Operating system (build VM template)
 # It's a x64 VM. There is no way to force it to x86 apparently.
@@ -41,6 +42,7 @@ environment:
 cache:
   - C:\wodi32
   - C:\ant
+  - C:\yices
 
 # Scripts that run after cloning repository. "ps:" means windows PowerShell
 install:
@@ -48,7 +50,7 @@ install:
     # This step is a workaround based on a snapshot of wodi (ocaml+cygwin). Because installing ocaml+opam
     # seems (for now) impossible, I chose to upload this wodi32.zip on my dropbox ; it contains everything
     # needed for touist-translator.
-  - ps: If(-Not(Test-Path c:\wodi32)){ Invoke-WebRequest https://dl.dropboxusercontent.com/u/41771140/wodi32.zip -OutFile c:\download\wodi32.zip }
+  - ps: If(-Not(Test-Path c:\wodi32)){ Invoke-WebRequest "https://dl.dropboxusercontent.com/u/41771140/wodi32.zip" -OutFile c:\download\wodi32.zip }
   - ps: If(-Not(Test-Path c:\wodi32)){ 7z x c:\download\wodi32.zip -oc:\ | Out-Null }
     # I download apache-ant directly from the web because `choco install ant` was re-installing
     # the jdk8 on each build, making them last much more time.
@@ -56,15 +58,23 @@ install:
   - ps: If(-Not(Test-Path c:\ant)){ 7z x c:\download\ant.zip -oc:\ | Out-Null; mv c:\apache-ant* c:\ant }
   - ps: $env:Path = $env:Path + ";C:\ant\bin"
 
-# to run your custom scripts instead of automatic MSBuild
-build_script:
-  - ps: cd c:\wodi32\bin
+# Now we must put the SMT solver into touist-gui/external/
+before_build:
+  - ps: If(-Not(Test-Path c:\yices)){ Invoke-WebRequest "http://yices.csl.sri.com/cgi-bin/yices2-newnewdownload.cgi?file=yices-2.4.2-i686-pc-mingw32-static-gmp.zip&accept=I+Agree" -OutFile c:\download\yices.zip }
+  - ps: If(-Not(Test-Path c:\yices)){ 7z x c:\download\yices.zip -oc:\ | Out-Null; mv c:\yices* c:\yices }
+  - ps: cp c:\yices\bin\yices-smt2.exe c:\touist\touist-gui\external
+  - ps: cp c:\yices\bin\libyices.dll c:\touist\touist-gui\external
+  - ps: ls c:\touist\touist-gui\external
+  - ps: ls c:\yices\bin 
 
+build_script:
   # Build touistc (touist-translator)
-  # NOTE: I had to add the 2>&1 because when something writes to stderr, Powershell thinks there was an error...
-  - ps: .\bash.exe --login -i -c 'cd /cygdrive/c/touist/touist-translator && ./configure --bindir ../touist-gui/external 2>&1'
-  - ps: .\bash.exe --login -i -c 'cd /cygdrive/c/touist/touist-translator && make 2>&1'
-  - ps: .\bash.exe --login -i -c 'cd /cygdrive/c/touist/touist-translator && make install 2>&1'
+  # NOTE: I had to add the 2>&1 because when something writes to stderr, 
+  # Powershell thinks there was an error...
+  - ps: cd c:\wodi32\bin
+  - ps: .\bash.exe -l -c 'cd /cygdrive/c/touist/touist-translator && ./configure --bindir ../touist-gui/external 2>&1'
+  - ps: .\bash.exe -l -c 'cd /cygdrive/c/touist/touist-translator && make 2>&1'
+  - ps: .\bash.exe -l -c 'cd /cygdrive/c/touist/touist-translator && make install 2>&1'
   
   # Build touist.jar (touist-gui)
   - ps: cd c:\touist\touist-gui
