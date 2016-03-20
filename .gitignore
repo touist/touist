@@ -51,35 +51,24 @@ hs_err_pid*
 .project
 **/dist/
 **/build/
-nbproject/*
+nbproject/**
 build.xml
-
 *.mf
-
 *.cnf
+*.table
 
-*._table
-
-bigAndFile-defaultname.txt
-
-/touist-gui/nbproject/private/
-/touist-gui/nbproject/build-impl.xml
-/touist-gui/nbproject/genfiles.properties
-/touist-gui/nbproject/project.properties
-/touist-gui/nbproject/project.xml
+/touist-gui/nbproject/**
 /touist-gui/nbbuild.xml
 *.prefs
-<<<<<<< Updated upstream
 
-touist-gui/external/touistc
+touist-gui/external/*
 
 touist-gui/*.touistl
 touist-gui/*.table
 touist-gui/*.txt
+touist-gui/*.smt
 touist-gui/touist-*
-=======
-/Chord/nbproject/private/
->>>>>>> Stashed changes
+
 
 touist-gui/ressources/version.properties
 
