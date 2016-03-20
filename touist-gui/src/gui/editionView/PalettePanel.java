@@ -137,7 +137,7 @@ public class PalettePanel extends AbstractComponentPanel {
         for (Component section : sectionsContainerPanel.getComponents()) {
             if (section instanceof PaletteSectionPanel) {
                 for (InsertionButton button : ((PaletteSectionPanel)section).getButtons()) {
-                    width = 8+(int) Math.max(width, button.getIcon().getIconWidth());
+                    width = 10+(int) Math.max(width, button.getIcon().getIconWidth());
                 }
             }
         }
