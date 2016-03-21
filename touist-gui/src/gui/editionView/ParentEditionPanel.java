@@ -539,9 +539,7 @@ public class ParentEditionPanel extends AbstractComponentPanel {
                 showErrorMessage(ex, errorMessage, getFrame().getLang().getWord(Lang.ERROR_TRADUCTION));
                 return State.EDITION;
             } catch (InterruptedException ex) {
-                ex.printStackTrace();
-                errorMessage = "Translator has been interrupted.";
-                showErrorMessage(ex, errorMessage, getFrame().getLang().getWord(Lang.ERROR_TRADUCTION));
+                System.out.println("touistc has been stopped");
                 return State.EDITION;
             }
 
