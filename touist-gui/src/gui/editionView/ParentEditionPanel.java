@@ -173,11 +173,11 @@ public class ParentEditionPanel extends AbstractComponentPanel {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabelErrorMessage)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(exportButton)
+                .addComponent(exportButton, javax.swing.GroupLayout.PREFERRED_SIZE, 66, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(importButton)
+                .addComponent(importButton, javax.swing.GroupLayout.PREFERRED_SIZE, 66, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(testButton)
+                .addComponent(testButton, javax.swing.GroupLayout.PREFERRED_SIZE, 129, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
@@ -509,6 +509,9 @@ public class ParentEditionPanel extends AbstractComponentPanel {
             return State.EDITION;
         }
         
+        // Button "Solve" now displays "Translating...
+        testButton.setText("Translating");
+
         if (getFrame().getSolverSelection().getSelectedSolver() == SolverSelection.SolverType.SAT) {
            
             try {
@@ -541,6 +544,8 @@ public class ParentEditionPanel extends AbstractComponentPanel {
                 showErrorMessage(ex, errorMessage, getFrame().getLang().getWord(Lang.ERROR_TRADUCTION));
                 return State.EDITION;
             }
+
+            testButton.setText("Solving");
 
             //Add CurrentPath/dimacsFile
             String translatedFilePath = getFrame().getTranslatorSAT().getDimacsFilePath();
