@@ -43,7 +43,6 @@ import java.util.Map;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
-import solution.ModelList;
 
 import solution.SolverExecutionException;
 import solution.SolverSMT;
@@ -426,21 +425,31 @@ public class ParentEditionPanel extends AbstractComponentPanel {
     
     private void showErrorMessage(Exception e, String message, String title) {
         showErrorMessage(message, title);
-        FileWriter writer = null;
-        String texte = String.valueOf(e.getStackTrace()) + "\n" + "######################";
-        try{
-             writer = new FileWriter("log.txt", true);
-             writer.write(texte,0,texte.length());
-        }catch(IOException ex){
-            ex.printStackTrace();
-        }finally{
-          if(writer != null){
-              try {
-                  writer.close();
-              } catch (IOException ex) {
-                  e.printStackTrace();
-              }
+        
+        /*
+         * To enable the exceptions stacks to be filed into log.txt, I added 
+         * a system property "debug" that must be added when calling java:
+         *     java -Ddebug=true -jar touist.jar
+         * 
+         * Or you can simply run `ant run`, it will enable that flag.
+         */
+        if(System.getProperty("debug") == "true") {
+        	FileWriter writer = null;
+        	String texte = String.valueOf(e.getStackTrace()) + "\n" + "######################";
+        	try{
+        		writer = new FileWriter("log.txt", true);
+        		writer.write(texte,0,texte.length());
+        	}catch(IOException ex){
+        		ex.printStackTrace();
+        	}finally{
+        		if(writer != null){
+        			try {
+        				writer.close();
+        			} catch (IOException ex) {
+        				e.printStackTrace();
+        			}
           }
+        }
         }
     }
     
