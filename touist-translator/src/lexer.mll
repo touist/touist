@@ -102,6 +102,7 @@ rule lexer = parse
   | "and"          { AND          }
   | "or"           { OR           }
   | "=>"           { IMPLIES      }
+  | "<=>"          { EQUIV        }
   | "xor"          { XOR          }
   | "not"          { NOT          }
   | "if"           { IF           }
