@@ -17,7 +17,7 @@ To debug this mess, first go to the translator folder
 	cd touist-translator
 
 The touistc must be in .byte instead of .native. In
-_oasis, I replaced the line with `CompiledObject: byte`.
+`_oasis`, I replaced the line with `CompiledObject: byte`.
 You must then re-generate the build scripts using `oasis`:
 
     oasis setup
@@ -40,8 +40,16 @@ The commands I used:
 - `r` to run, `f` to finish and be able to re-run
 - `break @eval 366` to set a breakpoint on src/eval.ml at line 366
 - `s` to step forward when you reached a breakpoint
-- `backstep` to do a backward step when you what to understand what 
+- `b` or `backstep` to do a backward step when you what to understand what 
   happened just before the crash/exception
   
+# Not using `make`
+Using directly `ocamlbuild`:
 
+    ocamlbuild -use-ocamlfind -use-menhir -menhir "menhir --table --inspection -v -la 2" -ocamlc "ocamlc -g" -package menhirLib -package fileutils,str touistc.byte
 
+# RE-building `parser_messages.ml` using `parser.messages`
+
+    menhir parser.mly --list-errors > parser.messages
+    menhir parser.mly --update-errors parser.messages > tmp && mv tmp parser.messages
+    menhir --compile-errors parser.messages parser.mly > parser_messages.ml
