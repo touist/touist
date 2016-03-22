@@ -96,6 +96,9 @@ and string_of_clause = function
       ^ " then\n" ^ (string_of_clause y)
       ^ "\nelse\n" ^ (string_of_clause z)
       ^ "\nend\n"
+  | Exact (x,y) -> "exact(" ^ (string_of_exp x) ^ "," ^ (string_of_exp y) ^ ")"
+  | Atmost (x,y) -> "atmost(" ^ (string_of_exp x) ^ "," ^ (string_of_exp y) ^ ")"
+  | Atleast (x,y) -> "atleast(" ^ (string_of_exp x) ^ "," ^ (string_of_exp y) ^ ")"
 
 and string_of_set = function
   | GenSet.Empty  -> "[]"
@@ -119,4 +122,5 @@ and string_of_floatset s =
 
 and string_of_strset s =
   "[" ^ (String.concat ", " (StringSet.elements s)) ^ "]"
+
 
