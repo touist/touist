@@ -1,20 +1,54 @@
-open Lexer
+(**************************************************************************)
+(*                                                                        *)
+(*  Menhir                                                                *)
+(*                                                                        *)
+(*  François Pottier, INRIA Paris-Rocquencourt                            *)
+(*  Yann Régis-Gianas, PPS, Université Paris Diderot                      *)
+(*                                                                        *)
+(*  Copyright 2005-2015 Institut National de Recherche en Informatique    *)
+(*  et en Automatique. All rights reserved. This file is distributed      *)
+(*  under the terms of the Q Public License version 1.0, with the change  *)
+(*  described in file LICENSE.                                            *)
+(*                                                                        *)
+(**************************************************************************)
+
 open Lexing
+open MenhirLib.General
+open Parser.MenhirInterpreter
 open Arg (* Parses the arguments *)
 open FilePath (* Operations on file names *)
-open Printf
-open Version
 
+(* Instantiate [MenhirLib.Printers] for our parser. This requires providing a
+   few printing functions -- see [CalcPrinters]. *)
 
-(* NOTE for utop or ocaml users: to open the FilePath module
-from the fileutils package, do the following:
-  #use "topfind";;
-  #require "fileutils";;
-If it doesn't work, check if the fileutils package is installed:
-  #list;; (uses the topfind library from the ocamlfind package)
-Then you can open the FilePath module:
-  open FilePath;;
-*)
+module P =
+  MenhirLib.Printers.Make
+    (Parser.MenhirInterpreter)
+    (ErrorPrinters)
+
+(* Instantiate [ErrorReporting] for our parser. This requires
+   providing a few functions -- see [CalcErrorReporting]. *)
+
+module E =
+  ErrorReporting.Make
+    (Parser.MenhirInterpreter)
+    (TouistErrorReporting)
+
+(* Define a printer for explanations. We treat an explanation as if it
+   were just an item: that is, we ignore the position information that
+   is provided in the explanation. Indeed, this information is hard to
+   show in text mode. *)
+
+let print_explanation explanation =
+  P.print_item (E.item explanation)
+
+let print_explanations startp explanations =
+  Printf.fprintf stderr
+    "At line %d, column %d: syntax error.\n"
+    startp.pos_lnum
+    startp.pos_cnum;
+  List.iter print_explanation explanations;
+  flush stderr
 
 type mode = SMTLIB2 | SAT_DIMACS
 type error =
@@ -38,6 +72,10 @@ let input_file_path = ref ""
 let output_file_path = ref ""
 let output_table_file_path = ref ""
 let output_file_basename = ref ""
+
+let print_position outx lexbuf =
+  let pos = lexbuf.lex_curr_p in
+    Printf.fprintf outx "%d:%d" pos.pos_lnum (pos.pos_cnum - pos.pos_bol+1)
 
 (* Used to write the "str" string into the "filename" file *)
 let write_to_file (filename:string) (str:string) =
@@ -71,26 +109,29 @@ let argIsInputFilePath (inputFilePath:string) : unit =
 (* Used by parse_with_error *)
 let print_position outx lexbuf =
   let pos = lexbuf.lex_curr_p in
-  fprintf outx "%d:%d" pos.pos_lnum (pos.pos_cnum - pos.pos_bol+1)
+  Printf.fprintf outx "%d:%d" pos.pos_lnum (pos.pos_cnum - pos.pos_bol+1)
 
 (* parse_with_error handles exceptions when calling
 the parser and lexer *)
 let parse_and_eval_with_error lexbuf =
-  try Eval.eval (Parser.prog Lexer.lexer lexbuf) [] with
-  | SyntaxError msg -> 
-      fprintf stderr "%a: %s\n" print_position lexbuf msg;
+  try Eval.eval (E.entry (Parser.Incremental.prog lexbuf.lex_curr_p) Lexer.token lexbuf) [] with
+  | Lexer.Error msg ->
+      Printf.fprintf stderr "%a: %s\n" print_position lexbuf msg;
       exit (get_code COMPILE_WITH_LINE_NUMBER_ERROR) (* Should be "None" *)
   | Parser.Error ->
-      fprintf stderr "%a: syntax error\n" print_position lexbuf;
+      Printf.fprintf stderr "%a: syntax error\n" print_position lexbuf;
       exit (get_code COMPILE_WITH_LINE_NUMBER_ERROR)
   | Eval.NameError msg ->
-      fprintf stderr "name error with '%s'\n" msg;
+      Printf.fprintf stderr "name error with '%s'\n" msg;
       exit (get_code COMPILE_NO_LINE_NUMBER_ERROR)
   | Eval.TypeError msg ->
-      fprintf stderr "type error with '%s'\n" msg;
+      Printf.fprintf stderr "type error with '%s'\n" msg;
       exit (get_code COMPILE_NO_LINE_NUMBER_ERROR)
   | Eval.ArgumentError msg ->
-      fprintf stderr "argument error: '%s'\n" msg;
+      Printf.fprintf stderr "argument error: '%s'\n" msg;
+      exit (get_code COMPILE_NO_LINE_NUMBER_ERROR)
+  | E.Error ((startp, _), explanations) ->
+      print_explanations startp explanations;
       exit (get_code COMPILE_NO_LINE_NUMBER_ERROR)
 (*  XXX: Mael: I removed this part to avoid "skipping" 
  *  some exceptions we could have forgotten to handle
