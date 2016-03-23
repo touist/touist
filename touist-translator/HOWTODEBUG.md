@@ -46,10 +46,28 @@ The commands I used:
 # Not using `make`
 Using directly `ocamlbuild`:
 
-    ocamlbuild -use-ocamlfind -use-menhir -menhir "menhir --table --inspection -v -la 2" -ocamlc "ocamlc -g" -package menhirLib -package fileutils,str touistc.byte
+    ocamlbuild -use-ocamlfind -use-menhir -menhir "menhir --table --inspection -v -la 2" -ocamlc "ocamlc -g" -package fileutils,str,menhirLib touistc.byte
+
+Or whith `-tag debug` instead of -ocamlc "ocamlc -g":
+
+    ocamlbuild -use-ocamlfind -use-menhir -menhir "menhir --table --inspection -v -la 2" -package fileutils,str,menhirLib touistc.byte -tag debug
 
 # RE-building `parser_messages.ml` using `parser.messages`
 
     menhir parser.mly --list-errors > parser.messages
     menhir parser.mly --update-errors parser.messages > tmp && mv tmp parser.messages
     menhir --compile-errors parser.messages parser.mly > parser_messages.ml
+
+# Testing with ocaml interpreter
+For utop or ocaml users: to open the FilePath module
+from the fileutils package, do the following:
+
+    #use "topfind";;
+    #require "fileutils";;
+
+If it doesn't work, check if the fileutils package is installed:
+
+    #list;; (uses the topfind library from the ocamlfind package)
+Then you can open the FilePath module:
+
+    open FilePath;;
