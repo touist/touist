@@ -91,7 +91,7 @@ deploy:
   - provider: GitHub
     auth_token:
       # maelvalais ciphered credetials using appveyor encryption
-      secure: "HxU0eV4dnrn1w5WzCZ5LSE18RPYMSkpiWdZNmj6LrIpbVH5wn3tC0wOYDYqwLLxYZA09Qg6X/NVx4gr4nQAvfoxdYubV95hPWCcGsZmh3NpP9e/IAdwx+NAsoz8GEZqm3UzlaZL8JVPN5gGkAYbZNVpoudjf7b2EoXP4IUIIkRE="
+      secure: "ipzGVEYVmAxErk3V2bjCzwNCO7QrOQMXqn2EYSE+Vf/UvIybwqZfHYJrKkrH8XU4"
     artifact: /touist-.*\.zip/          # upload all touist*.zip to release 
     #draft: true
     #prerelease: true
