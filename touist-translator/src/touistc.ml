@@ -31,6 +31,7 @@
  * under the terms of the INRIA Non-Commercial License Agreement. 
  *)
 
+open Lexer
 open Lexing
 open Arg (* Parses the arguments *)
 open FilePath (* Operations on file names *)
