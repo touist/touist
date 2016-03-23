@@ -1,4 +1,36 @@
-open Lexer
+(*
+ * touistc.ml: Entry point of touistc
+ *
+ * Project TouIST, 2015. Easily formalize and solve real-world sized problems
+ * using propositional logic and linear theory of reals with a nice language and GUI.
+ *
+ * https://github.com/FredMaris/touist
+ *
+ * Copyright Institut de Recherche en Informatique de Toulouse, France
+ * This program and the accompanying materials are made available 
+ * under the terms of the GNU Lesser General Public License (LGPL) 
+ * version 2.1 which accompanies this distribution, and is available at
+ * http://www.gnu.org/licenses/lgpl-2.1.html
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ * 
+ *
+ * Some of the code has been inspired by cparser/Lexer.mll contained in
+ * the project AbsInt/CompCert. Here are the terms:
+ *
+ * The Compcert verified compiler                      
+ * Jacques-Henri Jourdan, INRIA Paris-Rocquencourt            
+ * Copyright Institut National de Recherche en Informatique et en     
+ * Automatique.  All rights reserved.  This file is distributed       
+ * under the terms of the GNU General Public License as published by  
+ * the Free Software Foundation, either version 2 of the License, or  
+ * (at your option) any later version.  This file is also distributed 
+ * under the terms of the INRIA Non-Commercial License Agreement. 
+ *)
+
 open Lexing
 open Arg (* Parses the arguments *)
 open FilePath (* Operations on file names *)

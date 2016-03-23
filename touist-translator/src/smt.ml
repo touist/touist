@@ -1,3 +1,20 @@
+(*
+ * smt.ml: processes the "semantically correct" abstract syntaxic tree 
+ *         given by [eval] and produces a string in SMT-LIB2 format.
+ *         [to_smt2] is the main function.
+ *
+ * Project TouIST, 2015. Easily formalize and solve real-world sized problems
+ * using propositional logic and linear theory of reals with a nice language and GUI.
+ *
+ * https://github.com/FredMaris/touist
+ *
+ * Copyright Institut de Recherche en Informatique de Toulouse, France
+ * This program and the accompanying materials are made available 
+ * under the terms of the GNU Lesser General Public License (LGPL) 
+ * version 2.1 which accompanies this distribution, and is available at
+ * http://www.gnu.org/licenses/lgpl-2.1.html
+ *)
+
 open Syntax
 
 let to_smt2 logic formula =
