@@ -33,21 +33,11 @@
 
 open Lexer
 open Lexing
+open MenhirLib.General
+open Parser.MenhirInterpreter
 open Arg (* Parses the arguments *)
 open FilePath (* Operations on file names *)
-open Printf
-open Version
 
-
-(* NOTE for utop or ocaml users: to open the FilePath module
-from the fileutils package, do the following:
-  #use "topfind";;
-  #require "fileutils";;
-If it doesn't work, check if the fileutils package is installed:
-  #list;; (uses the topfind library from the ocamlfind package)
-Then you can open the FilePath module:
-  open FilePath;;
-*)
 
 type mode = SMTLIB2 | SAT_DIMACS
 type error =
@@ -71,6 +61,10 @@ let input_file_path = ref ""
 let output_file_path = ref ""
 let output_table_file_path = ref ""
 let output_file_basename = ref ""
+
+let print_position outx lexbuf =
+  let pos = lexbuf.lex_curr_p in
+    Printf.fprintf outx "%d:%d" pos.pos_lnum (pos.pos_cnum - pos.pos_bol+1)
 
 (* Used to write the "str" string into the "filename" file *)
 let write_to_file (filename:string) (str:string) =
@@ -104,26 +98,27 @@ let argIsInputFilePath (inputFilePath:string) : unit =
 (* Used by parse_with_error *)
 let print_position outx lexbuf =
   let pos = lexbuf.lex_curr_p in
-  fprintf outx "%d:%d" pos.pos_lnum (pos.pos_cnum - pos.pos_bol+1)
+  Printf.fprintf outx "%d:%d" pos.pos_lnum (pos.pos_cnum - pos.pos_bol+1)
 
-(* parse_with_error handles exceptions when calling
-the parser and lexer *)
-let parse_and_eval_with_error lexbuf =
-  try Eval.eval (Parser.prog Lexer.lexer lexbuf) [] with
-  | SyntaxError msg -> 
-      fprintf stderr "%a: %s\n" print_position lexbuf msg;
-      exit (get_code COMPILE_WITH_LINE_NUMBER_ERROR) (* Should be "None" *)
-  | Parser.Error ->
-      fprintf stderr "%a: syntax error\n" print_position lexbuf;
-      exit (get_code COMPILE_WITH_LINE_NUMBER_ERROR)
+
+  
+(* [evaluate] handles exceptions when calling the evaluation function [Eval.eval].
+ * Eval.eval takes an abstract syntaxic tree and check that it is semantically correct,
+ * creates the variables and everything.
+ *
+ * [ast] means it is of type Syntax.prog,
+ * i.e. the "root" type in lexer.mll 
+ *)
+let evaluate (ast:Syntax.prog) : Syntax.clause =
+  try Eval.eval ast [] with
   | Eval.NameError msg ->
-      fprintf stderr "name error with '%s'\n" msg;
+      Printf.fprintf stderr "name error with '%s'\n" msg;
       exit (get_code COMPILE_NO_LINE_NUMBER_ERROR)
   | Eval.TypeError msg ->
-      fprintf stderr "type error with '%s'\n" msg;
+      Printf.fprintf stderr "type error with '%s'\n" msg;
       exit (get_code COMPILE_NO_LINE_NUMBER_ERROR)
   | Eval.ArgumentError msg ->
-      fprintf stderr "argument error: '%s'\n" msg;
+      Printf.fprintf stderr "argument error: '%s'\n" msg;
       exit (get_code COMPILE_NO_LINE_NUMBER_ERROR)
 (*  XXX: Mael: I removed this part to avoid "skipping" 
  *  some exceptions we could have forgotten to handle
@@ -133,23 +128,67 @@ let parse_and_eval_with_error lexbuf =
       exit (get_code COMPILE_NO_LINE_NUMBER_ERROR)
 *)
 
+
+  (* This is the main entry point to the lexer. *)
+
+let lexer : (Lexing.lexbuf -> Parser.token) =
+  fun lexbuf -> Lexer.token lexbuf
+
+let lexer tokens buffer : (Lexing.lexbuf -> Parser.token) =
+  fun lexbuf ->
+    let startp = lexbuf.lex_start_p
+    and endp = lexbuf.lex_curr_p in
+      buffer := ErrorReporting.update !buffer (startp, endp);
+      (Lexer.token lexbuf)
+
+(*  [invoke_parser] is in charge of calling the parser. It uses
+    the incremental API, which allows us to do our own error handling. 
+   
+    [invoke_parser] *)
+
+let invoke_parser filename text lexer buffer : Syntax.prog =
+  let lexbuf = Lexing.from_string text in
+  lexbuf.lex_curr_p <- {lexbuf.lex_curr_p with pos_fname = filename; pos_lnum = 1};
+  let checkpoint = Parser.Incremental.prog lexbuf.lex_curr_p
+  and supplier = Parser.MenhirInterpreter.lexer_lexbuf_to_supplier lexer lexbuf
+  and succeed ast = ast
+  and fail checkpoint =
+      Printf.fprintf stderr "%s" (ErrorReporting.report text !buffer checkpoint);
+      exit (get_code COMPILE_NO_LINE_NUMBER_ERROR)
+  in
+    Parser.MenhirInterpreter.loop_handle succeed fail supplier checkpoint
     
 
+let file_to_string (filename:string) : string =
+  let inchannel = open_in filename in
+    let n = in_channel_length inchannel in
+      let text = Bytes.create n in
+        really_input inchannel text 0 n;
+        close_in inchannel;
+        (text)
+
+
 (* Main parsing/lexing function *)
-let translateToSATDIMACS infile outfile tablefile =
-  let exp =
-    parse_and_eval_with_error (Lexing.from_channel (open_in infile))
-  in
-  let c,t = Cnf.to_cnf exp |> Dimacs.to_dimacs in
-  write_to_file outfile c;
-  write_to_file tablefile (Dimacs.string_of_table t)
+let translateToSATDIMACS (infile:string) (outfile:string) (tablefile:string) =
+  let text = file_to_string infile
+  and tokens = Queue.create () 
+  and buffer = ref ErrorReporting.Zero in
+  let ast = invoke_parser infile text (lexer tokens buffer) buffer in
+    let exp = evaluate ast in
+      let c,t = Cnf.to_cnf exp |> Dimacs.to_dimacs in
+        write_to_file outfile c;
+        write_to_file tablefile (Dimacs.string_of_table t)
 
 let translate_to_smt2 logic infile outfile =
-  let exp = parse_and_eval_with_error (Lexing.from_channel (open_in infile)) in
-  let buf = Smt.to_smt2 logic exp in
-  let out = open_out outfile in
-  try Buffer.output_buffer out buf
-  with x -> close_out out; raise x
+  let text = file_to_string infile
+  and tokens = Queue.create () 
+  and buffer = ref ErrorReporting.Zero in
+  let ast = invoke_parser infile text (lexer tokens buffer) buffer in
+    let exp = evaluate ast in
+      let buf = Smt.to_smt2 logic exp
+      and out = open_out outfile in
+      try Buffer.output_buffer out buf
+      with x -> close_out out; raise x
 
 (* The main program *)
 let () =

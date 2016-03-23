@@ -9,7 +9,7 @@ Plugins:      META (0.4), DevFiles (0.4)
 
 BuildType: ocamlbuild (0.4)
 AlphaFeatures: ocamlbuild_more_args
-XOCamlbuildExtraArgs: -use-menhir -pkg fileutils
+XOCamlbuildExtraArgs: "-use-menhir -menhir 'menhir --table --inspection -v -la 2' -pkg fileutils,menhirLib,str"
 PreBuildCommand: sh generate-version-number.sh
 
 Executable touistc
