@@ -58,6 +58,10 @@ Or whith `-tag debug` instead of -ocamlc "ocamlc -g":
     menhir parser.mly --update-errors parser.messages > tmp && mv tmp parser.messages
     menhir --compile-errors parser.messages parser.mly > parser_messages.ml
 
+And to rebuild everything at once:
+
+    menhir parser.mly --update-errors parser.messages > tmp && mv tmp parser.messages && menhir --compile-errors parser.messages parser.mly > parser_messages.ml && ocamlbuild -use-ocamlfind -use-menhir -menhir "menhir --table --inspection -v -la 2" -package menhirLib -package fileutils,str touistc.byte -tag debug -r
+
 # Testing with ocaml interpreter
 For utop or ocaml users: to open the FilePath module
 from the fileutils package, do the following:
@@ -71,3 +75,11 @@ If it doesn't work, check if the fileutils package is installed:
 Then you can open the FilePath module:
 
     open FilePath;;
+
+
+# Debug `parser.messages`
+For example, you can type:
+    
+	menhir --interpret-error parser.mly << eof
+    BEGIN FORMULA ATLEAST LPAREN VAR COMMA INT AND
+    eof
