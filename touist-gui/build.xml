@@ -174,7 +174,9 @@
 			</filterchain>
 		</loadfile>
 		<delete file="some.tmp.file"/>
-		<zip destfile="${touist.dist.dir}.zip" basedir="${touist.dist.dir}">
+		<!-- I Added the duplicate=preserve because `ant zip` was producting 
+		2 copies of everything in external/ -->
+		<zip destfile="${touist.dist.dir}.zip" basedir="${touist.dist.dir}" duplicate="preserve">
 			<!-- Binaries in zip loose their permissions. Set them to 755 -->
 			<zipfileset filemode="755" dir="${touist.dist.dir}" 
 				includes="external/*"/>

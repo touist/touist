@@ -15,6 +15,8 @@
 # the owner of the project (Olivier Lezaud back then) had had to link
 # the repo to the Travis-ci website.
 #
+# vim:set et sw=2 ts=2:
+
 
 language: java
 os:
@@ -27,14 +29,20 @@ addons:
     - avsm
     packages:
     - opam
-      
+
 before_install:
   # Install packages using brew on osx environment
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update && brew install opam ant; fi
   - opam init --auto-setup
   - eval `opam config env`
   - opam install --yes ocamlfind menhir fileutils
-    
+  # Put the dependency yices-smt2 to external/
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then file=yices-2.4.2-x86_64-apple-darwin15.2.0-static-gmp.tar.gz; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then file=yices-2.4.2-x86_64-unknown-linux-gnu-static-gmp.tar.gz; fi
+  - echo $file
+  - curl -o yices.tar.gz "http://yices.csl.sri.com/cgi-bin/yices2-newnewdownload.cgi?file=${file}&accept=I+Agree"
+  - tar xzf yices.tar.gz
+  - cp yices-*/bin/yices-smt2 touist-gui/external
 install:
   # Build touistc (touist-translator)  
   - cd touist-translator
@@ -46,6 +54,7 @@ install:
   - chmod ugo+x external/touistc  
   - ant zip
   - zip=$(ls | grep 'touist.*\.zip' | head -1) # The artifact's name for later use
+  - echo $zip
 
 # This part is meant for unit tests (among others).
 script:
