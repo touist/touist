@@ -138,12 +138,13 @@ let evaluate (ast:Syntax.prog) : Syntax.clause =
 let lexer : (Lexing.lexbuf -> Parser.token) =
   fun lexbuf -> Lexer.token lexbuf
 
-let lexer tokens buffer : (Lexing.lexbuf -> Parser.token) =
+let lexer buffer : (Lexing.lexbuf -> Parser.token) =
   fun lexbuf ->
-    let startp = lexbuf.lex_start_p
-    and endp = lexbuf.lex_curr_p in
-      buffer := ErrorReporting.update !buffer (startp, endp);
-      (Lexer.token lexbuf)
+    let lex = lexer lexbuf in
+      let startp = lexbuf.lex_start_p
+      and endp = lexbuf.lex_curr_p in
+        buffer := ErrorReporting.update !buffer (startp, endp);
+        lex
 
 (*  [invoke_parser] is in charge of calling the parser. It uses
     the incremental API, which allows us to do our own error handling. 
@@ -175,9 +176,8 @@ let file_to_string (filename:string) : string =
 (* Main parsing/lexing function *)
 let translateToSATDIMACS (infile:string) (outfile:string) (tablefile:string) =
   let text = file_to_string infile
-  and tokens = Queue.create () 
   and buffer = ref ErrorReporting.Zero in
-  let ast = invoke_parser infile text (lexer tokens buffer) buffer in
+  let ast = invoke_parser infile text (lexer buffer) buffer in
     let exp = evaluate ast in
       let c,t = Cnf.to_cnf exp |> Dimacs.to_dimacs in
         write_to_file outfile c;
@@ -185,9 +185,8 @@ let translateToSATDIMACS (infile:string) (outfile:string) (tablefile:string) =
 
 let translate_to_smt2 logic infile outfile =
   let text = file_to_string infile
-  and tokens = Queue.create () 
   and buffer = ref ErrorReporting.Zero in
-  let ast = invoke_parser infile text (lexer tokens buffer) buffer in
+  let ast = invoke_parser infile text (lexer buffer) buffer in
     let exp = evaluate ast in
       let buf = Smt.to_smt2 logic exp
       and out = open_out outfile in
