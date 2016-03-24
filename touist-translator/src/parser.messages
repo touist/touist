@@ -3,10 +3,14 @@
 # token that has been read. $0 will typically show the token that has been read
 # right before an error occurred. 
 # Example: 
-# The dot = where we are stopped. Here, the parser didn't expect to encounter "end".
+# The dot is where we are stopped. Here, the parser didn't expect to read "end".
+# NOTE: I modified the [element checkpoint i] to display the failing token in $0,
+#       and the following tokens are accessible via $1, $2...
 # Here is what the $i tokens contain:
+#
 #     begin formula atleast  (   1   , [a] . end  formula
-#     $                     $3  $2  $1  $0   
+#                               $3  $2  $1    $0   
+#
 
 prog: BEGIN FORMULA ATLEAST LPAREN VAR COMMA VAR WHEN 
 ##

@@ -190,14 +190,18 @@ let rec drop n (xs : 'a S.stream) : 'a S.stream =
    if it isn't. *)
 
 let element checkpoint i : element =
-  match Lazy.force (drop i (stack checkpoint)) with
+  let i' = if i>0 then (i-1) else i in
+  match Lazy.force (drop i' (stack checkpoint)) with
   | S.Nil ->
       (* [i] is out of range. This could happen if the handwritten error
          messages are out of sync with the grammar, or if a mistake was
          made. We fail in a non-fatal way. *)
       raise Not_found
-  | S.Cons (e, _) ->
-      e
+  | S.Cons (Element (a, b, p1, p2), _) ->
+      match i with 
+      | 0 -> let p1',p2' = (positions (match checkpoint with HandlingError env -> env)) in
+        Element (a, b, p1', p2')
+      | _ -> Element (a, b, p1, p2)
 
 (* -------------------------------------------------------------------------- *)
 
