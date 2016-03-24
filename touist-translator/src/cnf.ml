@@ -44,6 +44,8 @@ let rec push_lit lit = function
   | COr (x,y)     -> COr (lit, COr (x,y))
   | x -> failwith ("push_lit: unexpected value " ^ (string_of_clause x)) 
 
+(* [to_cnf] takes a [Syntax.clause] (= the "root" of the abstract syntaxic tree)
+ * and transforms it into another Syntax.clause *)
 let rec to_cnf = function
   | Top    -> Top
   | Bottom -> Bottom

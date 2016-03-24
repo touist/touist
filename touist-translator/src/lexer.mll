@@ -34,8 +34,8 @@
 {
   open Lexing
   open Parser
-  exception SyntaxError of string
-  
+  exception Error of string
+
   let next_line lexbuf =
     let pos = lexbuf.lex_curr_p in
     lexbuf.lex_curr_p <-
@@ -53,9 +53,9 @@ let variable   = (special | digit)* alpha (alpha | special | digit)*
 let integer    = digit+
 let double     = digit+ '.' digit+
 
-rule lexer = parse
+rule token = parse
   | eof            { EOF          }
-  | empty+         { lexer lexbuf }
+  | empty+         { token lexbuf }
   | "begin"        { BEGIN        }
   | "end"          { END          }
   | "sets"         { SETS         }
@@ -108,13 +108,13 @@ rule lexer = parse
   | "if"           { IF           }
   | "then"         { THEN         }
   | "else"         { ELSE         }
-  | '$' variable   { VAR    (lexeme lexbuf) }
-  | identifier     { TERM   (lexeme lexbuf) }
-  | integer        { INT    (int_of_string   (lexeme lexbuf)) }
-  | double         { FLOAT  (float_of_string (lexeme lexbuf)) }
-  | newline        { next_line lexbuf; lexer lexbuf }
+  | '$' variable   { VAR    (Lexing.lexeme lexbuf) }
+  | identifier     { TERM   (Lexing.lexeme lexbuf) }
+  | integer        { INT    (int_of_string   (Lexing.lexeme lexbuf)) }
+  | double         { FLOAT  (float_of_string (Lexing.lexeme lexbuf)) }
+  | newline        { next_line lexbuf; token lexbuf }
   | ";;"           { comments_parse lexbuf          }
-  | _              { raise (SyntaxError ("Unexpected char: " ^ lexeme lexbuf)) }
+  | _              { raise (Error ("Unexpected char: " ^ (Lexing.lexeme lexbuf))) }
 and comments_parse = parse
-  | '\n'           { next_line lexbuf; lexer lexbuf }
+  | '\n'           { next_line lexbuf; token lexbuf }
   | _              { comments_parse lexbuf          }
