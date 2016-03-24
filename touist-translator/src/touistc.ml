@@ -164,18 +164,17 @@ let invoke_parser filename text lexer buffer : Syntax.prog =
     Parser.MenhirInterpreter.loop_handle succeed fail supplier checkpoint
     
 
-let file_to_string (filename:string) : string =
-  let inchannel = open_in filename in
+let string_of_file (filename:string) : string =
+  let inchannel = open_in_bin filename in
     let n = in_channel_length inchannel in
-      let text = Bytes.create n in
-        really_input inchannel text 0 n;
+    let text = really_input_string inchannel n in
         close_in inchannel;
         (text)
 
 
 (* Main parsing/lexing function *)
 let translateToSATDIMACS (infile:string) (outfile:string) (tablefile:string) =
-  let text = file_to_string infile
+  let text = string_of_file infile
   and buffer = ref ErrorReporting.Zero in
   let ast = invoke_parser infile text (lexer buffer) buffer in
     let exp = evaluate ast in
@@ -184,7 +183,7 @@ let translateToSATDIMACS (infile:string) (outfile:string) (tablefile:string) =
         write_to_file tablefile (Dimacs.string_of_table t)
 
 let translate_to_smt2 logic infile outfile =
-  let text = file_to_string infile
+  let text = string_of_file infile
   and buffer = ref ErrorReporting.Zero in
   let ast = invoke_parser infile text (lexer buffer) buffer in
     let exp = evaluate ast in
