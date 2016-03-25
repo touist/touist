@@ -40,7 +40,25 @@
 
 %start <Syntax.prog> prog
 
-%right EQUIV IMPLIES
+
+
+(* The following lines define in which order the tokens should
+ * be reduced, e.g. it tells the parser to reduce * before +.
+ *
+ * Note that the precedence rules apply from bottom to top:
+ * the top element will be the less prioritized   
+ *
+ * %left: e.g: a PLUS b TIMES -> a PLUS b
+ *   The precedence rule applies from left to right, 
+ *       
+ * %right: 
+ *   The precedence rule applies from right to left
+ *
+ * %noassoc, e.g. NOT(a)
+ *   The precedence rule has no direction; this often
+ *   applies for unary oparators *)
+
+%right EQUIV IMPLIES (* Lesser priority on precedence *)
 %left OR
 %left AND
 %left XOR
@@ -51,33 +69,54 @@
 %left ADD
 %left MUL DIV
 %left MOD
-%nonassoc neg
+%nonassoc high_precedence (* Highest priority on precedence *)
 
-%%
+(* This wierd [high_precedence] is not a TERMINAL, not a 
+ * production rule... It is an arbitrary name that allows 
+ * to give precedence indications on production rules. 
+ * Ex:
+ *     clause: SUB clause %prec high_precedence
+ * will give this production rule a predecence given by
+ * where the 
+ *     %nonassoc high_precedence 
+ * is written. Here, we want this production rule to be
+ * reduced before any other one because it is the "minus" sign,
+ * ex:
+ *     -3.905
+ * and, like 
+ *     not(a)
+ * the minus sign MUST be reduced as fast as possible. *)
 
+%% (* Everthing below that mark is expected to be a production rule *)
+   (* Note that VAR { $0 } is equivalent to v=VAR { v } *)
+
+(* [prog] is the entry point of the parser *)
 prog:
   | BEGIN SETS affect+ END SETS BEGIN FORMULA clause+ END FORMULA EOF
-  { Prog (Some $3, $8) }
+    { Prog (Some $3, $8) }
   | BEGIN FORMULA clause+ END FORMULA EOF
-  { Prog (None, $3) }
+    { Prog (None, $3) }
 
 var_decl:
   | VAR { ($1, None) }
   | VAR LPAREN separated_nonempty_list(COMMA, exp) RPAREN { ($1, Some $3) }
   | VAR LPAREN separated_nonempty_list(COMMA, TERM) RPAREN
-  { ($1, Some (List.map (fun e -> Clause (Term (e,None))) $3)) } 
+    { ($1, Some (List.map (fun e -> Clause (Term (e,None))) $3)) } 
 
 affect:
   | var_decl AFFECT exp { Affect ($1, $3) }
 
 exp:
+  (* This parametrized rule allows to "regroup" every "clause OPERATOR clause" 
+    under the same rule. I refactored the explicit rules to that form  to try to
+    have clearer messages in parser.messages *)
   | LPAREN exp RPAREN { $2 }
   | INT   { Int   $1 }
   | FLOAT { Float $1 }
   | BOOL  { Bool  $1 }
   | var_decl { Var      $1 }
   | set_decl { Set_decl $1 }
-  | SUB exp { Neg $2 } %prec neg
+  | SUB exp { Neg $2 } %prec high_precedence
   | exp ADD exp { Add ($1, $3) }
   | exp SUB exp { Sub ($1, $3) }
   | exp MUL exp { Mul ($1, $3) }
@@ -108,11 +147,25 @@ exp:
   | LBRACK exp RANGE exp RBRACK { Range ($2, $4) }
   | IF exp THEN exp ELSE exp END { If ($2, $4, $6) }
 
+
 clause:
+  (* Conflict between two rules when reading
+   *           "TERM LPAREN exp RPAREN"
+   *  clause ->      LPAREN exp RPAREN  <- mandatory for specifing order of clauses
+   *  clause -> TERM LPAREN exp RPAREN 
+   * are conflicting with each other *)
   | LPAREN clause RPAREN { $2 }
   | INT   { CInt   $1 }
   | FLOAT { CFloat $1 }
-  | SUB clause { CNeg $2 } %prec neg
+
+  (* SUB clause makes it really "hard" to solve. Just one example;
+     On the first line, the actual list of tokens. On the two following
+     lines, two reductions conflicting:
+               "clause1 SUB clause2 XOR clause3 ..."
+      clause -> clause1 SUB clause2        => ((clause1 SUB clause2) XOR clause3)
+      clause ->         SUB clause2        => (clause 1)((SUB clause2) XOR clause3)
+   *)
+  | SUB clause { CNeg $2 } %prec high_precedence
   | clause ADD      clause { CAdd              ($1, $3) }
   | clause SUB      clause { CSub              ($1, $3) }
   | clause MUL      clause { CMul              ($1, $3) }
@@ -127,7 +180,14 @@ clause:
   | TOP    { Top    }
   | BOTTOM { Bottom }
   | TERM   { Term ($1, None) }
-  | TERM LPAREN separated_nonempty_list(COMMA, term_or_exp) RPAREN { Term ($1, Some $3) }
+  (* There is a conflict between reducing TERM (the one just above)
+     and shifting before reducing, looking ahead for a LPAREN
+     Ambiguous example:   "a(b)"
+     We don't know if it should be understood as
+        ( a ) ( b )   => two separate clauses
+        a(b)          => a tuple-term with b as the tuple index *)
+  | TERM LPAREN separated_nonempty_list(COMMA, term_or_exp) RPAREN
+      { Term ($1, Some $3) }
   | NOT clause { CNot $2 }
   | clause AND     clause { CAnd     ($1, $3) }
   | clause OR      clause { COr      ($1, $3) }
@@ -147,6 +207,10 @@ clause:
   { Bigor ($2, $4, Some $6, $8) }
   | IF exp THEN clause ELSE clause END { CIf ($2, $4, $6) }
 
+(* Warning: the two rules
+     var_decl -> TERM 
+     exp -> var_decl
+   are doing the same thing as term_or_exp *)
 term_or_exp:
   | TERM { Clause (Term ($1,None)) }
   | exp { $1 }
