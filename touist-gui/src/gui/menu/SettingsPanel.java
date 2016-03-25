@@ -308,7 +308,7 @@ public class SettingsPanel extends AbstractComponentPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButtonChangeDirectoryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonChangeDirectoryActionPerformed
-        JFileChooser jFileChooser = new JFileChooser(new File(parent.getDefaultDirectoryPath()));
+        JFileChooser jFileChooser = new JFileChooser(new File(System.getProperty("user.dir")));
         jFileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
         int returnVal = jFileChooser.showOpenDialog(this);
         
