@@ -623,30 +623,6 @@ prog: BEGIN FORMULA BIGOR XOR
 
 <YOUR SYNTAX ERROR MESSAGE HERE>
 
-prog: BEGIN FORMULA END FORMULA XOR 
-##
-## Ends in an error in state: 246.
-##
-## prog -> BEGIN FORMULA list(clause) END FORMULA . EOF [ # ]
-##
-## The known suffix of the stack is as follows:
-## BEGIN FORMULA list(clause) END FORMULA 
-##
-
-<YOUR SYNTAX ERROR MESSAGE HERE>
-
-prog: BEGIN FORMULA END XOR 
-##
-## Ends in an error in state: 245.
-##
-## prog -> BEGIN FORMULA list(clause) END . FORMULA EOF [ # ]
-##
-## The known suffix of the stack is as follows:
-## BEGIN FORMULA list(clause) END 
-##
-
-<YOUR SYNTAX ERROR MESSAGE HERE>
-
 prog: BEGIN FORMULA EXACT LPAREN VAR COMMA VAR WHEN 
 ##
 ## Ends in an error in state: 152.
@@ -1235,18 +1211,6 @@ prog: BEGIN FORMULA IF INTER XOR
 
 <YOUR SYNTAX ERROR MESSAGE HERE>
 
-prog: BEGIN FORMULA IF LBRACK TERM COMMA XOR 
-##
-## Ends in an error in state: 20.
-##
-## separated_nonempty_list(COMMA,TERM) -> TERM COMMA . separated_nonempty_list(COMMA,TERM) [ RPAREN RBRACK ]
-##
-## The known suffix of the stack is as follows:
-## TERM COMMA 
-##
-
-<YOUR SYNTAX ERROR MESSAGE HERE>
-
 prog: BEGIN FORMULA IF LBRACK TERM RPAREN 
 ##
 ## Ends in an error in state: 91.
@@ -1261,19 +1225,6 @@ prog: BEGIN FORMULA IF LBRACK TERM RPAREN
 ## accurate view of the past (what has been recognized so far), they
 ## may provide an INCOMPLETE view of the future (what was expected next).
 ## In state 19, spurious reduction of production separated_nonempty_list(COMMA,TERM) -> TERM 
-##
-
-<YOUR SYNTAX ERROR MESSAGE HERE>
-
-prog: BEGIN FORMULA IF LBRACK TERM XOR 
-##
-## Ends in an error in state: 19.
-##
-## separated_nonempty_list(COMMA,TERM) -> TERM . [ RPAREN RBRACK ]
-## separated_nonempty_list(COMMA,TERM) -> TERM . COMMA separated_nonempty_list(COMMA,TERM) [ RPAREN RBRACK ]
-##
-## The known suffix of the stack is as follows:
-## TERM 
 ##
 
 <YOUR SYNTAX ERROR MESSAGE HERE>
@@ -1293,18 +1244,6 @@ prog: BEGIN FORMULA IF LBRACK VAR COMMA BOOL WHEN
 ## may provide an INCOMPLETE view of the future (what was expected next).
 ## In state 99, spurious reduction of production separated_nonempty_list(COMMA,exp) -> exp 
 ## In state 98, spurious reduction of production separated_nonempty_list(COMMA,exp) -> exp COMMA separated_nonempty_list(COMMA,exp) 
-##
-
-<YOUR SYNTAX ERROR MESSAGE HERE>
-
-prog: BEGIN FORMULA IF LBRACK VAR COMMA XOR 
-##
-## Ends in an error in state: 97.
-##
-## separated_nonempty_list(COMMA,exp) -> exp COMMA . separated_nonempty_list(COMMA,exp) [ WHEN RPAREN RBRACK COLON ]
-##
-## The known suffix of the stack is as follows:
-## exp COMMA 
 ##
 
 <YOUR SYNTAX ERROR MESSAGE HERE>
@@ -3055,7 +2994,7 @@ prog: BEGIN FORMULA TERM LPAREN XOR
 ## TERM LPAREN 
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HEREazdazd>
+<YOUR SYNTAX ERROR MESSAGE HERE>
 
 prog: BEGIN FORMULA TERM WHEN 
 ##
@@ -3170,6 +3109,30 @@ prog: BEGIN FORMULA VAR DIV XOR
 ##
 ## The known suffix of the stack is as follows:
 ## clause DIV 
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+prog: BEGIN FORMULA VAR END FORMULA XOR 
+##
+## Ends in an error in state: 246.
+##
+## prog -> BEGIN FORMULA nonempty_list(clause) END FORMULA . EOF [ # ]
+##
+## The known suffix of the stack is as follows:
+## BEGIN FORMULA nonempty_list(clause) END FORMULA 
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+prog: BEGIN FORMULA VAR END XOR 
+##
+## Ends in an error in state: 245.
+##
+## prog -> BEGIN FORMULA nonempty_list(clause) END . FORMULA EOF [ # ]
+##
+## The known suffix of the stack is as follows:
+## BEGIN FORMULA nonempty_list(clause) END 
 ##
 
 <YOUR SYNTAX ERROR MESSAGE HERE>
@@ -3667,7 +3630,8 @@ prog: BEGIN FORMULA VAR WHEN
 ## clause -> clause . XOR clause [ XOR VAR TOP TERM SUB OR NOTEQUAL NOT MUL LT LPAREN LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL END DIV BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ## clause -> clause . IMPLIES clause [ XOR VAR TOP TERM SUB OR NOTEQUAL NOT MUL LT LPAREN LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL END DIV BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ## clause -> clause . EQUIV clause [ XOR VAR TOP TERM SUB OR NOTEQUAL NOT MUL LT LPAREN LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL END DIV BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
-## list(clause) -> clause . list(clause) [ END ]
+## nonempty_list(clause) -> clause . [ END ]
+## nonempty_list(clause) -> clause . nonempty_list(clause) [ END ]
 ##
 ## The known suffix of the stack is as follows:
 ## clause 
@@ -3732,7 +3696,7 @@ prog: BEGIN FORMULA XOR
 ##
 ## Ends in an error in state: 243.
 ##
-## prog -> BEGIN FORMULA . list(clause) END FORMULA EOF [ # ]
+## prog -> BEGIN FORMULA . nonempty_list(clause) END FORMULA EOF [ # ]
 ##
 ## The known suffix of the stack is as follows:
 ## BEGIN FORMULA 
@@ -3740,74 +3704,74 @@ prog: BEGIN FORMULA XOR
 
 <YOUR SYNTAX ERROR MESSAGE HERE>
 
-prog: BEGIN SETS END SETS BEGIN FORMULA END FORMULA XOR 
+prog: BEGIN SETS VAR AFFECT BOOL END SETS BEGIN FORMULA VAR END FORMULA XOR 
 ##
 ## Ends in an error in state: 235.
 ##
-## prog -> BEGIN SETS list(affect) END SETS BEGIN FORMULA list(clause) END FORMULA . EOF [ # ]
+## prog -> BEGIN SETS nonempty_list(affect) END SETS BEGIN FORMULA nonempty_list(clause) END FORMULA . EOF [ # ]
 ##
 ## The known suffix of the stack is as follows:
-## BEGIN SETS list(affect) END SETS BEGIN FORMULA list(clause) END FORMULA 
+## BEGIN SETS nonempty_list(affect) END SETS BEGIN FORMULA nonempty_list(clause) END FORMULA 
 ##
 
 <YOUR SYNTAX ERROR MESSAGE HERE>
 
-prog: BEGIN SETS END SETS BEGIN FORMULA END XOR 
+prog: BEGIN SETS VAR AFFECT BOOL END SETS BEGIN FORMULA VAR END XOR 
 ##
 ## Ends in an error in state: 234.
 ##
-## prog -> BEGIN SETS list(affect) END SETS BEGIN FORMULA list(clause) END . FORMULA EOF [ # ]
+## prog -> BEGIN SETS nonempty_list(affect) END SETS BEGIN FORMULA nonempty_list(clause) END . FORMULA EOF [ # ]
 ##
 ## The known suffix of the stack is as follows:
-## BEGIN SETS list(affect) END SETS BEGIN FORMULA list(clause) END 
+## BEGIN SETS nonempty_list(affect) END SETS BEGIN FORMULA nonempty_list(clause) END 
 ##
 
 <YOUR SYNTAX ERROR MESSAGE HERE>
 
-prog: BEGIN SETS END SETS BEGIN FORMULA XOR 
+prog: BEGIN SETS VAR AFFECT BOOL END SETS BEGIN FORMULA XOR 
 ##
 ## Ends in an error in state: 129.
 ##
-## prog -> BEGIN SETS list(affect) END SETS BEGIN FORMULA . list(clause) END FORMULA EOF [ # ]
+## prog -> BEGIN SETS nonempty_list(affect) END SETS BEGIN FORMULA . nonempty_list(clause) END FORMULA EOF [ # ]
 ##
 ## The known suffix of the stack is as follows:
-## BEGIN SETS list(affect) END SETS BEGIN FORMULA 
+## BEGIN SETS nonempty_list(affect) END SETS BEGIN FORMULA 
 ##
 
 <YOUR SYNTAX ERROR MESSAGE HERE>
 
-prog: BEGIN SETS END SETS BEGIN XOR 
+prog: BEGIN SETS VAR AFFECT BOOL END SETS BEGIN XOR 
 ##
 ## Ends in an error in state: 128.
 ##
-## prog -> BEGIN SETS list(affect) END SETS BEGIN . FORMULA list(clause) END FORMULA EOF [ # ]
+## prog -> BEGIN SETS nonempty_list(affect) END SETS BEGIN . FORMULA nonempty_list(clause) END FORMULA EOF [ # ]
 ##
 ## The known suffix of the stack is as follows:
-## BEGIN SETS list(affect) END SETS BEGIN 
+## BEGIN SETS nonempty_list(affect) END SETS BEGIN 
 ##
 
 <YOUR SYNTAX ERROR MESSAGE HERE>
 
-prog: BEGIN SETS END SETS XOR 
+prog: BEGIN SETS VAR AFFECT BOOL END SETS XOR 
 ##
 ## Ends in an error in state: 127.
 ##
-## prog -> BEGIN SETS list(affect) END SETS . BEGIN FORMULA list(clause) END FORMULA EOF [ # ]
+## prog -> BEGIN SETS nonempty_list(affect) END SETS . BEGIN FORMULA nonempty_list(clause) END FORMULA EOF [ # ]
 ##
 ## The known suffix of the stack is as follows:
-## BEGIN SETS list(affect) END SETS 
+## BEGIN SETS nonempty_list(affect) END SETS 
 ##
 
 <YOUR SYNTAX ERROR MESSAGE HERE>
 
-prog: BEGIN SETS END XOR 
+prog: BEGIN SETS VAR AFFECT BOOL END XOR 
 ##
 ## Ends in an error in state: 126.
 ##
-## prog -> BEGIN SETS list(affect) END . SETS BEGIN FORMULA list(clause) END FORMULA EOF [ # ]
+## prog -> BEGIN SETS nonempty_list(affect) END . SETS BEGIN FORMULA nonempty_list(clause) END FORMULA EOF [ # ]
 ##
 ## The known suffix of the stack is as follows:
-## BEGIN SETS list(affect) END 
+## BEGIN SETS nonempty_list(affect) END 
 ##
 
 <YOUR SYNTAX ERROR MESSAGE HERE>
@@ -3860,6 +3824,18 @@ prog: BEGIN SETS VAR AFFECT XOR
 
 <YOUR SYNTAX ERROR MESSAGE HERE>
 
+prog: BEGIN SETS VAR LPAREN TERM COMMA XOR 
+##
+## Ends in an error in state: 20.
+##
+## separated_nonempty_list(COMMA,TERM) -> TERM COMMA . separated_nonempty_list(COMMA,TERM) [ RPAREN RBRACK ]
+##
+## The known suffix of the stack is as follows:
+## TERM COMMA 
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
 prog: BEGIN SETS VAR LPAREN TERM RBRACK 
 ##
 ## Ends in an error in state: 120.
@@ -3874,6 +3850,31 @@ prog: BEGIN SETS VAR LPAREN TERM RBRACK
 ## accurate view of the past (what has been recognized so far), they
 ## may provide an INCOMPLETE view of the future (what was expected next).
 ## In state 19, spurious reduction of production separated_nonempty_list(COMMA,TERM) -> TERM 
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+prog: BEGIN SETS VAR LPAREN TERM XOR 
+##
+## Ends in an error in state: 19.
+##
+## separated_nonempty_list(COMMA,TERM) -> TERM . [ RPAREN RBRACK ]
+## separated_nonempty_list(COMMA,TERM) -> TERM . COMMA separated_nonempty_list(COMMA,TERM) [ RPAREN RBRACK ]
+##
+## The known suffix of the stack is as follows:
+## TERM 
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+prog: BEGIN SETS VAR LPAREN VAR COMMA XOR 
+##
+## Ends in an error in state: 97.
+##
+## separated_nonempty_list(COMMA,exp) -> exp COMMA . separated_nonempty_list(COMMA,exp) [ WHEN RPAREN RBRACK COLON ]
+##
+## The known suffix of the stack is as follows:
+## exp COMMA 
 ##
 
 <YOUR SYNTAX ERROR MESSAGE HERE>
@@ -3984,7 +3985,7 @@ prog: BEGIN SETS XOR
 ##
 ## Ends in an error in state: 2.
 ##
-## prog -> BEGIN SETS . list(affect) END SETS BEGIN FORMULA list(clause) END FORMULA EOF [ # ]
+## prog -> BEGIN SETS . nonempty_list(affect) END SETS BEGIN FORMULA nonempty_list(clause) END FORMULA EOF [ # ]
 ##
 ## The known suffix of the stack is as follows:
 ## BEGIN SETS 
@@ -3996,8 +3997,8 @@ prog: BEGIN XOR
 ##
 ## Ends in an error in state: 1.
 ##
-## prog -> BEGIN . SETS list(affect) END SETS BEGIN FORMULA list(clause) END FORMULA EOF [ # ]
-## prog -> BEGIN . FORMULA list(clause) END FORMULA EOF [ # ]
+## prog -> BEGIN . SETS nonempty_list(affect) END SETS BEGIN FORMULA nonempty_list(clause) END FORMULA EOF [ # ]
+## prog -> BEGIN . FORMULA nonempty_list(clause) END FORMULA EOF [ # ]
 ##
 ## The known suffix of the stack is as follows:
 ## BEGIN 

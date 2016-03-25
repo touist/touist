@@ -22,7 +22,13 @@ let message =
         "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
     | 99 ->
         "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
+    | 97 ->
+        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
+    | 19 ->
+        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
     | 120 ->
+        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
+    | 20 ->
         "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
     | 123 ->
         "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
@@ -90,6 +96,10 @@ let message =
         "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
     | 207 ->
         "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
+    | 245 ->
+        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
+    | 246 ->
+        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
     | 192 ->
         "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
     | 210 ->
@@ -103,7 +113,7 @@ let message =
     | 131 ->
         "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
     | 132 ->
-        "<YOUR SYNTAX ERROR MESSAGE HEREazdazd>\n"
+        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
     | 137 ->
         "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
     | 135 ->
@@ -258,15 +268,9 @@ let message =
         "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
     | 95 ->
         "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
-    | 97 ->
-        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
     | 89 ->
         "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
-    | 19 ->
-        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
     | 91 ->
-        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
-    | 20 ->
         "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
     | 23 ->
         "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
@@ -321,10 +325,6 @@ let message =
     | 151 ->
         "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
     | 152 ->
-        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
-    | 245 ->
-        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
-    | 246 ->
         "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
     | 155 ->
         "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
