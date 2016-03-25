@@ -87,6 +87,38 @@
  *     not(a)
  * the minus sign MUST be reduced as fast as possible. *)
 
+%on_error_reduce separated_nonempty_list(COMMA,term_or_exp)
+(* %on_error_reduce is a nice "trick" to display a a more accurate
+   context when an error is handled. For example, with this text:
+
+       "begin formula formula a(b,c end formula"
+
+   - b is shifted and then reduced thanks to the lookahead ","
+   - c is shifted and then reduced thanks to the lookahead "end"
+   - end is now evaluated; the parser is still fullfilling the rule
+        separated_nonempty_list(COMMA,term_or_exp)                (1)
+        -> term_or_exp . COMMA | term_or_exp . RPAREN
+     At this moment, the term_or_exp is the "c"; as END does not match
+     RPAREN or COMMA, the rule (1) fails to be reduceable.
+
+   The problem is that the $0 token in parser.messages will be
+     $0 = end
+     $1 = c
+     $2 = ,    etc...
+   because we were trying to reduce "b (RPAREN | COMMA)". 
+   There is no way to display the "a" which was the actuall important 
+   information because we don't actually know on which $i it is.
+   
+   %on_error_reduce will actually tell the parser not to fail immediately 
+   and let the "caller rule" that was calling (1). Here, (1) was called
+   twice recursively. The failing rule will hence be 
+
+     TERM LPAREN separated_nonempty_list(COMMA,term_or_exp) . RPAREN (2)
+     
+   Hence we are sure that $1 will give b,c and $3 will give "a" !
+*)
+
+
 %% (* Everthing below that mark is expected to be a production rule *)
    (* Note that VAR { $0 } is equivalent to v=VAR { v } *)
 
