@@ -1,3 +1,6 @@
+v1.1.2
+  - touistc: In SMT mode, "Float" was produced instead of "Real" (Frédéric Maris)
+
 v1.1.1
   - gui: dollars in variables are now displaying in bold font in latex (Maël Valais)
   - touistc: the left panel with formulas should now be wide enough (Maël Valais)
