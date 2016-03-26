@@ -99,7 +99,7 @@ let to_smt2 logic formula =
     | CEqual            (Term (x,None), CFloat _)
     | CEqual            (CFloat _, Term (x,None))
     | CNot_equal        (Term (x,None), CFloat _)
-    | CNot_equal        (CFloat _, Term (x,None)) -> add_var x "Float"
+    | CNot_equal        (CFloat _, Term (x,None)) -> add_var x "Real"
     | CAdd              (Term (x,None), Term (y,None))
     | CSub              (Term (x,None), Term (y,None))
     | CMul              (Term (x,None), Term (y,None))
