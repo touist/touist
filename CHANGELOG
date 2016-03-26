@@ -1,4 +1,4 @@
-v1.1.2
+v1.1.2 (future)
   - touistc: In SMT mode, "Float" was produced instead of "Real" (Frédéric Maris)
 
 v1.1.1
