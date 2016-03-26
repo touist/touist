@@ -118,8 +118,8 @@ let message =
         "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
     | 135 ->
         "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
-    | 134 ->
-        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
+    | 138 ->
+        "Ill-formed $3 as a parametrized term.\nUp to this point, an expression has been recognized:\n  $1\nIf this expression is complete,\nthen at this point, a closing parenthesis ')' is expected.\n"
     | 140 ->
         "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
     | 141 ->

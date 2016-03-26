@@ -2929,16 +2929,25 @@ prog: BEGIN FORMULA SUB XOR
 
 prog: BEGIN FORMULA TERM LPAREN TERM XOR 
 ##
-## Ends in an error in state: 134.
+## Ends in an error in state: 138.
 ##
-## separated_nonempty_list(COMMA,term_or_exp) -> term_or_exp . [ RPAREN ]
-## separated_nonempty_list(COMMA,term_or_exp) -> term_or_exp . COMMA separated_nonempty_list(COMMA,term_or_exp) [ RPAREN ]
+## clause -> TERM LPAREN separated_nonempty_list(COMMA,term_or_exp) . RPAREN [ XOR VAR TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL END ELSE DIV BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ##
 ## The known suffix of the stack is as follows:
-## term_or_exp 
+## TERM LPAREN separated_nonempty_list(COMMA,term_or_exp) 
+##
+## WARNING: This example involves spurious reductions.
+## This implies that, although the LR(1) items shown above provide an
+## accurate view of the past (what has been recognized so far), they
+## may provide an INCOMPLETE view of the future (what was expected next).
+## In state 134, spurious reduction of production separated_nonempty_list(COMMA,term_or_exp) -> term_or_exp 
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Ill-formed $3 as a parametrized term.
+Up to this point, an expression has been recognized:
+  $1
+If this expression is complete,
+then at this point, a closing parenthesis ')' is expected.
 
 prog: BEGIN FORMULA TERM LPAREN VAR COMMA XOR 
 ##
