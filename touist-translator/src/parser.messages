@@ -48,6 +48,74 @@ prog: BEGIN FORMULA ATLEAST LPAREN VAR COMMA VAR WHEN
 
 <YOUR SYNTAX ERROR MESSAGE HERE>
 
+# ------------------------------------------------------------------------------ 
+prog: BEGIN SETS VAR LPAREN VAR COMMA XOR 
+##
+## Ends in an error in state: 97.
+##
+## separated_nonempty_list(COMMA,exp) -> exp COMMA . separated_nonempty_list(COMMA,exp) [ WHEN RPAREN RBRACK COLON ]
+##
+## The known suffix of the stack is as follows:
+## exp COMMA 
+##
+prog: BEGIN FORMULA IF UNION LPAREN VAR COMMA XOR 
+##
+## Ends in an error in state: 115.
+##
+## exp -> UNION LPAREN exp COMMA . exp RPAREN [ XOR WHEN VAR THEN SUB RPAREN RBRACK RANGE OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL END ELSE DIV COMMA COLON AND ADD ]
+##
+## The known suffix of the stack is as follows:
+## UNION LPAREN exp COMMA 
+##
+prog: BEGIN FORMULA IF SUBSET LPAREN VAR COMMA XOR 
+##
+## Ends in an error in state: 107.
+##
+## exp -> SUBSET LPAREN exp COMMA . exp RPAREN [ XOR WHEN VAR THEN SUB RPAREN RBRACK RANGE OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL END ELSE DIV COMMA COLON AND ADD ]
+##
+## The known suffix of the stack is as follows:
+## SUBSET LPAREN exp COMMA 
+##
+prog: BEGIN FORMULA IF DIFF LPAREN VAR COMMA XOR 
+##
+## Ends in an error in state: 74.
+##
+## exp -> DIFF LPAREN exp COMMA . exp RPAREN [ XOR WHEN VAR THEN SUB RPAREN RBRACK RANGE OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL END ELSE DIV COMMA COLON AND ADD ]
+##
+## The known suffix of the stack is as follows:
+## DIFF LPAREN exp COMMA 
+##
+prog: BEGIN FORMULA IF INTER LPAREN VAR COMMA XOR 
+##
+## Ends in an error in state: 86.
+##
+## exp -> INTER LPAREN exp COMMA . exp RPAREN [ XOR WHEN VAR THEN SUB RPAREN RBRACK RANGE OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL END ELSE DIV COMMA COLON AND ADD ]
+##
+## The known suffix of the stack is as follows:
+## INTER LPAREN exp COMMA 
+##
+prog: BEGIN FORMULA BIGOR VAR COMMA XOR 
+##
+## Ends in an error in state: 157.
+##
+## separated_nonempty_list(COMMA,VAR) -> VAR COMMA . separated_nonempty_list(COMMA,VAR) [ IN ]
+##
+## The known suffix of the stack is as follows:
+## VAR COMMA 
+##
+prog: BEGIN FORMULA EXACT LPAREN VAR COMMA XOR 
+##
+## Ends in an error in state: 151.
+##
+## clause -> EXACT LPAREN exp COMMA . exp RPAREN [ XOR VAR TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL END ELSE DIV BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
+##
+## The known suffix of the stack is as follows:
+## EXACT LPAREN exp COMMA 
+##
+
+Ill-formed use of 'exact' statement.
+An expression was expected after $1.
+
 prog: BEGIN FORMULA ATLEAST LPAREN VAR COMMA XOR 
 ##
 ## Ends in an error in state: 181.
@@ -58,7 +126,38 @@ prog: BEGIN FORMULA ATLEAST LPAREN VAR COMMA XOR
 ## ATLEAST LPAREN exp COMMA 
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Ill-formed use of 'atleast' statement.
+An expression was expected after $1.
+
+prog: BEGIN FORMULA ATMOST LPAREN VAR COMMA XOR 
+##
+## Ends in an error in state: 175.
+##
+## clause -> ATMOST LPAREN exp COMMA . exp RPAREN [ XOR VAR TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL END ELSE DIV BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
+##
+## The known suffix of the stack is as follows:
+## ATMOST LPAREN exp COMMA 
+##
+
+Ill-formed use of 'atmost' statement.
+An expression was expected after $1.
+
+# ------------------------------------------------------------------------------ 
+prog: BEGIN FORMULA TERM LPAREN VAR COMMA XOR 
+##
+## Ends in an error in state: 135.
+##
+## separated_nonempty_list(COMMA,term_or_exp) -> term_or_exp COMMA . separated_nonempty_list(COMMA,term_or_exp) [ RPAREN ]
+##
+## The known suffix of the stack is as follows:
+## term_or_exp COMMA 
+##
+
+Ill-formed declaration of a parametrized term.
+$0 was not expected after $1; a term or an expression
+were expected.
+
+# -----------------------------------------------------------------------------
 
 prog: BEGIN FORMULA ATLEAST LPAREN VAR WHEN 
 ##
@@ -94,7 +193,9 @@ prog: BEGIN FORMULA ATLEAST LPAREN VAR WHEN
 ## In state 35, spurious reduction of production exp -> var_decl 
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Ill-formed use of $3 statement.
+
+
 
 prog: BEGIN FORMULA ATLEAST LPAREN XOR 
 ##
@@ -106,7 +207,9 @@ prog: BEGIN FORMULA ATLEAST LPAREN XOR
 ## ATLEAST LPAREN 
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Ill-formed 'atleast' statement. 
+At this point, an expression or variable was expected.
+Instead, $0 was read.
 
 prog: BEGIN FORMULA ATLEAST XOR 
 ##
@@ -118,7 +221,9 @@ prog: BEGIN FORMULA ATLEAST XOR
 ## ATLEAST 
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Ill-formed 'atleast' statement. 
+At this point, '(' was expected.
+Instead, $0 was read.
 
 prog: BEGIN FORMULA ATMOST LPAREN VAR COMMA VAR WHEN 
 ##
@@ -152,18 +257,6 @@ prog: BEGIN FORMULA ATMOST LPAREN VAR COMMA VAR WHEN
 ## may provide an INCOMPLETE view of the future (what was expected next).
 ## In state 3, spurious reduction of production var_decl -> VAR 
 ## In state 35, spurious reduction of production exp -> var_decl 
-##
-
-<YOUR SYNTAX ERROR MESSAGE HERE>
-
-prog: BEGIN FORMULA ATMOST LPAREN VAR COMMA XOR 
-##
-## Ends in an error in state: 175.
-##
-## clause -> ATMOST LPAREN exp COMMA . exp RPAREN [ XOR VAR TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL END ELSE DIV BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
-##
-## The known suffix of the stack is as follows:
-## ATMOST LPAREN exp COMMA 
 ##
 
 <YOUR SYNTAX ERROR MESSAGE HERE>
@@ -415,18 +508,6 @@ prog: BEGIN FORMULA BIGAND XOR
 
 <YOUR SYNTAX ERROR MESSAGE HERE>
 
-prog: BEGIN FORMULA BIGOR VAR COMMA XOR 
-##
-## Ends in an error in state: 157.
-##
-## separated_nonempty_list(COMMA,VAR) -> VAR COMMA . separated_nonempty_list(COMMA,VAR) [ IN ]
-##
-## The known suffix of the stack is as follows:
-## VAR COMMA 
-##
-
-<YOUR SYNTAX ERROR MESSAGE HERE>
-
 prog: BEGIN FORMULA BIGOR VAR IN VAR COLON VAR WHEN 
 ##
 ## Ends in an error in state: 223.
@@ -663,18 +744,6 @@ prog: BEGIN FORMULA EXACT LPAREN VAR COMMA VAR WHEN
 
 <YOUR SYNTAX ERROR MESSAGE HERE>
 
-prog: BEGIN FORMULA EXACT LPAREN VAR COMMA XOR 
-##
-## Ends in an error in state: 151.
-##
-## clause -> EXACT LPAREN exp COMMA . exp RPAREN [ XOR VAR TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL END ELSE DIV BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
-##
-## The known suffix of the stack is as follows:
-## EXACT LPAREN exp COMMA 
-##
-
-<YOUR SYNTAX ERROR MESSAGE HERE>
-
 prog: BEGIN FORMULA EXACT LPAREN VAR WHEN 
 ##
 ## Ends in an error in state: 150.
@@ -827,18 +896,6 @@ prog: BEGIN FORMULA IF DIFF LPAREN VAR COMMA VAR WHEN
 ## may provide an INCOMPLETE view of the future (what was expected next).
 ## In state 3, spurious reduction of production var_decl -> VAR 
 ## In state 35, spurious reduction of production exp -> var_decl 
-##
-
-<YOUR SYNTAX ERROR MESSAGE HERE>
-
-prog: BEGIN FORMULA IF DIFF LPAREN VAR COMMA XOR 
-##
-## Ends in an error in state: 74.
-##
-## exp -> DIFF LPAREN exp COMMA . exp RPAREN [ XOR WHEN VAR THEN SUB RPAREN RBRACK RANGE OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL END ELSE DIV COMMA COLON AND ADD ]
-##
-## The known suffix of the stack is as follows:
-## DIFF LPAREN exp COMMA 
 ##
 
 <YOUR SYNTAX ERROR MESSAGE HERE>
@@ -1139,18 +1196,6 @@ prog: BEGIN FORMULA IF INTER LPAREN VAR COMMA VAR WHEN
 ## may provide an INCOMPLETE view of the future (what was expected next).
 ## In state 3, spurious reduction of production var_decl -> VAR 
 ## In state 35, spurious reduction of production exp -> var_decl 
-##
-
-<YOUR SYNTAX ERROR MESSAGE HERE>
-
-prog: BEGIN FORMULA IF INTER LPAREN VAR COMMA XOR 
-##
-## Ends in an error in state: 86.
-##
-## exp -> INTER LPAREN exp COMMA . exp RPAREN [ XOR WHEN VAR THEN SUB RPAREN RBRACK RANGE OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL END ELSE DIV COMMA COLON AND ADD ]
-##
-## The known suffix of the stack is as follows:
-## INTER LPAREN exp COMMA 
 ##
 
 <YOUR SYNTAX ERROR MESSAGE HERE>
@@ -1557,18 +1602,6 @@ prog: BEGIN FORMULA IF SUBSET LPAREN VAR COMMA VAR WHEN
 
 <YOUR SYNTAX ERROR MESSAGE HERE>
 
-prog: BEGIN FORMULA IF SUBSET LPAREN VAR COMMA XOR 
-##
-## Ends in an error in state: 107.
-##
-## exp -> SUBSET LPAREN exp COMMA . exp RPAREN [ XOR WHEN VAR THEN SUB RPAREN RBRACK RANGE OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL END ELSE DIV COMMA COLON AND ADD ]
-##
-## The known suffix of the stack is as follows:
-## SUBSET LPAREN exp COMMA 
-##
-
-<YOUR SYNTAX ERROR MESSAGE HERE>
-
 prog: BEGIN FORMULA IF SUBSET LPAREN VAR WHEN 
 ##
 ## Ends in an error in state: 106.
@@ -1781,18 +1814,6 @@ prog: BEGIN FORMULA IF UNION LPAREN VAR COMMA VAR WHEN
 ## may provide an INCOMPLETE view of the future (what was expected next).
 ## In state 3, spurious reduction of production var_decl -> VAR 
 ## In state 35, spurious reduction of production exp -> var_decl 
-##
-
-<YOUR SYNTAX ERROR MESSAGE HERE>
-
-prog: BEGIN FORMULA IF UNION LPAREN VAR COMMA XOR 
-##
-## Ends in an error in state: 115.
-##
-## exp -> UNION LPAREN exp COMMA . exp RPAREN [ XOR WHEN VAR THEN SUB RPAREN RBRACK RANGE OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL END ELSE DIV COMMA COLON AND ADD ]
-##
-## The known suffix of the stack is as follows:
-## UNION LPAREN exp COMMA 
 ##
 
 <YOUR SYNTAX ERROR MESSAGE HERE>
@@ -2949,18 +2970,6 @@ Up to this point, an expression has been recognized:
 If this expression is complete,
 then at this point, a closing parenthesis ')' is expected.
 
-prog: BEGIN FORMULA TERM LPAREN VAR COMMA XOR 
-##
-## Ends in an error in state: 135.
-##
-## separated_nonempty_list(COMMA,term_or_exp) -> term_or_exp COMMA . separated_nonempty_list(COMMA,term_or_exp) [ RPAREN ]
-##
-## The known suffix of the stack is as follows:
-## term_or_exp COMMA 
-##
-
-<YOUR SYNTAX ERROR MESSAGE HERE>
-
 prog: BEGIN FORMULA TERM LPAREN VAR WHEN 
 ##
 ## Ends in an error in state: 137.
@@ -3657,7 +3666,7 @@ prog: BEGIN FORMULA VAR WHEN
 ## In state 184, spurious reduction of production clause -> var_decl 
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+$0 was not expected here. 
 
 prog: BEGIN FORMULA VAR XOR VAR WHEN 
 ##
@@ -3715,7 +3724,8 @@ prog: BEGIN FORMULA XOR
 ## BEGIN FORMULA 
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+At least one clause is expected.
+$0 is not the beginning of a clause.
 
 prog: BEGIN SETS VAR AFFECT BOOL END SETS BEGIN FORMULA VAR END FORMULA XOR 
 ##
@@ -3880,18 +3890,6 @@ prog: BEGIN SETS VAR LPAREN TERM XOR
 
 <YOUR SYNTAX ERROR MESSAGE HERE>
 
-prog: BEGIN SETS VAR LPAREN VAR COMMA XOR 
-##
-## Ends in an error in state: 97.
-##
-## separated_nonempty_list(COMMA,exp) -> exp COMMA . separated_nonempty_list(COMMA,exp) [ WHEN RPAREN RBRACK COLON ]
-##
-## The known suffix of the stack is as follows:
-## exp COMMA 
-##
-
-<YOUR SYNTAX ERROR MESSAGE HERE>
-
 prog: BEGIN SETS VAR LPAREN VAR VAR 
 ##
 ## Ends in an error in state: 99.
@@ -3992,7 +3990,7 @@ prog: BEGIN SETS VAR XOR
 ## In state 3, spurious reduction of production var_decl -> VAR 
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+An affectation sign '=' is expected here.
 
 prog: BEGIN SETS XOR 
 ##
@@ -4004,7 +4002,7 @@ prog: BEGIN SETS XOR
 ## BEGIN SETS 
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+An affectation of the form "$var = ..." is expected.
 
 prog: BEGIN XOR 
 ##
@@ -4016,9 +4014,6 @@ prog: BEGIN XOR
 ## The known suffix of the stack is as follows:
 ## BEGIN 
 ##
-
-<YOUR SYNTAX ERROR MESSAGE HERE>
-
 prog: XOR 
 ##
 ## Ends in an error in state: 0.
@@ -4029,5 +4024,10 @@ prog: XOR
 ## 
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+You must specify (at least) a "formula" bloc,
+or a "sets" bloc followed by a "formula" bloc.
+Example: 
+    begin sets    ... end sets
+    begin formula ... end formula
+
 

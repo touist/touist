@@ -6,14 +6,12 @@
 let message =
   fun s ->
     match s with
-    | 0 ->
-        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
-    | 1 ->
-        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
+    | 1 | 0 ->
+        "You must specify (at least) a \"formula\" bloc,\nor a \"sets\" bloc followed by a \"formula\" bloc.\nExample: \n    begin sets    ... end sets\n    begin formula ... end formula\n"
     | 2 ->
-        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
+        "An affectation of the form \"$var = ...\" is expected.\n"
     | 122 ->
-        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
+        "An affectation sign '=' is expected here.\n"
     | 3 ->
         "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
     | 4 ->
@@ -21,8 +19,6 @@ let message =
     | 118 ->
         "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
     | 99 ->
-        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
-    | 97 ->
         "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
     | 19 ->
         "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
@@ -47,13 +43,13 @@ let message =
     | 235 ->
         "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
     | 243 ->
-        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
+        "At least one clause is expected.\n$0 is not the beginning of a clause.\n"
     | 186 ->
         "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
     | 187 ->
         "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
     | 237 ->
-        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
+        "$0 was not expected here. \n"
     | 238 ->
         "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
     | 239 ->
@@ -115,8 +111,6 @@ let message =
     | 132 ->
         "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
     | 137 ->
-        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
-    | 135 ->
         "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
     | 138 ->
         "Ill-formed $3 as a parametrized term.\nUp to this point, an expression has been recognized:\n  $1\nIf this expression is complete,\nthen at this point, a closing parenthesis ')' is expected.\n"
@@ -218,8 +212,6 @@ let message =
         "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
     | 114 ->
         "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
-    | 115 ->
-        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
     | 116 ->
         "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
     | 7 ->
@@ -239,8 +231,6 @@ let message =
     | 12 ->
         "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
     | 106 ->
-        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
-    | 107 ->
         "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
     | 108 ->
         "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
@@ -278,8 +268,6 @@ let message =
         "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
     | 85 ->
         "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
-    | 86 ->
-        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
     | 87 ->
         "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
     | 26 ->
@@ -306,8 +294,6 @@ let message =
         "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
     | 73 ->
         "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
-    | 74 ->
-        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
     | 75 ->
         "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
     | 32 ->
@@ -321,8 +307,6 @@ let message =
     | 149 ->
         "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
     | 150 ->
-        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
-    | 151 ->
         "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
     | 152 ->
         "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
@@ -345,8 +329,6 @@ let message =
     | 222 ->
         "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
     | 223 ->
-        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
-    | 157 ->
         "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
     | 165 ->
         "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
@@ -372,18 +354,22 @@ let message =
         "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
     | 174 ->
         "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
-    | 175 ->
-        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
     | 176 ->
         "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
     | 178 ->
-        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
+        "Ill-formed 'atleast' statement. \nAt this point, '(' was expected.\nInstead, $0 was read.\n"
     | 179 ->
-        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
+        "Ill-formed 'atleast' statement. \nAt this point, an expression or variable was expected.\nInstead, $0 was read.\n"
     | 180 ->
-        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
+        "Ill-formed use of $3 statement.\n"
+    | 135 ->
+        "Ill-formed declaration of a parametrized term.\n$0 was not expected after $1; a term or an expression\nwere expected.\n"
+    | 175 ->
+        "Ill-formed use of 'atmost' statement.\nAn expression was expected after $1.\n"
     | 181 ->
-        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
+        "Ill-formed use of 'atleast' statement.\nAn expression was expected after $1.\n"
+    | 97 | 115 | 107 | 74 | 86 | 157 | 151 ->
+        "Ill-formed use of 'exact' statement.\nAn expression was expected after $1.\n"
     | 182 ->
         "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
     | _ ->
