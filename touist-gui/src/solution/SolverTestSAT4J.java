@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.util.Arrays;
 import java.util.Map;
 
 import entity.Literal;
@@ -111,7 +112,7 @@ public class SolverTestSAT4J extends Solver {
 		String [] command = { "java", "-jar",
 				"external" + Character.toString(File.separatorChar) + "minisat.jar" 
 				, getDimacsFilePath() } ;
-		System.out.println("launch(): cmd executed: "+command);
+		System.out.println("launch(): cmd executed: "+Arrays.toString(command));
 		this.p = Runtime.getRuntime().exec(command);
 		stderr = new BufferedReader(new InputStreamReader(p.getErrorStream()));
 		stdout = new BufferedReader(new InputStreamReader(p.getInputStream()));

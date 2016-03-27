@@ -28,6 +28,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -84,7 +85,7 @@ public class TranslatorSMT {
 		// Check if translatorProgramFilePath is there
 		String path = currentPath + File.separatorChar + translatorProgramFilePath;
 		String [] cmd = {path.toString(),"-o", outputFilePath,"-smt2", logic, touistlFilePath};
-		System.out.println("translate(): cmd executed: "+cmd);
+		System.out.println("translate(): cmd executed: "+Arrays.toString(cmd));
 		this.p = Runtime.getRuntime().exec(cmd);
 		int return_code = p.waitFor();
 		BufferedReader stdout = new BufferedReader(new InputStreamReader(

@@ -10,6 +10,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.StringTokenizer;
 
 import entity.Literal;
@@ -53,7 +54,7 @@ public class SolverSMT extends Solver {
       // String command="bin"+File.separatorChar+"yices-smt2"+" "+this.smtpath;
         Model smt=null;
          String [] command = {pathsolver, this.smtpath};
-        System.out.println("launch(): cmd executed: "+command);
+        System.out.println("launch(): cmd executed: "+Arrays.toString(command));
         StringBuffer br=new StringBuffer();
         this.p = Runtime.getRuntime().exec(command);
 	stdout = new BufferedReader(new InputStreamReader(p.getInputStream()));

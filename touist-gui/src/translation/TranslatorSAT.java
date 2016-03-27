@@ -30,6 +30,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -93,7 +94,7 @@ public class TranslatorSAT {
 		String path = currentPath + File.separatorChar + translatorProgramFilePath;
 		String [] cmd = {path.toString(),"-sat","-table", outputTableFilePath, 
 				"-o", outputFilePath, touistlFilePath};
-        System.out.println("translate(): cmd executed: "+cmd);
+        System.out.println("translate(): cmd executed: "+Arrays.toString(cmd));
 		this.p = Runtime.getRuntime().exec(cmd);
 		int return_code = p.waitFor();
 		BufferedReader stdout = new BufferedReader(new InputStreamReader(
