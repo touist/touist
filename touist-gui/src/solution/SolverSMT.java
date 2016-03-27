@@ -4,8 +4,6 @@
  */
 package solution;
 
-import entity.Literal;
-import entity.Model;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -13,6 +11,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.StringTokenizer;
+
+import entity.Literal;
+import entity.Model;
 
 /**
  *
@@ -51,7 +52,7 @@ public class SolverSMT extends Solver {
      public Model getresult() throws IOException, SolverExecutionException{
       // String command="bin"+File.separatorChar+"yices-smt2"+" "+this.smtpath;
         Model smt=null;
-         String command=pathsolver+" "+this.smtpath;
+         String [] command = {pathsolver, this.smtpath};
         System.out.println("launch(): cmd executed: "+command);
         StringBuffer br=new StringBuffer();
         this.p = Runtime.getRuntime().exec(command);

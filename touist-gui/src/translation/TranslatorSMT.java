@@ -83,10 +83,7 @@ public class TranslatorSMT {
 		 */
 		// Check if translatorProgramFilePath is there
 		String path = currentPath + File.separatorChar + translatorProgramFilePath;
-		String cmd = path.toString()
-				+ " -o " + outputFilePath
-				+ " -smt2 " + logic
-				+ " " + touistlFilePath;
+		String [] cmd = {path.toString(),"-o", outputFilePath,"-smt2", logic, touistlFilePath};
 		System.out.println("translate(): cmd executed: "+cmd);
 		this.p = Runtime.getRuntime().exec(cmd);
 		int return_code = p.waitFor();
