@@ -6,7 +6,8 @@
 
 		To use `ant` with `build.xml` (these are incremental targets), 
 		just go to the directory containing `build.xml` and launch:
-			- `ant build` to simply build the touist-gui project
+			- `ant build` to build the touist-gui project WITHOUT debug info
+			- `ant build-debug` to build it with debug info
 			- `ant jar` to make the touist.jar
 			- `ant dist` to prepare a release
 			- `ant zip` to make a .zip to ship the release
