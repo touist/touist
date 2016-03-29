@@ -155,7 +155,7 @@ public class EditionPanel extends AbstractComponentPanel {
     
     public void initPalette(PalettePanel.PaletteType type) {
         palettePanel2.initPaletteContent(type);
-        jSplitPane2.setDividerLocation(palettePanel2.getRecommendWidth());
+        jSplitPane2.setDividerLocation(120);
     }
 
     public String getText() {
