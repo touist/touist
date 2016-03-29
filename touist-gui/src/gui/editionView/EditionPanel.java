@@ -207,6 +207,7 @@ public class EditionPanel extends AbstractComponentPanel {
 
         jSplitPane2.setRightComponent(jSplitPane1);
 
+        jScrollPane2.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         jScrollPane2.setViewportView(palettePanel2);
 
         jSplitPane2.setLeftComponent(jScrollPane2);
