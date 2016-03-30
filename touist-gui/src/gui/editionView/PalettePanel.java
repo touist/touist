@@ -132,16 +132,16 @@ public class PalettePanel extends AbstractComponentPanel {
         }
     }
     
-    public int getRecommendWidth() {
-        int width = 0;
+    public int getMaxWidthIcons() {
+        int max_icon_width = 0;
         for (Component section : sectionsContainerPanel.getComponents()) {
             if (section instanceof PaletteSectionPanel) {
                 for (InsertionButton button : ((PaletteSectionPanel)section).getButtons()) {
-                    width = 8+(int) Math.max(width, button.getIcon().getIconWidth());
+                    max_icon_width = (int) Math.max(max_icon_width, button.getIcon().getIconWidth());
                 }
             }
         }
-        return width;
+        return max_icon_width;
     }
 
     /**

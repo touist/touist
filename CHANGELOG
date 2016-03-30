@@ -1,7 +1,8 @@
 v1.1.2 (future)
   - fix problem with whitespaces in path names (Victor David)
   - touistc: In SMT mode, "Float" was produced instead of "Real" (Frédéric Maris)
-	- touistc: Now display a proper error when -smt2 is given with no logic	(Maël Valais)
+  - touistc: Now display a proper error when -smt2 is given with no logic	(Maël Valais)
+  - gui: the left "snippets" panel has now a correct size (Maël Valais)
 
 v1.1.1
   - gui: dollars in variables are now displaying in bold font in latex (Maël Valais)
