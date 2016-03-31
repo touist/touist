@@ -55,6 +55,7 @@ public class EditionMenuBar extends JMenuBar {
     JMenu jMenuLanguage;
     JMenu jMenuHelp;
     JMenu jMenuEdit;
+    JMenu jMenuPlugIn;
     JMenu jMenuView;
     JMenuItem jMenuItemEnglish;
     JMenuItem jMenuItemFrench;
@@ -67,6 +68,7 @@ public class EditionMenuBar extends JMenuBar {
     JMenuItem jMenuItemZoomMore;
     JMenuItem jMenuItemZoomLess;
     JMenuItem jMenuItemSettings;
+    JMenuItem jMenuItemPDDL4J;
     
     
     public EditionMenuBar(MainFrame parent){
@@ -75,6 +77,7 @@ public class EditionMenuBar extends JMenuBar {
         jMenuLanguage = new JMenu();
         jMenuHelp = new JMenu();
         jMenuEdit = new JMenu();
+        jMenuPlugIn = new JMenu();
         jMenuView = new JMenu();
         
         
@@ -90,6 +93,8 @@ public class EditionMenuBar extends JMenuBar {
         jMenuItemUndo.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_Z, java.awt.Event.META_MASK));
         jMenuItemRedo = new JMenuItem();
         jMenuItemRedo.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_Y, java.awt.Event.META_MASK));
+        
+        jMenuItemPDDL4J = new JMenuItem();
         
         jMenuItemZoomMore = new JMenuItem();
         jMenuItemZoomMore.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_PLUS, java.awt.Event.META_MASK));
@@ -179,6 +184,7 @@ public class EditionMenuBar extends JMenuBar {
         jMenuHelp.add(jMenuItemAbout);
         jMenuEdit.add(jMenuItemUndo);
         jMenuEdit.add(jMenuItemRedo);
+        jMenuPlugIn.add(jMenuItemPDDL4J);
         jMenuView.add(jMenuItemZoomMore);
         jMenuView.add(jMenuItemZoomLess);
         
@@ -186,6 +192,7 @@ public class EditionMenuBar extends JMenuBar {
         this.add(jMenuEdit);
         this.add(jMenuView);
         this.add(jMenuLanguage);
+        this.add(jMenuPlugIn);
         this.add(jMenuHelp);
         
         updateLanguage();
@@ -295,6 +302,7 @@ public class EditionMenuBar extends JMenuBar {
     public void updateLanguage() {
         this.jMenuFile.setText(parent.getLang().getWord(Lang.EDITION_MENU_FILE));
         this.jMenuEdit.setText(parent.getLang().getWord(Lang.EDITION_MENU_EDIT));
+        this.jMenuPlugIn.setText("Plug-in");
         this.jMenuView.setText(parent.getLang().getWord(Lang.EDITION_MENU_VIEW));
         this.jMenuLanguage.setText(parent.getLang().getWord(Lang.EDITION_MENU_LANGUAGE));
         this.jMenuHelp.setText(parent.getLang().getWord(Lang.EDITION_MENU_HELP));
@@ -307,6 +315,7 @@ public class EditionMenuBar extends JMenuBar {
         this.jMenuItemZoomMore.setText(parent.getLang().getWord(Lang.EDITION_MENUITEM_ZOOMMORE));
         this.jMenuItemZoomLess.setText(parent.getLang().getWord(Lang.EDITION_MENUITEM_ZOOMLESS));
         this.jMenuItemSettings.setText(parent.getLang().getWord(Lang.SETTINGS_TITLE));
+        this.jMenuItemPDDL4J.setText("PDDL4T");
     }
     
 }
