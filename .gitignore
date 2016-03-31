@@ -70,6 +70,6 @@ touist-gui/*.smt
 touist-gui/touist-*
 
 
-touist-gui/ressources/version.properties
+touist-gui/resources/version.properties
 
 touist-translator/src/version.ml
