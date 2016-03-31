@@ -248,12 +248,6 @@
 			<entry key="build.date" value="${build.date}"/>
 			<entry key="minimum_java_version" value="${target}"/>
 		</propertyfile>
-		<!-- Prevent git from saying the repo is dirty -->
-		<exec executable="git" failifexecutionfails="false"> 
-             <arg value="update-index"/>
-             <arg value="--assume-unchanged"/>
-             <arg value="${touist.resources.dir}/version.properties"/>
-        </exec>
 	</target>
 
 
