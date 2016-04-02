@@ -524,7 +524,7 @@ public class ParentEditionPanel extends AbstractComponentPanel {
                 f.deleteOnExit();
             } catch (IOException ex) {
                 ex.printStackTrace();
-                errorMessage = "The translator returned an IOException: \n"+ex.getMessage();
+                errorMessage = "The translator returned an IOException: \n"+ex.getMessage()+"\nCheck that touistc is in external/ and that it has the right permissions.";
                 showErrorMessage(ex, errorMessage, getFrame().getLang().getWord(Lang.ERROR_TRADUCTION));
                 return State.EDITION;
             } catch (InterruptedException ex) {
