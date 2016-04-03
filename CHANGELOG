@@ -1,4 +1,4 @@
-v1.1.2 (future)
+v1.1.2 (2016/04/03)
   - fix problem with whitespaces in path names (Victor David)
   - touistc: In SMT mode, "Float" was produced instead of "Real" (Frédéric Maris)
   - touistc: Now display a proper error when -smt2 is given with no logic	(Maël Valais)
