@@ -67,9 +67,9 @@ deploy:
   skip_cleanup: true
   provider: releases
   api_key:
-    # This is my (maelvalais) credentials. It has been ciphered by travis's 
-    # encryption system.
-    secure: "YAimStqO6NDkMSn6W+e+V2D5EDtPl1GxxVeS1Fgqz2fneD0RyH08MOggDJDKhd3dvi1WVlfv1b+0PXB9QC1BsmKrNhEUjFtM/IkGsrMVnZ3Y4/GjvUtWmmgCHkv9q7XmOmyGaqDXt39pqux3/EyyLgqssLy8maggn+YpgtolPRk="
+    # This is maelvalais's ciphered credentials.
+    # It has been ciphered by travis's encryption system.
+    secure: PNvSXUUBTgQjfio2QL9qQYtV8JCpT6nWkvRNDGFoAwdskusi719jRLjGYDKHrTHelxiehepKSxiFcPcOCfFD/WkfOLZvEBs463Xb3fldoNxUgRAWwYy/uEWwlD3lbSBREgtqrfuHP3uVKF7tYDlJXhTFpdM/nuwXGIwU5AuUhCw=
   file: $zip
   on:
     branch: master
