@@ -192,10 +192,9 @@
 		<delete file="some.tmp.file"/>
 		<!-- I Added the duplicate=preserve because `ant zip` was producting 
 		2 copies of everything in external/ -->
-		<zip destfile="${touist.dist.dir}.zip" basedir="${touist.dist.dir}" duplicate="preserve">
+		<zip destfile="${touist.dist.dir}.zip" duplicate="preserve">
 			<!-- Binaries in zip loose their permissions. Set them to 755 -->
-			<zipfileset filemode="755" dir="${touist.dist.dir}" 
-				includes="external/*"/>
+			<zipfileset filemode="755" dir="${touist.dist.dir}"/>
 		</zip>
 		<copy file="${touist.dist.dir}.zip" 
 			toFile="${touist.dist.zip.name.filtered}.zip"/>
