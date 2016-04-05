@@ -183,7 +183,7 @@ public class EditionMenuBar extends JMenuBar {
         
         this.add(jMenuFile);
         this.add(jMenuEdit);
-        //this.add(jMenuView);
+        this.add(jMenuView);
         this.add(jMenuLanguage);
         this.add(jMenuHelp);
         
