@@ -6,7 +6,8 @@
 
 		To use `ant` with `build.xml` (these are incremental targets), 
 		just go to the directory containing `build.xml` and launch:
-			- `ant build` to simply build the touist-gui project
+			- `ant build` to build the touist-gui project WITHOUT debug info
+			- `ant build-debug` to build it with debug info
 			- `ant jar` to make the touist.jar
 			- `ant dist` to prepare a release
 			- `ant zip` to make a .zip to ship the release
@@ -65,7 +66,22 @@
 		TODO: desable the debug mode when building 
 		for `dist` (for end-users).
 	-->
-	<target depends="update-version-string" name="build">
+	<target name="build" depends="update-version-string">
+		<echo message="******************************************************************" level="warning"/>
+		<echo message="WARNING: `ant build` won't enable `javac -g` and `java -Ddebug=true`"/>
+		<echo message="To enable debug mode (when developping) please run `ant build-debug` instead."/>
+		<echo message="NOTE: the `ant run` task automatically calls `ant build-debug` and does -Ddebug=true."/>
+		<echo message="******************************************************************"/>		
+		<mkdir dir="${touist.build.dir}"/>
+		<javac destdir="${touist.build.dir}" includeantruntime="false" 
+			source="${source}" target="${target}">
+			<!-- Files I decided to exlude because they contain errors for now -->
+			<exclude name="**/BaseDeClausesTest.java"/>
+			<src path="${touist.dir}/src"/>
+			<classpath refid="touist.classpath-for-debug"/>
+		</javac>
+	</target>
+	<target name="build-debug" depends="update-version-string">
 		<mkdir dir="${touist.build.dir}"/>
 		<javac debug="true" debuglevel="${debuglevel}" 
 			destdir="${touist.build.dir}" includeantruntime="false" 
@@ -96,7 +112,7 @@
 		To put all external binaries and touist.jar files in a single directory 
 		separated from your build tree, you can use `and dist`.
 	-->
-	<target depends="build" name="build-jar">
+	<target name="build-jar" depends="build">
 		<jar destfile="${touist.dir}/touist.jar" filesetmanifest="mergewithoutmain">
 			<manifest>
 				<attribute name="Main-Class" value="touist.TouIST"/>
@@ -114,7 +130,7 @@
 			<zipfileset src= "${touist.libs.dir}/jlatexmath-1.0.3.jar"/>
 		</jar>
 	</target>
-	<target depends="build-jar" name="jar"/> <!-- Simple alias for build-jar -->
+	<target name="jar" depends="build-jar" /> <!-- Simple alias for build-jar -->
 
 
 
@@ -209,9 +225,10 @@
 		The "launching" target to debug Touist. I did this
 		target to make it easy to launch the touist program.
 	-->
-	<target name="run" depends="build">
+	<target name="run" depends="build-debug">
 		<java classname="touist.TouIST" failonerror="false" fork="yes" taskname="touist">
 			<classpath refid="touist.classpath-for-debug"/>
+			<sysproperty key="debug" value="true"/>
 		</java>
 	</target>
 
