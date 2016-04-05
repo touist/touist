@@ -3,7 +3,7 @@
  * Project TouIST, 2015. Easily formalize and solve real-world sized problems
  * using propositional logic and linear theory of reals with a nice GUI.
  *
- * https://github.com/FredMaris/touist
+ * https://github.com/touist/touist
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.util.Arrays;
 import java.util.Map;
 
 import entity.Literal;
@@ -108,10 +109,10 @@ public class SolverTestSAT4J extends Solver {
 		 * parse issue 3 = wrong dimacs content 4 = error with the streamreader
 		 * 5 = solver timeout
 		 */
-		String command = "java -jar " +
-				"external"+File.separatorChar+"minisat.jar " 
-				+ getDimacsFilePath();
-		System.out.println("launch(): cmd executed: "+command);
+		String [] command = { "java", "-jar",
+				"external" + Character.toString(File.separatorChar) + "minisat.jar" 
+				, getDimacsFilePath() } ;
+		System.out.println("launch(): cmd executed: "+Arrays.toString(command));
 		this.p = Runtime.getRuntime().exec(command);
 		stderr = new BufferedReader(new InputStreamReader(p.getErrorStream()));
 		stdout = new BufferedReader(new InputStreamReader(p.getInputStream()));

@@ -3,7 +3,7 @@
  * Project TouIST, 2015. Easily formalize and solve real-world sized problems
  * using propositional logic and linear theory of reals with a nice GUI.
  *
- * https://github.com/FredMaris/touist
+ * https://github.com/touist/touist
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
@@ -32,6 +32,7 @@ import gui.State;
 import java.awt.Color;
 import java.awt.Component;
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -169,7 +170,7 @@ public class ResultsPanel extends AbstractComponentPanel {
     }
     
     public void exportModel() throws IOException {
-        final JFileChooser fc = new JFileChooser();
+        final JFileChooser fc = new JFileChooser(new File(System.getProperty("user.dir")));
         fc.setFileFilter(new FileNameExtensionFilter("Text files(txt, text)","txt","text"));
         fc.addChoosableFileFilter(new FileNameExtensionFilter("Latex files(latex)","tex"));
         fc.setAcceptAllFileFilterUsed(false);

@@ -3,7 +3,7 @@
  * Project TouIST, 2015. Easily formalize and solve real-world sized problems
  * using propositional logic and linear theory of reals with a nice GUI.
  *
- * https://github.com/FredMaris/touist
+ * https://github.com/touist/touist
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
@@ -132,16 +132,16 @@ public class PalettePanel extends AbstractComponentPanel {
         }
     }
     
-    public int getRecommendWidth() {
-        int width = 0;
+    public int getMaxWidthIcons() {
+        int max_icon_width = 0;
         for (Component section : sectionsContainerPanel.getComponents()) {
             if (section instanceof PaletteSectionPanel) {
                 for (InsertionButton button : ((PaletteSectionPanel)section).getButtons()) {
-                    width = 8+(int) Math.max(width, button.getIcon().getIconWidth());
+                    max_icon_width = (int) Math.max(max_icon_width, button.getIcon().getIconWidth());
                 }
             }
         }
-        return width;
+        return max_icon_width;
     }
 
     /**

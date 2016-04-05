@@ -3,7 +3,7 @@
  * Project TouIST, 2015. Easily formalize and solve real-world sized problems
  * using propositional logic and linear theory of reals with a nice GUI.
  *
- * https://github.com/FredMaris/touist
+ * https://github.com/touist/touist
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
@@ -155,7 +155,7 @@ public class EditionPanel extends AbstractComponentPanel {
     
     public void initPalette(PalettePanel.PaletteType type) {
         palettePanel2.initPaletteContent(type);
-        jSplitPane2.setDividerLocation(palettePanel2.getRecommendWidth());
+        jSplitPane2.setDividerLocation(120);
     }
 
     public String getText() {
@@ -207,6 +207,7 @@ public class EditionPanel extends AbstractComponentPanel {
 
         jSplitPane2.setRightComponent(jSplitPane1);
 
+        jScrollPane2.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         jScrollPane2.setViewportView(palettePanel2);
 
         jSplitPane2.setLeftComponent(jScrollPane2);

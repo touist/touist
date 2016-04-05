@@ -3,7 +3,7 @@
  * Project TouIST, 2015. Easily formalize and solve real-world sized problems
  * using propositional logic and linear theory of reals with a nice GUI.
  *
- * https://github.com/FredMaris/touist
+ * https://github.com/touist/touist
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
@@ -30,6 +30,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -91,12 +92,9 @@ public class TranslatorSAT {
 		 */
 		// Check if translatorProgramFilePath is there
 		String path = currentPath + File.separatorChar + translatorProgramFilePath;
-		String cmd = path.toString()
-				+ " -sat" 
-				+ " -table " + outputTableFilePath
-				+ " -o " + outputFilePath
-				+ " " + touistlFilePath;
-        System.out.println("translate(): cmd executed: "+cmd);
+		String [] cmd = {path.toString(),"-sat","-table", outputTableFilePath, 
+				"-o", outputFilePath, touistlFilePath};
+        System.out.println("translate(): cmd executed: "+Arrays.toString(cmd));
 		this.p = Runtime.getRuntime().exec(cmd);
 		int return_code = p.waitFor();
 		BufferedReader stdout = new BufferedReader(new InputStreamReader(

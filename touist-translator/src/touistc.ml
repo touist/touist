@@ -4,7 +4,7 @@
  * Project TouIST, 2015. Easily formalize and solve real-world sized problems
  * using propositional logic and linear theory of reals with a nice language and GUI.
  *
- * https://github.com/FredMaris/touist
+ * https://github.com/touist/touist
  *
  * Copyright Institut de Recherche en Informatique de Toulouse, France
  * This program and the accompanying materials are made available 
@@ -63,6 +63,10 @@ let get_code (e : error) : int = match e with
   | COMPILE_WITH_LINE_NUMBER_ERROR -> 1
   | COMPILE_NO_LINE_NUMBER_ERROR -> 2
   | OTHER -> 3
+
+(* Here is the list of hard-coded accepted logics. There are many
+ * other logics that can be accepted. *)
+let smt_logic_avail = ["QF_IDL";"QF_LIA";"QF_LRA";"QF_RDL"]
 
 let sat_mode = ref false
 let version_asked = ref false
@@ -156,17 +160,24 @@ let () =
   let cmd = (FilePath.basename Sys.argv.(0)) in (* ./touistl exec. name *)
   let argspecs = (* This list enumerates the different flags (-x,-f...)*)
   [ (* "-flag", Arg.toSomething (ref var), "Usage for this flag"*)
-    ("-o", Arg.Set_string (output_file_path), "The translated file");
-    ("-table", Arg.Set_string (output_table_file_path), "The literals table table (for SAT_DIMACS)");
+    ("-o", Arg.Set_string (output_file_path), "file The translated file");
+    ("-table", Arg.Set_string (output_table_file_path), "file The literals table table (for SAT_DIMACS)");
     ("-sat", Arg.Set sat_mode, "Use the SAT solver");
-    ("-smt2", Arg.Set_string (smt_logic), "Use the SMT solver with the specified logic");
-    ("--version", Arg.Set version_asked, "display version number")
+    ("-smt2", Arg.Set_string (smt_logic), (
+        "logic Use the SMT solver with the specified logic
+        QF_IDL allows to deal with boolean and integer, E.g, x - y < b
+        QF_RDL is the same as QF_IDL but with reals
+        QF_LIA (not documented)
+        QF_LRA (not documented)
+    See http://smtlib.cs.uiowa.edu/logics.shtml for more info."
+    ));
+    ("--version", Arg.Set version_asked, "Display version number")
   ]
   in
   let usage = "TouistL compiles files from the TouIST Language \
     to SAT-DIMACS/SMT-LIB2 \n\
     Usage: " ^ cmd ^ " -sat [-o translatedFile] [-table tableFile] file \n\
-    Usage: " ^ cmd ^ " -smt2 logic [-o translatedFile] file \n\
+    Usage: " ^ cmd ^ " -smt2 (QF_IDL|QF_RDL|QF_LIA|QF_LRA) [-o translatedFile] file \n\
     Note: if either tableFile or translatedFile is missing, \n\
     an artibrary name will be given."
   in
@@ -190,6 +201,7 @@ let () =
     exit (get_code OTHER)
   );
 
+  (* If no output file has been given, set to a default one *)
   if (String.length !output_file_path) == 0 && !sat_mode then
     output_file_path := (defaultOutput !input_file_path SAT_DIMACS);
   
@@ -200,12 +212,19 @@ let () =
   then
     output_table_file_path := (defaultOutputTable !input_file_path);
   
+  (* Check that either -smt2 or -sat have been selected *)
   if (!sat_mode && (!smt_logic <> "")) then
     (print_endline (cmd^": cannot use both SAT and SMT solvers (try --help)");
      exit (get_code OTHER));
 
   if (not !sat_mode) && (!smt_logic = "") then
     (print_endline (cmd^": you must choose a solver to use: -sat or -smt2 (try --help)");
+     exit (get_code OTHER));
+
+  (* SMT Mode: check if one of the available QF_? has been given after -smt2 *)
+  if (not !sat_mode) && (not (List.exists (fun x->x=(String.uppercase !smt_logic)) smt_logic_avail)) then 
+    (print_endline (cmd^": you must specify the logic used (-smt2 logic_name) (try --help)");
+     print_endline ("Example: -smt2 QF_IDL");
      exit (get_code OTHER));
 
   (* Step 3: translation *)
