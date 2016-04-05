@@ -6,7 +6,7 @@
  * Project TouIST, 2015. Easily formalize and solve real-world sized problems
  * using propositional logic and linear theory of reals with a nice language and GUI.
  *
- * https://github.com/FredMaris/touist
+ * https://github.com/touist/touist
  *
  * Copyright Institut de Recherche en Informatique de Toulouse, France
  * This program and the accompanying materials are made available 
