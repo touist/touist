@@ -70,7 +70,6 @@ public class ParentEditionPanel extends AbstractComponentPanel {
         
         editorPanelFormulas.initPalette(PalettePanel.PaletteType.FORMULA);
         editorPanelSets.initPalette(PalettePanel.PaletteType.SET);
-        jFileChooser1.setCurrentDirectory(new File(".."));
         jLabelErrorMessageText = "";
         jLabelErrorMessage.setText(jLabelErrorMessageText);
         
