@@ -25,6 +25,7 @@ package gui.menu;
 
 import gui.Lang;
 import gui.MainFrame;
+
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -81,19 +82,19 @@ public class EditionMenuBar extends JMenuBar {
         jMenuItemFrench = new JMenuItem("Français");
         
         jMenuItemSaveFile = new JMenuItem();
-        jMenuItemSaveFile.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_S, java.awt.Event.CTRL_MASK));
+        jMenuItemSaveFile.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_S, java.awt.Event.META_MASK));
         jMenuItemLoadFile = new JMenuItem();
-        jMenuItemLoadFile.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_O, java.awt.Event.CTRL_MASK));
+        jMenuItemLoadFile.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_O, java.awt.Event.META_MASK));
         
         jMenuItemUndo = new JMenuItem();
-        jMenuItemUndo.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_Z, java.awt.Event.CTRL_MASK));
+        jMenuItemUndo.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_Z, java.awt.Event.META_MASK));
         jMenuItemRedo = new JMenuItem();
-        jMenuItemRedo.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_Y, java.awt.Event.CTRL_MASK));
+        jMenuItemRedo.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_Y, java.awt.Event.META_MASK));
         
         jMenuItemZoomMore = new JMenuItem();
-        jMenuItemZoomMore.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_PLUS, java.awt.Event.CTRL_MASK));
+        jMenuItemZoomMore.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_PLUS, java.awt.Event.META_MASK));
         jMenuItemZoomLess = new JMenuItem();
-        jMenuItemZoomLess.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_MINUS, java.awt.Event.CTRL_MASK));
+        jMenuItemZoomLess.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_MINUS, java.awt.Event.META_MASK));
         
         
         jMenuItemHelpEditor = new JMenuItem();
@@ -183,7 +184,7 @@ public class EditionMenuBar extends JMenuBar {
         
         this.add(jMenuFile);
         this.add(jMenuEdit);
-        //this.add(jMenuView);
+        this.add(jMenuView);
         this.add(jMenuLanguage);
         this.add(jMenuHelp);
         

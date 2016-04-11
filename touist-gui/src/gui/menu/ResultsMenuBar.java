@@ -60,7 +60,7 @@ public class ResultsMenuBar extends JMenuBar {
         jMenuItemEnglish = new JMenuItem("English");
         jMenuItemFrench = new JMenuItem("French");
         jMenuItemSaveModel = new JMenuItem();
-        jMenuItemSaveModel.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_S, java.awt.Event.CTRL_MASK));
+        jMenuItemSaveModel.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_S, java.awt.Event.META_MASK));
         jMenuItemHelpResults = new JMenuItem();
         
         jMenuItemEnglish.addActionListener(new java.awt.event.ActionListener() {
