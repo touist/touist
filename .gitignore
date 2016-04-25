@@ -73,3 +73,5 @@ touist-gui/touist-*
 touist-gui/resources/version.properties
 
 touist-translator/src/version.ml
+
+touist-gui/dist.zip
