@@ -23,14 +23,14 @@ import com.sun.glass.events.KeyEvent;
 
 public class PDDL4T_interface extends JFrame implements ActionListener {
 	private JPanel j = new JPanel();
-	private JRadioButton instButton = new JRadioButton("Actions totalement instanciees");
-	private JRadioButton decButton = new JRadioButton("Actions decoupees selon leurs arguments");
+	private JRadioButton instButton = new JRadioButton("Actions totalement instanciées");
+	private JRadioButton decButton = new JRadioButton("Actions découpées selon leurs arguments");
 	private ButtonGroup action = new ButtonGroup();
 	private JRadioButton dirButton = new JRadioButton("Codage direct des actions");
 	private JRadioButton planButton = new JRadioButton("Codage du graphe de planifications");
 	private ButtonGroup graphe = new ButtonGroup();
 	private JRadioButton pasButton = new JRadioButton("Pas à pas");
-	private JRadioButton itButton = new JRadioButton("Iteratif");
+	private JRadioButton itButton = new JRadioButton("Itératif");
 	private ButtonGroup fonc = new ButtonGroup();
 	
 	private JButton chargerProbleme = new JButton("Charger le probleme");
@@ -137,7 +137,7 @@ public class PDDL4T_interface extends JFrame implements ActionListener {
 
 	class StateListener implements ActionListener{
 	    public void actionPerformed(ActionEvent e) {
-	      System.out.println("source : " + ((JRadioButton)e.getSource()).getText() + " - etat : " + ((JRadioButton)e.getSource()).isSelected());
+	      System.out.println("source : " + ((JRadioButton)e.getSource()).getText() + " - état : " + ((JRadioButton)e.getSource()).isSelected());
 	    }
 	  }
 	
@@ -161,7 +161,7 @@ public class PDDL4T_interface extends JFrame implements ActionListener {
 	}
 	
 	public void validerActionPerformed(java.awt.event.ActionEvent e) {
-		// En attendant d'ête racorder aux differents programmes de traitement.
+		// En attendant d'ête racorder aux différents programmes de traitement.
 		if(problemeACharger.compareTo("Aucun") == 0 || domaineACharger.compareTo("Aucun") == 0){
 			JEditorPane jEditorPane = new JEditorPane();
 	        jEditorPane.setEditable(false);
