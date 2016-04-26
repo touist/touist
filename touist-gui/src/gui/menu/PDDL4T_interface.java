@@ -8,6 +8,7 @@ import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.io.File;
 
 import javax.swing.ButtonGroup;
@@ -18,8 +19,6 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTextArea;
-
-import com.sun.glass.events.KeyEvent;
 
 public class PDDL4T_interface extends JFrame implements ActionListener {
 	private JPanel j = new JPanel();
