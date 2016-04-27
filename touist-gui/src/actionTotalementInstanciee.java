@@ -7,9 +7,9 @@ import fr.uga.pddl4j.util.* ;
 
 class ATI{
 	
-	private List<String> initiaux ;
+	protected List<String> initiaux ;
 	
-	private List<String> finaux ;
+	protected List<String> finaux ;
 	
 	private List<String> fluents ;
 	
@@ -21,7 +21,7 @@ class ATI{
 	
 	private List<String> PDDL_operations ;
 	
-	private List<String> operations ;
+	protected List<String> operations ;
 	
 	private List<String> constantes ;
 	
