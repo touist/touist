@@ -50,6 +50,7 @@
 		<pathelement location="${touist.libs.dir}/rsyntaxtextarea-2.5.6.jar"/>
 		<pathelement location="${touist.libs.dir}/java-cup-11b.jar"/>
 		<pathelement location="${touist.libs.dir}/jlatexmath-1.0.3.jar"/>
+		<pathelement location="${touist.libs.dir}/pddl4j.jar"/>
 	</path>
 
 
@@ -128,6 +129,7 @@
 			<zipfileset src= "${touist.libs.dir}/java-cup-11b.jar"/>
 			<zipfileset src= "${touist.libs.dir}/rsyntaxtextarea-2.5.6.jar"/>
 			<zipfileset src= "${touist.libs.dir}/jlatexmath-1.0.3.jar"/>
+			<zipfileset src= "${touist.libs.dir}/pddl4j.jar"/>
 		</jar>
 	</target>
 	<target name="jar" depends="build-jar" /> <!-- Simple alias for build-jar -->
