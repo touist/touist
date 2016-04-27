@@ -4,7 +4,7 @@ request? And by chance you can code it? Here is the guide to contributing.
 Report a bug or a feature
 =========================
 
-Simply file an issue [here](https://github.com/touist/touist). Please check that
+Simply file an issue [here](https://github.com/touist/touist/issues). Please check that
 this bug or feature as not already been submited by someone else; don't forget to 
 also search into closed issues!
 
