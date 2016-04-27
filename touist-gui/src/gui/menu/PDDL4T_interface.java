@@ -20,6 +20,9 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTextArea;
 
+import fr.uga.pddl4j.encoding.CodedProblem ;
+import fr.uga.pddl4j.util.* ;
+
 public class PDDL4T_interface extends JFrame implements ActionListener {
 	private JPanel j = new JPanel();
 	private JRadioButton instButton = new JRadioButton("Actions totalement instanciées");
@@ -171,6 +174,11 @@ public class PDDL4T_interface extends JFrame implements ActionListener {
 	        j.setLocationRelativeTo(null);
 	        j.setVisible(true);
 		}else{
+			Traduction traduc = new Traduction() ;
+			String arg = new String() ;
+			arg = "-o " + domaineACharger + " -f " + problemeACharger;
+			CodedProblem pb = new CodedProblem(traduc.Traduire(arg));
+			ATIGraph gTraducTI = new ATIGraph(pb) ;
 			this.setVisible(false);	
 			this.dispose();
 		}
