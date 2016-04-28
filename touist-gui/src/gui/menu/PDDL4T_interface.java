@@ -32,7 +32,7 @@ public class PDDL4T_interface extends JFrame implements ActionListener {
 	private JRadioButton dirButton = new JRadioButton("Codage direct des actions");
 	private JRadioButton planButton = new JRadioButton("Codage du graphe de planifications");
 	private ButtonGroup graphe = new ButtonGroup();
-	private JRadioButton pasButton = new JRadioButton("Pas a  pas");
+	private JRadioButton pasButton = new JRadioButton("Pas aï¿½ pas");
 	private JRadioButton itButton = new JRadioButton("Iteratif");
 	private ButtonGroup fonc = new ButtonGroup();
 	
@@ -96,7 +96,7 @@ public class PDDL4T_interface extends JFrame implements ActionListener {
         });
         
         /*
-    	 * Code pour lire l'état des jradiobutton
+    	 * Code pour lire l'ï¿½tat des jradiobutton
         instButton.addActionListener(new StateListener());
         decButton.addActionListener(new StateListener());
         dirButton.addActionListener(new StateListener());
@@ -144,7 +144,7 @@ public class PDDL4T_interface extends JFrame implements ActionListener {
 	}
 
 	/*
-	 * Code pour lire l'état des jradiobutton
+	 * Code pour lire l'ï¿½tat des jradiobutton
 	 * class StateListener implements ActionListener{
 	    public void actionPerformed(ActionEvent e) {
 	      System.out.println("source : " + ((JRadioButton)e.getSource()).getText() + " - etat : " + ((JRadioButton)e.getSource()).isSelected());
@@ -185,14 +185,14 @@ public class PDDL4T_interface extends JFrame implements ActionListener {
 			Traduction traduc = new Traduction() ;
 			String arg = new String() ;
 			arg = "-o " + domaineACharger + " -f " + problemeACharger;
-			//on récupère le problème.
+			//on rï¿½cupï¿½re le problï¿½me.
 			CodedProblem pb = new CodedProblem(traduc.Traduire(arg));
 			if(instButton.isSelected()){
-					//action totalement instancié
+					//action totalement instanciï¿½
 					ATI ati = new ATI(pb);
 			}
 			if(decButton.isSelected()){
-            		//action découpé selon leur argumen (plus tard)
+            		//action dï¿½coupï¿½ selon leur argumen (plus tard)
 					ATI ati = new ATI(pb);
 			}
 			if(dirButton.isSelected()){
