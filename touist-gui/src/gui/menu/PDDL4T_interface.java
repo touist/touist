@@ -20,19 +20,19 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTextArea;
 
-import fr.uga.pddl4j.encoding.CodedProblem ;
-import fr.uga.pddl4j.util.* ;
+//import fr.uga.pddl4j.encoding.CodedProblem ;
+//import fr.uga.pddl4j.util.* ;
 
 public class PDDL4T_interface extends JFrame implements ActionListener {
 	private JPanel j = new JPanel();
-	private JRadioButton instButton = new JRadioButton("Actions totalement instanciÃ©es");
-	private JRadioButton decButton = new JRadioButton("Actions dÃ©coupÃ©es selon leurs arguments");
+	private JRadioButton instButton = new JRadioButton("Actions totalement instanciees");
+	private JRadioButton decButton = new JRadioButton("Actions decoupees selon leurs arguments");
 	private ButtonGroup action = new ButtonGroup();
 	private JRadioButton dirButton = new JRadioButton("Codage direct des actions");
 	private JRadioButton planButton = new JRadioButton("Codage du graphe de planifications");
 	private ButtonGroup graphe = new ButtonGroup();
-	private JRadioButton pasButton = new JRadioButton("Pas Ã  pas");
-	private JRadioButton itButton = new JRadioButton("ItÃ©ratif");
+	private JRadioButton pasButton = new JRadioButton("Pas a  pas");
+	private JRadioButton itButton = new JRadioButton("Iteratif");
 	private ButtonGroup fonc = new ButtonGroup();
 	
 	private JButton chargerProbleme = new JButton("Charger le probleme");
@@ -44,6 +44,9 @@ public class PDDL4T_interface extends JFrame implements ActionListener {
 	private JTextArea textProbleme = new JTextArea(problemeACharger);
 	private String domaineACharger = "Aucun";
 	private JTextArea textDomaine = new JTextArea(domaineACharger);
+	
+	private String actionChoisie = "Actions totalement instanciees";
+	private String grapheChoisie = "Codage direct des actions";
 	
 	
 	public PDDL4T_interface() {
@@ -91,13 +94,15 @@ public class PDDL4T_interface extends JFrame implements ActionListener {
             }
         });
         
-        
+        /*
+    	 * Code pour lire l'état des jradiobutton
         instButton.addActionListener(new StateListener());
         decButton.addActionListener(new StateListener());
         dirButton.addActionListener(new StateListener());
         planButton.addActionListener(new StateListener());
         pasButton.addActionListener(new StateListener());
         itButton.addActionListener(new StateListener());
+        */
         valider.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
             	validerActionPerformed(evt);
@@ -137,11 +142,13 @@ public class PDDL4T_interface extends JFrame implements ActionListener {
         this.setVisible(true); 
 	}
 
-	class StateListener implements ActionListener{
+	/*
+	 * Code pour lire l'état des jradiobutton
+	 * class StateListener implements ActionListener{
 	    public void actionPerformed(ActionEvent e) {
-	      System.out.println("source : " + ((JRadioButton)e.getSource()).getText() + " - Ã©tat : " + ((JRadioButton)e.getSource()).isSelected());
+	      System.out.println("source : " + ((JRadioButton)e.getSource()).getText() + " - etat : " + ((JRadioButton)e.getSource()).isSelected());
 	    }
-	  }
+	  }*/
 	
 	private void chargerProblemeActionPerformed(java.awt.event.ActionEvent evt) {  
 		JFileChooser chooser = new JFileChooser();
@@ -177,11 +184,32 @@ public class PDDL4T_interface extends JFrame implements ActionListener {
 			Traduction traduc = new Traduction() ;
 			String arg = new String() ;
 			arg = "-o " + domaineACharger + " -f " + problemeACharger;
+			//on récupère le problème.
 			CodedProblem pb = new CodedProblem(traduc.Traduire(arg));
-			ATIGraph gTraducTI = new ATIGraph(pb) ;
-			this.setVisible(false);	
-			this.dispose();
+			if(instButton.isSelected()){
+					//action totalement instancié
+					ATI ati = new ATI(pb);
+			}
+			if(decButton.isSelected()){
+            		//action découpé selon leur argumen (plus tard)
+					ATI ati = new ATI(pb);
+			}
+			if(dirButton.isSelected()){
+        		//Codage direct des actions
+    			ATIGraph gTraducTI1 = new ATIGraph(ati) ;
+			}
+			if(planButton.isSelected()){
+        		//Codage du graphe de planification (plus tard 
+    			ATIGraph gTraducTI1 = new ATIGraph(ati) ;
+				break;
+			}
 		}
+        
+			
+		//les deux en 1
+		//ATIGraph gTraducTI2 = new ATIGraph(pb) ;
+		this.setVisible(false);	
+		this.dispose();
 	}
 	
 	public void annulerActionPerformed(java.awt.event.ActionEvent e) {
