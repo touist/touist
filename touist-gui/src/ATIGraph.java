@@ -48,7 +48,7 @@ class ATIGraph extends ATI{
 	
 	public ATIGraph(CodedProblem C){
 		super(C) ;
-		int gp_length = size(super.getOp());
+		int gp_length = super.getOp().size();
 		Res = new ArrayList<ActionRes>() ;
 		length = 0 ;
 		for(String o : operations){
