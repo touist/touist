@@ -3,8 +3,6 @@ import fr.uga.pddl4j.parser.*;
 import fr.uga.pddl4j.encoding.*;
 import java.io.*;
 
-package pdd4t;
-
 class Traduction{
 
 	public Traduction(){
