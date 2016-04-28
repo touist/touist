@@ -6,7 +6,7 @@ import fr.uga.pddl4j.encoding.CodedProblem ;
 import fr.uga.pddl4j.util.* ;
 
 
-class ATIGraph extends ATI{
+public class ATIGraph extends ATI{
 	private List<ActionRes> Res ;
 	private int length ;
 	

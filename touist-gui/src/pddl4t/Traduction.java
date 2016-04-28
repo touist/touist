@@ -4,7 +4,7 @@ import fr.uga.pddl4j.parser.*;
 import fr.uga.pddl4j.encoding.*;
 import java.io.*;
 
-class Traduction{
+public class Traduction{
 
 	public Traduction(){
 		
