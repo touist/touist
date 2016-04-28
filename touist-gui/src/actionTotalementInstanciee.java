@@ -3,7 +3,7 @@ import java.util.ArrayList ;
 import java.util.Arrays;
 import fr.uga.pddl4j.encoding.CodedProblem ;
 import fr.uga.pddl4j.util.* ;
-
+package pdd4t;
 
 class ATI{
 	
