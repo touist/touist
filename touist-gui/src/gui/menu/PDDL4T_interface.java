@@ -1,6 +1,7 @@
 package gui.menu;
 
 import gui.Lang;
+import pddl4t.*;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
