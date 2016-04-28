@@ -1,6 +1,6 @@
 import java.util.List ;
 import java.util.ArrayList ;
-
+package pdd4t;
 class ActionRes{
 	private String action ;
 	private int lvlmin ;
