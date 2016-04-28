@@ -1,3 +1,4 @@
+package pddl4t;
 
 import fr.uga.pddl4j.parser.*;
 import fr.uga.pddl4j.encoding.*;
