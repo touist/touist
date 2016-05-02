@@ -47,6 +47,11 @@ public class ATIGraph extends ATI{
 		fl.addAll(new_fluent);
 	}
 	
+	
+	public ATIGraph(ATI ati){
+		super(ati);
+	}
+	
 	public ATIGraph(CodedProblem C){
 		super(C) ;
 		int gp_length = super.getOp().size();

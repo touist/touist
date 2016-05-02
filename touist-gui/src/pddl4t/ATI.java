@@ -2,11 +2,12 @@ package pddl4t;
 import java.util.List ;
 import java.util.ArrayList ;
 import java.util.Arrays;
+
 import fr.uga.pddl4j.encoding.CodedProblem ;
 import fr.uga.pddl4j.util.* ;
 
 
-class ATI{
+public class ATI{
 	
 	protected List<String> initiaux ;
 	
@@ -165,5 +166,106 @@ class ATI{
 		retraits = new ArrayList<String>();
 		Instancier(C);
 	}
+	public ATI(ATI ati){
+		initiaux = ati.initiaux ;
+		finaux = ati.finaux ;
+		fluents = ati.fluents ;
+		ajouts = ati.ajouts ;
+		retraits = ati.retraits ;
+		preconditions = ati.preconditions ;
+		PDDL_operations = ati.PDDL_operations ;
+		operations = ati.operations ;
+		constantes = ati.constantes ;
+		predicats = ati.predicats ;
+		
+	}
+	
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result
+				+ ((PDDL_operations == null) ? 0 : PDDL_operations.hashCode());
+		result = prime * result + ((ajouts == null) ? 0 : ajouts.hashCode());
+		result = prime * result
+				+ ((constantes == null) ? 0 : constantes.hashCode());
+		result = prime * result + ((finaux == null) ? 0 : finaux.hashCode());
+		result = prime * result + ((fluents == null) ? 0 : fluents.hashCode());
+		result = prime * result
+				+ ((initiaux == null) ? 0 : initiaux.hashCode());
+		result = prime * result
+				+ ((operations == null) ? 0 : operations.hashCode());
+		result = prime * result
+				+ ((preconditions == null) ? 0 : preconditions.hashCode());
+		result = prime * result
+				+ ((predicats == null) ? 0 : predicats.hashCode());
+		result = prime * result
+				+ ((retraits == null) ? 0 : retraits.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		ATI other = (ATI) obj;
+		if (PDDL_operations == null) {
+			if (other.PDDL_operations != null)
+				return false;
+		} else if (!PDDL_operations.equals(other.PDDL_operations))
+			return false;
+		if (ajouts == null) {
+			if (other.ajouts != null)
+				return false;
+		} else if (!ajouts.equals(other.ajouts))
+			return false;
+		if (constantes == null) {
+			if (other.constantes != null)
+				return false;
+		} else if (!constantes.equals(other.constantes))
+			return false;
+		if (finaux == null) {
+			if (other.finaux != null)
+				return false;
+		} else if (!finaux.equals(other.finaux))
+			return false;
+		if (fluents == null) {
+			if (other.fluents != null)
+				return false;
+		} else if (!fluents.equals(other.fluents))
+			return false;
+		if (initiaux == null) {
+			if (other.initiaux != null)
+				return false;
+		} else if (!initiaux.equals(other.initiaux))
+			return false;
+		if (operations == null) {
+			if (other.operations != null)
+				return false;
+		} else if (!operations.equals(other.operations))
+			return false;
+		if (preconditions == null) {
+			if (other.preconditions != null)
+				return false;
+		} else if (!preconditions.equals(other.preconditions))
+			return false;
+		if (predicats == null) {
+			if (other.predicats != null)
+				return false;
+		} else if (!predicats.equals(other.predicats))
+			return false;
+		if (retraits == null) {
+			if (other.retraits != null)
+				return false;
+		} else if (!retraits.equals(other.retraits))
+			return false;
+		return true;
+	}
+	
+	
 	
 }

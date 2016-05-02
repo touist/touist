@@ -306,7 +306,7 @@ public class EditionMenuBar extends JMenuBar {
     }
     
     private void jMenuItemPDDL4TActionPerformed(java.awt.event.ActionEvent evt) {  
-        JFrame j = new PDDL4T_interface();
+        JFrame j = new PDDL4T_interface(this.parent);
     }
     
     public void updateLanguage() {
