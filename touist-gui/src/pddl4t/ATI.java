@@ -85,6 +85,7 @@ public class ATI{
 			}
 			L.set(i,L.get(i).replace("and",""));
 			L.set(i,L.get(i).replace(' ','_'));
+			L.set(i,L.get(i).replace('-','_'));
 			L.set(i,L.get(i).replace("(",""));
 			L.set(i,L.get(i).replace(")",""));
 		}
@@ -107,6 +108,7 @@ public class ATI{
 				R.add(L.get(i));
 			}
 			L.set(i,L.get(i).replace("not",""));
+			L.set(i,L.get(i).replace('-','_'));
 			L.set(i,L.get(i).replace(' ','_'));
 			L.set(i,L.get(i).replace("(",""));
 			L.set(i,L.get(i).replace(")",""));
@@ -122,11 +124,16 @@ public class ATI{
 			fluents.set(i,fluents.get(i).replace("(",""));
 			fluents.set(i,fluents.get(i).replace(' ','_'));
 			fluents.set(i,fluents.get(i).replace(")",""));
+			fluents.set(i,fluents.get(i).replace("-","_"));
 		}
 			
 		for(int i = 0 ; i < C.getOperators().size() ; ++i){
 			PDDL_operations.add(C.toString(C.getOperators().get(i))) ;
 			operations.add(C.toShortString(C.getOperators().get(i))) ;
+			operations.set(i,operations.get(i).replace("(",""));
+			operations.set(i,operations.get(i).replace(' ','_'));
+			operations.set(i,operations.get(i).replace(")",""));
+			operations.set(i,operations.get(i).replace("-","_"));
 		}
 			
 		initiaux = new ArrayList<String>(Arrays.asList(C.toString(C.getInit()).split("[\n]")));
