@@ -1,7 +1,7 @@
 package gui.menu;
 
 import gui.Lang;
-import pddl4t.*;
+import gui.MainFrame;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -21,8 +21,8 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTextArea;
 
-//import fr.uga.pddl4j.encoding.CodedProblem ;
-//import fr.uga.pddl4j.util.* ;
+import fr.uga.pddl4j.encoding.CodedProblem ;
+import pddl4t.* ;
 
 public class PDDL4T_interface extends JFrame implements ActionListener {
 	private JPanel j = new JPanel();
@@ -49,8 +49,10 @@ public class PDDL4T_interface extends JFrame implements ActionListener {
 	private String actionChoisie = "Actions totalement instanciees";
 	private String grapheChoisie = "Codage direct des actions";
 	
+	MainFrame parent;
 	
-	public PDDL4T_interface() {
+	public PDDL4T_interface(MainFrame parent) {
+		this.parent = parent;
 		this.setTitle("Options");
 		this.setSize(300, 300);
 		//ajouter un moyen de charger un chemin d'accès.
@@ -182,28 +184,42 @@ public class PDDL4T_interface extends JFrame implements ActionListener {
 	        j.setLocationRelativeTo(null);
 	        j.setVisible(true);
 		}else{
-			Traduction traduc = new Traduction() ;
-			String arg = new String() ;
-			arg = "-o " + domaineACharger + " -f " + problemeACharger;
+			//String arg = new String() ;
+			//arg = "-o " + domaineACharger + " -f + problemeACharger;
 			//on r�cup�re le probl�me.
+			Traduction traduc = new Traduction();
+			String[] arg = new String[4]  ;
+			arg[0] = "-o " ;
+			arg[1] = domaineACharger ;
+			arg[2] = " -f " ;
+			arg[3] = problemeACharger;
 			CodedProblem pb = new CodedProblem(traduc.Traduire(arg));
+			ATI ati = new ATI(pb);
+			ATIGraph gTraducTI1 = new ATIGraph(ati) ;
+			String formules = "";
+			String sets = "";
 			if(instButton.isSelected()){
 					//action totalement instanci�
-					ATI ati = new ATI(pb);
+					//ati = new ATI(pb);
 			}
 			if(decButton.isSelected()){
             		//action d�coup� selon leur argumen (plus tard)
-					ATI ati = new ATI(pb);
+					//ati = new ATI(pb);
 			}
 			if(dirButton.isSelected()){
         		//Codage direct des actions
-    			ATIGraph gTraducTI1 = new ATIGraph(ati) ;
+    			gTraducTI1 = new ATIGraph(ati) ;
 			}
 			if(planButton.isSelected()){
         		//Codage du graphe de planification (plus tard 
-    			ATIGraph gTraducTI1 = new ATIGraph(ati) ;
-				break;
+    			gTraducTI1 = new ATIGraph(ati) ;
 			}
+			//on met le resultat des graphes dans la base.
+			formules = gTraducTI1.getOp().toString();
+			sets = gTraducTI1.getFluents().toString();
+			parent.getClause().setFormules(formules);
+		    parent.getClause().setSets(sets);
+		    parent.getEditorPanel1().updateUI();
 		}
         
 			

@@ -292,6 +292,10 @@ public class EditionMenuBar extends JMenuBar {
                 JOptionPane.PLAIN_MESSAGE);
     }
     
+    private void jMenuItemPDDL4TActionPerformed(java.awt.event.ActionEvent evt) {  
+        JFrame j = new PDDL4T_interface(this.parent);
+    }
+    
     public void updateLanguage() {
         this.jMenuFile.setText(parent.getLang().getWord(Lang.EDITION_MENU_FILE));
         this.jMenuEdit.setText(parent.getLang().getWord(Lang.EDITION_MENU_EDIT));

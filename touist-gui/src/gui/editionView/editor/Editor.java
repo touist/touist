@@ -205,7 +205,7 @@ public class Editor extends RSyntaxTextArea  {
              E = new Editor();
         }
         catch (IOException e) {
-            System.err.println("Erreur lancement éditeur");
+            System.err.println("Erreur lancement editeur");
         }
         frame.add(E, BorderLayout.CENTER);
         frame.setSize(300,100);
