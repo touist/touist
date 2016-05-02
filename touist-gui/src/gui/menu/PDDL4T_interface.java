@@ -215,11 +215,20 @@ public class PDDL4T_interface extends JFrame implements ActionListener {
     			gTraducTI1 = new ATIGraph(ati) ;
 			}
 			//on met le resultat des graphes dans la base.
-			formules = gTraducTI1.getOp().toString();
-			sets = gTraducTI1.getFluents().toString();
+			for(int i = 0; i < gTraducTI1.getOp().size(); i++){
+				formules = formules+gTraducTI1.getOp().get(i)+"\r\n";
+			}
+			for(int i = 0; i < gTraducTI1.getFluents().size(); i++){
+				sets = sets.concat(gTraducTI1.getFluents().get(i));
+				sets = sets.concat("\r\n");
+			}
 			parent.getClause().setFormules(formules);
 		    parent.getClause().setSets(sets);
-		    parent.getEditorPanel1().updateUI();
+		    System.out.println(sets);
+		    System.out.println(formules);
+		    parent.getEditorPanel1().getEditorPanelFormulas().setText(formules);
+		    parent.getEditorPanel1().getEditorPanelSets().setText(sets);
+		    
 		}
         
 			
