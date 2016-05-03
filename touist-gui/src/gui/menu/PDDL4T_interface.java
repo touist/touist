@@ -197,7 +197,15 @@ public class PDDL4T_interface extends JFrame implements ActionListener {
 			ATI ati = new ATI(pb);
 			ATIGraph gTraducTI1 = new ATIGraph(ati) ;
 			String formules = "";
+			String init = "" ;
+			String finax = "" ;
+			String fluents = "" ;
+			String fp = "" ;
+			String fa = "";
+			String fd = "" ;		
 			String sets = "";
+			String _retc = "\r\n" ;
+			
 			if(instButton.isSelected()){
 					//action totalement instanci�
 					//ati = new ATI(pb);
@@ -215,18 +223,32 @@ public class PDDL4T_interface extends JFrame implements ActionListener {
     			gTraducTI1 = new ATIGraph(ati) ;
 			}
 			//on met le resultat des graphes dans la base.
-			for(int i = 0; i < gTraducTI1.getOp().size(); i++){
-				formules = formules+gTraducTI1.getOp().get(i)+"\r\n";
-			}
-			for(int i = 0; i < gTraducTI1.getFluents().size(); i++){
-				sets = sets.concat(gTraducTI1.getFluents().get(i));
-				sets = sets.concat("\r\n");
-			}
-			parent.getClause().setFormules(formules);
+			//for(int i = 0; i < gTraducTI1.getOp().size(); i++){
+				//formules = formules+gTraducTI1.getOp().get(i)+"\r\n";
+			//}
+			formules = "$O ="+ gTraducTI1.getOp().toString();
+			//for(int i = 0; i < gTraducTI1.getInitiaux().size(); i++){
+				//init = init+gTraducTI1.getInitiaux().get(i)+"\r\n";
+			//}
+			init = "$I =" + gTraducTI1.getInitiaux().toString();
+			//for(int i = 0; i < gTraducTI1.getFinaux().size(); i++){
+				//finax = finax+gTraducTI1.getFinaux().get(i)+"\r\n";
+			//} 
+			finax = "$G =" + gTraducTI1.getFinaux().toString();
+			//for(int i = 0; i < gTraducTI1.getFluents().size(); i++){
+				//fluents = fluents+gTraducTI1.getFluents().get(i)+"\r\n";
+			//}
+			fluents = "$F =" + gTraducTI1.getFluents().toString();
+			fp = "$Fp=" + gTraducTI1.getPrecond().toString() ;
+			fa = "$Fa=" + gTraducTI1.getAjouts().toString();
+			fd = "$Fd=" + gTraducTI1.getRetraits().toString();
+			//System.out.println(formules + _retc + init + _retc + finax + _retc + fluents + _retc + fp + _retc + fa + _retc + fd);
+			sets =formules + _retc + init + _retc + finax + _retc + fluents + _retc + fp + _retc + fa + _retc + fd + _retc ;   
+			parent.getClause().setFormules("");
 		    parent.getClause().setSets(sets);
-		    System.out.println(sets);
-		    System.out.println(formules);
-		    parent.getEditorPanel1().getEditorPanelFormulas().setText(formules);
+		    //System.out.println(sets);
+		    //System.out.println(formules);
+		    //parent.getEditorPanel1().getEditorPanelFormulas().setText(formules);
 		    parent.getEditorPanel1().getEditorPanelSets().setText(sets);
 		    
 		}

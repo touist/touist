@@ -61,8 +61,34 @@ public class ATI{
 		return retraits;
 	}
 	
-	public String Cond(String operation){
-		return operation.substring(operation.indexOf("Preconditions:") + 14,operation.indexOf("Effects:")) ;
+	public List<String> getPrecond(){
+		return preconditions;
+	}
+	
+	public List<String> Cond(String operation){
+		String [] pred ;
+		String predx = "";
+		List<String> Pred ; 
+		predx = operation.substring(operation.indexOf("Preconditions:") + 14,operation.indexOf("Effects:")) ;
+		pred = predx.split("[\n]");
+		Pred = new ArrayList<String>(Arrays.asList(pred));
+		for(int i = 0 ; i < Pred.size() ; ++i){
+			if(Pred.get(i).length() < 2){
+				Pred.remove(i);
+				if(i > 0) i--;
+			}
+			
+				Pred.set(i,Pred.get(i).replace("and ",""));
+				Pred.set(i,Pred.get(i).replace("not ",""));
+				Pred.set(i,Pred.get(i).replace(' ','_'));
+				Pred.set(i,Pred.get(i).replace("-",""));
+				Pred.set(i,Pred.get(i).replace("(",""));
+				Pred.set(i,Pred.get(i).replace(")",""));
+				if(Pred.get(i).charAt(0) == '_')	Pred.set(i,Pred.get(i).substring(1)) ;
+			
+		}
+		
+		return Pred;
 	}
 	
 	public String Effx(String operation){
@@ -76,18 +102,22 @@ public class ATI{
 		effx = Effx(operation);
 		l = effx.split("[\n]");
 		L = new ArrayList<String>(Arrays.asList(l));
-		if(L.get(0) == "(") L.remove(0);
-		if(L.get(L.size()-1) == ")") L.remove(L.size()-1);
 		for(int i = 0 ; i < L.size() ; i++){
 			if(L.get(i).contains("not")){
 				L.remove(i);
-				i--;
+				if(i > 0) i--;
 			}
-			L.set(i,L.get(i).replace("and",""));
-			L.set(i,L.get(i).replace(' ','_'));
-			L.set(i,L.get(i).replace('-','_'));
-			L.set(i,L.get(i).replace("(",""));
-			L.set(i,L.get(i).replace(")",""));
+			if(L.get(i).length() < 2){
+				L.remove(i);
+				if(i > 0) i--;
+			}
+			
+				L.set(i,L.get(i).replace("and ",""));
+				L.set(i,L.get(i).replace(' ','_'));
+				L.set(i,L.get(i).replace("-",""));
+				L.set(i,L.get(i).replace("(",""));
+				L.set(i,L.get(i).replace(")",""));
+				if(L.get(i).charAt(0) == '_')	L.set(i,L.get(i).substring(1)) ;
 		}
 		//~ System.out.println(L);
 		return L ;
@@ -101,17 +131,23 @@ public class ATI{
 		l = effx.split("[\n]");
 		L = new ArrayList<String>(Arrays.asList(l));
 		R = new ArrayList<String>();
-		if(L.get(0) == "(") L.remove(0);
-		if(L.get(L.size()-1) == ")") L.remove(L.size()-1);
+		int j ;
 		for(int i = 0 ; i < L.size() ; i++){
+			if(L.get(i).length() < 2){
+				L.remove(i);
+				if(i > 0) i--;
+			}
 			if(L.get(i).contains("not")){
 				R.add(L.get(i));
+				j = R.size()-1 ;
+				R.set(j,R.get(j).replace("not ",""));
+				R.set(j,R.get(j).replace("-",""));
+				R.set(j,R.get(j).replace(' ','_'));
+				R.set(j,R.get(j).replace("(",""));
+				R.set(j,R.get(j).replace(")",""));
+				if(R.get(j).charAt(0) == '_')	R.set(j,R.get(j).substring(1)) ;
 			}
-			L.set(i,L.get(i).replace("not",""));
-			L.set(i,L.get(i).replace('-','_'));
-			L.set(i,L.get(i).replace(' ','_'));
-			L.set(i,L.get(i).replace("(",""));
-			L.set(i,L.get(i).replace(")",""));
+			
 		}
 		//~ System.out.println(R);
 		return R ;
@@ -125,6 +161,7 @@ public class ATI{
 			fluents.set(i,fluents.get(i).replace(' ','_'));
 			fluents.set(i,fluents.get(i).replace(")",""));
 			fluents.set(i,fluents.get(i).replace("-","_"));
+			if(fluents.get(i).charAt(0) == '_')	fluents.set(i,fluents.get(i).substring(1)) ;
 		}
 			
 		for(int i = 0 ; i < C.getOperators().size() ; ++i){
@@ -134,26 +171,41 @@ public class ATI{
 			operations.set(i,operations.get(i).replace(' ','_'));
 			operations.set(i,operations.get(i).replace(")",""));
 			operations.set(i,operations.get(i).replace("-","_"));
+			if(operations.get(i).charAt(0) == '_')	operations.set(i,operations.get(i).substring(1)) ;
 		}
+		
 			
 		initiaux = new ArrayList<String>(Arrays.asList(C.toString(C.getInit()).split("[\n]")));
 		finaux = new ArrayList<String>(Arrays.asList(C.toString(C.getGoal()).split("[\n]"))) ;
 		
-		if(initiaux.get(0) == "(") initiaux.remove(0);
-		if(initiaux.get(initiaux.size()-1) == ")") initiaux.remove(initiaux.size()-1);
-		
-		if(finaux.get(0) == "(") finaux.remove(0);
-		if(finaux.get(finaux.size()-1) == ")") finaux.remove(finaux.size()-1);
 		
 		for(int i = 0 ; i < initiaux.size() ; ++i){
-			initiaux.set(i,initiaux.get(i).replace("(",""));
-			initiaux.set(i,initiaux.get(i).replace(' ','_'));
-			initiaux.set(i,initiaux.get(i).replace(")",""));
+			if (initiaux.get(i).length() >= 2){
+				initiaux.set(i,initiaux.get(i).replace("and ",""));
+				initiaux.set(i,initiaux.get(i).replace("not ",""));
+				initiaux.set(i,initiaux.get(i).replace("(",""));
+				initiaux.set(i,initiaux.get(i).replace(' ','_'));
+				initiaux.set(i,initiaux.get(i).replace(")",""));
+				if(initiaux.get(i).charAt(0) == '_') initiaux.set(i,initiaux.get(i).substring(1)) ;
+			}
+			else{
+				initiaux.remove(i);
+				if(i > 0) i-- ;
+			}
 		}
 		for(int i = 0 ; i < finaux.size() ; ++i){
-			finaux.set(i,finaux.get(i).replace("(",""));
-			finaux.set(i,finaux.get(i).replace(' ','_'));
-			finaux.set(i,finaux.get(i).replace(")",""));
+			if(finaux.get(i).length() >= 2){
+				finaux.set(i,finaux.get(i).replace("and ",""));
+				finaux.set(i,finaux.get(i).replace("not ",""));
+				finaux.set(i,finaux.get(i).replace("(",""));
+				finaux.set(i,finaux.get(i).replace(' ','_'));
+				finaux.set(i,finaux.get(i).replace(")",""));
+				if(finaux.get(i).charAt(0) == '_') finaux.set(i,finaux.get(i).substring(1)) ;
+			}
+			else{
+				finaux.remove(i);
+				if(i > 0) i-- ;
+			}
 		}
 		
 		constantes = C.getConstants();
@@ -162,6 +214,7 @@ public class ATI{
 		for(int i = 0 ; i < operations.size() ; ++i){
 			ajouts.addAll(Add(PDDL_operations.get(i)));
 			retraits.addAll(Del(PDDL_operations.get(i)));
+			preconditions.addAll(Cond(PDDL_operations.get(i)));
 		}
 		
 	}
@@ -171,8 +224,10 @@ public class ATI{
 		operations = new ArrayList<String>();
 		ajouts = new ArrayList<String>();
 		retraits = new ArrayList<String>();
+		preconditions = new ArrayList<String>();
 		Instancier(C);
 	}
+	
 	public ATI(ATI ati){
 		initiaux = ati.initiaux ;
 		finaux = ati.finaux ;

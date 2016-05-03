@@ -9,6 +9,7 @@ class ActionRes{
 	private List<String> add;
 	private List<String> del;
 	private List<String> cond;
+	
 	public ActionRes(String op,ATI ati){
 		action = new String();
 		action = op ;
@@ -17,10 +18,11 @@ class ActionRes{
 		cond =new ArrayList<String>();
 		add = ati.Add(action) ;
 		del = ati.Del(action) ;
-		cond.add(ati.Cond(action));
+		cond = ati.Cond(action);
 		lvlmin = 0 ;
 		lvlmax = (int)Math.pow(2.f,31.f) ;
 	}
+	
 	public String getAction(){return action;}
 	public int getMin(){ return lvlmin; }
 	public int getMax(){ return lvlmax;}

@@ -50,6 +50,7 @@ public class ATIGraph extends ATI{
 	
 	public ATIGraph(ATI ati){
 		super(ati);
+		length = super.getOp().size();
 	}
 	
 	public ATIGraph(CodedProblem C){
