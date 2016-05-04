@@ -243,7 +243,7 @@ public class PDDL4T_interface extends JFrame implements ActionListener {
 			fa = "$Fa=" + gTraducTI1.getAjouts().toString();
 			fd = "$Fd=" + gTraducTI1.getRetraits().toString();
 			//System.out.println(formules + _retc + init + _retc + finax + _retc + fluents + _retc + fp + _retc + fa + _retc + fd);
-			sets =formules + _retc + init + _retc + finax + _retc + fluents + _retc + fp + _retc + fa + _retc + fd + _retc ;   
+			sets = formules + _retc + init + _retc + finax + _retc + fluents + _retc + fp + _retc + fa + _retc + fd + _retc ;   
 			parent.getClause().setFormules("");
 		    parent.getClause().setSets(sets);
 		    //System.out.println(sets);
