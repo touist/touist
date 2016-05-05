@@ -32,7 +32,7 @@ public class PDDL4T_interface extends JFrame implements ActionListener {
 	private JRadioButton dirButton = new JRadioButton("Codage direct des actions");
 	private JRadioButton planButton = new JRadioButton("Codage du graphe de planifications");
 	private ButtonGroup graphe = new ButtonGroup();
-	private JRadioButton pasButton = new JRadioButton("Pas a� pas");
+	private JRadioButton pasButton = new JRadioButton("Pas à pas");
 	private JRadioButton itButton = new JRadioButton("Iteratif");
 	private ButtonGroup fonc = new ButtonGroup();
 	
@@ -98,7 +98,7 @@ public class PDDL4T_interface extends JFrame implements ActionListener {
         });
         
         /*
-    	 * Code pour lire l'�tat des jradiobutton
+    	 * Code pour lire l'état des jradiobutton
         instButton.addActionListener(new StateListener());
         decButton.addActionListener(new StateListener());
         dirButton.addActionListener(new StateListener());
@@ -146,7 +146,7 @@ public class PDDL4T_interface extends JFrame implements ActionListener {
 	}
 
 	/*
-	 * Code pour lire l'�tat des jradiobutton
+	 * Code pour lire l'état des jradiobutton
 	 * class StateListener implements ActionListener{
 	    public void actionPerformed(ActionEvent e) {
 	      System.out.println("source : " + ((JRadioButton)e.getSource()).getText() + " - etat : " + ((JRadioButton)e.getSource()).isSelected());
@@ -173,7 +173,7 @@ public class PDDL4T_interface extends JFrame implements ActionListener {
 	}
 	
 	public void validerActionPerformed(java.awt.event.ActionEvent e) {
-		// En attendant d'ête racorder aux différents programmes de traitement.
+		// En attendant d'être racorder aux différents programmes de traitement.
 		if(problemeACharger.compareTo("Aucun") == 0 || domaineACharger.compareTo("Aucun") == 0){
 			JEditorPane jEditorPane = new JEditorPane();
 	        jEditorPane.setEditable(false);
@@ -186,7 +186,7 @@ public class PDDL4T_interface extends JFrame implements ActionListener {
 		}else{
 			//String arg = new String() ;
 			//arg = "-o " + domaineACharger + " -f + problemeACharger;
-			//on r�cup�re le probl�me.
+			//on récupère le problème.
 			Traduction traduc = new Traduction();
 			String[] arg = new String[4]  ;
 			arg[0] = "-o " ;
@@ -207,11 +207,11 @@ public class PDDL4T_interface extends JFrame implements ActionListener {
 			String _retc = "\r\n" ;
 			
 			if(instButton.isSelected()){
-					//action totalement instanci�
+					//action totalement instancié
 					//ati = new ATI(pb);
 			}
 			if(decButton.isSelected()){
-            		//action d�coup� selon leur argumen (plus tard)
+            		//action découpé selon leur argumen (plus tard)
 					//ati = new ATI(pb);
 			}
 			if(dirButton.isSelected()){
