@@ -38,7 +38,11 @@ environment:
   JAVA_HOME: "C:\\Program Files (x86)\\Java\\jdk1.7.0"
   ANT_HOME: C:\ant
 
+
 # Build cache to preserve files/folders between builds (saves time)
+# Note: to clean/rebuild the cache, I didn't find any other way than
+# removing the line `- C:\wodi32` (for example). No explicit command
+# on appveyor.com...
 cache:
   - C:\wodi32
   - C:\ant
