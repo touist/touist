@@ -64,8 +64,6 @@ before_build:
   - ps: If(-Not(Test-Path c:\yices)){ 7z x c:\download\yices.zip -oc:\ | Out-Null; mv c:\yices* c:\yices }
   - ps: cp c:\yices\bin\yices-smt2.exe c:\touist\touist-gui\external
   - ps: cp c:\yices\bin\libyices.dll c:\touist\touist-gui\external
-  - ps: ls c:\touist\touist-gui\external
-  - ps: ls c:\yices\bin 
 
 build_script:
   # Build touistc (touist-translator)
@@ -109,12 +107,13 @@ deploy:
       branch: master                # release from master branch only
       appveyor_repo_tag: true       # deploy on tag push only
 
-# I set the same behaviour as for in .travis.yml: 
-# the commiter will only be emailed if his commit failed 
+# I set the same behaviour as for in .travis.yml:
+# the commiter will only be emailed if his commit failed
 # to build.
-notifications:
-  - provider: Email
-    on_build_success: false
-    on_build_failure: true
-    on_build_status_changed: false
+#
+# I removed the notifications: block. I expect AppVeyor to have
+# this behavior by default:
+# - If the commit fails, then send an email to the committer only.
+# - If the commit previously failing now passes, do not send an email.
+# - Do not send an email to anyone else
 
