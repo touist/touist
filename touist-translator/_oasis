@@ -1,3 +1,10 @@
+# This file, when processed by oasis, produces the Makefile needed
+# to build easily touistc. Once the Makefile is generated, there is
+# no need of re-running `oasis setup` again (unless you modified it)
+#
+# Note that menhirLib is required to be >= 20150118 because the feature
+# "incremental API" has been introduced at that version.
+
 OASISFormat:  0.4
 OcamlVersion: >= 4.01.0
 Name:         TouiST Compiler
@@ -7,9 +14,10 @@ Authors:      Olivier Lezaud
 License:      LGPL
 Plugins:      META (0.4), DevFiles (0.4)
 
+BuildDepends: menhirLib (>= 20150118), fileutils (>= 0.4.0), str
 BuildType: ocamlbuild (0.4)
 AlphaFeatures: ocamlbuild_more_args
-XOCamlbuildExtraArgs: -use-menhir -menhir \"menhir --table --inspection -v -la 2\" -pkg fileutils,menhirLib,str
+XOCamlbuildExtraArgs: -use-menhir -menhir \"menhir --table --inspection -v -la 2\"
 PreBuildCommand: sh generate-version-number.sh
 
 Executable touistc
@@ -17,4 +25,10 @@ Executable touistc
   BuildTools:     ocamlbuild
   CompiledObject: best
   MainIs:         touistc.ml
-  
+
+SourceRepository touist
+  Type:           git
+  Location:       https://github.com/touist/touist.git
+  Browser:        https://github.com/touist/touist
+  Subdir:         touist-translator
+
