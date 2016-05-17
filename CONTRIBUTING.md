@@ -13,3 +13,18 @@ Submit code modifications
 
 You can fork the project, push your modifications to it and then create a pull
 request on the https://github.com/touist/touist repository.
+
+Please make sure all CI builds are green; it might be a bit tricky to pass the
+builds sometimes, don't hesitate to ask for help.
+
+FAQ
+===
+
+Why are there duplicates of CI build?
+
+- `continuous-integration/appveyor/pr` and `continuous-integration/travis-ci/pr`
+  hare builds of temporary commits containing the merge of your branch into
+  master
+- `continuous-integration/travis-ci/push` and
+  `continuous-integration/appveyor/branch` are the builds made out you your
+  branch without merging into master
