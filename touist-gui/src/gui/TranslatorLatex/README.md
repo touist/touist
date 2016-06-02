@@ -18,7 +18,7 @@ The cup program is `java-cup-bin-11b-20151001/java-cup-11b.jar`.
 Now, put those `.jar` in the `TranslatorLatex` folder and do:
    
     java -jar jflex-1.6.1.jar Latex.flex
-    java -jar java-cup-11b.jar 
+    java -jar java-cup-11b.jar Latex.cup
 	
 
 ## Known errors
