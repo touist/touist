@@ -76,7 +76,7 @@ expr ::=IF expr:b THEN expr:e1 ELSE expr:e2  {: RESULT = new String("if\\;"+b+"\
 		| var:v {: RESULT = v;:}
 		| expr:n IN expr:s {: RESULT = new String(n+" \\in "+s);:}
 		| IDENTIFIER:i IN expr:s {: RESULT = new String(i+" \\in "+s);:}
-		| SUBSET LPAR expr:s1 COMMA expr:s2 {: RESULT = new String(s1+" \\subset "+s2);:}
+		| SUBSET LPAR expr:s1 COMMA expr:s2 RPAR {: RESULT = new String(s1+" \\subset "+s2);:}
 		| expr:n1 EQUAL expr:n2 {: RESULT = new String(n1+" == "+n2);:}
 		| expr:n1 DIFFERENT expr:n2 {: RESULT = new String(n1+" != "+n2);:}
 		| expr:n1 LESSER expr:n2 {: RESULT = new String(n1+" < "+n2);:}
