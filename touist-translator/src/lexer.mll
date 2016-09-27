@@ -57,6 +57,7 @@
     "union",         UNION;
     "inter",         INTER;
     "diff",          DIFF;
+    "powerset",      POWERSET;
     "exact",         EXACT;
     "atmost",        ATMOST;
     "atleast",       ATLEAST;

@@ -26,7 +26,7 @@
 %token AND OR XOR IMPLIES EQUIV NOT
 %token EQUAL NOTEQUAL LE LT GE GT
 %token IN WHEN
-%token UNION INTER DIFF SUBSET RANGE
+%token UNION INTER DIFF SUBSET RANGE POWERSET
 %token EMPTY CARD
 %token LBRACK RBRACK
 %token LPAREN RPAREN
@@ -171,6 +171,7 @@ exp:
   | exp GE       exp { Greater_or_equal ($1, $3) }
   | exp IN exp { In ($1, $3) }
   | UNION LPAREN exp COMMA exp RPAREN { Union ($3, $5) }
+  | POWERSET LPAREN exp RPAREN { Powerset ($3) }
   | INTER LPAREN exp COMMA exp RPAREN { Inter ($3, $5) }
   | DIFF  LPAREN exp COMMA exp RPAREN { Diff  ($3, $5) }
   | CARD  LPAREN exp RPAREN { Card  $3 }

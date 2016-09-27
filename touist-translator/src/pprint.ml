@@ -33,6 +33,7 @@ let rec string_of_exp = function
   | Union  (x,y) -> "union("  ^ (string_of_exp x) ^ ", " ^ (string_of_exp y)
   | Inter  (x,y) -> "inter("  ^ (string_of_exp x) ^ ", " ^ (string_of_exp y)
   | Diff   (x,y) -> "diff("   ^ (string_of_exp x) ^ ", " ^ (string_of_exp y)
+  | Powerset x -> "powerset(" ^ (string_of_exp x) ^ ")"
   | Range  (x,y) -> "["       ^ (string_of_exp x) ^ ".." ^ (string_of_exp y) ^ "]"
   | Subset (x,y) -> "subset(" ^ (string_of_exp x) ^ ", " ^ (string_of_exp y)
   | In     (x,y) -> (string_of_exp x) ^ " in " ^ (string_of_exp y)
@@ -108,6 +109,7 @@ and string_of_set = function
       string_of_floatset s
   | GenSet.SSet s -> (*string_of_a_list (fun x -> x) (StringSet.elements s)*)
       string_of_strset s
+  | GenSet.SupSet s -> string_of_supset s
 
 and string_of_exp_list sep el = String.concat sep (List.map string_of_exp el)
 
@@ -122,5 +124,8 @@ and string_of_floatset s =
 
 and string_of_strset s =
   "[" ^ (String.concat ", " (StringSet.elements s)) ^ "]"
+
+and string_of_supset s =
+  "[" ^ (String.concat ", " (List.map string_of_intset (SuperSet.elements s))) ^ "]"
 
 
