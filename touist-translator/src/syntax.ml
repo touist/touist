@@ -18,6 +18,7 @@ module IntSet = Set_ext.Make(struct
   let compare = Pervasives.compare
 end)
 
+
 module FloatSet = Set_ext.Make(struct
   type t = float
   let compare = Pervasives.compare
@@ -25,12 +26,49 @@ end)
 
 module StringSet = Set_ext.Make(String)
 
+(* TO USE? recursive module used to create recursive
+ * superset but it didn't succeed*)
+
+(*module rec Value : sig
+  type t =
+      | ISet of IntSet.t
+      | FSet of FloatSet.t
+      | SSet of StringSet.t
+      | SupSet of SuperSet.t 
+  val compare : t -> t -> int
+  end
+  = struct
+    type t =
+     | ISet of IntSet.t
+     | FSet of FloatSet.t
+     | SSet of StringSet.t
+     | SupSet of SuperSet.t
+     
+     let compare s1 s2 =
+     	match (s1, s2) with
+	| ISet x, ISet y -> IntSet.compare x y
+	| FSet x, FSet y -> FloatSet.compare x y
+	| SSet x, SSet y -> StringSet.compare x y
+	| SupSet x, SupSet y -> SuperSet.compare x y
+	| _ -> failwith "incompatible types"
+and SuperSet : Set.S with type elt = Value.t = Set_ext.PowerSet(Value)
+*)
+
+(* Supersets that aren't recursive *)
+module SuperSet = Set_ext.PowerSet(IntSet)
+module SuperFloatSet = Set_ext.PowerSet(FloatSet)
+module SuperStringSet = Set_ext.PowerSet(StringSet)
+
 module GenSet = struct
   type t =
     | Empty
     | ISet of IntSet.t
     | FSet of FloatSet.t
     | SSet of StringSet.t
+    | SupSet of SuperSet.t
+    | SupFSet of SuperFloatSet.t
+    | SupSSet of SuperStringSet.t
+
 end
 
 type prog =
@@ -68,6 +106,7 @@ and exp =
   | Greater_than     of exp * exp
   | Greater_or_equal of exp * exp
   | Union            of exp * exp
+  | Powerset	     of exp
   | Inter            of exp * exp
   | Diff             of exp * exp
   | Range            of exp * exp

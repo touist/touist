@@ -40,58 +40,99 @@ let frange min max step =
       loop (cpt::acc) (cpt+.1.)
   in loop [] min |> List.rev
 
-let rec set_bin_op iop fop sop repr s1 s2 =
+(* Returns the set resulting from the set operation
+* ipred : the operator for ints
+* fpred : ...floats
+* spred : ...strings
+* repr : the representation of the operator 
+* s1, s2 : two sets
+*)
+
+let rec set_bin_op iop fop sop supop supfop supsop repr s1 s2 =
   match s1, s2 with
   | GenSet.Empty, GenSet.Empty -> GenSet.Empty
   | GenSet.ISet _, GenSet.Empty ->
-      set_bin_op iop fop sop repr s1 (GenSet.ISet IntSet.empty)
+      set_bin_op iop fop sop supop supfop supsop repr s1 (GenSet.ISet IntSet.empty)
   | GenSet.Empty, GenSet.ISet _ ->
-      set_bin_op iop fop sop repr (GenSet.ISet IntSet.empty) s2
+      set_bin_op iop fop sop supop supfop supsop repr (GenSet.ISet IntSet.empty) s2
   | GenSet.Empty, GenSet.FSet _ ->
-      set_bin_op iop fop sop repr (GenSet.FSet FloatSet.empty) s2
+      set_bin_op iop fop sop supop supfop supsop repr (GenSet.FSet FloatSet.empty) s2
   | GenSet.FSet _, GenSet.Empty ->
-      set_bin_op iop fop sop repr s1 (GenSet.FSet FloatSet.empty)
+      set_bin_op iop fop sop supop supfop supsop repr s1 (GenSet.FSet FloatSet.empty)
   | GenSet.Empty, GenSet.SSet _ ->
-      set_bin_op iop fop sop repr (GenSet.SSet StringSet.empty) s2
+      set_bin_op iop fop sop supop supfop supsop repr (GenSet.SSet StringSet.empty) s2
   | GenSet.SSet _, GenSet.Empty ->
-      set_bin_op iop fop sop repr s1 (GenSet.SSet StringSet.empty)
+      set_bin_op iop fop sop supop supfop supsop repr s1 (GenSet.SSet StringSet.empty)
   | GenSet.ISet a, GenSet.ISet b -> GenSet.ISet (iop a b)
   | GenSet.FSet a, GenSet.FSet b -> GenSet.FSet (fop a b)
   | GenSet.SSet a, GenSet.SSet b -> GenSet.SSet (sop a b)
+  | GenSet.SupSet a, GenSet.SupSet b -> GenSet.SupSet (supop a b)
+  | GenSet.SupFSet a, GenSet.SupFSet b -> GenSet.SupFSet (supfop a b)
+  | GenSet.SupSSet a, GenSet.SupSSet b -> GenSet.SupSSet (supsop a b)
   | _,_ -> raise (TypeError ("unsupported set type(s) for '" ^ repr  ^ "'"))
 
-let rec set_pred_op ipred fpred spred repr s1 s2 =
+(* Returns the boolean resulting from the set operation
+ *)
+let rec set_pred_op ipred fpred spred suppred supfpred supspred repr s1 s2 =
   match s1, s2 with
   | GenSet.Empty, GenSet.Empty -> true
+
   | GenSet.Empty, GenSet.ISet _ ->
-      set_pred_op ipred fpred spred repr (GenSet.ISet IntSet.empty) s2
+      set_pred_op ipred fpred spred suppred supfpred supspred repr (GenSet.ISet IntSet.empty) s2
   | GenSet.ISet _, GenSet.Empty ->
-      set_pred_op ipred fpred spred repr s1 (GenSet.ISet IntSet.empty)
+      set_pred_op ipred fpred spred suppred supfpred supspred repr s1 (GenSet.ISet IntSet.empty)
+
   | GenSet.Empty, GenSet.FSet _ ->
-      set_pred_op ipred fpred spred repr (GenSet.FSet FloatSet.empty) s2
+      set_pred_op ipred fpred spred suppred supfpred supspred repr (GenSet.FSet FloatSet.empty) s2
   | GenSet.FSet _, GenSet.Empty ->
-      set_pred_op ipred fpred spred repr s1 (GenSet.FSet FloatSet.empty)
+      set_pred_op ipred fpred spred suppred supfpred supspred repr s1 (GenSet.FSet FloatSet.empty)
+
   | GenSet.Empty, GenSet.SSet _ ->
-      set_pred_op ipred fpred spred repr (GenSet.SSet StringSet.empty) s2
+      set_pred_op ipred fpred spred suppred supfpred supspred repr (GenSet.SSet StringSet.empty) s2
   | GenSet.SSet _, GenSet.Empty ->
-      set_pred_op ipred fpred spred repr s1 (GenSet.SSet StringSet.empty)
+      set_pred_op ipred fpred spred suppred supfpred supspred repr s1 (GenSet.SSet StringSet.empty)
+
+  | GenSet.Empty, GenSet.SupSet _ ->
+      set_pred_op ipred fpred spred suppred supfpred supspred repr (GenSet.SupSet SuperSet.empty) s2
+  | GenSet.SupSet _, GenSet.Empty ->
+      set_pred_op ipred fpred spred suppred supfpred supspred repr s1 (GenSet.SupSet SuperSet.empty)
+
+  | GenSet.Empty, GenSet.SupFSet _ ->
+      set_pred_op ipred fpred spred suppred supfpred supspred repr (GenSet.SupFSet SuperFloatSet.empty) s2
+  | GenSet.SupFSet _, GenSet.Empty ->
+      set_pred_op ipred fpred spred suppred supfpred supspred repr s1 (GenSet.SupFSet SuperFloatSet.empty)
+
+  | GenSet.Empty, GenSet.SupSSet _ ->
+      set_pred_op ipred fpred spred suppred supfpred supspred repr (GenSet.SupSSet SuperStringSet.empty) s2
+  | GenSet.SupSSet _, GenSet.Empty ->
+      set_pred_op ipred fpred spred suppred supfpred supspred repr s1 (GenSet.SupSSet SuperStringSet.empty)
+   
   | GenSet.ISet a, GenSet.ISet b -> ipred a b
   | GenSet.FSet a, GenSet.FSet b -> fpred a b
   | GenSet.SSet a, GenSet.SSet b -> spred a b
+  | GenSet.SupSet a, GenSet.SupSet b -> suppred a b
+  | GenSet.SupFSet a, GenSet.SupFSet b -> supfpred a b
+  | GenSet.SupSSet a, GenSet.SupSSet b -> supspred a b
   | _,_ -> raise (TypeError ("unsupported set type(s) for '" ^ repr ^ "'"))
 
+(* Compares two numbers and returns the resulting boolean 
+*)
 let num_pred_op n1 n2 ipred fpred repr =
   match n1,n2 with
   | Int x, Int y     -> Bool (ipred x y)
   | Float x, Float y -> Bool (fpred x y)
   | _,_ -> raise (TypeError ("unsupported operand types for '" ^ repr ^ "'"))
 
+(* Returns the result of the numerical operation
+*)
 let num_bin_op n1 n2 iop fop repr =
   match n1,n2 with
   | Int x, Int y     -> Int   (iop x y)
   | Float x, Float y -> Float (fop x y)
   | _,_ -> raise (TypeError ("unsupported operand types for '" ^ repr ^ "'"))
 
+(* Returns the result of the operation on two booleans
+ *)
 let bool_bin_op b1 b2 op repr =
   match b1,b2 with
   | Bool x, Bool y -> Bool (op x y)
@@ -110,7 +151,24 @@ let unwrap_str = function
   | Clause (Term (x,Some _)) -> failwith ("unevaluated term: " ^ x)
   | x -> raise (TypeError ("expected term, got " ^ (string_of_exp x)))
 
+let unwrap_set_decl = function
+  | Set_decl x -> x
+  | x -> raise (TypeError ("expected Set_decl, got " ^ (string_of_exp x)))
+
+let unwrap_iset = function
+  | Set (GenSet.ISet x) -> x
+  | x -> raise (TypeError ("expected GenSet.ISet, got " ^ (string_of_exp x)))
+
+let unwrap_fset = function
+  | Set (GenSet.FSet x) -> x
+  | x -> raise (TypeError ("expected GenSet.FSet, got " ^ (string_of_exp x)))
+
+let unwrap_sset = function
+  | Set (GenSet.SSet x) -> x
+  | x -> raise (TypeError ("expected GenSet.SSet, got " ^ (string_of_exp x)))
+
 let extenv = Hashtbl.create 10
+
 
 let rec eval exp env =
   eval_prog exp env
@@ -217,8 +275,28 @@ and eval_exp exp env =
         | Set x', Set y' ->
             Set (set_bin_op (IntSet.union)
                             (FloatSet.union)
-                            (StringSet.union) "union" x' y')
+                            (StringSet.union) 
+			    (SuperSet.union)
+                            (SuperFloatSet.union)
+                            (SuperStringSet.union) "union" x' y')
         | _,_ -> raise (TypeError (string_of_exp exp))
+      end
+ 
+ (* Génère l'ensemble des sous-ensembles d'un ensemble *)
+  | Powerset x -> 
+      begin
+        match eval_exp x env with
+        | Set x' ->
+            begin
+              match x' with
+	      | GenSet.ISet x'' -> Set (GenSet.SupSet (SuperSet.powerset x''))
+              | _ -> raise (TypeError (string_of_exp exp))
+
+              | GenSet.FSet x'' -> Set (GenSet.SupFSet (SuperFloatSet.powerset x''))
+	      | GenSet.SSet x'' -> Set (GenSet.SupSSet (SuperStringSet.powerset x''))
+	      
+	    end
+        | _ -> raise (TypeError (string_of_exp exp))
       end
   | Inter (x,y) ->
       begin
@@ -226,7 +304,10 @@ and eval_exp exp env =
         | Set x', Set y' ->
             Set (set_bin_op (IntSet.inter)
                             (FloatSet.inter)
-                            (StringSet.inter) "inter" x' y')
+                            (StringSet.inter) 
+			    (SuperSet.inter)
+                            (SuperFloatSet.inter)
+                            (SuperStringSet.inter)  "inter" x' y')
         | _,_ -> raise (TypeError (string_of_exp exp))
       end
   | Diff (x,y) ->
@@ -235,7 +316,10 @@ and eval_exp exp env =
         | Set x', Set y' ->
             Set (set_bin_op (IntSet.diff)
                             (FloatSet.diff)
-                            (StringSet.diff) "diff" x' y')
+                            (StringSet.diff) 
+			    (SuperSet.diff)
+                            (SuperFloatSet.diff)
+                            (SuperStringSet.diff)  "diff" x' y')
         | _,_ -> raise (TypeError (string_of_exp exp))
       end
   | Range (x,y) ->
@@ -255,6 +339,9 @@ and eval_exp exp env =
               | GenSet.ISet x'' -> Bool (IntSet.is_empty x'')
               | GenSet.FSet x'' -> Bool (FloatSet.is_empty x'')
               | GenSet.SSet x'' -> Bool (StringSet.is_empty x'')
+	      | GenSet.SupSet x'' -> Bool (SuperSet.is_empty x'')
+              | GenSet.SupFSet x'' -> Bool (SuperFloatSet.is_empty x'')
+              | GenSet.SupSSet x'' -> Bool (SuperStringSet.is_empty x'')              
             end
         | _ -> raise (TypeError (string_of_exp exp))
       end
@@ -268,6 +355,10 @@ and eval_exp exp env =
               | GenSet.ISet x'' -> Int (IntSet.cardinal x'')
               | GenSet.FSet x'' -> Int (FloatSet.cardinal x'')
               | GenSet.SSet x'' -> Int (StringSet.cardinal x'')
+	      | GenSet.SupSet x'' -> Int (SuperSet.cardinal x'')
+              | GenSet.SupFSet x'' -> Int (SuperFloatSet.cardinal x'')
+              | GenSet.SupSSet x'' -> Int (SuperStringSet.cardinal x'')              
+
             end
         | _ -> raise (TypeError (string_of_exp exp))
       end
@@ -277,7 +368,10 @@ and eval_exp exp env =
         | Set x', Set y' ->
             Bool (set_pred_op (IntSet.subset)
                               (FloatSet.subset)
-                              (StringSet.subset) "subset" x' y')
+                              (StringSet.subset)
+			      (SuperSet.subset)
+                              (SuperFloatSet.subset)
+                              (SuperStringSet.subset)  "subset" x' y')
         | _ -> raise (TypeError (string_of_exp exp))
       end
   | In (x,y) ->
@@ -286,9 +380,13 @@ and eval_exp exp env =
         | Int x', Set (GenSet.ISet y') -> Bool (IntSet.mem x' y')
         | Float x', Set (GenSet.FSet y') -> Bool (FloatSet.mem x' y')
         | Clause (Term (x',None)), Set (GenSet.SSet y') -> Bool (StringSet.mem x' y')
-        | Int _, Set (GenSet.Empty) -> Bool false
+        | Set (GenSet.ISet x'), Set (GenSet.SupSet y') -> Bool (SuperSet.mem x' y')
+        | Set (GenSet.FSet x'), Set (GenSet.SupFSet y') -> Bool (SuperFloatSet.mem x' y')
+        | Set (GenSet.SSet x'), Set (GenSet.SupSSet y') -> Bool (SuperStringSet.mem x' y')
+	| Int _, Set (GenSet.Empty) -> Bool false
         | Float _, Set (GenSet.Empty) -> Bool false
         | Clause _, Set (GenSet.Empty) -> Bool false
+	| Set _, Set (GenSet.Empty) -> Bool false
         | _,_ -> raise (TypeError (string_of_exp exp))
       end
   | Equal (x,y) ->
@@ -300,7 +398,10 @@ and eval_exp exp env =
         | Set x', Set y' ->
             Bool (set_pred_op (IntSet.equal)
                               (FloatSet.equal)
-                              (StringSet.equal) "=" x' y')
+                              (StringSet.equal)
+			      (SuperSet.equal)
+                              (SuperFloatSet.equal)
+                              (SuperStringSet.equal) "=" x' y')
         | _,_ -> raise (TypeError (string_of_exp exp))
       end
   | Not_equal        (x,y) -> eval_exp (Not (Equal (x,y))) env
@@ -309,17 +410,31 @@ and eval_exp exp env =
   | Greater_than     (x,y) -> num_pred_op (eval_exp x env) (eval_exp y env) (>) (>) ">"
   | Greater_or_equal (x,y) -> num_pred_op (eval_exp x env) (eval_exp y env) (>=) (>=) ">="
 
+
+and eval_set_aux set_decl hd env =
+        match hd with
+        | [] -> Set (GenSet.Empty)
+        | (Int _)::_ ->
+                 let list_of_set = List.map (fun elt -> unwrap_iset(eval_set(unwrap_set_decl elt) env)) set_decl
+                 in
+                 Set (GenSet.SupSet (List.fold_left (fun set elt -> SuperSet.add elt set) SuperSet.empty list_of_set))          | (Float _)::_ -> 
+                 let list_of_set = List.map (fun elt -> unwrap_fset(eval_set(unwrap_set_decl elt) env)) set_decl
+                 in
+                 Set (GenSet.SupFSet (List.fold_left (fun set elt -> SuperFloatSet.add elt set) SuperFloatSet.empty list_of_set))  
+        | (Clause _)::_ -> 
+                 let list_of_set = List.map (fun elt -> unwrap_sset(eval_set(unwrap_set_decl elt) env)) set_decl
+                 in
+                 Set (GenSet.SupSSet (List.fold_left (fun set elt -> SuperStringSet.add elt set) SuperStringSet.empty list_of_set)) 
+
+(* Returns the set associated with the list set_decl *)
 and eval_set set_decl env =
-  let eval_form = List.map (fun x -> eval_exp x env) set_decl in
-  match eval_form with
-  | [] -> Set (GenSet.Empty)
-  | (Int _)::xs ->
-      Set (GenSet.ISet (IntSet.of_list (List.map unwrap_int eval_form)))
-  | (Float _)::xs ->
-      Set (GenSet.FSet (FloatSet.of_list (List.map unwrap_float eval_form)))
-  | (Clause (Term (_,None)))::xs ->
-      Set (GenSet.SSet (StringSet.of_list (List.map unwrap_str eval_form)))
-  | _ -> raise (TypeError ("set: " ^ (string_of_exp_list ", " eval_form)))
+        match set_decl with
+        | [] -> Set (GenSet.Empty)
+        | (Int _)::_ -> Set (GenSet.ISet (IntSet.of_list (List.map unwrap_int set_decl)))
+        | (Float _)::_ -> Set (GenSet.FSet (FloatSet.of_list (List.map unwrap_float set_decl)))
+        | (Clause _)::_ -> Set (GenSet.SSet (StringSet.of_list (List.map unwrap_str set_decl)))
+        | (Set_decl hd)::_ -> eval_set_aux set_decl hd env
+        | _ -> raise (TypeError ("set: " ^ (string_of_exp_list ", " set_decl)))
 
 and eval_clause exp env =
   match exp with
@@ -453,6 +568,7 @@ and eval_clause exp env =
         | [x],[y] ->
             begin
               match eval_exp y env with
+	      (* voir pprint.ml pour biand_empty... *)
               | Set (GenSet.Empty)  -> bigand_empty env x [] test e
               | Set (GenSet.ISet a) -> bigand_int   env x (IntSet.elements a)    test e
               | Set (GenSet.FSet a) -> bigand_float env x (FloatSet.elements a)  test e
