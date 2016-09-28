@@ -105,32 +105,29 @@ public class TranslatorSAT {
 		}
 		BufferedReader stderr = new BufferedReader(new InputStreamReader(
 				this.p.getErrorStream()));
-		List<String> linesStdErr = new ArrayList<String>();
+		String linesStdErr = "";
 		while (stderr.ready()) {
-			linesStdErr.add(stderr.readLine());
+			linesStdErr += stderr.readLine() + "\n";
 		}
 		stderr.close();
 		stdout.close();
 		errors = new ArrayList<TranslationError>();
 		if(return_code == COMPILE_WITH_LINE_NUMBER_ERROR) {
-			System.err.println("translate(): the translator returned errors");
+			System.err.println("translate(): the translator returned an error");
 			String file_name; int num_line; int num_col;
-			String message_error;
-			for (String errMessage : linesStdErr) {
-				System.err.println("translate(): "+errMessage);
-				StringTokenizer tokenizer = new StringTokenizer(errMessage,":");
-				num_line = Integer.parseInt(tokenizer.nextToken());
-				num_col = Integer.parseInt(tokenizer.nextToken());
-				message_error = tokenizer.nextToken();
-				errors.add(new TranslationError(num_line,num_col,message_error));
-			}
+			String message_error = "";
+		
+			System.err.println("translate(): "+linesStdErr);
+			StringTokenizer tokenizer = new StringTokenizer(linesStdErr,":");
+			num_line = Integer.parseInt(tokenizer.nextToken());
+			num_col = Integer.parseInt(tokenizer.nextToken());
+			while(tokenizer.hasMoreTokens()) { message_error += tokenizer.nextToken(); }
+			errors.add(new TranslationError(num_line,num_col,message_error));
 		}
 		if(return_code == COMPILE_NO_LINE_NUMBER_ERROR) {
 			System.err.println("translate(): the translator returned errors");
-			for (String errMessage : linesStdErr) {
-				System.err.println("translate(): "+errMessage);
-				errors.add(new TranslationError(errMessage));
-			}
+			System.err.println("translate(): "+linesStdErr);
+			errors.add(new TranslationError(linesStdErr));
 		}
 		if(return_code == OK) {
 			parseLiteralsMapFile(currentPath+File.separatorChar+outputTableFilePath);

@@ -46,7 +46,7 @@ type error =
   | COMPILE_NO_LINE_NUMBER_ERROR
   | OTHER
 
-(* COMPILE_WITH_LINE_NUMBER_ERROR == `num_row:num_col:message`*)
+(* COMPILE_WITH_LINE_NUMBER_ERROR == `file_name:num_row:num_col:message`*)
 (* COMPILE_NO_LINE_NUMBER_ERROR == `Any other message format` *)
 let get_code (e : error) : int = match e with
   | OK -> 0
@@ -159,7 +159,7 @@ let invoke_parser filename text lexer buffer : Syntax.prog =
   and succeed ast = ast
   and fail checkpoint =
       Printf.fprintf stderr "%s" (ErrorReporting.report text !buffer checkpoint);
-      exit (get_code COMPILE_NO_LINE_NUMBER_ERROR)
+      exit (get_code COMPILE_WITH_LINE_NUMBER_ERROR)
   in
     Parser.MenhirInterpreter.loop_handle succeed fail supplier checkpoint
     

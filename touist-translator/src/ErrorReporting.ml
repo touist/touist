@@ -281,8 +281,7 @@ let report text buffer checkpoint : string =
                     Please report this problem to the compiler vendor.\n" s
   in
   (* Construct the full error message. *)
-  Printf.sprintf "%s:%d:%d: syntax error %s.\n%s"
-    pos.pos_fname
+  Printf.sprintf "%d:%d: syntax error %s.\n%s"
     pos.pos_lnum
     (pos.pos_cnum - pos.pos_bol + 1)
     where
