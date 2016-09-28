@@ -68,6 +68,7 @@ let rec to_cnf = function
         | CNot y -> to_cnf y
         | CAnd (x',y') -> to_cnf (COr (CNot x', CNot y'))
         | COr (x',y') -> CAnd (to_cnf (CNot x'), to_cnf (CNot y'))
+        | CImplies (x',y') -> CAnd (to_cnf x', CNot (to_cnf y'))
         | x -> failwith ("Failed to transform to CNF: " ^ (string_of_clause x))
       end
   | COr (x,y) ->
