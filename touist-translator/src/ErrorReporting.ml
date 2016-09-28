@@ -48,7 +48,7 @@ module S = MenhirLib.General (* Streams *)
    silently cover up for our internal error. Thus, we typically use an idiom of
    the form [if debug then assert false else <some default value>]. *)
 
-let debug = true
+let debug = ref false (* This variable is set when calling the function [report]*)
 
 (* -------------------------------------------------------------------------- *)
 
@@ -77,7 +77,7 @@ let show f buffer : string =
   | Zero ->
       (* The buffer cannot be empty. If we have read no tokens, we
          cannot have detected a syntax error. *)
-      if debug then assert false else ""
+      if !debug then assert false else ""
   | One invalid ->
       (* It is unlikely, but possible, that we have read just one token. *)
       Printf.sprintf "before '%s'" (f invalid)
@@ -112,7 +112,7 @@ let extract text (pos1, pos2) : string =
   with Invalid_argument _ ->
     (* In principle, this should not happen, but if it does, let's make this
        a non-fatal error. *)
-    if debug then assert false else "???"
+    if !debug then assert false else "???"
 
 (* -------------------------------------------------------------------------- *)
 
@@ -234,11 +234,11 @@ let fragment text checkpoint message =
   | Failure _ ->
       (* In principle, this should not happen, but if it does, let's cover up
          for our internal error. *)
-      if debug then assert false else "???"
+      if !debug then assert false else "???"
   | Not_found ->
       (* In principle, this should not happen, but if it does, let's cover up
          for our internal error. *)
-      if debug then assert false else "???"
+      if !debug then assert false else "???"
 
 let fragments text checkpoint (message : string) : string =
   Str.global_substitute
@@ -258,7 +258,8 @@ let fragments text checkpoint (message : string) : string =
    and [lexbuf.lex_curr_p], since this is the last token that was read. But
    we need not care about that here. *)
 
-let report text buffer checkpoint : string =
+let report text buffer checkpoint debug' : string =
+  debug := debug'; (* Sets the debug flag for the whole ErrorReporting.ml file *) 
   (* Extract the position where the error occurred, that is, the start
      position of the invalid token. We display it as a filename, a  (1-based)
      line number, and a (1-based) column number. *)
@@ -287,7 +288,7 @@ let report text buffer checkpoint : string =
     where
     message 
   ^
-  if debug then 
+  if !debug then 
       Printf.sprintf "Debug: Automaton state: %d (see src/parser.messages)\n" s
   else ""
 

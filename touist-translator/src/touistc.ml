@@ -60,6 +60,7 @@ let smt_logic_avail = ["QF_IDL";"QF_LIA";"QF_LRA";"QF_RDL"]
 
 let sat_mode = ref false
 let version_asked = ref false
+let debug = ref false
 let smt_logic = ref ""
 let input_file_path = ref ""
 let output_file_path = ref ""
@@ -158,7 +159,7 @@ let invoke_parser filename text lexer buffer : Syntax.prog =
   and supplier = Parser.MenhirInterpreter.lexer_lexbuf_to_supplier lexer lexbuf
   and succeed ast = ast
   and fail checkpoint =
-      Printf.fprintf stderr "%s" (ErrorReporting.report text !buffer checkpoint);
+      Printf.fprintf stderr "%s" (ErrorReporting.report text !buffer checkpoint !debug);
       exit (get_code COMPILE_WITH_LINE_NUMBER_ERROR)
   in
     Parser.MenhirInterpreter.loop_handle succeed fail supplier checkpoint
@@ -208,7 +209,8 @@ let () =
         QF_LRA (not documented)
     See http://smtlib.cs.uiowa.edu/logics.shtml for more info."
     ));
-    ("--version", Arg.Set version_asked, "Display version number")
+    ("--version", Arg.Set version_asked, "Display version number");
+    ("-d", Arg.Set debug, "Prints info for debugging syntax errors")
   ]
   in
   let usage = "TouistL compiles files from the TouIST Language \
