@@ -89,12 +89,12 @@ let rec to_cnf = function
             | Bottom,_ -> y'
             | _,Bottom -> x'
             | _,_ ->
-                if is_clause x && is_clause y then
-                  COr (to_cnf x, to_cnf y)
+                if is_clause x' && is_clause y' then
+                  COr (to_cnf x', to_cnf y')
                 else
                   let (new1, new2) = (genterm (), genterm ()) in
-                  CAnd (COr (new1, new2), CAnd (push_lit (CNot new1) (to_cnf x),
-                                                push_lit (CNot new2) (to_cnf y)))
+                  CAnd (COr (new1, new2), CAnd (push_lit (CNot new1) (to_cnf x'),
+                                                push_lit (CNot new2) (to_cnf y')))
       end
   | CImplies (x,y) -> to_cnf (COr (CNot x, y))
   | CEquiv (x,y) -> to_cnf (CAnd (CImplies (x,y), CImplies (y,x)))
