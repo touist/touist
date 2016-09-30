@@ -1,5 +1,6 @@
 v1.2.0 (to be released)
   - touistc: select stdin with "-" and default output to stdout
+  - fixed bug with some formulas like ((p => q) and (q => r)) => r
 v1.1.4
   - fixed bug on expressions like (a=>b)=>c
 v1.1.3
