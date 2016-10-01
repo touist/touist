@@ -1,6 +1,6 @@
 (*
- * cnf.ml: processes the "semantically correct" abstract syntaxic tree (ast) given by [eval]
- *         to produce a CNF-compliant version of the abstract syntaxic tree.
+ * cnf.ml: processes the "semantically correct" abstract syntax tree (ast) given by [eval]
+ *         to produce a CNF-compliant version of the abstract syntax tree.
  *         [to_cnf] is the main function.
  *
  * Project TouIST, 2015. Easily formalize and solve real-world sized problems
@@ -41,11 +41,11 @@ let genterm () =
       literals separated by "and"; example:
           a and b and not and not d                 is a conjunction
     - AST:
-      abstract syntaxic tree; it is homogenous to Syntax.clause
+      abstract syntax tree; it is homogenous to Syntax.clause
       and is a recursive tree representing a formula, using COr, CAnd, CImplies...
-      Example: (1) has the abstract syntaxic tree (2):
+      Example: the formula (1) has the abstract syntax tree (2):
           (a or b) and not c                          (1) natural language
-          CAnd (COr (Term a, Term b),CNot (Term c))   (2) abstract syntaxic tree
+          CAnd (COr (Term a, Term b),CNot (Term c))   (2) abstract syntax tree
     - CNF:
       a Conjunctive Normal Form is an AST that has a special structure with
       is a conjunction of disjunctions of literals. For example:
@@ -53,15 +53,17 @@ let genterm () =
           (a and b) or not (c or d)                 is not a CNF form
  *)
 
-(* [is_clause] checks that the given ast is a clause. *)
+(* [is_clause] checks that the given AST is a clause. This function can only
+   be called on an AST containing COr, CAnd or CNot. No CEquiv or CImplies! *)
 let rec is_clause (ast: clause) : bool = match ast with
   | Top | Bottom | Term _ | CNot (Term _) -> true
   | CAnd _ -> false
   | COr (x,y) -> is_clause x && is_clause y
   | x -> failwith ("is_clause: unexpected value " ^ (string_of_clause x))
 
-(* [push_lit] allows to translate the disjunction `d or cnf` with `d` being the
-   literal we want to add and `cnf` the existing CNF form; for example:
+(* [push_lit] allows to translate into CNF the non-CNF disjunction `d or cnf`
+   (`d` is the literal we want to add, `cnf` is the existing CNF form).
+   For example:
           d  or  ((a or not b) and (not c))            <- is not in CNF
     <=>   push_lit (d) ((a or not b) and not c)
     <=>   (d or a or b) and (d or not c)               <- is in CNF
@@ -82,7 +84,7 @@ let rec push_lit (lit:clause) (cnf: clause) : clause = match cnf with
  * COr, CAnd and CNot; moreover, it can only be in a conjunction of clauses (see a reminder of their definition
  * below). For example (instead of CAnd, COr we use "and" and "or" and "not"):
  *     (a or not b or c) and (not a or b or d) and (d)
- * The matching abstract syntaxic tree (ast) is
+ * The matching abstract syntax tree (ast) is
  *     CAnd (COr a,(Cor (CNot b),c)), (CAnd (COr (COr (CNot a),b),d), d)
  * *)
 let rec to_cnf (ast:clause) : clause = match ast with
