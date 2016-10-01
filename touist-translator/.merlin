@@ -1,0 +1,11 @@
+# Configuration file for `merlin`, an OCaml utlity that brings
+# auto-completion, code browsing, etc. to Vim|Emacs|Atom|SublimeText.
+# See https://github.com/the-lambda-church/merlin
+#
+# 2016, Mael Valais
+#
+S src/**
+B _build/**
+PKG menhirLib
+PKG str
+PKG fileutils
