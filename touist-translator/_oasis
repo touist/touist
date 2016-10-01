@@ -1,3 +1,10 @@
+# `_oasis` contains the configuration for launching `oasis setup`,
+# which creates the ./configure + Makefile for the project.
+# Running `oasis setup` is only required when _oasis is modified.
+#
+# To install oasis: `opam install oasis`
+#
+
 OASISFormat:  0.4
 OcamlVersion: >= 4.01.0
 Name:         TouiST Compiler
@@ -17,4 +24,3 @@ Executable touistc
   BuildTools:     ocamlbuild
   CompiledObject: best
   MainIs:         touistc.ml
-  
