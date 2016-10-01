@@ -81,8 +81,9 @@ let rec push_lit (lit:clause) (cnf: clause) : clause = match cnf with
   | x -> failwith ("Cnf.push_lit: unexpected " ^ (string_of_clause x))
 
 (* [to_cnf] translates the syntaxic tree made of COr, CAnd, CImplies, CEquiv...
- * COr, CAnd and CNot; moreover, it can only be in a conjunction of clauses (see a reminder of their definition
- * below). For example (instead of CAnd, COr we use "and" and "or" and "not"):
+ * COr, CAnd and CNot; moreover, it can only be in a conjunction of clauses
+ * (see a reminder of their definition above).
+ * For example (instead of CAnd, COr we use "and" and "or" and "not"):
  *     (a or not b or c) and (not a or b or d) and (d)
  * The matching abstract syntax tree (ast) is
  *     CAnd (COr a,(Cor (CNot b),c)), (CAnd (COr (COr (CNot a),b),d), d)
@@ -140,7 +141,3 @@ let rec to_cnf (ast:clause) : clause = match ast with
   | CEquiv (x,y) -> to_cnf (CAnd (CImplies (x,y), CImplies (y,x)))
   | CXor (x,y) -> to_cnf (CAnd (COr (x,y), COr (CNot x, CNot y)))
   | _ -> failwith("Cnf.to_cnf failed on: " ^ (string_of_clause ast))
-
-(*
-print_endline ((string_of_clause x) ^ " --- " ^ (string_of_clause x));
-*)
