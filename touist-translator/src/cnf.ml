@@ -99,12 +99,12 @@ let rec to_cnf (ast:clause) : clause = match ast with
   | CNot x -> let x = to_cnf x in
     begin
       match x with
-      | Top -> Bottom
-      | Bottom -> Top
-      | Term a -> CNot (Term a)
-      | CNot x -> x
+      | Top        -> Bottom
+      | Bottom     -> Top
+      | Term a     -> CNot (Term a)
+      | CNot x     -> x
       | CAnd (x,y) -> to_cnf (COr (CNot x, CNot y))          (* De Morgan *)
-      | COr (x,y) -> CAnd (to_cnf (CNot x), to_cnf (CNot y)) (* De Morgan *)
+      | COr (x,y)  -> CAnd (to_cnf (CNot x), to_cnf (CNot y)) (* De Morgan *)
       (* For any other forms like CImplies, CEquiv or CXor: must be  *)
       | _ -> failwith("Bug when turning to CNF: " ^ (string_of_clause (CNot x)))
     end
@@ -121,7 +121,7 @@ let rec to_cnf (ast:clause) : clause = match ast with
         let (new1, new2) = (genterm (), genterm ()) in
         CAnd (COr (new1, new2), CAnd (push_lit (CNot new1) x,
                                       push_lit (CNot new2) y))
-      end
+    end
       (* Note on `COr` and the Tseytin transform:
          When translating `x or y` into CNF and that either x or y is a
          conjunction (= isn't a clause), we must avoid the 'natural' translation
