@@ -18,13 +18,6 @@
 open Syntax
 open Pprint
 
-(* [genterm] generates a (Term &i) with i being a self-incrementing index.
- * This function allows to speed up and simplify the translation of some
- * forms of COr *)
-let dummy_term_count = ref 0
-let genterm () =
-  incr dummy_term_count; Term ("&" ^ (string_of_int !dummy_term_count), None)
-
 (*  Vocabulary:
     - Literal:
       a possibly negated proposition; we denote them as a, b... and
@@ -79,6 +72,15 @@ let rec push_lit (lit:clause) (cnf: clause) : clause = match cnf with
   | CAnd (x,y)    -> CAnd (push_lit lit x, push_lit lit y)
   | COr (x,y)     -> COr (lit, COr (x,y))
   | x -> failwith ("Cnf.push_lit: unexpected " ^ (string_of_clause x))
+
+
+(* [genterm] generates a (Term &i) with i being a self-incrementing index.
+ * This function allows to speed up and simplify the translation of some
+ * forms of COr.
+ * NOTE: OCaml's functions can't have 0 param: we use the unit `()`. *)
+let dummy_term_count = ref 0
+let genterm () =
+  incr dummy_term_count; Term ("&" ^ (string_of_int !dummy_term_count), None)
 
 (* [to_cnf] translates the syntaxic tree made of COr, CAnd, CImplies, CEquiv...
  * COr, CAnd and CNot; moreover, it can only be in a conjunction of clauses
