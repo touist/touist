@@ -99,17 +99,17 @@ let rec to_cnf (ast:clause) : clause = match ast with
       | Bottom,_|_,Bottom -> Bottom
       | x,y               -> CAnd (x,y)
     end
-  | CNot x -> let x = to_cnf x in
+  | CNot x ->
     begin
       match x with
       | Top        -> Bottom
       | Bottom     -> Top
       | Term a     -> CNot (Term a)
-      | CNot x     -> x
+      | CNot x     -> to_cnf x
       | CAnd (x,y) -> to_cnf (COr (CNot x, CNot y))          (* De Morgan *)
       | COr (x,y)  -> CAnd (to_cnf (CNot x), to_cnf (CNot y)) (* De Morgan *)
-      (* For any other forms like CImplies, CEquiv or CXor: must be  *)
-      | _ -> failwith("Cnf.CNot failed on: " ^ (string_of_clause (CNot x)))
+      (* For any other forms like CImplies, CEquiv or CXor: must re-run to_cnf *)
+      | _ -> to_cnf (CNot (to_cnf x))
     end
   | COr (x,y) -> let (x,y) = (to_cnf x, to_cnf y) in
     begin
