@@ -105,8 +105,8 @@ let rec to_cnf (ast:clause) : clause = match ast with
       | CNot x -> x
       | CAnd (x,y) -> to_cnf (COr (CNot x, CNot y))          (* De Morgan *)
       | COr (x,y) -> CAnd (to_cnf (CNot x), to_cnf (CNot y)) (* De Morgan *)
-      (* At this point, x has not been "translated" enough to be matched by CNot *)
-      | x -> to_cnf (CNot x)
+      (* For any other forms like CImplies, CEquiv or CXor: must be  *)
+      | _ -> failwith("Bug when turning to CNF: " ^ (string_of_clause (CNot x)))
     end
   | COr (x,y) -> let (x,y) = (to_cnf x, to_cnf y) in
     begin
