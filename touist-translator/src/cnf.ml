@@ -78,7 +78,7 @@ let rec push_lit (lit:clause) (cnf: clause) : clause = match cnf with
   | CNot (Term x) -> COr (lit, CNot (Term x))
   | CAnd (x,y)    -> CAnd (push_lit lit x, push_lit lit y)
   | COr (x,y)     -> COr (lit, COr (x,y))
-  | x -> failwith ("push_lit: unexpected value " ^ (string_of_clause x))
+  | x -> failwith ("Cnf.push_lit: unexpected " ^ (string_of_clause x))
 
 (* [to_cnf] translates the syntaxic tree made of COr, CAnd, CImplies, CEquiv...
  * COr, CAnd and CNot; moreover, it can only be in a conjunction of clauses (see a reminder of their definition
@@ -108,7 +108,7 @@ let rec to_cnf (ast:clause) : clause = match ast with
       | CAnd (x,y) -> to_cnf (COr (CNot x, CNot y))          (* De Morgan *)
       | COr (x,y)  -> CAnd (to_cnf (CNot x), to_cnf (CNot y)) (* De Morgan *)
       (* For any other forms like CImplies, CEquiv or CXor: must be  *)
-      | _ -> failwith("Bug when turning to CNF: " ^ (string_of_clause (CNot x)))
+      | _ -> failwith("Cnf.CNot failed on: " ^ (string_of_clause (CNot x)))
     end
   | COr (x,y) -> let (x,y) = (to_cnf x, to_cnf y) in
     begin
@@ -139,7 +139,7 @@ let rec to_cnf (ast:clause) : clause = match ast with
   | CImplies (x,y) -> to_cnf (COr (CNot x, y))
   | CEquiv (x,y) -> to_cnf (CAnd (CImplies (x,y), CImplies (y,x)))
   | CXor (x,y) -> to_cnf (CAnd (COr (x,y), COr (CNot x, CNot y)))
-  | _ -> failwith "Failed to transform to CNF"
+  | _ -> failwith("Cnf.to_cnf failed on: " ^ (string_of_clause ast))
 
 (*
 print_endline ((string_of_clause x) ^ " --- " ^ (string_of_clause x));
