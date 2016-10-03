@@ -1,9 +1,12 @@
-# This file, when processed by oasis, produces the Makefile needed
-# to build easily touistc. Once the Makefile is generated, there is
-# no need of re-running `oasis setup` again (unless you modified it)
+# `_oasis` contains the configuration for launching `oasis setup`,
+# which creates the ./configure + Makefile for the project.
+# Running `oasis setup` is only required when _oasis is modified.
 #
 # Note that menhirLib is required to be >= 20150118 because the feature
 # "incremental API" has been introduced at that version.
+#
+# To install oasis: `opam install oasis`
+#
 
 OASISFormat:  0.4
 OcamlVersion: >= 4.01.0
@@ -31,4 +34,3 @@ SourceRepository touist
   Location:       https://github.com/touist/touist.git
   Browser:        https://github.com/touist/touist
   Subdir:         touist-translator
-

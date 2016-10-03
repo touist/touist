@@ -7,8 +7,8 @@
  * https://github.com/touist/touist
  *
  * Copyright Institut de Recherche en Informatique de Toulouse, France
- * This program and the accompanying materials are made available 
- * under the terms of the GNU Lesser General Public License (LGPL) 
+ * This program and the accompanying materials are made available
+ * under the terms of the GNU Lesser General Public License (LGPL)
  * version 2.1 which accompanies this distribution, and is available at
  * http://www.gnu.org/licenses/lgpl-2.1.html
  *
@@ -16,19 +16,19 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  *
  * Some of the code has been inspired by cparser/Lexer.mll contained in
  * the project AbsInt/CompCert. Here are the terms:
  *
- * The Compcert verified compiler                      
- * Jacques-Henri Jourdan, INRIA Paris-Rocquencourt            
- * Copyright Institut National de Recherche en Informatique et en     
- * Automatique.  All rights reserved.  This file is distributed       
- * under the terms of the GNU General Public License as published by  
- * the Free Software Foundation, either version 2 of the License, or  
- * (at your option) any later version.  This file is also distributed 
- * under the terms of the INRIA Non-Commercial License Agreement. 
+ * The Compcert verified compiler
+ * Jacques-Henri Jourdan, INRIA Paris-Rocquencourt
+ * Copyright Institut National de Recherche en Informatique et en
+ * Automatique.  All rights reserved.  This file is distributed
+ * under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 2 of the License, or
+ * (at your option) any later version.  This file is also distributed
+ * under the terms of the INRIA Non-Commercial License Agreement.
  *)
 
 open Lexer
@@ -66,6 +66,10 @@ let input_file_path = ref ""
 let output_file_path = ref ""
 let output_table_file_path = ref ""
 let output_file_basename = ref ""
+let use_stdin = ref false
+let output = ref stdout
+let output_table = ref stdout
+let input = ref stdin
 
 let print_position outx lexbuf =
   let pos = lexbuf.lex_curr_p in
@@ -106,13 +110,13 @@ let print_position outx lexbuf =
   Printf.fprintf outx "%d:%d" pos.pos_lnum (pos.pos_cnum - pos.pos_bol+1)
 
 
-  
+
 (* [evaluate] handles exceptions when calling the evaluation function [Eval.eval].
  * Eval.eval takes an abstract syntaxic tree and check that it is semantically correct,
  * creates the variables and everything.
  *
  * [ast] means it is of type Syntax.prog,
- * i.e. the "root" type in lexer.mll 
+ * i.e. the "root" type in lexer.mll
  *)
 let evaluate (ast:Syntax.prog) : Syntax.clause =
   try Eval.eval ast [] with
@@ -125,13 +129,6 @@ let evaluate (ast:Syntax.prog) : Syntax.clause =
   | Eval.ArgumentError msg ->
       Printf.fprintf stderr "argument error: '%s'\n" msg;
       exit (get_code COMPILE_NO_LINE_NUMBER_ERROR)
-(*  XXX: Mael: I removed this part to avoid "skipping" 
- *  some exceptions we could have forgotten to handle
- *  
- *  | _ ->
-      fprintf stderr "unkwown error\n";
-      exit (get_code COMPILE_NO_LINE_NUMBER_ERROR)
-*)
 
 
   (* This is the main entry point to the lexer. *)
@@ -148,13 +145,14 @@ let lexer buffer : (Lexing.lexbuf -> Parser.token) =
         lex
 
 (*  [invoke_parser] is in charge of calling the parser. It uses
-    the incremental API, which allows us to do our own error handling. 
-   
-    [invoke_parser] *)
-
-let invoke_parser filename text lexer buffer : Syntax.prog =
+    the incremental API, which allows us to do our own error handling.
+    WARNING: for now, the `pos_fname` that should contain the filename
+    needed by menhirlib (just for error handling) contains
+    "foo.touistl"... For now, the name of the input file name is not
+    indicated to the user: useless because we only handle a single touistl file *)
+let invoke_parser (text:string) (lexer:Lexing.lexbuf -> Parser.token) (buffer) : Syntax.prog =
   let lexbuf = Lexing.from_string text in
-  lexbuf.lex_curr_p <- {lexbuf.lex_curr_p with pos_fname = filename; pos_lnum = 1};
+  lexbuf.lex_curr_p <- {lexbuf.lex_curr_p with pos_fname = "foo.touistl"; pos_lnum = 1};
   let checkpoint = Parser.Incremental.prog lexbuf.lex_curr_p
   and supplier = Parser.MenhirInterpreter.lexer_lexbuf_to_supplier lexer lexbuf
   and succeed ast = ast
@@ -163,116 +161,120 @@ let invoke_parser filename text lexer buffer : Syntax.prog =
       exit (get_code COMPILE_WITH_LINE_NUMBER_ERROR)
   in
     Parser.MenhirInterpreter.loop_handle succeed fail supplier checkpoint
-    
-
-let string_of_file (filename:string) : string =
-  let inchannel = open_in_bin filename in
-    let n = in_channel_length inchannel in
-    let text = really_input_string inchannel n in
-        close_in inchannel;
-        (text)
 
 
-(* Main parsing/lexing function *)
-let translateToSATDIMACS (infile:string) (outfile:string) (tablefile:string) =
+let string_of_file (input:in_channel) : string =
+  let n = in_channel_length input in
+  let text = really_input_string input n in
+      close_in input;
+      (text)
+
+(* Main parsing/lexing function (for SAT).
+ * Note: infile, outfile and tablefile must be already opened with open_in
+ * and open_out *)
+let translateToSATDIMACS (infile:in_channel) (outfile:out_channel) (tablefile:out_channel) =
   let text = string_of_file infile
   and buffer = ref ErrorReporting.Zero in
-  let ast = invoke_parser infile text (lexer buffer) buffer in
+  let ast = invoke_parser text (lexer buffer) buffer in
     let exp = evaluate ast in
       let c,t = Cnf.to_cnf exp |> Dimacs.to_dimacs in
-        write_to_file outfile c;
-        write_to_file tablefile (Dimacs.string_of_table t)
+        Printf.fprintf outfile "%s" c;
+        Printf.fprintf tablefile "%s" (Dimacs.string_of_table t)
 
+(* Main parsing/lexing function (for SMT).
+ * Note: infile and outfile must be already opened with open_in
+ * and open_out *)
 let translate_to_smt2 logic infile outfile =
   let text = string_of_file infile
   and buffer = ref ErrorReporting.Zero in
-  let ast = invoke_parser infile text (lexer buffer) buffer in
+  let ast = invoke_parser text (lexer buffer) buffer in
     let exp = evaluate ast in
-      let buf = Smt.to_smt2 logic exp
-      and out = open_out outfile in
-      try Buffer.output_buffer out buf
-      with x -> close_out out; raise x
+      let buf = Smt.to_smt2 logic exp in
+      Buffer.output_buffer outfile buf
 
 (* The main program *)
 let () =
   let cmd = (FilePath.basename Sys.argv.(0)) in (* ./touistl exec. name *)
   let argspecs = (* This list enumerates the different flags (-x,-f...)*)
   [ (* "-flag", Arg.toSomething (ref var), "Usage for this flag"*)
-    ("-o", Arg.Set_string (output_file_path), "file The translated file");
-    ("-table", Arg.Set_string (output_table_file_path), "file The literals table table (for SAT_DIMACS)");
-    ("-sat", Arg.Set sat_mode, "Use the SAT solver");
+    ("-o", Arg.Set_string (output_file_path), "OUTPUT is the translated file");
+    ("-table", Arg.Set_string (output_table_file_path),
+      "TABLE (-sat only) The output file that contains the literals table.
+      By default, prints to stdout.");
+    ("-sat", Arg.Set sat_mode, "Select the SAT solver");
     ("-smt2", Arg.Set_string (smt_logic), (
-        "logic Use the SMT solver with the specified logic
+        "LOGIC Select the SMT solver with the specified LOGIC:
         QF_IDL allows to deal with boolean and integer, E.g, x - y < b
         QF_RDL is the same as QF_IDL but with reals
         QF_LIA (not documented)
         QF_LRA (not documented)
     See http://smtlib.cs.uiowa.edu/logics.shtml for more info."
     ));
+    ("-d", Arg.Set debug, "Prints info for debugging syntax errors");
     ("--version", Arg.Set version_asked, "Display version number");
-    ("-d", Arg.Set debug, "Prints info for debugging syntax errors")
+    ("-", Arg.Set use_stdin,"reads from stdin instead of file")
   ]
   in
   let usage = "TouistL compiles files from the TouIST Language \
     to SAT-DIMACS/SMT-LIB2 \n\
-    Usage: " ^ cmd ^ " -sat [-o translatedFile] [-table tableFile] file \n\
-    Usage: " ^ cmd ^ " -smt2 (QF_IDL|QF_RDL|QF_LIA|QF_LRA) [-o translatedFile] file \n\
-    Note: if either tableFile or translatedFile is missing, \n\
-    an artibrary name will be given."
+    Usage: " ^ cmd ^ " -sat [-o OUTPUT] [-table TABLE] (INPUT | -)\n\
+    Usage: " ^ cmd ^ " -smt2 (QF_IDL|QF_RDL|QF_LIA|QF_LRA) [-o OUTPUT] (INPUT | -) \n\
+    Note: in -sat mode, if TABLE and OUTPUT aren't given, both output will be mixed in stdout."
   in
 
   (* Step 1: we parse the args. If an arg. is "alone", we suppose
    * it is a inputFilePath *)
   Arg.parse argspecs argIsInputFilePath usage; (* parses the arguments *)
 
-  (* Step 1.5: if we are asked the version number 
-   * NOTE: !version_asked means like in C, *version_asked. 
+  (* Step 1.5: if we are asked the version number
+   * NOTE: !version_asked means like in C, *version_asked.
    * It doesn't mean "not version_asked" *)
   if !version_asked then (
     print_endline (Version.version);
     exit (get_code OK)
-  ); 
+  );
 
   (* Step 2: we see if we got every parameter we need *)
-  if ((String.length !input_file_path) == 0)(* NOTE: !var is like *var in C *)
+
+
+  (* Check (file | -) and open input and output *)
+  if (!input_file_path = "") && not !use_stdin (* NOTE: !var is like *var in C *)
   then (
     print_endline (cmd^": you must give an input file (try --help)");
     exit (get_code OTHER)
   );
+  if !use_stdin then (input := stdin) else (input := open_in !input_file_path);
 
-  (* If no output file has been given, set to a default one *)
-  if (String.length !output_file_path) == 0 && !sat_mode then
-    output_file_path := (defaultOutput !input_file_path SAT_DIMACS);
-  
-  if (String.length !output_file_path) == 0 && (String.length !smt_logic != 0) then
-    output_file_path := (defaultOutput !input_file_path SMTLIB2);
+  if !output_file_path <> "" && (!sat_mode || (!smt_logic <> ""))
+  then output := open_out !output_file_path;
 
-  if ((String.length !output_table_file_path) == 0)
-  then
-    output_table_file_path := (defaultOutputTable !input_file_path);
-  
+  if !output_table_file_path <> "" && !sat_mode
+  then output_table := open_out !output_table_file_path;
+
   (* Check that either -smt2 or -sat have been selected *)
-  if (!sat_mode && (!smt_logic <> "")) then
-    (print_endline (cmd^": cannot use both SAT and SMT solvers (try --help)");
-     exit (get_code OTHER));
-
-  if (not !sat_mode) && (!smt_logic = "") then
-    (print_endline (cmd^": you must choose a solver to use: -sat or -smt2 (try --help)");
-     exit (get_code OTHER));
+  if (!sat_mode && (!smt_logic <> "")) then begin
+    print_endline (cmd^": cannot use both SAT and SMT solvers (try --help)");
+    exit (get_code OTHER) end;
+  if (not !sat_mode) && (!smt_logic = "") then begin
+    print_endline (cmd^": you must choose a solver to use: -sat or -smt2 (try --help)");
+    exit (get_code OTHER) end;
 
   (* SMT Mode: check if one of the available QF_? has been given after -smt2 *)
-  if (not !sat_mode) && (not (List.exists (fun x->x=(String.uppercase !smt_logic)) smt_logic_avail)) then 
+  if (not !sat_mode) && (not (List.exists (fun x->x=(String.uppercase !smt_logic)) smt_logic_avail)) then
     (print_endline (cmd^": you must specify the logic used (-smt2 logic_name) (try --help)");
      print_endline ("Example: -smt2 QF_IDL");
      exit (get_code OTHER));
 
   (* Step 3: translation *)
   if (!sat_mode) then
-    translateToSATDIMACS !input_file_path !output_file_path !output_table_file_path;
-  
+    translateToSATDIMACS !input !output !output_table;
+
   if (!smt_logic <> "") then
-    translate_to_smt2 (String.uppercase !smt_logic) !input_file_path !output_file_path;
-  
+    translate_to_smt2 (String.uppercase !smt_logic) !input !output;
+
+  close_out !output;
+  close_out !output_table;
+  close_in !input;
   exit (get_code OK)
 
 (* Quick testing main function *)
