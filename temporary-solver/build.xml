@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project default="jar" name="Minisat (java implementation)">
+	<!--
+		To use `ant` with `build.xml` (these are incremental targets),
+		just go to the directory containing `build.xml` and launch:
+			- `ant build` to build
+			- `ant jar` to make the minisat.jar
+	 -->
+	<!--
+		`ant build`
+
+		Builds all the .java files in `src`
+		and outputs `.class` files in `build`.
+	-->
+	<path id="minisat.classpath">
+	<pathelement location="build"/>
+	<pathelement location="sat4j-sat.jar"/>
+</path>
+	<target name="build">
+		<mkdir dir="bin"/>
+		<javac destdir="build" includeantruntime="false"
+			source="1.6" target="1.6">
+			<src path="src"/>
+			<classpath refid="minisat.classpath"/>
+		</javac>
+	</target>
+
+
+
+
+	<!--
+		`ant build-jar` or `ant jar`
+
+		After calling the target `build`, this target will
+		creates the `touist.jar` containing:
+			- the language files & images in `./touist-gui/resources`
+			- the .class from `./touist-gui/build`
+			- a file `manifest` containing the classpath (among others)
+
+		This target will not take care of the external binaries, e.g. touistc.
+
+		The `external/` directory and `touist.jar` must be in the same directory
+		for the program to work.
+
+		To put all external binaries and touist.jar files in a single directory
+		separated from your build tree, you can use `and dist`.
+	-->
+	<target name="jar" depends="build">
+		<jar destfile="minisat.jar" filesetmanifest="mergewithoutmain">
+			<manifest>
+				<attribute name="Main-Class" value="Minisat"/>
+				<attribute name="Class-Path" value="."/>
+				<attribute name="compress" value="no"/>
+				<attribute name="Implementation-Title" value="Minisat"/>
+				<attribute name="Implementation-Version" value=""/>
+				<attribute name="Implementation-Vendor"
+					value="Institut de Recherche en Informatique de Toulouse"/>
+			</manifest>
+			<zipfileset dir="build"/>
+			<zipfileset src= "sat4j-sat.jar"/>
+		</jar>
+	</target>
+
+</project>
