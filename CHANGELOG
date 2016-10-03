@@ -1,4 +1,4 @@
-v1.2.0 (to be released)
+v1.2.0
   - touistc: select stdin with "-" and default output to stdout
   - touistc: fixed bugs when translating to CNF; now handles correctly
     forms like `((p => q) and (q => r)) => r` and cleaned code.
