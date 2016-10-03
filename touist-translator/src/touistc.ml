@@ -163,11 +163,13 @@ let invoke_parser (text:string) (lexer:Lexing.lexbuf -> Parser.token) (buffer) :
     Parser.MenhirInterpreter.loop_handle succeed fail supplier checkpoint
 
 
-let string_of_file (input:in_channel) : string =
-  let n = in_channel_length input in
-  let text = really_input_string input n in
-      close_in input;
-      (text)
+let rec string_of_file (input:in_channel) : string =
+  let text = ref "" in
+  try
+    while true do
+      text := !text ^ (input_line input) ^ "\n"
+    done; ""
+  with End_of_file -> !text
 
 (* Main parsing/lexing function (for SAT).
  * Note: infile, outfile and tablefile must be already opened with open_in
