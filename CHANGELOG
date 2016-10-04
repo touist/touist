@@ -1,9 +1,9 @@
-v1.2.0 (to be released)
+v1.3.0 (to be released)
   - revamped syntax errors, with multi-lines errors and precise position
-    Note that many syntax errors still lack a proper message; you can help us
-    improve these messages in parser.messages
+    Note that many syntax errors still lack a proper message; some error
+	messages still you can 
+    help us improve these messages in parser.messages
   - added <=> symbol that had been forgotten at some point
-
 v1.2.0
   - touistc: select stdin with "-" and default output to stdout
   - touistc: fixed bugs when translating to CNF; now handles correctly
