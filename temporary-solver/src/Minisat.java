@@ -48,7 +48,7 @@ public class Minisat {
     //press 1 given Next Model
     //and 0 to exiting prog
     public static void main(String[] args) throws ParseFormatException, IOException, ContradictionException {
-        
+
         //Instanciate MiniSat Solver from org.sat4j.minisat.SolverFactory
         ISolver solver = SolverFactory.newDefault();
         //ModelIterator
@@ -72,23 +72,24 @@ public class Minisat {
                 System.out.println(reader.decode(problem.model()));
             }
             if(unsat)
-                System.out.println("Unsatisfiable !");
-        
+                System.err.println("Unsatisfiable !");
+                System.exit(1);
+
         //Catch Exceptions....
         } catch (FileNotFoundException e) {
-            System.out.println("Error Loading File");
+            System.err.println("Error Loading File");
             System.exit(2);
         } catch (ParseFormatException e) {
-            System.out.println("Incorrect Dimacs Content");
+            System.err.println("Incorrect Dimacs Content");
             System.exit(3);
         } catch (IOException e) {
-            System.out.println("Error StreamReader");
+            System.err.println("Error StreamReader");
             System.exit(4);
         } catch (ContradictionException e) {
-            //System.out.println("Unsatisfiable (trivial)!");
+            System.err.println("Unsatisfiable (trivial)!");
             System.exit(1);
         }catch (org.sat4j.specs.TimeoutException ex) {
-            System.out.println("Timeout Solver/Please Restart");
+            System.err.println("Timeout Solver/Please Restart");
             System.exit(6);
         }
         System.exit(0);

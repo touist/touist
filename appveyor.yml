@@ -54,7 +54,7 @@ install:
   - ps: If(-Not(Test-Path c:\wodi32)){ 7z x c:\download\wodi32.zip -oc:\ | Out-Null }
     # I download apache-ant directly from the web because `choco install ant` was re-installing
     # the jdk8 on each build, making them last much more time.
-  - ps: If(-Not(Test-Path c:\ant)){Invoke-WebRequest "http://www.us.apache.org/dist/ant/binaries/apache-ant-1.9.6-bin.zip" -OutFile c:\download\ant.zip}
+  - ps: If(-Not(Test-Path c:\ant)){Invoke-WebRequest "http://www.us.apache.org/dist/ant/binaries/apache-ant-1.9.7-bin.zip" -OutFile c:\download\ant.zip}
   - ps: If(-Not(Test-Path c:\ant)){ 7z x c:\download\ant.zip -oc:\ | Out-Null; mv c:\apache-ant* c:\ant }
   - ps: $env:Path = $env:Path + ";C:\ant\bin"
 
@@ -104,7 +104,6 @@ deploy:
     #draft: true
     #prerelease: true
     on:
-      branch: master                # release from master branch only
       appveyor_repo_tag: true       # deploy on tag push only
 
 # I set the same behaviour as for in .travis.yml:

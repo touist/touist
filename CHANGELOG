@@ -1,3 +1,11 @@
+v1.3.0 (to be released)
+  - fix touist hanging on "solve" on some unsatisfiable formulas
+v1.2.0
+  - touistc: select stdin with "-" and default output to stdout
+  - touistc: fixed bugs when translating to CNF; now handles correctly
+    forms like `((p => q) and (q => r)) => r` and cleaned code.
+v1.1.4
+  - fixed bug on expressions like (a=>b)=>c
 v1.1.3
   - added "View" menu item with zoom/unzoom latex viewer
   - ctrl-related shortcuts will now work with cmd on osx 
