@@ -1,5 +1,6 @@
 v1.3.0 (to be released)
   - fix touist hanging on "solve" on some unsatisfiable formulas
+  - fix subset(.,.) construct not displayed in latex display
 v1.2.0
   - touistc: select stdin with "-" and default output to stdout
   - touistc: fixed bugs when translating to CNF; now handles correctly
