@@ -82,6 +82,16 @@ let dummy_term_count = ref 0
 let genterm () =
   incr dummy_term_count; Term ("&" ^ (string_of_int !dummy_term_count), None)
 
+let debug = ref false (* The debug flag activated by --debug-cnf *)
+let rec indent = function 0 -> "" | i -> (indent (i-1))^"\t"
+type limit = No | Yes of int
+let print_debug (prefix:string) depth (clauses:clause list) : unit =
+  let rec string_of_clauses = function
+    | [] -> ""
+    | cur::next -> (string_of_clause cur)^", "^(string_of_clauses next)
+  in print_endline ((indent depth) ^ (string_of_int depth) ^ " " ^ prefix
+                    ^ (string_of_clauses clauses))
+
 (* [to_cnf] translates the syntaxic tree made of COr, CAnd, CImplies, CEquiv...
  * COr, CAnd and CNot; moreover, it can only be in a conjunction of clauses
  * (see a reminder of their definition above).
@@ -89,57 +99,82 @@ let genterm () =
  *     (a or not b or c) and (not a or b or d) and (d)
  * The matching abstract syntax tree (ast) is
  *     CAnd (COr a,(Cor (CNot b),c)), (CAnd (COr (COr (CNot a),b),d), d)
+ *
+ * The `depth` variable tells what is the current level of recursion and
+ * helps for debugging the translation to CNF.
+ * The `stop` boolean tells to_cnf if it should stop or continue the recursion
+ *
+ * (1) When transforming to CNF, we want to make sure that "outer" to_cnf
+ *     transformations are made before inner ones. For example, in
+ *          to_cnf (CNot (to_cnf ((a and b) => c)))
+ *     we want to limit the inner `to_cnf` expansion to let the possibily for
+ *     the outer to_cnf to "simplify" with the CNot as soon as possible.
+ *     For inner `to_cnf`, we simply use `to_cnf_once` to prevent the inner
+ *     `to_cnf` from recursing more than once.
  * *)
-let rec to_cnf (ast:clause) : clause = match ast with
-  | Top    -> Top
-  | Bottom -> Bottom
-  | Term a -> Term a
-  | CAnd (x,y) -> let (x,y) = (to_cnf x, to_cnf y) in
-    begin
-      match x,y with
-      | Top,x | x,Top     -> x
-      | Bottom,_|_,Bottom -> Bottom
-      | x,y               -> CAnd (x,y)
-    end
-  | CNot x ->
-    begin
-      match x with
-      | Top        -> Bottom
-      | Bottom     -> Top
-      | Term a     -> CNot (Term a)
-      | CNot x     -> to_cnf x
-      | CAnd (x,y) -> to_cnf (COr (CNot x, CNot y))          (* De Morgan *)
-      | COr (x,y)  -> CAnd (to_cnf (CNot x), to_cnf (CNot y)) (* De Morgan *)
-      (* For any other forms like CImplies, CEquiv or CXor: must re-run to_cnf *)
-      | _ -> to_cnf (CNot (to_cnf x))
-    end
-  | COr (x,y) -> let (x,y) = (to_cnf x, to_cnf y) in
-    begin
-      match x,y with
-      | Bottom, z | z, Bottom   -> z
-      | Top, _ | _, Top         -> Top
-      | Term a, z | z, Term a   -> push_lit (Term a) z
-      | CNot (Term a),z | z,CNot (Term a) -> push_lit (CNot (Term a)) z
-      | x,y when is_clause x && is_clause y -> COr (x, y)
-      | x,y -> (* At this point, either x or y is a conjunction
-                  => Tseytin transform (see explanations below) *)
-        let (new1, new2) = (genterm (), genterm ()) in
-        CAnd (COr (new1, new2), CAnd (push_lit (CNot new1) x,
-                                      push_lit (CNot new2) y))
-    end
-      (* Note on `COr` and the Tseytin transform:
-         When translating `x or y` into CNF and that either x or y is a
-         conjunction (= isn't a clause), we must avoid the 'natural' translation
-         that should occur when translating (1) into (2): (2) would have an
-         exponential number of clauses. Instead, we use arbitrary variables
-         created by [genterm], denoted by &1, &2... and use the Tseytin
-         transform (3) which yields a linear number of clauses.
-              (x1 and y1)  or  (x2 and y2)                                (1)
-              (x1 or x2) and (x1 or y2) and (y1 or x2) or (etc...)        (2)
-              (&1 or &2) and (not &1 or x1) and (not &1 or y1)            (3)
-                        and (not &2 or x2) and (not &2 or y2)
-      *)
-  | CImplies (x,y) -> to_cnf (COr (CNot x, y))
-  | CEquiv (x,y) -> to_cnf (CAnd (CImplies (x,y), CImplies (y,x)))
-  | CXor (x,y) -> to_cnf (CAnd (COr (x,y), COr (CNot x, CNot y)))
-  | _ -> failwith("Cnf.to_cnf failed on: " ^ (string_of_clause ast))
+let rec to_cnf depth stop (ast:clause) : clause =
+  if !debug then print_debug "in:  " depth [ast];
+  if (match stop with Yes 0 -> true | _ -> false) then ast else (* See (1) above*)
+      let to_cnf_once = to_cnf (depth+1) (match stop with Yes i->Yes (i-1) | No->Yes 1) in
+      let to_cnf = to_cnf (depth+1) (match stop with Yes i->Yes (i-1) | No->No) in
+    let cnf = begin match ast with
+    | Top    -> Top
+    | Bottom -> Bottom
+    | Term a -> Term a
+    | CAnd (x,y) -> let (x,y) = (to_cnf_once x, to_cnf_once y) in
+      begin
+        match x,y with
+        | Top,x | x,Top     -> x
+        | Bottom,_|_,Bottom -> Bottom
+        | x,y               -> CAnd (x,y)
+      end
+    | CNot x ->
+      begin
+        match x with
+        | Top        -> Bottom
+        | Bottom     -> Top
+        | Term a     -> CNot (Term a)
+        | CNot x     -> to_cnf x
+        | CAnd (x,y) -> to_cnf (COr (CNot x, CNot y))           (* De Morgan *)
+        | COr (x,y)  -> CAnd (to_cnf (CNot x), to_cnf (CNot y)) (* De Morgan *)
+        | _ -> to_cnf (CNot (to_cnf_once x)) (* See (1) above*)
+      end
+    | COr (x,y) -> if !debug then print_debug "in:  " depth [x;y];
+      let (x,y) = (to_cnf_once x, to_cnf_once y) in
+      begin
+        match x,y with
+        | Bottom, z | z, Bottom   -> z
+        | Top, _ | _, Top         -> Top
+        | Term a, z | z, Term a   -> push_lit (Term a) z
+        | CNot (Term a),z | z,CNot (Term a) -> push_lit (CNot (Term a)) z
+        | x,y when is_clause x && is_clause y -> COr (x, y)
+        | x,y -> (* At this point, either x or y is a conjunction
+                    => Tseytin transform (see explanations below) *)
+          let (new1, new2) = (genterm (), genterm ()) in
+          CAnd (COr (new1, new2), CAnd (push_lit (CNot new1) x,
+                                        push_lit (CNot new2) y))
+      end
+        (* Note on `COr` and the Tseytin transform:
+           When translating `x or y` into CNF and that either x or y is a
+           conjunction (= isn't a clause), we must avoid the 'natural' translation
+           that should occur when translating (1) into (2): (2) would have an
+           exponential number of clauses. Instead, we use arbitrary variables
+           created by [genterm], denoted by &1, &2... and use the Tseytin
+           transform (3) which yields a linear number of clauses.
+                (x1 and y1)  or  (x2 and y2)                                (1)
+                (x1 or x2) and (x1 or y2) and (y1 or x2) or (etc...)        (2)
+                (&1 or &2) and (not &1 or x1) and (not &1 or y1)            (3)
+                          and (not &2 or x2) and (not &2 or y2)
+        *)
+    | CImplies (x,y) -> to_cnf (COr (CNot x, y))
+    | CEquiv (x,y) -> to_cnf (CAnd (CImplies (x,y), CImplies (y,x)))
+    | CXor (x,y) -> to_cnf (CAnd (COr (x,y), COr (CNot x, CNot y)))
+    | _ -> failwith("Cnf.to_cnf failed on: " ^ (string_of_clause ast))
+    end in
+    if !debug then print_debug "in:  " depth [cnf];
+    cnf
+
+(* [transform_to_cnf] is the entry point  for [to_cnf] *)
+let transform_to_cnf (ast:clause) debug_mode : clause =
+  debug := debug_mode;
+  to_cnf 0 No ast

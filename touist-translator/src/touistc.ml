@@ -70,6 +70,7 @@ let use_stdin = ref false
 let output = ref stdout
 let output_table = ref stdout
 let input = ref stdin
+let debug_cnf = ref false
 
 let print_position outx lexbuf =
   let pos = lexbuf.lex_curr_p in
@@ -179,7 +180,7 @@ let translateToSATDIMACS (infile:in_channel) (outfile:out_channel) (tablefile:ou
   and buffer = ref ErrorReporting.Zero in
   let ast = invoke_parser text (lexer buffer) buffer in
     let exp = evaluate ast in
-      let c,t = Cnf.to_cnf exp |> Dimacs.to_dimacs in
+      let c,t = Cnf.transform_to_cnf exp !debug_cnf |> Dimacs.to_dimacs in
         Printf.fprintf outfile "%s" c;
         Printf.fprintf tablefile "%s" (Dimacs.string_of_table t)
 
@@ -214,7 +215,8 @@ let () =
     ));
     ("-d", Arg.Set debug, "Prints info for debugging syntax errors");
     ("--version", Arg.Set version_asked, "Display version number");
-    ("-", Arg.Set use_stdin,"reads from stdin instead of file")
+    ("-", Arg.Set use_stdin,"reads from stdin instead of file");
+    ("--debug-cnf", Arg.Set debug_cnf,"Print step by step CNF transformation");
   ]
   in
   let usage = "TouistL compiles files from the TouIST Language \
