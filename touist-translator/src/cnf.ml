@@ -82,9 +82,13 @@ let dummy_term_count = ref 0
 let genterm () =
   incr dummy_term_count; Term ("&" ^ (string_of_int !dummy_term_count), None)
 
+
 let debug = ref false (* The debug flag activated by --debug-cnf *)
+
+(* [indent] creates a string that contains N indentations *)
 let rec indent = function 0 -> "" | i -> (indent (i-1))^"\t"
-type limit = No | Yes of int
+
+(* Just a function for printing debug info in [to_cnf] *)
 let print_debug (prefix:string) depth (clauses:clause list) : unit =
   let rec string_of_clauses = function
     | [] -> ""
@@ -92,6 +96,10 @@ let print_debug (prefix:string) depth (clauses:clause list) : unit =
     | cur::next -> (string_of_clause cur)^", "^(string_of_clauses next)
   in print_endline ((indent depth) ^ (string_of_int depth) ^ " " ^ prefix
                     ^ (string_of_clauses clauses))
+
+(* `strop` is a type is used in [to_cnf] in order to stop it after a number of
+   recursions. See (1) below *)
+type stop = No | Yes of int
 
 (* [to_cnf] translates the syntaxic tree made of COr, CAnd, CImplies, CEquiv...
  * COr, CAnd and CNot; moreover, it can only be in a conjunction of clauses
@@ -113,11 +121,11 @@ let print_debug (prefix:string) depth (clauses:clause list) : unit =
  *     For inner `to_cnf`, we simply use `to_cnf_once` to prevent the inner
  *     `to_cnf` from recursing more than once.
  * *)
-let rec to_cnf depth stop (ast:clause) : clause =
+let rec to_cnf depth (stop:stop) (ast:clause) : clause =
   if !debug then print_debug "in:  " depth [ast];
   if (match stop with Yes 0 -> true | _ -> false) then ast else (* See (1) above*)
-      let to_cnf_once = to_cnf (depth+1) (match stop with Yes i->Yes (i-1) | No->Yes 1) in
-      let to_cnf = to_cnf (depth+1) (match stop with Yes i->Yes (i-1) | No->No) in
+    let to_cnf_once = to_cnf (depth+1) (match stop with Yes i->Yes (i-1) | No->Yes 1) in
+    let to_cnf = to_cnf (depth+1) (match stop with Yes i->Yes (i-1) | No->No) in
     let cnf = begin match ast with
     | Top    -> Top
     | Bottom -> Bottom
