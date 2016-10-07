@@ -3990,6 +3990,27 @@ prog: BEGIN SETS VAR XOR
 ## In state 3, spurious reduction of production var_decl -> VAR 
 ##
 
+
+#####################################
+## TO FINISH : parser_messages 
+##
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+prog: BEGIN FORMULA IF POWERSET LPAREN VAR WHEN 
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+prog: BEGIN FORMULA IF POWERSET LPAREN XOR
+
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+prog: BEGIN FORMULA IF POWERSET XOR 
+#####################################
+
+
 An affectation sign '=' is expected here.
 
 prog: BEGIN SETS XOR 
