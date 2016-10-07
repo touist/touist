@@ -2,6 +2,9 @@
 # which creates the ./configure + Makefile for the project.
 # Running `oasis setup` is only required when _oasis is modified.
 #
+# Note that menhirLib is required to be >= 20150118 because the feature
+# "incremental API" has been introduced at that version.
+#
 # To install oasis: `opam install oasis`
 #
 
@@ -14,9 +17,10 @@ Authors:      Olivier Lezaud
 License:      LGPL
 Plugins:      META (0.4), DevFiles (0.4)
 
+BuildDepends: menhirLib (>= 20150118), fileutils (>= 0.4.0), str
 BuildType: ocamlbuild (0.4)
 AlphaFeatures: ocamlbuild_more_args
-XOCamlbuildExtraArgs: -use-menhir -pkg fileutils
+XOCamlbuildExtraArgs: -use-menhir -menhir \"menhir --table --inspection -v -la 2\"
 PreBuildCommand: sh generate-version-number.sh
 
 Executable touistc
@@ -24,3 +28,9 @@ Executable touistc
   BuildTools:     ocamlbuild
   CompiledObject: best
   MainIs:         touistc.ml
+
+SourceRepository touist
+  Type:           git
+  Location:       https://github.com/touist/touist.git
+  Browser:        https://github.com/touist/touist
+  Subdir:         touist-translator

@@ -1,4 +1,9 @@
 v1.3.0 (to be released)
+  - revamped syntax errors, with multi-lines errors and precise position
+    Note that many syntax errors still lack a proper message; some error
+    messages still you can 
+    help us improve these messages in parser.messages
+  - added <=> symbol that had been forgotten at some point
   - fix touist hanging on "solve" on some unsatisfiable formulas
 v1.2.0
   - touistc: select stdin with "-" and default output to stdout
