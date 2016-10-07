@@ -121,7 +121,7 @@ let rec to_cnf depth stop (ast:clause) : clause =
     | Top    -> Top
     | Bottom -> Bottom
     | Term a -> Term a
-    | CAnd (x,y) -> let (x,y) = (to_cnf_once x, to_cnf_once y) in
+    | CAnd (x,y) -> let (x,y) = (to_cnf x, to_cnf y) in
       begin
         match x,y with
         | Top,x | x,Top     -> x
@@ -140,7 +140,7 @@ let rec to_cnf depth stop (ast:clause) : clause =
         | _ -> to_cnf (CNot (to_cnf_once x)) (* See (1) above*)
       end
     | COr (x,y) -> if !debug then print_debug "in:  " depth [x;y];
-      let (x,y) = (to_cnf_once x, to_cnf_once y) in
+      let (x,y) = (to_cnf x, to_cnf y) in
       begin
         match x,y with
         | Bottom, z | z, Bottom   -> z
