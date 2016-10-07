@@ -88,6 +88,7 @@ type limit = No | Yes of int
 let print_debug (prefix:string) depth (clauses:clause list) : unit =
   let rec string_of_clauses = function
     | [] -> ""
+    | cur::[] -> string_of_clause cur
     | cur::next -> (string_of_clause cur)^", "^(string_of_clauses next)
   in print_endline ((indent depth) ^ (string_of_int depth) ^ " " ^ prefix
                     ^ (string_of_clauses clauses))
@@ -139,7 +140,7 @@ let rec to_cnf depth stop (ast:clause) : clause =
         | COr (x,y)  -> CAnd (to_cnf (CNot x), to_cnf (CNot y)) (* De Morgan *)
         | _ -> to_cnf (CNot (to_cnf_once x)) (* See (1) above*)
       end
-    | COr (x,y) -> if !debug then print_debug "in:  " depth [x;y];
+    | COr (x,y) -> if !debug then print_debug "COr: " depth [x;y];
       let (x,y) = (to_cnf x, to_cnf y) in
       begin
         match x,y with
@@ -171,7 +172,7 @@ let rec to_cnf depth stop (ast:clause) : clause =
     | CXor (x,y) -> to_cnf (CAnd (COr (x,y), COr (CNot x, CNot y)))
     | _ -> failwith("Cnf.to_cnf failed on: " ^ (string_of_clause ast))
     end in
-    if !debug then print_debug "in:  " depth [cnf];
+    if !debug then print_debug "out: " depth [cnf];
     cnf
 
 (* [transform_to_cnf] is the entry point  for [to_cnf] *)
