@@ -5,7 +5,7 @@ let rec string_of_exp = function
   | Float  x -> string_of_float x
   | Bool   x -> string_of_bool x
   | Var (x,None)   -> x
-  | Var (x,Some y) -> x ^ "(" ^ (string_of_exp_list ", " y) ^ ")" 
+  | Var (x,Some y) -> x ^ "(" ^ (string_of_exp_list ", " y) ^ ")"
   | Clause x -> string_of_clause x
   | Set    x -> string_of_set x
   | Set_decl x -> "<set-decl>"
@@ -63,12 +63,12 @@ and string_of_clause = function
   | CVar (x,Some y) -> x ^ "(" ^ (string_of_exp_list ", " y) ^ ")"
   | Term (x,None)   -> x
   | Term (x,Some y) -> x ^ "(" ^ (string_of_exp_list ", " y) ^ ")"
-  | CNot x -> "not " ^ (string_of_clause x)
+  | CNot x -> "(not " ^ (string_of_clause x) ^ ")"
   | CAnd     (x,y) -> "(" ^ (string_of_clause x) ^ " and " ^ (string_of_clause y) ^ ")"
   | COr      (x,y) -> "(" ^ (string_of_clause x) ^ " or "  ^ (string_of_clause y) ^ ")"
-  | CXor     (x,y) -> (string_of_clause x) ^ " xor " ^ (string_of_clause y)
-  | CImplies (x,y) -> (string_of_clause x) ^ " => "  ^ (string_of_clause y)
-  | CEquiv   (x,y) -> (string_of_clause x) ^ " <=> " ^ (string_of_clause y)
+  | CXor     (x,y) -> "(" ^ (string_of_clause x) ^ " xor " ^ (string_of_clause y) ^ ")"
+  | CImplies (x,y) -> "(" ^ (string_of_clause x) ^ " => "  ^ (string_of_clause y) ^ ")"
+  | CEquiv   (x,y) -> "(" ^ (string_of_clause x) ^ " <=> " ^ (string_of_clause y) ^ ")"
   | Bigand (x,y,None,z) ->
       "bigand " ^ (String.concat "," x)
        ^ " in " ^ (string_of_exp_list "," y)
@@ -122,5 +122,3 @@ and string_of_floatset s =
 
 and string_of_strset s =
   "[" ^ (String.concat ", " (StringSet.elements s)) ^ "]"
-
-
