@@ -6,6 +6,10 @@ v1.3.0 (to be released)
   - added <=> symbol that had been forgotten at some point
   - fix touist hanging on "solve" on some unsatisfiable formulas
   - fix subset(.,.) construct not displayed in latex display
+  - touistc: fixed bug with `not((p => p) => (q => q))` that should be
+    unsat; it was related to CNF expansion happening in inner -> outer
+    instead of outer -> inner
+  - touistc: added --debug-cnf option
 v1.2.0
   - touistc: select stdin with "-" and default output to stdout
   - touistc: fixed bugs when translating to CNF; now handles correctly
