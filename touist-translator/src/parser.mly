@@ -7,8 +7,8 @@
  * https://github.com/touist/touist
  *
  * Copyright Institut de Recherche en Informatique de Toulouse, France
- * This program and the accompanying materials are made available 
- * under the terms of the GNU Lesser General Public License (LGPL) 
+ * This program and the accompanying materials are made available
+ * under the terms of the GNU Lesser General Public License (LGPL)
  * version 2.1 which accompanies this distribution, and is available at
  * http://www.gnu.org/licenses/lgpl-2.1.html
  *)
@@ -46,12 +46,12 @@
  * be reduced, e.g. it tells the parser to reduce * before +.
  *
  * Note that the precedence rules apply from bottom to top:
- * the top element will be the less prioritized   
+ * the top element will be the less prioritized
  *
  * %left: e.g: a PLUS b TIMES -> a PLUS b
- *   The precedence rule applies from left to right, 
- *       
- * %right: 
+ *   The precedence rule applies from left to right,
+ *
+ * %right:
  *   The precedence rule applies from right to left
  *
  * %noassoc, e.g. NOT(a)
@@ -71,19 +71,19 @@
 %left MOD
 %nonassoc high_precedence (* Highest priority on precedence *)
 
-(* This wierd [high_precedence] is not a TERMINAL, not a 
- * production rule... It is an arbitrary name that allows 
- * to give precedence indications on production rules. 
+(* This wierd [high_precedence] is not a TERMINAL, not a
+ * production rule... It is an arbitrary name that allows
+ * to give precedence indications on production rules.
  * Ex:
  *     clause: SUB clause %prec high_precedence
  * will give this production rule a predecence given by
- * where the 
- *     %nonassoc high_precedence 
+ * where the
+ *     %nonassoc high_precedence
  * is written. Here, we want this production rule to be
  * reduced before any other one because it is the "minus" sign,
  * ex:
  *     -3.905
- * and, like 
+ * and, like
  *     not(a)
  * the minus sign MUST be reduced as fast as possible. *)
 
@@ -105,16 +105,16 @@
      $0 = end
      $1 = c
      $2 = ,    etc...
-   because we were trying to reduce "b (RPAREN | COMMA)". 
-   There is no way to display the "a" which was the actuall important 
+   because we were trying to reduce "b (RPAREN | COMMA)".
+   There is no way to display the "a" which was the actuall important
    information because we don't actually know on which $i it is.
-   
-   %on_error_reduce will actually tell the parser not to fail immediately 
+
+   %on_error_reduce will actually tell the parser not to fail immediately
    and let the "caller rule" that was calling (1). Here, (1) was called
-   twice recursively. The failing rule will hence be 
+   twice recursively. The failing rule will hence be
 
      TERM LPAREN separated_nonempty_list(COMMA,term_or_exp) . RPAREN (2)
-     
+
    Hence we are sure that $1 will give b,c and $3 will give "a" !
 *)
 
@@ -133,13 +133,13 @@ var_decl:
   | VAR { ($1, None) }
   | VAR LPAREN separated_nonempty_list(COMMA, exp) RPAREN { ($1, Some $3) }
   | VAR LPAREN separated_nonempty_list(COMMA, TERM) RPAREN
-    { ($1, Some (List.map (fun e -> Clause (Term (e,None))) $3)) } 
+    { ($1, Some (List.map (fun e -> Clause (Term (e,None))) $3)) }
 
 affect:
   | var_decl AFFECT exp { Affect ($1, $3) }
 
 exp:
-  (* This parametrized rule allows to "regroup" every "clause OPERATOR clause" 
+  (* This parametrized rule allows to "regroup" every "clause OPERATOR clause"
     under the same rule. I refactored the explicit rules to that form  to try to
     have clearer messages in parser.messages *)
   | LPAREN exp RPAREN { $2 }
@@ -184,7 +184,7 @@ clause:
   (* Conflict between two rules when reading
    *           "TERM LPAREN exp RPAREN"
    *  clause ->      LPAREN exp RPAREN  <- mandatory for specifing order of clauses
-   *  clause -> TERM LPAREN exp RPAREN 
+   *  clause -> TERM LPAREN exp RPAREN
    * are conflicting with each other *)
   | LPAREN clause RPAREN { $2 }
   | INT   { CInt   $1 }
@@ -240,7 +240,7 @@ clause:
   | IF exp THEN clause ELSE clause END { CIf ($2, $4, $6) }
 
 (* Warning: the two rules
-     var_decl -> TERM 
+     var_decl -> TERM
      exp -> var_decl
    are doing the same thing as term_or_exp *)
 term_or_exp:
@@ -248,7 +248,7 @@ term_or_exp:
   | exp { $1 }
 
 set_decl:
-  | LBRACK RBRACK { [] } 
+  | LBRACK RBRACK { [] }
   | LBRACK separated_nonempty_list(COMMA, exp) RBRACK { $2 }
   | LBRACK separated_nonempty_list(COMMA, TERM) RBRACK
   { List.map (fun x -> Clause (Term (x,None))) $2 }

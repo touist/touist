@@ -9,7 +9,7 @@ end
 
 module Make (Ord : Set.OrderedType) = struct
   include Set.Make(Ord)
-  
+
   let of_list =
     List.fold_left (fun acc x -> add x acc) empty
 

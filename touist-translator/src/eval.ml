@@ -8,8 +8,8 @@
  * https://github.com/touist/touist
  *
  * Copyright Institut de Recherche en Informatique de Toulouse, France
- * This program and the accompanying materials are made available 
- * under the terms of the GNU Lesser General Public License (LGPL) 
+ * This program and the accompanying materials are made available
+ * under the terms of the GNU Lesser General Public License (LGPL)
  * version 2.1 which accompanies this distribution, and is available at
  * http://www.gnu.org/licenses/lgpl-2.1.html
  *)
@@ -20,9 +20,9 @@ open Pprint
 exception TypeError     of string
 exception ArgumentError of string
 
-(* This error informs the user that he tried to use a variable, e.g. $a 
+(* This error informs the user that he tried to use a variable, e.g. $a
  * but that variable has not been declared in the set section *)
-exception UnknownVar    of string 
+exception UnknownVar    of string
 
 (* Return the list of integers between min and max
  * with an increment of step
@@ -132,7 +132,7 @@ and eval_prog exp env =
 
 and eval_affect exp env =
   match exp with
-  | Affect (x,y) -> 
+  | Affect (x,y) ->
       Hashtbl.replace extenv (expand_var_name x env) (eval_exp y env)
 
 and eval_exp exp env =

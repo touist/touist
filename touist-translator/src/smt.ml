@@ -1,5 +1,5 @@
 (*
- * smt.ml: processes the "semantically correct" abstract syntaxic tree 
+ * smt.ml: processes the "semantically correct" abstract syntaxic tree
  *         given by [eval] and produces a string in SMT-LIB2 format.
  *         [to_smt2] is the main function.
  *
@@ -9,8 +9,8 @@
  * https://github.com/touist/touist
  *
  * Copyright Institut de Recherche en Informatique de Toulouse, France
- * This program and the accompanying materials are made available 
- * under the terms of the GNU Lesser General Public License (LGPL) 
+ * This program and the accompanying materials are made available
+ * under the terms of the GNU Lesser General Public License (LGPL)
  * version 2.1 which accompanies this distribution, and is available at
  * http://www.gnu.org/licenses/lgpl-2.1.html
  *)
@@ -21,7 +21,7 @@ let to_smt2 logic formula =
   let vtbl = Hashtbl.create 10 in
   let out  = Buffer.create 1000 in
   Buffer.add_string out ("(set-logic " ^ logic ^ ")\n");
- 
+
   let write_to_buf = Buffer.add_string out in
 
   let add_var name typ =
@@ -35,14 +35,14 @@ let to_smt2 logic formula =
   let decl_assert body   = "(assert " ^ body ^ ")\n" in
   let decl_bin_op op x y = "(" ^ op ^ " " ^ x ^ " " ^ y ^ ")" in
   let decl_un_op  op x   = "(" ^ op ^ " " ^ x ^ ")" in
-  
+
   let sanitize_var name =
     String.map (fun c ->
       if (c = '(') ||
          (c = ')') ||
          (c = ',') || (c = ' ') then '_' else c) name
   in
-  
+
   let rec term_expr = function
     | Term (_,None)
     | CNeg (Term _)
@@ -128,13 +128,13 @@ let to_smt2 logic formula =
     | CXor     (x,y)
     | CImplies (x,y)
     | CEquiv   (x,y) -> gen_var "Bool" x; gen_var "Bool" y
-    | CAdd              (x, CInt _) 
-    | CAdd              (CInt _, x) 
-    | CSub              (x, CInt _) 
-    | CSub              (CInt _, x) 
-    | CMul              (x, CInt _) 
-    | CMul              (CInt _, x) 
-    | CDiv              (x, CInt _) 
+    | CAdd              (x, CInt _)
+    | CAdd              (CInt _, x)
+    | CSub              (x, CInt _)
+    | CSub              (CInt _, x)
+    | CMul              (x, CInt _)
+    | CMul              (CInt _, x)
+    | CDiv              (x, CInt _)
     | CDiv              (CInt _, x)
     | CEqual            (x, CInt _)
     | CEqual            (CInt _, x)
@@ -157,13 +157,13 @@ let to_smt2 logic formula =
           | _ -> failwith "not a term exp"
         in
         if term_expr x then go x else ()
-    | CAdd              (x, CFloat _) 
-    | CAdd              (CFloat _, x) 
-    | CSub              (x, CFloat _) 
-    | CSub              (CFloat _, x) 
-    | CMul              (x, CFloat _) 
-    | CMul              (CFloat _, x) 
-    | CDiv              (x, CFloat _) 
+    | CAdd              (x, CFloat _)
+    | CAdd              (CFloat _, x)
+    | CSub              (x, CFloat _)
+    | CSub              (CFloat _, x)
+    | CMul              (x, CFloat _)
+    | CMul              (CFloat _, x)
+    | CDiv              (x, CFloat _)
     | CDiv              (CFloat _, x)
     | CEqual            (x, CFloat _)
     | CEqual            (CFloat _, x)
@@ -186,10 +186,10 @@ let to_smt2 logic formula =
           | _ -> failwith "not a term exp"
         in
         if term_expr x then go x else ()
-    | CAdd              (x, y) 
-    | CSub              (x, y) 
-    | CMul              (x, y) 
-    | CDiv              (x, y) 
+    | CAdd              (x, y)
+    | CSub              (x, y)
+    | CMul              (x, y)
+    | CDiv              (x, y)
     | CEqual            (x, y)
     | CNot_equal        (x, y)
     | CLesser_than      (x, y)
@@ -253,12 +253,12 @@ let to_smt2 logic formula =
     | CEquiv   (x, y) -> gen_var "Bool" x; gen_var "Bool" y(*; CEquiv (x, y)*)
     | _ -> failwith "parse error"
   in
-  
+
   let rec write = function
     | Top                        -> "true"
     | Bottom                     -> "false"
     | Term              (x,None) -> sanitize_var x
-    | CInt x -> 
+    | CInt x ->
         if x < 0 then
           "(- " ^ string_of_int (-x) ^ ")"
         else
@@ -290,7 +290,7 @@ let to_smt2 logic formula =
     | CGreater_or_equal (x,y)    -> decl_bin_op ">=" (write x) (write y)
     | _ -> failwith "error smt write"
   in
-  
+
   (*gen_var formula;*)
   (*gen formula;*)
   parse formula;

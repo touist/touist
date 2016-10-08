@@ -7,8 +7,8 @@
  * https://github.com/touist/touist
  *
  * Copyright Institut de Recherche en Informatique de Toulouse, France
- * This program and the accompanying materials are made available 
- * under the terms of the GNU Lesser General Public License (LGPL) 
+ * This program and the accompanying materials are made available
+ * under the terms of the GNU Lesser General Public License (LGPL)
  * version 2.1 which accompanies this distribution, and is available at
  * http://www.gnu.org/licenses/lgpl-2.1.html
  *)
@@ -80,16 +80,16 @@ and clause =
   | CInt              of int
   | CFloat            of float
   | CNeg              of clause
-  | CAdd              of clause * clause 
-  | CSub              of clause * clause 
-  | CMul              of clause * clause 
-  | CDiv              of clause * clause 
-  | CEqual            of clause * clause 
-  | CNot_equal        of clause * clause 
-  | CLesser_than      of clause * clause 
-  | CLesser_or_equal  of clause * clause 
-  | CGreater_than     of clause * clause 
-  | CGreater_or_equal of clause * clause 
+  | CAdd              of clause * clause
+  | CSub              of clause * clause
+  | CMul              of clause * clause
+  | CDiv              of clause * clause
+  | CEqual            of clause * clause
+  | CNot_equal        of clause * clause
+  | CLesser_than      of clause * clause
+  | CLesser_or_equal  of clause * clause
+  | CGreater_than     of clause * clause
+  | CGreater_or_equal of clause * clause
   | Top
   | Bottom
   | Term     of var

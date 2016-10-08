@@ -7,8 +7,8 @@
  * https://github.com/touist/touist
  *
  * Copyright Institut de Recherche en Informatique de Toulouse, France
- * This program and the accompanying materials are made available 
- * under the terms of the GNU Lesser General Public License (LGPL) 
+ * This program and the accompanying materials are made available
+ * under the terms of the GNU Lesser General Public License (LGPL)
  * version 2.1 which accompanies this distribution, and is available at
  * http://www.gnu.org/licenses/lgpl-2.1.html
  *
@@ -16,19 +16,19 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  *
  * Some of the code has been inspired by cparser/Lexer.mll contained in
  * the project AbsInt/CompCert. Here are the terms:
  *
- * The Compcert verified compiler                      
- * Jacques-Henri Jourdan, INRIA Paris-Rocquencourt            
- * Copyright Institut National de Recherche en Informatique et en     
- * Automatique.  All rights reserved.  This file is distributed       
- * under the terms of the GNU General Public License as published by  
- * the Free Software Foundation, either version 2 of the License, or  
- * (at your option) any later version.  This file is also distributed 
- * under the terms of the INRIA Non-Commercial License Agreement. 
+ * The Compcert verified compiler
+ * Jacques-Henri Jourdan, INRIA Paris-Rocquencourt
+ * Copyright Institut National de Recherche en Informatique et en
+ * Automatique.  All rights reserved.  This file is distributed
+ * under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 2 of the License, or
+ * (at your option) any later version.  This file is also distributed
+ * under the terms of the INRIA Non-Commercial License Agreement.
  *)
 
 {
@@ -42,7 +42,7 @@
       { pos with pos_bol  = lexbuf.lex_curr_pos;
                  pos_lnum = pos.pos_lnum + 1}
 
-  (* I added this hashtable to be 100% sure that no [ident] will be using a 
+  (* I added this hashtable to be 100% sure that no [ident] will be using a
   reserved keyword. Inspired from
   http://www.seas.upenn.edu/~cis120/16sp/ocaml-4.01-manual/lexyacc.html#sec286 *)
   let reserved_keywords = Hashtbl.create 70
