@@ -22,6 +22,7 @@
 %token <bool> BOOL
 %token <string> VAR
 %token <string> TERM
+%token <string> TUPLE
 %token ADD SUB MUL DIV MOD SQRT TOINT TOFLOAT
 %token AND OR XOR IMPLIES EQUIV NOT
 %token EQUAL NOTEQUAL LE LT GE GT
@@ -154,9 +155,9 @@ exp:
   | exp MUL exp { Mul ($1, $3) }
   | exp DIV exp { Div ($1, $3) }
   | exp MOD exp { Mod ($1, $3) }
-  | SQRT    LPAREN exp RPAREN { Sqrt     $3 }
-  | TOINT   LPAREN exp RPAREN { To_int   $3 }
-  | TOFLOAT LPAREN exp RPAREN { To_float $3 }
+  | SQRT    (*LPAREN*) x=exp RPAREN { Sqrt     x }
+  | TOINT   (*LPAREN*) x=exp RPAREN { To_int   x }
+  | TOFLOAT (*LPAREN*) x=exp RPAREN { To_float x }
   | exp AND     exp { And     ($1, $3) }
   | exp OR      exp { Or      ($1, $3) }
   | exp XOR     exp { Xor     ($1, $3) }
@@ -170,12 +171,12 @@ exp:
   | exp GT       exp { Greater_than     ($1, $3) }
   | exp GE       exp { Greater_or_equal ($1, $3) }
   | exp IN exp { In ($1, $3) }
-  | UNION LPAREN exp COMMA exp RPAREN { Union ($3, $5) }
-  | INTER LPAREN exp COMMA exp RPAREN { Inter ($3, $5) }
-  | DIFF  LPAREN exp COMMA exp RPAREN { Diff  ($3, $5) }
-  | CARD  LPAREN exp RPAREN { Card  $3 }
-  | EMPTY LPAREN exp RPAREN { Empty $3 }
-  | SUBSET LPAREN exp COMMA exp RPAREN { Subset ($3, $5) }
+  | UNION (*LPAREN*) x=exp COMMA y=exp RPAREN { Union (x, y) }
+  | INTER (*LPAREN*) x=exp COMMA y=exp RPAREN { Inter (x, y) }
+  | DIFF (*LPAREN*) x=exp COMMA y=exp RPAREN { Diff  (x, y) }
+  | CARD  (*LPAREN*) x=exp RPAREN { Card  x }
+  | EMPTY (*LPAREN*) x=exp RPAREN { Empty x }
+  | SUBSET (*LPAREN*) x=exp COMMA y=exp RPAREN { Subset (x, y) }
   | LBRACK exp RANGE exp RBRACK { Range ($2, $4) }
   | IF exp THEN exp ELSE exp END { If ($2, $4, $6) }
 
@@ -218,17 +219,17 @@ clause:
      We don't know if it should be understood as
         ( a ) ( b )   => two separate clauses
         a(b)          => a tuple-term with b as the tuple index *)
-  | TERM LPAREN separated_nonempty_list(COMMA, term_or_exp) RPAREN
-      { Term ($1, Some $3) }
+  | t=TUPLE (*LPAREN*) l=separated_nonempty_list(COMMA, term_or_exp) RPAREN
+      { Term (t, Some l) }
   | NOT clause { CNot $2 }
   | clause AND     clause { CAnd     ($1, $3) }
   | clause OR      clause { COr      ($1, $3) }
   | clause XOR     clause { CXor     ($1, $3) }
   | clause IMPLIES clause { CImplies ($1, $3) }
   | clause EQUIV   clause { CEquiv   ($1, $3) }
-  | EXACT   LPAREN exp COMMA exp RPAREN { Exact   ($3, $5) }
-  | ATLEAST LPAREN exp COMMA exp RPAREN { Atleast ($3, $5) }
-  | ATMOST  LPAREN exp COMMA exp RPAREN { Atmost  ($3, $5) }
+  | EXACT (*LPAREN*) x=exp COMMA y=exp RPAREN { Exact   (x, y) }
+  | ATLEAST (*LPAREN*) x=exp COMMA y=exp RPAREN { Atleast (x, y) }
+  | ATMOST (*LPAREN*) x=exp COMMA y=exp RPAREN { Atmost  (x, y) }
   | BIGAND separated_nonempty_list(COMMA,VAR) IN separated_nonempty_list(COMMA,exp) COLON clause END
   { Bigand ($2, $4, None, $6) }
   | BIGAND separated_nonempty_list(COMMA,VAR) IN separated_nonempty_list(COMMA,exp) WHEN exp COLON clause END
