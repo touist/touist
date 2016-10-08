@@ -60,7 +60,6 @@ let smt_logic_avail = ["QF_IDL";"QF_LIA";"QF_LRA";"QF_RDL"]
 
 let sat_mode = ref false
 let version_asked = ref false
-let debug = ref false
 let smt_logic = ref ""
 let input_file_path = ref ""
 let output_file_path = ref ""
@@ -71,6 +70,7 @@ let output = ref stdout
 let output_table = ref stdout
 let input = ref stdin
 let debug_cnf = ref false
+let debug_syntax = ref false
 
 let print_position outx lexbuf =
   let pos = lexbuf.lex_curr_p in
@@ -156,7 +156,7 @@ let invoke_parser (text:string) (lexer:Lexing.lexbuf -> Parser.token) (buffer) :
   and supplier = Parser.MenhirInterpreter.lexer_lexbuf_to_supplier lexer lexbuf
   and succeed ast = ast
   and fail checkpoint =
-      Printf.fprintf stderr "%s" (ErrorReporting.report text !buffer checkpoint !debug);
+      Printf.fprintf stderr "%s" (ErrorReporting.report text !buffer checkpoint !debug_syntax);
       exit (get_code COMPILE_WITH_LINE_NUMBER_ERROR)
   in
     Parser.MenhirInterpreter.loop_handle succeed fail supplier checkpoint
@@ -211,9 +211,10 @@ let () =
         QF_LRA (not documented)
     See http://smtlib.cs.uiowa.edu/logics.shtml for more info."
     ));
-    ("-d", Arg.Set debug, "Prints info for debugging syntax errors");
     ("--version", Arg.Set version_asked, "Display version number");
     ("-", Arg.Set use_stdin,"reads from stdin instead of file");
+    ("--debug-syntax", Arg.Set debug_syntax, "Print information for debugging
+    syntax errors given by parser.messages");
     ("--debug-cnf", Arg.Set debug_cnf,"Print step by step CNF transformation");
   ]
   in

@@ -1,7 +1,6 @@
 v1.3.0 (to be released)
   - touist.jar:
     - fix touist hanging on "solve" on some unsatisfiable formulas
-    - fix touist hanging on "solve" on some unsatisfiable formulas
     - fix subset(.,.) construct not displayed in latex display
   - touistc:
     - now possible to have empty sets or formula block
@@ -17,7 +16,8 @@ v1.3.0 (to be released)
     - fixed bug with `not((p => p) => (q => q))` that should be
       unsat; it was related to CNF expansion happening in inner -> outer
       instead of outer -> inner
-    - added --debug-cnf option
+    - added --debug-cnf option for debugging cnf.ml transformations
+    - added --debug-syntax option for debugging parser.messages messages
 v1.2.0
   - touistc: select stdin with "-" and default output to stdout
   - touistc: fixed bugs when translating to CNF; now handles correctly
