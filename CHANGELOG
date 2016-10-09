@@ -1,6 +1,8 @@
 v1.3.1
   - touistc:
     - fixed `a (b)` recognized as `a(b)` instead of `a and b`
+  - gui:
+    - select the system language automatically
 v1.3.0
   - touist.jar:
     - fix touist hanging on "solve" on some unsatisfiable formulas
