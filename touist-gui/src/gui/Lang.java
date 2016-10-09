@@ -41,13 +41,18 @@ public class Lang {
 
     public Lang(Locale language){
         initSupportedLanguages();
-        this.language = language;
-        translation = ResourceBundle.getBundle(supportedLanguages.get(language));
+        setLanguage(language);
     }
     
     public void setLanguage(Locale language){
         this.language = language;
-        translation = ResourceBundle.getBundle(supportedLanguages.get(language));
+        System.out.println(language.toString() + Locale.ENGLISH.toString());
+        try {
+        	translation = ResourceBundle.getBundle(supportedLanguages.get(language));
+        } catch(Exception e)
+        {
+        	translation = ResourceBundle.getBundle(supportedLanguages.get(Locale.ENGLISH));
+        }
     }
 
     public String getWord(String keyword){
