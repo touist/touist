@@ -46,7 +46,6 @@ public class Lang {
     
     public void setLanguage(Locale language){
         this.language = language;
-        System.out.println(language.toString() + Locale.ENGLISH.toString());
         try {
         	translation = ResourceBundle.getBundle(supportedLanguages.get(language));
         } catch(Exception e)
@@ -78,6 +77,7 @@ public class Lang {
         supportedLanguages = new HashMap<Locale,String>();
         supportedLanguages.put(Locale.ENGLISH, "lang.en_US"); // "lang" is the package
         supportedLanguages.put(Locale.FRENCH, "lang.fr_FR");
+        supportedLanguages.put(Locale.FRANCE, "lang.fr_FR");
     }
     
     public static final String FRAME_TITLE = "MainFrame.title";
