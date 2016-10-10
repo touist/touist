@@ -193,9 +193,7 @@ Comment     = ";;"[^\n]*
 
    
 	/* Keywords */   
-	"begin" |   
-	"sets" |   
-	"formula" |
+	"data" |   
 	"if" |
 	"then" |
 	"else"  |
