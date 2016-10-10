@@ -35,10 +35,8 @@ Comment     = ";;"[^\n]*
 
 %%
 
-	"begin"			{return symbol(sym.BEGIN); }
+	"data"			{ return symbol(sym.DATA); }
 	"end"			{ return symbol(sym.END); }
-	"sets"			{ return symbol(sym.SETS); }
-	"formula"		{ return symbol(sym.FORMULA); }
 	"if"			{ return symbol(sym.IF); }
 	"then"			{ return symbol(sym.THEN); }
 	"else"			{ return symbol(sym.ELSE); }
