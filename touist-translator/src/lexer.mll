@@ -52,14 +52,14 @@
     "sets",          SETS;
     "formula",       FORMULA;
     "in",            IN;
-    "subset",        SUBSET;
-    "empty",         EMPTY;
-    "union",         UNION;
-    "inter",         INTER;
-    "diff",          DIFF;
-    "exact",         EXACT;
-    "atmost",        ATMOST;
-    "atleast",       ATLEAST;
+    "subset(",       SUBSET;
+    "empty(",        EMPTY;
+    "union(",        UNION;
+    "inter(",        INTER;
+    "diff(",         DIFF;
+    "exact(",        EXACT;
+    "atmost(",       ATMOST;
+    "atleast(",      ATLEAST;
     "bigand",        BIGAND;
     "bigor",         BIGOR;
     "when",          WHEN;
@@ -67,9 +67,9 @@
     "Bot",           BOTTOM;
     "card",          CARD;
     "mod",           MOD;
-    "sqrt",          SQRT;
-    "int",           TOINT;
-    "float",         TOFLOAT;
+    "sqrt(",         SQRT;
+    "int(",          TOINT;
+    "float(",        TOFLOAT;
     "and",           AND;
     "or",            OR;
     "xor",           XOR;
@@ -78,7 +78,6 @@
     "then",          THEN;
     "else",          ELSE;
     "mod",           MOD;
-    "sqrt",          SQRT;
     "true",          BOOL true;
     "false",         BOOL false ]
 }
@@ -96,8 +95,6 @@ let double     = digit+ '.' digit+
 rule token = parse
   | eof            { EOF          }
   | empty+         { token lexbuf }
-  | "("            { LPAREN       }
-  | ")"            { RPAREN       }
   | "["            { LBRACK       }
   | "]"            { RBRACK       }
   | ".."           { RANGE        }
@@ -116,12 +113,16 @@ rule token = parse
   | ">="           { GE           }
   | "="            { AFFECT       }
   | ":"            { COLON        }
-
-  | '$'(var as v)  { VAR ("$" ^ v) }
+  | ")"            { RPAREN       }
+(*| '$'(var as v)'('{TUPLE_VAR ("$" ^ v)}*)
+  | '$'(var as v)  { VAR ("$" ^ v)}
     (* This rule is going to take care of both identifiers
      * and every keyword in reserved_keywords *)
+  | (ident as i)'('{ try Hashtbl.find reserved_keywords i with Not_found ->
+                     TUPLE                      (i) }
   | ident as i     { try Hashtbl.find reserved_keywords i with Not_found ->
                      TERM                       (i) }
+  | "("            { LPAREN       }
   | integer as i   { INT          (int_of_string i) }
   | double as f    { FLOAT      (float_of_string f) }
   | newline        { next_line lexbuf; token lexbuf }

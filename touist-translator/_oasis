@@ -16,16 +16,26 @@ Synopsis:     This package is a compiler to the DIMACS file format
 Authors:      Olivier Lezaud
 License:      LGPL
 Plugins:      META (0.4), DevFiles (0.4)
-
 BuildDepends: menhirLib (>= 20150118), fileutils (>= 0.4.0), str
 BuildType: ocamlbuild (0.4)
 AlphaFeatures: ocamlbuild_more_args
-XOCamlbuildExtraArgs: -use-menhir -menhir \"menhir --table --inspection -v -la 2\"
-PreBuildCommand: sh generate-version-number.sh
+
+Flag trace
+  Description: Display trace of the parser when parsing (NO WORKING)
+  Default: false
+
+XOCamlbuildExtraArgs: -use-menhir -menhir \"menhir --table --inspection -v -la 2
+#if flag(trace)
+#  XOCamlbuildExtraArgs+: --trace
+XOCamlbuildExtraArgs+: \" -pkg menhirLib,fileutils,str
+
+
+PreBuildCommand: menhir src/parser.mly --update-errors src/parser.messages > tmp && mv tmp src/parser.messages && menhir --compile-errors src/parser.messages src/parser.mly > src/parser_messages.ml && sh generate-version-number.sh
 
 Executable touistc
+  Build:          true
   Path:           src
-  BuildTools:     ocamlbuild
+  BuildTools:     ocamlbuild, git, menhir
   CompiledObject: best
   MainIs:         touistc.ml
 
