@@ -69,6 +69,7 @@ public class EditionPanel extends AbstractComponentPanel {
             }
             catch (Exception exc) {
                 System.err.println("Erreur lors de la conversion latex");
+                System.err.println(exc.toString());
             }
     }
     
