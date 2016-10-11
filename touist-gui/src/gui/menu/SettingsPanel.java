@@ -33,43 +33,43 @@ public class SettingsPanel extends AbstractComponentPanel {
         this.parent = parent;
         updateLanguage();
         
-        buttonGroup1.add(jRadioButtonSAT4J);
-        buttonGroup1.add(jRadioButtonYCES);
-        buttonGroup2.add(jRadioButtonSMTLQFLRA);
-        buttonGroup2.add(jRadioButtonSMTLQFLIA);
-        buttonGroup2.add(jRadioButtonSMTLQFRDL);
-        buttonGroup2.add(jRadioButtonSMTLQFIDL);
+        buttonGroup1.add(SAT4J);
+        buttonGroup1.add(YCES);
+        buttonGroup2.add(SMTLQFLRA);
+        buttonGroup2.add(SMTLQFLIA);
+        buttonGroup2.add(SMTLQFRDL);
+        buttonGroup2.add(SMTLQFIDL);
         
         switch(parent.getSolverSelection().getSelectedSolver()) {
             case SAT : 
-                jRadioButtonSAT4J.setSelected(true);
+                SAT4J.setSelected(true);
                 break;
             case QF_LRA : 
-                jRadioButtonYCES.setSelected(true);
-                jRadioButtonSMTLQFLRA.setSelected(true);
+                YCES.setSelected(true);
+                SMTLQFLRA.setSelected(true);
                 break;
             case QF_LIA : 
-                jRadioButtonYCES.setSelected(true);
-                jRadioButtonSMTLQFLIA.setSelected(true);
+                YCES.setSelected(true);
+                SMTLQFLIA.setSelected(true);
                 break;
             case QF_RDL : 
-                jRadioButtonYCES.setSelected(true);
-                jRadioButtonSMTLQFRDL.setSelected(true);
+                YCES.setSelected(true);
+                SMTLQFRDL.setSelected(true);
                 break;
             case QF_IDL : 
-                jRadioButtonYCES.setSelected(true);
-                jRadioButtonSMTLQFIDL.setSelected(true);
+                YCES.setSelected(true);
+                SMTLQFIDL.setSelected(true);
                 break;
             default :
         }
         updateRadioButtons();
         
-        jComboBoxLanguages.removeAllItems();
+        choiceLanguage.removeAllItems();
         for (Locale locale : parent.getLang().getSupportedLanguages()) {
-            jComboBoxLanguages.addItem(locale);
+            choiceLanguage.addItem(locale);
         }
         jComboBoxLanguagesEnabled = true; 
-        jComboBoxLanguages.setSelectedItem(parent.getLang().getLanguage());
+        choiceLanguage.setSelectedItem(parent.getLang().getLanguage());
     }
     
     private MainFrame parent = null;
@@ -80,25 +80,25 @@ public class SettingsPanel extends AbstractComponentPanel {
     public SettingsPanel() {
         initComponents();
         
-        buttonGroup1.add(jRadioButtonSAT4J);
-        buttonGroup1.add(jRadioButtonYCES);
-        buttonGroup2.add(jRadioButtonSMTLQFLRA);
-        buttonGroup2.add(jRadioButtonSMTLQFLIA);
-        buttonGroup2.add(jRadioButtonSMTLQFRDL);
-        buttonGroup2.add(jRadioButtonSMTLQFIDL);
+        buttonGroup1.add(SAT4J);
+        buttonGroup1.add(YCES);
+        buttonGroup2.add(SMTLQFLRA);
+        buttonGroup2.add(SMTLQFLIA);
+        buttonGroup2.add(SMTLQFRDL);
+        buttonGroup2.add(SMTLQFIDL);
         updateRadioButtons();
         
-        jComboBoxLanguages.removeAllItems();
+        choiceLanguage.removeAllItems();
         for (Locale locale : parent.getLang().getSupportedLanguages()) {
-            jComboBoxLanguages.addItem(locale);
+            choiceLanguage.addItem(locale);
         }
     }
     
     public void updateRadioButtons() {
-        jRadioButtonSMTLQFLRA.setEnabled(! jRadioButtonSAT4J.isSelected());
-        jRadioButtonSMTLQFLIA.setEnabled(! jRadioButtonSAT4J.isSelected());
-        jRadioButtonSMTLQFRDL.setEnabled(! jRadioButtonSAT4J.isSelected());
-        jRadioButtonSMTLQFIDL.setEnabled(! jRadioButtonSAT4J.isSelected());
+        SMTLQFLRA.setEnabled(! SAT4J.isSelected());
+        SMTLQFLIA.setEnabled(! SAT4J.isSelected());
+        SMTLQFRDL.setEnabled(! SAT4J.isSelected());
+        SMTLQFIDL.setEnabled(! SAT4J.isSelected());
         updateUI();
     }
     
@@ -114,276 +114,276 @@ public class SettingsPanel extends AbstractComponentPanel {
 
         buttonGroup1 = new javax.swing.ButtonGroup();
         buttonGroup2 = new javax.swing.ButtonGroup();
-        jTabbedPane1 = new javax.swing.JTabbedPane();
-        jPanelGeneral = new javax.swing.JPanel();
-        jLabelDefaultDirectory = new javax.swing.JLabel();
-        jTextFieldPath = new javax.swing.JTextField();
-        jButtonChangeDirectory = new javax.swing.JButton();
-        jPanelSolver = new javax.swing.JPanel();
-        jRadioButtonSAT4J = new javax.swing.JRadioButton();
-        jRadioButtonYCES = new javax.swing.JRadioButton();
-        jRadioButtonSMTLQFLRA = new javax.swing.JRadioButton();
-        jRadioButtonSMTLQFLIA = new javax.swing.JRadioButton();
-        jRadioButtonSMTLQFRDL = new javax.swing.JRadioButton();
-        jRadioButtonSMTLQFIDL = new javax.swing.JRadioButton();
-        jLabelSolver = new javax.swing.JLabel();
-        jPanelLanguage = new javax.swing.JPanel();
-        jLabelLanguage = new javax.swing.JLabel();
-        jComboBoxLanguages = new javax.swing.JComboBox();
+        tabs = new javax.swing.JTabbedPane();
+        generalSettings = new javax.swing.JPanel();
+        labelDefaultDirectory = new javax.swing.JLabel();
+        pathDefaultDirectory = new javax.swing.JTextField();
+        changeDefaultDirectory = new javax.swing.JButton();
+        solverSettings = new javax.swing.JPanel();
+        SAT4J = new javax.swing.JRadioButton();
+        YCES = new javax.swing.JRadioButton();
+        SMTLQFLRA = new javax.swing.JRadioButton();
+        SMTLQFLIA = new javax.swing.JRadioButton();
+        SMTLQFRDL = new javax.swing.JRadioButton();
+        SMTLQFIDL = new javax.swing.JRadioButton();
+        chooseSolverText = new javax.swing.JLabel();
+        languageSettings = new javax.swing.JPanel();
+        chooseLanguageText = new javax.swing.JLabel();
+        choiceLanguage = new javax.swing.JComboBox();
 
-        jLabelDefaultDirectory.setText("Default directory");
+        labelDefaultDirectory.setText("Default directory");
 
-        jTextFieldPath.setEditable(false);
-        jTextFieldPath.setText("path");
+        pathDefaultDirectory.setEditable(false);
+        pathDefaultDirectory.setText("path");
 
-        jButtonChangeDirectory.setText("Change");
-        jButtonChangeDirectory.addActionListener(new java.awt.event.ActionListener() {
+        changeDefaultDirectory.setText("Change");
+        changeDefaultDirectory.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButtonChangeDirectoryActionPerformed(evt);
+                changeDefaultDirectoryActionPerformed(evt);
             }
         });
 
-        javax.swing.GroupLayout jPanelGeneralLayout = new javax.swing.GroupLayout(jPanelGeneral);
-        jPanelGeneral.setLayout(jPanelGeneralLayout);
-        jPanelGeneralLayout.setHorizontalGroup(
-            jPanelGeneralLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanelGeneralLayout.createSequentialGroup()
+        javax.swing.GroupLayout generalSettingsLayout = new javax.swing.GroupLayout(generalSettings);
+        generalSettings.setLayout(generalSettingsLayout);
+        generalSettingsLayout.setHorizontalGroup(
+            generalSettingsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(generalSettingsLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanelGeneralLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanelGeneralLayout.createSequentialGroup()
-                        .addComponent(jLabelDefaultDirectory)
+                .addGroup(generalSettingsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(generalSettingsLayout.createSequentialGroup()
+                        .addComponent(labelDefaultDirectory)
                         .addGap(0, 0, Short.MAX_VALUE))
-                    .addGroup(jPanelGeneralLayout.createSequentialGroup()
-                        .addComponent(jTextFieldPath, javax.swing.GroupLayout.DEFAULT_SIZE, 279, Short.MAX_VALUE)
+                    .addGroup(generalSettingsLayout.createSequentialGroup()
+                        .addComponent(pathDefaultDirectory, javax.swing.GroupLayout.DEFAULT_SIZE, 284, Short.MAX_VALUE)
                         .addGap(18, 18, 18)
-                        .addComponent(jButtonChangeDirectory)))
+                        .addComponent(changeDefaultDirectory)))
                 .addContainerGap())
         );
-        jPanelGeneralLayout.setVerticalGroup(
-            jPanelGeneralLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanelGeneralLayout.createSequentialGroup()
+        generalSettingsLayout.setVerticalGroup(
+            generalSettingsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(generalSettingsLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jLabelDefaultDirectory)
+                .addComponent(labelDefaultDirectory)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanelGeneralLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jTextFieldPath, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButtonChangeDirectory))
-                .addContainerGap(151, Short.MAX_VALUE))
+                .addGroup(generalSettingsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(pathDefaultDirectory, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(changeDefaultDirectory))
+                .addContainerGap(162, Short.MAX_VALUE))
         );
 
-        jTabbedPane1.addTab("General", jPanelGeneral);
+        tabs.addTab("General", generalSettings);
 
-        jRadioButtonSAT4J.setSelected(true);
-        jRadioButtonSAT4J.setText("SAT4J");
-        jRadioButtonSAT4J.addActionListener(new java.awt.event.ActionListener() {
+        SAT4J.setSelected(true);
+        SAT4J.setText("SAT4J");
+        SAT4J.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jRadioButtonSAT4JActionPerformed(evt);
+                SAT4JActionPerformed(evt);
             }
         });
 
-        jRadioButtonYCES.setText("YCES");
-        jRadioButtonYCES.addActionListener(new java.awt.event.ActionListener() {
+        YCES.setText("YCES");
+        YCES.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jRadioButtonYCESActionPerformed(evt);
+                YCESActionPerformed(evt);
             }
         });
 
-        jRadioButtonSMTLQFLRA.setText("SMT_QF_LRA");
-        jRadioButtonSMTLQFLRA.addActionListener(new java.awt.event.ActionListener() {
+        SMTLQFLRA.setText("SMT_QF_LRA");
+        SMTLQFLRA.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jRadioButtonSMTLQFLRAActionPerformed(evt);
+                SMTLQFLRAActionPerformed(evt);
             }
         });
 
-        jRadioButtonSMTLQFLIA.setText("SMT_QF_LIA");
-        jRadioButtonSMTLQFLIA.addActionListener(new java.awt.event.ActionListener() {
+        SMTLQFLIA.setText("SMT_QF_LIA");
+        SMTLQFLIA.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jRadioButtonSMTLQFLIAActionPerformed(evt);
+                SMTLQFLIAActionPerformed(evt);
             }
         });
 
-        jRadioButtonSMTLQFRDL.setText("SMT_QF_RDL");
-        jRadioButtonSMTLQFRDL.addActionListener(new java.awt.event.ActionListener() {
+        SMTLQFRDL.setText("SMT_QF_RDL");
+        SMTLQFRDL.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jRadioButtonSMTLQFRDLActionPerformed(evt);
+                SMTLQFRDLActionPerformed(evt);
             }
         });
 
-        jRadioButtonSMTLQFIDL.setText("SMT_QF_IDL");
-        jRadioButtonSMTLQFIDL.addActionListener(new java.awt.event.ActionListener() {
+        SMTLQFIDL.setText("SMT_QF_IDL");
+        SMTLQFIDL.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jRadioButtonSMTLQFIDLActionPerformed(evt);
+                SMTLQFIDLActionPerformed(evt);
             }
         });
 
-        jLabelSolver.setText("Choose your solver");
+        chooseSolverText.setText("Choose your solver");
 
-        javax.swing.GroupLayout jPanelSolverLayout = new javax.swing.GroupLayout(jPanelSolver);
-        jPanelSolver.setLayout(jPanelSolverLayout);
-        jPanelSolverLayout.setHorizontalGroup(
-            jPanelSolverLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanelSolverLayout.createSequentialGroup()
+        javax.swing.GroupLayout solverSettingsLayout = new javax.swing.GroupLayout(solverSettings);
+        solverSettings.setLayout(solverSettingsLayout);
+        solverSettingsLayout.setHorizontalGroup(
+            solverSettingsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(solverSettingsLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanelSolverLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanelSolverLayout.createSequentialGroup()
+                .addGroup(solverSettingsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(solverSettingsLayout.createSequentialGroup()
                         .addGap(21, 21, 21)
-                        .addGroup(jPanelSolverLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jRadioButtonSMTLQFRDL)
-                            .addComponent(jRadioButtonSMTLQFLIA)
-                            .addComponent(jRadioButtonSMTLQFLRA)
-                            .addComponent(jRadioButtonSMTLQFIDL)))
-                    .addComponent(jRadioButtonSAT4J)
-                    .addComponent(jRadioButtonYCES)
-                    .addComponent(jLabelSolver))
+                        .addGroup(solverSettingsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(SMTLQFRDL)
+                            .addComponent(SMTLQFLIA)
+                            .addComponent(SMTLQFLRA)
+                            .addComponent(SMTLQFIDL)))
+                    .addComponent(SAT4J)
+                    .addComponent(YCES)
+                    .addComponent(chooseSolverText))
                 .addContainerGap(264, Short.MAX_VALUE))
         );
-        jPanelSolverLayout.setVerticalGroup(
-            jPanelSolverLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanelSolverLayout.createSequentialGroup()
+        solverSettingsLayout.setVerticalGroup(
+            solverSettingsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, solverSettingsLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jLabelSolver)
+                .addComponent(chooseSolverText)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jRadioButtonSAT4J)
+                .addComponent(SAT4J)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jRadioButtonYCES)
+                .addComponent(YCES)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jRadioButtonSMTLQFLRA)
+                .addComponent(SMTLQFLRA)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jRadioButtonSMTLQFLIA)
+                .addComponent(SMTLQFLIA)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jRadioButtonSMTLQFRDL)
+                .addComponent(SMTLQFRDL)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jRadioButtonSMTLQFIDL)
-                .addContainerGap(29, Short.MAX_VALUE))
+                .addComponent(SMTLQFIDL)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        jTabbedPane1.addTab("Solver", jPanelSolver);
+        tabs.addTab("Solver", solverSettings);
 
-        jLabelLanguage.setText("Language");
+        chooseLanguageText.setText("Language");
 
-        jComboBoxLanguages.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-        jComboBoxLanguages.addActionListener(new java.awt.event.ActionListener() {
+        choiceLanguage.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        choiceLanguage.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jComboBoxLanguagesActionPerformed(evt);
+                choiceLanguageActionPerformed(evt);
             }
         });
 
-        javax.swing.GroupLayout jPanelLanguageLayout = new javax.swing.GroupLayout(jPanelLanguage);
-        jPanelLanguage.setLayout(jPanelLanguageLayout);
-        jPanelLanguageLayout.setHorizontalGroup(
-            jPanelLanguageLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanelLanguageLayout.createSequentialGroup()
+        javax.swing.GroupLayout languageSettingsLayout = new javax.swing.GroupLayout(languageSettings);
+        languageSettings.setLayout(languageSettingsLayout);
+        languageSettingsLayout.setHorizontalGroup(
+            languageSettingsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(languageSettingsLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jLabelLanguage)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 78, Short.MAX_VALUE)
-                .addComponent(jComboBoxLanguages, javax.swing.GroupLayout.PREFERRED_SIZE, 128, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(123, Short.MAX_VALUE))
+                .addComponent(chooseLanguageText)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 83, Short.MAX_VALUE)
+                .addComponent(choiceLanguage, javax.swing.GroupLayout.PREFERRED_SIZE, 128, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(128, Short.MAX_VALUE))
         );
-        jPanelLanguageLayout.setVerticalGroup(
-            jPanelLanguageLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanelLanguageLayout.createSequentialGroup()
+        languageSettingsLayout.setVerticalGroup(
+            languageSettingsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(languageSettingsLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanelLanguageLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabelLanguage)
-                    .addComponent(jComboBoxLanguages, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(174, Short.MAX_VALUE))
+                .addGroup(languageSettingsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(chooseLanguageText)
+                    .addComponent(choiceLanguage, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(187, Short.MAX_VALUE))
         );
 
-        jTabbedPane1.addTab("Language", jPanelLanguage);
+        tabs.addTab("Language", languageSettings);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 391, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(tabs, javax.swing.GroupLayout.PREFERRED_SIZE, 391, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(0, 0, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 233, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addComponent(tabs, javax.swing.GroupLayout.PREFERRED_SIZE, 233, javax.swing.GroupLayout.PREFERRED_SIZE)
         );
 
-        jTabbedPane1.getAccessibleContext().setAccessibleName("General");
+        tabs.getAccessibleContext().setAccessibleName("General");
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jButtonChangeDirectoryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonChangeDirectoryActionPerformed
+    private void changeDefaultDirectoryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_changeDefaultDirectoryActionPerformed
         JFileChooser jFileChooser = new JFileChooser(new File(System.getProperty("user.dir")));
         jFileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
         int returnVal = jFileChooser.showOpenDialog(this);
         
         if (returnVal == JFileChooser.APPROVE_OPTION && jFileChooser.getSelectedFile() != null) {
             String path = jFileChooser.getSelectedFile().getPath();
-            jTextFieldPath.setText(path);
+            pathDefaultDirectory.setText(path);
             parent.setDefaultDirectoryPath(path);
         }
         
-    }//GEN-LAST:event_jButtonChangeDirectoryActionPerformed
+    }//GEN-LAST:event_changeDefaultDirectoryActionPerformed
 
-    private void jComboBoxLanguagesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBoxLanguagesActionPerformed
-        if (jComboBoxLanguagesEnabled && jComboBoxLanguages.getSelectedIndex() >= 0) {
-            Locale selectedLanguage = (Locale)jComboBoxLanguages.getSelectedItem();
+    private void choiceLanguageActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_choiceLanguageActionPerformed
+        if (jComboBoxLanguagesEnabled && choiceLanguage.getSelectedIndex() >= 0) {
+            Locale selectedLanguage = (Locale)choiceLanguage.getSelectedItem();
             parent.setLanguage(selectedLanguage);
             parent.updateLanguage();
             updateLanguage();
         }
-    }//GEN-LAST:event_jComboBoxLanguagesActionPerformed
+    }//GEN-LAST:event_choiceLanguageActionPerformed
 
-    private void jRadioButtonSAT4JActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButtonSAT4JActionPerformed
+    private void SAT4JActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SAT4JActionPerformed
         parent.getSolverSelection().setSelectedSolver(SolverSelection.SolverType.SAT);
-        jRadioButtonSMTLQFLRA.setSelected(false);
-        jRadioButtonSMTLQFLIA.setSelected(false);
-        jRadioButtonSMTLQFRDL.setSelected(false);
-        jRadioButtonSMTLQFIDL.setSelected(false);
+        SMTLQFLRA.setSelected(false);
+        SMTLQFLIA.setSelected(false);
+        SMTLQFRDL.setSelected(false);
+        SMTLQFIDL.setSelected(false);
         updateRadioButtons();
-    }//GEN-LAST:event_jRadioButtonSAT4JActionPerformed
+    }//GEN-LAST:event_SAT4JActionPerformed
 
-    private void jRadioButtonYCESActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButtonYCESActionPerformed
+    private void YCESActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_YCESActionPerformed
         parent.getSolverSelection().setSelectedSolver(SolverSelection.SolverType.QF_LRA);
-        jRadioButtonSMTLQFLRA.setSelected(true);
+        SMTLQFLRA.setSelected(true);
         updateRadioButtons();
-    }//GEN-LAST:event_jRadioButtonYCESActionPerformed
+    }//GEN-LAST:event_YCESActionPerformed
 
-    private void jRadioButtonSMTLQFLIAActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButtonSMTLQFLIAActionPerformed
+    private void SMTLQFLIAActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SMTLQFLIAActionPerformed
         parent.getSolverSelection().setSelectedSolver(SolverSelection.SolverType.QF_LIA);
         updateRadioButtons();
-    }//GEN-LAST:event_jRadioButtonSMTLQFLIAActionPerformed
+    }//GEN-LAST:event_SMTLQFLIAActionPerformed
 
-    private void jRadioButtonSMTLQFLRAActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButtonSMTLQFLRAActionPerformed
+    private void SMTLQFLRAActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SMTLQFLRAActionPerformed
         parent.getSolverSelection().setSelectedSolver(SolverSelection.SolverType.QF_LRA);
         updateRadioButtons();
-    }//GEN-LAST:event_jRadioButtonSMTLQFLRAActionPerformed
+    }//GEN-LAST:event_SMTLQFLRAActionPerformed
 
-    private void jRadioButtonSMTLQFRDLActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButtonSMTLQFRDLActionPerformed
+    private void SMTLQFRDLActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SMTLQFRDLActionPerformed
         parent.getSolverSelection().setSelectedSolver(SolverSelection.SolverType.QF_RDL);
         updateRadioButtons();
-    }//GEN-LAST:event_jRadioButtonSMTLQFRDLActionPerformed
+    }//GEN-LAST:event_SMTLQFRDLActionPerformed
 
-    private void jRadioButtonSMTLQFIDLActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButtonSMTLQFIDLActionPerformed
+    private void SMTLQFIDLActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SMTLQFIDLActionPerformed
         parent.getSolverSelection().setSelectedSolver(SolverSelection.SolverType.QF_IDL);
         updateRadioButtons();
-    }//GEN-LAST:event_jRadioButtonSMTLQFIDLActionPerformed
+    }//GEN-LAST:event_SMTLQFIDLActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JRadioButton SAT4J;
+    private javax.swing.JRadioButton SMTLQFIDL;
+    private javax.swing.JRadioButton SMTLQFLIA;
+    private javax.swing.JRadioButton SMTLQFLRA;
+    private javax.swing.JRadioButton SMTLQFRDL;
+    private javax.swing.JRadioButton YCES;
     private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.ButtonGroup buttonGroup2;
-    private javax.swing.JButton jButtonChangeDirectory;
-    private javax.swing.JComboBox jComboBoxLanguages;
-    private javax.swing.JLabel jLabelDefaultDirectory;
-    private javax.swing.JLabel jLabelLanguage;
-    private javax.swing.JLabel jLabelSolver;
-    private javax.swing.JPanel jPanelGeneral;
-    private javax.swing.JPanel jPanelLanguage;
-    private javax.swing.JPanel jPanelSolver;
-    private javax.swing.JRadioButton jRadioButtonSAT4J;
-    private javax.swing.JRadioButton jRadioButtonSMTLQFIDL;
-    private javax.swing.JRadioButton jRadioButtonSMTLQFLIA;
-    private javax.swing.JRadioButton jRadioButtonSMTLQFLRA;
-    private javax.swing.JRadioButton jRadioButtonSMTLQFRDL;
-    private javax.swing.JRadioButton jRadioButtonYCES;
-    private javax.swing.JTabbedPane jTabbedPane1;
-    private javax.swing.JTextField jTextFieldPath;
+    private javax.swing.JButton changeDefaultDirectory;
+    private javax.swing.JComboBox choiceLanguage;
+    private javax.swing.JLabel chooseLanguageText;
+    private javax.swing.JLabel chooseSolverText;
+    private javax.swing.JPanel generalSettings;
+    private javax.swing.JLabel labelDefaultDirectory;
+    private javax.swing.JPanel languageSettings;
+    private javax.swing.JTextField pathDefaultDirectory;
+    private javax.swing.JPanel solverSettings;
+    private javax.swing.JTabbedPane tabs;
     // End of variables declaration//GEN-END:variables
 
     @Override
@@ -391,12 +391,12 @@ public class SettingsPanel extends AbstractComponentPanel {
         if (getParent() != null && getRootPane().getParent() instanceof JDialog) {
             ((JDialog)(getRootPane().getParent())).setTitle(parent.getLang().getWord(Lang.SETTINGS_TITLE));
         }
-        jTabbedPane1.setTitleAt(0, parent.getLang().getWord(Lang.SETTINGS_GENERAL_TITLE));
-        jTabbedPane1.setTitleAt(1, parent.getLang().getWord(Lang.SETTINGS_SOLVER_TITLE));
-        jTabbedPane1.setTitleAt(2, parent.getLang().getWord(Lang.SETTINGS_LANGUAGE_TITLE));
-        jLabelDefaultDirectory.setText(parent.getLang().getWord(Lang.SETTINGS_GENERAL_TEXT));
-        jButtonChangeDirectory.setText(parent.getLang().getWord(Lang.SETTINGS_GENERAL_BUTTON));
-        jLabelSolver.setText(parent.getLang().getWord(Lang.SETTINGS_SOLVER_TEXT));
-        jLabelLanguage.setText(parent.getLang().getWord(Lang.SETTINGS_LANGUAGE_TEXT));
+        tabs.setTitleAt(0, parent.getLang().getWord(Lang.SETTINGS_GENERAL_TITLE));
+        tabs.setTitleAt(1, parent.getLang().getWord(Lang.SETTINGS_SOLVER_TITLE));
+        tabs.setTitleAt(2, parent.getLang().getWord(Lang.SETTINGS_LANGUAGE_TITLE));
+        labelDefaultDirectory.setText(parent.getLang().getWord(Lang.SETTINGS_GENERAL_TEXT));
+        changeDefaultDirectory.setText(parent.getLang().getWord(Lang.SETTINGS_GENERAL_BUTTON));
+        chooseSolverText.setText(parent.getLang().getWord(Lang.SETTINGS_SOLVER_TEXT));
+        chooseLanguageText.setText(parent.getLang().getWord(Lang.SETTINGS_LANGUAGE_TEXT));
     }
 }

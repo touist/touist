@@ -36,30 +36,30 @@ import javax.swing.BoxLayout;
  *
  * @author Skander
  */
-public class PalettePanel extends AbstractComponentPanel {
+public class SnippetContainer extends AbstractComponentPanel {
 
     @Override
     public void updateLanguage() {
-        jLabel1.setText(getFrame().getLang().getWord(Lang.PALETTE_TEXT));
-        if(sectionConnect!=null) sectionConnect.setText(getFrame().getLang().getWord("PaletteSectionPanel.FormulasSection1"));
-        if(sectionCard!=null) sectionCard.setText(getFrame().getLang().getWord("PaletteSectionPanel.FormulasSection2"));
-        if(sectionOthers!=null) sectionOthers.setText(getFrame().getLang().getWord("PaletteSectionPanel.FormulasSection3"));
-        if(sectionSets!=null) sectionSets.setText(getFrame().getLang().getWord("PaletteSectionPanel.SetsSection1"));
+        snippetSectionName.setText(getFrame().getLang().getWord(Lang.PALETTE_TEXT));
+        if(sectionConnect!=null) sectionConnect.setText(getFrame().getLang().getWord("SnippetSection.FormulasSection1"));
+        if(sectionCard!=null) sectionCard.setText(getFrame().getLang().getWord("SnippetSection.FormulasSection2"));
+        if(sectionOthers!=null) sectionOthers.setText(getFrame().getLang().getWord("SnippetSection.FormulasSection3"));
+        if(sectionSets!=null) sectionSets.setText(getFrame().getLang().getWord("SnippetSection.SetsSection1"));
     }
 
     public static enum PaletteType {FORMULA, SET};
     
     private Editor editorTextArea;
     
-    public PalettePanel() {
+    public SnippetContainer() {
         initComponents();
     }
     
     /**
-     * Creates new form PalettePanel
+     * Creates new form SnippetContainer
      * @param editorTextArea
      */
-    public PalettePanel(Editor editorTextArea) {
+    public SnippetContainer(Editor editorTextArea) {
         initComponents();
         this.editorTextArea = editorTextArea;
     }
@@ -68,16 +68,16 @@ public class PalettePanel extends AbstractComponentPanel {
         this.editorTextArea = editorTextArea;
     }
     
-    private PaletteSectionPanel sectionConnect;
-    private PaletteSectionPanel sectionOthers;
-    private PaletteSectionPanel sectionCard;
-    private PaletteSectionPanel sectionSets;
+    private SnippetSection sectionConnect;
+    private SnippetSection sectionOthers;
+    private SnippetSection sectionCard;
+    private SnippetSection sectionSets;
     
     public void initPaletteContent(PaletteType type) {
         if (type == PaletteType.FORMULA) {
-            sectionConnect = new PaletteSectionPanel("Connectors");
-            sectionCard = new PaletteSectionPanel("Cardinality");
-            sectionOthers = new PaletteSectionPanel("Others");
+            sectionConnect = new SnippetSection("Connectors");
+            sectionCard = new SnippetSection("Cardinality");
+            sectionOthers = new SnippetSection("Others");
 
             ArrayList<Integer> snippetsAnd = new ArrayList<Integer>(){{add(0);add(1);add(7);add(8);}};
             ArrayList<Integer> snippetsOr = new ArrayList<Integer>(){{add(0);add(1);add(6);add(7);}};
@@ -108,14 +108,14 @@ public class PalettePanel extends AbstractComponentPanel {
             sectionOthers.addInsertButton(new InsertionButton(editorTextArea, "if $a \nthen \n\t$b \nelse \n\t$c\n", snippetsIf, "if then else","if\\,\\$a \\\\ then\\\\\\quad\\$b \\\\ else\\\\\\quad\\$c"));
             
 
-            sectionsContainerPanel.setLayout(new BoxLayout(sectionsContainerPanel, BoxLayout.Y_AXIS));
-            sectionsContainerPanel.add(sectionConnect);
-            sectionsContainerPanel.add(sectionCard);
-            sectionsContainerPanel.add(sectionOthers);
+            snippetSectionsContainer.setLayout(new BoxLayout(snippetSectionsContainer, BoxLayout.Y_AXIS));
+            snippetSectionsContainer.add(sectionConnect);
+            snippetSectionsContainer.add(sectionCard);
+            snippetSectionsContainer.add(sectionOthers);
             
             sectionConnect.unfold();
         } else if (type == PaletteType.SET) {
-            sectionSets = new PaletteSectionPanel("Sets");
+            sectionSets = new SnippetSection("Sets");
 
             ArrayList<Integer> snippetsSet = new ArrayList<Integer>(){{add(0);add(1);}};
             
@@ -125,8 +125,8 @@ public class PalettePanel extends AbstractComponentPanel {
             sectionSets.addInsertButton(new InsertionButton(editorTextArea, "$v = 0.0", snippetsSet, ""));
             sectionSets.addInsertButton(new InsertionButton(editorTextArea, "$a = [a,b,c]", snippetsSet, ""));
 
-            sectionsContainerPanel.setLayout(new BoxLayout(sectionsContainerPanel, BoxLayout.Y_AXIS));
-            sectionsContainerPanel.add(sectionSets);
+            snippetSectionsContainer.setLayout(new BoxLayout(snippetSectionsContainer, BoxLayout.Y_AXIS));
+            snippetSectionsContainer.add(sectionSets);
             
             sectionSets.unfold();
         }
@@ -134,9 +134,9 @@ public class PalettePanel extends AbstractComponentPanel {
     
     public int getMaxWidthIcons() {
         int max_icon_width = 0;
-        for (Component section : sectionsContainerPanel.getComponents()) {
-            if (section instanceof PaletteSectionPanel) {
-                for (InsertionButton button : ((PaletteSectionPanel)section).getButtons()) {
+        for (Component section : snippetSectionsContainer.getComponents()) {
+            if (section instanceof SnippetSection) {
+                for (InsertionButton button : ((SnippetSection)section).getButtons()) {
                     max_icon_width = (int) Math.max(max_icon_width, button.getIcon().getIconWidth());
                 }
             }
@@ -153,36 +153,36 @@ public class PalettePanel extends AbstractComponentPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jLabel1 = new javax.swing.JLabel();
-        sectionsContainerPanel = new javax.swing.JPanel();
+        snippetSectionName = new javax.swing.JLabel();
+        snippetSectionsContainer = new javax.swing.JPanel();
 
-        jLabel1.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
-        jLabel1.setText("Insert");
+        snippetSectionName.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+        snippetSectionName.setText("Insert");
 
-        sectionsContainerPanel.setLayout(new javax.swing.BoxLayout(sectionsContainerPanel, javax.swing.BoxLayout.LINE_AXIS));
+        snippetSectionsContainer.setLayout(new javax.swing.BoxLayout(snippetSectionsContainer, javax.swing.BoxLayout.LINE_AXIS));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(sectionsContainerPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(snippetSectionsContainer, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jLabel1)
+                .addComponent(snippetSectionName)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addComponent(jLabel1)
+                .addComponent(snippetSectionName)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(sectionsContainerPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(snippetSectionsContainer, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JPanel sectionsContainerPanel;
+    private javax.swing.JLabel snippetSectionName;
+    private javax.swing.JPanel snippetSectionsContainer;
     // End of variables declaration//GEN-END:variables
 }

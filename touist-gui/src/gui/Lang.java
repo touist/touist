@@ -102,7 +102,7 @@ public class Lang {
     public static final String EDITION_MENUITEM_REDO = "EditionMenuBar.jMenuItemRedo.text";
     public static final String EDITION_MENUITEM_ZOOMMORE = "EditionMenuBar.jMenuItemZoomMore.text";
     public static final String EDITION_MENUITEM_ZOOMLESS = "EditionMenuBar.jMenuItemZoomLess.text";
-    public static final String PALETTE_TEXT = "PalettePanel.jLabel1.text";
+    public static final String PALETTE_TEXT = "SnippetContainer.jLabel1.text";
     public static final String RESULTS_NEXT = "ResultsPanel.jButtonNext.text";
     public static final String RESULTS_PREVIOUS = "ResultsPanel.jButtonPrevious.text";
     public static final String RESULTS_RETURN = "ResultsPanel.jButtonEditor.text";

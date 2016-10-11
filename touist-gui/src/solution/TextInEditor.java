@@ -46,7 +46,7 @@ class FormatException extends Exception {
     }
 }
 
-public class BaseDeClauses {
+public class TextInEditor {
     private String formules;
     private String sets;
 
@@ -63,7 +63,7 @@ public class BaseDeClauses {
     /**
      * Construct a set of clauses
      */
-    public BaseDeClauses() {
+    public TextInEditor() {
         formules = new String();
         sets = new String();
     }
@@ -115,7 +115,7 @@ public class BaseDeClauses {
      * @throws FormatException if the filedefines incorrectly the formula
      *                         section
      */
-    public void uploadFile(String path) throws FileNotFoundException,
+    public void loadFile(String path) throws FileNotFoundException,
                                                IOException,
                                                FormatException {
         BufferedReader in = new BufferedReader(new FileReader(path));

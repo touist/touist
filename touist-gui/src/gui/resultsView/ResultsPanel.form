@@ -25,24 +25,24 @@
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="jScrollPane2" max="32767" attributes="0"/>
+                  <Component id="literals" max="32767" attributes="0"/>
                   <Group type="102" alignment="0" attributes="0">
-                      <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
+                      <Component id="resultsLabel" min="-2" max="-2" attributes="0"/>
                       <EmptySpace min="-2" pref="32" max="-2" attributes="0"/>
-                      <Component id="trueCheckBox" min="-2" max="-2" attributes="0"/>
+                      <Component id="showTrueLiterals" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="falseCheckBox" min="-2" max="-2" attributes="0"/>
+                      <Component id="showFalseLiterals" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="searchTextField" pref="333" max="32767" attributes="0"/>
+                      <Component id="filterLiterals" pref="333" max="32767" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="jButtonEditor" min="-2" max="-2" attributes="0"/>
+                      <Component id="backToEditor" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <Group type="102" alignment="0" attributes="0">
-                      <Component id="jButtonPrevious" min="-2" max="-2" attributes="0"/>
+                      <Component id="previousModel" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="jButtonNext" min="-2" max="-2" attributes="0"/>
+                      <Component id="nextModel" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="32767" attributes="0"/>
-                      <Component id="jButtonExport" min="-2" max="-2" attributes="0"/>
+                      <Component id="exportModel" min="-2" max="-2" attributes="0"/>
                   </Group>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
@@ -54,19 +54,19 @@
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="jLabel1" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="jButtonEditor" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="trueCheckBox" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="falseCheckBox" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="searchTextField" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="resultsLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="backToEditor" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="showTrueLiterals" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="showFalseLiterals" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="filterLiterals" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="jScrollPane2" pref="291" max="32767" attributes="0"/>
+              <Component id="literals" pref="291" max="32767" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="jButtonPrevious" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="jButtonNext" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="jButtonExport" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="previousModel" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="nextModel" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="exportModel" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
@@ -74,85 +74,85 @@
     </DimensionLayout>
   </Layout>
   <SubComponents>
-    <Component class="javax.swing.JLabel" name="jLabel1">
+    <Component class="javax.swing.JLabel" name="resultsLabel">
       <Properties>
         <Property name="text" type="java.lang.String" value="R&#xe9;sultats"/>
       </Properties>
     </Component>
-    <Component class="javax.swing.JButton" name="jButtonEditor">
+    <Component class="javax.swing.JButton" name="backToEditor">
       <Properties>
         <Property name="text" type="java.lang.String" value="Retour en &#xe9;dition"/>
       </Properties>
       <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButtonEditorActionPerformed"/>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="backToEditorActionPerformed"/>
       </Events>
     </Component>
-    <Component class="javax.swing.JButton" name="jButtonPrevious">
+    <Component class="javax.swing.JButton" name="previousModel">
       <Properties>
         <Property name="text" type="java.lang.String" value="Pr&#xe9;c&#xe9;dent"/>
       </Properties>
       <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButtonPreviousActionPerformed"/>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="previousModelActionPerformed"/>
       </Events>
     </Component>
-    <Component class="javax.swing.JButton" name="jButtonNext">
+    <Component class="javax.swing.JButton" name="nextModel">
       <Properties>
         <Property name="text" type="java.lang.String" value="Suivant"/>
       </Properties>
       <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButtonNextActionPerformed"/>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="nextModelActionPerformed"/>
       </Events>
     </Component>
-    <Container class="javax.swing.JScrollPane" name="jScrollPane2">
+    <Container class="javax.swing.JScrollPane" name="literals">
       <AuxValues>
         <AuxValue name="autoScrollPane" type="java.lang.Boolean" value="true"/>
       </AuxValues>
 
       <Layout class="org.netbeans.modules.form.compat2.layouts.support.JScrollPaneSupportLayout"/>
       <SubComponents>
-        <Component class="javax.swing.JTable" name="jTable1">
+        <Component class="javax.swing.JTable" name="literalsTable">
           <Properties>
             <Property name="model" type="javax.swing.table.TableModel" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
               <Connection code="new ResultTableModel(&#xa;    new String [] {&#xa;        &quot;Name&quot;, &quot;Value&quot;&#xa;    },0&#xa;)" type="code"/>
             </Property>
           </Properties>
           <AuxValues>
-            <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="jTable1.setAutoCreateRowSorter(true);&#xa;jTable1.setDefaultRenderer(Object.class, new ResultTableCellRenderer());&#xa;jTable1.setGridColor(Color.BLACK);&#xa;jTable1.setShowGrid(true);&#xa;jTable1.getRowSorter().toggleSortOrder(0);&#xa;jTable1.setRowSelectionAllowed(false);"/>
+            <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="literalsTable.setAutoCreateRowSorter(true);&#xa;literalsTable.setDefaultRenderer(Object.class, new ResultTableCellRenderer());&#xa;literalsTable.setGridColor(Color.BLACK);&#xa;literalsTable.setShowGrid(true);&#xa;literalsTable.getRowSorter().toggleSortOrder(0);&#xa;literalsTable.setRowSelectionAllowed(false);"/>
           </AuxValues>
         </Component>
       </SubComponents>
     </Container>
-    <Component class="javax.swing.JCheckBox" name="trueCheckBox">
+    <Component class="javax.swing.JCheckBox" name="showTrueLiterals">
       <Properties>
         <Property name="text" type="java.lang.String" value="true"/>
       </Properties>
       <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="trueCheckBoxActionPerformed"/>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="showTrueLiteralsActionPerformed"/>
       </Events>
       <AuxValues>
-        <AuxValue name="JavaCodeGenerator_InitCodePre" type="java.lang.String" value="trueCheckBox.setSelected(true);"/>
+        <AuxValue name="JavaCodeGenerator_InitCodePre" type="java.lang.String" value="showTrueLiterals.setSelected(true);"/>
       </AuxValues>
     </Component>
-    <Component class="javax.swing.JCheckBox" name="falseCheckBox">
+    <Component class="javax.swing.JCheckBox" name="showFalseLiterals">
       <Properties>
         <Property name="selected" type="boolean" value="true"/>
         <Property name="text" type="java.lang.String" value="false"/>
       </Properties>
       <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="falseCheckBoxActionPerformed"/>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="showFalseLiteralsActionPerformed"/>
       </Events>
     </Component>
-    <Component class="javax.swing.JTextField" name="searchTextField">
+    <Component class="javax.swing.JTextField" name="filterLiterals">
       <AuxValues>
-        <AuxValue name="JavaCodeGenerator_InitCodePre" type="java.lang.String" value="searchTextField.getDocument().addDocumentListener(new RegexListener());"/>
+        <AuxValue name="JavaCodeGenerator_InitCodePre" type="java.lang.String" value="filterLiterals.getDocument().addDocumentListener(new RegexListener());"/>
       </AuxValues>
     </Component>
-    <Component class="javax.swing.JButton" name="jButtonExport">
+    <Component class="javax.swing.JButton" name="exportModel">
       <Properties>
         <Property name="text" type="java.lang.String" value="Export"/>
       </Properties>
       <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButtonExportActionPerformed"/>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="exportModelActionPerformed"/>
       </Events>
     </Component>
   </SubComponents>
