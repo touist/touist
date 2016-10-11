@@ -182,11 +182,6 @@ exp:
 
 
 clause:
-  (* Conflict between two rules when reading
-   *           "TERM LPAREN exp RPAREN"
-   *  clause ->      LPAREN exp RPAREN  <- mandatory for specifing order of clauses
-   *  clause -> TERM LPAREN exp RPAREN
-   * are conflicting with each other *)
   | LPAREN clause RPAREN { $2 }
   | INT   { CInt   $1 }
   | FLOAT { CFloat $1 }
@@ -213,12 +208,6 @@ clause:
   | TOP    { Top    }
   | BOTTOM { Bottom }
   | TERM   { Term ($1, None) }
-  (* There is a conflict between reducing TERM (the one just above)
-     and shifting before reducing, looking ahead for a LPAREN
-     Ambiguous example:   "a(b)"
-     We don't know if it should be understood as
-        ( a ) ( b )   => two separate clauses
-        a(b)          => a tuple-term with b as the tuple index *)
   | t=TUPLE (*LPAREN*) l=separated_nonempty_list(COMMA, term_or_exp) RPAREN
       { Term (t, Some l) }
   | NOT clause { CNot $2 }
