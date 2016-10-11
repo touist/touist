@@ -180,6 +180,19 @@ exp:
   | LBRACK exp RANGE exp RBRACK { Range ($2, $4) }
   | IF exp THEN exp ELSE exp END { If ($2, $4, $6) }
 
+(* Redundancy of clause and exp
+   ============================
+   Because of the need of being able to express SMT clauseulas, the clause and exp
+   types are (seemingly) redundant. At first sight, we might think that merging
+   clause and exp into a single type would simplify the grammar...
+   But clause and exp express two completely different things:
+   - an exp will be "computed"; at the end of the touistc translation, its
+     result will be reduced to a single float, integer, bool or set.
+     An expression of the clause `2+3+$i/5` will give a float.
+   - a clause won't be computed, in the sense that the clause
+         (x+2 > 0) and not (y-3 != 0)
+     will stay the same after touistc translation.
+ *)
 
 clause:
   | LPAREN clause RPAREN { $2 }
