@@ -88,7 +88,7 @@ public class MainFrame extends javax.swing.JFrame {
      * Creates new form MainFrame
      */
     public MainFrame() {
-        lang = new Lang(Locale.ENGLISH);
+        lang = new Lang(Locale.getDefault());
         
     	cards = new JPanel(new CardLayout());
     	editorPanel1 = new ParentEditionPanel();
