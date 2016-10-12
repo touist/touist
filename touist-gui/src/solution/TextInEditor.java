@@ -29,9 +29,6 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 /**
  *
@@ -47,63 +44,25 @@ class FormatException extends Exception {
 }
 
 public class TextInEditor {
-    private String formules;
-    private String sets;
-
-    private static final String errorBeginFormula = "Syntax error at line %d"
-                                       + ". Formula begin section already"
-                                       + " declared.";
-    private static final String errorEndFormula =  "Syntax error at line %d"
-                                       + ". No formula section is opened.";
-    private static final String errorBeginSet =
-                                errorBeginFormula.replace("Formula","Set");
-    private static final String errorEndSet =
-                                errorEndFormula.replace("formula","set");
+    private String textInEditor;
 
     /**
      * Construct a set of clauses
      */
     public TextInEditor() {
-        formules = new String();
-        sets = new String();
+        textInEditor = new String();
     }
 
     /**
      *
      * @return the list of formules
      */
-    public String getFormules() {
-        return formules;
+    public String get() {
+        return textInEditor;
     }
 
-    /**
-     * @return the list of sets
-     */
-    public String getSets() {
-        return sets;
-    }
-
-    public void setFormules(String formules) {
-        this.formules = formules;
-    }
-
-    public void setSets(String sets) {
-        this.sets = sets;
-    }
-
-    /**
-     * @return the index of the line of "begin formula"
-     */
-    public int getLineFormula(){
-        if(sets.isEmpty()) return 1;
-        return sets.split("\n").length+3;
-    }
-    
-    /**
-     * @return the index of the line of "begin sets"
-     */
-    public int getLineSets(){
-        return 1;
+    public void set(String text) {
+        this.textInEditor = text;
     }
     
 
@@ -120,128 +79,18 @@ public class TextInEditor {
                                                FormatException {
         BufferedReader in = new BufferedReader(new FileReader(path));
         String line;
-
-        boolean formulaSection = false;
-        boolean setSection = false;
-        int indexLine = 0;
-
         while((line = in.readLine()) != null) {
-
-            indexLine ++;
             System.out.println(line);
             String []words = line.replace("\\s+"," ").split(" ");
-            for(String x:words)
-                System.out.println("\t"+x);
-            if(words.length == 2) {
-                words[0] = words[0].toLowerCase();
-                words[1] = words[1].toLowerCase();
-
-                if(Arrays.equals(words,new String[]{"begin","formula"})) {
-                    if(formulaSection == true) {
-                        String message = String.format(errorBeginFormula,indexLine);
-                        throw new FormatException(message);
-                    }
-                    else {
-                        formulaSection = true;
-                    }
-                }
-                else if(Arrays.equals(words,new String[]{"end","formula"})) {
-                    if(formulaSection == false) {
-                        String message = String.format(errorEndFormula,indexLine);
-                        throw new FormatException(message);
-                    }
-                    else {
-                        formulaSection = false;
-                    }
-                }
-                else if(Arrays.equals(words,new String[]{"begin","sets"})) {
-                    if(setSection == true) {
-                        String message = String.format(errorBeginSet,indexLine);
-                        throw new FormatException(message);
-                    }
-                    else {
-                        setSection = true;
-                    }
-                }
-                else if(Arrays.equals(words,new String[]{"end","sets"})) {
-                    if(setSection == false) {
-                        String message = String.format(errorEndSet,indexLine);
-                        throw new FormatException(message);
-                    }
-                    else {
-                        setSection = false;
-                    }
-                }
-//Alexis: attention
-//probleme de 2 words genre not b  à la fin ne marche pas
-//                addFormule(line);
-            }
-            else if(formulaSection) {
-                addFormule(line);
-            }
-            else if(setSection) {
-                addSet(line);
-            }
+            textInEditor = textInEditor.concat(words + "\n");
         }
     }
 
     public void saveToFile(String path) throws IOException {
         int sizeBuffer = 8192;
         BufferedWriter writer = new BufferedWriter(new FileWriter(path), sizeBuffer);
-
-	if(!sets.isEmpty()) {
-            writer.write("begin sets\n");
-            writer.write(sets);
-            writer.write("\nend sets\n");
-        }
-        if(!formules.isEmpty()) {
-            writer.write("begin formula\n");
-            writer.write(formules);
-            writer.write("\nend formula\n");
-        }
-
+        writer.write(this.get());
         writer.flush();
         writer.close();
     }
-
-    /**
-     * Add a formule to the current String of formules
-     * @param A formule
-     */
-
-    public void addFormule(String formule) {
-        formules = formules.concat(formule+"\n");
-    }
-
-    /**
-     * Add a set to the current String of sets
-     * @param A set
-     */
-
-    public void addSet(String set) {
-        sets = sets.concat(set+"\n");
-    }
-    
-     /**
-     * Add all formules found in a string to the current String of formules
-     * @param a String
-     */
-    
-    public void addFormules(String text) {
-        formules = formules.concat(text);
-    }
-
-    /**
-     * Add all sets found in a string to the current String of sets
-     * @param a String
-     */
-    
-    public void addSets(String text) {
-        sets = sets.concat(text);
-    }
-
-    public static void main(String[] args) {
-        System.out.println("essai");
-    }
-
 }

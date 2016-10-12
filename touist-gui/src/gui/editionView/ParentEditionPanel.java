@@ -69,8 +69,7 @@ public class ParentEditionPanel extends AbstractComponentPanel {
         
         testThread = new Thread();
         
-        editorPanelFormulas.initPalette(SnippetContainer.PaletteType.FORMULA);
-        editorPanelSets.initPalette(SnippetContainer.PaletteType.SET);
+        editor.initPalette();
         jLabelErrorMessageText = "";
         bottomMessage.setText(jLabelErrorMessageText);
         
@@ -108,9 +107,7 @@ public class ParentEditionPanel extends AbstractComponentPanel {
 
         fileChooser = new javax.swing.JFileChooser();
         popupMessage = new javax.swing.JOptionPane();
-        editorTabsFormulaSet = new javax.swing.JTabbedPane();
-        editorPanelFormulas = new gui.editionView.EditionPanel();
-        editorPanelSets = new gui.editionView.EditionPanel();
+        editor = new gui.editionView.EditionPanel();
         solveButton = new javax.swing.JButton();
         importButton = new javax.swing.JButton();
         bottomMessage = new javax.swing.JLabel();
@@ -120,10 +117,6 @@ public class ParentEditionPanel extends AbstractComponentPanel {
 
         fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
         fileChooser.addChoosableFileFilter(new FileNameExtensionFilter("Touistl files(touistl)","touistl"));
-
-        editorTabsFormulaSet.setToolTipText("");
-        editorTabsFormulaSet.addTab("Formulas", editorPanelFormulas);
-        editorTabsFormulaSet.addTab("Sets", editorPanelSets);
 
         solveButton.setText("Solve");
         solveButton.addActionListener(new java.awt.event.ActionListener() {
@@ -167,27 +160,29 @@ public class ParentEditionPanel extends AbstractComponentPanel {
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(editorTabsFormulaSet, javax.swing.GroupLayout.DEFAULT_SIZE, 992, Short.MAX_VALUE)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+            .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(cursorPosition)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(bottomMessage)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(exportButton)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(importButton)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(solveButton)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(selectSatOrSmt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addComponent(cursorPosition)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(bottomMessage)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 497, Short.MAX_VALUE)
+                        .addComponent(exportButton)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(importButton)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(solveButton)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(selectSatOrSmt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(editor, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addComponent(editorTabsFormulaSet, javax.swing.GroupLayout.DEFAULT_SIZE, 510, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(editor, javax.swing.GroupLayout.DEFAULT_SIZE, 511, Short.MAX_VALUE)
+                .addGap(4, 4, 4)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(solveButton)
                     .addComponent(importButton)
@@ -360,9 +355,7 @@ public class ParentEditionPanel extends AbstractComponentPanel {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel bottomMessage;
     private javax.swing.JLabel cursorPosition;
-    private gui.editionView.EditionPanel editorPanelFormulas;
-    private gui.editionView.EditionPanel editorPanelSets;
-    private javax.swing.JTabbedPane editorTabsFormulaSet;
+    private gui.editionView.EditionPanel editor;
     private javax.swing.JButton exportButton;
     private javax.swing.JFileChooser fileChooser;
     private javax.swing.JButton importButton;
@@ -378,30 +371,28 @@ public class ParentEditionPanel extends AbstractComponentPanel {
     	d.setMode(FileDialog.LOAD);
     	d.setVisible(true);
     	
-        getFrame().getClause().setFormules("");
-        getFrame().getClause().setSets("");
+        getFrame().getTextInEditor().set("");
 
         if (d.getFile() != null) 
         {
         	String path = d.getDirectory() + d.getFile();
 
             try {
-                getFrame().getClause().loadFile(path);
+                getFrame().getTextInEditor().loadFile(path);
             } catch(Exception e) {
                 System.err.println("Failed to load file: " + path);
                 showErrorMessage(e,"Failed to load file: '" + path + "'","");
 
             }
 
-            // Update text in editor
-            editorPanelFormulas.setText(getFrame().getClause().getFormules());
-            editorPanelSets.setText(getFrame().getClause().getSets());
-        }
+            //Réinitialisation des sets et des formules
+            String text = getFrame().getTextInEditor().get();
+            editor.setText(text);
+        }   
     }
 
     public void exportHandler() {
-        getFrame().getClause().setFormules(editorPanelFormulas.getText());
-        getFrame().getClause().setSets(editorPanelSets.getText());
+        getFrame().getTextInEditor().set(editor.getText());
 
     	FileDialog d = new FileDialog(getFrame()); 
     	d.setDirectory(getFrame().getDefaultDirectoryPath());
@@ -412,7 +403,7 @@ public class ParentEditionPanel extends AbstractComponentPanel {
         try {
             if(d.getFile() != null){
             	 path = d.getDirectory() + d.getFile();
-            	 getFrame().getClause().saveToFile(path);
+                getFrame().getTextInEditor().saveToFile(path);
             }
         } catch (IOException e) {
             String warningWindowTitle = getFrame().getLang().getWord(Lang.EDITION_EXPORT_FAILURE_TITLE);
@@ -458,40 +449,10 @@ public class ParentEditionPanel extends AbstractComponentPanel {
         }
     }
     
-    private TranslationError guiTranslationErrorAdapter(TranslationError error) {
-        TranslatorSAT t = new TranslatorSAT("");
-        TranslationError adaptedError;
-        int row = error.getRowInCode();
-        String sets = getFrame().getClause().getSets();
-        int nbRowsInSets = 1;
-        int setShift = (getFrame().getClause().getSets().isEmpty()) ? 0 : -1; // -1 pour tenir compte de "begin sets";
-        int formulasShift = (getFrame().getClause().getSets().isEmpty()) ? 0 : -3; // -3 pour tenir compte de "begin sets", "end sets" et "begin formulas"
-        
-        for (int i=0; i<sets.length(); i++) {
-            if (sets.charAt(i) == '\n') {
-                nbRowsInSets++;
-            }
-        }
-        if (row < nbRowsInSets) {
-            // l'erreur est dans les sets
-            adaptedError = new TranslationError(row - setShift,
-                    error.getColumnInCode(), 
-                    error.getErrorMessage() + getFrame().getLang().getWord(Lang.ERROR_TRADUCTION_IN_SETS));
-        } else {
-            // l'erreur est dans les formules
-            adaptedError = new TranslationError(row-nbRowsInSets - formulasShift, 
-                    error.getColumnInCode(), 
-                    error.getErrorMessage() + getFrame().getLang().getWord(Lang.ERROR_TRADUCTION_IN_FORMULAS));
-        }
-        return adaptedError;
-    }
 
     private State initResultView() {
         // Initialisation de BaseDeClause
-        getFrame().getClause().setFormules("");
-        getFrame().getClause().setSets("");
-        getFrame().getClause().addFormules(editorPanelFormulas.getText());
-        getFrame().getClause().addSets(editorPanelSets.getText());
+        getFrame().getTextInEditor().set(editor.getText());
         
         /*
         Faire appel au solveur avec les fichiers générés par le traducteur
@@ -506,7 +467,7 @@ public class ParentEditionPanel extends AbstractComponentPanel {
         
         
         try {
-            getFrame().getClause().saveToFile(bigAndFilePath);
+            getFrame().getTextInEditor().saveToFile(bigAndFilePath);
         } catch (IOException ex) {
             ex.printStackTrace();
             errorMessage = "Couldn't create file '" + bigAndFilePath + "'";
@@ -521,11 +482,7 @@ public class ParentEditionPanel extends AbstractComponentPanel {
                 if(! getFrame().getTranslatorSAT().translate(bigAndFilePath)) {
                     errorMessage = "";
                     for (TranslationError error : getFrame().getTranslatorSAT().getErrors()) {
-                            if(error.hasRowAndColumn()) {
-                                    errorMessage += guiTranslationErrorAdapter(error) + "\n";
-                            } else { 
-                                    errorMessage += error + "\n";
-                            }
+                            errorMessage += error + "\n";
                     }
                     setJLabelErrorMessageText(errorMessage);
 
@@ -616,11 +573,7 @@ public class ParentEditionPanel extends AbstractComponentPanel {
                 if(! getFrame().getTranslatorSMT().translate(bigAndFilePath, logic)) {
                     errorMessage = "";
                     for (TranslationError error : getFrame().getTranslatorSAT().getErrors()) {
-                            if(error.hasRowAndColumn()) {
-                                    errorMessage += guiTranslationErrorAdapter(error) + "\n";
-                            } else { 
-                                    errorMessage += error + "\n";
-                            }
+                    	errorMessage += error + "\n";
                     }
                     setJLabelErrorMessageText(errorMessage);
 
@@ -688,26 +641,18 @@ public class ParentEditionPanel extends AbstractComponentPanel {
     }
     
     public void zoom(int n) {
-        if(editorTabsFormulaSet.getSelectedIndex() <= 1) {
-            ((EditionPanel)editorTabsFormulaSet.getSelectedComponent()).zoom(n);
-        }
+    	editor.zoom(n);
     }
     
     @Override
     public void updateLanguage() {
-        editorTabsFormulaSet.setToolTipText("");
         importButton.setText(getFrame().getLang().getWord(Lang.EDITION_IMPORT));
         importButton.setToolTipText(getFrame().getLang().getWord("ParentEditionPanel.importButton.tooltip"));
         exportButton.setText(getFrame().getLang().getWord(Lang.EDITION_EXPORT));
         exportButton.setToolTipText(getFrame().getLang().getWord("ParentEditionPanel.exportButton.tooltip"));
         solveButton.setText(getFrame().getLang().getWord(Lang.EDITION_TEST));
         solveButton.setToolTipText(getFrame().getLang().getWord("ParentEditionPanel.testButton.tooltip")); 
-        editorPanelFormulas.updateLanguage();
-        editorPanelSets.updateLanguage();
-        editorTabsFormulaSet.setTitleAt(0, getFrame().getLang().getWord(Lang.EDITION_TAB_FORMULAS));
-        editorTabsFormulaSet.setTitleAt(1, getFrame().getLang().getWord(Lang.EDITION_TAB_SETS));
-        editorTabsFormulaSet.setToolTipTextAt(0, getFrame().getLang().getWord("ParentEditionPanel.editorPanelFormulas.TabConstraints.tabTooltip"));
-        editorTabsFormulaSet.setToolTipTextAt(1, getFrame().getLang().getWord("ParentEditionPanel.editorPanelSets.TabConstraints.tabTooltip"));
+        editor.updateLanguage();
         selectSatOrSmt.setToolTipText(getFrame().getLang().getWord("ParentEditionPanel.comboBoxSATSMT.tooltip"));
         cursorPosition.setToolTipText(getFrame().getLang().getWord("ParentEditionPanel.jLabelCaretPosition.tooltip"));
         bottomMessage.setToolTipText(getFrame().getLang().getWord("ParentEditionPanel.jLabelErrorMessage.tooltip"));
