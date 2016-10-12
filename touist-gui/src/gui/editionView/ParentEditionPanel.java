@@ -79,7 +79,24 @@ public class ParentEditionPanel extends AbstractComponentPanel {
         }
     }
     
-    public void updateComboBoxSelectedSolver() {
+    public gui.editionView.EditionPanel getEditorPanelFormulas() {
+		return editorPanelFormulas;
+	}
+
+	public void setEditorPanelFormulas(
+			gui.editionView.EditionPanel editorPanelFormulas) {
+		this.editorPanelFormulas = editorPanelFormulas;
+	}
+
+	public gui.editionView.EditionPanel getEditorPanelSets() {
+		return editorPanelSets;
+	}
+
+	public void setEditorPanelSets(gui.editionView.EditionPanel editorPanelSets) {
+		this.editorPanelSets = editorPanelSets;
+	}
+
+	public void updateComboBoxSelectedSolver() {
         jComboBox1.setSelectedItem(getFrame().getSolverSelection().getSelectedSolver());
     }
     
