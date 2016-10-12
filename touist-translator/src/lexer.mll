@@ -114,7 +114,7 @@ rule token = parse
   | "="            { AFFECT       }
   | ":"            { COLON        }
   | ")"            { RPAREN       }
-(*| '$'(var as v)'('{TUPLE_VAR ("$" ^ v)}*)
+  | '$'(var as v)'(' { VARTUPLE ("$" ^ v)}
   | '$'(var as v)  { VAR ("$" ^ v)}
     (* This rule is going to take care of both identifiers
      * and every keyword in reserved_keywords *)

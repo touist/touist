@@ -23,6 +23,7 @@
 %token <string> VAR
 %token <string> TERM
 %token <string> TUPLE
+%token <string> VARTUPLE
 %token ADD SUB MUL DIV MOD SQRT TOINT TOFLOAT
 %token AND OR XOR IMPLIES EQUIV NOT
 %token EQUAL NOTEQUAL LE LT GE GT
@@ -132,9 +133,9 @@ prog:
 
 var_decl:
   | VAR { ($1, None) }
-  | VAR LPAREN separated_nonempty_list(COMMA, exp) RPAREN { ($1, Some $3) }
-  | VAR LPAREN separated_nonempty_list(COMMA, TERM) RPAREN
-    { ($1, Some (List.map (fun e -> Clause (Term (e,None))) $3)) }
+  | v=VARTUPLE (*LPAREN*) l=separated_nonempty_list(COMMA, exp) RPAREN { (v, Some l) }
+  | v=VARTUPLE (*LPAREN*) l=separated_nonempty_list(COMMA, TERM) RPAREN
+    { (v, Some (List.map (fun e -> Clause (Term (e,None))) l)) }
 
 affect:
   | var_decl AFFECT exp { Affect ($1, $3) }
