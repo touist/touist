@@ -124,7 +124,7 @@ public class MainFrame extends javax.swing.JFrame {
         editionMenuBar.updateLanguage();
     }
 
-    public TextInEditor getClause() {
+    public TextInEditor getTextInEditor() {
         return clause;
     }
 

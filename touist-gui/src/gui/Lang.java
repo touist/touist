@@ -90,8 +90,6 @@ public class Lang {
     public static final String EDITION_IMPORT = "ParentEditionPanel.importButton.text";
     public static final String EDITION_EXPORT = "ParentEditionPanel.exportButton.text";
     public static final String EDITION_TEST = "ParentEditionPanel.testButton.text";
-    public static final String EDITION_TAB_FORMULAS = "ParentEditionPanel.editorPanelFormulas.TabConstraints.tabTitle";
-    public static final String EDITION_TAB_SETS = "ParentEditionPanel.editorPanelSets.TabConstraints.tabTitle";
     public static final String EDITION_EXPORT_FAILURE_TITLE = "ParentEditionPanel.exportFailure.title";
     public static final String EDITION_EXPORT_FAILURE_TEXT = "ParentEditionPanel.exportFailure.text";
     public static final String EDITION_MENUITEM_SAVEFILE = "EditionMenuBar.jMenuItemSaveFile.text";

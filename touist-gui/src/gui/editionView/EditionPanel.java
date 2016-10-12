@@ -135,7 +135,7 @@ public class EditionPanel extends AbstractComponentPanel {
             @Override
             public void caretUpdate(CaretEvent e) {
                 // +1 car par défaut, on compte à partir de 0.
-                ((ParentEditionPanel)getParent().getParent()).setJLabelCaretPositionText(
+                ((ParentEditionPanel)getParent()).setJLabelCaretPositionText(
                         (editorTextArea.getCaretLineNumber() + 1)
                         + ":"
                         + (editorTextArea.getCaretOffsetFromLineStart() + 1)
@@ -154,8 +154,8 @@ public class EditionPanel extends AbstractComponentPanel {
         snippetsAndCodeAndLatex.setDividerSize(3);
     }
     
-    public void initPalette(SnippetContainer.PaletteType type) {
-        snippetsContainer.initPaletteContent(type);
+    public void initPalette() {
+        snippetsContainer.initPaletteContent();
         snippetsAndCodeAndLatex.setDividerLocation(120);
     }
 
