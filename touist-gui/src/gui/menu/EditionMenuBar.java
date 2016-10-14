@@ -79,7 +79,7 @@ public class EditionMenuBar extends JMenuBar {
         
         
         jMenuItemEnglish = new JMenuItem("English");
-        jMenuItemFrench = new JMenuItem("FranÃ§ais");
+        jMenuItemFrench = new JMenuItem("Français");
         
         jMenuItemSaveFile = new JMenuItem();
         jMenuItemSaveFile.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_S, java.awt.Event.META_MASK));
