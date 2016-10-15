@@ -3,6 +3,10 @@ v1.3.1
     - fixed `a (b)` recognized as `a(b)` instead of `a and b`
   - gui:
     - select the system language automatically
+	- fix "export" button not working
+	- export and import are now use the operating system UI (jre>=1.7)
+	- jre>=1.7 is now required; it solves the wierd mac problem that says
+	  that you need to install the JDK for using command-line functions
 v1.3.0
   - touist.jar:
     - fix touist hanging on "solve" on some unsatisfiable formulas
