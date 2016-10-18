@@ -19,8 +19,8 @@
 		 Those lines set some properties (equivalent of shell variables)
 		 that will be used in targets
 	-->
-	<property name="source" value="1.6"/>
-	<property name="target" value="1.6"/>
+	<property name="source" value="1.7"/>
+	<property name="target" value="1.7"/>
 	<property environment="env"/>
 	<property name="debuglevel" value="source,lines,vars"/>
 	<property name="touist.dir" value="${basedir}"/>

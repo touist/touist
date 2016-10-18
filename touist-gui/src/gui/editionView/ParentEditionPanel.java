@@ -32,6 +32,7 @@ import gui.SolverSelection.SolverType;
 import gui.State;
 
 import java.awt.AWTException;
+import java.awt.FileDialog;
 import java.awt.Robot;
 import java.awt.event.KeyEvent;
 import java.io.File;
@@ -371,42 +372,47 @@ public class ParentEditionPanel extends AbstractComponentPanel {
     // End of variables declaration//GEN-END:variables
 
     public void importHandler() {
-        String path = getFrame().getDefaultDirectoryPath();
-        int returnVal;
+
+		FileDialog d = new FileDialog(getFrame()); 
+		d.setDirectory(getFrame().getDefaultDirectoryPath());
+    	d.setMode(FileDialog.LOAD);
+    	d.setVisible(true);
+    	
         getFrame().getClause().setFormules("");
         getFrame().getClause().setSets("");
-        
-        returnVal = fileChooser.showOpenDialog(this);
-        
-        if (returnVal == JFileChooser.APPROVE_OPTION && fileChooser.getSelectedFile() != null) {
-            path = fileChooser.getSelectedFile().getPath();
+
+        if (d.getFile() != null) 
+        {
+        	String path = d.getDirectory() + d.getFile();
 
             try {
                 getFrame().getClause().loadFile(path);
             } catch(Exception e) {
-                //TODO handle error message
-                System.out.println("Error : Failed to load the file : " + path);
-                e.printStackTrace();
+                System.err.println("Failed to load file: " + path);
+                showErrorMessage(e,"Failed to load file: '" + path + "'","");
+
             }
 
-            //Réinitialisation des sets et des formules
-            String text = getFrame().getClause().getFormules();
-            editorPanelFormulas.setText(text);
-            text = getFrame().getClause().getSets();
-            editorPanelSets.setText(text);
-        }   
+            // Update text in editor
+            editorPanelFormulas.setText(getFrame().getClause().getFormules());
+            editorPanelSets.setText(getFrame().getClause().getSets());
+        }
     }
-    
+
     public void exportHandler() {
-        getFrame().getClause().setFormules("");
-        getFrame().getClause().setSets("");
-        getFrame().getClause().addFormules(editorPanelFormulas.getText());
-        getFrame().getClause().addSets(editorPanelSets.getText());
-        
-        int returnVal = fileChooser.showDialog(this,getFrame().getLang().getWord(Lang.EDITION_FILE_CHOOSER));
+        getFrame().getClause().setFormules(editorPanelFormulas.getText());
+        getFrame().getClause().setSets(editorPanelSets.getText());
+
+    	FileDialog d = new FileDialog(getFrame()); 
+    	d.setDirectory(getFrame().getDefaultDirectoryPath());
+    	d.setMode(FileDialog.SAVE);
+    	d.setVisible(true);
+
+    	String path;
         try {
-            if(returnVal == JFileChooser.APPROVE_OPTION){
-                getFrame().getClause().saveToFile(fileChooser.getSelectedFile().getPath());
+            if(d.getFile() != null){
+            	 path = d.getDirectory() + d.getFile();
+            	 getFrame().getClause().saveToFile(path);
             }
         } catch (IOException e) {
             String warningWindowTitle = getFrame().getLang().getWord(Lang.EDITION_EXPORT_FAILURE_TITLE);
