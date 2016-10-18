@@ -12,20 +12,6 @@ let message =
         "An affectation of the form \"$var = ...\" is expected.\n"
     | 113 ->
         "An affectation sign '=' is expected here.\n"
-    | 3 ->
-        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
-    | 4 ->
-        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
-    | 109 ->
-        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
-    | 90 ->
-        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
-    | 14 ->
-        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
-    | 111 ->
-        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
-    | 15 ->
-        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
     | 114 ->
         "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
     | 115 ->
@@ -294,7 +280,7 @@ let message =
         "Ill-formed 'atleast' statement.\nAt this point, an expression or variable was expected.\nInstead, $0 was read.\n"
     | 91 ->
         "Ill-formed use of $3 statement.\n"
-    | 88 | 147 ->
+    | 147 ->
         "Ill-formed use of 'exact' statement.\nAn expression was expected after $1.\n"
     | _ ->
         raise Not_found
