@@ -117,8 +117,8 @@ let print_position outx lexbuf =
  *
  * [ast] means it is of type Syntax.prog,
  * i.e. the "root" type in lexer.mll
-*)
-let evaluate (ast:Syntax.prog) : Syntax.clause =
+ *)
+let evaluate (ast:Syntax.prog) : Syntax.exp =
   try Eval.eval ast [] with
   | Eval.UnknownVar msg ->
     Printf.fprintf stderr "the variable %s has not been declared\n" msg;

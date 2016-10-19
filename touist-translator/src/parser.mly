@@ -135,7 +135,7 @@ var_decl:
   | VAR { ($1, None) }
   | v=VARTUPLE (*LPAREN*) l=separated_nonempty_list(COMMA, exp) RPAREN { (v, Some l) }
   | v=VARTUPLE (*LPAREN*) l=separated_nonempty_list(COMMA, TERM) RPAREN
-    { (v, Some (List.map (fun e -> Clause (Term (e,None))) l)) }
+    { (v, Some (List.map (fun e -> Term (e,None)) l)) }
 
 affect:
   | var_decl AFFECT exp { Affect ($1, $3) }
@@ -197,8 +197,8 @@ exp:
 
 clause:
   | LPAREN clause RPAREN { $2 }
-  | INT   { CInt   $1 }
-  | FLOAT { CFloat $1 }
+  | INT   { Int   $1 }
+  | FLOAT { Float $1 }
 
   (* SUB clause makes it really "hard" to solve. Just one example;
      On the first line, the actual list of tokens. On the two following
@@ -207,29 +207,29 @@ clause:
       clause -> clause1 SUB clause2        => ((clause1 SUB clause2) XOR clause3)
       clause ->         SUB clause2        => (clause 1)((SUB clause2) XOR clause3)
    *)
-  | SUB clause { CNeg $2 } %prec high_precedence
-  | clause ADD      clause { CAdd              ($1, $3) }
-  | clause SUB      clause { CSub              ($1, $3) }
-  | clause MUL      clause { CMul              ($1, $3) }
-  | clause DIV      clause { CDiv              ($1, $3) }
-  | clause EQUAL    clause { CEqual            ($1, $3) }
-  | clause NOTEQUAL clause { CNot_equal        ($1, $3) }
-  | clause LT       clause { CLesser_than      ($1, $3) }
-  | clause LE       clause { CLesser_or_equal  ($1, $3) }
-  | clause GT       clause { CGreater_than     ($1, $3) }
-  | clause GE       clause { CGreater_or_equal ($1, $3) }
-  | var_decl { CVar $1 }
+  | SUB clause { Neg $2 } %prec high_precedence
+  | clause ADD      clause { Add              ($1, $3) }
+  | clause SUB      clause { Sub              ($1, $3) }
+  | clause MUL      clause { Mul              ($1, $3) }
+  | clause DIV      clause { Div              ($1, $3) }
+  | clause EQUAL    clause { Equal            ($1, $3) }
+  | clause NOTEQUAL clause { Not_equal        ($1, $3) }
+  | clause LT       clause { Lesser_than      ($1, $3) }
+  | clause LE       clause { Lesser_or_equal  ($1, $3) }
+  | clause GT       clause { Greater_than     ($1, $3) }
+  | clause GE       clause { Greater_or_equal ($1, $3) }
+  | var_decl { Var $1 }
   | TOP    { Top    }
   | BOTTOM { Bottom }
   | TERM   { Term ($1, None) }
   | t=TUPLE (*LPAREN*) l=separated_nonempty_list(COMMA, term_or_exp) RPAREN
       { Term (t, Some l) }
-  | NOT clause { CNot $2 }
-  | clause AND     clause { CAnd     ($1, $3) }
-  | clause OR      clause { COr      ($1, $3) }
-  | clause XOR     clause { CXor     ($1, $3) }
-  | clause IMPLIES clause { CImplies ($1, $3) }
-  | clause EQUIV   clause { CEquiv   ($1, $3) }
+  | NOT clause { Not $2 }
+  | clause AND     clause { And     ($1, $3) }
+  | clause OR      clause { Or      ($1, $3) }
+  | clause XOR     clause { Xor     ($1, $3) }
+  | clause IMPLIES clause { Implies ($1, $3) }
+  | clause EQUIV   clause { Equiv   ($1, $3) }
   | EXACT (*LPAREN*) x=exp COMMA y=exp RPAREN { Exact   (x, y) }
   | ATLEAST (*LPAREN*) x=exp COMMA y=exp RPAREN { Atleast (x, y) }
   | ATMOST (*LPAREN*) x=exp COMMA y=exp RPAREN { Atmost  (x, y) }
@@ -241,18 +241,18 @@ clause:
   { Bigor ($2, $4, None, $6) }
   | BIGOR separated_nonempty_list(COMMA,VAR) IN separated_nonempty_list(COMMA,exp) WHEN exp COLON clause END
   { Bigor ($2, $4, Some $6, $8) }
-  | IF exp THEN clause ELSE clause END { CIf ($2, $4, $6) }
+  | IF exp THEN clause ELSE clause END { If ($2, $4, $6) }
 
 (* Warning: the two rules
      var_decl -> TERM
      exp -> var_decl
    are doing the same thing as term_or_exp *)
 term_or_exp:
-  | TERM { Clause (Term ($1,None)) }
+  | TERM { Term ($1,None) }
   | exp { $1 }
 
 set_decl:
   | LBRACK RBRACK { [] }
   | LBRACK separated_nonempty_list(COMMA, exp) RBRACK { $2 }
   | LBRACK separated_nonempty_list(COMMA, TERM) RBRACK
-  { List.map (fun x -> Clause (Term (x,None))) $2 }
+  { List.map (fun x -> Term (x,None)) $2 }

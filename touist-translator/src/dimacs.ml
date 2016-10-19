@@ -26,9 +26,9 @@ let to_dimacs prop =
     | Bottom -> failwith "Clause is alway false"
     | Term (x, None)        -> acc ^ string_of_int (gensym x)
     | Term (x, _)           -> failwith ("unevaluated term: " ^ x)
-    | CNot (Term (x, None)) -> acc ^ string_of_int (- (gensym x))
-    | CAnd (x, y) -> incr nbclause; (go acc x) ^ " 0\n" ^ (go acc y)
-    | COr  (x, y) -> (go acc x) ^ " " ^ (go acc y)
+    | Not (Term (x, None)) -> acc ^ string_of_int (- (gensym x))
+    | And (x, y) -> incr nbclause; (go acc x) ^ " 0\n" ^ (go acc y)
+    | Or  (x, y) -> (go acc x) ^ " " ^ (go acc y)
     | _ -> failwith "non CNF clause"
   and gensym x =
     try Hashtbl.find table x
@@ -53,9 +53,9 @@ let to_text prop =
     | Bottom -> (*failwith "Clause is alway false"*) "VBot"
     | Term (x, None)        -> acc ^ x
     | Term (x, _)           -> failwith ("unevaluated term: " ^ x)
-    | CNot (Term (x, None)) -> acc ^ "-" ^ x
-    | CAnd (x, y) -> incr nbclause; (go acc x) ^ " \n" ^ (go acc y)
-    | COr  (x, y) -> (go acc x) ^ " v " ^ (go acc y)
+    | Not (Term (x, None)) -> acc ^ "-" ^ x
+    | And (x, y) -> incr nbclause; (go acc x) ^ " \n" ^ (go acc y)
+    | Or  (x, y) -> (go acc x) ^ " v " ^ (go acc y)
     | _ -> failwith "non CNF clause"
   in
   let str = (go "" prop) ^ " 0\n" in
