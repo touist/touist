@@ -4,6 +4,7 @@ v1.3.1
     - added --debug-formula-expansion which prints the "expanded" version
       of bigand, bigor, exact and numerical expressions; helps for debugging
       complex formulas!
+	- (internal) merged exp and clause types for less code redundancy
   - gui:
     - select the system language automatically
 	- fix "export" button not working
