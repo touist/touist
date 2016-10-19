@@ -71,10 +71,11 @@ let output_table = ref stdout
 let input = ref stdin
 let debug_cnf = ref false
 let debug_syntax = ref false
+let debug_formula_expansion = ref false
 
 let print_position outx lexbuf =
   let pos = lexbuf.lex_curr_p in
-    Printf.fprintf outx "%d:%d" pos.pos_lnum (pos.pos_cnum - pos.pos_bol+1)
+  Printf.fprintf outx "%d:%d" pos.pos_lnum (pos.pos_cnum - pos.pos_bol+1)
 
 (* Used to write the "str" string into the "filename" file *)
 let write_to_file (filename:string) (str:string) =
@@ -85,23 +86,23 @@ let write_to_file (filename:string) (str:string) =
   with x -> close_out out; raise x
 
 (* Used when no outputFilePath is given: builds an arbitrary
-outputFilePath name using the inputFilePath name *)
+   outputFilePath name using the inputFilePath name *)
 let defaultOutput (inputFilePath:string) (m:mode) : string =
   let inputBase = FilePath.basename inputFilePath in
   match m with
   | SAT_DIMACS -> FilePath.replace_extension inputBase "cnf"
   | SMTLIB2 -> FilePath.replace_extension inputBase "smt2"
-  (*in FilePath.concat inputDir outputBase*)
+(*in FilePath.concat inputDir outputBase*)
 
 (* Used when no outputFilePath is given: builds an arbitrary
-outputFilePath name using the inputFilePath name *)
+   outputFilePath name using the inputFilePath name *)
 let defaultOutputTable (inputFilePath:string) : string =
   let inputBase = (FilePath.basename inputFilePath) in
   let inputBaseNoExt = (FilePath.chop_extension inputBase) in
   inputBaseNoExt ^ ".table"
 
 (* Used in Arg.parse when a parameter without any preceeding -flag (-f, -x...)
-Here, this kind of parameter is considered as an inputFilePath *)
+   Here, this kind of parameter is considered as an inputFilePath *)
 let argIsInputFilePath (inputFilePath:string) : unit =
   input_file_path := inputFilePath
 
@@ -116,18 +117,18 @@ let print_position outx lexbuf =
  *
  * [ast] means it is of type Syntax.prog,
  * i.e. the "root" type in lexer.mll
- *)
+*)
 let evaluate (ast:Syntax.prog) : Syntax.clause =
   try Eval.eval ast [] with
   | Eval.UnknownVar msg ->
-      Printf.fprintf stderr "the variable %s has not been declared\n" msg;
-      exit (get_code COMPILE_NO_LINE_NUMBER_ERROR)
+    Printf.fprintf stderr "the variable %s has not been declared\n" msg;
+    exit (get_code COMPILE_NO_LINE_NUMBER_ERROR)
   | Eval.TypeError msg ->
-      Printf.fprintf stderr "type error with '%s'\n" msg;
-      exit (get_code COMPILE_NO_LINE_NUMBER_ERROR)
+    Printf.fprintf stderr "type error with '%s'\n" msg;
+    exit (get_code COMPILE_NO_LINE_NUMBER_ERROR)
   | Eval.ArgumentError msg ->
-      Printf.fprintf stderr "argument error: '%s'\n" msg;
-      exit (get_code COMPILE_NO_LINE_NUMBER_ERROR)
+    Printf.fprintf stderr "argument error: '%s'\n" msg;
+    exit (get_code COMPILE_NO_LINE_NUMBER_ERROR)
 
 
 (* [lexer] is an intermediate to the [Lexer.token] function (in lexer.mll);
@@ -165,10 +166,10 @@ let invoke_parser (text:string) (lexer:Lexing.lexbuf -> Parser.token) (buffer) :
   and supplier = Parser.MenhirInterpreter.lexer_lexbuf_to_supplier lexer lexbuf
   and succeed ast = ast
   and fail checkpoint =
-      Printf.fprintf stderr "%s" (ErrorReporting.report text !buffer checkpoint !debug_syntax);
-      exit (get_code COMPILE_WITH_LINE_NUMBER_ERROR)
+    Printf.fprintf stderr "%s" (ErrorReporting.report text !buffer checkpoint !debug_syntax);
+    exit (get_code COMPILE_WITH_LINE_NUMBER_ERROR)
   in
-    Parser.MenhirInterpreter.loop_handle succeed fail supplier checkpoint
+  Parser.MenhirInterpreter.loop_handle succeed fail supplier checkpoint
 
 
 let rec string_of_file (input:in_channel) : string =
@@ -182,14 +183,17 @@ let rec string_of_file (input:in_channel) : string =
 (* Main parsing/lexing function (for SAT).
  * Note: infile, outfile and tablefile must be already opened with open_in
  * and open_out *)
+open Pprint
 let translateToSATDIMACS (infile:in_channel) (outfile:out_channel) (tablefile:out_channel) =
   let text = string_of_file infile
   and buffer = ref ErrorReporting.Zero in
   let ast = invoke_parser text (lexer buffer) buffer in
-    let exp = evaluate ast in
-      let c,t = Cnf.transform_to_cnf exp !debug_cnf |> Dimacs.to_dimacs in
-        Printf.fprintf outfile "%s" c;
-        Printf.fprintf tablefile "%s" (Dimacs.string_of_table t)
+  let exp = evaluate ast in
+  if !debug_formula_expansion then print_string (string_of_clause exp)
+  else
+    let c,t = Cnf.transform_to_cnf exp !debug_cnf |> Dimacs.to_dimacs in
+    Printf.fprintf outfile "%s" c;
+    Printf.fprintf tablefile "%s" (Dimacs.string_of_table t)
 
 (* Main parsing/lexing function (for SMT).
  * Note: infile and outfile must be already opened with open_in
@@ -198,40 +202,41 @@ let translate_to_smt2 logic infile outfile =
   let text = string_of_file infile
   and buffer = ref ErrorReporting.Zero in
   let ast = invoke_parser text (lexer buffer) buffer in
-    let exp = evaluate ast in
-      let buf = Smt.to_smt2 logic exp in
-      Buffer.output_buffer outfile buf
+  let exp = evaluate ast in
+  let buf = Smt.to_smt2 logic exp in
+  Buffer.output_buffer outfile buf
 
 (* The main program *)
 let () =
   let cmd = (FilePath.basename Sys.argv.(0)) in (* ./touistl exec. name *)
   let argspecs = (* This list enumerates the different flags (-x,-f...)*)
-  [ (* "-flag", Arg.toSomething (ref var), "Usage for this flag"*)
-    ("-o", Arg.Set_string (output_file_path), "OUTPUT is the translated file");
-    ("-table", Arg.Set_string (output_table_file_path),
-      "TABLE (-sat only) The output file that contains the literals table.
+    [ (* "-flag", Arg.toSomething (ref var), "Usage for this flag"*)
+      ("-o", Arg.Set_string (output_file_path), "OUTPUT is the translated file");
+      ("-table", Arg.Set_string (output_table_file_path),
+       "TABLE (-sat only) The output file that contains the literals table.
       By default, prints to stdout.");
-    ("-sat", Arg.Set sat_mode, "Select the SAT solver");
-    ("-smt2", Arg.Set_string (smt_logic), (
-        "LOGIC Select the SMT solver with the specified LOGIC:
+      ("-sat", Arg.Set sat_mode, "Select the SAT solver");
+      ("-smt2", Arg.Set_string (smt_logic), (
+          "LOGIC Select the SMT solver with the specified LOGIC:
         QF_IDL allows to deal with boolean and integer, E.g, x - y < b
         QF_RDL is the same as QF_IDL but with reals
         QF_LIA (not documented)
         QF_LRA (not documented)
     See http://smtlib.cs.uiowa.edu/logics.shtml for more info."
-    ));
-    ("--version", Arg.Set version_asked, "Display version number");
-    ("-", Arg.Set use_stdin,"reads from stdin instead of file");
-    ("--debug-syntax", Arg.Set debug_syntax, "Print information for debugging
+        ));
+      ("--version", Arg.Set version_asked, "Display version number");
+      ("-", Arg.Set use_stdin,"reads from stdin instead of file");
+      ("--debug-syntax", Arg.Set debug_syntax, "Print information for debugging
     syntax errors given by parser.messages");
-    ("--debug-cnf", Arg.Set debug_cnf,"Print step by step CNF transformation");
-  ]
+      ("--debug-cnf", Arg.Set debug_cnf,"Print step by step CNF transformation");
+      ("--debug-formula-expansion", Arg.Set debug_formula_expansion,"Print how the formula is expanded (bigand...)");
+    ]
   in
   let usage = "TouistL compiles files from the TouIST Language \
-    to SAT-DIMACS/SMT-LIB2 \n\
-    Usage: " ^ cmd ^ " -sat [-o OUTPUT] [-table TABLE] (INPUT | -)\n\
-    Usage: " ^ cmd ^ " -smt2 (QF_IDL|QF_RDL|QF_LIA|QF_LRA) [-o OUTPUT] (INPUT | -) \n\
-    Note: in -sat mode, if TABLE and OUTPUT aren't given, both output will be mixed in stdout."
+               to SAT-DIMACS/SMT-LIB2 \n\
+               Usage: " ^ cmd ^ " -sat [-o OUTPUT] [-table TABLE] (INPUT | -)\n\
+                      Usage: " ^ cmd ^ " -smt2 (QF_IDL|QF_RDL|QF_LIA|QF_LRA) [-o OUTPUT] (INPUT | -) \n\
+                      Note: in -sat mode, if TABLE and OUTPUT aren't given, both output will be mixed in stdout."
   in
 
   (* Step 1: we parse the args. If an arg. is "alone", we suppose
