@@ -7,7 +7,7 @@ terminal TRUE,FALSE,TOP,BOT,AFFECT,EQUAL,DIFFERENT,LESSER,LESSER_OR_EQUAL;
 terminal GREATER,GREATER_OR_EQUAL,BOOL_AND,BOOL_OR,IMPLIQUE,EQUIV,LPAR,RPAR;
 terminal ADD,MULTIPLY,SUBSTRACT,DIVIDE,LCRO,RCRO,DODOT,COMMA,TWODOT,XOR;
 terminal COMMENT,DOT,UNION,INTER,DIFF,WHEN,NEWLINE;
-terminal ATLEAST,EXACT,ATMOST;
+terminal ATLEAST,EXACT,ATMOST,LET;
 
 
 
@@ -119,6 +119,8 @@ expr ::=IF expr:b THEN expr:e1 ELSE expr:e2  {: RESULT = new String("if\\;"+b+"\
 		| ATLEAST LPAR expr:s1 COMMA expr:s2 COMMA expr:s3 COMMA expr:s4 RPAR  {: RESULT = new String("(\\geqslant_{"+s2+" \\in "+s3+"}^{"+s1+"}"+s4+")");:}
 		| EXACT LPAR expr:s1 COMMA expr:s2 COMMA expr:s3 COMMA expr:s4 RPAR  {: RESULT = new String("(=_{"+s2+" \\in "+s3+"}^{"+s1+"}"+s4+")");:}
 		| ATMOST LPAR expr:s1 COMMA expr:s2 COMMA expr:s3 COMMA expr:s4 RPAR  {: RESULT = new String("(\\leqslant_{"+s2+" \\in "+s3+"}^{"+s1+"}"+s4+")");:}
+		| LET expr:s1 AFFECT expr:s2 TWODOT expr:s3  {: RESULT = new String(s1+"="+s2+"\\\\"+s3);:}
+		
 ;
 
 
