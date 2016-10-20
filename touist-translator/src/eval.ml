@@ -484,6 +484,8 @@ and eval_exp_no_expansion exp env =
   | If (x,y,z) ->
       let test = eval_test x env in
       if test then eval_exp_no_expansion y env else eval_exp_no_expansion z env
+  | Let (v,x,c) -> eval_affect (Affect (v,x)) env; eval_exp_no_expansion c env
+
 
 and exact_str lst =
   let rec go = function

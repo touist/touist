@@ -83,3 +83,4 @@ and exp =
   | Atmost   of exp * exp
   | Bigand   of string list * exp list * exp option * exp
   | Bigor    of string list * exp list * exp option * exp
+  | Let      of var * exp * exp
