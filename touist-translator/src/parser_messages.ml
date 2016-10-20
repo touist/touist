@@ -24,43 +24,29 @@ let message =
         "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
     | 120 ->
         "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
-    | 222 ->
+    | 228 ->
         "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
-    | 223 ->
+    | 229 ->
         "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
-    | 231 ->
+    | 237 ->
         "At least one clause is expected.\n$0 is not the beginning of a clause.\n"
-    | 174 ->
+    | 179 ->
         "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
-    | 175 ->
+    | 180 ->
         "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
-    | 226 ->
+    | 232 ->
         "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
-    | 227 ->
-        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
-    | 196 ->
-        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
-    | 197 ->
-        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
-    | 184 ->
-        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
-    | 185 ->
-        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
-    | 178 ->
-        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
-    | 186 ->
-        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
-    | 187 ->
-        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
-    | 188 ->
-        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
-    | 189 ->
-        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
-    | 200 ->
+    | 233 ->
         "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
     | 201 ->
         "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
+    | 202 ->
+        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
+    | 189 ->
+        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
     | 190 ->
+        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
+    | 183 ->
         "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
     | 191 ->
         "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
@@ -68,59 +54,73 @@ let message =
         "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
     | 193 ->
         "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
-    | 202 ->
-        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
-    | 203 ->
-        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
     | 194 ->
+        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
+    | 205 ->
+        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
+    | 206 ->
         "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
     | 195 ->
         "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
-    | 233 ->
+    | 196 ->
         "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
-    | 234 ->
-        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
-    | 180 ->
+    | 197 ->
         "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
     | 198 ->
         "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
+    | 207 ->
+        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
+    | 208 ->
+        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
     | 199 ->
         "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
-    | 182 ->
+    | 200 ->
         "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
-    | 183 ->
+    | 239 ->
         "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
-    | 225 ->
+    | 240 ->
         "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
-    | 217 ->
+    | 185 ->
+        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
+    | 203 ->
+        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
+    | 204 ->
+        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
+    | 187 ->
+        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
+    | 188 ->
+        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
+    | 231 ->
+        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
+    | 223 ->
         "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
     | 131 ->
         "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
     | 132 ->
         "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
-    | 219 ->
+    | 225 ->
         "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
-    | 176 ->
+    | 181 ->
         "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
-    | 177 ->
+    | 182 ->
         "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
     | 133 ->
         "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
-    | 135 ->
+    | 140 ->
         "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
     | 29 ->
         "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
     | 30 ->
         "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
-    | 136 ->
+    | 141 ->
         "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
-    | 137 ->
+    | 142 ->
         "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
-    | 213 ->
+    | 218 ->
         "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
-    | 214 ->
+    | 219 ->
         "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
-    | 215 ->
+    | 220 ->
         "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
     | 31 ->
         "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
@@ -232,55 +232,55 @@ let message =
         "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
     | 24 ->
         "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
-    | 139 ->
-        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
-    | 145 ->
-        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
-    | 146 ->
+    | 144 ->
         "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
     | 150 ->
         "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
-    | 152 ->
-        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
-    | 153 ->
-        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
-    | 154 ->
-        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
-    | 208 ->
-        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
     | 151 ->
-        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
-    | 210 ->
-        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
-    | 211 ->
         "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
     | 155 ->
         "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
     | 157 ->
         "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
+    | 158 ->
+        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
     | 159 ->
+        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
+    | 213 ->
+        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
+    | 156 ->
+        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
+    | 215 ->
+        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
+    | 216 ->
         "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
     | 160 ->
         "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
-    | 161 ->
-        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
-    | 173 ->
-        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
-    | 158 ->
-        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
-    | 205 ->
-        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
-    | 206 ->
-        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
     | 162 ->
         "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
+    | 164 ->
+        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
+    | 165 ->
+        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
+    | 166 ->
+        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
+    | 178 ->
+        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
+    | 163 ->
+        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
+    | 210 ->
+        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
+    | 211 ->
+        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
     | 167 ->
+        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
+    | 172 ->
         "Ill-formed 'atleast' statement.\nAt this point, '(' was expected.\nInstead, $0 was read.\n"
     | 12 ->
-        "Ill-formed 'atleast' statement.\nAt this point, an expression or variable was expected.\nInstead, $0 was read.\n"
+        "Ill-formed '$2' statement.\nAt this point, an expression or variable was expected.\nInstead, $0 was read.\n"
     | 91 ->
         "Ill-formed use of $3 statement.\n"
-    | 147 ->
+    | 152 ->
         "Ill-formed use of 'exact' statement.\nAn expression was expected after $1.\n"
     | _ ->
         raise Not_found

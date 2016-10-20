@@ -38,6 +38,7 @@
 %token TOP BOTTOM
 %token BIGAND BIGOR
 %token BEGIN SETS FORMULA
+%token LET
 %token EOF
 
 %start <Syntax.prog> prog
@@ -242,6 +243,7 @@ clause:
   | BIGOR separated_nonempty_list(COMMA,VAR) IN separated_nonempty_list(COMMA,exp) WHEN exp COLON clause END
   { Bigor ($2, $4, Some $6, $8) }
   | IF exp THEN clause ELSE clause END { If ($2, $4, $6) }
+  | LET v=var_decl AFFECT e=exp COLON c=clause { Let (v,e,c) }
 
 (* Warning: the two rules
      var_decl -> TERM

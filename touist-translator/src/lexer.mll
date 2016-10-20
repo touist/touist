@@ -79,7 +79,8 @@
     "else",          ELSE;
     "mod",           MOD;
     "true",          BOOL true;
-    "false",         BOOL false ]
+    "false",         BOOL false;
+    "let",           LET]
 }
 
 let digit      = ['0' - '9']
