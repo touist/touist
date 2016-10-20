@@ -4,8 +4,9 @@
 #
 # 2016, Mael Valais
 #
-S src/**
-B _build/**
+S src
+B _build/src
 PKG menhirLib
 PKG str
 PKG fileutils
+PKG minisat

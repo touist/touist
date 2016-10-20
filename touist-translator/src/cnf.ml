@@ -28,13 +28,13 @@ open Pprint
       a disjunction (= separated by "or") of possibly negated literals.
       Example of clause:
           a or not b or c or d                      is a clause
-      WARNING: Syntax.clause isn't actually a clause as defined here; it can
+      WARNING: Syntax.exp isn't actually a clause as defined here; it can
       hold Implies, Equiv, Xor. Its naming isn't really appropriate...
     - Conjunction:
       literals separated by "and"; example:
           a and b and not and not d                 is a conjunction
     - AST:
-      abstract syntax tree; it is homogenous to Syntax.clause
+      abstract syntax tree; it is homogenous to Syntax.exp
       and is a recursive tree representing a formula, using Or, And, Implies...
       Example: the formula (1) has the abstract syntax tree (2):
           (a or b) and not c                          (1) natural language

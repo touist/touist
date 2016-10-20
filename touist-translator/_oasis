@@ -5,8 +5,12 @@
 # Note that menhirLib is required to be >= 20150118 because the feature
 # "incremental API" has been introduced at that version.
 #
-# To install oasis: `opam install oasis`
-#
+# To install oasis:
+#     opam install oasis
+# To install menhir, fileutils:
+#     opam install menhir fileutils
+# To install minisat:
+#     opam pin add -y minisat "https://github.com/c-cube/ocaml-minisat.git"
 
 OASISFormat:  0.4
 OcamlVersion: >= 4.01.0
@@ -16,13 +20,10 @@ Synopsis:     This package is a compiler to the DIMACS file format
 Authors:      Olivier Lezaud
 License:      LGPL
 Plugins:      META (0.4), DevFiles (0.4)
-BuildDepends: menhirLib (>= 20150118), fileutils (>= 0.4.0), str
 BuildType: ocamlbuild (0.4)
 AlphaFeatures: ocamlbuild_more_args
 
-Flag trace
-  Description: Display trace of the parser when parsing (NO WORKING)
-  Default: false
+PreBuildCommand: menhir src/parser.mly --update-errors src/parser.messages > tmp && mv tmp src/parser.messages && menhir --compile-errors src/parser.messages src/parser.mly > src/parser_messages.ml && sh generate-version-number.sh
 
 XOCamlbuildExtraArgs: -use-menhir -menhir \"menhir --table --inspection -v -la 2
 #if flag(trace)
@@ -30,14 +31,13 @@ XOCamlbuildExtraArgs: -use-menhir -menhir \"menhir --table --inspection -v -la 2
 XOCamlbuildExtraArgs+: \" -pkg menhirLib,fileutils,str
 
 
-PreBuildCommand: menhir src/parser.mly --update-errors src/parser.messages > tmp && mv tmp src/parser.messages && menhir --compile-errors src/parser.messages src/parser.mly > src/parser_messages.ml && sh generate-version-number.sh
-
 Executable touistc
-  Build:          true
   Path:           src
   BuildTools:     ocamlbuild, git, menhir
   CompiledObject: best
   MainIs:         touistc.ml
+  BuildDepends: menhirLib (>= 20150118), fileutils (>= 0.4.0), str
+  BuildDepends+: minisat
 
 SourceRepository touist
   Type:           git

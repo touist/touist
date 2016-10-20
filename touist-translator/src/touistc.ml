@@ -37,6 +37,7 @@ open MenhirLib.General
 open Parser.MenhirInterpreter
 open Arg (* Parses the arguments *)
 open FilePath (* Operations on file names *)
+open Minisat
 
 
 type mode = SMTLIB2 | SAT_DIMACS
@@ -71,6 +72,10 @@ let output_table = ref stdout
 let input = ref stdin
 let debug_cnf = ref false
 let debug_syntax = ref false
+let solve_sat = ref false
+let limit_models = ref 1
+let only_count_models = ref false
+let show_hidden_lits = ref false
 let debug_formula_expansion = ref false
 
 let print_position outx lexbuf =
@@ -171,6 +176,16 @@ let invoke_parser (text:string) (lexer:Lexing.lexbuf -> Parser.token) (buffer) :
   in
   Parser.MenhirInterpreter.loop_handle succeed fail supplier checkpoint
 
+(* [print_solve] outputs the result of a Minisat.solve; the result is passed
+   using 'inst' (as 'instance'). One result corresponds to one model.
+   'show_hidden' indicates that the hidden literals introduced during
+   CNF conversion should be shown. *)
+let print_solve output (inst:Minisat.t) (table:(string, Minisat.Lit.t) Hashtbl.t) show_hidden =
+  let string_of_value inst (lit:Minisat.Lit.t) = match Minisat.value inst lit with
+    | V_true -> "1" | V_false -> "0" | V_undef -> "?"
+  in let print_value_and_name name lit = if show_hidden || name.[0] != '&'
+    then Printf.fprintf output "%s %s\n" (string_of_value inst lit) name
+  in Hashtbl.iter print_value_and_name table
 
 let rec string_of_file (input:in_channel) : string =
   let text = ref "" in
@@ -179,32 +194,6 @@ let rec string_of_file (input:in_channel) : string =
       text := !text ^ (input_line input) ^ "\n"
     done; ""
   with End_of_file -> !text
-
-(* Main parsing/lexing function (for SAT).
- * Note: infile, outfile and tablefile must be already opened with open_in
- * and open_out *)
-open Pprint
-let translateToSATDIMACS (infile:in_channel) (outfile:out_channel) (tablefile:out_channel) =
-  let text = string_of_file infile
-  and buffer = ref ErrorReporting.Zero in
-  let ast = invoke_parser text (lexer buffer) buffer in
-  let exp = evaluate ast in
-  if !debug_formula_expansion then print_string (string_of_exp exp)
-  else
-    let c,t = Cnf.transform_to_cnf exp !debug_cnf |> Dimacs.to_dimacs in
-    Printf.fprintf outfile "%s" c;
-    Printf.fprintf tablefile "%s" (Dimacs.string_of_table t)
-
-(* Main parsing/lexing function (for SMT).
- * Note: infile and outfile must be already opened with open_in
- * and open_out *)
-let translate_to_smt2 logic infile outfile =
-  let text = string_of_file infile
-  and buffer = ref ErrorReporting.Zero in
-  let ast = invoke_parser text (lexer buffer) buffer in
-  let exp = evaluate ast in
-  let buf = Smt.to_smt2 logic exp in
-  Buffer.output_buffer outfile buf
 
 (* The main program *)
 let () =
@@ -228,9 +217,14 @@ let () =
       ("-", Arg.Set use_stdin,"reads from stdin instead of file");
       ("--debug-syntax", Arg.Set debug_syntax, "Print information for debugging
     syntax errors given by parser.messages");
-      ("--debug-cnf", Arg.Set debug_cnf,"Print step by step CNF transformation");
-      ("--debug-formula-expansion", Arg.Set debug_formula_expansion,"Print how the formula is expanded (bigand...)");
-    ]
+    ("--debug-cnf", Arg.Set debug_cnf,"Print step by step CNF transformation");
+    ("--solve", Arg.Set solve_sat,"Solve the problem and print the first model if it exists");
+    ("--limit", Arg.Set_int limit_models,"(with --solve) Instead of one model, return N models if they exist.
+                                            With 0, return every possible model.");
+    ("--count", Arg.Set only_count_models,"(with --solve) Instead of displaying models, return the number of models");
+    ("--show-hidden", Arg.Set show_hidden_lits,"(with --solve) Show the hidden '&a' literals used when translating to CNF");
+    ("--debug-formula-expansion", Arg.Set debug_formula_expansion,"Print how the formula is expanded (bigand...)");
+  ]
   in
   let usage = "TouistL compiles files from the TouIST Language \
                to SAT-DIMACS/SMT-LIB2 \n\
@@ -282,12 +276,48 @@ let () =
      print_endline ("Example: -smt2 QF_IDL");
      exit (get_code OTHER));
 
+  (* *)
+  let text_input = string_of_file !input in
+  let buffer = ref ErrorReporting.Zero in
+  let ast = invoke_parser text_input (lexer buffer) buffer in
+  let evaluated_ast = evaluate ast in
+
   (* Step 3: translation *)
   if (!sat_mode) then
-    translateToSATDIMACS !input !output !output_table;
+    let cnf = Cnf.transform_to_cnf evaluated_ast !debug_cnf in
+    if !solve_sat then
+      let instance,table = Dimacs.minisat_of_cnf cnf in
+      let models = ref Dimacs.ModelSet.empty in
+      let rec solve_loop limit i =
+        let continue = i<limit || limit==0
+        and has_model = Dimacs.fetch_model instance
+        and has_next_model = Dimacs.next_model instance table
+        and has_duplicate = Dimacs.is_duplicate instance table models
+        in match continue,has_model,has_duplicate,has_next_model with
+        | false,_,_,_    -> i   (* limit on the number of models *)
+        | true,false,_,_ -> i   (* not a model *)
+        | _,_,true,false -> i  (* duplicate and no next model *)
+        | _,_,true,true  -> solve_loop limit i (* duplicate but has next *)
+        | _,_,false,next ->
+            if not !only_count_models then begin
+              Printf.fprintf !output "=== model %d ===\n" (i+1);
+              print_solve !output instance table !show_hidden_lits;
+            end;
+            if next then solve_loop limit (i+1) else (i+1)
+      in let limit = (if !only_count_models then 0 else !limit_models)
+      in let nb_models = solve_loop limit 0 in match nb_models with
+      | i when !only_count_models -> Printf.fprintf !output "%d\n" nb_models
+      | 0 -> Printf.fprintf !output "Unsat\n"
+      | i -> ()
+    else
+      let dimacs,table = Dimacs.to_dimacs cnf in
+      Printf.fprintf !output "%s" dimacs;
+      Printf.fprintf !output_table "%s" (Dimacs.string_of_table table)
 
-  if (!smt_logic <> "") then
-    translate_to_smt2 (String.uppercase !smt_logic) !input !output;
+  else if (!smt_logic <> "") then
+    let smt = Smt.to_smt2 (String.uppercase !smt_logic) evaluated_ast in
+      Buffer.output_buffer !output smt;
+
 
   close_out !output;
   close_out !output_table;
