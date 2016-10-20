@@ -1,6 +1,12 @@
 v1.4.0
   - touistc:
     - (internal) merged exp and clause types for less code redundancy
+v1.4.0
+  - gui:
+    - added support for local variables of the form 
+	  'let $i=1: p($i) end'. For now, the scope of these variables is
+	  not actually limited to the current context (the current clause);
+	  the variables exist even after 'end'.
 v1.3.1
   - touistc:
     - fixed `a (b)` recognized as `a(b)` instead of `a and b`
