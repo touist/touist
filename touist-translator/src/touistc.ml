@@ -130,18 +130,27 @@ let evaluate (ast:Syntax.prog) : Syntax.clause =
       exit (get_code COMPILE_NO_LINE_NUMBER_ERROR)
 
 
-  (* This is the main entry point to the lexer. *)
-
-let lexer : (Lexing.lexbuf -> Parser.token) =
-  fun lexbuf -> Lexer.token lexbuf
-
+(* [lexer] is an intermediate to the [Lexer.token] function (in lexer.mll);
+   - Rationale: the parser only accepts Parser.token; but [Lexer.token] returns
+     Parser.token list. [lexer] acts as a buffer, returning one by one the list
+     of tokens returned by [Lexer.token].
+   - Drawback: ALL tokens must be returned as a list, even though most token
+     case returns a single token, e.g.,
+       "=>" { IMPLIES }    must be translated into     { [IMPLIES] }
+   - Note: see details in [Lexer.token] (file lexer.mll)
+*)
 let lexer buffer : (Lexing.lexbuf -> Parser.token) =
+  let tokens = ref [] in (* tokens stored to be processed (see above) *)
   fun lexbuf ->
-    let lex = lexer lexbuf in
-      let startp = lexbuf.lex_start_p
-      and endp = lexbuf.lex_curr_p in
-        buffer := ErrorReporting.update !buffer (startp, endp);
-        lex
+    match !tokens with
+    | x::xs -> tokens := xs; x (* tokens isn't empty, use one of its tokens *)
+    | [] -> (* tokens is empty, we can read a new token *)
+      let t = Lexer.token lexbuf in
+      buffer := ErrorReporting.update !buffer (lexbuf.lex_start_p, lexbuf.lex_curr_p);
+      match t with
+      | [] -> failwith "One token at least must be returned in 'token rules' "
+      | x::xs -> tokens := xs; x
+
 
 (*  [invoke_parser] is in charge of calling the parser. It uses
     the incremental API, which allows us to do our own error handling.

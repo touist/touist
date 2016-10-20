@@ -92,41 +92,65 @@ let var   = (special | digit)* alpha (alpha | special | digit)*
 let integer    = digit+
 let double     = digit+ '.' digit+
 
-rule token = parse
-  | eof            { EOF          }
-  | empty+         { token lexbuf }
-  | "["            { LBRACK       }
-  | "]"            { RBRACK       }
-  | ".."           { RANGE        }
-  | ","            { COMMA        }
-  | "=="           { EQUAL        }
-  | "!="           { NOTEQUAL     }
-  | "+"            { ADD          }
-  | "-"            { SUB          }
-  | "*"            { MUL          }
-  | "/"            { DIV          }
-  | "=>"           { IMPLIES      }
-  | "<=>"          { EQUIV        }
-  | "<"            { LT           }
-  | ">"            { GT           }
-  | "<="           { LE           }
-  | ">="           { GE           }
-  | "="            { AFFECT       }
-  | ":"            { COLON        }
-  | ")"            { RPAREN       }
-  | '$'(var as v)'(' { VARTUPLE ("$" ^ v)}
-  | '$'(var as v)  { VAR ("$" ^ v)}
+(* [token] is the function called by the parser for getting the next token.
+   [token] returns a list of tokens instead of a single token, i.e., is of type
+       (Lexing.lexbuf -> Parser.token list)                       (1)
+   - Why: because of the case (ident as i)'(', we need to return two tokens;
+     for example, with 'not(', we must return NOT and LPAREN.
+   - Consequence: the parser cannot accept [token] directly; it needs a function
+       (Lexing.lexbuf -> Parser.token)                            (2)
+     This forces us to write another function ('lexer' in touist.ml) that
+     transforms the function (1) to correct function type (2).
+*)
+rule token = parse (* is a function (Lexing.lexbuf -> Parser.token list) *)
+  | eof               {[ EOF          ]}
+  | empty+            {  token lexbuf  }
+  | "["               {[ LBRACK       ]}
+  | "]"               {[ RBRACK       ]}
+  | ".."              {[ RANGE        ]}
+  | ","               {[ COMMA        ]}
+  | "=="              {[ EQUAL        ]}
+  | "!="              {[ NOTEQUAL     ]}
+  | "+"               {[ ADD          ]}
+  | "-"               {[ SUB          ]}
+  | "*"               {[ MUL          ]}
+  | "/"               {[ DIV          ]}
+  | "=>"              {[ IMPLIES      ]}
+  | "<=>"             {[ EQUIV        ]}
+  | "<"               {[ LT           ]}
+  | ">"               {[ GT           ]}
+  | "<="              {[ LE           ]}
+  | ">="              {[ GE           ]}
+  | "="               {[ AFFECT       ]}
+  | ":"               {[ COLON        ]}
+  | ")"               {[ RPAREN       ]}
+  | '$'(var as v)'('  {[ VARTUPLE ("$" ^ v)]}
+  | '$'(var as v)     {[ VAR ("$" ^ v)]}
     (* This rule is going to take care of both identifiers
      * and every keyword in reserved_keywords *)
-  | (ident as i)'('{ try Hashtbl.find reserved_keywords i with Not_found ->
-                     TUPLE                      (i) }
-  | ident as i     { try Hashtbl.find reserved_keywords i with Not_found ->
-                     TERM                       (i) }
-  | "("            { LPAREN       }
-  | integer as i   { INT          (int_of_string i) }
-  | double as f    { FLOAT      (float_of_string f) }
-  | newline        { next_line lexbuf; token lexbuf }
-  | ";;"           { comments_parse lexbuf          }
+  | (ident as i)'('
+  (* Three cases:
+     1. i is an identifier that requires an opening parenthesis, e.g., int().
+        In this case, we just send the token INT.
+     2. i is an identifier that doesn't require an opening parenthesis, e.g.,
+        "not". In this case, two tokens must be sent: NOT and LPAREN
+     3. i is an identifier that does not belong to known identifiers. This means
+         that it is a tuple-term. This is the "Not_found" case which send a
+         TUPLE token.
+   *)
+    { try [ Hashtbl.find reserved_keywords (i ^ "(") ]  (* case 1 *)
+      with Not_found ->
+        print_endline ("'"^(lexeme lexbuf) ^ "' not a paren id");
+        try [ Hashtbl.find reserved_keywords i ; LPAREN ]          (* case 2 *)
+        with Not_found -> [TUPLE i]                   (* case 3 *)
+    }
+  | ident as i     { try [ Hashtbl.find reserved_keywords i ]
+                     with Not_found ->  [TERM i] }
+  | "("            {[ LPAREN       ]}
+  | integer as i   {[ INT          (int_of_string i) ]}
+  | double as f    {[ FLOAT      (float_of_string f) ]}
+  | newline        { next_line lexbuf; token lexbuf   }
+  | ";;"           { comments_parse lexbuf            }
   | _ as c         { raise (Error ("Unexpected char: " ^ (String.make 1 c))) }
 
 and comments_parse = parse
