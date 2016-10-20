@@ -70,6 +70,8 @@ Comment     = ";;"[^\n]*
 	"exact"			{ return symbol(sym.EXACT); }
 	"atleast"		{ return symbol(sym.ATLEAST); }
 	"atmost"		{ return symbol(sym.ATMOST); }
+	"let"			{ return symbol(sym.LET); }
+
 	
 
    

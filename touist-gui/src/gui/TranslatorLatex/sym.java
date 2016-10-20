@@ -17,13 +17,13 @@ public class sym {
   public static final int EMPTY = 19;
   public static final int COMMENT = 52;
   public static final int XOR = 51;
-  public static final int INTEGER = 63;
+  public static final int INTEGER = 64;
   public static final int GREATER = 34;
   public static final int INT = 11;
   public static final int LESSER_OR_EQUAL = 33;
   public static final int DODOT = 48;
   public static final int WHITESPACE = 24;
-  public static final int ERROR_IDENTIFIER = 67;
+  public static final int ERROR_IDENTIFIER = 68;
   public static final int NOT = 16;
   public static final int AND = 18;
   public static final int RCRO = 47;
@@ -50,7 +50,7 @@ public class sym {
   public static final int ATLEAST = 59;
   public static final int NEWLINE = 58;
   public static final int ADD = 42;
-  public static final int DOUBLENUMBER = 64;
+  public static final int DOUBLENUMBER = 65;
   public static final int MOD = 23;
   public static final int CONSTANT = 9;
   public static final int BOOL_AND = 36;
@@ -58,8 +58,9 @@ public class sym {
   public static final int SUBSET = 20;
   public static final int BOT = 28;
   public static final int UNION = 54;
-  public static final int LATEX = 68;
+  public static final int LATEX = 69;
   public static final int ELSE = 8;
+  public static final int LET = 62;
   public static final int EQUIV = 39;
   public static final int FLOAT = 12;
   public static final int SETS = 4;
@@ -72,11 +73,11 @@ public class sym {
   public static final int DIFF = 56;
   public static final int FALSE = 26;
   public static final int INTER = 55;
-  public static final int ALPHA = 66;
-  public static final int VAR = 62;
+  public static final int ALPHA = 67;
+  public static final int VAR = 63;
   public static final int EXACT = 60;
   public static final int SET = 10;
-  public static final int IDENTIFIER = 65;
+  public static final int IDENTIFIER = 66;
   public static final String[] terminalNames = new String[] {
   "EOF",
   "error",
@@ -140,6 +141,7 @@ public class sym {
   "ATLEAST",
   "EXACT",
   "ATMOST",
+  "LET",
   "VAR",
   "INTEGER",
   "DOUBLENUMBER",
