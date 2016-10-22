@@ -1,0 +1,35 @@
+#
+# TopMakefile
+# Maël Valais, 2016-10-22 18:38
+#
+# Pre-build makefile for building touistc
+#
+# Builds everything needed before launching the real build process:
+# - git-produced 'version.ml'
+# - menhir-produced 'parser.messages' and 'parser_messages.ml'
+#
+# The purpose of this makefile is only to be called (by the oasis-generated
+# setup.ml) when using ./configure + make
+#
+
+SRC?=src
+
+all: $(SRC)/version.ml $(SRC)/parser_messages.ml
+
+# Produced by menhir
+%parser.messages: %parser.mly
+	if [ -f $@ ]; then menhir $< --update-errors $@ > tmp && mv tmp $@; fi
+	if [ ! -f $@ ]; then menhir $< --list-errors > $@; fi
+
+# Produced by menhir
+%parser_messages.ml: %parser.messages %parser.mly
+	menhir --compile-errors $^ > $@
+
+ # Produced by git
+%version.ml:
+	@echo "let version=\"`if which -s git; then git describe --tags; else echo "n/a"; fi`\"" > $@
+
+clean:
+	cd $(SRC) && rm -f *_messages.ml version.ml
+# vim:ft=make
+#
