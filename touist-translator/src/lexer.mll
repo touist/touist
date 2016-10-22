@@ -140,7 +140,6 @@ rule token = parse (* is a function (Lexing.lexbuf -> Parser.token list) *)
    *)
     { try [ Hashtbl.find reserved_keywords (i ^ "(") ]  (* case 1 *)
       with Not_found ->
-        print_endline ("'"^(lexeme lexbuf) ^ "' not a paren id");
         try [ Hashtbl.find reserved_keywords i ; LPAREN ]          (* case 2 *)
         with Not_found -> [TUPLE i]                   (* case 3 *)
     }
