@@ -4,13 +4,18 @@
 #
 # Note that menhirLib is required to be >= 20150118 because the feature
 # "incremental API" has been introduced at that version.
-#
+###############
 # To install oasis:
 #     opam install oasis
 # To install menhir, fileutils:
 #     opam install menhir fileutils
 # To install minisat:
 #     opam pin add -y minisat "https://github.com/c-cube/ocaml-minisat.git"
+###############
+# To force using 'bytecode' over 'native' binary for debugging with
+# ocamldebug or utop, launch:
+#     ./configure --override is_native false
+#
 
 OASISFormat:  0.4
 OcamlVersion: >= 4.01.0
@@ -23,13 +28,12 @@ Plugins:      META (0.4), DevFiles (0.4)
 BuildType: ocamlbuild (0.4)
 AlphaFeatures: ocamlbuild_more_args
 
-PreBuildCommand: menhir src/parser.mly --update-errors src/parser.messages > tmp && mv tmp src/parser.messages && menhir --compile-errors src/parser.messages src/parser.mly > src/parser_messages.ml && sh generate-version-number.sh
+PreBuildCommand: make -f TopMakefile
 
 XOCamlbuildExtraArgs: -use-menhir -menhir \"menhir --table --inspection -v -la 2
 #if flag(trace)
 #  XOCamlbuildExtraArgs+: --trace
 XOCamlbuildExtraArgs+: \" -pkg menhirLib,fileutils,str
-
 
 Executable touistc
   Path:           src
