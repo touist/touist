@@ -69,8 +69,8 @@ let to_text prop =
   in
   header ^ str, table
 
-let string_of_table table =
-  Hashtbl.fold (fun k v acc -> acc ^ k ^ " " ^ (string_of_int v) ^ "\n") table ""
+let string_of_table table ?(prefix="") =
+  Hashtbl.fold (fun k v acc -> acc ^ prefix ^ k ^ " " ^ (string_of_int v) ^ "\n") table ""
 
 open Minisat
 (* [minisat_of_cnf] translates the expression into an instance of Minisat.t,
