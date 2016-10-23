@@ -312,7 +312,13 @@ let () =
     else
       let dimacs,table = Dimacs.to_dimacs cnf in
       Printf.fprintf !output "%s" dimacs;
-      Printf.fprintf !output_table "%s" (Dimacs.string_of_table table)
+      (* ~prefix:"" is an optionnal argument that allows to add the 'c' before
+         each line of the table display, when and only when everything is
+         outputed in a single file. Example:
+             c 98 p(1,2,3)     -> c means 'comment' in any DIMACS file   *)
+      let table_string = Dimacs.string_of_table table
+        ~prefix:(if !output == !output_table then "c " else "")
+      in Printf.fprintf !output_table "%s" table_string
 
   else if (!smt_logic <> "") then
     let smt = Smt.to_smt2 (String.uppercase !smt_logic) evaluated_ast in
