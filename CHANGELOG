@@ -1,6 +1,9 @@
 v1.3.1
   - touistc:
     - fixed `a (b)` recognized as `a(b)` instead of `a and b`
+    - added --debug-formula-expansion which prints the "expanded" version
+      of bigand, bigor, exact and numerical expressions; helps for debugging
+      complex formulas!
   - gui:
     - select the system language automatically
 	- fix "export" button not working
