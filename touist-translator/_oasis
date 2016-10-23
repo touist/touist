@@ -33,15 +33,14 @@ PreBuildCommand: make -f TopMakefile
 XOCamlbuildExtraArgs: -use-menhir -menhir \"menhir --table --inspection -v -la 2
 #if flag(trace)
 #  XOCamlbuildExtraArgs+: --trace
-XOCamlbuildExtraArgs+: \" -pkg menhirLib,fileutils,str
+XOCamlbuildExtraArgs+: \" -pkg menhirLib,fileutils,str,minisat
 
 Executable touistc
   Path:           src
   BuildTools:     ocamlbuild, git, menhir
   CompiledObject: best
   MainIs:         touistc.ml
-  BuildDepends: menhirLib (>= 20150118), fileutils (>= 0.4.0), str
-  BuildDepends+: minisat
+  BuildDepends: menhirLib (>= 20150118), fileutils (>= 0.4.0), str, minisat
 
 SourceRepository touist
   Type:           git
