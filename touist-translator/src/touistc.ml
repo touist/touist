@@ -117,8 +117,8 @@ let print_position outx lexbuf =
  *
  * [ast] means it is of type Syntax.prog,
  * i.e. the "root" type in lexer.mll
-*)
-let evaluate (ast:Syntax.prog) : Syntax.clause =
+ *)
+let evaluate (ast:Syntax.prog) : Syntax.exp =
   try Eval.eval ast [] with
   | Eval.UnknownVar msg ->
     Printf.fprintf stderr "the variable %s has not been declared\n" msg;
@@ -189,7 +189,7 @@ let translateToSATDIMACS (infile:in_channel) (outfile:out_channel) (tablefile:ou
   and buffer = ref ErrorReporting.Zero in
   let ast = invoke_parser text (lexer buffer) buffer in
   let exp = evaluate ast in
-  if !debug_formula_expansion then print_string (string_of_clause exp)
+  if !debug_formula_expansion then print_string (string_of_exp exp)
   else
     let c,t = Cnf.transform_to_cnf exp !debug_cnf |> Dimacs.to_dimacs in
     Printf.fprintf outfile "%s" c;

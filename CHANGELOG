@@ -1,3 +1,6 @@
+v1.4.0
+  - touistc:
+    - (internal) merged exp and clause types for less code redundancy
 v1.3.1
   - touistc:
     - fixed `a (b)` recognized as `a(b)` instead of `a and b`
