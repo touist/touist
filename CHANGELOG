@@ -1,12 +1,15 @@
 v1.4.0
   - touistc:
+    - touistc is now able to solve SAT problems on its own. You can use
+      '--solve' to return the first model of your problem, '--count' for counting
+      the number of models), '--limit i' for setting a limit to the number of
+      models returned; 0 will set no limit). Way faster that the java code!
     - (internal) merged exp and clause types for less code redundancy
-v1.4.0
   - gui:
     - added support for local variables of the form 
-	  'let $i=1: p($i) end'. For now, the scope of these variables is
-	  not actually limited to the current context (the current clause);
-	  the variables exist even after 'end'.
+      'let $i=1: p($i) end'. For now, the scope of these variables is
+      not actually limited to the current context (the current clause);
+      the variables exist even after 'end'.
 v1.3.1
   - touistc:
     - fixed `a (b)` recognized as `a(b)` instead of `a and b`
@@ -15,10 +18,10 @@ v1.3.1
       complex formulas!
   - gui:
     - select the system language automatically
-	- fix "export" button not working
-	- export and import are now use the operating system UI (jre>=1.7)
-	- jre>=1.7 is now required; it solves the wierd mac problem that says
-	  that you need to install the JDK for using command-line functions
+    - fix "export" button not working
+    - export and import are now use the operating system UI (jre>=1.7)
+    - jre>=1.7 is now required; it solves the wierd mac problem that says
+      that you need to install the JDK for using command-line functions
 v1.3.0
   - touist.jar:
     - fix touist hanging on "solve" on some unsatisfiable formulas
@@ -52,7 +55,7 @@ v1.1.3
 v1.1.2 (2016/04/03)
   - fix problem with whitespaces in path names (Victor David)
   - touistc: In SMT mode, "Float" was produced instead of "Real" (Frédéric Maris)
-  - touistc: Now display a proper error when -smt2 is given with no logic	(Maël Valais)
+  - touistc: Now display a proper error when -smt2 is given with no logic    (Maël Valais)
   - gui: the left "snippets" panel has now a correct size (Maël Valais)
   - gui: more explicit error message when touistc is missing (Maël Valais)
 
