@@ -189,7 +189,7 @@ let translateToSATDIMACS (infile:in_channel) (outfile:out_channel) (tablefile:ou
   and buffer = ref ErrorReporting.Zero in
   let ast = invoke_parser text (lexer buffer) buffer in
   let exp = evaluate ast in
-  if !debug_formula_expansion then print_string (string_of_clause exp)
+  if !debug_formula_expansion then print_string (string_of_exp exp)
   else
     let c,t = Cnf.transform_to_cnf exp !debug_cnf |> Dimacs.to_dimacs in
     Printf.fprintf outfile "%s" c;
