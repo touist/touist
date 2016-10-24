@@ -1,7 +1,10 @@
 v1.4.0
   - touistc:
+    - touistc is now able to solve SAT problems on its own. You can use
+      '--solve' to return the first model of your problem, '--count' for counting
+      the number of models), '--limit i' for setting a limit to the number of
+      models returned; 0 will set no limit). Way faster that the java code!
     - (internal) merged exp and clause types for less code redundancy
-v1.4.0
   - gui:
     - added support for local variables of the form 
 	  'let $i=1: p($i) end'. For now, the scope of these variables is
