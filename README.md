@@ -2,7 +2,7 @@ TouIST, the IDE for propositional logic
 =======================================
 
 [![Travis (Linux/Mac) build state](https://travis-ci.org/touist/touist.svg?branch=master)](https://travis-ci.org/touist/touist)
-[![AppVeyor (Windows) build state](https://ci.appveyor.com/api/projects/status/github/touist/touist?branch=master&svg=true)](https://ci.appveyor.com/project/touist/touist/branch/master)
+[![Appveyor (Windows)](https://ci.appveyor.com/api/projects/status/rayupfflmut8xbe0?svg=true)](https://ci.appveyor.com/project/maelvalais/touist-kila4)
 
 ## I want to try
 [Get the latest release here](https://github.com/touist/touist/releases). Touist works on **macOS** (x86_64 only), **Linux** x86\_64 and **Windows** (x86 or x64\_86). 
