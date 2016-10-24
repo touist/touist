@@ -73,10 +73,13 @@ let input = ref stdin
 let debug_cnf = ref false
 let debug_syntax = ref false
 let solve_sat = ref false
-let limit_models = ref 1
-let only_count_models = ref false
+let limit = ref 1
+let only_count = ref false
 let show_hidden_lits = ref false
 let debug_formula_expansion = ref false
+let equiv_file_path = ref ""
+let input_equiv = ref stdin
+
 
 let print_position outx lexbuf =
   let pos = lexbuf.lex_curr_p in
@@ -135,6 +138,7 @@ let transform_to_cnf (evaluated_ast:Syntax.exp) : Syntax.exp =
     Printf.fprintf stderr "%s\n" msg;
     exit (get_code COMPILE_NO_LINE_NUMBER_ERROR)
 
+
 (* [lexer] is an intermediate to the [Lexer.token] function (in lexer.mll);
    - Rationale: the parser only accepts Parser.token; but [Lexer.token] returns
      Parser.token list. [lexer] acts as a buffer, returning one by one the list
@@ -186,6 +190,7 @@ let print_solve output (inst:Minisat.t) (table:(string, Minisat.Lit.t) Hashtbl.t
     then Printf.fprintf output "%s %s\n" (string_of_value inst lit) name
   in Hashtbl.iter print_value_and_name table
 
+(* [string_of_file] takes an opened file and returns a string of its content. *)
 let rec string_of_file (input:in_channel) : string =
   let text = ref "" in
   try
@@ -193,6 +198,15 @@ let rec string_of_file (input:in_channel) : string =
       text := !text ^ (input_line input) ^ "\n"
     done; ""
   with End_of_file -> !text
+
+(* [ast_of_channel] takes an opened file and return its Abstract Syntaxic Tree.
+   NOTE: this AST is already evaluated (the variables have been handled and
+   everything). At this point, the AST can be transformed to DIMACS, SMT... *)
+let ast_of_channel (input:in_channel) : Syntax.exp =
+    let text_input = string_of_file input in
+    let buffer = ref ErrorReporting.Zero in
+    let ast = invoke_parser text_input (lexer buffer) buffer in
+    evaluate ast
 
 (* The main program *)
 let () =
@@ -218,10 +232,12 @@ let () =
     syntax errors given by parser.messages");
     ("--debug-cnf", Arg.Set debug_cnf,"Print step by step CNF transformation");
     ("--solve", Arg.Set solve_sat,"Solve the problem and print the first model if it exists");
-    ("--limit", Arg.Set_int limit_models,"(with --solve) Instead of one model, return N models if they exist.
+    ("--limit", Arg.Set_int limit,"(with --solve) Instead of one model, return N models if they exist.
                                             With 0, return every possible model.");
-    ("--count", Arg.Set only_count_models,"(with --solve) Instead of displaying models, return the number of models");
+    ("--count", Arg.Set only_count,"(with --solve) Instead of displaying models, return the number of models");
     ("--show-hidden", Arg.Set show_hidden_lits,"(with --solve) Show the hidden '&a' literals used when translating to CNF");
+    ("--equiv", Arg.Set_string equiv_file_path,"(with --solve) Check that the given INPUT2 has the same models as INPUT (equivalency)");
+
     ("--debug-formula-expansion", Arg.Set debug_formula_expansion,"Print how the formula is expanded (bigand...)");
   ]
   in
@@ -261,6 +277,9 @@ let () =
   if !output_table_file_path <> "" && !sat_mode
   then output_table := open_out !output_table_file_path;
 
+  if !equiv_file_path <> ""
+  then input_equiv := open_in !equiv_file_path;
+
   (* Check that either -smt2 or -sat have been selected *)
   if (!sat_mode && (!smt_logic <> "")) then begin
     print_endline (cmd^": cannot use both SAT and SMT solvers (try --help)");
@@ -276,51 +295,39 @@ let () =
      exit (get_code OTHER));
 
   (* *)
-  let text_input = string_of_file !input in
-  let buffer = ref ErrorReporting.Zero in
-  let ast = invoke_parser text_input (lexer buffer) buffer in
-  let evaluated_ast = evaluate ast in
+
 
   (* Step 3: translation *)
   if (!sat_mode) then
-    let cnf = transform_to_cnf evaluated_ast in
+    (* A. solve has been asked *)
     if !solve_sat then
-      let instance,table = Dimacs.minisat_of_cnf cnf in
-      let models = ref Dimacs.ModelSet.empty in
-      let rec solve_loop limit i =
-        let continue = i<limit || limit==0
-        and has_model = Dimacs.fetch_model instance
-        and has_next_model = Dimacs.next_model instance table
-        and has_duplicate = Dimacs.is_duplicate instance table models
-        in match continue,has_model,has_duplicate,has_next_model with
-        | false,_,_,_    -> i   (* limit on the number of models *)
-        | true,false,_,_ -> i   (* not a model *)
-        | _,_,true,false -> i  (* duplicate and no next model *)
-        | _,_,true,true  -> solve_loop limit i (* duplicate but has next *)
-        | _,_,false,next ->
-            if not !only_count_models then begin
-              Printf.fprintf !output "=== model %d ===\n" (i+1);
-              print_solve !output instance table !show_hidden_lits;
-            end;
-            if next then solve_loop limit (i+1) else (i+1)
-      in let limit = (if !only_count_models then 0 else !limit_models)
-      in let nb_models = solve_loop limit 0 in match nb_models with
-      | i when !only_count_models -> Printf.fprintf !output "%d\n" nb_models
-      | 0 -> Printf.fprintf !output "Unsat\n"
-      | i -> ()
+      if !equiv_file_path <> "" then begin
+        let _,models = Cnf.transform_to_cnf (ast_of_channel !input) !debug_cnf |> Dimacs.find_models
+        and _,models2 = Cnf.transform_to_cnf (ast_of_channel !input_equiv) !debug_cnf |> Dimacs.find_models in
+        match Dimacs.ModelSet.equal !models !models2 with
+        | true -> Printf.fprintf !output "Equivalent\n"; exit 0
+        | false -> Printf.fprintf !output "Not equivalent\n"; exit 1
+      end
+      else
+        let table,models = Cnf.transform_to_cnf (ast_of_channel !input) !debug_cnf |> Dimacs.find_models in
+        match Dimacs.ModelSet.cardinal !models with
+        | i when !only_count -> Printf.fprintf !output "%d\n" i; exit 0
+        | 0 -> Printf.fprintf !output "Unsat\n"; exit 1
+        | i -> Dimacs.ModelSet.pprint table !models; exit 0
     else
-      let dimacs,table = Dimacs.to_dimacs cnf in
+      (* B. solve not asked: print the DIMACS file *)
+      let dimacs,table = Cnf.transform_to_cnf (ast_of_channel !input) !debug_cnf |> Dimacs.to_dimacs in
       Printf.fprintf !output "%s" dimacs;
       (* ~prefix:"" is an optionnal argument that allows to add the 'c' before
          each line of the table display, when and only when everything is
          outputed in a single file. Example:
              c 98 p(1,2,3)     -> c means 'comment' in any DIMACS file   *)
-      let table_string = Dimacs.string_of_table table
-        ~prefix:(if !output == !output_table then "c " else "")
+      let table_prefix = (if !output == !output_table then "c " else "") in
+      let table_string = Dimacs.string_of_table table ~prefix:table_prefix
       in Printf.fprintf !output_table "%s" table_string
 
   else if (!smt_logic <> "") then
-    let smt = Smt.to_smt2 (String.uppercase !smt_logic) evaluated_ast in
+    let smt = Smt.to_smt2 (String.uppercase !smt_logic) (ast_of_channel !input) in
       Buffer.output_buffer !output smt;
 
 
