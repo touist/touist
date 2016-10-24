@@ -10,7 +10,7 @@
 # To install menhir, fileutils:
 #     opam install menhir fileutils
 # To install minisat:
-#     opam pin add -y minisat "https://github.com/c-cube/ocaml-minisat.git"
+#     opam pin add -y minisat "https://github.com/maelvalais/ocaml-minisat.git#0.0.2"
 ###############
 # To force using 'bytecode' over 'native' binary for debugging with
 # ocamldebug or utop, launch:
