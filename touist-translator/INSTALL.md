@@ -12,17 +12,19 @@ Before you go, make sure you have the following installed:
 ```shell
 apt-get install opam
 opam install menhir fileutils
+opam pin add -y minisat "https://github.com/maelvalais/ocaml-minisat.git#v0.0.2"
 make
 ```
 ### Build it on Mac OS X
 ```shell
 ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
 brew install opam
-opam install menhir fileutils
+opam install menhir fileutils minisat
+opam pin add -y minisat "https://github.com/maelvalais/ocaml-minisat.git#v0.0.2"
 make
 ```
 ### Build it on windows
-First, you need to install `wodi`. 
+First, you need to install `wodi`.
 Then, in `wodi`, you must install `menhir` and `fileutils`.
 Then, just launch `make` in `touist-translator`.
 ### Build it without `make`
@@ -38,7 +40,7 @@ As you probably noticed, there is a file named `_oasis`. This file contains the 
 ## Notes on version numbers
 
 To be able to have a version number synchronized with the `git` version,
-the script `./generate-version-number.sh` will try to run the command 
+the script `./generate-version-number.sh` will try to run the command
 
 	git describe --tags
 
