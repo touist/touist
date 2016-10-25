@@ -129,8 +129,8 @@ and eval_prog exp env =
     | x::xs -> And (x, loop xs)
   in
   match exp with
-  | Prog (None, clauses) -> eval_exp_no_expansion (loop clauses) env
-  | Prog (Some decl, clauses) ->
+  | Prog (clauses, None) -> eval_exp_no_expansion (loop clauses) env
+  | Prog (clauses, Some decl) ->
       List.iter (fun x -> eval_affect x env) decl;
       eval_exp_no_expansion (loop clauses) env
 

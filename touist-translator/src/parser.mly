@@ -37,7 +37,7 @@
 %token EXACT ATLEAST ATMOST
 %token TOP BOTTOM
 %token BIGAND BIGOR
-%token BEGIN SETS FORMULA
+%token DATA
 %token LET
 %token EOF
 
@@ -127,10 +127,10 @@
 
 (* [prog] is the entry point of the parser *)
 prog:
-  | BEGIN SETS affect* END SETS BEGIN FORMULA clause* END FORMULA EOF
-    { Prog (Some $3, $8) }
-  | BEGIN FORMULA clause* END FORMULA EOF
-    { Prog (None, $3) }
+  | c=clause* DATA a=affect* EOF
+    { Prog (c, Some a) }
+  | c=clause* EOF
+    { Prog (c, None) }
 
 var_decl:
   | VAR { ($1, None) }

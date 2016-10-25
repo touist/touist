@@ -34,7 +34,7 @@ module GenSet = struct
 end
 
 type prog =
-  | Prog of affect list option * exp list
+  | Prog of exp list * affect list option
 and affect =
   | Affect of var * exp
 and var = string * exp list option

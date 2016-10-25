@@ -47,10 +47,7 @@
   http://www.seas.upenn.edu/~cis120/16sp/ocaml-4.01-manual/lexyacc.html#sec286 *)
   let reserved_keywords = Hashtbl.create 70
   let _ = List.iter (fun (kwd, tok) -> Hashtbl.add reserved_keywords kwd tok)
-   ["begin",         BEGIN;
-    "end",           END;
-    "sets",          SETS;
-    "formula",       FORMULA;
+   ["end",           END;
     "in",            IN;
     "subset(",       SUBSET;
     "empty(",        EMPTY;
@@ -80,7 +77,8 @@
     "mod",           MOD;
     "true",          BOOL true;
     "false",         BOOL false;
-    "let",           LET]
+    "let",           LET;
+    "data",          DATA ]
 }
 
 let digit      = ['0' - '9']
