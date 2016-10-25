@@ -244,6 +244,7 @@ clause:
   { Bigor ($2, $4, Some $6, $8) }
   | IF exp THEN clause ELSE clause END { If ($2, $4, $6) }
   | LET v=var_decl AFFECT e=exp COLON c=clause { Let (v,e,c) }
+  | LET v=var_decl AFFECT e=clause COLON c=clause { Let (v,e,c) }
 
 (* Warning: the two rules
      var_decl -> TERM

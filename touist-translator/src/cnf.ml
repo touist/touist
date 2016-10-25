@@ -17,6 +17,7 @@
 
 open Syntax
 open Pprint
+exception Error of string
 
 (*  Vocabulary:
     - Literal:
@@ -50,9 +51,9 @@ open Pprint
    be called on an AST containing Or, And or Not. No Equiv or Implies! *)
 let rec is_clause (ast: exp) : bool = match ast with
   | Top | Bottom | Term _ | Not (Term _) -> true
-  | And _ -> false
   | Or (x,y) -> is_clause x && is_clause y
-  | x -> failwith ("is_clause: unexpected value " ^ (string_of_exp x))
+  | And _ -> false
+  | x -> false
 
 (* [push_lit] allows to translate into CNF the non-CNF disjunction `d or cnf`
    (`d` is the literal we want to add, `cnf` is the existing CNF form).
@@ -71,7 +72,7 @@ let rec push_lit (lit:exp) (cnf:exp) : exp = match cnf with
   | Not (Term x) -> Or (lit, Not (Term x))
   | And (x,y)    -> And (push_lit lit x, push_lit lit y)
   | Or (x,y)     -> Or (lit, Or (x,y))
-  | x -> failwith ("Cnf.push_lit: unexpected " ^ (string_of_exp x))
+  | x -> raise (Error ("this doesn't seem to be a formula: '" ^ (string_of_exp x) ^ "'"))
 
 
 (* [genterm] generates a (Term &i) with i being a self-incrementing index.
@@ -178,7 +179,7 @@ let rec to_cnf depth (stop:stop) (ast:exp) : exp =
     | Implies (x,y) -> to_cnf (Or (Not x, y))
     | Equiv (x,y) -> to_cnf (And (Implies (x,y), Implies (y,x)))
     | Xor (x,y) -> to_cnf (And (Or (x,y), Or (Not x, Not y)))
-    | _ -> failwith("Cnf.to_cnf failed on: " ^ (string_of_exp ast))
+    | _ -> raise (Error ("this doesn't seem to be a formula: '" ^ (string_of_exp ast) ^ "'"))
     end in
     if !debug then print_debug "out: " depth [cnf];
     cnf

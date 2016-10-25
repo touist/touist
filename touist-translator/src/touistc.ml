@@ -125,16 +125,15 @@ let print_position outx lexbuf =
  *)
 let evaluate (ast:Syntax.prog) : Syntax.exp =
   try Eval.eval ast [] with
-  | Eval.UnknownVar msg ->
-    Printf.fprintf stderr "the variable %s has not been declared\n" msg;
-    exit (get_code COMPILE_NO_LINE_NUMBER_ERROR)
-  | Eval.TypeError msg ->
-    Printf.fprintf stderr "type error with '%s'\n" msg;
-    exit (get_code COMPILE_NO_LINE_NUMBER_ERROR)
-  | Eval.ArgumentError msg ->
-    Printf.fprintf stderr "argument error: '%s'\n" msg;
+  | Eval.Error msg ->
+    Printf.fprintf stderr "%s\n" msg;
     exit (get_code COMPILE_NO_LINE_NUMBER_ERROR)
 
+let transform_to_cnf (evaluated_ast:Syntax.exp) : Syntax.exp =
+  try Cnf.transform_to_cnf evaluated_ast !debug_cnf with
+  | Cnf.Error msg ->
+    Printf.fprintf stderr "%s\n" msg;
+    exit (get_code COMPILE_NO_LINE_NUMBER_ERROR)
 
 (* [lexer] is an intermediate to the [Lexer.token] function (in lexer.mll);
    - Rationale: the parser only accepts Parser.token; but [Lexer.token] returns
@@ -284,7 +283,7 @@ let () =
 
   (* Step 3: translation *)
   if (!sat_mode) then
-    let cnf = Cnf.transform_to_cnf evaluated_ast !debug_cnf in
+    let cnf = transform_to_cnf evaluated_ast in
     if !solve_sat then
       let instance,table = Dimacs.minisat_of_cnf cnf in
       let models = ref Dimacs.ModelSet.empty in
