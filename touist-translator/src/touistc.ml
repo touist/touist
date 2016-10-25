@@ -271,7 +271,7 @@ let () =
     exit (get_code OTHER) end;
 
   (* SMT Mode: check if one of the available QF_? has been given after -smt2 *)
-  if (not !sat_mode) && (not (List.exists (fun x->x=(String.uppercase !smt_logic)) smt_logic_avail)) then
+  if (not !sat_mode) && (not (List.exists (fun x->x=(String.uppercase_ascii !smt_logic)) smt_logic_avail)) then
     (print_endline (cmd^": you must specify the logic used (-smt2 logic_name) (try --help)");
      print_endline ("Example: -smt2 QF_IDL");
      exit (get_code OTHER));
@@ -321,7 +321,7 @@ let () =
       in Printf.fprintf !output_table "%s" table_string
 
   else if (!smt_logic <> "") then
-    let smt = Smt.to_smt2 (String.uppercase !smt_logic) evaluated_ast in
+    let smt = Smt.to_smt2 (String.uppercase_ascii !smt_logic) evaluated_ast in
       Buffer.output_buffer !output smt;
 
 
