@@ -150,7 +150,10 @@ and eval_exp exp env =
         try List.assoc name env
         with Not_found ->
           try Hashtbl.find extenv name
-          with Not_found -> raise (Error ("variable '" ^ name ^"' has not been declared"))
+          with Not_found -> raise (Error (
+              "variable '" ^ name ^"' does not seem to be known. Either you forgot\n"^
+              "to declare it globally or it has been previously declared locally\n"^
+              "(with bigand, bigor or let) and you are out of its scope."))
       end
   | Set x -> Set x
   | Set_decl x -> eval_set x env
@@ -382,33 +385,53 @@ and eval_exp_no_expansion exp env =
   | Bottom -> Bottom
   | Term x -> Term ((expand_var_name x env), None)
   | Var x ->
-      let name = expand_var_name x env in
-      begin
-        (* Check if this variable has been affected locally (recursive-wise)
-           by bigand, bigor or let. *)
-        try (match List.assoc name env with
-             | Int x' -> Int x'
-             | Float x' -> Float x'
-             | _ -> raise (Error ("'" ^ name ^ "' has been declared locally (in bigand, bigor or let)\nLocally declared variables must be float or int")))
-        with Not_found ->
-        (* Check if this variable name has been affected globally by something *)
-          try (match Hashtbl.find extenv name with
-               | Int x' -> Int x'
-               | Float x' -> Float x'
-               | Set (_) -> raise (Error ("'" ^ name ^ " has been declared globally, meaning that it is\n
-                                          expected to be a number. Instead, you gave a set."))
-               | _ -> failwith ("'" ^ name ^ " has been declared globally, meaning that it is\n
-                                expected to be a ."))
-          with Not_found ->
-            let (x',y') = x in
-            try
-              let term = match List.assoc x' env with
-               | Int x'' -> Int x''
-               | Float x'' -> Float x''
-               | _ -> raise (Error "baz")
-              in eval_exp_no_expansion (Term ((string_of_exp term),y')) env
-            with Not_found -> raise (Error name)
-      end
+    (* fullname = name + indices. Example with $v(a,b,c):
+       fullname is ''$v(a,b,c)', name is '$v' and indices are '(a,b,c)' *)
+    let fullname = expand_var_name x env in
+    begin
+      (* Check if this variable has been affected locally (recursive-wise)
+         by bigand, bigor or let. *)
+      try let content = List.assoc fullname env in
+        match content with
+        | Int x' -> Int x'
+        | Float x' -> Float x'
+        | Term x' -> Term x'
+        | _ -> raise (Error (
+            "'" ^ fullname ^ "' has been declared locally (in bigand, bigor or let)\n" ^
+            "Locally declared variables must be scalar (float, int or term).\n" ^
+            "Instead, you gave '"^(string_of_exp content)^"'"))
+      with Not_found ->
+      (* Check if this variable name has been affected globally *)
+      try let content = Hashtbl.find extenv fullname in
+        match content with
+        | Int x' -> Int x'
+        | Float x' -> Float x'
+        | Term x' -> Term x'
+        | _ -> raise (Error (
+            "the global variable '" ^ fullname ^ "' should be a scalar (number or term)\n" ^
+            "Instead, you gave '" ^(string_of_exp content)^"'"))
+      with Not_found ->
+      (* This variable has not been declared either locally or globally.
+         Now, we... I don't know what we are doing :-(  *)
+      match x with
+      | name, None -> raise (Error (
+          "problem with '" ^ fullname ^ "': I have no idea what this piece of code does,\n"^
+          "the only thing I know at this point is that this variable must have indices.\n"^
+          "Example: $v(1,2,3)"))
+      | name, Some indices ->
+        try
+          let term = match List.assoc name env with
+            | Int x'' -> Int x''
+            | Float x'' -> Float x''
+            | Term x'' -> Term x''
+            | x'' -> raise (Error (
+                "problem with '" ^ fullname ^ "': I have no idea what this piece of code does,\n"^
+                "the only thing I know at this point is that the content of the variable\n"^
+                "'"^name^"' was expected to be a scalar (int, float or int) but is actually\n"^
+                "'"^(string_of_exp x'')^"'. I hope this message helped you..."))
+          in eval_exp_no_expansion (Term ((string_of_exp term), Some indices)) env
+        with Not_found -> raise (Error ("'" ^ name ^ "' "))
+    end
   | Not Top    -> Bottom
   | Not Bottom -> Top
   | Not x      -> Not (eval_exp_no_expansion x env)
@@ -570,7 +593,7 @@ and eval_test exp env =
   | Bool x -> x
   | _ -> raise (Error (string_of_exp exp))
 
-and expand_var_name var env =
+and expand_var_name (var:var) env =
   match var with
   | (x,None)   -> x
   | (x,Some y) ->

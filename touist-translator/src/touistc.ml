@@ -125,14 +125,8 @@ let print_position outx lexbuf =
  *)
 let evaluate (ast:Syntax.prog) : Syntax.exp =
   try Eval.eval ast [] with
-  | Eval.UnknownVar msg ->
-    Printf.fprintf stderr "the variable %s has not been declared\n" msg;
-    exit (get_code COMPILE_NO_LINE_NUMBER_ERROR)
-  | Eval.TypeError msg ->
-    Printf.fprintf stderr "type error with '%s'\n" msg;
-    exit (get_code COMPILE_NO_LINE_NUMBER_ERROR)
-  | Eval.ArgumentError msg ->
-    Printf.fprintf stderr "argument error: '%s'\n" msg;
+  | Eval.Error msg ->
+    Printf.fprintf stderr "%s\n" msg;
     exit (get_code COMPILE_NO_LINE_NUMBER_ERROR)
 
 let transform_to_cnf (evaluated_ast:Syntax.exp) : Syntax.exp =
