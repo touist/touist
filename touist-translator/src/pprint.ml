@@ -11,7 +11,7 @@ let rec string_of_exp = function
   | Var (x,None)   -> x
   | Var (x,Some y) -> x ^ "(" ^ (string_of_exp_list ", " y) ^ ")"
   | Set    x -> string_of_set x
-  | Set_decl x -> "<set-decl>"
+  | Set_decl x -> "[" ^ (string_of_exp_list "," x) ^ "]"
   | Neg x     -> "(- " ^ (string_of_exp x) ^ ")"
   | Add (x,y) -> "(" ^ (string_of_exp x) ^ " + "   ^ (string_of_exp y) ^ ")"
   | Sub (x,y) -> "(" ^ (string_of_exp x) ^ " - "   ^ (string_of_exp y) ^ ")"
