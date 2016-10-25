@@ -17,12 +17,7 @@
 open Syntax
 open Pprint
 
-exception TypeError     of string
-exception ArgumentError of string
-
-(* This error informs the user that he tried to use a variable, e.g. $a
- * but that variable has not been declared in the set section *)
-exception UnknownVar    of string
+exception Error of string
 
 (* Return the list of integers between min and max
  * with an increment of step
@@ -61,7 +56,7 @@ let rec set_bin_op iop fop sop repr s1 s2 =
   | GenSet.ISet a, GenSet.ISet b -> GenSet.ISet (iop a b)
   | GenSet.FSet a, GenSet.FSet b -> GenSet.FSet (fop a b)
   | GenSet.SSet a, GenSet.SSet b -> GenSet.SSet (sop a b)
-  | _,_ -> raise (TypeError ("unsupported set type(s) for '" ^ repr  ^ "'"))
+  | _,_ -> raise (Error ("unsupported set type(s) for '" ^ repr  ^ "'"))
 
 let rec set_pred_op ipred fpred spred repr s1 s2 =
   match s1, s2 with
@@ -81,38 +76,47 @@ let rec set_pred_op ipred fpred spred repr s1 s2 =
   | GenSet.ISet a, GenSet.ISet b -> ipred a b
   | GenSet.FSet a, GenSet.FSet b -> fpred a b
   | GenSet.SSet a, GenSet.SSet b -> spred a b
-  | _,_ -> raise (TypeError ("unsupported set type(s) for '" ^ repr ^ "'"))
+  | _,_ -> raise (Error ("unsupported set type(s) for '" ^ repr ^ "'"))
 
 let num_pred_op n1 n2 ipred fpred repr =
   match n1,n2 with
   | Int x, Int y     -> Bool (ipred x y)
   | Float x, Float y -> Bool (fpred x y)
-  | _,_ -> raise (TypeError ("unsupported operand types for '" ^ repr ^ "'"))
+  | _,_ -> raise (Error ("unsupported operand types for '" ^ repr ^ "'"))
 
 let num_bin_op n1 n2 iop fop repr =
   match n1,n2 with
   | Int x, Int y     -> Int   (iop x y)
   | Float x, Float y -> Float (fop x y)
-  | _,_ -> raise (TypeError ("unsupported operand types for '" ^ repr ^ "'"))
+  | _,_ -> raise (Error ("unsupported operand types for '" ^ repr ^ "'"))
 
 let bool_bin_op b1 b2 op repr =
   match b1,b2 with
   | Bool x, Bool y -> Bool (op x y)
-  | _,_ -> raise (TypeError ("unsupported operand types for '" ^ repr ^ "'"))
+  | _,_ -> raise (Error ("unsupported operand types for '" ^ repr ^ "'"))
 
 let unwrap_int = function
   | Int x -> x
-  | x -> raise (TypeError ("expected int, got " ^ (string_of_exp x)))
+  | x -> raise (Error ("expected int, got " ^ (string_of_exp x)))
 
 let unwrap_float = function
   | Float x -> x
-  | x -> raise (TypeError ("expected float, got " ^ (string_of_exp x)))
+  | x -> raise (Error ("expected float, got " ^ (string_of_exp x)))
 
 let unwrap_str = function
   | Term (x,None)   -> x
-  | Term (x,Some _) -> failwith ("unevaluated term: " ^ x)
-  | x -> raise (TypeError ("expected term, got " ^ (string_of_exp x)))
+  | Term (x,Some _) -> raise (Error ("unevaluated term: " ^ x))
+  | x -> raise (Error ("expected term, got " ^ (string_of_exp x)))
 
+(* Two structures are used to store the information on variables.
+
+   [env] a simple list [(name,content),...] passed as recursive argument that
+   stores int & floats. It allows 'local' variables (i.e., local to the block).
+   It is used for bigand and bigor and let
+
+   [extenv] is a global hashtable with (name, content)
+
+*)
 let extenv = Hashtbl.create 10
 
 let rec eval exp env =
@@ -120,7 +124,7 @@ let rec eval exp env =
 
 and eval_prog exp env =
   let rec loop = function
-    | []    -> failwith "no clauses"
+    | []    -> raise (Error ("no clauses"))
     | [x]   -> x
     | x::xs -> And (x, loop xs)
   in
@@ -146,7 +150,7 @@ and eval_exp exp env =
         try List.assoc name env
         with Not_found ->
           try Hashtbl.find extenv name
-          with Not_found -> raise (UnknownVar name)
+          with Not_found -> raise (Error ("variable '" ^ name ^"' has not been declared"))
       end
   | Set x -> Set x
   | Set_decl x -> eval_set x env
@@ -155,7 +159,7 @@ and eval_exp exp env =
         match eval_exp x env with
         | Int x'   -> Int   (- x')
         | Float x' -> Float (-. x')
-        | _ -> raise (TypeError (string_of_exp exp))
+        | _ -> raise (Error (string_of_exp exp))
       end
   | Add (x,y) -> num_bin_op (eval_exp x env) (eval_exp y env) (+) (+.) "+"
   | Sub (x,y) -> num_bin_op (eval_exp x env) (eval_exp y env) (-) (-.) "-"
@@ -165,33 +169,33 @@ and eval_exp exp env =
       begin
         match eval_exp x env, eval_exp y env with
         | Int x', Int y' -> Int (x' mod y')
-        | _,_ -> raise (TypeError (string_of_exp exp))
+        | _,_ -> raise (Error (string_of_exp exp))
       end
   | Sqrt x ->
       begin
         match eval_exp x env with
         | Float x' -> Float (sqrt x')
-        | _ -> raise (TypeError (string_of_exp exp))
+        | _ -> raise (Error (string_of_exp exp))
       end
   | To_int x ->
       begin
         match eval_exp x env with
         | Float x' -> Int (int_of_float x')
         | Int x'   -> Int x'
-        | _ -> raise (TypeError (string_of_exp exp))
+        | _ -> raise (Error (string_of_exp exp))
       end
   | To_float x ->
       begin
         match eval_exp x env with
         | Int x'   -> Float (float_of_int x')
         | Float x' -> Float x'
-        | _ -> raise (TypeError (string_of_exp exp))
+        | _ -> raise (Error (string_of_exp exp))
       end
   | Not x ->
       begin
         match eval_exp x env with
         | Bool x' -> Bool (not x')
-        | _ -> raise (TypeError (string_of_exp exp))
+        | _ -> raise (Error (string_of_exp exp))
       end
   | And (x,y) -> bool_bin_op (eval_exp x env) (eval_exp y env) (&&) "and"
   | Or (x,y) -> bool_bin_op (eval_exp x env) (eval_exp y env) (||) "or"
@@ -210,7 +214,7 @@ and eval_exp exp env =
         match eval_exp x env with
         | Bool true  -> true
         | Bool false -> false
-        | _ -> raise (TypeError (string_of_exp exp))
+        | _ -> raise (Error (string_of_exp exp))
       in
       if test then eval_exp y env else eval_exp z env
   | Union (x,y) ->
@@ -220,7 +224,7 @@ and eval_exp exp env =
             Set (set_bin_op (IntSet.union)
                             (FloatSet.union)
                             (StringSet.union) "union" x' y')
-        | _,_ -> raise (TypeError (string_of_exp exp))
+        | _,_ -> raise (Error (string_of_exp exp))
       end
   | Inter (x,y) ->
       begin
@@ -229,7 +233,7 @@ and eval_exp exp env =
             Set (set_bin_op (IntSet.inter)
                             (FloatSet.inter)
                             (StringSet.inter) "inter" x' y')
-        | _,_ -> raise (TypeError (string_of_exp exp))
+        | _,_ -> raise (Error (string_of_exp exp))
       end
   | Diff (x,y) ->
       begin
@@ -238,14 +242,14 @@ and eval_exp exp env =
             Set (set_bin_op (IntSet.diff)
                             (FloatSet.diff)
                             (StringSet.diff) "diff" x' y')
-        | _,_ -> raise (TypeError (string_of_exp exp))
+        | _,_ -> raise (Error (string_of_exp exp))
       end
   | Range (x,y) ->
       begin
         match eval_exp x env, eval_exp y env with
         | Int x', Int y'     -> Set (GenSet.ISet (IntSet.of_list (irange x' y' 1)))
         | Float x', Float y' -> Set (GenSet.FSet (FloatSet.of_list (frange x' y' 1.)))
-        | _,_ -> raise (ArgumentError (string_of_exp exp))
+        | _,_ -> raise (Error (string_of_exp exp))
       end
   | Empty x ->
       begin
@@ -258,7 +262,7 @@ and eval_exp exp env =
               | GenSet.FSet x'' -> Bool (FloatSet.is_empty x'')
               | GenSet.SSet x'' -> Bool (StringSet.is_empty x'')
             end
-        | _ -> raise (TypeError (string_of_exp exp))
+        | _ -> raise (Error (string_of_exp exp))
       end
   | Card x ->
       begin
@@ -271,7 +275,7 @@ and eval_exp exp env =
               | GenSet.FSet x'' -> Int (FloatSet.cardinal x'')
               | GenSet.SSet x'' -> Int (StringSet.cardinal x'')
             end
-        | _ -> raise (TypeError (string_of_exp exp))
+        | _ -> raise (Error (string_of_exp exp))
       end
   | Subset (x,y) ->
       begin
@@ -280,7 +284,7 @@ and eval_exp exp env =
             Bool (set_pred_op (IntSet.subset)
                               (FloatSet.subset)
                               (StringSet.subset) "subset" x' y')
-        | _ -> raise (TypeError (string_of_exp exp))
+        | _ -> raise (Error (string_of_exp exp))
       end
   | In (x,y) ->
       begin
@@ -288,7 +292,7 @@ and eval_exp exp env =
         | Int x', Set (GenSet.ISet y') -> Bool (IntSet.mem x' y')
         | Float x', Set (GenSet.FSet y') -> Bool (FloatSet.mem x' y')
         | Term (x',None), Set (GenSet.SSet y') -> Bool (StringSet.mem x' y')
-        | _,_ -> raise (TypeError (string_of_exp exp))
+        | _,_ -> raise (Error (string_of_exp exp))
       end
   | Equal (x,y) ->
       begin
@@ -300,13 +304,14 @@ and eval_exp exp env =
             Bool (set_pred_op (IntSet.equal)
                               (FloatSet.equal)
                               (StringSet.equal) "=" x' y')
-        | _,_ -> raise (TypeError (string_of_exp exp))
+        | _,_ -> raise (Error (string_of_exp exp))
       end
   | Not_equal        (x,y) -> eval_exp (Not (Equal (x,y))) env
   | Lesser_than      (x,y) -> num_pred_op (eval_exp x env) (eval_exp y env) (<) (<) "<"
   | Lesser_or_equal  (x,y) -> num_pred_op (eval_exp x env) (eval_exp y env) (<=) (<=) "<="
   | Greater_than     (x,y) -> num_pred_op (eval_exp x env) (eval_exp y env) (>) (>) ">"
   | Greater_or_equal (x,y) -> num_pred_op (eval_exp x env) (eval_exp y env) (>=) (>=) ">="
+  | e -> raise (Error ("this expression is not an 'evaluable' expression: " ^ string_of_exp e))
 
 and eval_set set_decl env =
   let eval_form = List.map (fun x -> eval_exp x env) set_decl in
@@ -318,7 +323,7 @@ and eval_set set_decl env =
       Set (GenSet.FSet (FloatSet.of_list (List.map unwrap_float eval_form)))
   | (Term (_,None))::xs ->
       Set (GenSet.SSet (StringSet.of_list (List.map unwrap_str eval_form)))
-  | _ -> raise (TypeError ("set: " ^ (string_of_exp_list ", " eval_form)))
+  | _ -> raise (Error ("set: " ^ (string_of_exp_list ", " eval_form)))
 
 and eval_exp_no_expansion exp env =
   match exp with
@@ -330,7 +335,7 @@ and eval_exp_no_expansion exp env =
         | Int   x' -> Int   (- x')
         | Float x' -> Float (-. x')
         | x' -> Neg x'
-        (*| _ -> raise (TypeError (string_of_exp exp))*)
+        (*| _ -> raise (Error (string_of_exp exp))*)
       end
   | Add (x,y) ->
       begin
@@ -340,7 +345,7 @@ and eval_exp_no_expansion exp env =
         | Int _, Term _
         | Term _, Int _ -> Add (x,y)
         | x', y' -> Add (x', y')
-        (*| _,_ -> raise (TypeError (string_of_exp exp))*)
+        (*| _,_ -> raise (Error (string_of_exp exp))*)
       end
   | Sub (x,y) ->
       begin
@@ -349,7 +354,7 @@ and eval_exp_no_expansion exp env =
         | Float x', Float y' -> Float (x' -. y')
         (*| Term x', Term y' -> Sub (Term x', Term y')*)
         | x', y' -> Sub (x', y')
-        (*| _,_ -> raise (TypeError (string_of_exp exp))*)
+        (*| _,_ -> raise (Error (string_of_exp exp))*)
       end
   | Mul (x,y) ->
       begin
@@ -357,7 +362,7 @@ and eval_exp_no_expansion exp env =
         | Int x', Int y'     -> Int   (x' *  y')
         | Float x', Float y' -> Float (x' *. y')
         | x', y' -> Mul (x', y')
-        (*| _,_ -> raise (TypeError (string_of_exp exp))*)
+        (*| _,_ -> raise (Error (string_of_exp exp))*)
       end
   | Div (x,y) ->
       begin
@@ -365,7 +370,7 @@ and eval_exp_no_expansion exp env =
         | Int x', Int y'     -> Int   (x' /  y')
         | Float x', Float y' -> Float (x' /. y')
         | x', y' -> Div (x', y')
-        (*| _,_ -> raise (TypeError (string_of_exp exp))*)
+        (*| _,_ -> raise (Error (string_of_exp exp))*)
       end
   | Equal            (x,y) -> Equal            (eval_exp_no_expansion x env, eval_exp_no_expansion y env)
   | Not_equal        (x,y) -> Not_equal        (eval_exp_no_expansion x env, eval_exp_no_expansion y env)
@@ -379,24 +384,30 @@ and eval_exp_no_expansion exp env =
   | Var x ->
       let name = expand_var_name x env in
       begin
+        (* Check if this variable has been affected locally (recursive-wise)
+           by bigand, bigor or let. *)
         try (match List.assoc name env with
              | Int x' -> Int x'
              | Float x' -> Float x'
-             | _ -> failwith (name ^ " has been declared but something went wrong"))
+             | _ -> raise (Error ("'" ^ name ^ "' has been declared locally (in bigand, bigor or let)\nLocally declared variables must be float or int")))
         with Not_found ->
-          (* Check if this variable name has been affected by something *)
+        (* Check if this variable name has been affected globally by something *)
           try (match Hashtbl.find extenv name with
                | Int x' -> Int x'
                | Float x' -> Float x'
-               | Set (_) -> failwith (name ^ " was expected to be a clause or a number, but it's a set")
-               | _ -> failwith (name ^ " has not the right content"))
+               | Set (_) -> raise (Error ("'" ^ name ^ " has been declared globally, meaning that it is\n
+                                          expected to be a number. Instead, you gave a set."))
+               | _ -> failwith ("'" ^ name ^ " has been declared globally, meaning that it is\n
+                                expected to be a ."))
           with Not_found ->
             let (x',y') = x in
-            try eval_exp_no_expansion (Term (string_of_exp (match List.assoc x' env with
-                 | Int x'' -> Int x''
-                 | Float x'' -> Float x''
-                 | _ -> failwith "baz"),y')) env
-            with Not_found -> raise (UnknownVar name)
+            try
+              let term = match List.assoc x' env with
+               | Int x'' -> Int x''
+               | Float x'' -> Float x''
+               | _ -> raise (Error "baz")
+              in eval_exp_no_expansion (Term ((string_of_exp term),y')) env
+            with Not_found -> raise (Error name)
       end
   | Not Top    -> Bottom
   | Not Bottom -> Top
@@ -421,7 +432,7 @@ and eval_exp_no_expansion exp env =
         match eval_exp y env with
         | Set (GenSet.SSet s) ->
             exact_str (StringSet.exact (unwrap_int (eval_exp x env)) s)
-        | _ -> raise (TypeError (string_of_exp y))
+        | _ -> raise (Error (string_of_exp y))
       end
   | Atleast (x,y) ->
       begin
@@ -429,7 +440,7 @@ and eval_exp_no_expansion exp env =
         | Set (GenSet.SSet s) ->
             atleast_str (StringSet.atleast (unwrap_int (eval_exp x env)) s)
         | _ ->
-            raise (TypeError (string_of_exp y))
+            raise (Error (string_of_exp y))
       end
   | Atmost (x,y) ->
       begin
@@ -437,7 +448,7 @@ and eval_exp_no_expansion exp env =
         | Set (GenSet.SSet s) ->
             atmost_str (StringSet.atmost (unwrap_int (eval_exp x env)) s)
         | _ ->
-            raise (TypeError (string_of_exp y))
+            raise (Error (string_of_exp y))
       end
   | Bigand (v,s,t,e) ->
       let test =
@@ -447,7 +458,7 @@ and eval_exp_no_expansion exp env =
       in
       begin
         match v,s with
-        | [],[] | _,[] | [],_ -> raise (ArgumentError (string_of_exp exp))
+        | [],[] | _,[] | [],_ -> raise (Error (string_of_exp exp))
         | [x],[y] ->
             begin
               match eval_exp y env with
@@ -455,7 +466,7 @@ and eval_exp_no_expansion exp env =
               | Set (GenSet.ISet a) -> bigand_int   env x (IntSet.elements a)    test e
               | Set (GenSet.FSet a) -> bigand_float env x (FloatSet.elements a)  test e
               | Set (GenSet.SSet a) -> bigand_str   env x (StringSet.elements a) test e
-              | _ -> raise (ArgumentError (string_of_exp exp))
+              | _ -> raise (Error (string_of_exp exp))
             end
         | x::xs,y::ys ->
             eval_exp_no_expansion (Bigand ([x],[y],None,(Bigand (xs,ys,t,e)))) env
@@ -468,7 +479,7 @@ and eval_exp_no_expansion exp env =
       in
       begin
         match v,s with
-        | [],[] | _,[] | [],_ -> raise (ArgumentError (string_of_exp exp))
+        | [],[] | _,[] | [],_ -> raise (Error (string_of_exp exp))
         | [x],[y] ->
             begin
               match eval_exp y env with
@@ -476,7 +487,7 @@ and eval_exp_no_expansion exp env =
               | Set (GenSet.ISet a) -> bigor_int   env x (IntSet.elements a)    test e
               | Set (GenSet.FSet a) -> bigor_float env x (FloatSet.elements a)  test e
               | Set (GenSet.SSet a) -> bigor_str   env x (StringSet.elements a) test e
-              | _ -> raise (ArgumentError (string_of_exp exp))
+              | _ -> raise (Error (string_of_exp exp))
             end
         | x::xs,y::ys ->
             eval_exp_no_expansion (Bigor ([x],[y],None,(Bigor (xs,ys,t,e)))) env
@@ -484,7 +495,8 @@ and eval_exp_no_expansion exp env =
   | If (x,y,z) ->
       let test = eval_test x env in
       if test then eval_exp_no_expansion y env else eval_exp_no_expansion z env
-  | Let (v,x,c) -> eval_affect (Affect (v,x)) env; eval_exp_no_expansion c env
+  | Let (v,x,c) -> eval_exp_no_expansion c (((expand_var_name v env),x)::env)
+  | e -> raise (Error ("this expression is not a formula: " ^ string_of_exp e))
 
 
 and exact_str lst =
@@ -556,7 +568,7 @@ and bigor_str env var values test exp =
 and eval_test exp env =
   match eval_exp exp env with
   | Bool x -> x
-  | _ -> raise (TypeError (string_of_exp exp))
+  | _ -> raise (Error (string_of_exp exp))
 
 and expand_var_name var env =
   match var with
