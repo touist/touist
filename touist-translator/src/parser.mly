@@ -91,6 +91,9 @@
  * the minus sign MUST be reduced as fast as possible. *)
 
 %on_error_reduce separated_nonempty_list(COMMA,term_or_exp)
+%on_error_reduce separated_nonempty_list(COMMA,VAR)
+%on_error_reduce separated_nonempty_list(COMMA,exp)
+%on_error_reduce separated_nonempty_list(COMMA,TERM)
 (* %on_error_reduce is a nice "trick" to display a a more accurate
    context when an error is handled. For example, with this text:
 
