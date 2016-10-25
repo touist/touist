@@ -4,6 +4,10 @@ let rec string_of_exp = function
   | Int    x -> string_of_int x
   | Float  x -> string_of_float x
   | Bool   x -> string_of_bool x
+  | Top    -> "top"
+  | Bottom -> "bot"
+  | Term (x,None)   -> x
+  | Term (x,Some y) -> x ^ "(" ^ (string_of_exp_list ", " y) ^ ")"
   | Var (x,None)   -> x
   | Var (x,Some y) -> x ^ "(" ^ (string_of_exp_list ", " y) ^ ")"
   | Set    x -> string_of_set x
@@ -67,6 +71,7 @@ let rec string_of_exp = function
   | Exact (x,y) -> "exact(" ^ (string_of_exp x) ^ "," ^ (string_of_exp y) ^ ")"
   | Atmost (x,y) -> "atmost(" ^ (string_of_exp x) ^ "," ^ (string_of_exp y) ^ ")"
   | Atleast (x,y) -> "atleast(" ^ (string_of_exp x) ^ "," ^ (string_of_exp y) ^ ")"
+  | Let (v,x,c) -> (string_of_exp (Var v)) ^ "=" ^ (string_of_exp x) ^ ": " ^ (string_of_exp c)
 
 and string_of_set = function
   | GenSet.Empty  -> "[]"
