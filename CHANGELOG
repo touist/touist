@@ -2,7 +2,14 @@ v2.0.0
   - touistc:
     - simplified 'begin sets end sets begin formula end formula'; syntax is
         <formulas> data <sets>
-      Note that the sets are now after formulas.
+      Note that the sets are now after formulas. It will be soon possible
+      to give the formulas and sets as two separate files, for genericity
+      of the models (defined by the formulas) and the data (the sets).
+  - gui:
+    - merged the sets and formulas tabs in GUI; the solution is now to
+      use the syntax <formulas> data <sets>. I'm still looking for
+      a way to separate formulas and sets in GUI, e.g., two separate
+      files that have each its own tab
 v1.4.0
   - touistc:
     - touistc is now able to solve SAT problems on its own. You can use
@@ -13,12 +20,14 @@ v1.4.0
     - Added --equiv that allows to test the equivalency of two files.
       Note that it is not an actual equivalence as both problems must 
       have the exact same set of propositions/literals.
-      '--solve' to return the first model of your problem, '--count' for counting
-      the number of models), '--limit i' for setting a limit to the number of
-      models returned; 0 will set no limit). Way faster that the java code!
     - (internal) merged exp and clause types for less code redundancy
     - added support for local variables of the form 'let $i=1: p($i)'.
       A 'let' variable is local to the clause it precedes, e.g., p($i) 
+  - gui:
+    - added support for local variables of the form
+      'let $i=1: p($i) end'. For now, the scope of these variables is
+      not actually limited to the current context (the current clause);
+      the variables exist even after 'end'.
 v1.3.1
   - touistc:
     - fixed `a (b)` recognized as `a(b)` instead of `a and b`
