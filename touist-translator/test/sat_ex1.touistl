@@ -1,18 +1,3 @@
-begin sets
-$length  = 10
-$F       = [a,b,c,d]
-$O       = [A,B]
-$I       = [a,c]
-$G       = [a,d]
-$Prec(A) = [a]
-$Add(A)  = [b]
-$Del(A)  = [a]
-$Prec(B) = [b,c]
-$Add(B)  = [a,d]
-$Del(B)  = []
-
-end sets
-begin formula
 bigand $f in $I: $f(0) end
 bigand $f in diff($F,$I): not $f(0) end
 bigand $f in $G: $f($length) end
@@ -47,4 +32,16 @@ bigand $i in [1..$length]:
     end
   end
 end
-end formula
+
+data
+$length  = 10
+$F       = [a,b,c,d]
+$O       = [A,B]
+$I       = [a,c]
+$G       = [a,d]
+$Prec(A) = [a]
+$Add(A)  = [b]
+$Del(A)  = [a]
+$Prec(B) = [b,c]
+$Add(B)  = [a,d]
+$Del(B)  = []

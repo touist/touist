@@ -1,9 +1,6 @@
-begin sets
-$a = [a,b,c]
-end sets
-
-begin formula
 bigand $i in $a:
 	A($i) and B($i)
 end
-end formula
+
+data
+$a = [a,b,c]
