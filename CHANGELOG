@@ -2,6 +2,20 @@ v1.4.2
     - (regression) possible to declare a set with terms: [a,b,c]...
 v1.4.1
     - (regression) output of the table (id,name) had been inverted (!)
+v2.0.0
+  - touistc:
+    - simplified 'begin sets end sets begin formula end formula'; syntax is
+        <formulas> data <sets>
+      Note that the sets are now after formulas. It will be soon possible
+      to give the formulas and sets as two separate files, for genericity
+      of the models (defined by the formulas) and the data (the sets).
+  - gui:
+    - merged the sets and formulas tabs in GUI; the solution is now to
+      use the syntax <formulas> data <sets>. I'm still looking for
+      a way to separate formulas and sets in GUI, e.g., two separate
+      files that have each its own tab
+v1.4.1
+    - (regression) output of the table (id,name) had been inverted (!)
 v1.4.0
   - touistc:
     - touistc is now able to solve SAT problems on its own. You can use
