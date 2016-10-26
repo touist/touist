@@ -386,52 +386,67 @@ and eval_exp_no_expansion exp env =
   | Bottom -> Bottom
   | Term x -> Term ((expand_var_name x env), None)
   | Var x ->
-    (* fullname = name + indices. Example with $v(a,b,c):
-       fullname is ''$v(a,b,c)', name is '$v' and indices are '(a,b,c)' *)
-    let fullname = expand_var_name x env in
+    (* name = prefix + indices. 
+       Example with $v(a,b,c):
+       name is '$v(a,b,c)', prefix is '$v' and indices are '(a,b,c)' *)
+    let name = expand_var_name x env in
     begin
-      (* Check if this variable has been affected locally (recursive-wise)
-         by bigand, bigor or let. *)
-      try let content = List.assoc fullname env in
+      (* Case 1. Check if this variable name has been affected locally 
+         (recursive-wise) in bigand, bigor or let. *)
+      try let content = List.assoc name env in
         match content with
         | Int x' -> Int x'
         | Float x' -> Float x'
         | Term x' -> Term x'
         | _ -> raise (Error (
-            "'" ^ fullname ^ "' has been declared locally (in bigand, bigor or let)\n" ^
+            "'" ^ name ^ "' has been declared locally (in bigand, bigor or let)\n" ^
             "Locally declared variables must be scalar (float, int or term).\n" ^
             "Instead, you gave '"^(string_of_exp content)^"'"))
       with Not_found ->
-      (* Check if this variable name has been affected globally *)
-      try let content = Hashtbl.find extenv fullname in
+      (* Case 2. Check if this variable name has been affected globally, i.e.,
+         in the 'data' section *)
+      try let content = Hashtbl.find extenv name in
         match content with
         | Int x' -> Int x'
         | Float x' -> Float x'
         | Term x' -> Term x'
         | _ -> raise (Error (
-            "the global variable '" ^ fullname ^ "' should be a scalar (number or term)\n" ^
+            "the global variable '" ^ name ^ "' should be a scalar (number or term)\n" ^
             "Instead, you gave '" ^(string_of_exp content)^"'"))
       with Not_found ->
-      (* This variable has not been declared either locally or globally.
-         Now, we... I don't know what we are doing :-(  *)
-      match x with
-      | name, None -> raise (Error (
-          "problem with '" ^ fullname ^ "': I have no idea what this piece of code does,\n"^
-          "the only thing I know at this point is that this variable must have indices.\n"^
-          "Example: $v(1,2,3)"))
-      | name, Some indices ->
-        try
-          let term = match List.assoc name env with
+      try
+        match x with
+        (* Case 3. The variable is a non-tuple of the form '$v' => name=prefix only.
+           As it has not been found in the Case 1 or 2, this means that this variable
+           has not been declared. *)
+        | prefix, None -> raise Not_found (* trick to go to the Case 5. error *)
+        (* Case 4. The var is a tuple-variable of the form '$v(1,2,3)' and has not
+           been declared.
+           But maybe we are in the following special case where the parenthesis
+           in $v(a,b,c) that should let think it is a tuple-variable is actually
+           a 'reconstructed' term, e.g. the content of $v should be expanded.
+           Example of use:
+            $F = [a,b,c]
+            bigand $i in [1..3]:
+              bigand $f in $F:     <- $f is defined as non-tuple variable (= no indices)
+                $f($i)             <- here, $f looks like a tuple-variable but NO!
+              end                     It is simply used to form the proposition
+            end                       a(1), a(2)..., b(1)...    *)
+        | prefix, Some indices ->
+          let term = match List.assoc prefix env with
             | Int x'' -> Int x''
             | Float x'' -> Float x''
             | Term x'' -> Term x''
             | x'' -> raise (Error (
-                "problem with '" ^ fullname ^ "': I have no idea what this piece of code does,\n"^
-                "the only thing I know at this point is that the content of the variable\n"^
-                "'"^name^"' was expected to be a scalar (int, float or int) but is actually\n"^
-                "'"^(string_of_exp x'')^"'. I hope this message helped you..."))
+                "'" ^ name ^ "' has not been declared; maybe you wanted '"^prefix^"' to expand\n" ^
+                "in order to produce an expanded version <"^prefix^"-content>("^(string_of_exp_list "," indices)^")." ^
+                "But the content of '"^prefix^"' is\n'"^
+                "    "^(string_of_exp x'')^"\n'"^
+                "which is not a term or a number, so it cannot be expanded as explained above."))
           in eval_exp_no_expansion (Term ((string_of_exp term), Some indices)) env
-        with Not_found -> raise (Error ("'" ^ name ^ "' "))
+      (* Case 5. the variable was of the form '$v(1,2,3)' and was not declared
+         and '$v' is not either declared, so we can safely guess that this var has not been declared. *)
+      with Not_found -> raise (Error ("'" ^ name ^ "' has not been declared"))
     end
   | Not Top    -> Bottom
   | Not Bottom -> Top
