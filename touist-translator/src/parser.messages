@@ -198,7 +198,8 @@ prog: TUPLE DIFF VAR COMMA VAR WHEN
 
 Ill-formed $4 statement. At this point, either finish the 
 $4 statement by a ')' or continue the expression $1.
-Instead, $0 has been read.
+Instead, the following statement were read:
+    $0
 
 prog: ATLEAST VAR COMMA XOR 
 ##
@@ -265,7 +266,8 @@ prog: TUPLE UNION VAR COMMA XOR
 ##
 
 Ill-formed $3 statement. At this point, an expression was expected.
-Instead, got $0.
+Instead, the following statement were read:
+    $0
 
 prog: ATLEAST VAR WHEN 
 ##
@@ -345,59 +347,6 @@ prog: EXACT VAR WHEN
 ## The known suffix of the stack is as follows:
 ## EXACT exp 
 ##
-prog: IF VAR WHEN 
-##
-## Ends in an error in state: 153.
-##
-## clause -> IF exp . THEN clause ELSE clause END [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
-## exp -> exp . ADD exp [ XOR THEN SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
-## exp -> exp . SUB exp [ XOR THEN SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
-## exp -> exp . MUL exp [ XOR THEN SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
-## exp -> exp . DIV exp [ XOR THEN SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
-## exp -> exp . MOD exp [ XOR THEN SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
-## exp -> exp . AND exp [ XOR THEN SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
-## exp -> exp . OR exp [ XOR THEN SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
-## exp -> exp . XOR exp [ XOR THEN SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
-## exp -> exp . IMPLIES exp [ XOR THEN SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
-## exp -> exp . EQUIV exp [ XOR THEN SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
-## exp -> exp . EQUAL exp [ XOR THEN SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
-## exp -> exp . NOTEQUAL exp [ XOR THEN SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
-## exp -> exp . LT exp [ XOR THEN SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
-## exp -> exp . LE exp [ XOR THEN SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
-## exp -> exp . GT exp [ XOR THEN SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
-## exp -> exp . GE exp [ XOR THEN SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
-## exp -> exp . IN exp [ XOR THEN SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
-##
-## The known suffix of the stack is as follows:
-## IF exp 
-##
-prog: LET VAR AFFECT IF VAR WHEN 
-##
-## Ends in an error in state: 132.
-##
-## clause -> IF exp . THEN clause ELSE clause END [ XOR SUB RPAREN OR NOTEQUAL MUL LT LE IMPLIES GT GE EQUIV EQUAL ELSE DIV COLON AND ADD ]
-## exp -> exp . ADD exp [ XOR THEN SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
-## exp -> exp . SUB exp [ XOR THEN SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
-## exp -> exp . MUL exp [ XOR THEN SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
-## exp -> exp . DIV exp [ XOR THEN SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
-## exp -> exp . MOD exp [ XOR THEN SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
-## exp -> exp . AND exp [ XOR THEN SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
-## exp -> exp . OR exp [ XOR THEN SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
-## exp -> exp . XOR exp [ XOR THEN SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
-## exp -> exp . IMPLIES exp [ XOR THEN SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
-## exp -> exp . EQUIV exp [ XOR THEN SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
-## exp -> exp . EQUAL exp [ XOR THEN SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
-## exp -> exp . NOTEQUAL exp [ XOR THEN SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
-## exp -> exp . LT exp [ XOR THEN SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
-## exp -> exp . LE exp [ XOR THEN SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
-## exp -> exp . GT exp [ XOR THEN SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
-## exp -> exp . GE exp [ XOR THEN SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
-## exp -> exp . IN exp [ XOR THEN SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
-## exp -> IF exp . THEN exp ELSE exp END [ XOR SUB RPAREN OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL ELSE DIV COLON AND ADD ]
-##
-## The known suffix of the stack is as follows:
-## IF exp 
-##
 prog: TUPLE DIFF VAR WHEN 
 ##
 ## Ends in an error in state: 62.
@@ -423,32 +372,6 @@ prog: TUPLE DIFF VAR WHEN
 ##
 ## The known suffix of the stack is as follows:
 ## DIFF exp 
-##
-prog: TUPLE IF VAR WHEN 
-##
-## Ends in an error in state: 68.
-##
-## exp -> exp . ADD exp [ XOR THEN SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
-## exp -> exp . SUB exp [ XOR THEN SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
-## exp -> exp . MUL exp [ XOR THEN SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
-## exp -> exp . DIV exp [ XOR THEN SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
-## exp -> exp . MOD exp [ XOR THEN SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
-## exp -> exp . AND exp [ XOR THEN SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
-## exp -> exp . OR exp [ XOR THEN SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
-## exp -> exp . XOR exp [ XOR THEN SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
-## exp -> exp . IMPLIES exp [ XOR THEN SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
-## exp -> exp . EQUIV exp [ XOR THEN SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
-## exp -> exp . EQUAL exp [ XOR THEN SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
-## exp -> exp . NOTEQUAL exp [ XOR THEN SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
-## exp -> exp . LT exp [ XOR THEN SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
-## exp -> exp . LE exp [ XOR THEN SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
-## exp -> exp . GT exp [ XOR THEN SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
-## exp -> exp . GE exp [ XOR THEN SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
-## exp -> exp . IN exp [ XOR THEN SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
-## exp -> IF exp . THEN exp ELSE exp END [ XOR WHEN VARTUPLE VAR THEN SUB RPAREN RBRACK RANGE OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL EOF END ELSE DIV COMMA COLON AND ADD ]
-##
-## The known suffix of the stack is as follows:
-## IF exp 
 ##
 prog: TUPLE INTER VAR WHEN 
 ##
@@ -557,7 +480,8 @@ prog: TUPLE UNION VAR WHEN
 
 Ill-formed $2 statement. At this point, either finish the expression $1
 with a ',' or continue it with an operator over expressions.
-Instead, read $0.
+Instead, the following statement were read:
+    $0
 
 prog: TUPLE EMPTY VAR WHEN 
 ##
@@ -718,7 +642,8 @@ prog: TUPLE LPAREN VAR WHEN
 
 Ill-formed $2 statement. At this point, either finish the expression $1
 with a ')' or continue it with an operator over expressions.
-Instead, read $0.
+Instead, the following statement were read:
+    $0
 
 prog: ATLEAST XOR 
 ##
@@ -749,7 +674,8 @@ prog: EXACT XOR
 ##
 
 Ill-formed $1 statement. At this point, an expression is expected.
-Instead, got $0.
+Instead, the following statement were read:
+    $0
 
 prog: BIGAND VAR IN VAR COLON VAR WHEN 
 ##
@@ -800,9 +726,14 @@ prog: BIGOR VAR IN VAR COLON VAR WHEN
 ## BIGOR separated_nonempty_list(COMMA,VAR) IN separated_nonempty_list(COMMA,exp) COLON clause 
 ##
 
-The $6 construct only takes one formula (not a list).
-Either put a 'and' to continue your clause, or finish the $6 with an 'end'.
-Instead, read $0.
+Ill-formed $6 body. At this point, expecting either 'end' or
+a continuation of the formula that was started by:
+    $1
+Instead, the following statement were read:
+    $0
+Important: in $6, you cannot write 'a b'. It must be written 'a and b'.
+Explanation: $6 expects a formula, but 'a b' is a list of formulas and
+is only allowed outside $6
 
 prog: BIGAND VAR IN VAR COLON XOR 
 ##
@@ -823,11 +754,9 @@ prog: BIGOR VAR IN VAR COLON XOR
 ## BIGOR separated_nonempty_list(COMMA,VAR) IN separated_nonempty_list(COMMA,exp) COLON 
 ##
 
-Ill-formed $5 statement. At this point, expecting either a continuation of
-the formula $1 or 'end'.
-Instead, found $0.
-Important: in $5, you cannot write 'a b'. It must be written 'a and b'.
-Explanation: $5 expects a formula, but 'a b' is a list of formulas.
+Ill-formed $5 statement. The body of $5 is expected to be a single
+formula. Instead, the following statement were read:
+    $0
 
 prog: BIGAND VAR IN VAR RPAREN 
 ##
@@ -862,9 +791,11 @@ prog: BIGOR VAR IN VAR RPAREN
 ## In state 88, spurious reduction of production separated_nonempty_list(COMMA,exp) -> exp 
 ##
 
-Ill-formed $4 statement. At this point, expecting either a continuation of
-the comma-separated list of variables $1 or ':' or 'when'.
-Instead, found $0.
+Ill-formed $4 statement. At this point, expecting either ':' or 'when' or
+a continuation of the comma-separated list of variables you started with:
+    $1
+Instead, the following statement were read:
+    $0
 
 prog: BIGAND VAR IN VAR WHEN VAR COLON VAR WHEN 
 ##
@@ -915,9 +846,11 @@ prog: BIGOR VAR IN VAR WHEN VAR COLON VAR WHEN
 ## BIGOR separated_nonempty_list(COMMA,VAR) IN separated_nonempty_list(COMMA,exp) WHEN exp COLON clause 
 ##
 
-Ill-formed $8 statement. At this point, expecting either a continuation of
-the formula $1 or 'end'. 
-Instead, found $0.
+Ill-formed $8 statement. At this point, expecting either 'end' or
+a continuation of the formula that was started by:
+    $1 
+Instead, the following statement were read:
+    $0
 Important: in $8, you cannot write 'a b'. It must be written 'a and b'.
 Explanation: $8 expects a formula, but 'a b' is a list of formulas.
 
@@ -940,8 +873,9 @@ prog: BIGOR VAR IN VAR WHEN VAR COLON XOR
 ## BIGOR separated_nonempty_list(COMMA,VAR) IN separated_nonempty_list(COMMA,exp) WHEN exp COLON 
 ##
 
-Ill-formed $7 statement. At this point, expecting a valid formula.
-Instead, found $0.
+Ill-formed $7 statement. The body of $7 is expected to be a formula.
+Instead, the following statement were read:
+    $0
 
 prog: BIGAND VAR IN VAR WHEN VAR WHEN 
 ##
@@ -996,9 +930,11 @@ prog: BIGOR VAR IN VAR WHEN VAR WHEN
 ## BIGOR separated_nonempty_list(COMMA,VAR) IN separated_nonempty_list(COMMA,exp) WHEN exp 
 ##
 
-Ill-formed $6 statement. At this point, expecting either the expression
-to finish with a ':' or a continuation of the expression with an operator.
-Instead, found $0.
+Ill-formed $6 statement. At this point, expecting either ':' or a continuation
+of the expression you started with:
+    $1
+Instead, the following statement were read:
+    $0
 
 prog: BIGAND VAR IN VAR WHEN XOR 
 ##
@@ -1020,7 +956,8 @@ prog: BIGOR VAR IN VAR WHEN XOR
 ##
 
 A boolean expression is required after $1.
-Instead, $0 was read.
+Instead, the following statement were read:
+    $0
 
 prog: BIGAND XOR 
 ##
@@ -1045,7 +982,8 @@ prog: BIGOR XOR
 
 Ill-formed $1 statement. At this point, a comma-separated list of
 variables is expected.
-Instead, read $0
+Instead, the following statement were read:
+    $0
 
 prog: BIGAND VAR IN XOR 
 ##
@@ -1068,8 +1006,9 @@ prog: BIGOR VAR IN XOR
 ## BIGOR separated_nonempty_list(COMMA,VAR) IN 
 ##
 
-Ill-formed $3 statement. After $1 is expected a comma-separated list of variables.
-Instead, got $0
+Ill-formed $3 statement. After $1 is expected a comma-separated list of 
+Instead, the following statement were read:
+    $0
 
 prog: BIGOR VAR XOR 
 ##
@@ -1090,7 +1029,8 @@ prog: BIGOR VAR XOR
 
 Ill-formed $2 statement. At this point, either finish the list of variables with 'in'
 or continue it with ','.
-Instead, got $0
+Instead, the following statement were read:
+    $0
 
 prog: BIGOR VAR COMMA XOR 
 ##
@@ -1104,7 +1044,8 @@ prog: BIGOR VAR COMMA XOR
 
 At this point, either finish the list of variables with 'in'
 or continue with a new variable.
-Instead, got $0.
+Instead, the following statement were read:
+    $0
 
 prog: VARTUPLE VAR COMMA XOR 
 ##
@@ -1118,7 +1059,8 @@ prog: VARTUPLE VAR COMMA XOR
 
 At this point, either finish the list of expressions with 'when' or ':',
 or continue the list with a new expression.
-Instead, got $0.
+Instead, the following statement were read:
+    $0
 
 prog: TUPLE VAR IN XOR 
 ##
@@ -1160,8 +1102,9 @@ prog: DATA VAR AFFECT VAR WHEN
 ## var_decl AFFECT exp 
 ##
 
-Ill-formed affectation. The right-term $1 should be a valid expression.
-Instead, it ends with $0.
+Ill-formed affectation. The right-term $1 is expected to be an
+expression. Instead, the following statement were read:
+    $0
 
 prog: DATA VAR AFFECT XOR 
 ##
@@ -1174,7 +1117,8 @@ prog: DATA VAR AFFECT XOR
 ##
 
 Ill-formed affectation. On the right of '=' is expected an expression.
-Instead, got $0.
+Instead, the following statement were read:
+    $0
 
 prog: DATA VAR XOR 
 ##
@@ -1198,7 +1142,9 @@ prog: LET VAR XOR
 
 The affectation to $1 is incomplete and must be of the form
     $1 = <expression>
-At this point, '=' is expected. Instead, got $0.
+At this point, '=' is expected. 
+Instead, the following statement were read:
+    $0
 
 prog: DATA XOR 
 ##
@@ -1212,7 +1158,8 @@ prog: DATA XOR
 
 At this point, an affectation is expected; example:
     $p = [a,b,c]
-Instead, got $0.
+Instead, the following statement were read:
+    $0
 
 prog: IF VAR THEN VAR ELSE VAR WHEN 
 ##
@@ -1239,9 +1186,11 @@ prog: IF VAR THEN VAR ELSE VAR WHEN
 ## IF exp THEN clause ELSE clause 
 ##
 
-Ill-formed 'if' statement. At this point, either finish the formula
+Ill-formed 'if' statement. At this point, either finish the clause
+    $1
 with 'end' or continue the formula with 'and'.
-Instead, found $0.
+Instead, the following statement were read:
+    $0
 
 prog: TUPLE IF VAR THEN VAR ELSE VAR WHEN 
 ##
@@ -1271,8 +1220,10 @@ prog: TUPLE IF VAR THEN VAR ELSE VAR WHEN
 ##
 
 Ill-formed 'if' statement. At this point, either finish the expression
-with 'end' or continue the expression with an operator on expressions.
-Instead, found $0.
+    $1
+with 'end' or continue the expression with an operator on expressions (+,not...).
+Instead, the following statement were read:
+    $0
 
 prog: TUPLE IF VAR THEN VAR WHEN 
 ##
@@ -1301,36 +1252,11 @@ prog: TUPLE IF VAR THEN VAR WHEN
 ## IF exp THEN exp 
 ##
 
-Ill-formed $4 statement. At this point, either finish the statement
+Ill-formed 'if' statement. At this point, either finish the expression
     $1
-with a 'else' or continue the expression using an operator.
-Instead, got $0.
-
-prog: IF VAR THEN VAR ELSE XOR 
-##
-## Ends in an error in state: 210.
-##
-## clause -> IF exp THEN clause ELSE . clause END [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
-##
-## The known suffix of the stack is as follows:
-## IF exp THEN clause ELSE 
-##
-
-Ill-formed 'if' statement. After $1, a formula is expected.
-Instead, got $0.
-
-prog: TUPLE IF VAR THEN VAR ELSE XOR 
-##
-## Ends in an error in state: 71.
-##
-## exp -> IF exp THEN exp ELSE . exp END [ XOR WHEN VARTUPLE VAR THEN SUB RPAREN RBRACK RANGE OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL EOF END ELSE DIV COMMA COLON AND ADD ]
-##
-## The known suffix of the stack is as follows:
-## IF exp THEN exp ELSE 
-##
-
-Ill-formed 'if' statement. After $1, an expression is expected.
-Instead, got $0.
+with 'else' or continue the expression with an operator on expressions (+,not...).
+Instead, the following statement were read:
+    $0
 
 prog: IF VAR THEN VAR WHEN 
 ##
@@ -1358,7 +1284,38 @@ prog: IF VAR THEN VAR WHEN
 ##
 
 Ill-formed 'if' statement. At this point, either finish the formula
-with 'else' or continue the formula with 'and'.
+    $1
+with 'else' or continue the formula with a 'and'.
+Instead, the following statement were read:
+    $0
+
+prog: IF VAR THEN VAR ELSE XOR 
+##
+## Ends in an error in state: 210.
+##
+## clause -> IF exp THEN clause ELSE . clause END [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
+##
+## The known suffix of the stack is as follows:
+## IF exp THEN clause ELSE 
+##
+
+Ill-formed 'if' statement. After $1, a formula is expected.
+Instead, the following statement were read:
+    $0
+
+prog: TUPLE IF VAR THEN VAR ELSE XOR 
+##
+## Ends in an error in state: 71.
+##
+## exp -> IF exp THEN exp ELSE . exp END [ XOR WHEN VARTUPLE VAR THEN SUB RPAREN RBRACK RANGE OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL EOF END ELSE DIV COMMA COLON AND ADD ]
+##
+## The known suffix of the stack is as follows:
+## IF exp THEN exp ELSE 
+##
+
+Ill-formed 'if' statement. After $1, an expression is expected.
+Instead, the following statement were read:
+    $0
 
 prog: IF VAR THEN XOR 
 ##
@@ -1390,7 +1347,95 @@ prog: TUPLE IF VAR THEN XOR
 ##
 
 Ill-formed $3 statement. After $1, an expression or formula is expected.
-Instead, got $0.
+Instead, the following statement were read:
+    $0
+
+prog: IF VAR WHEN 
+##
+## Ends in an error in state: 153.
+##
+## clause -> IF exp . THEN clause ELSE clause END [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
+## exp -> exp . ADD exp [ XOR THEN SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
+## exp -> exp . SUB exp [ XOR THEN SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
+## exp -> exp . MUL exp [ XOR THEN SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
+## exp -> exp . DIV exp [ XOR THEN SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
+## exp -> exp . MOD exp [ XOR THEN SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
+## exp -> exp . AND exp [ XOR THEN SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
+## exp -> exp . OR exp [ XOR THEN SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
+## exp -> exp . XOR exp [ XOR THEN SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
+## exp -> exp . IMPLIES exp [ XOR THEN SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
+## exp -> exp . EQUIV exp [ XOR THEN SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
+## exp -> exp . EQUAL exp [ XOR THEN SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
+## exp -> exp . NOTEQUAL exp [ XOR THEN SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
+## exp -> exp . LT exp [ XOR THEN SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
+## exp -> exp . LE exp [ XOR THEN SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
+## exp -> exp . GT exp [ XOR THEN SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
+## exp -> exp . GE exp [ XOR THEN SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
+## exp -> exp . IN exp [ XOR THEN SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
+##
+## The known suffix of the stack is as follows:
+## IF exp 
+##
+prog: LET VAR AFFECT IF VAR WHEN 
+##
+## Ends in an error in state: 132.
+##
+## clause -> IF exp . THEN clause ELSE clause END [ XOR SUB RPAREN OR NOTEQUAL MUL LT LE IMPLIES GT GE EQUIV EQUAL ELSE DIV COLON AND ADD ]
+## exp -> exp . ADD exp [ XOR THEN SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
+## exp -> exp . SUB exp [ XOR THEN SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
+## exp -> exp . MUL exp [ XOR THEN SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
+## exp -> exp . DIV exp [ XOR THEN SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
+## exp -> exp . MOD exp [ XOR THEN SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
+## exp -> exp . AND exp [ XOR THEN SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
+## exp -> exp . OR exp [ XOR THEN SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
+## exp -> exp . XOR exp [ XOR THEN SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
+## exp -> exp . IMPLIES exp [ XOR THEN SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
+## exp -> exp . EQUIV exp [ XOR THEN SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
+## exp -> exp . EQUAL exp [ XOR THEN SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
+## exp -> exp . NOTEQUAL exp [ XOR THEN SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
+## exp -> exp . LT exp [ XOR THEN SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
+## exp -> exp . LE exp [ XOR THEN SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
+## exp -> exp . GT exp [ XOR THEN SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
+## exp -> exp . GE exp [ XOR THEN SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
+## exp -> exp . IN exp [ XOR THEN SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
+## exp -> IF exp . THEN exp ELSE exp END [ XOR SUB RPAREN OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL ELSE DIV COLON AND ADD ]
+##
+## The known suffix of the stack is as follows:
+## IF exp 
+##
+prog: TUPLE IF VAR WHEN 
+##
+## Ends in an error in state: 68.
+##
+## exp -> exp . ADD exp [ XOR THEN SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
+## exp -> exp . SUB exp [ XOR THEN SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
+## exp -> exp . MUL exp [ XOR THEN SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
+## exp -> exp . DIV exp [ XOR THEN SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
+## exp -> exp . MOD exp [ XOR THEN SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
+## exp -> exp . AND exp [ XOR THEN SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
+## exp -> exp . OR exp [ XOR THEN SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
+## exp -> exp . XOR exp [ XOR THEN SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
+## exp -> exp . IMPLIES exp [ XOR THEN SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
+## exp -> exp . EQUIV exp [ XOR THEN SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
+## exp -> exp . EQUAL exp [ XOR THEN SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
+## exp -> exp . NOTEQUAL exp [ XOR THEN SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
+## exp -> exp . LT exp [ XOR THEN SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
+## exp -> exp . LE exp [ XOR THEN SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
+## exp -> exp . GT exp [ XOR THEN SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
+## exp -> exp . GE exp [ XOR THEN SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
+## exp -> exp . IN exp [ XOR THEN SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
+## exp -> IF exp . THEN exp ELSE exp END [ XOR WHEN VARTUPLE VAR THEN SUB RPAREN RBRACK RANGE OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL EOF END ELSE DIV COMMA COLON AND ADD ]
+##
+## The known suffix of the stack is as follows:
+## IF exp 
+##
+
+Ill-formed 'if' statement. At this point, either finish the expression
+with 'else' or continue the expression 
+    $1
+with an operator on expressions.
+Instead, the following statement were read:
+    $0
 
 prog: IF XOR 
 ##
@@ -1411,6 +1456,12 @@ prog: LET VAR AFFECT IF XOR
 ## The known suffix of the stack is as follows:
 ## IF 
 ##
+
+Ill-formed $1 statement. After $1, an expression is expected.
+Instead, the following statement were read:
+    $0
+Note: you cannot use a formula as condition for the 'if' statement.
+
 prog: LET VAR AFFECT LPAREN XOR 
 ##
 ## Ends in an error in state: 129.
@@ -1478,7 +1529,8 @@ prog: TUPLE TOINT XOR
 
 Ill-formed $1 statement. Either finish the statement with ')'
 or continue with an operator over expressions.
-Instead, got $0.
+Instead, the following statement were read:
+    $0
 
 prog: LET VAR AFFECT NOT XOR 
 ##
@@ -1537,8 +1589,10 @@ prog: SUB XOR
 ## SUB 
 ##
 
-The operator $1 does not seem to be given
-an expression or formula on its right; instead, got $0
+The operator $1 does not seem to be given an expression or formula 
+on its right side.
+Instead, the following statement were read:
+    $0
 
 prog: LET VAR AFFECT TOP COLON VAR WHEN 
 ##
@@ -1597,6 +1651,18 @@ prog: LET VAR AFFECT TOP WHEN
 ## The known suffix of the stack is as follows:
 ## LET var_decl AFFECT clause 
 ##
+
+Ill-formed $4 statement. At this point, either expecting ':' to finish
+the affectation or a continuation of the formula that was started by:
+    $1
+Instead, the following statement were read:
+    $0
+Important: in 'let', if you write
+    'let $i=1: $i not($i)',
+$i will only be declared for the first '$i' and not in 'not($i)'.
+This is because '$i not($i)' is a list of formula, and 'let' expected a
+single formula.
+
 prog: LET VAR AFFECT VAR COLON VAR WHEN 
 ##
 ## Ends in an error in state: 225.
@@ -1621,6 +1687,16 @@ prog: LET VAR AFFECT VAR COLON VAR WHEN
 ## The known suffix of the stack is as follows:
 ## LET var_decl AFFECT exp COLON clause 
 ##
+
+Ill-formed $6 statement. At this point, expecting a continuation 
+of the formula that was started by:
+    $1
+Instead, the following statement were read:
+    $0
+Important: in $6, if you write 'let $i=1: $i not($i)', $i will only
+be declared for the first '$i' and not in 'not($i)'. This is because
+'$i not($i)' is a list of formula, and 'let' expected a single formula.
+
 prog: LET VAR AFFECT VAR COLON XOR 
 ##
 ## Ends in an error in state: 224.
@@ -1630,6 +1706,11 @@ prog: LET VAR AFFECT VAR COLON XOR
 ## The known suffix of the stack is as follows:
 ## LET var_decl AFFECT exp COLON 
 ##
+
+Ill-formed $5 statement. The body of $5 is expected to be a formula.
+Instead, the following statement were read:
+    $0
+
 prog: LET VAR AFFECT VAR WHEN 
 ##
 ## Ends in an error in state: 223.
@@ -1656,6 +1737,13 @@ prog: LET VAR AFFECT VAR WHEN
 ## The known suffix of the stack is as follows:
 ## LET var_decl AFFECT exp 
 ##
+
+Ill-formed $4 statement. At this point, expecting either ':' or
+a continuation of the expression that was started by:
+    $1
+Instead, the following statement were read:
+    $0
+
 prog: LET VAR AFFECT XOR 
 ##
 ## Ends in an error in state: 126.
@@ -1666,6 +1754,12 @@ prog: LET VAR AFFECT XOR
 ## The known suffix of the stack is as follows:
 ## LET var_decl AFFECT 
 ##
+
+Ill-formed 'let' statement. The right-term of the affectation is
+expected to be an expression or formula.
+Instead, the following statement were read:
+    $0
+
 prog: LET XOR 
 ##
 ## Ends in an error in state: 124.
@@ -1677,9 +1771,9 @@ prog: LET XOR
 ## LET 
 ##
 
-Ill-formed 'let' statement. It should have the form:
-    let <var> = <number|term>: <formula>
-IMPORTANT: <var> will not exist after <formula>.
+Ill-formed 'let' statement. At this point, a variable is expected.
+Instead, the following statement were read:
+    $0
 
 prog: TUPLE DIFF XOR 
 ##
@@ -1728,7 +1822,8 @@ prog: LPAREN XOR
 ##
 
 Ill-formed $1 statement. At this point, an expression was expected.
-Instead, got $0.
+Instead, the following statement were read:
+    $0
 
 prog: TUPLE LBRACK TERM RPAREN 
 ##
@@ -1749,7 +1844,8 @@ prog: TUPLE LBRACK TERM RPAREN
 Ill-formed set. At this point, either finish the comma-separated list of terms
     $1
 with an ']' or continue the list of terms with a ','.
-Instead, got $0.
+Instead, the following statement were read:
+    $0
 
 prog: TUPLE LBRACK VAR COMMA BOOL WHEN 
 ##
@@ -1771,7 +1867,8 @@ prog: TUPLE LBRACK VAR COMMA BOOL WHEN
 Ill-formed set. At this point, either finish the comma-separated list of expressions
     $1
 with an ']' or continue the list of terms with a ','.
-Instead, got $0.
+Instead, the following statement were read:
+    $0
 
 prog: TUPLE LBRACK VAR RANGE VAR WHEN 
 ##
@@ -1803,7 +1900,8 @@ prog: TUPLE LBRACK VAR RANGE VAR WHEN
 Ill-formed range set. At this point, either finish the expression
     $1
 with an ']' or continue the expression with an operator on expressions.
-Instead, got $0.
+Instead, the following statement were read:
+    $0
 
 prog: TUPLE LBRACK VAR RANGE XOR 
 ##
@@ -1816,7 +1914,8 @@ prog: TUPLE LBRACK VAR RANGE XOR
 ##
 
 Ill-formed range set. After $1, an expression is expected.
-Instead, got $0.
+Instead, the following statement were read:
+    $0
 
 prog: TUPLE LBRACK XOR 
 ##
@@ -1832,7 +1931,8 @@ prog: TUPLE LBRACK XOR
 ##
 
 Ill-formed set. At this point, an expression or a term or ']' is expected.
-Instead, got $0.
+Instead, the following statement were read:
+    $0
 
 prog: TUPLE VAR ADD VAR UNION 
 ##
@@ -2400,7 +2500,8 @@ prog: TUPLE VAR XOR XOR
 ##
 
 The operator over expressions $1 does not seem to be given
-an expression on its right; instead, got $0.
+an expression on its right; instead, got the following statement:
+    $0
 
 prog: TUPLE VAR WHEN 
 ##
@@ -2429,8 +2530,11 @@ prog: TUPLE VAR WHEN
 ## exp 
 ##
 
-The expression $1 cannot continue with $0.
-Expected a continuation of $1 (operator over expressions...)
+The expression
+    $1
+cannot continue with the statement
+    $0
+Expected a continuation of the expression (with +,and,...)
 
 prog: TUPLE TERM XOR 
 ##
@@ -2480,7 +2584,8 @@ prog: VARTUPLE VAR VARTUPLE
 
 At this point, the $2 definition either expects a closing ')'
 or a ',' for continuiing the comma-separated expression list.
-Instead, got $0.
+Instead, the following statement were read:
+    $0
 
 prog: VARTUPLE XOR 
 ##
@@ -2503,7 +2608,9 @@ prog: TUPLE XOR
 ##
 
 At this point, the tuple $1 is expecting a list of comma-separated
-scalars (numbers or terms). Instead, got $0.
+scalars (numbers or terms).
+Instead, the following statement were read:
+    $0
 
 prog: VAR ADD VAR WHEN 
 ##
@@ -2869,7 +2976,8 @@ prog: LPAREN VAR WHEN
 
 At this point, you should either continue the formula $1
 or close the opened parenthesis with ')'.
-Instead, got $0.
+Instead, the following statement were read:
+    $0
 
 prog: NOT VAR WHEN 
 ##
@@ -2898,7 +3006,8 @@ prog: NOT VAR WHEN
 
 At this point, you should either continue the formula $1
 or finish it using either a whitespace or a new line.
-Instead, got $0.
+Instead, the following statement were read:
+    $0
 NOTE: a whitespace or a new line between two formulas is
 strictly equivalent to a logical 'and'.
 
@@ -3049,7 +3158,9 @@ prog: NOT VAR SUB XOR
 ##
 
 The formula started by '$2 $1' does not finish correctly.
-Instead, got $0 which does not seem to be a formula continuation.
+Instead, the following statement were read:
+    $0
+which does not seem to be a formula continuation.
 
 prog: VARTUPLE TERM COMMA XOR 
 ##
@@ -3071,7 +3182,8 @@ prog: TUPLE VAR COMMA XOR
 ##
 
 Either finish the list with a ')' or continue the expression list with a comma.
-Instead, $0 was read.
+Instead, the following statement were read:
+    $0
 
 prog: XOR 
 ##
