@@ -1,15 +1,3 @@
-$length = 10 
-$F = [a,b,c,d] 
-$O = [A,B] 
-$I = [a,c] 
-$G = [a,d] 
-$Prec(A) = [a] 
-$Add(A) = [b] 
-$Del(A) = [a] 
-$Prec(B) = [b,c] 
-$Add(B) = [a,d] 
-$Del(B) = [a] 
-
 bigand $f in $I: $f(0) end 
 bigand $f in (diff($F,$I)): $f and $g end
 
@@ -50,3 +38,16 @@ bigand $i in [1..$length]:
         end 
     end
 end 
+
+data
+$length = 10 
+$F = [a,b,c,d] 
+$O = [A,B] 
+$I = [a,c] 
+$G = [a,d] 
+$Prec(A) = [a] 
+$Add(A) = [b] 
+$Del(A) = [a] 
+$Prec(B) = [b,c] 
+$Add(B) = [a,d] 
+$Del(B) = [a]
