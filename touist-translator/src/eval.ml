@@ -372,11 +372,12 @@ and eval_exp exp env =
         | Float x', Set (GenSet.FSet y') -> Bool (FloatSet.mem x' y')
         | Term (x',None), Set (GenSet.SSet y') -> Bool (StringSet.mem x' y')
         | x',y' -> raise (Error (
-            "In the following statement, the operator 'A in B' should\n"^
-            "be (A) a number and (B) a set, and the set must contain elements of type (A):\n"^
+            "In the following statement, the operator 'in' should be applied to\n"^
+            "a scalar (term or number) and a set of the same type:\n"^
             "    "^(string_of_exp exp)^"\n"^
-            "The following statement (respectively A and B) do not have matching types:\n"^
+            "The scalar\n"^
             "    "^(string_of_exp x')^"\n"^
+            "does not have the same type as the set\n"^
             "    "^(string_of_exp y')))
       end
   | Equal (x,y) ->
