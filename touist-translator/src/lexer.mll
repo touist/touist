@@ -34,7 +34,7 @@
 {
   open Lexing
   open Parser
-  exception Error of string
+  exception Error of string * lexbuf
 
   let next_line lexbuf =
     let pos = lexbuf.lex_curr_p in
@@ -149,7 +149,7 @@ rule token = parse (* is a function (Lexing.lexbuf -> Parser.token list) *)
   | double as f    {[ FLOAT      (float_of_string f) ]}
   | newline        { next_line lexbuf; token lexbuf   }
   | ";;"           { comments_parse lexbuf            }
-  | _ as c         { raise (Error ("Unexpected char: " ^ (String.make 1 c))) }
+  | _ as c         { raise (Error ("unexpected char '"^(String.make 1 c)^"'",lexbuf)) }
 
 and comments_parse = parse
   | '\n'           { next_line lexbuf; token lexbuf }

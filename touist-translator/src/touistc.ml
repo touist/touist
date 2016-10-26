@@ -154,11 +154,16 @@ let lexer buffer : (Lexing.lexbuf -> Parser.token) =
     match !tokens with
     | x::xs -> tokens := xs; x (* tokens isn't empty, use one of its tokens *)
     | [] -> (* tokens is empty, we can read a new token *)
-      let t = Lexer.token lexbuf in
-      buffer := ErrorReporting.update !buffer (lexbuf.lex_start_p, lexbuf.lex_curr_p);
-      match t with
-      | [] -> failwith "One token at least must be returned in 'token rules' "
-      | x::xs -> tokens := xs; x
+      try 
+        let t = Lexer.token lexbuf in
+        buffer := ErrorReporting.update !buffer (lexbuf.lex_start_p, lexbuf.lex_curr_p);
+        match t with
+        | [] -> failwith "One token at least must be returned in 'token rules' "
+        | x::xs -> tokens := xs; x
+      with Lexer.Error (msg,lexbuf) -> 
+        print_position !output lexbuf;
+        Printf.fprintf !output " %s\n" msg;
+        exit (get_code COMPILE_WITH_LINE_NUMBER_ERROR)
 
 
 (*  [invoke_parser] is in charge of calling the parser. It uses
