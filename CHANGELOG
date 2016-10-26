@@ -1,3 +1,5 @@
+v1.4.1
+    - (regression) output of the table (id,name) had been inverted (!)
 v1.4.0
   - touistc:
     - touistc is now able to solve SAT problems on its own. You can use
