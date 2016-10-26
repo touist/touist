@@ -80,9 +80,7 @@ public class TextInEditor {
         BufferedReader in = new BufferedReader(new FileReader(path));
         String line;
         while((line = in.readLine()) != null) {
-            System.out.println(line);
-            String []words = line.replace("\\s+"," ").split(" ");
-            textInEditor = textInEditor.concat(words + "\n");
+            textInEditor = textInEditor.concat(line + "\n");
         }
     }
 
