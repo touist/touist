@@ -366,20 +366,22 @@ and eval_exp exp env =
             "    "^(string_of_exp y')))
       end
   | In (x,y) ->
-      begin
-        match eval_exp x env, eval_exp y env with
-        | Int x', Set (GenSet.ISet y') -> Bool (IntSet.mem x' y')
-        | Float x', Set (GenSet.FSet y') -> Bool (FloatSet.mem x' y')
-        | Term (x',None), Set (GenSet.SSet y') -> Bool (StringSet.mem x' y')
-        | x',y' -> raise (Error (
-            "In the following statement, the operator 'in' should be applied to\n"^
-            "a scalar (term or number) and a set of the same type:\n"^
-            "    "^(string_of_exp exp)^"\n"^
-            "The scalar\n"^
-            "    "^(string_of_exp x')^"\n"^
-            "does not have the same type as the set\n"^
-            "    "^(string_of_exp y')))
-      end
+    begin
+      let x,y = eval_exp x env, eval_exp y env in
+      match x,y with
+      | _, Set (GenSet.Empty) -> Bool false (* nothing can be in an empty set!*)
+      | Int x', Set (GenSet.ISet y') -> Bool (IntSet.mem x' y')
+      | Float x', Set (GenSet.FSet y') -> Bool (FloatSet.mem x' y')
+      | Term (x',None), Set (GenSet.SSet y') -> Bool (StringSet.mem x' y')
+      | x',y' -> raise (Error (
+          "In the following statement, the operator 'in' should be applied to\n"^
+          "a scalar (term or number) and a set of the same type:\n"^
+          "    "^(string_of_exp exp)^"\n"^
+          "The scalar\n"^
+          "    "^(string_of_exp x)^"\n"^
+          "does not have the same type as the set\n"^
+          "    "^(string_of_exp y)))
+    end
   | Equal (x,y) ->
       begin
         match eval_exp x env, eval_exp y env with
