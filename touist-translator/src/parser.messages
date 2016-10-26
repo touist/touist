@@ -2974,8 +2974,9 @@ prog: LPAREN VAR WHEN
 ## LPAREN clause 
 ##
 
-At this point, you should either continue the formula $1
-or close the opened parenthesis with ')'.
+At this point, either close the parenthesis with ')'
+or continue the formula started by:
+    $1
 Instead, the following statement were read:
     $0
 
