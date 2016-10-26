@@ -81,10 +81,6 @@ let equiv_file_path = ref ""
 let input_equiv = ref stdin
 
 
-let print_position outx lexbuf =
-  let pos = lexbuf.lex_curr_p in
-  Printf.fprintf outx "%d:%d" pos.pos_lnum (pos.pos_cnum - pos.pos_bol+1)
-
 (* Used to write the "str" string into the "filename" file *)
 let write_to_file (filename:string) (str:string) =
   let out = open_out filename in
@@ -92,22 +88,6 @@ let write_to_file (filename:string) (str:string) =
     Printf.fprintf out "%s" str;
     close_out out
   with x -> close_out out; raise x
-
-(* Used when no outputFilePath is given: builds an arbitrary
-   outputFilePath name using the inputFilePath name *)
-let defaultOutput (inputFilePath:string) (m:mode) : string =
-  let inputBase = FilePath.basename inputFilePath in
-  match m with
-  | SAT_DIMACS -> FilePath.replace_extension inputBase "cnf"
-  | SMTLIB2 -> FilePath.replace_extension inputBase "smt2"
-(*in FilePath.concat inputDir outputBase*)
-
-(* Used when no outputFilePath is given: builds an arbitrary
-   outputFilePath name using the inputFilePath name *)
-let defaultOutputTable (inputFilePath:string) : string =
-  let inputBase = (FilePath.basename inputFilePath) in
-  let inputBaseNoExt = (FilePath.chop_extension inputBase) in
-  inputBaseNoExt ^ ".table"
 
 (* Used in Arg.parse when a parameter without any preceeding -flag (-f, -x...)
    Here, this kind of parameter is considered as an inputFilePath *)
@@ -341,14 +321,3 @@ let () =
   close_in !input;
   exit (get_code OK)
 
-(* Quick testing main function *)
-(*
-let () =
-  let input_file = FilePath.basename Sys.argv.(1) in
-  let out_file = FilePath.replace_extension input_file "cnf" in
-  let table_file = "." ^ (FilePath.chop_extension input_file) ^ "_table" in
-  let exp = Eval.eval (Parser.prog Lexer.lexer (Lexing.from_channel (open_in Sys.argv.(1)))) [] in
-  let c,t = Cnf.to_cnf exp |> Dimacs.to_dimacs in
-  write_to_file out_file c;
-  write_to_file table_file (Dimacs.string_of_table t)
-*)
