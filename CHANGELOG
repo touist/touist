@@ -5,6 +5,9 @@ v1.4.0
       counting the number of models), '--limit i' for setting a limit to
       the number of models returned (or 0 for no limit). Way faster that
       the java call to minisat.jar!
+    - Added --equiv that allows to test the equivalency of two files.
+      Note that it is not an actual equivalence as both problems must 
+      have the exact same set of propositions/literals.
     - (internal) merged exp and clause types for less code redundancy
     - added support for local variables of the form 'let $i=1: p($i)'.
       A 'let' variable is local to the clause it precedes, e.g., p($i) 
