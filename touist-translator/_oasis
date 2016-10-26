@@ -29,6 +29,7 @@ BuildType: ocamlbuild (0.4)
 AlphaFeatures: ocamlbuild_more_args
 
 PreBuildCommand: make -f TopMakefile
+PostCleanCommand: make -f TopMakefile clean
 
 XOCamlbuildExtraArgs: -use-menhir -menhir \"menhir --table --inspection -v -la 2
 #if flag(trace)

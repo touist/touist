@@ -30,6 +30,6 @@ all: $(SRC)/version.ml $(SRC)/parser_messages.ml
 	@echo "let version=\"`if which git 2>/dev/null; then git describe --tags; else echo "n/a"; fi`\"" > $@
 
 clean:
-	cd $(SRC) && rm -f *_messages.ml version.ml
+	cd $(SRC) && rm -f parser_messages.ml version.ml
 # vim:ft=make
 #
