@@ -162,7 +162,12 @@ and eval_exp exp env =
         match eval_exp x env with
         | Int x'   -> Int   (- x')
         | Float x' -> Float (-. x')
-        | _ -> raise (Error (string_of_exp exp))
+        | x' -> raise (Error (
+            "In the following statement, the operator '-' should only\n"^
+            "be used on a number:\n"^
+            "    "^(string_of_exp exp)^"\n"^
+            "The following statement is not a number:\n"^
+            "    "^(string_of_exp x')))
       end
   | Add (x,y) -> num_bin_op (eval_exp x env) (eval_exp y env) (+) (+.) "+"
   | Sub (x,y) -> num_bin_op (eval_exp x env) (eval_exp y env) (-) (-.) "-"
@@ -172,33 +177,59 @@ and eval_exp exp env =
       begin
         match eval_exp x env, eval_exp y env with
         | Int x', Int y' -> Int (x' mod y')
-        | _,_ -> raise (Error (string_of_exp exp))
+        | x',y' -> raise (Error (
+            "In the following statement, the modulo operator 'mod' should only\n"^
+            "be used on numbers:\n"^
+            "    "^(string_of_exp exp)^"\n"^
+            "One of the two following statement is now a number:\n"^
+            "    "^(string_of_exp x')^"\n"^
+            "    "^(string_of_exp y')))
       end
   | Sqrt x ->
       begin
         match eval_exp x env with
         | Float x' -> Float (sqrt x')
-        | _ -> raise (Error (string_of_exp exp))
+        | x' -> raise (Error (
+            "In the following statement, the operator 'sqrt()' should only\n"^
+            "be used on a float:\n"^
+            "    "^(string_of_exp exp)^"\n"^
+            "The following statement is not a float:\n"^
+            "    "^(string_of_exp x')))
       end
   | To_int x ->
       begin
         match eval_exp x env with
         | Float x' -> Int (int_of_float x')
         | Int x'   -> Int x'
-        | _ -> raise (Error (string_of_exp exp))
+        | x' -> raise (Error (
+            "In the following statement, the operator 'int()' should only\n"^
+            "be used on a number:\n"^
+            "    "^(string_of_exp exp)^"\n"^
+            "The following statement is not a number:\n"^
+            "    "^(string_of_exp x')))
       end
   | To_float x ->
       begin
         match eval_exp x env with
         | Int x'   -> Float (float_of_int x')
         | Float x' -> Float x'
-        | _ -> raise (Error (string_of_exp exp))
+        | x' -> raise (Error (
+            "In the following statement, the operator 'float()' should only\n"^
+            "be used on a number:\n"^
+            "    "^(string_of_exp exp)^"\n"^
+            "The following statement is not a number:\n"^
+            "    "^(string_of_exp x')))
       end
   | Not x ->
       begin
         match eval_exp x env with
         | Bool x' -> Bool (not x')
-        | _ -> raise (Error (string_of_exp exp))
+        | x' -> raise (Error (
+            "In the following statement, the operator 'not()' should only\n"^
+            "be used on a boolean:\n"^
+            "    "^(string_of_exp exp)^"\n"^
+            "The following statement is not a boolean:\n"^
+            "    "^(string_of_exp x')))
       end
   | And (x,y) -> bool_bin_op (eval_exp x env) (eval_exp y env) (&&) "and"
   | Or (x,y) -> bool_bin_op (eval_exp x env) (eval_exp y env) (||) "or"
@@ -217,7 +248,11 @@ and eval_exp exp env =
         match eval_exp x env with
         | Bool true  -> true
         | Bool false -> false
-        | _ -> raise (Error (string_of_exp exp))
+        | x -> raise (Error (
+            "In the following statement, the condition of 'if' should be a boolean:\n"^
+            "    "^(string_of_exp exp)^"\n"^
+            "The following statement is not a boolean:\n"^
+            "    "^(string_of_exp x)))
       in
       if test then eval_exp y env else eval_exp z env
   | Union (x,y) ->
@@ -227,7 +262,13 @@ and eval_exp exp env =
             Set (set_bin_op (IntSet.union)
                             (FloatSet.union)
                             (StringSet.union) "union" x' y')
-        | _,_ -> raise (Error (string_of_exp exp))
+        | x',y' -> raise (Error (
+            "In the following statement, the operator 'union' should only\n"^
+            "be used on sets:\n"^
+            "    "^(string_of_exp exp)^"\n"^
+            "One of the two following statement is not a set:\n"^
+            "    "^(string_of_exp x')^"\n"^
+            "    "^(string_of_exp y')))
       end
   | Inter (x,y) ->
       begin
@@ -236,7 +277,13 @@ and eval_exp exp env =
             Set (set_bin_op (IntSet.inter)
                             (FloatSet.inter)
                             (StringSet.inter) "inter" x' y')
-        | _,_ -> raise (Error (string_of_exp exp))
+        | x',y' -> raise (Error (
+            "In the following statement, the operator 'inter' should only\n"^
+            "be used on sets:\n"^
+            "    "^(string_of_exp exp)^"\n"^
+            "One of the two following statement is not a set:\n"^
+            "    "^(string_of_exp x')^"\n"^
+            "    "^(string_of_exp y')))
       end
   | Diff (x,y) ->
       begin
@@ -245,14 +292,27 @@ and eval_exp exp env =
             Set (set_bin_op (IntSet.diff)
                             (FloatSet.diff)
                             (StringSet.diff) "diff" x' y')
-        | _,_ -> raise (Error (string_of_exp exp))
+        | x',y' -> raise (Error (
+            "In the following statement, the operator 'diff(_,_)' should only\n"^
+            "be used on sets:\n"^
+            "    "^(string_of_exp exp)^"\n"^
+            "One of the two following statement is not a set:\n"^
+            "    "^(string_of_exp x')^"\n"^
+            "    "^(string_of_exp y')))
       end
   | Range (x,y) ->
       begin
         match eval_exp x env, eval_exp y env with
         | Int x', Int y'     -> Set (GenSet.ISet (IntSet.of_list (irange x' y' 1)))
         | Float x', Float y' -> Set (GenSet.FSet (FloatSet.of_list (frange x' y' 1.)))
-        | _,_ -> raise (Error (string_of_exp exp))
+        | x',y' -> raise (Error (
+            "In the following statement, the range-set should be used with\n"^
+            "two numbers of the same type (either float or int):\n"^
+            "    "^(string_of_exp exp)^"\n"^
+            "In the two following statements, either one of them is not a number\n"^
+            "or they do not have the same number type:\n"^
+            "    "^(string_of_exp x')^"\n"^
+            "    "^(string_of_exp y')))
       end
   | Empty x ->
       begin
@@ -265,7 +325,12 @@ and eval_exp exp env =
               | GenSet.FSet x'' -> Bool (FloatSet.is_empty x'')
               | GenSet.SSet x'' -> Bool (StringSet.is_empty x'')
             end
-        | _ -> raise (Error (string_of_exp exp))
+        | x' -> raise (Error (
+            "In the following statement, the operator 'empty(_)' should only\n"^
+            "be used on a set:\n"^
+            "    "^(string_of_exp exp)^"\n"^
+            "The following statement is not a set:\n"^
+            "    "^(string_of_exp x')))
       end
   | Card x ->
       begin
@@ -278,7 +343,12 @@ and eval_exp exp env =
               | GenSet.FSet x'' -> Int (FloatSet.cardinal x'')
               | GenSet.SSet x'' -> Int (StringSet.cardinal x'')
             end
-        | _ -> raise (Error (string_of_exp exp))
+        | x' -> raise (Error (
+            "In the following statement, the operator 'card(_)' should only\n"^
+            "be used on a set:\n"^
+            "    "^(string_of_exp exp)^"\n"^
+            "The following statement is not a set:\n"^
+            "    "^(string_of_exp x')))
       end
   | Subset (x,y) ->
       begin
@@ -287,7 +357,13 @@ and eval_exp exp env =
             Bool (set_pred_op (IntSet.subset)
                               (FloatSet.subset)
                               (StringSet.subset) "subset" x' y')
-        | _ -> raise (Error (string_of_exp exp))
+        | x',y' -> raise (Error (
+            "In the following statement, the operator 'subset(_,_)' should only\n"^
+            "be used on sets:\n"^
+            "    "^(string_of_exp exp)^"\n"^
+            "One of the two following statement is not a set:\n"^
+            "    "^(string_of_exp x')^"\n"^
+            "    "^(string_of_exp y')))
       end
   | In (x,y) ->
       begin
@@ -295,7 +371,13 @@ and eval_exp exp env =
         | Int x', Set (GenSet.ISet y') -> Bool (IntSet.mem x' y')
         | Float x', Set (GenSet.FSet y') -> Bool (FloatSet.mem x' y')
         | Term (x',None), Set (GenSet.SSet y') -> Bool (StringSet.mem x' y')
-        | _,_ -> raise (Error (string_of_exp exp))
+        | x',y' -> raise (Error (
+            "In the following statement, the operator 'A in B' should\n"^
+            "be (A) a number and (B) a set, and the set must contain elements of type (A):\n"^
+            "    "^(string_of_exp exp)^"\n"^
+            "The following statement (respectively A and B) do not have matching types:\n"^
+            "    "^(string_of_exp x')^"\n"^
+            "    "^(string_of_exp y')))
       end
   | Equal (x,y) ->
       begin
@@ -307,7 +389,13 @@ and eval_exp exp env =
             Bool (set_pred_op (IntSet.equal)
                               (FloatSet.equal)
                               (StringSet.equal) "=" x' y')
-        | _,_ -> raise (Error (string_of_exp exp))
+        | x',y' -> raise (Error (
+            "In the following statement, the operator '=' should\n"^
+            "be used on the same types (int, float, term or set):\n"^
+            "    "^(string_of_exp exp)^"\n"^
+            "The two following statements do not have the same type:\n"^
+            "    "^(string_of_exp x')^"\n"^
+            "    "^(string_of_exp y')))
       end
   | Not_equal        (x,y) -> eval_exp (Not (Equal (x,y))) env
   | Lesser_than      (x,y) -> num_pred_op (eval_exp x env) (eval_exp y env) (<) (<) "<"
@@ -327,7 +415,10 @@ and eval_set set_decl env =
       Set (GenSet.FSet (FloatSet.of_list (List.map unwrap_float eval_form)))
   | (Term (_,None))::xs ->
       Set (GenSet.SSet (StringSet.of_list (List.map unwrap_str eval_form)))
-  | _ -> raise (Error ("set: " ^ (string_of_exp_list ", " eval_form)))
+  | _ -> raise (Error (
+      "the following set is not consistent and contains contradictory types:\n"^
+      "    "^(string_of_exp_list ", " eval_form)^"\n"^
+      "Check that the elements of the set have the same type."))
 
 and eval_exp_no_expansion exp env =
   match exp with
@@ -471,23 +562,30 @@ and eval_exp_no_expansion exp env =
         match eval_exp y env with
         | Set (GenSet.SSet s) ->
             exact_str (StringSet.exact (unwrap_int (eval_exp x env)) s)
-        | _ -> raise (Error (string_of_exp y))
+        | _ -> raise (Error (
+            "'exact("^(string_of_exp x)^",_)' expects a set as second parameter. The expression\n"^
+            "    "^(string_of_exp y)^"\n"^
+            "is not a set."))
       end
   | Atleast (x,y) ->
       begin
         match eval_exp y env with
         | Set (GenSet.SSet s) ->
             atleast_str (StringSet.atleast (unwrap_int (eval_exp x env)) s)
-        | _ ->
-            raise (Error (string_of_exp y))
+        | _ -> raise (Error (
+            "'atleast("^(string_of_exp x)^",_)' expects a set as second parameter. The expression\n"^
+            "    "^(string_of_exp y)^"\n"^
+            "is not a set."))
       end
   | Atmost (x,y) ->
       begin
         match eval_exp y env with
         | Set (GenSet.SSet s) ->
             atmost_str (StringSet.atmost (unwrap_int (eval_exp x env)) s)
-        | _ ->
-            raise (Error (string_of_exp y))
+        | _ -> raise (Error (
+            "'atmost("^(string_of_exp x)^",_)' expects a set as second parameter. The expression\n"^
+            "    "^(string_of_exp y)^"\n"^
+            "is not a set."))
       end
   | Bigand (v,s,t,e) ->
       let test =
@@ -497,7 +595,10 @@ and eval_exp_no_expansion exp env =
       in
       begin
         match v,s with
-        | [],[] | _,[] | [],_ -> raise (Error (string_of_exp exp))
+        | [],[] | _,[] | [],_ -> raise (Error (
+            "In the 'bigand' statement\n"^
+            "    "^(string_of_exp exp)^"\n"^
+            "the number of variables and the number of sets are not the same."))
         | [x],[y] ->
             begin
               match eval_exp y env with
@@ -505,7 +606,12 @@ and eval_exp_no_expansion exp env =
               | Set (GenSet.ISet a) -> bigand_int   env x (IntSet.elements a)    test e
               | Set (GenSet.FSet a) -> bigand_float env x (FloatSet.elements a)  test e
               | Set (GenSet.SSet a) -> bigand_str   env x (StringSet.elements a) test e
-              | _ -> raise (Error (string_of_exp exp))
+              | _ -> raise (Error (
+                  "In the 'bigand' statement\n"^
+                  "    "^(string_of_exp exp)^"\n"^
+                  "the following expression\n"^
+                  "    "^(string_of_exp y)^"\n"^
+                  "is expected to be a set."))
             end
         | x::xs,y::ys ->
             eval_exp_no_expansion (Bigand ([x],[y],None,(Bigand (xs,ys,t,e)))) env
@@ -518,7 +624,10 @@ and eval_exp_no_expansion exp env =
       in
       begin
         match v,s with
-        | [],[] | _,[] | [],_ -> raise (Error (string_of_exp exp))
+        | [],[] | _,[] | [],_ -> raise (Error (
+            "In the 'bigor' statement\n"^
+            "    "^(string_of_exp exp)^"\n"^
+            "the number of variables and the number of sets are not the same."))
         | [x],[y] ->
             begin
               match eval_exp y env with
@@ -526,7 +635,12 @@ and eval_exp_no_expansion exp env =
               | Set (GenSet.ISet a) -> bigor_int   env x (IntSet.elements a)    test e
               | Set (GenSet.FSet a) -> bigor_float env x (FloatSet.elements a)  test e
               | Set (GenSet.SSet a) -> bigor_str   env x (StringSet.elements a) test e
-              | _ -> raise (Error (string_of_exp exp))
+              | _ -> raise (Error (
+                  "In the 'bigor' statement\n"^
+                  "    "^(string_of_exp (Bigand (v,s,t,e)))^"\n"^
+                  "the following expression\n"^
+                  "    "^(string_of_exp y)^"\n"^
+                  "is expected to be a set."))
             end
         | x::xs,y::ys ->
             eval_exp_no_expansion (Bigor ([x],[y],None,(Bigor (xs,ys,t,e)))) env
@@ -607,7 +721,9 @@ and bigor_str env var values test exp =
 and eval_test exp env =
   match eval_exp exp env with
   | Bool x -> x
-  | _ -> raise (Error (string_of_exp exp))
+  | _ -> raise (Error (
+      "the following expression is expected to be a boolean:\n"^
+      "    "^(string_of_exp exp)))
 
 and expand_var_name (var:var) env =
   match var with
