@@ -12,7 +12,7 @@ There are two ways of building: with with pre-generated setup.ml (and
 `make install` step is not mandatory as it will only move the compiled touistc
 to the place you indicated in --bindir.
 
-        ./configure --enable-debug --bindir .
+        ./configure --enable-debug --bindir . --override is_native false
         make
         make install
 
@@ -23,7 +23,7 @@ to the place you indicated in --bindir.
 After having make & make install using `./configure --bindir .`, you should be
 able to run `./touistc`:
 
-    echo 'begin formula $a end formula' | ./touistc -sat /dev/stdin -o /dev/stdout -table /dev/stdout
+    echo '$a' | ./touistc - -sat
 
 
 ## Edit how the build is made ##
@@ -76,6 +76,13 @@ So developers can improve the error syntax messages by editing
 
 ## Re-building `parser_messages.ml` using `parser.messages` ##
 
+I wrote the makefile TopMakefile to do the whole thing. You can just run
+
+    make -f TopMakefile
+    make -f TopMakefile clean
+
+and everything will be compiled. But if you want to do it by hand:
+
 Most of the time, the only command you want to use is the 3.
 
 1. To generate the `parser.messages` for the first time, use:
@@ -101,7 +108,8 @@ There are two ways to test if the messages actually work. The first one
 is simply to launch `./touistc` with a wrong syntax touistl file. If you built
 using ocamlbuild and the option --trace in -menhir "" block, it will show you
 the steps of the automaton. It is REALLY helpful to understand why an expression
-is not parsed as expected. For example:
+is not parsed as expected. For example (WARNING: this is the old syntax with
+begin formula end formula):
 
 ```
 ./touistc.byte -sat /dev/stdin -o /dev/stdout -table /dev/stdout << eof
@@ -137,28 +145,8 @@ Prototyping ocaml functions using toplevel
 ==========================================
 *toplevel* = the interpreter that prompts when you launch `ocaml` with no file.
 
-## Problems of imports in utop or ocaml ##
-In utop or ocaml, to open the FilePath module from the fileutils package,
-do the following:
+Just launch utop. I wrote a .ocamlinit that should load everything fine.
+Just make sure that everything is compiled (with make build) and that
+you are compiling in bytecode; to enable that:
 
-    #use "topfind";;
-    #require "fileutils";;
-
-If it doesn't work, check if the fileutils package is installed:
-
-    #list;; (uses the topfind library from the ocamlfind package)
-
-Then you can open the FilePath module:
-
-    open FilePath;;
-
-## Using modules in utop or ocaml ##
-When I was trying to debug some code in `set_ext.ml`, I have had to deal with
-"modularized" things. Here is how I did to manipulate that it in utop/ocaml:
-
-    #use "set_ext.ml";;
-	module StringSet = Make(String);;
-	let s = StringSet.empty;;
-	let s = StringSet.add "a" s;;
-	let s = StringSet.add "b" s;;
-	let s = StringSet.add "c" s;;
+    ./configure --override is_native false
