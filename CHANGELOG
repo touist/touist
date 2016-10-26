@@ -10,6 +10,8 @@ v2.0.0
       use the syntax <formulas> data <sets>. I'm still looking for
       a way to separate formulas and sets in GUI, e.g., two separate
       files that have each its own tab
+v1.4.1
+    - (regression) output of the table (id,name) had been inverted (!)
 v1.4.0
   - touistc:
     - touistc is now able to solve SAT problems on its own. You can use

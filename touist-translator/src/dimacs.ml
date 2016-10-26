@@ -69,18 +69,18 @@ let to_text prop =
   in
   header ^ str, table
 
-(* [string_of_table] gives a string where each like contain '98 p(1,2)'
+(* [string_of_table] gives a string where each like contain 'p(1,2) 98'
    where 98 is the literal id number (given automatically) of the DIMACS format
    and 'p(1,2)' is the name of the literal (given by the user).
-   NOTE: you can add a prefix to '98 p(1,2)', e.g.
+   NOTE: you can add a prefix to 'p(1,2) 98', e.g.
      string_of_table table ~prefix:"c "
    in order to have all lines beginning by 'c' (=comment) in order to comply to
    the DIMACS format. *)
 let string_of_table (table:(string,int) Hashtbl.t) ?prefix:(prefix="") =
-  Hashtbl.fold (fun name lit acc -> acc ^ prefix ^ (string_of_int lit) ^ " " ^ (name) ^ "\n") table ""
+  Hashtbl.fold (fun name lit acc -> acc ^ prefix ^ name ^ " " ^ (string_of_int lit) ^ "\n") table ""
 
 let string_of_lit2str (table:(Lit.t,string) Hashtbl.t) ?prefix:(prefix="") =
-  Hashtbl.fold (fun lit name acc -> acc ^ prefix ^ (Lit.to_string lit) ^ " " ^ (name) ^ "\n") table ""
+  Hashtbl.fold (fun lit name acc -> acc ^ prefix ^ name ^ " " ^ (Lit.to_string lit) ^ "\n") table ""
 
 (* [minisat_of_cnf] translates the expression into an instance of Minisat.t,
    which can then be used for solving the SAT problem with Minisat.Solve
