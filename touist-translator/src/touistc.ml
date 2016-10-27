@@ -79,6 +79,7 @@ let show_hidden_lits = ref false
 let debug_formula_expansion = ref false
 let equiv_file_path = ref ""
 let input_equiv = ref stdin
+let use_old_dimacs = ref false
 
 
 (* Used to write the "str" string into the "filename" file *)
@@ -107,7 +108,7 @@ let print_position outx lexbuf =
  * i.e. the "root" type in lexer.mll
  *)
 let evaluate (ast:Syntax.ast) : Syntax.ast =
-  try Eval.eval ast [] with
+  try Eval.eval ast with
   | Eval.Error msg ->
     Printf.fprintf stderr "%s\n" msg;
     exit (get_code COMPILE_NO_LINE_NUMBER_ERROR)
@@ -115,10 +116,8 @@ let evaluate (ast:Syntax.ast) : Syntax.ast =
 let transform_to_cnf (evaluated_ast:Syntax.ast) : Syntax.ast =
   try Cnf.transform_to_cnf evaluated_ast !debug_cnf 
   with Cnf.Error msg ->
-    Printf.fprintf stderr "%s\n" msg;
-    exit (get_code COMPILE_NO_LINE_NUMBER_ERROR)
-     | _ -> Printf.fprintf stderr "????\n"; exit 1
-
+      (Printf.fprintf stderr "%s\n" msg;
+       exit (get_code COMPILE_NO_LINE_NUMBER_ERROR))
 
 (* [lexer] is an intermediate to the [Lexer.token] function (in lexer.mll);
    - Rationale: the parser only accepts Parser.token; but [Lexer.token] returns
@@ -225,13 +224,15 @@ let () =
     ("--equiv", Arg.Set_string equiv_file_path,"(with --solve) Check that the given INPUT2 has the same models as INPUT (equivalency)");
 
     ("--debug-formula-expansion", Arg.Set debug_formula_expansion,"Print how the formula is expanded (bigand...)");
+    ("--use-old-dimacs", Arg.Set use_old_dimacs,"(just for try)");
   ]
   in
-  let usage = "TouistL compiles files from the TouIST Language \
-               to SAT-DIMACS/SMT-LIB2 \n\
-               Usage: " ^ cmd ^ " -sat [-o OUTPUT] [-table TABLE] (INPUT | -)\n\
-                      Usage: " ^ cmd ^ " -smt2 (QF_IDL|QF_RDL|QF_LIA|QF_LRA) [-o OUTPUT] (INPUT | -) \n\
-                      Note: in -sat mode, if TABLE and OUTPUT aren't given, both output will be mixed in stdout."
+  let usage = 
+    "TouistL compiles files from the TouIST Language \
+    to SAT-DIMACS/SMT-LIB2 \n\
+    Usage: " ^ cmd ^ " -sat [-o OUTPUT] [-table TABLE] (INPUT | -)\n\
+    Usage: " ^ cmd ^ " -smt2 (QF_IDL|QF_RDL|QF_LIA|QF_LRA) [-o OUTPUT] (INPUT | -) \n\
+    Note: in -sat mode, if TABLE and OUTPUT aren't given, both output will be mixed in stdout."
   in
 
   (* Step 1: we parse the args. If an arg. is "alone", we suppose
@@ -302,15 +303,22 @@ let () =
         | i -> Dimacs.ModelSet.pprint table !models; exit 0
     else
       (* B. solve not asked: print the DIMACS file *)
-      let dimacs,table = transform_to_cnf (ast_of_channel !input) |> Dimacs.to_dimacs in
-      Printf.fprintf !output "%s" dimacs;
+      let ast = (ast_of_channel !input) in
+      let table_prefix = (if !output == !output_table then "c " else "") in
+      if not !use_old_dimacs then begin
+        let clauses,tbl,nblits = transform_to_cnf ast |> Dimacs.minisatclauses_of_cnf in
+        Dimacs.dimacs_of_minisatclauses !output nblits clauses;
+        Dimacs.print_lit2str !output_table tbl ~prefix:table_prefix
+      end
+      else begin
+        let dimacs,table = transform_to_cnf ast |> Dimacs.to_dimacs in
+        Printf.fprintf !output "%s" dimacs;
+        Printf.fprintf !output_table "%s" (Dimacs.string_of_table table ~prefix:table_prefix)
+      end
       (* ~prefix:"" is an optionnal argument that allows to add the 'c' before
          each line of the table display, when and only when everything is
          outputed in a single file. Example:
              c 98 p(1,2,3)     -> c means 'comment' in any DIMACS file   *)
-      let table_prefix = (if !output == !output_table then "c " else "") in
-      let table_string = Dimacs.string_of_table table ~prefix:table_prefix
-      in Printf.fprintf !output_table "%s" table_string
 
   else if (!smt_logic <> "") then
     let smt = Smt.to_smt2 (String.uppercase !smt_logic) (ast_of_channel !input) in

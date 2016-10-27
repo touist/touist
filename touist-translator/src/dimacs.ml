@@ -79,49 +79,74 @@ let to_text prop =
 let string_of_table (table:(string,int) Hashtbl.t) ?prefix:(prefix="") =
   Hashtbl.fold (fun name lit acc -> acc ^ prefix ^ name ^ " " ^ (string_of_int lit) ^ "\n") table ""
 
-let string_of_lit2str (table:(Lit.t,string) Hashtbl.t) ?prefix:(prefix="") =
-  Hashtbl.fold (fun lit name acc -> acc ^ prefix ^ name ^ " " ^ (Lit.to_string lit) ^ "\n") table ""
+let print_lit2str (out:out_channel) (table:(Lit.t,string) Hashtbl.t) ?prefix:(prefix="") =
+  let print_lit_and_name lit name = Printf.fprintf out "%s %d\n" name (Lit.to_int lit)
+  in Hashtbl.iter print_lit_and_name table
 
-(* [minisat_of_cnf] translates the expression into an instance of Minisat.t,
+(* [minisatclauses_of_cnf] translates the expression into an instance of Minisat.t,
    which can then be used for solving the SAT problem with Minisat.Solve
    In utop, you can test Minisat with
        #require "minisat";;
        open Minisat
 *)
 (*    ((((not &2) or a) and ((not &2) or b)) and (((not &1) or c) and ((not &1) or (not a)))) *)
-let minisat_of_cnf (ast:ast) : Minisat.t * (Lit.t,string) Hashtbl.t =
-  let inst = Minisat.create () in
+let minisatclauses_of_cnf (ast:ast) : Lit.t list list * (Lit.t,string) Hashtbl.t * int = (* int = nb of literals *)
   (* num = a number that will serve to identify a literal
      lit = a literal that has a number inside it to identify it *)
   let str_to_lit = Hashtbl.create 500 in
   let lit_to_str = Hashtbl.create 500 in (* this duplicate is for the return value *)
   let num_lit = ref 1 in
   let rec process_cnf ast : Minisat.Lit.t list list = match ast with
-    | And  (x,y) when Cnf.is_clause x -> [process_clause x] @ process_cnf y
-    | And  (y,x) when Cnf.is_clause x -> [process_clause x] @ process_cnf y
     | And  (x,y) -> (process_cnf x) @ (process_cnf y)
-    | x when Cnf.is_clause x -> [process_clause x]
+    | x when Cnf.is_clause x -> begin 
+        match process_clause x with
+        | [] -> let lit=(gen_lit ("&bot"^(string_of_int !num_lit))) 
+          in [[lit]] @ [[Lit.neg lit]]
+        (* This [] is caused by Bottom that was alone in the clause. We must 
+           trigger the Unsat case; to do so, we add '&bot12 and not &bot12'*)
+        | x -> [x]
+      end
     | _ -> failwith ("CNF: was expecting a conjunction of clauses but got '" ^ (string_of_ast ast) ^ "'")
   and process_clause (ast:ast) : Minisat.Lit.t list = match ast with
     | Term (str, None)        -> (gen_lit str)::[]
     | Not (Term (str, None)) -> (Minisat.Lit.neg (gen_lit str))::[]
-    | Or (x,y)               -> (process_clause x) @ (process_clause y)
+    | Bottom -> [] (* if Bot is the only one in the clause, then the whole formula is false *)
+    | Top -> (* The clause shouldn't be added because Top is found. Instead of
+                not adding the clause, we translate it by '&top12 or not &top12'*)
+      let lit=(gen_lit ("&top"^(string_of_int !num_lit))) in lit::(Lit.neg lit)::[]
+    | Or (x,y) ->
+        (match process_clause x,process_clause y with 
+          | [],x | x,[] -> x (* [] is created by Bottom; remove [] as soon as another literal exists in the clause *)
+          | x,y -> x @ y)
     | _ -> failwith ("CNF: was expecting a clause but got '" ^ (string_of_ast ast) ^ "'")
-  and gen_lit (s:string) : Minisat.Lit.t =
+  and gen_lit (s:string) : Lit.t =
     try Hashtbl.find str_to_lit s
     with Not_found ->
       let lit = Minisat.Lit.make !num_lit in
       Hashtbl.add str_to_lit s lit; Hashtbl.add lit_to_str lit s;
       incr num_lit;
       lit
-  and add_clauses inst (l:Minisat.Lit.t list list) : unit =
-  match l with
-  | [] -> ()
-  | cur::next ->
-    Minisat.add_clause_l inst cur;
-    add_clauses inst next
-  in
-  process_cnf ast |> add_clauses inst; inst, lit_to_str
+  in process_cnf ast, lit_to_str, !num_lit - 1
+
+let instance_of_minisatclauses (clauses:Lit.t list list) : Minisat.t =
+  let inst = Minisat.create () in
+  let rec add_clauses inst (l:Lit.t list list) : unit =
+    match l with
+    | [] -> ()
+    | cur::next -> Minisat.add_clause_l inst cur; add_clauses inst next
+  in add_clauses inst clauses; inst
+
+let dimacs_of_minisatclauses (out:out_channel) nblits (clauses:Lit.t list list) : unit =
+  let nbclauses = List.length clauses in
+  let rec string_of_clause (cl:Lit.t list) = match cl with
+    | [] -> "0"
+    | cur::next -> (Lit.to_string cur) ^" "^ (string_of_clause next)
+  and print_listclause (cl:Lit.t list list) = match cl with
+    | [] -> ()
+    | cur::next -> Printf.fprintf out "%s\n" (string_of_clause cur); print_listclause next
+  in Printf.fprintf out "c CNF format file\np cnf %d %d\n" nblits nbclauses;
+  print_listclause clauses
+  
 
 (* for printing the Minisat.value type *)
 let string_of_value = function
@@ -211,7 +236,8 @@ let equivalent_models set1 set2 = ModelSet.equal set1 set2
    When limit = 0, all models will be fetched. *)
 let count = ref 0
 let find_models ?limit:(limit=0) cnf : (Lit.t,string) Hashtbl.t * (ModelSet.t ref) =
-  let instance,table = minisat_of_cnf cnf in
+  let clauses,table,_ = minisatclauses_of_cnf cnf in
+  let instance = instance_of_minisatclauses clauses in
   let models = ref ModelSet.empty in (* for returning the models found *)
   (* searching for duplicate is slow on ModelSet. For checking a model hasn't
      appeared already, I use a way faster Hashtbl, ass it won't check on every

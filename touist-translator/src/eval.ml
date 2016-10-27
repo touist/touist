@@ -140,8 +140,8 @@ let bool_bin_op b1 b2 op repr =
 *)
 let extenv = Hashtbl.create 10
 
-let rec eval ast env =
-  eval_touist_code ast env
+let rec eval ast =
+  eval_touist_code ast []
 
 and eval_touist_code ast env =
   let rec loop = function
