@@ -113,10 +113,11 @@ let evaluate (ast:Syntax.prog) : Syntax.exp =
     exit (get_code COMPILE_NO_LINE_NUMBER_ERROR)
 
 let transform_to_cnf (evaluated_ast:Syntax.exp) : Syntax.exp =
-  try Cnf.transform_to_cnf evaluated_ast !debug_cnf with
-  | Cnf.Error msg ->
+  try Cnf.transform_to_cnf evaluated_ast !debug_cnf 
+  with Cnf.Error msg ->
     Printf.fprintf stderr "%s\n" msg;
     exit (get_code COMPILE_NO_LINE_NUMBER_ERROR)
+     | _ -> Printf.fprintf stderr "????\n"; exit 1
 
 
 (* [lexer] is an intermediate to the [Lexer.token] function (in lexer.mll);
@@ -287,21 +288,21 @@ let () =
     (* A. solve has been asked *)
     if !solve_sat then
       if !equiv_file_path <> "" then begin
-        let _,models = Cnf.transform_to_cnf (ast_of_channel !input) !debug_cnf |> Dimacs.find_models
-        and _,models2 = Cnf.transform_to_cnf (ast_of_channel !input_equiv) !debug_cnf |> Dimacs.find_models in
+        let _,models = transform_to_cnf (ast_of_channel !input) |> Dimacs.find_models
+        and _,models2 = transform_to_cnf (ast_of_channel !input_equiv) |> Dimacs.find_models in
         match Dimacs.ModelSet.equal !models !models2 with
         | true -> Printf.fprintf !output "Equivalent\n"; exit 0
         | false -> Printf.fprintf !output "Not equivalent\n"; exit 1
       end
       else
-        let table,models = Cnf.transform_to_cnf (ast_of_channel !input) !debug_cnf |> Dimacs.find_models in
+        let table,models = transform_to_cnf (ast_of_channel !input) |> Dimacs.find_models in
         match Dimacs.ModelSet.cardinal !models with
         | i when !only_count -> Printf.fprintf !output "%d\n" i; exit 0
         | 0 -> Printf.fprintf !output "Unsat\n"; exit 1
         | i -> Dimacs.ModelSet.pprint table !models; exit 0
     else
       (* B. solve not asked: print the DIMACS file *)
-      let dimacs,table = Cnf.transform_to_cnf (ast_of_channel !input) !debug_cnf |> Dimacs.to_dimacs in
+      let dimacs,table = transform_to_cnf (ast_of_channel !input) |> Dimacs.to_dimacs in
       Printf.fprintf !output "%s" dimacs;
       (* ~prefix:"" is an optionnal argument that allows to add the 'c' before
          each line of the table display, when and only when everything is
