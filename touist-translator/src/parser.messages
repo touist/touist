@@ -197,7 +197,8 @@ prog: TUPLE DIFF VAR COMMA VAR WHEN
 ##
 
 Ill-formed $4 statement. At this point, either finish the 
-$4 statement by a ')' or continue the expression $1.
+$4 statement by a ')' or continue the expression started by:
+    $1
 Instead, the following statement were read:
     $0
 
@@ -1276,9 +1277,10 @@ prog: IF VAR THEN VAR WHEN
 ## IF exp THEN clause 
 ##
 
-Ill-formed 'if' statement. At this point, either finish the formula
+Ill-formed 'if' statement. At this point, either finish the 'if' statement
+with 'else' or continue the formula (with 'and', 'or'...), or continue
+the formula that with:
     $1
-with 'else' or continue the formula with a 'and'.
 Instead, the following statement were read:
     $0
 
@@ -1611,6 +1613,18 @@ prog: LET VAR AFFECT TOP COLON VAR WHEN
 ## The known suffix of the stack is as follows:
 ## LET local_var AFFECT clause COLON clause 
 ##
+
+Ill-formed $6 statement. At this point, either expecting ':' to finish
+the affectation or a continuation of the formula that was started by:
+    $1
+Instead, the following statement were read:
+    $0
+Important: in 'let', if you write
+    'let $i=1: $i not($i)',
+$i will only be declared for the first '$i' and not in 'not($i)'.
+This is because '$i not($i)' is a list of formula, and 'let' expected a
+single formula.
+
 prog: LET VAR AFFECT TOP COLON XOR 
 ##
 ## Ends in an error in state: 226.
@@ -1650,11 +1664,8 @@ the affectation or a continuation of the formula that was started by:
     $1
 Instead, the following statement were read:
     $0
-Important: in 'let', if you write
-    'let $i=1: $i not($i)',
-$i will only be declared for the first '$i' and not in 'not($i)'.
-This is because '$i not($i)' is a list of formula, and 'let' expected a
-single formula.
+Important: one single formula is expected, not a space-separated list
+of formulas.
 
 prog: LET VAR AFFECT VAR COLON VAR WHEN 
 ##
@@ -1681,14 +1692,16 @@ prog: LET VAR AFFECT VAR COLON VAR WHEN
 ## LET local_var AFFECT exp COLON clause 
 ##
 
-Ill-formed $6 statement. At this point, expecting a continuation 
+Ill-formed $6 statement. At this point, expecting a continuation
 of the formula that was started by:
     $1
 Instead, the following statement were read:
     $0
-Important: in $6, if you write 'let $i=1: $i not($i)', $i will only
-be declared for the first '$i' and not in 'not($i)'. This is because
-'$i not($i)' is a list of formula, and 'let' expected a single formula.
+Important: in $6, if you write 
+    'let $i=1: $i not($i)', 
+$i will only be declared for the first '$i' and not in 'not($i)'.
+This is because '$i not($i)' is a list of formula, and 'let'
+expects a single formula.
 
 prog: LET VAR AFFECT VAR COLON XOR 
 ##
@@ -2344,8 +2357,8 @@ prog: TUPLE VAR XOR VAR UNION
 ## exp XOR exp 
 ##
 
-At this point, the expression $1 is expected to either finish
-or be continued with an expression operator (+,and,<,...).
+At this point, the expression $1 is expected to continue with
+an expression operator (+,and,<,...).
 Instead, found $0.
 
 prog: TUPLE VAR ADD XOR 
@@ -2493,8 +2506,8 @@ prog: TUPLE VAR XOR XOR
 ## exp XOR 
 ##
 
-The operator over expressions $1 does not seem to be given
-an expression on its right; instead, got the following statement:
+The operator over expressions $1 does not seem to be given an
+expression on its right; instead, got the following statement:
     $0
 
 prog: TUPLE VAR WHEN 
@@ -2575,6 +2588,13 @@ prog: VARTUPLE XOR
 ## The known suffix of the stack is as follows:
 ## VARTUPLE 
 ##
+
+Ill-formed variable-tuple statement that was started by:
+    $1
+At this point, expecting a list of comma-separated expressions or terms.
+Instead, the following statement were read:
+    $0
+
 prog: TUPLE XOR 
 ##
 ## Ends in an error in state: 12.
@@ -2586,8 +2606,9 @@ prog: TUPLE XOR
 ## TUPLE 
 ##
 
-At this point, the tuple $1 is expecting a list of comma-separated
-scalars (numbers or terms).
+Ill-formed term-tuple statement that was started by:
+    $1
+At this point, expecting a list of comma-separated expressions or terms.
 Instead, the following statement were read:
     $0
 
@@ -2928,6 +2949,12 @@ prog: VAR XOR VAR WHEN
 ## The known suffix of the stack is as follows:
 ## clause XOR clause 
 ##
+
+At this point, a continuation of the formula started by:
+    $1
+is expected. Instead, the following statement was read:
+    $0
+
 prog: LPAREN VAR WHEN 
 ##
 ## Ends in an error in state: 218.
@@ -2984,12 +3011,14 @@ prog: NOT VAR WHEN
 ## NOT clause 
 ##
 
-At this point, you should either continue the formula $1
-or finish it using either a whitespace or a new line.
+At this point, you should either finish your formula and begin a new
+one (with a space or new line), or continue the formula started with:
+    $1
 Instead, the following statement were read:
     $0
 NOTE: a whitespace or a new line between two formulas is
-strictly equivalent to a logical 'and'.
+strictly equivalent to a logical 'and' and is only available
+at the 'root' level of your formula list.
 
 prog: VAR ADD XOR 
 ##
@@ -3137,10 +3166,10 @@ prog: NOT VAR SUB XOR
 ## clause SUB 
 ##
 
-The formula started by '$2 $1' does not finish correctly.
-Instead, the following statement were read:
+At this point, the operator $1 expects a formula as right-hand
+operand. Instead, the following statement were read:
     $0
-which does not seem to be a formula continuation.
+which does not seem to be a formula.
 
 prog: VARTUPLE TERM COMMA XOR 
 ##
@@ -3152,8 +3181,9 @@ prog: VARTUPLE TERM COMMA XOR
 ## term COMMA 
 ##
 
-At this point, a 
-Instead, the following statement were read:
+A term is expected right after $1 to continue the comma-separated
+list of term.
+The following statement does not seem to be a term:
     $0
 
 prog: XOR 
