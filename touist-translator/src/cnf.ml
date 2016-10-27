@@ -33,7 +33,7 @@ exception Error of string
       literals separated by "and"; example:
           a and b and not and not d                 is a conjunction
     - AST:
-      abstract syntax tree; it is homogenous to Syntax.exp
+      abstract syntax tree; it is homogenous to Syntax.ast
       and is a recursive tree representing a formula, using Or, And, Implies...
       Example: the formula (1) has the abstract syntax tree (2):
           (a or b) and not c                          (1) natural language
@@ -47,7 +47,7 @@ exception Error of string
 
 (* [is_clause] checks that the given AST is a clause. This function can only
    be called on an AST containing Or, And or Not. No Equiv or Implies! *)
-let rec is_clause (ast: exp) : bool = match ast with
+let rec is_clause (ast: ast) : bool = match ast with
   | Top | Bottom | Term _ | Not (Term _) -> true
   | Or (x,y) -> is_clause x && is_clause y
   | And _ -> false
@@ -63,14 +63,14 @@ let rec is_clause (ast: exp) : bool = match ast with
     form) is not a CNF form and must be modified. Conversely, the form
           `d  and  ((a or not b) and (not c))`
     doesn't need to be modified because it is already in CNF.  *)
-let rec push_lit (lit:exp) (cnf:exp) : exp = match cnf with
+let rec push_lit (lit:ast) (cnf:ast) : ast = match cnf with
   | Top           -> Top
   | Bottom        -> lit
   | Term x        -> Or (lit, Term x)
   | Not (Term x) -> Or (lit, Not (Term x))
   | And (x,y)    -> And (push_lit lit x, push_lit lit y)
   | Or (x,y)     -> Or (lit, Or (x,y))
-  | x -> raise (Error ("this doesn't seem to be a formula: '" ^ (string_of_exp x) ^ "'"))
+  | x -> raise (Error ("this doesn't seem to be a formula: '" ^ (string_of_ast x) ^ "'"))
 
 
 (* [genterm] generates a (Term &i) with i being a self-incrementing index.
@@ -88,13 +88,13 @@ let debug = ref false (* The debug flag activated by --debug-cnf *)
 let rec indent = function 0 -> "" | i -> (indent (i-1))^"\t"
 
 (* Just a function for printing debug info in [to_cnf] *)
-let print_debug (prefix:string) depth (formulas:exp list) : unit =
-  let rec string_of_exps = function
+let print_debug (prefix:string) depth (formulas:ast list) : unit =
+  let rec string_of_asts = function
     | [] -> ""
-    | cur::[] -> string_of_exp cur
-    | cur::next -> (string_of_exp cur)^", "^(string_of_exps next)
+    | cur::[] -> string_of_ast cur
+    | cur::next -> (string_of_ast cur)^", "^(string_of_asts next)
   in print_endline ((indent depth) ^ (string_of_int depth) ^ " " ^ prefix
-                    ^ (string_of_exps formulas))
+                    ^ (string_of_asts formulas))
 
 (* `strop` is a type is used in [to_cnf] in order to stop it after a number of
    recursions. See (1) below *)
@@ -120,7 +120,7 @@ type stop = No | Yes of int
  *     For inner `to_cnf`, we simply use `to_cnf_once` to prevent the inner
  *     `to_cnf` from recursing more than once.
  * *)
-let rec to_cnf depth (stop:stop) (ast:exp) : exp =
+let rec to_cnf depth (stop:stop) (ast:ast) : ast =
   if !debug then print_debug "in:  " depth [ast];
   if (match stop with Yes 0 -> true | _ -> false) then ast else (* See (1) above*)
     let to_cnf_once = to_cnf (depth+1) (match stop with Yes i->Yes (i-1) | No->Yes 1) in
@@ -177,12 +177,12 @@ let rec to_cnf depth (stop:stop) (ast:exp) : exp =
     | Implies (x,y) -> to_cnf (Or (Not x, y))
     | Equiv (x,y) -> to_cnf (And (Implies (x,y), Implies (y,x)))
     | Xor (x,y) -> to_cnf (And (Or (x,y), Or (Not x, Not y)))
-    | _ -> raise (Error ("this doesn't seem to be a formula: '" ^ (string_of_exp ast) ^ "'"))
+    | _ -> raise (Error ("this doesn't seem to be a formula: '" ^ (string_of_ast ast) ^ "'"))
     end in
     if !debug then print_debug "out: " depth [cnf];
     cnf
 
 (* [transform_to_cnf] is the entry point  for [to_cnf] *)
-let transform_to_cnf (ast:exp) debug_mode : exp =
+let transform_to_cnf (ast:ast) debug_mode : ast =
   debug := debug_mode;
   to_cnf 0 No ast
