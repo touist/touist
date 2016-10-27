@@ -58,11 +58,11 @@ let rec set_bin_op iop fop sop repr s1 s2 =
   | GenSet.SSet a, GenSet.SSet b -> GenSet.SSet (sop a b)
   | _,_ -> raise (Error (
       "mismatch types for set operator '" ^ repr ^ "' in the statement\n"^
-      "    "^(string_of_set s1) ^ repr ^ (string_of_set s2)^"\n"^
+      "    "^(string_of_set s1) ^" "^repr^" "^ (string_of_set s2)^"\n"^
       "Left operand has type '"^(string_of_ast_type (Set s1))^"'\n"^
       "    "^(string_of_ast_type (Set s1))^"\n"^
       "and right operand has type '"^(string_of_ast_type (Set s2))^"'\n"^
-      "    "^(string_of_ast_type (Set s2))^"\n"^
+      "    "^(string_of_ast_type (Set s2))^""^
       ""))
 let rec set_pred_op ipred fpred spred repr s1 s2 =
   match s1, s2 with
@@ -84,11 +84,11 @@ let rec set_pred_op ipred fpred spred repr s1 s2 =
   | GenSet.SSet a, GenSet.SSet b -> spred a b
   | _,_ -> raise (Error (
       "mismatch types for set operator '" ^ repr ^ "' in the statement\n"^
-      "    "^(string_of_set s1) ^ repr ^ (string_of_set s2)^"\n"^
+      "    "^(string_of_set s1) ^" "^repr^" "^ (string_of_set s2)^"\n"^
       "Left operand has type '"^(string_of_ast_type (Set s1))^"'\n"^
       "    "^(string_of_ast_type (Set s1))^"\n"^
       "and right operand has type '"^(string_of_ast_type (Set s2))^"'\n"^
-      "    "^(string_of_ast_type (Set s2))^"\n"^
+      "    "^(string_of_ast_type (Set s2))^""^
       ""))
 
 let num_pred_op n1 n2 ipred fpred repr =
@@ -97,11 +97,11 @@ let num_pred_op n1 n2 ipred fpred repr =
   | Float x, Float y -> Bool (fpred x y)
   | _,_ -> raise (Error (
       "mismatch types for number operator '" ^ repr ^ "' in the statement\n"^
-      "    "^(string_of_ast n1) ^ repr ^ (string_of_ast n2)^"\n"^
+      "    "^(string_of_ast n1) ^" "^repr^" "^ (string_of_ast n2)^"\n"^
       "Left operand has type '"^(string_of_ast_type n1)^"':\n"^
       "    "^(string_of_ast n1)^"\n"^
       "and right operand has type '"^(string_of_ast_type n2)^"':\n"^
-      "    "^(string_of_ast n2)^"\n"^
+      "    "^(string_of_ast n2)^""^
       ""))
 let num_bin_op n1 n2 iop fop repr =
   match n1,n2 with
@@ -109,11 +109,11 @@ let num_bin_op n1 n2 iop fop repr =
   | Float x, Float y -> Float (fop x y)
   | _,_ -> raise (Error (
       "mismatch types for number operator '" ^ repr ^ "' in the statement\n"^
-      "    "^(string_of_ast n1) ^ repr ^ (string_of_ast n2)^"\n"^
+      "    "^(string_of_ast n1) ^" "^repr^" "^ (string_of_ast n2)^"\n"^
       "Left operand has type '"^(string_of_ast_type n1)^"':\n"^
       "    "^(string_of_ast n1)^"\n"^
       "and right operand has type '"^(string_of_ast_type n2)^"':\n"^
-      "    "^(string_of_ast n2)^"\n"^
+      "    "^(string_of_ast n2)^""^
       ""))
 
 let bool_bin_op b1 b2 op repr =
@@ -121,11 +121,11 @@ let bool_bin_op b1 b2 op repr =
   | Bool x, Bool y -> Bool (op x y)
   | _,_ -> raise (Error (
       "mismatch types for boolean operator '" ^ repr ^ "' in the statement\n"^
-      "    "^(string_of_ast b1) ^ repr ^ (string_of_ast b2)^"\n"^
+      "    "^(string_of_ast b1) ^" "^repr^" "^ (string_of_ast b2)^"\n"^
       "Left operand has type '"^(string_of_ast_type b1)^"':\n"^
       "    "^(string_of_ast b1)^"\n"^
       "and right operand has type '"^(string_of_ast_type b2)^"':\n"^
-      "    "^(string_of_ast b2)^"\n"^
+      "    "^(string_of_ast b2)^""^
       ""))
 
 
