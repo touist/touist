@@ -78,7 +78,7 @@
  * production rule... It is an arbitrary name that allows
  * to give precedence indications on production rules.
  * Ex:
- *     clause: SUB clause %prec high_precedence
+ *     formula: SUB formula %prec high_precedence
  * will give this production rule a predecence given by
  * where the
  *     %nonassoc high_precedence
@@ -133,8 +133,8 @@ comma_list(T):
 
 (* [prog] is the entry point of the parser *)
 prog:
-  | c=clause* DATA a=affect* EOF { Prog (c, Some a) }
-  | c=clause* EOF { Prog (c, None) }
+  | c=formula* DATA a=affect* EOF { Prog (c, Some a) }
+  | c=formula* EOF { Prog (c, None) }
 
 term:
   | t=TERM { Term (t,None) }
@@ -156,7 +156,7 @@ affect:
   | v=global_var AFFECT e=exp { Affect (v,e) }
 
 exp:
-  (* This parametrized rule allows to "regroup" every "clause OPERATOR clause"
+  (* This parametrized rule allows to "regroup" every "formula OPERATOR formula"
     under the same rule. I refactored the explicit rules to that form  to try to
     have clearer messages in parser.messages *)
   | LPAREN exp RPAREN { $2 }
@@ -196,64 +196,64 @@ exp:
   | LBRACK exp RANGE exp RBRACK { Range ($2, $4) }
   | IF exp THEN exp ELSE exp END { If ($2, $4, $6) }
 
-(* Redundancy of clause and exp
+(* Redundancy of formula and exp
    ============================
-   Because of the need of being able to express SMT clauseulas, the clause and exp
+   Because of the need of being able to express SMT formulas, the formula and exp
    types are (seemingly) redundant. At first sight, we might think that merging
-   clause and exp into a single type would simplify the grammar...
-   But clause and exp express two completely different things:
+   formula and exp into a single type would simplify the grammar...
+   But formula and exp express two completely different things:
    - an exp will be "computed"; at the end of the touistc translation, its
      result will be reduced to a single float, integer, bool or set.
-     An expression of the clause `2+3+$i/5` will give a float.
-   - a clause won't be computed, in the sense that the clause
+     An expression of the formula `2+3+$i/5` will give a float.
+   - a formula won't be computed, in the sense that the formula
          (x+2 > 0) and not (y-3 != 0)
      will stay the same after touistc translation.
  *)
 
-clause:
-  | LPAREN clause RPAREN { $2 }
+formula:
+  | LPAREN formula RPAREN { $2 }
   | INT   { Int   $1 }
   | FLOAT { Float $1 }
 
-  (* SUB clause makes it really "hard" to solve. Just one example;
+  (* SUB formula makes it really "hard" to solve. Just one example;
      On the first line, the actual list of tokens. On the two following
      lines, two reductions conflicting:
-               "clause1 SUB clause2 XOR clause3 ..."
-      clause -> clause1 SUB clause2        => ((clause1 SUB clause2) XOR clause3)
-      clause ->         SUB clause2        => (clause 1)((SUB clause2) XOR clause3)
+               "formula1 SUB formula2 XOR formula3 ..."
+      formula -> formula1 SUB formula2        => ((formula1 SUB formula2) XOR formula3)
+      formula ->         SUB formula2        => (formula 1)((SUB formula2) XOR formula3)
    *)
-  | SUB clause { Neg $2 } %prec high_precedence
-  | clause ADD      clause { Add              ($1, $3) }
-  | clause SUB      clause { Sub              ($1, $3) }
-  | clause MUL      clause { Mul              ($1, $3) }
-  | clause DIV      clause { Div              ($1, $3) }
-  | clause EQUAL    clause { Equal            ($1, $3) }
-  | clause NOTEQUAL clause { Not_equal        ($1, $3) }
-  | clause LT       clause { Lesser_than      ($1, $3) }
-  | clause LE       clause { Lesser_or_equal  ($1, $3) }
-  | clause GT       clause { Greater_than     ($1, $3) }
-  | clause GE       clause { Greater_or_equal ($1, $3) }
+  | SUB formula { Neg $2 } %prec high_precedence
+  | formula ADD      formula { Add              ($1, $3) }
+  | formula SUB      formula { Sub              ($1, $3) }
+  | formula MUL      formula { Mul              ($1, $3) }
+  | formula DIV      formula { Div              ($1, $3) }
+  | formula EQUAL    formula { Equal            ($1, $3) }
+  | formula NOTEQUAL formula { Not_equal        ($1, $3) }
+  | formula LT       formula { Lesser_than      ($1, $3) }
+  | formula LE       formula { Lesser_or_equal  ($1, $3) }
+  | formula GT       formula { Greater_than     ($1, $3) }
+  | formula GE       formula { Greater_or_equal ($1, $3) }
   | v=global_var { v }
   | TOP    { Top    }
   | BOTTOM { Bottom }
   | t=term { t }
-  | NOT clause { Not $2 }
-  | clause AND     clause { And     ($1, $3) }
-  | clause OR      clause { Or      ($1, $3) }
-  | clause XOR     clause { Xor     ($1, $3) }
-  | clause IMPLIES clause { Implies ($1, $3) }
-  | clause EQUIV   clause { Equiv   ($1, $3) }
+  | NOT formula { Not $2 }
+  | formula AND     formula { And     ($1, $3) }
+  | formula OR      formula { Or      ($1, $3) }
+  | formula XOR     formula { Xor     ($1, $3) }
+  | formula IMPLIES formula { Implies ($1, $3) }
+  | formula EQUIV   formula { Equiv   ($1, $3) }
   | EXACT (*LPAREN*) x=exp COMMA y=exp RPAREN { Exact   (x, y) }
   | ATLEAST (*LPAREN*) x=exp COMMA y=exp RPAREN { Atleast (x, y) }
   | ATMOST (*LPAREN*) x=exp COMMA y=exp RPAREN { Atmost  (x, y) }
-  | BIGAND comma_list(local_var) IN comma_list(exp) COLON clause END
+  | BIGAND comma_list(local_var) IN comma_list(exp) COLON formula END
   { Bigand ($2, $4, None, $6) }
-  | BIGAND comma_list(local_var) IN comma_list(exp) WHEN exp COLON clause END
+  | BIGAND comma_list(local_var) IN comma_list(exp) WHEN exp COLON formula END
   { Bigand ($2, $4, Some $6, $8) }
-  | BIGOR comma_list(local_var) IN comma_list(exp) COLON clause END
+  | BIGOR comma_list(local_var) IN comma_list(exp) COLON formula END
   { Bigor ($2, $4, None, $6) }
-  | BIGOR comma_list(local_var) IN comma_list(exp) WHEN exp COLON clause END
+  | BIGOR comma_list(local_var) IN comma_list(exp) WHEN exp COLON formula END
   { Bigor ($2, $4, Some $6, $8) }
-  | IF exp THEN clause ELSE clause END { If ($2, $4, $6) }
-  | LET v=local_var AFFECT e=exp COLON c=clause { Let (v,e,c) }
-  | LET v=local_var AFFECT e=clause COLON c=clause { Let (v,e,c) }
+  | IF exp THEN formula ELSE formula END { If ($2, $4, $6) }
+  | LET v=local_var AFFECT e=exp COLON c=formula { Let (v,e,c) }
+  | LET v=local_var AFFECT e=formula COLON c=formula { Let (v,e,c) }
