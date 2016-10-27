@@ -15,7 +15,6 @@
 SRC=src
 # If git is present, then ROOT_GIT will be set with the project root path
 # elsewise, ROOT_GIT will not be defined at all
-ROOT_GIT := $(shell git rev-parse --show-toplevel 2> /dev/null)
 
 targets = $(SRC)/parser_messages.ml $(SRC)/version.ml
 
