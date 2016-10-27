@@ -56,8 +56,14 @@ let rec set_bin_op iop fop sop repr s1 s2 =
   | GenSet.ISet a, GenSet.ISet b -> GenSet.ISet (iop a b)
   | GenSet.FSet a, GenSet.FSet b -> GenSet.FSet (fop a b)
   | GenSet.SSet a, GenSet.SSet b -> GenSet.SSet (sop a b)
-  | _,_ -> raise (Error ("unsupported set type(s) for '" ^ repr  ^ "'"))
-
+  | _,_ -> raise (Error (
+      "mismatch types for set operator '" ^ repr ^ "' in the statement\n"^
+      "    "^(string_of_set s1) ^ repr ^ (string_of_set s2)^"\n"^
+      "Left operand has type '"^(string_of_exp_type (Set s1))^"'\n"^
+      "    "^(string_of_exp_type (Set s1))^"\n"^
+      "and right operand has type '"^(string_of_exp_type (Set s2))^"'\n"^
+      "    "^(string_of_exp_type (Set s2))^"\n"^
+      ""))
 let rec set_pred_op ipred fpred spred repr s1 s2 =
   match s1, s2 with
   | GenSet.Empty, GenSet.Empty -> true
@@ -121,18 +127,7 @@ let bool_bin_op b1 b2 op repr =
       "and right operand has type '"^(string_of_exp_type b2)^"':\n"^
       "    "^(string_of_exp b2)^"\n"^
       ""))
-let unwrap_int = function
-  | Int x -> x
-  | x -> raise (Error ("expected int, got " ^ (string_of_exp x)))
 
-let unwrap_float = function
-  | Float x -> x
-  | x -> raise (Error ("expected float, got " ^ (string_of_exp x)))
-
-let unwrap_str = function
-  | Term (x,None)   -> x
-  | Term (x,Some _) -> raise (Error ("unevaluated term: " ^ x))
-  | x -> raise (Error ("expected term, got " ^ (string_of_exp x)))
 
 (* Two structures are used to store the information on variables.
 
@@ -234,7 +229,7 @@ and eval_exp exp env =
             "the operator 'int(_)' expects float or int as operand. In the statement:\n"^
             "    "^(string_of_exp exp)^"\n"^
             "which has been expanded to:\n"^
-            "    "^(string_of_exp (Sqrt (x')))^"\n"^
+            "    "^(string_of_exp (To_int (x')))^"\n"^
             "the operand has type '"^(string_of_exp_type x')^"':\n"^
             "    "^(string_of_exp x')^"\n"))
       end
@@ -256,11 +251,12 @@ and eval_exp exp env =
         match eval_exp x env with
         | Bool x' -> Bool (not x')
         | x' -> raise (Error (
-            "In the following statement, the operator 'not()' should only\n"^
-            "be used on a boolean:\n"^
+            "the operator 'float(_)' expects a boolean as operand. In the statement:\n"^
             "    "^(string_of_exp exp)^"\n"^
-            "The following statement is not a boolean:\n"^
-            "    "^(string_of_exp x')))
+            "which has been expanded to:\n"^
+            "    "^(string_of_exp (Not (x')))^"\n"^
+            "the operand has type '"^(string_of_exp_type x')^"':\n"^
+            "    "^(string_of_exp x')^"\n"))
       end
   | And (x,y) -> bool_bin_op (eval_exp x env) (eval_exp y env) (&&) "and"
   | Or (x,y) -> bool_bin_op (eval_exp x env) (eval_exp y env) (||) "or"
@@ -279,11 +275,13 @@ and eval_exp exp env =
         match eval_exp x env with
         | Bool true  -> true
         | Bool false -> false
-        | x -> raise (Error (
-            "In the following statement, the condition of 'if' should be a boolean:\n"^
+        | x' -> raise (Error (
+            "the 'if' statement expects a boolean in its condition. In the statement:\n"^
             "    "^(string_of_exp exp)^"\n"^
-            "The following statement is not a boolean:\n"^
-            "    "^(string_of_exp x)))
+            "which has been expanded to:\n"^
+            "    "^(string_of_exp (If (x',y,z)))^"\n"^
+            "the operand has type '"^(string_of_exp_type x')^"':\n"^
+            "    "^(string_of_exp x')^"\n"))
       in
       if test then eval_exp y env else eval_exp z env
   | Union (x,y) ->
@@ -294,11 +292,14 @@ and eval_exp exp env =
                             (FloatSet.union)
                             (StringSet.union) "union" x' y')
         | x',y' -> raise (Error (
-            "In the following statement, the operator 'union' should only\n"^
-            "be used on sets:\n"^
+            "the operator 'union' expects sets of same types as operands.\n"^
+            "In the statement:\n"^
             "    "^(string_of_exp exp)^"\n"^
-            "One of the two following statement is not a set:\n"^
+            "which has been expanded to:\n"^
+            "    "^(string_of_exp (Mod (x',y')))^"\n"^
+            "left operand has type '"^(string_of_exp_type x')^"':\n"^
             "    "^(string_of_exp x')^"\n"^
+            "and right-operand has type '"^(string_of_exp_type x')^"':\n"^
             "    "^(string_of_exp y')))
       end
   | Inter (x,y) ->
@@ -324,11 +325,14 @@ and eval_exp exp env =
                             (FloatSet.diff)
                             (StringSet.diff) "diff" x' y')
         | x',y' -> raise (Error (
-            "In the following statement, the operator 'diff(_,_)' should only\n"^
-            "be used on sets:\n"^
+            "the operator 'diff' expects sets of same types as operands.\n"^
+            "In the statement:\n"^
             "    "^(string_of_exp exp)^"\n"^
-            "One of the two following statement is not a set:\n"^
+            "which has been expanded to:\n"^
+            "    "^(string_of_exp (Diff (x',y')))^"\n"^
+            "left operand has type '"^(string_of_exp_type x')^"':\n"^
             "    "^(string_of_exp x')^"\n"^
+            "and right-operand has type '"^(string_of_exp_type x')^"':\n"^
             "    "^(string_of_exp y')))
       end
   | Range (x,y) ->
@@ -337,12 +341,14 @@ and eval_exp exp env =
         | Int x', Int y'     -> Set (GenSet.ISet (IntSet.of_list (irange x' y' 1)))
         | Float x', Float y' -> Set (GenSet.FSet (FloatSet.of_list (frange x' y' 1.)))
         | x',y' -> raise (Error (
-            "In the following statement, the range-set should be used with\n"^
-            "two numbers of the same type (either float or int):\n"^
+            "the operator '..' expects int as operands.\n"^
+            "In the statement:\n"^
             "    "^(string_of_exp exp)^"\n"^
-            "In the two following statements, either one of them is not a number\n"^
-            "or they do not have the same number type:\n"^
+            "which has been expanded to:\n"^
+            "    "^(string_of_exp (Range (x',y')))^"\n"^
+            "left operand has type '"^(string_of_exp_type x')^"':\n"^
             "    "^(string_of_exp x')^"\n"^
+            "and right-operand has type '"^(string_of_exp_type x')^"':\n"^
             "    "^(string_of_exp y')))
       end
   | Empty x ->
@@ -357,11 +363,12 @@ and eval_exp exp env =
               | GenSet.SSet x'' -> Bool (StringSet.is_empty x'')
             end
         | x' -> raise (Error (
-            "In the following statement, the operator 'empty(_)' should only\n"^
-            "be used on a set:\n"^
+            "the operator 'empty(_)' expects a set as operand. In the statement:\n"^
             "    "^(string_of_exp exp)^"\n"^
-            "The following statement is not a set:\n"^
-            "    "^(string_of_exp x')))
+            "which has been expanded to:\n"^
+            "    "^(string_of_exp (Empty x'))^"\n"^
+            "the operand has type '"^(string_of_exp_type x')^"':\n"^
+            "    "^(string_of_exp x')^"\n"))
       end
   | Card x ->
       begin
@@ -375,11 +382,12 @@ and eval_exp exp env =
               | GenSet.SSet x'' -> Int (StringSet.cardinal x'')
             end
         | x' -> raise (Error (
-            "In the following statement, the operator 'card(_)' should only\n"^
-            "be used on a set:\n"^
+            "the operator 'card(_)' expects a set as operand. In the statement:\n"^
             "    "^(string_of_exp exp)^"\n"^
-            "The following statement is not a set:\n"^
-            "    "^(string_of_exp x')))
+            "which has been expanded to:\n"^
+            "    "^(string_of_exp (Card (x')))^"\n"^
+            "the operand has type '"^(string_of_exp_type x')^"':\n"^
+            "    "^(string_of_exp x')^"\n"))
       end
   | Subset (x,y) ->
       begin
@@ -389,11 +397,14 @@ and eval_exp exp env =
                               (FloatSet.subset)
                               (StringSet.subset) "subset" x' y')
         | x',y' -> raise (Error (
-            "In the following statement, the operator 'subset(_,_)' should only\n"^
-            "be used on sets:\n"^
+            "the operator 'subset(_,_)' expects sets of same types as operands.\n"^
+            "In the statement:\n"^
             "    "^(string_of_exp exp)^"\n"^
-            "One of the two following statement is not a set:\n"^
+            "which has been expanded to:\n"^
+            "    "^(string_of_exp (Subset (x',y')))^"\n"^
+            "left operand has type '"^(string_of_exp_type x')^"':\n"^
             "    "^(string_of_exp x')^"\n"^
+            "and right-operand has type '"^(string_of_exp_type x')^"':\n"^
             "    "^(string_of_exp y')))
       end
   | In (x,y) ->
@@ -405,13 +416,15 @@ and eval_exp exp env =
       | Float x', Set (GenSet.FSet y') -> Bool (FloatSet.mem x' y')
       | Term (x',None), Set (GenSet.SSet y') -> Bool (StringSet.mem x' y')
       | x',y' -> raise (Error (
-          "In the following statement, the operator 'in' should be applied to\n"^
-          "a scalar (term or number) and a set of the same type:\n"^
+          "the operator 'in' expects a scalar and a set of same types as operands.\n"^
+          "In the statement:\n"^
           "    "^(string_of_exp exp)^"\n"^
-          "The scalar\n"^
-          "    "^(string_of_exp x)^"\n"^
-          "does not have the same type as the set\n"^
-          "    "^(string_of_exp y)))
+          "which has been expanded to:\n"^
+          "    "^(string_of_exp (In (x',y')))^"\n"^
+          "left operand, expected to be a scalar (number or term), has type '"^(string_of_exp_type x')^"':\n"^
+          "    "^(string_of_exp x')^"\n"^
+          "and right-operand, expected to be a set, has type '"^(string_of_exp_type x')^"':\n"^
+          "    "^(string_of_exp y')))
     end
   | Equal (x,y) ->
       begin
@@ -424,11 +437,14 @@ and eval_exp exp env =
                               (FloatSet.equal)
                               (StringSet.equal) "=" x' y')
         | x',y' -> raise (Error (
-            "In the following statement, the operator '=' should\n"^
-            "be used on the same types (int, float, term or set):\n"^
+            "the operator '==' expects scalars or sets of same types as operands.\n"^
+            "In the statement:\n"^
             "    "^(string_of_exp exp)^"\n"^
-            "The two following statements do not have the same type:\n"^
+            "which has been expanded to:\n"^
+            "    "^(string_of_exp (Equal (x',y')))^"\n"^
+            "left operand has type '"^(string_of_exp_type x')^"':\n"^
             "    "^(string_of_exp x')^"\n"^
+            "and right-operand has type '"^(string_of_exp_type x')^"':\n"^
             "    "^(string_of_exp y')))
       end
   | Not_equal        (x,y) -> eval_exp (Not (Equal (x,y))) env
@@ -440,20 +456,43 @@ and eval_exp exp env =
   | e -> raise (Error ("this expression cannot be expanded: " ^ string_of_exp e))
 
 and eval_set set_decl env =
-  let eval_form = List.map (fun x -> eval_exp x env) set_decl in
-  match eval_form with
-  | [] -> Set (GenSet.Empty)
-  | (Int _)::xs ->
-      Set (GenSet.ISet (IntSet.of_list (List.map unwrap_int eval_form)))
-  | (Float _)::xs ->
-      Set (GenSet.FSet (FloatSet.of_list (List.map unwrap_float eval_form)))
-  | (Term (_,None))::xs ->
-      Set (GenSet.SSet (StringSet.of_list (List.map unwrap_str eval_form)))
-  | _ -> raise (Error (
-      "the following set is not consistent and contains contradictory types:\n"^
-      "    "^(string_of_exp_list ", " eval_form)^"\n"^
-      "Check that the elements of the set have the same type."))
-
+  let set_as_list = List.map (fun x -> eval_exp x env) set_decl in
+  (* [unwrap] needs a function exp -> 'a to transform, for example, 
+     'Int 1' to '1'; expected is a dummy variable to tell which type the set is;
+     given is the actual element to unwrap.
+  *)
+  let check_types (expected:exp) (given:exp) : exp = match expected,given with
+    (*expected, given*)
+    | Int _, Int x -> Int x
+    | Float _, Float x -> Float x
+    | Term (_,None), Term (x,None) -> Term (x,None)
+    | expected, given -> raise (Error (
+        "elements do not have the same type in set declaration:\n"^
+        "    ["^(string_of_exp_list ", " set_decl)^"]\n"^
+        "which has been expanded to:\n"^
+        "    ["^(string_of_exp_list ", " set_as_list)^"]\n"^
+        "the set elements have type '"^(string_of_exp_type expected)^"',\n"^
+        "but the following element has type '"^(string_of_exp_type given)^"':\n"^
+        "    "^(string_of_exp given)))
+  in 
+  let unwrap_int exp = match check_types (Int 0) exp with 
+    | Int x -> x | _ -> failwith "[check_types] already cheched"
+  and unwrap_float exp = match check_types (Float 0.0) exp with  
+    | Float x -> x | _ -> failwith "[check_types] already cheched"
+  and unwrap_str exp = match check_types (Term ("",None)) exp with  
+    | Term (x,None) -> x | _ -> failwith "[check_types] already cheched"
+  in match set_as_list with
+  | [] -> Set (GenSet.Empty) (*   (fun -> function Int x->x   *)
+  | (Int _)::xs -> Set (GenSet.ISet (IntSet.of_list (List.map unwrap_int set_as_list)))
+  | (Float _)::xs -> Set (GenSet.FSet (FloatSet.of_list (List.map unwrap_float set_as_list)))
+  | (Term (_,None))::xs -> Set (GenSet.SSet (StringSet.of_list (List.map unwrap_str set_as_list)))
+  | x::xs -> raise (Error (
+      "sets declarations can only contain scalars (float, int or term). In the statement:\n"^
+      "    ["^(string_of_exp_list ", " set_decl)^"]\n"^
+      "which has been expanded to:\n"^
+      "    ["^(string_of_exp_list ", " set_as_list)^"]\n"^
+      "the following element has type '"^(string_of_exp_type x)^"':\n"^
+      "    "^(string_of_exp x)))
 and eval_exp_no_expansion exp env =
   match exp with
   | Int x   -> Int x
@@ -526,8 +565,9 @@ and eval_exp_no_expansion exp env =
         | _ -> raise (Error (
             "'" ^ name ^ "' has been declared locally (in bigand, bigor or let)\n" ^
             "Locally declared variables must be scalar (float, int or term).\n" ^
-            "Instead, you gave '"^(string_of_exp content)^"'"))
-      with Not_found ->
+            "Instead, the content of the variable has type '"^(string_of_exp_type content)^"':\n"^
+            "    "^(string_of_exp content)))
+      with Not_found ->  
       (* Case 2. Check if this variable name has been affected globally, i.e.,
          in the 'data' section *)
       try let content = Hashtbl.find extenv name in
@@ -536,8 +576,9 @@ and eval_exp_no_expansion exp env =
         | Float x' -> Float x'
         | Term x' -> Term x'
         | _ -> raise (Error (
-            "the global variable '" ^ name ^ "' should be a scalar (number or term)\n" ^
-            "Instead, you gave '" ^(string_of_exp content)^"'"))
+            "the global variable '" ^ name ^ "' should be a scalar (number or term).\n" ^
+            "Instead, the content of the variable has type '"^(string_of_exp_type content)^"':\n"^
+            "    "^(string_of_exp content)))
       with Not_found ->
       try
         match x with
@@ -565,7 +606,7 @@ and eval_exp_no_expansion exp env =
             | x'' -> raise (Error (
                 "'" ^ name ^ "' has not been declared; maybe you wanted '"^prefix^"' to expand\n" ^
                 "in order to produce an expanded version <"^prefix^"-content>("^(string_of_exp_list "," indices)^")." ^
-                "But the content of '"^prefix^"' is\n'"^
+                "But the content of the variable '"^prefix^"' has type '"^(string_of_exp_type x'')^"':\n"^
                 "    "^(string_of_exp x'')^"\n'"^
                 "which is not a term or a number, so it cannot be expanded as explained above."))
           in eval_exp_no_expansion (Term ((string_of_exp term), Some indices)) env
@@ -593,33 +634,49 @@ and eval_exp_no_expansion exp env =
   | Equiv   (x,y) -> Equiv (eval_exp_no_expansion x env, eval_exp_no_expansion y env)
   | Exact (x,y) ->
       begin
-        match eval_exp y env with
-        | Set (GenSet.SSet s) ->
-            exact_str (StringSet.exact (unwrap_int (eval_exp x env)) s)
-        | _ -> raise (Error (
-            "'exact("^(string_of_exp x)^",_)' expects a set as second parameter. The expression\n"^
-            "    "^(string_of_exp y)^"\n"^
-            "is not a set."))
+        match eval_exp x env, eval_exp y env with
+        | Int x, Set (GenSet.SSet s) ->
+            exact_str (StringSet.exact x s)
+        | x',y' -> raise (Error (
+            "the operator 'exact(_,_)' expects an int and a term-set as operands.\n"^
+            "In the statement:\n"^
+            "    "^(string_of_exp exp)^"\n"^
+            "which has been expanded to:\n"^
+            "    "^(string_of_exp (Exact (x',y')))^"\n"^
+            "left operand that should be an 'int' has type '"^(string_of_exp_type x')^"':\n"^
+            "    "^(string_of_exp x')^"\n"^
+            "and right-operand that should be a set has type '"^(string_of_exp_type x')^"':\n"^
+            "    "^(string_of_exp y')))
       end
   | Atleast (x,y) ->
       begin
-        match eval_exp y env with
-        | Set (GenSet.SSet s) ->
-            atleast_str (StringSet.atleast (unwrap_int (eval_exp x env)) s)
-        | _ -> raise (Error (
-            "'atleast("^(string_of_exp x)^",_)' expects a set as second parameter. The expression\n"^
-            "    "^(string_of_exp y)^"\n"^
-            "is not a set."))
+        match eval_exp x env, eval_exp y env with
+        | Int x, Set (GenSet.SSet s) -> atleast_str (StringSet.atleast x s)
+        | x',y' -> raise (Error (
+            "the operator 'atleast(_,_)' expects an int and a term-set as operands.\n"^
+            "In the statement:\n"^
+            "    "^(string_of_exp exp)^"\n"^
+            "which has been expanded to:\n"^
+            "    "^(string_of_exp (Atleast (x',y')))^"\n"^
+            "left operand that should be an 'int' has type '"^(string_of_exp_type x')^"':\n"^
+            "    "^(string_of_exp x')^"\n"^
+            "and right-operand that should be a set has type '"^(string_of_exp_type x')^"':\n"^
+            "    "^(string_of_exp y')))
       end
   | Atmost (x,y) ->
       begin
-        match eval_exp y env with
-        | Set (GenSet.SSet s) ->
-            atmost_str (StringSet.atmost (unwrap_int (eval_exp x env)) s)
-        | _ -> raise (Error (
-            "'atmost("^(string_of_exp x)^",_)' expects a set as second parameter. The expression\n"^
-            "    "^(string_of_exp y)^"\n"^
-            "is not a set."))
+        match eval_exp x env, eval_exp y env with
+        | Int x,Set (GenSet.SSet s) -> atmost_str (StringSet.atmost x s)
+        | x',y' -> raise (Error (
+            "the operator 'atmost(_,_)' expects an int and a term-set as operands.\n"^
+            "In the statement:\n"^
+            "    "^(string_of_exp exp)^"\n"^
+            "which has been expanded to:\n"^
+            "    "^(string_of_exp (Atmost (x',y')))^"\n"^
+            "left operand that should be an 'int' has type '"^(string_of_exp_type x')^"':\n"^
+            "    "^(string_of_exp x')^"\n"^
+            "and right-operand that should be a set has type '"^(string_of_exp_type x')^"':\n"^
+            "    "^(string_of_exp y')))
       end
   | Bigand (v,s,t,e) ->
       let test =
@@ -640,12 +697,14 @@ and eval_exp_no_expansion exp env =
               | Set (GenSet.ISet a) -> bigand_int   env x (IntSet.elements a)    test e
               | Set (GenSet.FSet a) -> bigand_float env x (FloatSet.elements a)  test e
               | Set (GenSet.SSet a) -> bigand_str   env x (StringSet.elements a) test e
-              | _ -> raise (Error (
-                  "In the 'bigand' statement\n"^
+              | y' -> raise (Error (
+                  "the 'bigand _ in _ :' statement expects a comma-separated list of\n"^
+                  "sets as second operand. In the statement:\n"^
                   "    "^(string_of_exp exp)^"\n"^
-                  "the following expression\n"^
-                  "    "^(string_of_exp y)^"\n"^
-                  "is expected to be a set."))
+                  "which has been expanded to:\n"^
+                  "    "^(string_of_exp (Bigand (v,s,t,e)))^"\n"^
+                  "the following statement, expected to be a set, has type '"^(string_of_exp_type y')^"':\n"^
+                  "    "^(string_of_exp y')^"\n"))
             end
         | x::xs,y::ys ->
             eval_exp_no_expansion (Bigand ([x],[y],None,(Bigand (xs,ys,t,e)))) env
@@ -669,12 +728,14 @@ and eval_exp_no_expansion exp env =
               | Set (GenSet.ISet a) -> bigor_int   env x (IntSet.elements a)    test e
               | Set (GenSet.FSet a) -> bigor_float env x (FloatSet.elements a)  test e
               | Set (GenSet.SSet a) -> bigor_str   env x (StringSet.elements a) test e
-              | _ -> raise (Error (
-                  "In the 'bigor' statement\n"^
+              | y' -> raise (Error (
+                  "the 'bigor _ in _ :' statement expects a comma-separated list of\n"^
+                  "sets as second operand. In the statement:\n"^
+                  "    "^(string_of_exp exp)^"\n"^
+                  "which has been expanded to:\n"^
                   "    "^(string_of_exp (Bigand (v,s,t,e)))^"\n"^
-                  "the following expression\n"^
-                  "    "^(string_of_exp y)^"\n"^
-                  "is expected to be a set."))
+                  "the following statement, expected to be a set, has type '"^(string_of_exp_type y')^"':\n"^
+                  "    "^(string_of_exp y')^"\n"))
             end
         | x::xs,y::ys ->
             eval_exp_no_expansion (Bigor ([x],[y],None,(Bigor (xs,ys,t,e)))) env
