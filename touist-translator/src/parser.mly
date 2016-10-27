@@ -90,10 +90,9 @@
  *     not(a)
  * the minus sign MUST be reduced as fast as possible. *)
 
-%on_error_reduce separated_nonempty_list(COMMA,term_or_exp)
-%on_error_reduce separated_nonempty_list(COMMA,VAR)
-%on_error_reduce separated_nonempty_list(COMMA,exp)
-%on_error_reduce separated_nonempty_list(COMMA,TERM)
+%on_error_reduce comma_list(VAR)
+%on_error_reduce comma_list(exp)
+%on_error_reduce comma_list(TERM)
 (* %on_error_reduce is a nice "trick" to display a a more accurate
    context when an error is handled. For example, with this text:
 
@@ -128,21 +127,33 @@
 %% (* Everthing below that mark is expected to be a production rule *)
    (* Note that VAR { $0 } is equivalent to v=VAR { v } *)
 
+comma_list(T): 
+  | x=T { x::[] }
+  | x=T COMMA l=comma_list(T) { x::l }
+
 (* [prog] is the entry point of the parser *)
 prog:
-  | c=clause* DATA a=affect* EOF
-    { Prog (c, Some a) }
-  | c=clause* EOF
-    { Prog (c, None) }
+  | c=clause* DATA a=affect* EOF { Prog (c, Some a) }
+  | c=clause* EOF { Prog (c, None) }
 
-var_decl:
-  | VAR { ($1, None) }
-  | v=VARTUPLE (*LPAREN*) l=separated_nonempty_list(COMMA, exp) RPAREN { (v, Some l) }
-  | v=VARTUPLE (*LPAREN*) l=separated_nonempty_list(COMMA, TERM) RPAREN
-    { (v, Some (List.map (fun e -> Term (e,None)) l)) }
+term:
+  | t=TERM { Term (t,None) }
+  | t=TUPLE (*LPAREN*) l=comma_list(term) RPAREN { Term (t, Some l) }
+  | t=TUPLE (*LPAREN*) l=comma_list(exp) RPAREN { Term (t, Some l) }
+set:
+  | LBRACK RBRACK { Set_decl [] }
+  | LBRACK l=comma_list(exp) RBRACK { Set_decl l }
+  | LBRACK l=comma_list(term) RBRACK { Set_decl l }
+
+local_var:
+  | v=VAR { Var (v,None) } (* var = string * exp list option *)
+global_var:
+  | v=local_var { v }
+  | v=VARTUPLE (*LPAREN*) l=comma_list(exp) RPAREN { Var (v,Some l) }
+  | v=VARTUPLE (*LPAREN*) l=comma_list(term) RPAREN { Var (v,Some l) }
 
 affect:
-  | var_decl AFFECT exp { Affect ($1, $3) }
+  | v=global_var AFFECT e=exp { Affect (v,e) }
 
 exp:
   (* This parametrized rule allows to "regroup" every "clause OPERATOR clause"
@@ -152,8 +163,8 @@ exp:
   | INT   { Int   $1 }
   | FLOAT { Float $1 }
   | BOOL  { Bool  $1 }
-  | var_decl { Var      $1 }
-  | set_decl { Set_decl $1 }
+  | v=global_var { v }
+  | s=set { s }
   | SUB exp { Neg $2 } %prec high_precedence
   | exp ADD exp { Add ($1, $3) }
   | exp SUB exp { Sub ($1, $3) }
@@ -222,12 +233,10 @@ clause:
   | clause LE       clause { Lesser_or_equal  ($1, $3) }
   | clause GT       clause { Greater_than     ($1, $3) }
   | clause GE       clause { Greater_or_equal ($1, $3) }
-  | var_decl { Var $1 }
+  | v=global_var { v }
   | TOP    { Top    }
   | BOTTOM { Bottom }
-  | TERM   { Term ($1, None) }
-  | t=TUPLE (*LPAREN*) l=separated_nonempty_list(COMMA, term_or_exp) RPAREN
-      { Term (t, Some l) }
+  | t=term { t }
   | NOT clause { Not $2 }
   | clause AND     clause { And     ($1, $3) }
   | clause OR      clause { Or      ($1, $3) }
@@ -237,28 +246,14 @@ clause:
   | EXACT (*LPAREN*) x=exp COMMA y=exp RPAREN { Exact   (x, y) }
   | ATLEAST (*LPAREN*) x=exp COMMA y=exp RPAREN { Atleast (x, y) }
   | ATMOST (*LPAREN*) x=exp COMMA y=exp RPAREN { Atmost  (x, y) }
-  | BIGAND separated_nonempty_list(COMMA,VAR) IN separated_nonempty_list(COMMA,exp) COLON clause END
+  | BIGAND comma_list(local_var) IN comma_list(exp) COLON clause END
   { Bigand ($2, $4, None, $6) }
-  | BIGAND separated_nonempty_list(COMMA,VAR) IN separated_nonempty_list(COMMA,exp) WHEN exp COLON clause END
+  | BIGAND comma_list(local_var) IN comma_list(exp) WHEN exp COLON clause END
   { Bigand ($2, $4, Some $6, $8) }
-  | BIGOR separated_nonempty_list(COMMA,VAR) IN separated_nonempty_list(COMMA,exp) COLON clause END
+  | BIGOR comma_list(local_var) IN comma_list(exp) COLON clause END
   { Bigor ($2, $4, None, $6) }
-  | BIGOR separated_nonempty_list(COMMA,VAR) IN separated_nonempty_list(COMMA,exp) WHEN exp COLON clause END
+  | BIGOR comma_list(local_var) IN comma_list(exp) WHEN exp COLON clause END
   { Bigor ($2, $4, Some $6, $8) }
   | IF exp THEN clause ELSE clause END { If ($2, $4, $6) }
-  | LET v=var_decl AFFECT e=exp COLON c=clause { Let (v,e,c) }
-  | LET v=var_decl AFFECT e=clause COLON c=clause { Let (v,e,c) }
-
-(* Warning: the two rules
-     var_decl -> TERM
-     exp -> var_decl
-   are doing the same thing as term_or_exp *)
-term_or_exp:
-  | TERM { Term ($1,None) }
-  | exp { $1 }
-
-set_decl:
-  | LBRACK RBRACK { [] }
-  | LBRACK separated_nonempty_list(COMMA, exp) RBRACK { $2 }
-  | LBRACK separated_nonempty_list(COMMA, TERM) RBRACK
-  { List.map (fun x -> Term (x,None)) $2 }
+  | LET v=local_var AFFECT e=exp COLON c=clause { Let (v,e,c) }
+  | LET v=local_var AFFECT e=clause COLON c=clause { Let (v,e,c) }

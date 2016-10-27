@@ -157,8 +157,10 @@ and eval_prog exp env =
 
 and eval_affect exp env =
   match exp with
-  | Affect (x,y) ->
-      Hashtbl.replace extenv (expand_var_name x env) (eval_exp y env)
+  | Affect (Var x,y) ->
+    Hashtbl.replace extenv (expand_var_name x env) (eval_exp y env)
+  | e -> raise (Error ("this does not seem to be an affectation: " ^ string_of_exp e))
+
 
 and eval_exp exp env =
   match exp with
@@ -166,7 +168,7 @@ and eval_exp exp env =
   | Float x -> Float x
   | Bool x  -> Bool x
   | Var x ->
-      let name = expand_var_name x env in
+    let name = expand_var_name x env in
       begin
         try List.assoc name env
         with Not_found ->
@@ -690,7 +692,7 @@ and eval_exp_no_expansion exp env =
             "In the 'bigand' statement\n"^
             "    "^(string_of_exp exp)^"\n"^
             "the number of variables and the number of sets are not the same."))
-        | [x],[y] ->
+        | [Var x],[y] ->
             begin
               match eval_exp y env with
               | Set (GenSet.Empty)  -> bigand_empty env x [] test e
@@ -721,7 +723,7 @@ and eval_exp_no_expansion exp env =
             "In the 'bigor' statement\n"^
             "    "^(string_of_exp exp)^"\n"^
             "the number of variables and the number of sets are not the same."))
-        | [x],[y] ->
+        | [Var x],[y] ->
             begin
               match eval_exp y env with
               | Set (GenSet.Empty)  -> bigor_empty env x [] test e
@@ -743,7 +745,7 @@ and eval_exp_no_expansion exp env =
   | If (x,y,z) ->
       let test = eval_test x env in
       if test then eval_exp_no_expansion y env else eval_exp_no_expansion z env
-  | Let (v,x,c) -> eval_exp_no_expansion c (((expand_var_name v env),x)::env)
+  | Let (Var v,x,c) -> eval_exp_no_expansion c (((expand_var_name v env),x)::env)
   | e -> raise (Error ("this expression is not a formula: " ^ string_of_exp e))
 
 
@@ -774,44 +776,44 @@ and and_of_term_list =
 
 and bigand_empty env var values test exp = Top
 and bigand_int env var values test exp =
-  let exp' = If (test,exp,Top) in
+  let exp' = If (test,exp,Top) and (name,_) = var in
   match values with
   | []    -> Top
-  | [x]   -> eval_exp_no_expansion exp' ((var, Int x)::env)
-  | x::xs -> And (eval_exp_no_expansion exp' ((var, Int x)::env) ,bigand_int env var xs test exp)
+  | [x]   -> eval_exp_no_expansion exp' ((name, Int x)::env)
+  | x::xs -> And (eval_exp_no_expansion exp' ((name, Int x)::env) ,bigand_int env var xs test exp)
 and bigand_float env var values test exp =
-  let exp' = If (test,exp,Top) in
+  let exp' = If (test,exp,Top) and (name,_) = var in
   match values with
   | []    -> Top
-  | [x]   -> eval_exp_no_expansion exp' ((var, Float x)::env)
-  | x::xs -> And (eval_exp_no_expansion exp' ((var, Float x)::env) ,bigand_float env var xs test exp)
+  | [x]   -> eval_exp_no_expansion exp' ((name, Float x)::env)
+  | x::xs -> And (eval_exp_no_expansion exp' ((name, Float x)::env) ,bigand_float env var xs test exp)
 and bigand_str env var values test exp =
-  let exp' = If (test,exp,Top) in
+  let exp' = If (test,exp,Top) and (name,_) = var in
   match values with
   | []    -> Top
-  | [x]   -> eval_exp_no_expansion exp' ((var, Term  (x,None))::env)
+  | [x]   -> eval_exp_no_expansion exp' ((name, Term  (x,None))::env)
   | x::xs ->
-      And (eval_exp_no_expansion exp' ((var, Term  (x,None))::env), bigand_str env var xs test exp)
+      And (eval_exp_no_expansion exp' ((name, Term  (x,None))::env), bigand_str env var xs test exp)
 and bigor_empty env var values test exp = Bottom
 and bigor_int env var values test exp =
-  let exp' = If (test,exp,Bottom) in
+  let exp' = If (test,exp,Bottom) and (name,_) = var in
   match values with
   | []    -> Bottom
-  | [x]   -> eval_exp_no_expansion exp' ((var, Int x)::env)
-  | x::xs -> Or (eval_exp_no_expansion exp' ((var, Int x)::env), bigor_int env var xs test exp)
-and bigor_float env var values test exp =
-  let exp' = If (test,exp,Bottom) in
+  | [x]   -> eval_exp_no_expansion exp' ((name, Int x)::env)
+  | x::xs -> Or (eval_exp_no_expansion exp' ((name, Int x)::env), bigor_int env var xs test exp)
+and bigor_float env (var:var) values test exp =
+  let exp' = If (test,exp,Bottom) and (name,_) = var in
   match values with
   | []    -> Bottom
-  | [x]   -> eval_exp_no_expansion exp' ((var, Float x)::env)
-  | x::xs -> Or (eval_exp_no_expansion exp' ((var, Float x)::env), bigor_float env var xs test exp)
+  | [x]   -> eval_exp_no_expansion exp' ((name, Float x)::env)
+  | x::xs -> Or (eval_exp_no_expansion exp' ((name, Float x)::env), bigor_float env var xs test exp)
 and bigor_str env var values test exp =
-  let exp' = If (test,exp,Bottom) in
+  let exp' = If (test,exp,Bottom) and (name,_) = var in
   match values with
   | []    -> Bottom
-  | [x]   -> eval_exp_no_expansion exp' ((var, Term  (x,None))::env)
+  | [x]   -> eval_exp_no_expansion exp' ((name, Term  (x,None))::env)
   | x::xs ->
-      Or (eval_exp_no_expansion exp' ((var, Term (x,None))::env), bigor_str env var xs test exp)
+      Or (eval_exp_no_expansion exp' ((name, Term (x,None))::env), bigor_str env var xs test exp)
 
 and eval_test exp env =
   match eval_exp exp env with

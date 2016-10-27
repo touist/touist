@@ -34,15 +34,14 @@ module GenSet = struct
 end
 
 type prog =
-  | Prog of exp list * affect list option
-and affect =
-  | Affect of var * exp
+  | Prog of exp list * exp list option
 and var = string * exp list option
 and exp =
   | Int              of int
   | Float            of float
   | Bool             of bool
-  | Var              of var
+  | Var              of var (* Var and Term are the ONLY to be able to *)
+  | Term             of var (* have the var type to avoid spagetti in exp *)
   | Set              of GenSet.t
   | Set_decl         of exp list
   | Neg              of exp
@@ -77,10 +76,10 @@ and exp =
   | Subset           of exp * exp
   | In               of exp * exp
   | If               of exp * exp * exp
-  | Term     of var
   | Exact    of exp * exp
   | Atleast  of exp * exp
   | Atmost   of exp * exp
-  | Bigand   of string list * exp list * exp option * exp
-  | Bigor    of string list * exp list * exp option * exp
-  | Let      of var * exp * exp
+  | Bigand   of exp list * exp list * exp option * exp
+  | Bigor    of exp list * exp list * exp option * exp
+  | Let      of exp * exp * exp
+  | Affect   of exp * exp
