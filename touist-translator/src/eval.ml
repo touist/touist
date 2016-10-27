@@ -76,25 +76,51 @@ let rec set_pred_op ipred fpred spred repr s1 s2 =
   | GenSet.ISet a, GenSet.ISet b -> ipred a b
   | GenSet.FSet a, GenSet.FSet b -> fpred a b
   | GenSet.SSet a, GenSet.SSet b -> spred a b
-  | _,_ -> raise (Error ("unsupported set type(s) for '" ^ repr ^ "'"))
+  | _,_ -> raise (Error (
+      "mismatch types for set operator '" ^ repr ^ "' in the statement\n"^
+      "    "^(string_of_set s1) ^ repr ^ (string_of_set s2)^"\n"^
+      "Left operand has type '"^(string_of_exp_type (Set s1))^"'\n"^
+      "    "^(string_of_exp_type (Set s1))^"\n"^
+      "and right operand has type '"^(string_of_exp_type (Set s2))^"'\n"^
+      "    "^(string_of_exp_type (Set s2))^"\n"^
+      ""))
 
 let num_pred_op n1 n2 ipred fpred repr =
   match n1,n2 with
   | Int x, Int y     -> Bool (ipred x y)
   | Float x, Float y -> Bool (fpred x y)
-  | _,_ -> raise (Error ("unsupported operand types for '" ^ repr ^ "'"))
-
+  | _,_ -> raise (Error (
+      "mismatch types for number operator '" ^ repr ^ "' in the statement\n"^
+      "    "^(string_of_exp n1) ^ repr ^ (string_of_exp n2)^"\n"^
+      "Left operand has type '"^(string_of_exp_type n1)^"':\n"^
+      "    "^(string_of_exp n1)^"\n"^
+      "and right operand has type '"^(string_of_exp_type n2)^"':\n"^
+      "    "^(string_of_exp n2)^"\n"^
+      ""))
 let num_bin_op n1 n2 iop fop repr =
   match n1,n2 with
   | Int x, Int y     -> Int   (iop x y)
   | Float x, Float y -> Float (fop x y)
-  | _,_ -> raise (Error ("unsupported operand types for '" ^ repr ^ "'"))
+  | _,_ -> raise (Error (
+      "mismatch types for number operator '" ^ repr ^ "' in the statement\n"^
+      "    "^(string_of_exp n1) ^ repr ^ (string_of_exp n2)^"\n"^
+      "Left operand has type '"^(string_of_exp_type n1)^"':\n"^
+      "    "^(string_of_exp n1)^"\n"^
+      "and right operand has type '"^(string_of_exp_type n2)^"':\n"^
+      "    "^(string_of_exp n2)^"\n"^
+      ""))
 
 let bool_bin_op b1 b2 op repr =
   match b1,b2 with
   | Bool x, Bool y -> Bool (op x y)
-  | _,_ -> raise (Error ("unsupported operand types for '" ^ repr ^ "'"))
-
+  | _,_ -> raise (Error (
+      "mismatch types for boolean operator '" ^ repr ^ "' in the statement\n"^
+      "    "^(string_of_exp b1) ^ repr ^ (string_of_exp b2)^"\n"^
+      "Left operand has type '"^(string_of_exp_type b1)^"':\n"^
+      "    "^(string_of_exp b1)^"\n"^
+      "and right operand has type '"^(string_of_exp_type b2)^"':\n"^
+      "    "^(string_of_exp b2)^"\n"^
+      ""))
 let unwrap_int = function
   | Int x -> x
   | x -> raise (Error ("expected int, got " ^ (string_of_exp x)))
@@ -178,11 +204,13 @@ and eval_exp exp env =
         match eval_exp x env, eval_exp y env with
         | Int x', Int y' -> Int (x' mod y')
         | x',y' -> raise (Error (
-            "In the following statement, the modulo operator 'mod' should only\n"^
-            "be used on numbers:\n"^
+            "the operator 'mod' expects int as operands. In the statement:\n"^
             "    "^(string_of_exp exp)^"\n"^
-            "One of the two following statement is now a number:\n"^
+            "which has been expanded to:\n"^
+            "    "^(string_of_exp (Mod (x',y')))^"\n"^
+            "left operand has type '"^(string_of_exp_type x')^"':\n"^
             "    "^(string_of_exp x')^"\n"^
+            "and right-operand has type '"^(string_of_exp_type x')^"':\n"^
             "    "^(string_of_exp y')))
       end
   | Sqrt x ->
@@ -190,11 +218,12 @@ and eval_exp exp env =
         match eval_exp x env with
         | Float x' -> Float (sqrt x')
         | x' -> raise (Error (
-            "In the following statement, the operator 'sqrt()' should only\n"^
-            "be used on a float:\n"^
+            "the operator 'sqrt(_)' expects float as operand. In the statement:\n"^
             "    "^(string_of_exp exp)^"\n"^
-            "The following statement is not a float:\n"^
-            "    "^(string_of_exp x')))
+            "which has been expanded to:\n"^
+            "    "^(string_of_exp (Sqrt (x')))^"\n"^
+            "the operand has type '"^(string_of_exp_type x')^"':\n"^
+            "    "^(string_of_exp x')^"\n"))
       end
   | To_int x ->
       begin
@@ -202,11 +231,12 @@ and eval_exp exp env =
         | Float x' -> Int (int_of_float x')
         | Int x'   -> Int x'
         | x' -> raise (Error (
-            "In the following statement, the operator 'int()' should only\n"^
-            "be used on a number:\n"^
+            "the operator 'int(_)' expects float or int as operand. In the statement:\n"^
             "    "^(string_of_exp exp)^"\n"^
-            "The following statement is not a number:\n"^
-            "    "^(string_of_exp x')))
+            "which has been expanded to:\n"^
+            "    "^(string_of_exp (Sqrt (x')))^"\n"^
+            "the operand has type '"^(string_of_exp_type x')^"':\n"^
+            "    "^(string_of_exp x')^"\n"))
       end
   | To_float x ->
       begin
@@ -214,11 +244,12 @@ and eval_exp exp env =
         | Int x'   -> Float (float_of_int x')
         | Float x' -> Float x'
         | x' -> raise (Error (
-            "In the following statement, the operator 'float()' should only\n"^
-            "be used on a number:\n"^
+            "the operator 'float(_)' expects float or int as operand. In the statement:\n"^
             "    "^(string_of_exp exp)^"\n"^
-            "The following statement is not a number:\n"^
-            "    "^(string_of_exp x')))
+            "which has been expanded to:\n"^
+            "    "^(string_of_exp (Sqrt (x')))^"\n"^
+            "the operand has type '"^(string_of_exp_type x')^"':\n"^
+            "    "^(string_of_exp x')^"\n"))
       end
   | Not x ->
       begin
