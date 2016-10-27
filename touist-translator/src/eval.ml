@@ -680,6 +680,16 @@ and eval_exp_no_expansion exp env =
             "and right-operand that should be a set has type '"^(string_of_exp_type x')^"':\n"^
             "    "^(string_of_exp y')))
       end
+  (* What is returned by bigand or bigor when they do not
+     generate anything? A direct solution would have been to
+     return the 'neutral' element of the containing type, e.g.,
+         ... and (bigand $i in []: p($i) end)
+     would have to transform into
+         ... and Top
+     And we would have to know in what is the 'bigor/bigand'.
+     Maybe we could bypass this problem: return Nothing when
+     the bigand is empty; during the evaluation, Nothing will
+     act like '... and Top' or '... or Bot'. *)
   | Bigand (v,s,t,e) ->
       let test =
         match t with
