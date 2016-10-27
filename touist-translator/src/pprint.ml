@@ -47,23 +47,23 @@ let rec string_of_exp = function
       ^ "\nelse\n" ^ (string_of_exp z)
       ^ "\nend\n"
   | Bigand (x,y,None,z) ->
-      "bigand " ^ (String.concat "," x)
+      "bigand " ^ (string_of_exp_list "," x)
        ^ " in " ^ (string_of_exp_list "," y)
        ^ ":\n"  ^ (string_of_exp z)
        ^ "\nend\n"
   | Bigand (x,y,Some b,z) ->
-      "bigand " ^ (String.concat "," x)
+      "bigand " ^ (string_of_exp_list "," x)
        ^ " in "   ^ (string_of_exp_list "," y)
        ^ " when " ^ (string_of_exp b)
        ^ ":\n"    ^ (string_of_exp z)
        ^ "\nend\n"
   | Bigor (x,y,None,z) ->
-      "bigor " ^ (String.concat "," x)
+      "bigor " ^ (string_of_exp_list "," x)
        ^ " in " ^ (string_of_exp_list "," y)
        ^ ":\n"  ^ (string_of_exp z)
        ^ "\nend\n"
   | Bigor (x,y,Some b,z) ->
-      "bigor " ^ (String.concat "," x)
+      "bigor " ^ (string_of_exp_list "," x)
        ^ " in "   ^ (string_of_exp_list "," y)
        ^ " when " ^ (string_of_exp b)
        ^ ":\n"    ^ (string_of_exp z)
@@ -71,7 +71,8 @@ let rec string_of_exp = function
   | Exact (x,y) -> "exact(" ^ (string_of_exp x) ^ "," ^ (string_of_exp y) ^ ")"
   | Atmost (x,y) -> "atmost(" ^ (string_of_exp x) ^ "," ^ (string_of_exp y) ^ ")"
   | Atleast (x,y) -> "atleast(" ^ (string_of_exp x) ^ "," ^ (string_of_exp y) ^ ")"
-  | Let (v,x,c) -> (string_of_exp (Var v)) ^ "=" ^ (string_of_exp x) ^ ": " ^ (string_of_exp c)
+  | Let (v,x,c) -> (string_of_exp v) ^ "=" ^ (string_of_exp x) ^ ": " ^ (string_of_exp c)
+  | Affect (v,c) -> (string_of_exp v) ^ "=" ^ (string_of_exp c)
 
 and string_of_exp_type = function
   | Int    x               -> "int"
@@ -126,6 +127,7 @@ and string_of_exp_type = function
   | Atmost (x,y)           -> "operator atmost"
   | Atleast (x,y)          -> "operator atleast"
   | Let (v,x,c)            -> "operator let"
+  | Affect (_,_)           -> "operator ="
 
 and string_of_set = function
   | GenSet.Empty  -> "[]"

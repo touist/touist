@@ -15,7 +15,7 @@
 # ------------------------------------------------------------------------------
 prog: ATLEAST VAR COMMA VAR WHEN 
 ##
-## Ends in an error in state: 171.
+## Ends in an error in state: 169.
 ##
 ## clause -> ATLEAST exp COMMA exp . RPAREN [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ## exp -> exp . ADD exp [ XOR SUB RPAREN OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
@@ -41,7 +41,7 @@ prog: ATLEAST VAR COMMA VAR WHEN
 ##
 prog: TUPLE UNION VAR COMMA VAR WHEN 
 ##
-## Ends in an error in state: 105.
+## Ends in an error in state: 112.
 ##
 ## exp -> exp . ADD exp [ XOR SUB RPAREN OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
 ## exp -> exp . SUB exp [ XOR SUB RPAREN OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
@@ -67,7 +67,7 @@ prog: TUPLE UNION VAR COMMA VAR WHEN
 ##
 prog: ATMOST VAR COMMA VAR WHEN 
 ##
-## Ends in an error in state: 166.
+## Ends in an error in state: 164.
 ##
 ## clause -> ATMOST exp COMMA exp . RPAREN [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ## exp -> exp . ADD exp [ XOR SUB RPAREN OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
@@ -93,7 +93,7 @@ prog: ATMOST VAR COMMA VAR WHEN
 ##
 prog: TUPLE SUBSET VAR COMMA VAR WHEN 
 ##
-## Ends in an error in state: 97.
+## Ends in an error in state: 104.
 ##
 ## exp -> exp . ADD exp [ XOR SUB RPAREN OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
 ## exp -> exp . SUB exp [ XOR SUB RPAREN OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
@@ -119,7 +119,7 @@ prog: TUPLE SUBSET VAR COMMA VAR WHEN
 ##
 prog: TUPLE INTER VAR COMMA VAR WHEN 
 ##
-## Ends in an error in state: 76.
+## Ends in an error in state: 75.
 ##
 ## exp -> exp . ADD exp [ XOR SUB RPAREN OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
 ## exp -> exp . SUB exp [ XOR SUB RPAREN OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
@@ -145,7 +145,7 @@ prog: TUPLE INTER VAR COMMA VAR WHEN
 ##
 prog: EXACT VAR COMMA VAR WHEN 
 ##
-## Ends in an error in state: 138.
+## Ends in an error in state: 136.
 ##
 ## clause -> EXACT exp COMMA exp . RPAREN [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ## exp -> exp . ADD exp [ XOR SUB RPAREN OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
@@ -171,7 +171,7 @@ prog: EXACT VAR COMMA VAR WHEN
 ##
 prog: TUPLE DIFF VAR COMMA VAR WHEN 
 ##
-## Ends in an error in state: 64.
+## Ends in an error in state: 63.
 ##
 ## exp -> exp . ADD exp [ XOR SUB RPAREN OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
 ## exp -> exp . SUB exp [ XOR SUB RPAREN OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
@@ -203,7 +203,7 @@ Instead, the following statement were read:
 
 prog: ATLEAST VAR COMMA XOR 
 ##
-## Ends in an error in state: 170.
+## Ends in an error in state: 168.
 ##
 ## clause -> ATLEAST exp COMMA . exp RPAREN [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ##
@@ -212,7 +212,7 @@ prog: ATLEAST VAR COMMA XOR
 ##
 prog: ATMOST VAR COMMA XOR 
 ##
-## Ends in an error in state: 165.
+## Ends in an error in state: 163.
 ##
 ## clause -> ATMOST exp COMMA . exp RPAREN [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ##
@@ -221,7 +221,7 @@ prog: ATMOST VAR COMMA XOR
 ##
 prog: EXACT VAR COMMA XOR 
 ##
-## Ends in an error in state: 137.
+## Ends in an error in state: 135.
 ##
 ## clause -> EXACT exp COMMA . exp RPAREN [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ##
@@ -230,7 +230,7 @@ prog: EXACT VAR COMMA XOR
 ##
 prog: TUPLE DIFF VAR COMMA XOR 
 ##
-## Ends in an error in state: 63.
+## Ends in an error in state: 62.
 ##
 ## exp -> DIFF exp COMMA . exp RPAREN [ XOR WHEN VARTUPLE VAR THEN SUB RPAREN RBRACK RANGE OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL EOF END ELSE DIV COMMA COLON AND ADD ]
 ##
@@ -239,7 +239,7 @@ prog: TUPLE DIFF VAR COMMA XOR
 ##
 prog: TUPLE INTER VAR COMMA XOR 
 ##
-## Ends in an error in state: 75.
+## Ends in an error in state: 74.
 ##
 ## exp -> INTER exp COMMA . exp RPAREN [ XOR WHEN VARTUPLE VAR THEN SUB RPAREN RBRACK RANGE OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL EOF END ELSE DIV COMMA COLON AND ADD ]
 ##
@@ -248,7 +248,7 @@ prog: TUPLE INTER VAR COMMA XOR
 ##
 prog: TUPLE SUBSET VAR COMMA XOR 
 ##
-## Ends in an error in state: 96.
+## Ends in an error in state: 103.
 ##
 ## exp -> SUBSET exp COMMA . exp RPAREN [ XOR WHEN VARTUPLE VAR THEN SUB RPAREN RBRACK RANGE OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL EOF END ELSE DIV COMMA COLON AND ADD ]
 ##
@@ -257,7 +257,7 @@ prog: TUPLE SUBSET VAR COMMA XOR
 ##
 prog: TUPLE UNION VAR COMMA XOR 
 ##
-## Ends in an error in state: 104.
+## Ends in an error in state: 111.
 ##
 ## exp -> UNION exp COMMA . exp RPAREN [ XOR WHEN VARTUPLE VAR THEN SUB RPAREN RBRACK RANGE OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL EOF END ELSE DIV COMMA COLON AND ADD ]
 ##
@@ -271,7 +271,7 @@ Instead, the following statement were read:
 
 prog: ATLEAST VAR WHEN 
 ##
-## Ends in an error in state: 169.
+## Ends in an error in state: 167.
 ##
 ## clause -> ATLEAST exp . COMMA exp RPAREN [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ## exp -> exp . ADD exp [ XOR SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COMMA AND ADD ]
@@ -297,7 +297,7 @@ prog: ATLEAST VAR WHEN
 ##
 prog: ATMOST VAR WHEN 
 ##
-## Ends in an error in state: 164.
+## Ends in an error in state: 162.
 ##
 ## clause -> ATMOST exp . COMMA exp RPAREN [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ## exp -> exp . ADD exp [ XOR SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COMMA AND ADD ]
@@ -323,7 +323,7 @@ prog: ATMOST VAR WHEN
 ##
 prog: EXACT VAR WHEN 
 ##
-## Ends in an error in state: 136.
+## Ends in an error in state: 134.
 ##
 ## clause -> EXACT exp . COMMA exp RPAREN [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ## exp -> exp . ADD exp [ XOR SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COMMA AND ADD ]
@@ -349,7 +349,7 @@ prog: EXACT VAR WHEN
 ##
 prog: TUPLE DIFF VAR WHEN 
 ##
-## Ends in an error in state: 62.
+## Ends in an error in state: 61.
 ##
 ## exp -> exp . ADD exp [ XOR SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COMMA AND ADD ]
 ## exp -> exp . SUB exp [ XOR SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COMMA AND ADD ]
@@ -375,7 +375,7 @@ prog: TUPLE DIFF VAR WHEN
 ##
 prog: TUPLE INTER VAR WHEN 
 ##
-## Ends in an error in state: 74.
+## Ends in an error in state: 73.
 ##
 ## exp -> exp . ADD exp [ XOR SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COMMA AND ADD ]
 ## exp -> exp . SUB exp [ XOR SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COMMA AND ADD ]
@@ -401,7 +401,7 @@ prog: TUPLE INTER VAR WHEN
 ##
 prog: TUPLE NOT VAR UNION 
 ##
-## Ends in an error in state: 91.
+## Ends in an error in state: 98.
 ##
 ## exp -> exp . ADD exp [ XOR WHEN VARTUPLE VAR THEN SUB RPAREN RBRACK RANGE OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL EOF END ELSE DIV COMMA COLON AND ADD ]
 ## exp -> exp . SUB exp [ XOR WHEN VARTUPLE VAR THEN SUB RPAREN RBRACK RANGE OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL EOF END ELSE DIV COMMA COLON AND ADD ]
@@ -427,7 +427,7 @@ prog: TUPLE NOT VAR UNION
 ##
 prog: TUPLE SUBSET VAR WHEN 
 ##
-## Ends in an error in state: 95.
+## Ends in an error in state: 102.
 ##
 ## exp -> exp . ADD exp [ XOR SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COMMA AND ADD ]
 ## exp -> exp . SUB exp [ XOR SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COMMA AND ADD ]
@@ -453,7 +453,7 @@ prog: TUPLE SUBSET VAR WHEN
 ##
 prog: TUPLE UNION VAR WHEN 
 ##
-## Ends in an error in state: 103.
+## Ends in an error in state: 110.
 ##
 ## exp -> exp . ADD exp [ XOR SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COMMA AND ADD ]
 ## exp -> exp . SUB exp [ XOR SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COMMA AND ADD ]
@@ -485,7 +485,7 @@ Instead, the following statement were read:
 
 prog: TUPLE EMPTY VAR WHEN 
 ##
-## Ends in an error in state: 66.
+## Ends in an error in state: 65.
 ##
 ## exp -> exp . ADD exp [ XOR SUB RPAREN OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
 ## exp -> exp . SUB exp [ XOR SUB RPAREN OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
@@ -511,7 +511,7 @@ prog: TUPLE EMPTY VAR WHEN
 ##
 prog: TUPLE CARD VAR WHEN 
 ##
-## Ends in an error in state: 26.
+## Ends in an error in state: 25.
 ##
 ## exp -> exp . ADD exp [ XOR SUB RPAREN OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
 ## exp -> exp . SUB exp [ XOR SUB RPAREN OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
@@ -537,7 +537,7 @@ prog: TUPLE CARD VAR WHEN
 ##
 prog: TUPLE SQRT VAR WHEN 
 ##
-## Ends in an error in state: 92.
+## Ends in an error in state: 99.
 ##
 ## exp -> exp . ADD exp [ XOR SUB RPAREN OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
 ## exp -> exp . SUB exp [ XOR SUB RPAREN OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
@@ -563,7 +563,7 @@ prog: TUPLE SQRT VAR WHEN
 ##
 prog: TUPLE TOFLOAT VAR WHEN 
 ##
-## Ends in an error in state: 99.
+## Ends in an error in state: 106.
 ##
 ## exp -> exp . ADD exp [ XOR SUB RPAREN OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
 ## exp -> exp . SUB exp [ XOR SUB RPAREN OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
@@ -589,7 +589,7 @@ prog: TUPLE TOFLOAT VAR WHEN
 ##
 prog: TUPLE TOINT VAR WHEN 
 ##
-## Ends in an error in state: 101.
+## Ends in an error in state: 108.
 ##
 ## exp -> exp . ADD exp [ XOR SUB RPAREN OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
 ## exp -> exp . SUB exp [ XOR SUB RPAREN OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
@@ -615,7 +615,7 @@ prog: TUPLE TOINT VAR WHEN
 ##
 prog: TUPLE LPAREN VAR WHEN 
 ##
-## Ends in an error in state: 89.
+## Ends in an error in state: 96.
 ##
 ## exp -> LPAREN exp . RPAREN [ XOR WHEN VARTUPLE VAR THEN SUB RPAREN RBRACK RANGE OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL EOF END ELSE DIV COMMA COLON AND ADD ]
 ## exp -> exp . ADD exp [ XOR SUB RPAREN OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
@@ -647,7 +647,7 @@ Instead, the following statement were read:
 
 prog: ATLEAST XOR 
 ##
-## Ends in an error in state: 168.
+## Ends in an error in state: 166.
 ##
 ## clause -> ATLEAST . exp COMMA exp RPAREN [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ##
@@ -656,7 +656,7 @@ prog: ATLEAST XOR
 ##
 prog: ATMOST XOR 
 ##
-## Ends in an error in state: 163.
+## Ends in an error in state: 161.
 ##
 ## clause -> ATMOST . exp COMMA exp RPAREN [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ##
@@ -665,7 +665,7 @@ prog: ATMOST XOR
 ##
 prog: EXACT XOR 
 ##
-## Ends in an error in state: 135.
+## Ends in an error in state: 133.
 ##
 ## clause -> EXACT . exp COMMA exp RPAREN [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ##
@@ -679,7 +679,7 @@ Instead, the following statement were read:
 
 prog: BIGAND VAR IN VAR COLON VAR WHEN 
 ##
-## Ends in an error in state: 207.
+## Ends in an error in state: 206.
 ##
 ## clause -> clause . ADD clause [ XOR SUB OR NOTEQUAL MUL LT LE IMPLIES GT GE EQUIV EQUAL END DIV AND ADD ]
 ## clause -> clause . SUB clause [ XOR SUB OR NOTEQUAL MUL LT LE IMPLIES GT GE EQUIV EQUAL END DIV AND ADD ]
@@ -696,14 +696,14 @@ prog: BIGAND VAR IN VAR COLON VAR WHEN
 ## clause -> clause . XOR clause [ XOR SUB OR NOTEQUAL MUL LT LE IMPLIES GT GE EQUIV EQUAL END DIV AND ADD ]
 ## clause -> clause . IMPLIES clause [ XOR SUB OR NOTEQUAL MUL LT LE IMPLIES GT GE EQUIV EQUAL END DIV AND ADD ]
 ## clause -> clause . EQUIV clause [ XOR SUB OR NOTEQUAL MUL LT LE IMPLIES GT GE EQUIV EQUAL END DIV AND ADD ]
-## clause -> BIGAND separated_nonempty_list(COMMA,VAR) IN separated_nonempty_list(COMMA,exp) COLON clause . END [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
+## clause -> BIGAND comma_list(local_var) IN comma_list(exp) COLON clause . END [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ##
 ## The known suffix of the stack is as follows:
-## BIGAND separated_nonempty_list(COMMA,VAR) IN separated_nonempty_list(COMMA,exp) COLON clause 
+## BIGAND comma_list(local_var) IN comma_list(exp) COLON clause 
 ##
 prog: BIGOR VAR IN VAR COLON VAR WHEN 
 ##
-## Ends in an error in state: 216.
+## Ends in an error in state: 215.
 ##
 ## clause -> clause . ADD clause [ XOR SUB OR NOTEQUAL MUL LT LE IMPLIES GT GE EQUIV EQUAL END DIV AND ADD ]
 ## clause -> clause . SUB clause [ XOR SUB OR NOTEQUAL MUL LT LE IMPLIES GT GE EQUIV EQUAL END DIV AND ADD ]
@@ -720,10 +720,10 @@ prog: BIGOR VAR IN VAR COLON VAR WHEN
 ## clause -> clause . XOR clause [ XOR SUB OR NOTEQUAL MUL LT LE IMPLIES GT GE EQUIV EQUAL END DIV AND ADD ]
 ## clause -> clause . IMPLIES clause [ XOR SUB OR NOTEQUAL MUL LT LE IMPLIES GT GE EQUIV EQUAL END DIV AND ADD ]
 ## clause -> clause . EQUIV clause [ XOR SUB OR NOTEQUAL MUL LT LE IMPLIES GT GE EQUIV EQUAL END DIV AND ADD ]
-## clause -> BIGOR separated_nonempty_list(COMMA,VAR) IN separated_nonempty_list(COMMA,exp) COLON clause . END [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
+## clause -> BIGOR comma_list(local_var) IN comma_list(exp) COLON clause . END [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ##
 ## The known suffix of the stack is as follows:
-## BIGOR separated_nonempty_list(COMMA,VAR) IN separated_nonempty_list(COMMA,exp) COLON clause 
+## BIGOR comma_list(local_var) IN comma_list(exp) COLON clause 
 ##
 
 Ill-formed $6 body. At this point, expecting either 'end' or
@@ -737,21 +737,21 @@ is only allowed outside $6
 
 prog: BIGAND VAR IN VAR COLON XOR 
 ##
-## Ends in an error in state: 206.
+## Ends in an error in state: 205.
 ##
-## clause -> BIGAND separated_nonempty_list(COMMA,VAR) IN separated_nonempty_list(COMMA,exp) COLON . clause END [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
+## clause -> BIGAND comma_list(local_var) IN comma_list(exp) COLON . clause END [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ##
 ## The known suffix of the stack is as follows:
-## BIGAND separated_nonempty_list(COMMA,VAR) IN separated_nonempty_list(COMMA,exp) COLON 
+## BIGAND comma_list(local_var) IN comma_list(exp) COLON 
 ##
 prog: BIGOR VAR IN VAR COLON XOR 
 ##
-## Ends in an error in state: 215.
+## Ends in an error in state: 214.
 ##
-## clause -> BIGOR separated_nonempty_list(COMMA,VAR) IN separated_nonempty_list(COMMA,exp) COLON . clause END [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
+## clause -> BIGOR comma_list(local_var) IN comma_list(exp) COLON . clause END [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ##
 ## The known suffix of the stack is as follows:
-## BIGOR separated_nonempty_list(COMMA,VAR) IN separated_nonempty_list(COMMA,exp) COLON 
+## BIGOR comma_list(local_var) IN comma_list(exp) COLON 
 ##
 
 Ill-formed $5 statement. The body of $5 is expected to be a single
@@ -760,35 +760,35 @@ formula. Instead, the following statement were read:
 
 prog: BIGAND VAR IN VAR RPAREN 
 ##
-## Ends in an error in state: 159.
+## Ends in an error in state: 157.
 ##
-## clause -> BIGAND separated_nonempty_list(COMMA,VAR) IN separated_nonempty_list(COMMA,exp) . COLON clause END [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
-## clause -> BIGAND separated_nonempty_list(COMMA,VAR) IN separated_nonempty_list(COMMA,exp) . WHEN exp COLON clause END [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
+## clause -> BIGAND comma_list(local_var) IN comma_list(exp) . COLON clause END [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
+## clause -> BIGAND comma_list(local_var) IN comma_list(exp) . WHEN exp COLON clause END [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ##
 ## The known suffix of the stack is as follows:
-## BIGAND separated_nonempty_list(COMMA,VAR) IN separated_nonempty_list(COMMA,exp) 
+## BIGAND comma_list(local_var) IN comma_list(exp) 
 ##
 ## WARNING: This example involves spurious reductions.
 ## This implies that, although the LR(1) items shown above provide an
 ## accurate view of the past (what has been recognized so far), they
 ## may provide an INCOMPLETE view of the future (what was expected next).
-## In state 88, spurious reduction of production separated_nonempty_list(COMMA,exp) -> exp 
+## In state 80, spurious reduction of production comma_list(exp) -> exp 
 ##
 prog: BIGOR VAR IN VAR RPAREN 
 ##
-## Ends in an error in state: 147.
+## Ends in an error in state: 145.
 ##
-## clause -> BIGOR separated_nonempty_list(COMMA,VAR) IN separated_nonempty_list(COMMA,exp) . COLON clause END [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
-## clause -> BIGOR separated_nonempty_list(COMMA,VAR) IN separated_nonempty_list(COMMA,exp) . WHEN exp COLON clause END [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
+## clause -> BIGOR comma_list(local_var) IN comma_list(exp) . COLON clause END [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
+## clause -> BIGOR comma_list(local_var) IN comma_list(exp) . WHEN exp COLON clause END [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ##
 ## The known suffix of the stack is as follows:
-## BIGOR separated_nonempty_list(COMMA,VAR) IN separated_nonempty_list(COMMA,exp) 
+## BIGOR comma_list(local_var) IN comma_list(exp) 
 ##
 ## WARNING: This example involves spurious reductions.
 ## This implies that, although the LR(1) items shown above provide an
 ## accurate view of the past (what has been recognized so far), they
 ## may provide an INCOMPLETE view of the future (what was expected next).
-## In state 88, spurious reduction of production separated_nonempty_list(COMMA,exp) -> exp 
+## In state 80, spurious reduction of production comma_list(exp) -> exp 
 ##
 
 Ill-formed $4 statement. At this point, expecting either ':' or 'when' or
@@ -799,7 +799,7 @@ Instead, the following statement were read:
 
 prog: BIGAND VAR IN VAR WHEN VAR COLON VAR WHEN 
 ##
-## Ends in an error in state: 174.
+## Ends in an error in state: 173.
 ##
 ## clause -> clause . ADD clause [ XOR SUB OR NOTEQUAL MUL LT LE IMPLIES GT GE EQUIV EQUAL END DIV AND ADD ]
 ## clause -> clause . SUB clause [ XOR SUB OR NOTEQUAL MUL LT LE IMPLIES GT GE EQUIV EQUAL END DIV AND ADD ]
@@ -816,14 +816,14 @@ prog: BIGAND VAR IN VAR WHEN VAR COLON VAR WHEN
 ## clause -> clause . XOR clause [ XOR SUB OR NOTEQUAL MUL LT LE IMPLIES GT GE EQUIV EQUAL END DIV AND ADD ]
 ## clause -> clause . IMPLIES clause [ XOR SUB OR NOTEQUAL MUL LT LE IMPLIES GT GE EQUIV EQUAL END DIV AND ADD ]
 ## clause -> clause . EQUIV clause [ XOR SUB OR NOTEQUAL MUL LT LE IMPLIES GT GE EQUIV EQUAL END DIV AND ADD ]
-## clause -> BIGAND separated_nonempty_list(COMMA,VAR) IN separated_nonempty_list(COMMA,exp) WHEN exp COLON clause . END [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
+## clause -> BIGAND comma_list(local_var) IN comma_list(exp) WHEN exp COLON clause . END [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ##
 ## The known suffix of the stack is as follows:
-## BIGAND separated_nonempty_list(COMMA,VAR) IN separated_nonempty_list(COMMA,exp) WHEN exp COLON clause 
+## BIGAND comma_list(local_var) IN comma_list(exp) WHEN exp COLON clause 
 ##
 prog: BIGOR VAR IN VAR WHEN VAR COLON VAR WHEN 
 ##
-## Ends in an error in state: 213.
+## Ends in an error in state: 212.
 ##
 ## clause -> clause . ADD clause [ XOR SUB OR NOTEQUAL MUL LT LE IMPLIES GT GE EQUIV EQUAL END DIV AND ADD ]
 ## clause -> clause . SUB clause [ XOR SUB OR NOTEQUAL MUL LT LE IMPLIES GT GE EQUIV EQUAL END DIV AND ADD ]
@@ -840,10 +840,10 @@ prog: BIGOR VAR IN VAR WHEN VAR COLON VAR WHEN
 ## clause -> clause . XOR clause [ XOR SUB OR NOTEQUAL MUL LT LE IMPLIES GT GE EQUIV EQUAL END DIV AND ADD ]
 ## clause -> clause . IMPLIES clause [ XOR SUB OR NOTEQUAL MUL LT LE IMPLIES GT GE EQUIV EQUAL END DIV AND ADD ]
 ## clause -> clause . EQUIV clause [ XOR SUB OR NOTEQUAL MUL LT LE IMPLIES GT GE EQUIV EQUAL END DIV AND ADD ]
-## clause -> BIGOR separated_nonempty_list(COMMA,VAR) IN separated_nonempty_list(COMMA,exp) WHEN exp COLON clause . END [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
+## clause -> BIGOR comma_list(local_var) IN comma_list(exp) WHEN exp COLON clause . END [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ##
 ## The known suffix of the stack is as follows:
-## BIGOR separated_nonempty_list(COMMA,VAR) IN separated_nonempty_list(COMMA,exp) WHEN exp COLON clause 
+## BIGOR comma_list(local_var) IN comma_list(exp) WHEN exp COLON clause 
 ##
 
 Ill-formed $8 statement. At this point, expecting either 'end' or
@@ -856,21 +856,21 @@ Explanation: $8 expects a formula, but 'a b' is a list of formulas.
 
 prog: BIGAND VAR IN VAR WHEN VAR COLON XOR 
 ##
-## Ends in an error in state: 162.
+## Ends in an error in state: 160.
 ##
-## clause -> BIGAND separated_nonempty_list(COMMA,VAR) IN separated_nonempty_list(COMMA,exp) WHEN exp COLON . clause END [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
+## clause -> BIGAND comma_list(local_var) IN comma_list(exp) WHEN exp COLON . clause END [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ##
 ## The known suffix of the stack is as follows:
-## BIGAND separated_nonempty_list(COMMA,VAR) IN separated_nonempty_list(COMMA,exp) WHEN exp COLON 
+## BIGAND comma_list(local_var) IN comma_list(exp) WHEN exp COLON 
 ##
 prog: BIGOR VAR IN VAR WHEN VAR COLON XOR 
 ##
-## Ends in an error in state: 150.
+## Ends in an error in state: 148.
 ##
-## clause -> BIGOR separated_nonempty_list(COMMA,VAR) IN separated_nonempty_list(COMMA,exp) WHEN exp COLON . clause END [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
+## clause -> BIGOR comma_list(local_var) IN comma_list(exp) WHEN exp COLON . clause END [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ##
 ## The known suffix of the stack is as follows:
-## BIGOR separated_nonempty_list(COMMA,VAR) IN separated_nonempty_list(COMMA,exp) WHEN exp COLON 
+## BIGOR comma_list(local_var) IN comma_list(exp) WHEN exp COLON 
 ##
 
 Ill-formed $7 statement. The body of $7 is expected to be a formula.
@@ -879,9 +879,9 @@ Instead, the following statement were read:
 
 prog: BIGAND VAR IN VAR WHEN VAR WHEN 
 ##
-## Ends in an error in state: 161.
+## Ends in an error in state: 159.
 ##
-## clause -> BIGAND separated_nonempty_list(COMMA,VAR) IN separated_nonempty_list(COMMA,exp) WHEN exp . COLON clause END [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
+## clause -> BIGAND comma_list(local_var) IN comma_list(exp) WHEN exp . COLON clause END [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ## exp -> exp . ADD exp [ XOR SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COLON AND ADD ]
 ## exp -> exp . SUB exp [ XOR SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COLON AND ADD ]
 ## exp -> exp . MUL exp [ XOR SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COLON AND ADD ]
@@ -901,13 +901,13 @@ prog: BIGAND VAR IN VAR WHEN VAR WHEN
 ## exp -> exp . IN exp [ XOR SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COLON AND ADD ]
 ##
 ## The known suffix of the stack is as follows:
-## BIGAND separated_nonempty_list(COMMA,VAR) IN separated_nonempty_list(COMMA,exp) WHEN exp 
+## BIGAND comma_list(local_var) IN comma_list(exp) WHEN exp 
 ##
 prog: BIGOR VAR IN VAR WHEN VAR WHEN 
 ##
-## Ends in an error in state: 149.
+## Ends in an error in state: 147.
 ##
-## clause -> BIGOR separated_nonempty_list(COMMA,VAR) IN separated_nonempty_list(COMMA,exp) WHEN exp . COLON clause END [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
+## clause -> BIGOR comma_list(local_var) IN comma_list(exp) WHEN exp . COLON clause END [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ## exp -> exp . ADD exp [ XOR SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COLON AND ADD ]
 ## exp -> exp . SUB exp [ XOR SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COLON AND ADD ]
 ## exp -> exp . MUL exp [ XOR SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COLON AND ADD ]
@@ -927,7 +927,7 @@ prog: BIGOR VAR IN VAR WHEN VAR WHEN
 ## exp -> exp . IN exp [ XOR SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COLON AND ADD ]
 ##
 ## The known suffix of the stack is as follows:
-## BIGOR separated_nonempty_list(COMMA,VAR) IN separated_nonempty_list(COMMA,exp) WHEN exp 
+## BIGOR comma_list(local_var) IN comma_list(exp) WHEN exp 
 ##
 
 Ill-formed $6 statement. At this point, expecting either ':' or a continuation
@@ -938,21 +938,21 @@ Instead, the following statement were read:
 
 prog: BIGAND VAR IN VAR WHEN XOR 
 ##
-## Ends in an error in state: 160.
+## Ends in an error in state: 158.
 ##
-## clause -> BIGAND separated_nonempty_list(COMMA,VAR) IN separated_nonempty_list(COMMA,exp) WHEN . exp COLON clause END [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
+## clause -> BIGAND comma_list(local_var) IN comma_list(exp) WHEN . exp COLON clause END [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ##
 ## The known suffix of the stack is as follows:
-## BIGAND separated_nonempty_list(COMMA,VAR) IN separated_nonempty_list(COMMA,exp) WHEN 
+## BIGAND comma_list(local_var) IN comma_list(exp) WHEN 
 ##
 prog: BIGOR VAR IN VAR WHEN XOR 
 ##
-## Ends in an error in state: 148.
+## Ends in an error in state: 146.
 ##
-## clause -> BIGOR separated_nonempty_list(COMMA,VAR) IN separated_nonempty_list(COMMA,exp) WHEN . exp COLON clause END [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
+## clause -> BIGOR comma_list(local_var) IN comma_list(exp) WHEN . exp COLON clause END [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ##
 ## The known suffix of the stack is as follows:
-## BIGOR separated_nonempty_list(COMMA,VAR) IN separated_nonempty_list(COMMA,exp) WHEN 
+## BIGOR comma_list(local_var) IN comma_list(exp) WHEN 
 ##
 
 A boolean expression is required after $1.
@@ -961,20 +961,20 @@ Instead, the following statement were read:
 
 prog: BIGAND XOR 
 ##
-## Ends in an error in state: 156.
+## Ends in an error in state: 154.
 ##
-## clause -> BIGAND . separated_nonempty_list(COMMA,VAR) IN separated_nonempty_list(COMMA,exp) COLON clause END [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
-## clause -> BIGAND . separated_nonempty_list(COMMA,VAR) IN separated_nonempty_list(COMMA,exp) WHEN exp COLON clause END [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
+## clause -> BIGAND . comma_list(local_var) IN comma_list(exp) COLON clause END [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
+## clause -> BIGAND . comma_list(local_var) IN comma_list(exp) WHEN exp COLON clause END [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ##
 ## The known suffix of the stack is as follows:
 ## BIGAND 
 ##
 prog: BIGOR XOR 
 ##
-## Ends in an error in state: 141.
+## Ends in an error in state: 139.
 ##
-## clause -> BIGOR . separated_nonempty_list(COMMA,VAR) IN separated_nonempty_list(COMMA,exp) COLON clause END [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
-## clause -> BIGOR . separated_nonempty_list(COMMA,VAR) IN separated_nonempty_list(COMMA,exp) WHEN exp COLON clause END [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
+## clause -> BIGOR . comma_list(local_var) IN comma_list(exp) COLON clause END [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
+## clause -> BIGOR . comma_list(local_var) IN comma_list(exp) WHEN exp COLON clause END [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ##
 ## The known suffix of the stack is as follows:
 ## BIGOR 
@@ -987,84 +987,77 @@ Instead, the following statement were read:
 
 prog: BIGAND VAR IN XOR 
 ##
-## Ends in an error in state: 158.
+## Ends in an error in state: 156.
 ##
-## clause -> BIGAND separated_nonempty_list(COMMA,VAR) IN . separated_nonempty_list(COMMA,exp) COLON clause END [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
-## clause -> BIGAND separated_nonempty_list(COMMA,VAR) IN . separated_nonempty_list(COMMA,exp) WHEN exp COLON clause END [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
+## clause -> BIGAND comma_list(local_var) IN . comma_list(exp) COLON clause END [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
+## clause -> BIGAND comma_list(local_var) IN . comma_list(exp) WHEN exp COLON clause END [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ##
 ## The known suffix of the stack is as follows:
-## BIGAND separated_nonempty_list(COMMA,VAR) IN 
+## BIGAND comma_list(local_var) IN 
 ##
 prog: BIGOR VAR IN XOR 
 ##
-## Ends in an error in state: 146.
+## Ends in an error in state: 144.
 ##
-## clause -> BIGOR separated_nonempty_list(COMMA,VAR) IN . separated_nonempty_list(COMMA,exp) COLON clause END [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
-## clause -> BIGOR separated_nonempty_list(COMMA,VAR) IN . separated_nonempty_list(COMMA,exp) WHEN exp COLON clause END [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
+## clause -> BIGOR comma_list(local_var) IN . comma_list(exp) COLON clause END [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
+## clause -> BIGOR comma_list(local_var) IN . comma_list(exp) WHEN exp COLON clause END [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ##
 ## The known suffix of the stack is as follows:
-## BIGOR separated_nonempty_list(COMMA,VAR) IN 
+## BIGOR comma_list(local_var) IN 
 ##
 
 Ill-formed $3 statement. After $1 is expected a comma-separated list of 
-Instead, the following statement were read:
+expressions that would refer to sets. Instead, the following statement were read:
     $0
 
 prog: BIGOR VAR XOR 
 ##
-## Ends in an error in state: 145.
+## Ends in an error in state: 140.
 ##
-## clause -> BIGOR separated_nonempty_list(COMMA,VAR) . IN separated_nonempty_list(COMMA,exp) COLON clause END [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
-## clause -> BIGOR separated_nonempty_list(COMMA,VAR) . IN separated_nonempty_list(COMMA,exp) WHEN exp COLON clause END [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
+## comma_list(local_var) -> local_var . [ IN ]
+## comma_list(local_var) -> local_var . COMMA comma_list(local_var) [ IN ]
 ##
 ## The known suffix of the stack is as follows:
-## BIGOR separated_nonempty_list(COMMA,VAR) 
-##
-## WARNING: This example involves spurious reductions.
-## This implies that, although the LR(1) items shown above provide an
-## accurate view of the past (what has been recognized so far), they
-## may provide an INCOMPLETE view of the future (what was expected next).
-## In state 142, spurious reduction of production separated_nonempty_list(COMMA,VAR) -> VAR 
+## local_var 
 ##
 
-Ill-formed $2 statement. At this point, either finish the list of variables with 'in'
-or continue it with ','.
+At this point, either finish the comma-separated list of variables
+with 'in' or continue it with ','.
 Instead, the following statement were read:
     $0
 
 prog: BIGOR VAR COMMA XOR 
 ##
-## Ends in an error in state: 143.
+## Ends in an error in state: 141.
 ##
-## separated_nonempty_list(COMMA,VAR) -> VAR COMMA . separated_nonempty_list(COMMA,VAR) [ IN ]
+## comma_list(local_var) -> local_var COMMA . comma_list(local_var) [ IN ]
 ##
 ## The known suffix of the stack is as follows:
-## VAR COMMA 
+## local_var COMMA 
 ##
 
-At this point, either finish the list of variables with 'in'
-or continue with a new variable.
-Instead, the following statement were read:
+An expression is expected right after $1 to continue the comma-separated
+list of variables. Instead, the following statement were read:
     $0
 
 prog: VARTUPLE VAR COMMA XOR 
 ##
-## Ends in an error in state: 86.
+## Ends in an error in state: 81.
 ##
-## separated_nonempty_list(COMMA,exp) -> exp COMMA . separated_nonempty_list(COMMA,exp) [ WHEN RPAREN RBRACK COLON ]
+## comma_list(exp) -> exp COMMA . comma_list(exp) [ WHEN RPAREN RBRACK COLON ]
 ##
 ## The known suffix of the stack is as follows:
 ## exp COMMA 
 ##
 
-At this point, either finish the list of expressions with 'when' or ':',
-or continue the list with a new expression.
-Instead, the following statement were read:
+An expression is expected right after $1 to continue the comma-separated
+list of expressions. 
+The following statement does not seem to be an expression:
     $0
 
 prog: TUPLE VAR IN XOR 
 ##
-## Ends in an error in state: 45.
+## Ends in an error in state: 44.
 ##
 ## exp -> exp IN . exp [ XOR WHEN VARTUPLE VAR THEN SUB RPAREN RBRACK RANGE OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL EOF END ELSE DIV COMMA COLON AND ADD ]
 ##
@@ -1077,9 +1070,9 @@ Instead, $0 was read.
 
 prog: DATA VAR AFFECT VAR WHEN 
 ##
-## Ends in an error in state: 235.
+## Ends in an error in state: 236.
 ##
-## affect -> var_decl AFFECT exp . [ VARTUPLE VAR EOF ]
+## affect -> global_var AFFECT exp . [ VARTUPLE VAR EOF ]
 ## exp -> exp . ADD exp [ XOR VARTUPLE VAR SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL EOF DIV AND ADD ]
 ## exp -> exp . SUB exp [ XOR VARTUPLE VAR SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL EOF DIV AND ADD ]
 ## exp -> exp . MUL exp [ XOR VARTUPLE VAR SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL EOF DIV AND ADD ]
@@ -1099,7 +1092,7 @@ prog: DATA VAR AFFECT VAR WHEN
 ## exp -> exp . IN exp [ XOR VARTUPLE VAR SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL EOF DIV AND ADD ]
 ##
 ## The known suffix of the stack is as follows:
-## var_decl AFFECT exp 
+## global_var AFFECT exp 
 ##
 
 Ill-formed affectation. The right-term $1 is expected to be an
@@ -1108,12 +1101,12 @@ expression. Instead, the following statement were read:
 
 prog: DATA VAR AFFECT XOR 
 ##
-## Ends in an error in state: 234.
+## Ends in an error in state: 235.
 ##
-## affect -> var_decl AFFECT . exp [ VARTUPLE VAR EOF ]
+## affect -> global_var AFFECT . exp [ VARTUPLE VAR EOF ]
 ##
 ## The known suffix of the stack is as follows:
-## var_decl AFFECT 
+## global_var AFFECT 
 ##
 
 Ill-formed affectation. On the right of '=' is expected an expression.
@@ -1122,22 +1115,22 @@ Instead, the following statement were read:
 
 prog: DATA VAR XOR 
 ##
-## Ends in an error in state: 233.
+## Ends in an error in state: 234.
 ##
-## affect -> var_decl . AFFECT exp [ VARTUPLE VAR EOF ]
+## affect -> global_var . AFFECT exp [ VARTUPLE VAR EOF ]
 ##
 ## The known suffix of the stack is as follows:
-## var_decl 
+## global_var 
 ##
 prog: LET VAR XOR 
 ##
-## Ends in an error in state: 125.
+## Ends in an error in state: 123.
 ##
-## clause -> LET var_decl . AFFECT exp COLON clause [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
-## clause -> LET var_decl . AFFECT clause COLON clause [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
+## clause -> LET local_var . AFFECT exp COLON clause [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
+## clause -> LET local_var . AFFECT clause COLON clause [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ##
 ## The known suffix of the stack is as follows:
-## LET var_decl 
+## LET local_var 
 ##
 
 The affectation to $1 is incomplete and must be of the form
@@ -1148,7 +1141,7 @@ Instead, the following statement were read:
 
 prog: DATA XOR 
 ##
-## Ends in an error in state: 232.
+## Ends in an error in state: 231.
 ##
 ## prog -> list(clause) DATA . list(affect) EOF [ # ]
 ##
@@ -1163,7 +1156,7 @@ Instead, the following statement were read:
 
 prog: IF VAR THEN VAR ELSE VAR WHEN 
 ##
-## Ends in an error in state: 211.
+## Ends in an error in state: 210.
 ##
 ## clause -> clause . ADD clause [ XOR SUB OR NOTEQUAL MUL LT LE IMPLIES GT GE EQUIV EQUAL END DIV AND ADD ]
 ## clause -> clause . SUB clause [ XOR SUB OR NOTEQUAL MUL LT LE IMPLIES GT GE EQUIV EQUAL END DIV AND ADD ]
@@ -1194,7 +1187,7 @@ Instead, the following statement were read:
 
 prog: TUPLE IF VAR THEN VAR ELSE VAR WHEN 
 ##
-## Ends in an error in state: 72.
+## Ends in an error in state: 71.
 ##
 ## exp -> exp . ADD exp [ XOR SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL END DIV AND ADD ]
 ## exp -> exp . SUB exp [ XOR SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL END DIV AND ADD ]
@@ -1227,7 +1220,7 @@ Instead, the following statement were read:
 
 prog: TUPLE IF VAR THEN VAR WHEN 
 ##
-## Ends in an error in state: 70.
+## Ends in an error in state: 69.
 ##
 ## exp -> exp . ADD exp [ XOR SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL ELSE DIV AND ADD ]
 ## exp -> exp . SUB exp [ XOR SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL ELSE DIV AND ADD ]
@@ -1260,7 +1253,7 @@ Instead, the following statement were read:
 
 prog: IF VAR THEN VAR WHEN 
 ##
-## Ends in an error in state: 209.
+## Ends in an error in state: 208.
 ##
 ## clause -> clause . ADD clause [ XOR SUB OR NOTEQUAL MUL LT LE IMPLIES GT GE EQUIV EQUAL ELSE DIV AND ADD ]
 ## clause -> clause . SUB clause [ XOR SUB OR NOTEQUAL MUL LT LE IMPLIES GT GE EQUIV EQUAL ELSE DIV AND ADD ]
@@ -1291,7 +1284,7 @@ Instead, the following statement were read:
 
 prog: IF VAR THEN VAR ELSE XOR 
 ##
-## Ends in an error in state: 210.
+## Ends in an error in state: 209.
 ##
 ## clause -> IF exp THEN clause ELSE . clause END [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ##
@@ -1305,7 +1298,7 @@ Instead, the following statement were read:
 
 prog: TUPLE IF VAR THEN VAR ELSE XOR 
 ##
-## Ends in an error in state: 71.
+## Ends in an error in state: 70.
 ##
 ## exp -> IF exp THEN exp ELSE . exp END [ XOR WHEN VARTUPLE VAR THEN SUB RPAREN RBRACK RANGE OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL EOF END ELSE DIV COMMA COLON AND ADD ]
 ##
@@ -1319,7 +1312,7 @@ Instead, the following statement were read:
 
 prog: IF VAR THEN XOR 
 ##
-## Ends in an error in state: 154.
+## Ends in an error in state: 152.
 ##
 ## clause -> IF exp THEN . clause ELSE clause END [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ##
@@ -1328,7 +1321,7 @@ prog: IF VAR THEN XOR
 ##
 prog: LET VAR AFFECT IF VAR THEN XOR 
 ##
-## Ends in an error in state: 133.
+## Ends in an error in state: 131.
 ##
 ## clause -> IF exp THEN . clause ELSE clause END [ XOR SUB RPAREN OR NOTEQUAL MUL LT LE IMPLIES GT GE EQUIV EQUAL ELSE DIV COLON AND ADD ]
 ## exp -> IF exp THEN . exp ELSE exp END [ XOR SUB RPAREN OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL ELSE DIV COLON AND ADD ]
@@ -1338,7 +1331,7 @@ prog: LET VAR AFFECT IF VAR THEN XOR
 ##
 prog: TUPLE IF VAR THEN XOR 
 ##
-## Ends in an error in state: 69.
+## Ends in an error in state: 68.
 ##
 ## exp -> IF exp THEN . exp ELSE exp END [ XOR WHEN VARTUPLE VAR THEN SUB RPAREN RBRACK RANGE OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL EOF END ELSE DIV COMMA COLON AND ADD ]
 ##
@@ -1352,7 +1345,7 @@ Instead, the following statement were read:
 
 prog: IF VAR WHEN 
 ##
-## Ends in an error in state: 153.
+## Ends in an error in state: 151.
 ##
 ## clause -> IF exp . THEN clause ELSE clause END [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ## exp -> exp . ADD exp [ XOR THEN SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
@@ -1378,7 +1371,7 @@ prog: IF VAR WHEN
 ##
 prog: LET VAR AFFECT IF VAR WHEN 
 ##
-## Ends in an error in state: 132.
+## Ends in an error in state: 130.
 ##
 ## clause -> IF exp . THEN clause ELSE clause END [ XOR SUB RPAREN OR NOTEQUAL MUL LT LE IMPLIES GT GE EQUIV EQUAL ELSE DIV COLON AND ADD ]
 ## exp -> exp . ADD exp [ XOR THEN SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
@@ -1405,7 +1398,7 @@ prog: LET VAR AFFECT IF VAR WHEN
 ##
 prog: TUPLE IF VAR WHEN 
 ##
-## Ends in an error in state: 68.
+## Ends in an error in state: 67.
 ##
 ## exp -> exp . ADD exp [ XOR THEN SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
 ## exp -> exp . SUB exp [ XOR THEN SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
@@ -1439,7 +1432,7 @@ Instead, the following statement were read:
 
 prog: IF XOR 
 ##
-## Ends in an error in state: 152.
+## Ends in an error in state: 150.
 ##
 ## clause -> IF . exp THEN clause ELSE clause END [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ##
@@ -1448,7 +1441,7 @@ prog: IF XOR
 ##
 prog: LET VAR AFFECT IF XOR 
 ##
-## Ends in an error in state: 131.
+## Ends in an error in state: 129.
 ##
 ## clause -> IF . exp THEN clause ELSE clause END [ XOR SUB RPAREN OR NOTEQUAL MUL LT LE IMPLIES GT GE EQUIV EQUAL ELSE DIV COLON AND ADD ]
 ## exp -> IF . exp THEN exp ELSE exp END [ XOR SUB RPAREN OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL ELSE DIV COLON AND ADD ]
@@ -1464,7 +1457,7 @@ Note: you cannot use a formula as condition for the 'if' statement.
 
 prog: LET VAR AFFECT LPAREN XOR 
 ##
-## Ends in an error in state: 129.
+## Ends in an error in state: 127.
 ##
 ## clause -> LPAREN . clause RPAREN [ XOR SUB RPAREN OR NOTEQUAL MUL LT LE IMPLIES GT GE EQUIV EQUAL ELSE DIV COLON AND ADD ]
 ## exp -> LPAREN . exp RPAREN [ XOR SUB RPAREN OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL ELSE DIV COLON AND ADD ]
@@ -1474,7 +1467,7 @@ prog: LET VAR AFFECT LPAREN XOR
 ##
 prog: TUPLE CARD XOR 
 ##
-## Ends in an error in state: 22.
+## Ends in an error in state: 20.
 ##
 ## exp -> CARD . exp RPAREN [ XOR WHEN VARTUPLE VAR THEN SUB RPAREN RBRACK RANGE OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL EOF END ELSE DIV COMMA COLON AND ADD ]
 ##
@@ -1483,7 +1476,7 @@ prog: TUPLE CARD XOR
 ##
 prog: TUPLE EMPTY XOR 
 ##
-## Ends in an error in state: 20.
+## Ends in an error in state: 18.
 ##
 ## exp -> EMPTY . exp RPAREN [ XOR WHEN VARTUPLE VAR THEN SUB RPAREN RBRACK RANGE OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL EOF END ELSE DIV COMMA COLON AND ADD ]
 ##
@@ -1534,7 +1527,7 @@ Instead, the following statement were read:
 
 prog: LET VAR AFFECT NOT XOR 
 ##
-## Ends in an error in state: 128.
+## Ends in an error in state: 126.
 ##
 ## clause -> NOT . clause [ XOR SUB RPAREN OR NOTEQUAL MUL LT LE IMPLIES GT GE EQUIV EQUAL ELSE DIV COLON AND ADD ]
 ## exp -> NOT . exp [ XOR SUB RPAREN OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL ELSE DIV COLON AND ADD ]
@@ -1544,7 +1537,7 @@ prog: LET VAR AFFECT NOT XOR
 ##
 prog: LET VAR AFFECT SUB XOR 
 ##
-## Ends in an error in state: 127.
+## Ends in an error in state: 125.
 ##
 ## clause -> SUB . clause [ XOR SUB RPAREN OR NOTEQUAL MUL LT LE IMPLIES GT GE EQUIV EQUAL ELSE DIV COLON AND ADD ]
 ## exp -> SUB . exp [ XOR SUB RPAREN OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL ELSE DIV COLON AND ADD ]
@@ -1572,7 +1565,7 @@ prog: TUPLE SUB XOR
 ##
 prog: NOT XOR 
 ##
-## Ends in an error in state: 122.
+## Ends in an error in state: 120.
 ##
 ## clause -> NOT . clause [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ##
@@ -1581,7 +1574,7 @@ prog: NOT XOR
 ##
 prog: SUB XOR 
 ##
-## Ends in an error in state: 121.
+## Ends in an error in state: 119.
 ##
 ## clause -> SUB . clause [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ##
@@ -1596,7 +1589,7 @@ Instead, the following statement were read:
 
 prog: LET VAR AFFECT TOP COLON VAR WHEN 
 ##
-## Ends in an error in state: 228.
+## Ends in an error in state: 227.
 ##
 ## clause -> clause . ADD clause [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ## clause -> clause . SUB clause [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
@@ -1613,23 +1606,23 @@ prog: LET VAR AFFECT TOP COLON VAR WHEN
 ## clause -> clause . XOR clause [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ## clause -> clause . IMPLIES clause [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ## clause -> clause . EQUIV clause [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
-## clause -> LET var_decl AFFECT clause COLON clause . [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
+## clause -> LET local_var AFFECT clause COLON clause . [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ##
 ## The known suffix of the stack is as follows:
-## LET var_decl AFFECT clause COLON clause 
+## LET local_var AFFECT clause COLON clause 
 ##
 prog: LET VAR AFFECT TOP COLON XOR 
 ##
-## Ends in an error in state: 227.
+## Ends in an error in state: 226.
 ##
-## clause -> LET var_decl AFFECT clause COLON . clause [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
+## clause -> LET local_var AFFECT clause COLON . clause [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ##
 ## The known suffix of the stack is as follows:
-## LET var_decl AFFECT clause COLON 
+## LET local_var AFFECT clause COLON 
 ##
 prog: LET VAR AFFECT TOP WHEN 
 ##
-## Ends in an error in state: 226.
+## Ends in an error in state: 225.
 ##
 ## clause -> clause . ADD clause [ XOR SUB OR NOTEQUAL MUL LT LE IMPLIES GT GE EQUIV EQUAL DIV COLON AND ADD ]
 ## clause -> clause . SUB clause [ XOR SUB OR NOTEQUAL MUL LT LE IMPLIES GT GE EQUIV EQUAL DIV COLON AND ADD ]
@@ -1646,10 +1639,10 @@ prog: LET VAR AFFECT TOP WHEN
 ## clause -> clause . XOR clause [ XOR SUB OR NOTEQUAL MUL LT LE IMPLIES GT GE EQUIV EQUAL DIV COLON AND ADD ]
 ## clause -> clause . IMPLIES clause [ XOR SUB OR NOTEQUAL MUL LT LE IMPLIES GT GE EQUIV EQUAL DIV COLON AND ADD ]
 ## clause -> clause . EQUIV clause [ XOR SUB OR NOTEQUAL MUL LT LE IMPLIES GT GE EQUIV EQUAL DIV COLON AND ADD ]
-## clause -> LET var_decl AFFECT clause . COLON clause [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
+## clause -> LET local_var AFFECT clause . COLON clause [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ##
 ## The known suffix of the stack is as follows:
-## LET var_decl AFFECT clause 
+## LET local_var AFFECT clause 
 ##
 
 Ill-formed $4 statement. At this point, either expecting ':' to finish
@@ -1665,7 +1658,7 @@ single formula.
 
 prog: LET VAR AFFECT VAR COLON VAR WHEN 
 ##
-## Ends in an error in state: 225.
+## Ends in an error in state: 224.
 ##
 ## clause -> clause . ADD clause [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ## clause -> clause . SUB clause [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
@@ -1682,10 +1675,10 @@ prog: LET VAR AFFECT VAR COLON VAR WHEN
 ## clause -> clause . XOR clause [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ## clause -> clause . IMPLIES clause [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ## clause -> clause . EQUIV clause [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
-## clause -> LET var_decl AFFECT exp COLON clause . [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
+## clause -> LET local_var AFFECT exp COLON clause . [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ##
 ## The known suffix of the stack is as follows:
-## LET var_decl AFFECT exp COLON clause 
+## LET local_var AFFECT exp COLON clause 
 ##
 
 Ill-formed $6 statement. At this point, expecting a continuation 
@@ -1699,12 +1692,12 @@ be declared for the first '$i' and not in 'not($i)'. This is because
 
 prog: LET VAR AFFECT VAR COLON XOR 
 ##
-## Ends in an error in state: 224.
+## Ends in an error in state: 223.
 ##
-## clause -> LET var_decl AFFECT exp COLON . clause [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
+## clause -> LET local_var AFFECT exp COLON . clause [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ##
 ## The known suffix of the stack is as follows:
-## LET var_decl AFFECT exp COLON 
+## LET local_var AFFECT exp COLON 
 ##
 
 Ill-formed $5 statement. The body of $5 is expected to be a formula.
@@ -1713,9 +1706,9 @@ Instead, the following statement were read:
 
 prog: LET VAR AFFECT VAR WHEN 
 ##
-## Ends in an error in state: 223.
+## Ends in an error in state: 222.
 ##
-## clause -> LET var_decl AFFECT exp . COLON clause [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
+## clause -> LET local_var AFFECT exp . COLON clause [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ## exp -> exp . ADD exp [ XOR SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COLON AND ADD ]
 ## exp -> exp . SUB exp [ XOR SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COLON AND ADD ]
 ## exp -> exp . MUL exp [ XOR SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COLON AND ADD ]
@@ -1735,7 +1728,7 @@ prog: LET VAR AFFECT VAR WHEN
 ## exp -> exp . IN exp [ XOR SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COLON AND ADD ]
 ##
 ## The known suffix of the stack is as follows:
-## LET var_decl AFFECT exp 
+## LET local_var AFFECT exp 
 ##
 
 Ill-formed $4 statement. At this point, expecting either ':' or
@@ -1746,13 +1739,13 @@ Instead, the following statement were read:
 
 prog: LET VAR AFFECT XOR 
 ##
-## Ends in an error in state: 126.
+## Ends in an error in state: 124.
 ##
-## clause -> LET var_decl AFFECT . exp COLON clause [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
-## clause -> LET var_decl AFFECT . clause COLON clause [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
+## clause -> LET local_var AFFECT . exp COLON clause [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
+## clause -> LET local_var AFFECT . clause COLON clause [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ##
 ## The known suffix of the stack is as follows:
-## LET var_decl AFFECT 
+## LET local_var AFFECT 
 ##
 
 Ill-formed 'let' statement. The right-term of the affectation is
@@ -1762,10 +1755,10 @@ Instead, the following statement were read:
 
 prog: LET XOR 
 ##
-## Ends in an error in state: 124.
+## Ends in an error in state: 122.
 ##
-## clause -> LET . var_decl AFFECT exp COLON clause [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
-## clause -> LET . var_decl AFFECT clause COLON clause [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
+## clause -> LET . local_var AFFECT exp COLON clause [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
+## clause -> LET . local_var AFFECT clause COLON clause [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ##
 ## The known suffix of the stack is as follows:
 ## LET 
@@ -1777,7 +1770,7 @@ Instead, the following statement were read:
 
 prog: TUPLE DIFF XOR 
 ##
-## Ends in an error in state: 21.
+## Ends in an error in state: 19.
 ##
 ## exp -> DIFF . exp COMMA exp RPAREN [ XOR WHEN VARTUPLE VAR THEN SUB RPAREN RBRACK RANGE OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL EOF END ELSE DIV COMMA COLON AND ADD ]
 ##
@@ -1786,7 +1779,7 @@ prog: TUPLE DIFF XOR
 ##
 prog: TUPLE INTER XOR 
 ##
-## Ends in an error in state: 16.
+## Ends in an error in state: 14.
 ##
 ## exp -> INTER . exp COMMA exp RPAREN [ XOR WHEN VARTUPLE VAR THEN SUB RPAREN RBRACK RANGE OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL EOF END ELSE DIV COMMA COLON AND ADD ]
 ##
@@ -1813,7 +1806,7 @@ prog: TUPLE UNION XOR
 ##
 prog: LPAREN XOR 
 ##
-## Ends in an error in state: 123.
+## Ends in an error in state: 121.
 ##
 ## clause -> LPAREN . clause RPAREN [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ##
@@ -1827,18 +1820,18 @@ Instead, the following statement were read:
 
 prog: TUPLE LBRACK TERM RPAREN 
 ##
-## Ends in an error in state: 80.
+## Ends in an error in state: 92.
 ##
-## set_decl -> LBRACK separated_nonempty_list(COMMA,TERM) . RBRACK [ XOR WHEN VARTUPLE VAR THEN SUB RPAREN RBRACK RANGE OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL EOF END ELSE DIV COMMA COLON AND ADD ]
+## set -> LBRACK comma_list(term) . RBRACK [ XOR WHEN VARTUPLE VAR THEN SUB RPAREN RBRACK RANGE OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL EOF END ELSE DIV COMMA COLON AND ADD ]
 ##
 ## The known suffix of the stack is as follows:
-## LBRACK separated_nonempty_list(COMMA,TERM) 
+## LBRACK comma_list(term) 
 ##
 ## WARNING: This example involves spurious reductions.
 ## This implies that, although the LR(1) items shown above provide an
 ## accurate view of the past (what has been recognized so far), they
 ## may provide an INCOMPLETE view of the future (what was expected next).
-## In state 12, spurious reduction of production separated_nonempty_list(COMMA,TERM) -> TERM 
+## In state 77, spurious reduction of production comma_list(term) -> term 
 ##
 
 Ill-formed set. At this point, either finish the comma-separated list of terms
@@ -1849,19 +1842,19 @@ Instead, the following statement were read:
 
 prog: TUPLE LBRACK VAR COMMA BOOL WHEN 
 ##
-## Ends in an error in state: 78.
+## Ends in an error in state: 94.
 ##
-## set_decl -> LBRACK separated_nonempty_list(COMMA,exp) . RBRACK [ XOR WHEN VARTUPLE VAR THEN SUB RPAREN RBRACK RANGE OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL EOF END ELSE DIV COMMA COLON AND ADD ]
+## set -> LBRACK comma_list(exp) . RBRACK [ XOR WHEN VARTUPLE VAR THEN SUB RPAREN RBRACK RANGE OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL EOF END ELSE DIV COMMA COLON AND ADD ]
 ##
 ## The known suffix of the stack is as follows:
-## LBRACK separated_nonempty_list(COMMA,exp) 
+## LBRACK comma_list(exp) 
 ##
 ## WARNING: This example involves spurious reductions.
 ## This implies that, although the LR(1) items shown above provide an
 ## accurate view of the past (what has been recognized so far), they
 ## may provide an INCOMPLETE view of the future (what was expected next).
-## In state 88, spurious reduction of production separated_nonempty_list(COMMA,exp) -> exp 
-## In state 87, spurious reduction of production separated_nonempty_list(COMMA,exp) -> exp COMMA separated_nonempty_list(COMMA,exp) 
+## In state 80, spurious reduction of production comma_list(exp) -> exp 
+## In state 82, spurious reduction of production comma_list(exp) -> exp COMMA comma_list(exp) 
 ##
 
 Ill-formed set. At this point, either finish the comma-separated list of expressions
@@ -1872,7 +1865,7 @@ Instead, the following statement were read:
 
 prog: TUPLE LBRACK VAR RANGE VAR WHEN 
 ##
-## Ends in an error in state: 84.
+## Ends in an error in state: 90.
 ##
 ## exp -> exp . ADD exp [ XOR SUB RBRACK OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
 ## exp -> exp . SUB exp [ XOR SUB RBRACK OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
@@ -1905,7 +1898,7 @@ Instead, the following statement were read:
 
 prog: TUPLE LBRACK VAR RANGE XOR 
 ##
-## Ends in an error in state: 83.
+## Ends in an error in state: 89.
 ##
 ## exp -> LBRACK exp RANGE . exp RBRACK [ XOR WHEN VARTUPLE VAR THEN SUB RPAREN RBRACK RANGE OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL EOF END ELSE DIV COMMA COLON AND ADD ]
 ##
@@ -1922,9 +1915,9 @@ prog: TUPLE LBRACK XOR
 ## Ends in an error in state: 11.
 ##
 ## exp -> LBRACK . exp RANGE exp RBRACK [ XOR WHEN VARTUPLE VAR THEN SUB RPAREN RBRACK RANGE OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL EOF END ELSE DIV COMMA COLON AND ADD ]
-## set_decl -> LBRACK . RBRACK [ XOR WHEN VARTUPLE VAR THEN SUB RPAREN RBRACK RANGE OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL EOF END ELSE DIV COMMA COLON AND ADD ]
-## set_decl -> LBRACK . separated_nonempty_list(COMMA,exp) RBRACK [ XOR WHEN VARTUPLE VAR THEN SUB RPAREN RBRACK RANGE OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL EOF END ELSE DIV COMMA COLON AND ADD ]
-## set_decl -> LBRACK . separated_nonempty_list(COMMA,TERM) RBRACK [ XOR WHEN VARTUPLE VAR THEN SUB RPAREN RBRACK RANGE OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL EOF END ELSE DIV COMMA COLON AND ADD ]
+## set -> LBRACK . RBRACK [ XOR WHEN VARTUPLE VAR THEN SUB RPAREN RBRACK RANGE OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL EOF END ELSE DIV COMMA COLON AND ADD ]
+## set -> LBRACK . comma_list(exp) RBRACK [ XOR WHEN VARTUPLE VAR THEN SUB RPAREN RBRACK RANGE OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL EOF END ELSE DIV COMMA COLON AND ADD ]
+## set -> LBRACK . comma_list(term) RBRACK [ XOR WHEN VARTUPLE VAR THEN SUB RPAREN RBRACK RANGE OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL EOF END ELSE DIV COMMA COLON AND ADD ]
 ##
 ## The known suffix of the stack is as follows:
 ## LBRACK 
@@ -1936,7 +1929,7 @@ Instead, the following statement were read:
 
 prog: TUPLE VAR ADD VAR UNION 
 ##
-## Ends in an error in state: 38.
+## Ends in an error in state: 37.
 ##
 ## exp -> exp . ADD exp [ XOR WHEN VARTUPLE VAR THEN SUB RPAREN RBRACK RANGE OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL EOF END ELSE DIV COMMA COLON AND ADD ]
 ## exp -> exp ADD exp . [ XOR WHEN VARTUPLE VAR THEN SUB RPAREN RBRACK RANGE OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL EOF END ELSE DIV COMMA COLON AND ADD ]
@@ -1962,7 +1955,7 @@ prog: TUPLE VAR ADD VAR UNION
 ##
 prog: TUPLE VAR GE VAR UNION 
 ##
-## Ends in an error in state: 50.
+## Ends in an error in state: 49.
 ##
 ## exp -> exp . ADD exp [ XOR WHEN VARTUPLE VAR THEN SUB RPAREN RBRACK RANGE OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL EOF END ELSE DIV COMMA COLON AND ADD ]
 ## exp -> exp . SUB exp [ XOR WHEN VARTUPLE VAR THEN SUB RPAREN RBRACK RANGE OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL EOF END ELSE DIV COMMA COLON AND ADD ]
@@ -1985,9 +1978,10 @@ prog: TUPLE VAR GE VAR UNION
 ##
 ## The known suffix of the stack is as follows:
 ## exp GE exp 
+##
 prog: TUPLE VAR AND VAR UNION 
 ##
-## Ends in an error in state: 57.
+## Ends in an error in state: 56.
 ##
 ## exp -> exp . ADD exp [ XOR WHEN VARTUPLE VAR THEN SUB RPAREN RBRACK RANGE OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL EOF END ELSE DIV COMMA COLON AND ADD ]
 ## exp -> exp . SUB exp [ XOR WHEN VARTUPLE VAR THEN SUB RPAREN RBRACK RANGE OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL EOF END ELSE DIV COMMA COLON AND ADD ]
@@ -2013,7 +2007,7 @@ prog: TUPLE VAR AND VAR UNION
 ##
 prog: TUPLE VAR DIV VAR UNION 
 ##
-## Ends in an error in state: 36.
+## Ends in an error in state: 35.
 ##
 ## exp -> exp . ADD exp [ XOR WHEN VARTUPLE VAR THEN SUB RPAREN RBRACK RANGE OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL EOF END ELSE DIV COMMA COLON AND ADD ]
 ## exp -> exp . SUB exp [ XOR WHEN VARTUPLE VAR THEN SUB RPAREN RBRACK RANGE OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL EOF END ELSE DIV COMMA COLON AND ADD ]
@@ -2039,7 +2033,7 @@ prog: TUPLE VAR DIV VAR UNION
 ##
 prog: TUPLE VAR EQUAL VAR UNION 
 ##
-## Ends in an error in state: 52.
+## Ends in an error in state: 51.
 ##
 ## exp -> exp . ADD exp [ XOR WHEN VARTUPLE VAR THEN SUB RPAREN RBRACK RANGE OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL EOF END ELSE DIV COMMA COLON AND ADD ]
 ## exp -> exp . SUB exp [ XOR WHEN VARTUPLE VAR THEN SUB RPAREN RBRACK RANGE OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL EOF END ELSE DIV COMMA COLON AND ADD ]
@@ -2065,7 +2059,7 @@ prog: TUPLE VAR EQUAL VAR UNION
 ##
 prog: TUPLE VAR EQUIV VAR UNION 
 ##
-## Ends in an error in state: 61.
+## Ends in an error in state: 60.
 ##
 ## exp -> exp . ADD exp [ XOR WHEN VARTUPLE VAR THEN SUB RPAREN RBRACK RANGE OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL EOF END ELSE DIV COMMA COLON AND ADD ]
 ## exp -> exp . SUB exp [ XOR WHEN VARTUPLE VAR THEN SUB RPAREN RBRACK RANGE OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL EOF END ELSE DIV COMMA COLON AND ADD ]
@@ -2091,7 +2085,7 @@ prog: TUPLE VAR EQUIV VAR UNION
 ##
 prog: TUPLE VAR GT VAR UNION 
 ##
-## Ends in an error in state: 48.
+## Ends in an error in state: 47.
 ##
 ## exp -> exp . ADD exp [ XOR WHEN VARTUPLE VAR THEN SUB RPAREN RBRACK RANGE OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL EOF END ELSE DIV COMMA COLON AND ADD ]
 ## exp -> exp . SUB exp [ XOR WHEN VARTUPLE VAR THEN SUB RPAREN RBRACK RANGE OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL EOF END ELSE DIV COMMA COLON AND ADD ]
@@ -2117,7 +2111,7 @@ prog: TUPLE VAR GT VAR UNION
 ##
 prog: TUPLE VAR IMPLIES VAR UNION 
 ##
-## Ends in an error in state: 59.
+## Ends in an error in state: 58.
 ##
 ## exp -> exp . ADD exp [ XOR WHEN VARTUPLE VAR THEN SUB RPAREN RBRACK RANGE OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL EOF END ELSE DIV COMMA COLON AND ADD ]
 ## exp -> exp . SUB exp [ XOR WHEN VARTUPLE VAR THEN SUB RPAREN RBRACK RANGE OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL EOF END ELSE DIV COMMA COLON AND ADD ]
@@ -2143,7 +2137,7 @@ prog: TUPLE VAR IMPLIES VAR UNION
 ##
 prog: TUPLE VAR IN VAR UNION 
 ##
-## Ends in an error in state: 46.
+## Ends in an error in state: 45.
 ##
 ## exp -> exp . ADD exp [ XOR WHEN VARTUPLE VAR THEN SUB RPAREN RBRACK RANGE OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL EOF END ELSE DIV COMMA COLON AND ADD ]
 ## exp -> exp . SUB exp [ XOR WHEN VARTUPLE VAR THEN SUB RPAREN RBRACK RANGE OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL EOF END ELSE DIV COMMA COLON AND ADD ]
@@ -2169,7 +2163,7 @@ prog: TUPLE VAR IN VAR UNION
 ##
 prog: TUPLE VAR LE VAR UNION 
 ##
-## Ends in an error in state: 44.
+## Ends in an error in state: 43.
 ##
 ## exp -> exp . ADD exp [ XOR WHEN VARTUPLE VAR THEN SUB RPAREN RBRACK RANGE OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL EOF END ELSE DIV COMMA COLON AND ADD ]
 ## exp -> exp . SUB exp [ XOR WHEN VARTUPLE VAR THEN SUB RPAREN RBRACK RANGE OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL EOF END ELSE DIV COMMA COLON AND ADD ]
@@ -2195,7 +2189,7 @@ prog: TUPLE VAR LE VAR UNION
 ##
 prog: TUPLE VAR LT VAR UNION 
 ##
-## Ends in an error in state: 42.
+## Ends in an error in state: 41.
 ##
 ## exp -> exp . ADD exp [ XOR WHEN VARTUPLE VAR THEN SUB RPAREN RBRACK RANGE OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL EOF END ELSE DIV COMMA COLON AND ADD ]
 ## exp -> exp . SUB exp [ XOR WHEN VARTUPLE VAR THEN SUB RPAREN RBRACK RANGE OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL EOF END ELSE DIV COMMA COLON AND ADD ]
@@ -2221,7 +2215,7 @@ prog: TUPLE VAR LT VAR UNION
 ##
 prog: TUPLE VAR MUL VAR UNION 
 ##
-## Ends in an error in state: 32.
+## Ends in an error in state: 31.
 ##
 ## exp -> exp . ADD exp [ XOR WHEN VARTUPLE VAR THEN SUB RPAREN RBRACK RANGE OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL EOF END ELSE DIV COMMA COLON AND ADD ]
 ## exp -> exp . SUB exp [ XOR WHEN VARTUPLE VAR THEN SUB RPAREN RBRACK RANGE OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL EOF END ELSE DIV COMMA COLON AND ADD ]
@@ -2247,7 +2241,7 @@ prog: TUPLE VAR MUL VAR UNION
 ##
 prog: TUPLE VAR NOTEQUAL VAR UNION 
 ##
-## Ends in an error in state: 40.
+## Ends in an error in state: 39.
 ##
 ## exp -> exp . ADD exp [ XOR WHEN VARTUPLE VAR THEN SUB RPAREN RBRACK RANGE OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL EOF END ELSE DIV COMMA COLON AND ADD ]
 ## exp -> exp . SUB exp [ XOR WHEN VARTUPLE VAR THEN SUB RPAREN RBRACK RANGE OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL EOF END ELSE DIV COMMA COLON AND ADD ]
@@ -2273,7 +2267,7 @@ prog: TUPLE VAR NOTEQUAL VAR UNION
 ##
 prog: TUPLE VAR OR VAR UNION 
 ##
-## Ends in an error in state: 55.
+## Ends in an error in state: 54.
 ##
 ## exp -> exp . ADD exp [ XOR WHEN VARTUPLE VAR THEN SUB RPAREN RBRACK RANGE OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL EOF END ELSE DIV COMMA COLON AND ADD ]
 ## exp -> exp . SUB exp [ XOR WHEN VARTUPLE VAR THEN SUB RPAREN RBRACK RANGE OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL EOF END ELSE DIV COMMA COLON AND ADD ]
@@ -2299,7 +2293,7 @@ prog: TUPLE VAR OR VAR UNION
 ##
 prog: TUPLE VAR SUB VAR UNION 
 ##
-## Ends in an error in state: 30.
+## Ends in an error in state: 29.
 ##
 ## exp -> exp . ADD exp [ XOR WHEN VARTUPLE VAR THEN SUB RPAREN RBRACK RANGE OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL EOF END ELSE DIV COMMA COLON AND ADD ]
 ## exp -> exp . SUB exp [ XOR WHEN VARTUPLE VAR THEN SUB RPAREN RBRACK RANGE OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL EOF END ELSE DIV COMMA COLON AND ADD ]
@@ -2325,7 +2319,7 @@ prog: TUPLE VAR SUB VAR UNION
 ##
 prog: TUPLE VAR XOR VAR UNION 
 ##
-## Ends in an error in state: 28.
+## Ends in an error in state: 27.
 ##
 ## exp -> exp . ADD exp [ XOR WHEN VARTUPLE VAR THEN SUB RPAREN RBRACK RANGE OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL EOF END ELSE DIV COMMA COLON AND ADD ]
 ## exp -> exp . SUB exp [ XOR WHEN VARTUPLE VAR THEN SUB RPAREN RBRACK RANGE OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL EOF END ELSE DIV COMMA COLON AND ADD ]
@@ -2356,7 +2350,7 @@ Instead, found $0.
 
 prog: TUPLE VAR ADD XOR 
 ##
-## Ends in an error in state: 37.
+## Ends in an error in state: 36.
 ##
 ## exp -> exp ADD . exp [ XOR WHEN VARTUPLE VAR THEN SUB RPAREN RBRACK RANGE OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL EOF END ELSE DIV COMMA COLON AND ADD ]
 ##
@@ -2365,7 +2359,7 @@ prog: TUPLE VAR ADD XOR
 ##
 prog: TUPLE VAR AND XOR 
 ##
-## Ends in an error in state: 56.
+## Ends in an error in state: 55.
 ##
 ## exp -> exp AND . exp [ XOR WHEN VARTUPLE VAR THEN SUB RPAREN RBRACK RANGE OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL EOF END ELSE DIV COMMA COLON AND ADD ]
 ##
@@ -2374,7 +2368,7 @@ prog: TUPLE VAR AND XOR
 ##
 prog: TUPLE VAR DIV XOR 
 ##
-## Ends in an error in state: 35.
+## Ends in an error in state: 34.
 ##
 ## exp -> exp DIV . exp [ XOR WHEN VARTUPLE VAR THEN SUB RPAREN RBRACK RANGE OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL EOF END ELSE DIV COMMA COLON AND ADD ]
 ##
@@ -2383,7 +2377,7 @@ prog: TUPLE VAR DIV XOR
 ##
 prog: TUPLE VAR EQUAL XOR 
 ##
-## Ends in an error in state: 51.
+## Ends in an error in state: 50.
 ##
 ## exp -> exp EQUAL . exp [ XOR WHEN VARTUPLE VAR THEN SUB RPAREN RBRACK RANGE OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL EOF END ELSE DIV COMMA COLON AND ADD ]
 ##
@@ -2392,7 +2386,7 @@ prog: TUPLE VAR EQUAL XOR
 ##
 prog: TUPLE VAR EQUIV XOR 
 ##
-## Ends in an error in state: 60.
+## Ends in an error in state: 59.
 ##
 ## exp -> exp EQUIV . exp [ XOR WHEN VARTUPLE VAR THEN SUB RPAREN RBRACK RANGE OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL EOF END ELSE DIV COMMA COLON AND ADD ]
 ##
@@ -2401,7 +2395,7 @@ prog: TUPLE VAR EQUIV XOR
 ##
 prog: TUPLE VAR GE XOR 
 ##
-## Ends in an error in state: 49.
+## Ends in an error in state: 48.
 ##
 ## exp -> exp GE . exp [ XOR WHEN VARTUPLE VAR THEN SUB RPAREN RBRACK RANGE OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL EOF END ELSE DIV COMMA COLON AND ADD ]
 ##
@@ -2410,7 +2404,7 @@ prog: TUPLE VAR GE XOR
 ##
 prog: TUPLE VAR GT XOR 
 ##
-## Ends in an error in state: 47.
+## Ends in an error in state: 46.
 ##
 ## exp -> exp GT . exp [ XOR WHEN VARTUPLE VAR THEN SUB RPAREN RBRACK RANGE OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL EOF END ELSE DIV COMMA COLON AND ADD ]
 ##
@@ -2419,7 +2413,7 @@ prog: TUPLE VAR GT XOR
 ##
 prog: TUPLE VAR IMPLIES XOR 
 ##
-## Ends in an error in state: 58.
+## Ends in an error in state: 57.
 ##
 ## exp -> exp IMPLIES . exp [ XOR WHEN VARTUPLE VAR THEN SUB RPAREN RBRACK RANGE OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL EOF END ELSE DIV COMMA COLON AND ADD ]
 ##
@@ -2428,7 +2422,7 @@ prog: TUPLE VAR IMPLIES XOR
 ##
 prog: TUPLE VAR LE XOR 
 ##
-## Ends in an error in state: 43.
+## Ends in an error in state: 42.
 ##
 ## exp -> exp LE . exp [ XOR WHEN VARTUPLE VAR THEN SUB RPAREN RBRACK RANGE OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL EOF END ELSE DIV COMMA COLON AND ADD ]
 ##
@@ -2437,7 +2431,7 @@ prog: TUPLE VAR LE XOR
 ##
 prog: TUPLE VAR LT XOR 
 ##
-## Ends in an error in state: 41.
+## Ends in an error in state: 40.
 ##
 ## exp -> exp LT . exp [ XOR WHEN VARTUPLE VAR THEN SUB RPAREN RBRACK RANGE OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL EOF END ELSE DIV COMMA COLON AND ADD ]
 ##
@@ -2446,7 +2440,7 @@ prog: TUPLE VAR LT XOR
 ##
 prog: TUPLE VAR MOD XOR 
 ##
-## Ends in an error in state: 33.
+## Ends in an error in state: 32.
 ##
 ## exp -> exp MOD . exp [ XOR WHEN VARTUPLE VAR THEN SUB RPAREN RBRACK RANGE OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL EOF END ELSE DIV COMMA COLON AND ADD ]
 ##
@@ -2455,7 +2449,7 @@ prog: TUPLE VAR MOD XOR
 ##
 prog: TUPLE VAR MUL XOR 
 ##
-## Ends in an error in state: 31.
+## Ends in an error in state: 30.
 ##
 ## exp -> exp MUL . exp [ XOR WHEN VARTUPLE VAR THEN SUB RPAREN RBRACK RANGE OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL EOF END ELSE DIV COMMA COLON AND ADD ]
 ##
@@ -2464,7 +2458,7 @@ prog: TUPLE VAR MUL XOR
 ##
 prog: TUPLE VAR NOTEQUAL XOR 
 ##
-## Ends in an error in state: 39.
+## Ends in an error in state: 38.
 ##
 ## exp -> exp NOTEQUAL . exp [ XOR WHEN VARTUPLE VAR THEN SUB RPAREN RBRACK RANGE OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL EOF END ELSE DIV COMMA COLON AND ADD ]
 ##
@@ -2473,7 +2467,7 @@ prog: TUPLE VAR NOTEQUAL XOR
 ##
 prog: TUPLE VAR OR XOR 
 ##
-## Ends in an error in state: 54.
+## Ends in an error in state: 53.
 ##
 ## exp -> exp OR . exp [ XOR WHEN VARTUPLE VAR THEN SUB RPAREN RBRACK RANGE OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL EOF END ELSE DIV COMMA COLON AND ADD ]
 ##
@@ -2482,7 +2476,7 @@ prog: TUPLE VAR OR XOR
 ##
 prog: TUPLE VAR SUB XOR 
 ##
-## Ends in an error in state: 29.
+## Ends in an error in state: 28.
 ##
 ## exp -> exp SUB . exp [ XOR WHEN VARTUPLE VAR THEN SUB RPAREN RBRACK RANGE OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL EOF END ELSE DIV COMMA COLON AND ADD ]
 ##
@@ -2491,7 +2485,7 @@ prog: TUPLE VAR SUB XOR
 ##
 prog: TUPLE VAR XOR XOR 
 ##
-## Ends in an error in state: 27.
+## Ends in an error in state: 26.
 ##
 ## exp -> exp XOR . exp [ XOR WHEN VARTUPLE VAR THEN SUB RPAREN RBRACK RANGE OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL EOF END ELSE DIV COMMA COLON AND ADD ]
 ##
@@ -2505,81 +2499,65 @@ an expression on its right; instead, got the following statement:
 
 prog: TUPLE VAR WHEN 
 ##
-## Ends in an error in state: 116.
+## Ends in an error in state: 85.
 ##
-## exp -> exp . ADD exp [ XOR SUB RPAREN OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COMMA AND ADD ]
-## exp -> exp . SUB exp [ XOR SUB RPAREN OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COMMA AND ADD ]
-## exp -> exp . MUL exp [ XOR SUB RPAREN OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COMMA AND ADD ]
-## exp -> exp . DIV exp [ XOR SUB RPAREN OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COMMA AND ADD ]
-## exp -> exp . MOD exp [ XOR SUB RPAREN OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COMMA AND ADD ]
-## exp -> exp . AND exp [ XOR SUB RPAREN OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COMMA AND ADD ]
-## exp -> exp . OR exp [ XOR SUB RPAREN OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COMMA AND ADD ]
-## exp -> exp . XOR exp [ XOR SUB RPAREN OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COMMA AND ADD ]
-## exp -> exp . IMPLIES exp [ XOR SUB RPAREN OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COMMA AND ADD ]
-## exp -> exp . EQUIV exp [ XOR SUB RPAREN OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COMMA AND ADD ]
-## exp -> exp . EQUAL exp [ XOR SUB RPAREN OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COMMA AND ADD ]
-## exp -> exp . NOTEQUAL exp [ XOR SUB RPAREN OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COMMA AND ADD ]
-## exp -> exp . LT exp [ XOR SUB RPAREN OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COMMA AND ADD ]
-## exp -> exp . LE exp [ XOR SUB RPAREN OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COMMA AND ADD ]
-## exp -> exp . GT exp [ XOR SUB RPAREN OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COMMA AND ADD ]
-## exp -> exp . GE exp [ XOR SUB RPAREN OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COMMA AND ADD ]
-## exp -> exp . IN exp [ XOR SUB RPAREN OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COMMA AND ADD ]
-## term_or_exp -> exp . [ RPAREN COMMA ]
+## term -> TUPLE comma_list(exp) . RPAREN [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN RBRACK OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COMMA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ##
 ## The known suffix of the stack is as follows:
-## exp 
+## TUPLE comma_list(exp) 
+##
+## WARNING: This example involves spurious reductions.
+## This implies that, although the LR(1) items shown above provide an
+## accurate view of the past (what has been recognized so far), they
+## may provide an INCOMPLETE view of the future (what was expected next).
+## In state 80, spurious reduction of production comma_list(exp) -> exp 
 ##
 
-The expression
+At this point, either finish the tuple-term with ')' or use ',' to
+continue the comma-separated list of terms started by:
     $1
-cannot continue with the statement
+Instead, the following statement were read:
     $0
-Expected a continuation of the expression (with +,and,...)
 
 prog: TUPLE TERM XOR 
 ##
-## Ends in an error in state: 117.
+## Ends in an error in state: 77.
 ##
-## clause -> TUPLE separated_nonempty_list(COMMA,term_or_exp) . RPAREN [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
+## comma_list(term) -> term . [ RPAREN RBRACK ]
+## comma_list(term) -> term . COMMA comma_list(term) [ RPAREN RBRACK ]
 ##
 ## The known suffix of the stack is as follows:
-## TUPLE separated_nonempty_list(COMMA,term_or_exp) 
-##
-## WARNING: This example involves spurious reductions.
-## This implies that, although the LR(1) items shown above provide an
-## accurate view of the past (what has been recognized so far), they
-## may provide an INCOMPLETE view of the future (what was expected next).
-## In state 113, spurious reduction of production separated_nonempty_list(COMMA,term_or_exp) -> term_or_exp 
+## term 
 ##
 prog: VARTUPLE TERM RBRACK 
 ##
-## Ends in an error in state: 109.
+## Ends in an error in state: 114.
 ##
-## var_decl -> VARTUPLE separated_nonempty_list(COMMA,TERM) . RPAREN [ XOR WHEN VARTUPLE VAR TUPLE TOP THEN TERM SUB RPAREN RBRACK RANGE OR NOTEQUAL NOT MUL MOD LT LPAREN LET LE INT IN IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COMMA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND AFFECT ADD ]
+## global_var -> VARTUPLE comma_list(term) . RPAREN [ XOR WHEN VARTUPLE VAR TUPLE TOP THEN TERM SUB RPAREN RBRACK RANGE OR NOTEQUAL NOT MUL MOD LT LPAREN LET LE INT IN IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COMMA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND AFFECT ADD ]
 ##
 ## The known suffix of the stack is as follows:
-## VARTUPLE separated_nonempty_list(COMMA,TERM) 
+## VARTUPLE comma_list(term) 
 ##
 ## WARNING: This example involves spurious reductions.
 ## This implies that, although the LR(1) items shown above provide an
 ## accurate view of the past (what has been recognized so far), they
 ## may provide an INCOMPLETE view of the future (what was expected next).
-## In state 12, spurious reduction of production separated_nonempty_list(COMMA,TERM) -> TERM 
+## In state 77, spurious reduction of production comma_list(term) -> term 
 ##
 prog: VARTUPLE VAR VARTUPLE 
 ##
-## Ends in an error in state: 107.
+## Ends in an error in state: 116.
 ##
-## var_decl -> VARTUPLE separated_nonempty_list(COMMA,exp) . RPAREN [ XOR WHEN VARTUPLE VAR TUPLE TOP THEN TERM SUB RPAREN RBRACK RANGE OR NOTEQUAL NOT MUL MOD LT LPAREN LET LE INT IN IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COMMA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND AFFECT ADD ]
+## global_var -> VARTUPLE comma_list(exp) . RPAREN [ XOR WHEN VARTUPLE VAR TUPLE TOP THEN TERM SUB RPAREN RBRACK RANGE OR NOTEQUAL NOT MUL MOD LT LPAREN LET LE INT IN IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COMMA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND AFFECT ADD ]
 ##
 ## The known suffix of the stack is as follows:
-## VARTUPLE separated_nonempty_list(COMMA,exp) 
+## VARTUPLE comma_list(exp) 
 ##
 ## WARNING: This example involves spurious reductions.
 ## This implies that, although the LR(1) items shown above provide an
 ## accurate view of the past (what has been recognized so far), they
 ## may provide an INCOMPLETE view of the future (what was expected next).
-## In state 88, spurious reduction of production separated_nonempty_list(COMMA,exp) -> exp 
+## In state 80, spurious reduction of production comma_list(exp) -> exp 
 ##
 
 At this point, the $2 definition either expects a closing ')'
@@ -2591,17 +2569,18 @@ prog: VARTUPLE XOR
 ##
 ## Ends in an error in state: 1.
 ##
-## var_decl -> VARTUPLE . separated_nonempty_list(COMMA,exp) RPAREN [ XOR WHEN VARTUPLE VAR TUPLE TOP THEN TERM SUB RPAREN RBRACK RANGE OR NOTEQUAL NOT MUL MOD LT LPAREN LET LE INT IN IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COMMA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND AFFECT ADD ]
-## var_decl -> VARTUPLE . separated_nonempty_list(COMMA,TERM) RPAREN [ XOR WHEN VARTUPLE VAR TUPLE TOP THEN TERM SUB RPAREN RBRACK RANGE OR NOTEQUAL NOT MUL MOD LT LPAREN LET LE INT IN IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COMMA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND AFFECT ADD ]
+## global_var -> VARTUPLE . comma_list(exp) RPAREN [ XOR WHEN VARTUPLE VAR TUPLE TOP THEN TERM SUB RPAREN RBRACK RANGE OR NOTEQUAL NOT MUL MOD LT LPAREN LET LE INT IN IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COMMA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND AFFECT ADD ]
+## global_var -> VARTUPLE . comma_list(term) RPAREN [ XOR WHEN VARTUPLE VAR TUPLE TOP THEN TERM SUB RPAREN RBRACK RANGE OR NOTEQUAL NOT MUL MOD LT LPAREN LET LE INT IN IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COMMA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND AFFECT ADD ]
 ##
 ## The known suffix of the stack is as follows:
 ## VARTUPLE 
 ##
 prog: TUPLE XOR 
 ##
-## Ends in an error in state: 111.
+## Ends in an error in state: 12.
 ##
-## clause -> TUPLE . separated_nonempty_list(COMMA,term_or_exp) RPAREN [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
+## term -> TUPLE . comma_list(term) RPAREN [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN RBRACK OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COMMA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
+## term -> TUPLE . comma_list(exp) RPAREN [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN RBRACK OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COMMA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ##
 ## The known suffix of the stack is as follows:
 ## TUPLE 
@@ -2614,7 +2593,7 @@ Instead, the following statement were read:
 
 prog: VAR ADD VAR WHEN 
 ##
-## Ends in an error in state: 184.
+## Ends in an error in state: 183.
 ##
 ## clause -> clause . ADD clause [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ## clause -> clause ADD clause . [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
@@ -2638,7 +2617,7 @@ prog: VAR ADD VAR WHEN
 ##
 prog: VAR AND VAR WHEN 
 ##
-## Ends in an error in state: 200.
+## Ends in an error in state: 199.
 ##
 ## clause -> clause . ADD clause [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ## clause -> clause . SUB clause [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
@@ -2662,7 +2641,7 @@ prog: VAR AND VAR WHEN
 ##
 prog: VAR EQUAL VAR WHEN 
 ##
-## Ends in an error in state: 196.
+## Ends in an error in state: 195.
 ##
 ## clause -> clause . ADD clause [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ## clause -> clause . SUB clause [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
@@ -2686,7 +2665,7 @@ prog: VAR EQUAL VAR WHEN
 ##
 prog: VAR EQUIV VAR WHEN 
 ##
-## Ends in an error in state: 204.
+## Ends in an error in state: 203.
 ##
 ## clause -> clause . ADD clause [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ## clause -> clause . SUB clause [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
@@ -2710,7 +2689,7 @@ prog: VAR EQUIV VAR WHEN
 ##
 prog: VAR GE VAR WHEN 
 ##
-## Ends in an error in state: 194.
+## Ends in an error in state: 193.
 ##
 ## clause -> clause . ADD clause [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ## clause -> clause . SUB clause [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
@@ -2734,7 +2713,7 @@ prog: VAR GE VAR WHEN
 ##
 prog: VAR GT VAR WHEN 
 ##
-## Ends in an error in state: 192.
+## Ends in an error in state: 191.
 ##
 ## clause -> clause . ADD clause [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ## clause -> clause . SUB clause [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
@@ -2758,7 +2737,7 @@ prog: VAR GT VAR WHEN
 ##
 prog: VAR IMPLIES VAR WHEN 
 ##
-## Ends in an error in state: 202.
+## Ends in an error in state: 201.
 ##
 ## clause -> clause . ADD clause [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ## clause -> clause . SUB clause [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
@@ -2782,7 +2761,7 @@ prog: VAR IMPLIES VAR WHEN
 ##
 prog: VAR LE VAR WHEN 
 ##
-## Ends in an error in state: 190.
+## Ends in an error in state: 189.
 ##
 ## clause -> clause . ADD clause [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ## clause -> clause . SUB clause [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
@@ -2806,7 +2785,7 @@ prog: VAR LE VAR WHEN
 ##
 prog: VAR LT VAR WHEN 
 ##
-## Ends in an error in state: 188.
+## Ends in an error in state: 187.
 ##
 ## clause -> clause . ADD clause [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ## clause -> clause . SUB clause [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
@@ -2830,7 +2809,7 @@ prog: VAR LT VAR WHEN
 ##
 prog: VAR NOTEQUAL VAR WHEN 
 ##
-## Ends in an error in state: 186.
+## Ends in an error in state: 185.
 ##
 ## clause -> clause . ADD clause [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ## clause -> clause . SUB clause [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
@@ -2854,7 +2833,7 @@ prog: VAR NOTEQUAL VAR WHEN
 ##
 prog: VAR OR VAR WHEN 
 ##
-## Ends in an error in state: 198.
+## Ends in an error in state: 197.
 ##
 ## clause -> clause . ADD clause [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ## clause -> clause . SUB clause [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
@@ -2878,7 +2857,7 @@ prog: VAR OR VAR WHEN
 ##
 prog: VAR SUB VAR WHEN 
 ##
-## Ends in an error in state: 242.
+## Ends in an error in state: 241.
 ##
 ## clause -> SUB clause . [ XOR VARTUPLE VAR TUPLE TOP TERM SUB OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF DIV DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ## clause -> clause . ADD clause [ XOR VARTUPLE VAR TUPLE TOP TERM SUB OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF DIV DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
@@ -2903,7 +2882,7 @@ prog: VAR SUB VAR WHEN
 ##
 prog: VAR WHEN 
 ##
-## Ends in an error in state: 240.
+## Ends in an error in state: 239.
 ##
 ## clause -> clause . ADD clause [ XOR VARTUPLE VAR TUPLE TOP TERM SUB OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF DIV DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ## clause -> clause . SUB clause [ XOR VARTUPLE VAR TUPLE TOP TERM SUB OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF DIV DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
@@ -2927,7 +2906,7 @@ prog: VAR WHEN
 ##
 prog: VAR XOR VAR WHEN 
 ##
-## Ends in an error in state: 176.
+## Ends in an error in state: 175.
 ##
 ## clause -> clause . ADD clause [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ## clause -> clause . SUB clause [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
@@ -2951,7 +2930,7 @@ prog: VAR XOR VAR WHEN
 ##
 prog: LPAREN VAR WHEN 
 ##
-## Ends in an error in state: 219.
+## Ends in an error in state: 218.
 ##
 ## clause -> LPAREN clause . RPAREN [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ## clause -> clause . ADD clause [ XOR SUB RPAREN OR NOTEQUAL MUL LT LE IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
@@ -2982,7 +2961,7 @@ Instead, the following statement were read:
 
 prog: NOT VAR WHEN 
 ##
-## Ends in an error in state: 221.
+## Ends in an error in state: 220.
 ##
 ## clause -> clause . ADD clause [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ## clause -> clause . SUB clause [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
@@ -3014,7 +2993,7 @@ strictly equivalent to a logical 'and'.
 
 prog: VAR ADD XOR 
 ##
-## Ends in an error in state: 183.
+## Ends in an error in state: 182.
 ##
 ## clause -> clause ADD . clause [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ##
@@ -3023,7 +3002,7 @@ prog: VAR ADD XOR
 ##
 prog: VAR AND XOR 
 ##
-## Ends in an error in state: 199.
+## Ends in an error in state: 198.
 ##
 ## clause -> clause AND . clause [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ##
@@ -3032,7 +3011,7 @@ prog: VAR AND XOR
 ##
 prog: VAR DIV XOR 
 ##
-## Ends in an error in state: 181.
+## Ends in an error in state: 180.
 ##
 ## clause -> clause DIV . clause [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ##
@@ -3041,7 +3020,7 @@ prog: VAR DIV XOR
 ##
 prog: VAR EQUAL XOR 
 ##
-## Ends in an error in state: 195.
+## Ends in an error in state: 194.
 ##
 ## clause -> clause EQUAL . clause [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ##
@@ -3050,7 +3029,7 @@ prog: VAR EQUAL XOR
 ##
 prog: VAR EQUIV XOR 
 ##
-## Ends in an error in state: 203.
+## Ends in an error in state: 202.
 ##
 ## clause -> clause EQUIV . clause [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ##
@@ -3059,7 +3038,7 @@ prog: VAR EQUIV XOR
 ##
 prog: VAR GE XOR 
 ##
-## Ends in an error in state: 193.
+## Ends in an error in state: 192.
 ##
 ## clause -> clause GE . clause [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ##
@@ -3068,7 +3047,7 @@ prog: VAR GE XOR
 ##
 prog: VAR GT XOR 
 ##
-## Ends in an error in state: 191.
+## Ends in an error in state: 190.
 ##
 ## clause -> clause GT . clause [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ##
@@ -3077,7 +3056,7 @@ prog: VAR GT XOR
 ##
 prog: VAR IMPLIES XOR 
 ##
-## Ends in an error in state: 201.
+## Ends in an error in state: 200.
 ##
 ## clause -> clause IMPLIES . clause [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ##
@@ -3086,7 +3065,7 @@ prog: VAR IMPLIES XOR
 ##
 prog: VAR LE XOR 
 ##
-## Ends in an error in state: 189.
+## Ends in an error in state: 188.
 ##
 ## clause -> clause LE . clause [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ##
@@ -3095,7 +3074,7 @@ prog: VAR LE XOR
 ##
 prog: VAR LT XOR 
 ##
-## Ends in an error in state: 187.
+## Ends in an error in state: 186.
 ##
 ## clause -> clause LT . clause [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ##
@@ -3104,7 +3083,7 @@ prog: VAR LT XOR
 ##
 prog: VAR MUL XOR 
 ##
-## Ends in an error in state: 179.
+## Ends in an error in state: 178.
 ##
 ## clause -> clause MUL . clause [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ##
@@ -3113,7 +3092,7 @@ prog: VAR MUL XOR
 ##
 prog: VAR NOTEQUAL XOR 
 ##
-## Ends in an error in state: 185.
+## Ends in an error in state: 184.
 ##
 ## clause -> clause NOTEQUAL . clause [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ##
@@ -3122,7 +3101,7 @@ prog: VAR NOTEQUAL XOR
 ##
 prog: VAR OR XOR 
 ##
-## Ends in an error in state: 197.
+## Ends in an error in state: 196.
 ##
 ## clause -> clause OR . clause [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ##
@@ -3131,7 +3110,7 @@ prog: VAR OR XOR
 ##
 prog: VAR SUB XOR 
 ##
-## Ends in an error in state: 241.
+## Ends in an error in state: 240.
 ##
 ## clause -> SUB . clause [ XOR VARTUPLE VAR TUPLE TOP TERM SUB OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF DIV DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ## clause -> clause SUB . clause [ XOR VARTUPLE VAR TUPLE TOP TERM SUB OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF DIV DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
@@ -3141,7 +3120,7 @@ prog: VAR SUB XOR
 ##
 prog: VAR XOR XOR 
 ##
-## Ends in an error in state: 175.
+## Ends in an error in state: 174.
 ##
 ## clause -> clause XOR . clause [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ##
@@ -3150,7 +3129,7 @@ prog: VAR XOR XOR
 ##
 prog: NOT VAR SUB XOR 
 ##
-## Ends in an error in state: 177.
+## Ends in an error in state: 176.
 ##
 ## clause -> clause SUB . clause [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ##
@@ -3165,24 +3144,15 @@ which does not seem to be a formula continuation.
 
 prog: VARTUPLE TERM COMMA XOR 
 ##
-## Ends in an error in state: 13.
+## Ends in an error in state: 78.
 ##
-## separated_nonempty_list(COMMA,TERM) -> TERM COMMA . separated_nonempty_list(COMMA,TERM) [ RPAREN RBRACK ]
-##
-## The known suffix of the stack is as follows:
-## TERM COMMA 
-##
-prog: TUPLE VAR COMMA XOR 
-##
-## Ends in an error in state: 114.
-##
-## separated_nonempty_list(COMMA,term_or_exp) -> term_or_exp COMMA . separated_nonempty_list(COMMA,term_or_exp) [ RPAREN ]
+## comma_list(term) -> term COMMA . comma_list(term) [ RPAREN RBRACK ]
 ##
 ## The known suffix of the stack is as follows:
-## term_or_exp COMMA 
+## term COMMA 
 ##
 
-Either finish the list with a ')' or continue the expression list with a comma.
+At this point, a 
 Instead, the following statement were read:
     $0
 
