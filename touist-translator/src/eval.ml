@@ -150,10 +150,12 @@ and eval_prog ast env =
     | x::xs -> And (x, loop xs)
   in
   match ast with
-  | Prog (formulas, None) -> eval_ast_no_astansion (loop formulas) env
-  | Prog (formulas, Some decl) ->
+  | Touist_code (formulas, None) -> eval_ast_no_astansion (loop formulas) env
+  | Touist_code (formulas, Some decl) ->
       List.iter (fun x -> eval_affect x env) decl;
       eval_ast_no_astansion (loop formulas) env
+  | e -> raise (Error ("this does not seem to be a touist code structure: " ^ string_of_ast e))
+
 
 and eval_affect ast env =
   match ast with

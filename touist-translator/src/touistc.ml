@@ -106,7 +106,7 @@ let print_position outx lexbuf =
  * [ast] means it is of type Syntax.prog,
  * i.e. the "root" type in lexer.mll
  *)
-let evaluate (ast:Syntax.prog) : Syntax.ast =
+let evaluate (ast:Syntax.ast) : Syntax.ast =
   try Eval.eval ast [] with
   | Eval.Error msg ->
     Printf.fprintf stderr "%s\n" msg;
@@ -153,10 +153,10 @@ let lexer buffer : (Lexing.lexbuf -> Parser.token) =
     needed by menhirlib (just for error handling) contains
     "foo.touistl"... For now, the name of the input file name is not
     indicated to the user: useless because we only handle a single touistl file *)
-let invoke_parser (text:string) (lexer:Lexing.lexbuf -> Parser.token) (buffer) : Syntax.prog =
+let invoke_parser (text:string) (lexer:Lexing.lexbuf -> Parser.token) (buffer) : Syntax.ast =
   let lexbuf = Lexing.from_string text in
   lexbuf.lex_curr_p <- {lexbuf.lex_curr_p with pos_fname = "foo.touistl"; pos_lnum = 1};
-  let checkpoint = Parser.Incremental.prog lexbuf.lex_curr_p
+  let checkpoint = Parser.Incremental.touist_code lexbuf.lex_curr_p
   and supplier = Parser.MenhirInterpreter.lexer_lexbuf_to_supplier lexer lexbuf
   and succeed ast = ast
   and fail checkpoint =
