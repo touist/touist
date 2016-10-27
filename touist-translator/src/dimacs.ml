@@ -163,10 +163,11 @@ end
    to do so, we add a clause that take the negation of the valuations
    E.g: with the model a=1, b=0 we must add the clause -a or b.
    [counter_clause] will produce a list of literals that corresponds
-   to this clause.
+   to this clause. [counter_current_model] then adds the clause to the problem.
    IMPORTANT: When adding the counter-clause, the problem can become unsat.
-   [next_model] returns false if the added clause makes the formula unsat. *)
-let next_model instance (table:(Lit.t,string) Hashtbl.t) : bool =
+   [counter_current_model] returns false if the added clause makes the
+   formula unsat right away. *)
+let counter_current_model instance (table:(Lit.t,string) Hashtbl.t) : bool =
  let counter_clause (l:Lit.t) _ acc = match Minisat.value instance l with
   | V_true -> (Minisat.Lit.neg l)::acc | V_false -> l::acc | _ -> acc
  in let counter_clause = Hashtbl.fold counter_clause table []
@@ -208,27 +209,32 @@ let equivalent_models set1 set2 = ModelSet.equal set1 set2
 *)
 (* limit is the limit of number of models you allow to be fetched.
    When limit = 0, all models will be fetched. *)
+let count = ref 0
 let find_models ?limit:(limit=0) cnf : (Lit.t,string) Hashtbl.t * (ModelSet.t ref) =
   let instance,table = minisat_of_cnf cnf in
-  let models = ref ModelSet.empty in
+  let models = ref ModelSet.empty in (* for returning the models found *)
+  (* searching for duplicate is slow on ModelSet. For checking a model hasn't
+     appeared already, I use a way faster Hashtbl, ass it won't check on every
+     single literal but compute a hash of the model) *)
+  let models_hash = (Hashtbl.create 100) in
   let rec solve_loop limit i =
-    if not (i<limit || limit==0)
+    if not (i<limit || limit==0) (* limit=0 means no limit *)
     || not (Minisat.Raw.simplify instance)
     || not (Minisat.Raw.solve instance [||])
     then models
     else
-      let model = (Model.model_of_instance instance table)
-      and has_next_model = next_model instance table in
-      let is_duplicate = ModelSet.mem model !models in
-      if is_duplicate
-      then solve_loop limit i
-      else
-        begin
-          models := ModelSet.add model !models;
-          match is_duplicate,has_next_model with
-          | true,false -> models   (* duplicate and no next model *)
-          | true,true  -> solve_loop limit i (* duplicate but has next *)
-          | false, true -> solve_loop limit (i+1)
-          | false, false -> models
-        end
+      let model = Model.model_of_instance instance table
+      and has_next_model = counter_current_model instance table in
+      let is_duplicate = Hashtbl.mem models_hash model in 
+      count := (!count + 1); if not is_duplicate then print_endline ((string_of_bool is_duplicate) ^" " ^(string_of_int !count));
+      match is_duplicate,has_next_model with
+      | true,false -> models (* is duplicate and no next model *)
+      | true,true  -> solve_loop limit i (* is duplicate but has next *)
+      | false, true ->  (* both not duplicate and has next *)
+        models := ModelSet.add model !models;
+        Hashtbl.add models_hash model ();
+        solve_loop  limit (i+1)
+      | false, false -> (* is not duplicate and no next model *)
+        models := ModelSet.add model !models;
+        models
   in table, solve_loop limit 0
