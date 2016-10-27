@@ -141,9 +141,9 @@ let bool_bin_op b1 b2 op repr =
 let extenv = Hashtbl.create 10
 
 let rec eval ast env =
-  eval_prog ast env
+  eval_touist_code ast env
 
-and eval_prog ast env =
+and eval_touist_code ast env =
   let rec loop = function
     | []    -> raise (Error ("no formulas"))
     | [x]   -> x
