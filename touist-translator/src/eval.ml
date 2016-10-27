@@ -150,10 +150,10 @@ and eval_prog ast env =
     | x::xs -> And (x, loop xs)
   in
   match ast with
-  | Touist_code (formulas, None) -> eval_ast_no_astansion (loop formulas) env
+  | Touist_code (formulas, None) -> eval_ast_no_expansion (loop formulas) env
   | Touist_code (formulas, Some decl) ->
       List.iter (fun x -> eval_affect x env) decl;
-      eval_ast_no_astansion (loop formulas) env
+      eval_ast_no_expansion (loop formulas) env
   | e -> raise (Error ("this does not seem to be a touist code structure: " ^ string_of_ast e))
 
 
@@ -497,13 +497,13 @@ and eval_set set_decl env =
       "    ["^(string_of_ast_list ", " set_as_list)^"]\n"^
       "the following element has type '"^(string_of_ast_type x)^"':\n"^
       "    "^(string_of_ast x)))
-and eval_ast_no_astansion ast env =
+and eval_ast_no_expansion ast env =
   match ast with
   | Int x   -> Int x
   | Float x -> Float x
   | Neg x ->
       begin
-        match eval_ast_no_astansion x env with
+        match eval_ast_no_expansion x env with
         | Int   x' -> Int   (- x')
         | Float x' -> Float (-. x')
         | x' -> Neg x'
@@ -511,7 +511,7 @@ and eval_ast_no_astansion ast env =
       end
   | Add (x,y) ->
       begin
-        match eval_ast_no_astansion x env, eval_ast_no_astansion y env with
+        match eval_ast_no_expansion x env, eval_ast_no_expansion y env with
         | Int x', Int y'     -> Int   (x' +  y')
         | Float x', Float y' -> Float (x' +. y')
         | Int _, Term _
@@ -521,7 +521,7 @@ and eval_ast_no_astansion ast env =
       end
   | Sub (x,y) ->
       begin
-        match eval_ast_no_astansion x env, eval_ast_no_astansion y env with
+        match eval_ast_no_expansion x env, eval_ast_no_expansion y env with
         | Int x', Int y'     -> Int   (x' -  y')
         | Float x', Float y' -> Float (x' -. y')
         (*| Term x', Term y' -> Sub (Term x', Term y')*)
@@ -530,7 +530,7 @@ and eval_ast_no_astansion ast env =
       end
   | Mul (x,y) ->
       begin
-        match eval_ast_no_astansion x env, eval_ast_no_astansion y env with
+        match eval_ast_no_expansion x env, eval_ast_no_expansion y env with
         | Int x', Int y'     -> Int   (x' *  y')
         | Float x', Float y' -> Float (x' *. y')
         | x', y' -> Mul (x', y')
@@ -538,18 +538,18 @@ and eval_ast_no_astansion ast env =
       end
   | Div (x,y) ->
       begin
-        match eval_ast_no_astansion x env, eval_ast_no_astansion y env with
+        match eval_ast_no_expansion x env, eval_ast_no_expansion y env with
         | Int x', Int y'     -> Int   (x' /  y')
         | Float x', Float y' -> Float (x' /. y')
         | x', y' -> Div (x', y')
         (*| _,_ -> raise (Error (string_of_ast ast))*)
       end
-  | Equal            (x,y) -> Equal            (eval_ast_no_astansion x env, eval_ast_no_astansion y env)
-  | Not_equal        (x,y) -> Not_equal        (eval_ast_no_astansion x env, eval_ast_no_astansion y env)
-  | Lesser_than      (x,y) -> Lesser_than      (eval_ast_no_astansion x env, eval_ast_no_astansion y env)
-  | Lesser_or_equal  (x,y) -> Lesser_or_equal  (eval_ast_no_astansion x env, eval_ast_no_astansion y env)
-  | Greater_than     (x,y) -> Greater_than     (eval_ast_no_astansion x env, eval_ast_no_astansion y env)
-  | Greater_or_equal (x,y) -> Greater_or_equal (eval_ast_no_astansion x env, eval_ast_no_astansion y env)
+  | Equal            (x,y) -> Equal            (eval_ast_no_expansion x env, eval_ast_no_expansion y env)
+  | Not_equal        (x,y) -> Not_equal        (eval_ast_no_expansion x env, eval_ast_no_expansion y env)
+  | Lesser_than      (x,y) -> Lesser_than      (eval_ast_no_expansion x env, eval_ast_no_expansion y env)
+  | Lesser_or_equal  (x,y) -> Lesser_or_equal  (eval_ast_no_expansion x env, eval_ast_no_expansion y env)
+  | Greater_than     (x,y) -> Greater_than     (eval_ast_no_expansion x env, eval_ast_no_expansion y env)
+  | Greater_or_equal (x,y) -> Greater_or_equal (eval_ast_no_expansion x env, eval_ast_no_expansion y env)
   | Top    -> Top
   | Bottom -> Bottom
   | Term x -> Term ((expand_var_name x env), None)
@@ -613,29 +613,29 @@ and eval_ast_no_astansion ast env =
                 "But the content of the variable '"^prefix^"' has type '"^(string_of_ast_type x'')^"':\n"^
                 "    "^(string_of_ast x'')^"\n'"^
                 "which is not a term or a number, so it cannot be expanded as explained above."))
-          in eval_ast_no_astansion (Term ((string_of_ast term), Some indices)) env
+          in eval_ast_no_expansion (Term ((string_of_ast term), Some indices)) env
       (* Case 5. the variable was of the form '$v(1,2,3)' and was not declared
          and '$v' is not either declared, so we can safely guess that this var has not been declared. *)
       with Not_found -> raise (Error ("'" ^ name ^ "' has not been declared"))
     end
   | Not Top    -> Bottom
   | Not Bottom -> Top
-  | Not x      -> Not (eval_ast_no_astansion x env)
+  | Not x      -> Not (eval_ast_no_expansion x env)
   | And (Bottom, _) | And (_, Bottom) -> Bottom
   | And (Top,x)
-  | And (x,Top) -> eval_ast_no_astansion x env
-  | And     (x,y) -> And (eval_ast_no_astansion x env, eval_ast_no_astansion y env)
+  | And (x,Top) -> eval_ast_no_expansion x env
+  | And     (x,y) -> And (eval_ast_no_expansion x env, eval_ast_no_expansion y env)
   | Or (Top, _) | Or (_, Top) -> Top
   | Or (Bottom,x)
-  | Or (x,Bottom) -> eval_ast_no_astansion x env
-  | Or      (x,y) -> Or  (eval_ast_no_astansion x env, eval_ast_no_astansion y env)
-  | Xor     (x,y) -> Xor (eval_ast_no_astansion x env, eval_ast_no_astansion y env)
+  | Or (x,Bottom) -> eval_ast_no_expansion x env
+  | Or      (x,y) -> Or  (eval_ast_no_expansion x env, eval_ast_no_expansion y env)
+  | Xor     (x,y) -> Xor (eval_ast_no_expansion x env, eval_ast_no_expansion y env)
   | Implies (_,Top)
   | Implies (Bottom,_) -> Top
-  | Implies (x,Bottom) -> eval_ast_no_astansion (Not x) env
-  | Implies (Top,x) -> eval_ast_no_astansion x env
-  | Implies (x,y) -> Implies (eval_ast_no_astansion x env, eval_ast_no_astansion y env)
-  | Equiv   (x,y) -> Equiv (eval_ast_no_astansion x env, eval_ast_no_astansion y env)
+  | Implies (x,Bottom) -> eval_ast_no_expansion (Not x) env
+  | Implies (Top,x) -> eval_ast_no_expansion x env
+  | Implies (x,y) -> Implies (eval_ast_no_expansion x env, eval_ast_no_expansion y env)
+  | Equiv   (x,y) -> Equiv (eval_ast_no_expansion x env, eval_ast_no_expansion y env)
   | Exact (x,y) ->
       begin
         match eval_ast x env, eval_ast y env with
@@ -721,7 +721,7 @@ and eval_ast_no_astansion ast env =
                   "    "^(string_of_ast y')^"\n"))
             end
         | x::xs,y::ys ->
-            eval_ast_no_astansion (Bigand ([x],[y],None,(Bigand (xs,ys,t,e)))) env
+            eval_ast_no_expansion (Bigand ([x],[y],None,(Bigand (xs,ys,t,e)))) env
       end
   | Bigor (v,s,t,e) ->
       let test =
@@ -752,12 +752,12 @@ and eval_ast_no_astansion ast env =
                   "    "^(string_of_ast y')^"\n"))
             end
         | x::xs,y::ys ->
-            eval_ast_no_astansion (Bigor ([x],[y],None,(Bigor (xs,ys,t,e)))) env
+            eval_ast_no_expansion (Bigor ([x],[y],None,(Bigor (xs,ys,t,e)))) env
       end
   | If (x,y,z) ->
       let test = eval_test x env in
-      if test then eval_ast_no_astansion y env else eval_ast_no_astansion z env
-  | Let (Var v,x,c) -> eval_ast_no_astansion c (((expand_var_name v env),x)::env)
+      if test then eval_ast_no_expansion y env else eval_ast_no_expansion z env
+  | Let (Var v,x,c) -> eval_ast_no_expansion c (((expand_var_name v env),x)::env)
   | e -> raise (Error ("this expression is not a formula: " ^ string_of_ast e))
 
 
@@ -791,41 +791,41 @@ and bigand_int env var values test ast =
   let ast' = If (test,ast,Top) and (name,_) = var in
   match values with
   | []    -> Top
-  | [x]   -> eval_ast_no_astansion ast' ((name, Int x)::env)
-  | x::xs -> And (eval_ast_no_astansion ast' ((name, Int x)::env) ,bigand_int env var xs test ast)
+  | [x]   -> eval_ast_no_expansion ast' ((name, Int x)::env)
+  | x::xs -> And (eval_ast_no_expansion ast' ((name, Int x)::env) ,bigand_int env var xs test ast)
 and bigand_float env var values test ast =
   let ast' = If (test,ast,Top) and (name,_) = var in
   match values with
   | []    -> Top
-  | [x]   -> eval_ast_no_astansion ast' ((name, Float x)::env)
-  | x::xs -> And (eval_ast_no_astansion ast' ((name, Float x)::env) ,bigand_float env var xs test ast)
+  | [x]   -> eval_ast_no_expansion ast' ((name, Float x)::env)
+  | x::xs -> And (eval_ast_no_expansion ast' ((name, Float x)::env) ,bigand_float env var xs test ast)
 and bigand_str env var values test ast =
   let ast' = If (test,ast,Top) and (name,_) = var in
   match values with
   | []    -> Top
-  | [x]   -> eval_ast_no_astansion ast' ((name, Term  (x,None))::env)
+  | [x]   -> eval_ast_no_expansion ast' ((name, Term  (x,None))::env)
   | x::xs ->
-      And (eval_ast_no_astansion ast' ((name, Term  (x,None))::env), bigand_str env var xs test ast)
+      And (eval_ast_no_expansion ast' ((name, Term  (x,None))::env), bigand_str env var xs test ast)
 and bigor_empty env var values test ast = Bottom
 and bigor_int env var values test ast =
   let ast' = If (test,ast,Bottom) and (name,_) = var in
   match values with
   | []    -> Bottom
-  | [x]   -> eval_ast_no_astansion ast' ((name, Int x)::env)
-  | x::xs -> Or (eval_ast_no_astansion ast' ((name, Int x)::env), bigor_int env var xs test ast)
+  | [x]   -> eval_ast_no_expansion ast' ((name, Int x)::env)
+  | x::xs -> Or (eval_ast_no_expansion ast' ((name, Int x)::env), bigor_int env var xs test ast)
 and bigor_float env (var:var) values test ast =
   let ast' = If (test,ast,Bottom) and (name,_) = var in
   match values with
   | []    -> Bottom
-  | [x]   -> eval_ast_no_astansion ast' ((name, Float x)::env)
-  | x::xs -> Or (eval_ast_no_astansion ast' ((name, Float x)::env), bigor_float env var xs test ast)
+  | [x]   -> eval_ast_no_expansion ast' ((name, Float x)::env)
+  | x::xs -> Or (eval_ast_no_expansion ast' ((name, Float x)::env), bigor_float env var xs test ast)
 and bigor_str env var values test ast =
   let ast' = If (test,ast,Bottom) and (name,_) = var in
   match values with
   | []    -> Bottom
-  | [x]   -> eval_ast_no_astansion ast' ((name, Term  (x,None))::env)
+  | [x]   -> eval_ast_no_expansion ast' ((name, Term  (x,None))::env)
   | x::xs ->
-      Or (eval_ast_no_astansion ast' ((name, Term (x,None))::env), bigor_str env var xs test ast)
+      Or (eval_ast_no_expansion ast' ((name, Term (x,None))::env), bigor_str env var xs test ast)
 
 and eval_test ast env =
   match eval_ast ast env with
