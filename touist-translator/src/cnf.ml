@@ -134,7 +134,7 @@ let rec to_cnf depth (stop:stop) (ast:ast) : ast =
         match x,y with
         | Top,x | x,Top     -> x
         | Bottom,_|_,Bottom -> Bottom
-        | x,y               -> to_cnf (And (x,y))
+        | x,y               -> And (x,y)
       end
     | Not x ->
       begin
