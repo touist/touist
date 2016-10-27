@@ -29,8 +29,6 @@ exception Error of string
       a disjunction (= separated by "or") of possibly negated literals.
       Example of clause:
           a or not b or c or d                      is a clause
-      WARNING: Syntax.exp isn't actually a clause as defined here; it can
-      hold Implies, Equiv, Xor. Its naming isn't really appropriate...
     - Conjunction:
       literals separated by "and"; example:
           a and b and not and not d                 is a conjunction
@@ -90,20 +88,20 @@ let debug = ref false (* The debug flag activated by --debug-cnf *)
 let rec indent = function 0 -> "" | i -> (indent (i-1))^"\t"
 
 (* Just a function for printing debug info in [to_cnf] *)
-let print_debug (prefix:string) depth (clauses:exp list) : unit =
+let print_debug (prefix:string) depth (formulas:exp list) : unit =
   let rec string_of_exps = function
     | [] -> ""
     | cur::[] -> string_of_exp cur
     | cur::next -> (string_of_exp cur)^", "^(string_of_exps next)
   in print_endline ((indent depth) ^ (string_of_int depth) ^ " " ^ prefix
-                    ^ (string_of_exps clauses))
+                    ^ (string_of_exps formulas))
 
 (* `strop` is a type is used in [to_cnf] in order to stop it after a number of
    recursions. See (1) below *)
 type stop = No | Yes of int
 
 (* [to_cnf] translates the syntaxic tree made of Or, And, Implies, Equiv...
- * Or, And and Not; moreover, it can only be in a conjunction of clauses
+ * Or, And and Not; moreover, it can only be in a conjunction of formulas
  * (see a reminder of their definition above).
  * For example (instead of And, Or we use "and" and "or" and "not"):
  *     (a or not b or c) and (not a or b or d) and (d)
@@ -136,7 +134,7 @@ let rec to_cnf depth (stop:stop) (ast:exp) : exp =
         match x,y with
         | Top,x | x,Top     -> x
         | Bottom,_|_,Bottom -> Bottom
-        | x,y               -> And (x,y)
+        | x,y               -> to_cnf (And (x,y))
       end
     | Not x ->
       begin

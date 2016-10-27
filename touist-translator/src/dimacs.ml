@@ -58,7 +58,7 @@ let to_text prop =
     | Not (Term (x, None)) -> acc ^ "-" ^ x
     | And (x, y) -> incr nbclause; (go acc x) ^ " \n" ^ (go acc y)
     | Or  (x, y) -> (go acc x) ^ " v " ^ (go acc y)
-    | _ -> failwith "non CNF clause"
+    | _ -> failwith "non CNF formula"
   in
   let str = (go "" prop) ^ " 0\n" in
   let header =

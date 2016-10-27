@@ -145,15 +145,15 @@ let rec eval exp env =
 
 and eval_prog exp env =
   let rec loop = function
-    | []    -> raise (Error ("no clauses"))
+    | []    -> raise (Error ("no formulas"))
     | [x]   -> x
     | x::xs -> And (x, loop xs)
   in
   match exp with
-  | Prog (clauses, None) -> eval_exp_no_expansion (loop clauses) env
-  | Prog (clauses, Some decl) ->
+  | Prog (formulas, None) -> eval_exp_no_expansion (loop formulas) env
+  | Prog (formulas, Some decl) ->
       List.iter (fun x -> eval_affect x env) decl;
-      eval_exp_no_expansion (loop clauses) env
+      eval_exp_no_expansion (loop formulas) env
 
 and eval_affect exp env =
   match exp with
@@ -761,20 +761,20 @@ and exact_str lst =
   | x::xs -> Or (go x, exact_str xs)
 
 and atleast_str lst =
-  List.fold_left (fun acc str -> Or (acc, clause_of_string_list str)) Bottom lst
+  List.fold_left (fun acc str -> Or (acc, formula_of_string_list str)) Bottom lst
 
 and atmost_str lst =
   List.fold_left (fun acc str ->
     Or (acc, List.fold_left (fun acc' str' ->
       And (acc', Not (Term (str',None)))) Top str)) Bottom lst
 
-and clause_of_string_list =
+and formula_of_string_list =
   List.fold_left (fun acc str -> And (acc, Term (str,None))) Top
 
 and and_of_term_list =
   List.fold_left (fun acc t -> And (acc, t)) Top
 
-and bigand_empty env var values test exp = Top
+and bigand_empty env var values test exp = Top (* XXX what if bigand in a or?*)
 and bigand_int env var values test exp =
   let exp' = If (test,exp,Top) and (name,_) = var in
   match values with
