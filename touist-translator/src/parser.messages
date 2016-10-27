@@ -13,7 +13,7 @@
 # NOTE: simple quotes ' ' will be added; dont write $1 but rather $1 directly.
 
 # ------------------------------------------------------------------------------
-prog: ATLEAST VAR COMMA VAR WHEN 
+touist_code: ATLEAST VAR COMMA VAR WHEN 
 ##
 ## Ends in an error in state: 169.
 ##
@@ -39,7 +39,7 @@ prog: ATLEAST VAR COMMA VAR WHEN
 ## The known suffix of the stack is as follows:
 ## ATLEAST exp COMMA exp 
 ##
-prog: TUPLE UNION VAR COMMA VAR WHEN 
+touist_code: TUPLE UNION VAR COMMA VAR WHEN 
 ##
 ## Ends in an error in state: 112.
 ##
@@ -65,7 +65,7 @@ prog: TUPLE UNION VAR COMMA VAR WHEN
 ## The known suffix of the stack is as follows:
 ## UNION exp COMMA exp 
 ##
-prog: ATMOST VAR COMMA VAR WHEN 
+touist_code: ATMOST VAR COMMA VAR WHEN 
 ##
 ## Ends in an error in state: 164.
 ##
@@ -91,7 +91,7 @@ prog: ATMOST VAR COMMA VAR WHEN
 ## The known suffix of the stack is as follows:
 ## ATMOST exp COMMA exp 
 ##
-prog: TUPLE SUBSET VAR COMMA VAR WHEN 
+touist_code: TUPLE SUBSET VAR COMMA VAR WHEN 
 ##
 ## Ends in an error in state: 104.
 ##
@@ -117,7 +117,7 @@ prog: TUPLE SUBSET VAR COMMA VAR WHEN
 ## The known suffix of the stack is as follows:
 ## SUBSET exp COMMA exp 
 ##
-prog: TUPLE INTER VAR COMMA VAR WHEN 
+touist_code: TUPLE INTER VAR COMMA VAR WHEN 
 ##
 ## Ends in an error in state: 75.
 ##
@@ -143,7 +143,7 @@ prog: TUPLE INTER VAR COMMA VAR WHEN
 ## The known suffix of the stack is as follows:
 ## INTER exp COMMA exp 
 ##
-prog: EXACT VAR COMMA VAR WHEN 
+touist_code: EXACT VAR COMMA VAR WHEN 
 ##
 ## Ends in an error in state: 136.
 ##
@@ -169,7 +169,7 @@ prog: EXACT VAR COMMA VAR WHEN
 ## The known suffix of the stack is as follows:
 ## EXACT exp COMMA exp 
 ##
-prog: TUPLE DIFF VAR COMMA VAR WHEN 
+touist_code: TUPLE DIFF VAR COMMA VAR WHEN 
 ##
 ## Ends in an error in state: 63.
 ##
@@ -202,7 +202,7 @@ $4 statement by a ')' or continue the expression started by:
 Instead, the following statement were read:
     $0
 
-prog: ATLEAST VAR COMMA XOR 
+touist_code: ATLEAST VAR COMMA XOR 
 ##
 ## Ends in an error in state: 168.
 ##
@@ -211,7 +211,7 @@ prog: ATLEAST VAR COMMA XOR
 ## The known suffix of the stack is as follows:
 ## ATLEAST exp COMMA 
 ##
-prog: ATMOST VAR COMMA XOR 
+touist_code: ATMOST VAR COMMA XOR 
 ##
 ## Ends in an error in state: 163.
 ##
@@ -220,7 +220,7 @@ prog: ATMOST VAR COMMA XOR
 ## The known suffix of the stack is as follows:
 ## ATMOST exp COMMA 
 ##
-prog: EXACT VAR COMMA XOR 
+touist_code: EXACT VAR COMMA XOR 
 ##
 ## Ends in an error in state: 135.
 ##
@@ -229,7 +229,7 @@ prog: EXACT VAR COMMA XOR
 ## The known suffix of the stack is as follows:
 ## EXACT exp COMMA 
 ##
-prog: TUPLE DIFF VAR COMMA XOR 
+touist_code: TUPLE DIFF VAR COMMA XOR 
 ##
 ## Ends in an error in state: 62.
 ##
@@ -238,7 +238,7 @@ prog: TUPLE DIFF VAR COMMA XOR
 ## The known suffix of the stack is as follows:
 ## DIFF exp COMMA 
 ##
-prog: TUPLE INTER VAR COMMA XOR 
+touist_code: TUPLE INTER VAR COMMA XOR 
 ##
 ## Ends in an error in state: 74.
 ##
@@ -247,7 +247,7 @@ prog: TUPLE INTER VAR COMMA XOR
 ## The known suffix of the stack is as follows:
 ## INTER exp COMMA 
 ##
-prog: TUPLE SUBSET VAR COMMA XOR 
+touist_code: TUPLE SUBSET VAR COMMA XOR 
 ##
 ## Ends in an error in state: 103.
 ##
@@ -256,7 +256,7 @@ prog: TUPLE SUBSET VAR COMMA XOR
 ## The known suffix of the stack is as follows:
 ## SUBSET exp COMMA 
 ##
-prog: TUPLE UNION VAR COMMA XOR 
+touist_code: TUPLE UNION VAR COMMA XOR 
 ##
 ## Ends in an error in state: 111.
 ##
@@ -270,7 +270,7 @@ Ill-formed $3 statement. At this point, an expression was expected.
 Instead, the following statement were read:
     $0
 
-prog: ATLEAST VAR WHEN 
+touist_code: ATLEAST VAR WHEN 
 ##
 ## Ends in an error in state: 167.
 ##
@@ -296,7 +296,7 @@ prog: ATLEAST VAR WHEN
 ## The known suffix of the stack is as follows:
 ## ATLEAST exp 
 ##
-prog: ATMOST VAR WHEN 
+touist_code: ATMOST VAR WHEN 
 ##
 ## Ends in an error in state: 162.
 ##
@@ -322,7 +322,7 @@ prog: ATMOST VAR WHEN
 ## The known suffix of the stack is as follows:
 ## ATMOST exp 
 ##
-prog: EXACT VAR WHEN 
+touist_code: EXACT VAR WHEN 
 ##
 ## Ends in an error in state: 134.
 ##
@@ -348,7 +348,7 @@ prog: EXACT VAR WHEN
 ## The known suffix of the stack is as follows:
 ## EXACT exp 
 ##
-prog: TUPLE DIFF VAR WHEN 
+touist_code: TUPLE DIFF VAR WHEN 
 ##
 ## Ends in an error in state: 61.
 ##
@@ -374,7 +374,7 @@ prog: TUPLE DIFF VAR WHEN
 ## The known suffix of the stack is as follows:
 ## DIFF exp 
 ##
-prog: TUPLE INTER VAR WHEN 
+touist_code: TUPLE INTER VAR WHEN 
 ##
 ## Ends in an error in state: 73.
 ##
@@ -400,7 +400,7 @@ prog: TUPLE INTER VAR WHEN
 ## The known suffix of the stack is as follows:
 ## INTER exp 
 ##
-prog: TUPLE NOT VAR UNION 
+touist_code: TUPLE NOT VAR UNION 
 ##
 ## Ends in an error in state: 98.
 ##
@@ -426,7 +426,7 @@ prog: TUPLE NOT VAR UNION
 ## The known suffix of the stack is as follows:
 ## NOT exp 
 ##
-prog: TUPLE SUBSET VAR WHEN 
+touist_code: TUPLE SUBSET VAR WHEN 
 ##
 ## Ends in an error in state: 102.
 ##
@@ -452,7 +452,7 @@ prog: TUPLE SUBSET VAR WHEN
 ## The known suffix of the stack is as follows:
 ## SUBSET exp 
 ##
-prog: TUPLE UNION VAR WHEN 
+touist_code: TUPLE UNION VAR WHEN 
 ##
 ## Ends in an error in state: 110.
 ##
@@ -484,7 +484,7 @@ with a ',' or continue it with an operator over expressions.
 Instead, the following statement were read:
     $0
 
-prog: TUPLE EMPTY VAR WHEN 
+touist_code: TUPLE EMPTY VAR WHEN 
 ##
 ## Ends in an error in state: 65.
 ##
@@ -510,7 +510,7 @@ prog: TUPLE EMPTY VAR WHEN
 ## The known suffix of the stack is as follows:
 ## EMPTY exp 
 ##
-prog: TUPLE CARD VAR WHEN 
+touist_code: TUPLE CARD VAR WHEN 
 ##
 ## Ends in an error in state: 25.
 ##
@@ -536,7 +536,7 @@ prog: TUPLE CARD VAR WHEN
 ## The known suffix of the stack is as follows:
 ## CARD exp 
 ##
-prog: TUPLE SQRT VAR WHEN 
+touist_code: TUPLE SQRT VAR WHEN 
 ##
 ## Ends in an error in state: 99.
 ##
@@ -562,7 +562,7 @@ prog: TUPLE SQRT VAR WHEN
 ## The known suffix of the stack is as follows:
 ## SQRT exp 
 ##
-prog: TUPLE TOFLOAT VAR WHEN 
+touist_code: TUPLE TOFLOAT VAR WHEN 
 ##
 ## Ends in an error in state: 106.
 ##
@@ -588,7 +588,7 @@ prog: TUPLE TOFLOAT VAR WHEN
 ## The known suffix of the stack is as follows:
 ## TOFLOAT exp 
 ##
-prog: TUPLE TOINT VAR WHEN 
+touist_code: TUPLE TOINT VAR WHEN 
 ##
 ## Ends in an error in state: 108.
 ##
@@ -614,7 +614,7 @@ prog: TUPLE TOINT VAR WHEN
 ## The known suffix of the stack is as follows:
 ## TOINT exp 
 ##
-prog: TUPLE LPAREN VAR WHEN 
+touist_code: TUPLE LPAREN VAR WHEN 
 ##
 ## Ends in an error in state: 96.
 ##
@@ -646,7 +646,7 @@ with a ')' or continue it with an operator over expressions.
 Instead, the following statement were read:
     $0
 
-prog: ATLEAST XOR 
+touist_code: ATLEAST XOR 
 ##
 ## Ends in an error in state: 166.
 ##
@@ -655,7 +655,7 @@ prog: ATLEAST XOR
 ## The known suffix of the stack is as follows:
 ## ATLEAST 
 ##
-prog: ATMOST XOR 
+touist_code: ATMOST XOR 
 ##
 ## Ends in an error in state: 161.
 ##
@@ -664,7 +664,7 @@ prog: ATMOST XOR
 ## The known suffix of the stack is as follows:
 ## ATMOST 
 ##
-prog: EXACT XOR 
+touist_code: EXACT XOR 
 ##
 ## Ends in an error in state: 133.
 ##
@@ -678,7 +678,7 @@ Ill-formed $1 statement. At this point, an expression is expected.
 Instead, the following statement were read:
     $0
 
-prog: BIGAND VAR IN VAR COLON VAR WHEN 
+touist_code: BIGAND VAR IN VAR COLON VAR WHEN 
 ##
 ## Ends in an error in state: 206.
 ##
@@ -702,7 +702,7 @@ prog: BIGAND VAR IN VAR COLON VAR WHEN
 ## The known suffix of the stack is as follows:
 ## BIGAND comma_list(local_var) IN comma_list(exp) COLON formula 
 ##
-prog: BIGOR VAR IN VAR COLON VAR WHEN 
+touist_code: BIGOR VAR IN VAR COLON VAR WHEN 
 ##
 ## Ends in an error in state: 215.
 ##
@@ -736,7 +736,7 @@ Important: in $6, you cannot write 'a b'. It must be written 'a and b'.
 Explanation: $6 expects a formula, but 'a b' is a list of formulas and
 is only allowed outside $6
 
-prog: BIGAND VAR IN VAR COLON XOR 
+touist_code: BIGAND VAR IN VAR COLON XOR 
 ##
 ## Ends in an error in state: 205.
 ##
@@ -745,7 +745,7 @@ prog: BIGAND VAR IN VAR COLON XOR
 ## The known suffix of the stack is as follows:
 ## BIGAND comma_list(local_var) IN comma_list(exp) COLON 
 ##
-prog: BIGOR VAR IN VAR COLON XOR 
+touist_code: BIGOR VAR IN VAR COLON XOR 
 ##
 ## Ends in an error in state: 214.
 ##
@@ -759,7 +759,7 @@ Ill-formed $5 statement. The body of $5 is expected to be a single
 formula. Instead, the following statement were read:
     $0
 
-prog: BIGAND VAR IN VAR RPAREN 
+touist_code: BIGAND VAR IN VAR RPAREN 
 ##
 ## Ends in an error in state: 157.
 ##
@@ -775,7 +775,7 @@ prog: BIGAND VAR IN VAR RPAREN
 ## may provide an INCOMPLETE view of the future (what was expected next).
 ## In state 80, spurious reduction of production comma_list(exp) -> exp 
 ##
-prog: BIGOR VAR IN VAR RPAREN 
+touist_code: BIGOR VAR IN VAR RPAREN 
 ##
 ## Ends in an error in state: 145.
 ##
@@ -798,7 +798,7 @@ a continuation of the comma-separated list of variables you started with:
 Instead, the following statement were read:
     $0
 
-prog: BIGAND VAR IN VAR WHEN VAR COLON VAR WHEN 
+touist_code: BIGAND VAR IN VAR WHEN VAR COLON VAR WHEN 
 ##
 ## Ends in an error in state: 173.
 ##
@@ -822,7 +822,7 @@ prog: BIGAND VAR IN VAR WHEN VAR COLON VAR WHEN
 ## The known suffix of the stack is as follows:
 ## BIGAND comma_list(local_var) IN comma_list(exp) WHEN exp COLON formula 
 ##
-prog: BIGOR VAR IN VAR WHEN VAR COLON VAR WHEN 
+touist_code: BIGOR VAR IN VAR WHEN VAR COLON VAR WHEN 
 ##
 ## Ends in an error in state: 212.
 ##
@@ -855,7 +855,7 @@ Instead, the following statement were read:
 Important: in $8, you cannot write 'a b'. It must be written 'a and b'.
 Explanation: $8 expects a formula, but 'a b' is a list of formulas.
 
-prog: BIGAND VAR IN VAR WHEN VAR COLON XOR 
+touist_code: BIGAND VAR IN VAR WHEN VAR COLON XOR 
 ##
 ## Ends in an error in state: 160.
 ##
@@ -864,7 +864,7 @@ prog: BIGAND VAR IN VAR WHEN VAR COLON XOR
 ## The known suffix of the stack is as follows:
 ## BIGAND comma_list(local_var) IN comma_list(exp) WHEN exp COLON 
 ##
-prog: BIGOR VAR IN VAR WHEN VAR COLON XOR 
+touist_code: BIGOR VAR IN VAR WHEN VAR COLON XOR 
 ##
 ## Ends in an error in state: 148.
 ##
@@ -878,7 +878,7 @@ Ill-formed $7 statement. The body of $7 is expected to be a formula.
 Instead, the following statement were read:
     $0
 
-prog: BIGAND VAR IN VAR WHEN VAR WHEN 
+touist_code: BIGAND VAR IN VAR WHEN VAR WHEN 
 ##
 ## Ends in an error in state: 159.
 ##
@@ -904,7 +904,7 @@ prog: BIGAND VAR IN VAR WHEN VAR WHEN
 ## The known suffix of the stack is as follows:
 ## BIGAND comma_list(local_var) IN comma_list(exp) WHEN exp 
 ##
-prog: BIGOR VAR IN VAR WHEN VAR WHEN 
+touist_code: BIGOR VAR IN VAR WHEN VAR WHEN 
 ##
 ## Ends in an error in state: 147.
 ##
@@ -937,7 +937,7 @@ of the expression you started with:
 Instead, the following statement were read:
     $0
 
-prog: BIGAND VAR IN VAR WHEN XOR 
+touist_code: BIGAND VAR IN VAR WHEN XOR 
 ##
 ## Ends in an error in state: 158.
 ##
@@ -946,7 +946,7 @@ prog: BIGAND VAR IN VAR WHEN XOR
 ## The known suffix of the stack is as follows:
 ## BIGAND comma_list(local_var) IN comma_list(exp) WHEN 
 ##
-prog: BIGOR VAR IN VAR WHEN XOR 
+touist_code: BIGOR VAR IN VAR WHEN XOR 
 ##
 ## Ends in an error in state: 146.
 ##
@@ -960,7 +960,7 @@ A boolean expression is required after $1.
 Instead, the following statement were read:
     $0
 
-prog: BIGAND XOR 
+touist_code: BIGAND XOR 
 ##
 ## Ends in an error in state: 154.
 ##
@@ -970,7 +970,7 @@ prog: BIGAND XOR
 ## The known suffix of the stack is as follows:
 ## BIGAND 
 ##
-prog: BIGOR XOR 
+touist_code: BIGOR XOR 
 ##
 ## Ends in an error in state: 139.
 ##
@@ -986,7 +986,7 @@ variables is expected.
 Instead, the following statement were read:
     $0
 
-prog: BIGAND VAR IN XOR 
+touist_code: BIGAND VAR IN XOR 
 ##
 ## Ends in an error in state: 156.
 ##
@@ -996,7 +996,7 @@ prog: BIGAND VAR IN XOR
 ## The known suffix of the stack is as follows:
 ## BIGAND comma_list(local_var) IN 
 ##
-prog: BIGOR VAR IN XOR 
+touist_code: BIGOR VAR IN XOR 
 ##
 ## Ends in an error in state: 144.
 ##
@@ -1011,7 +1011,7 @@ Ill-formed $3 statement. After $1 is expected a comma-separated list of
 expressions that would refer to sets. Instead, the following statement were read:
     $0
 
-prog: BIGOR VAR XOR 
+touist_code: BIGOR VAR XOR 
 ##
 ## Ends in an error in state: 140.
 ##
@@ -1027,7 +1027,7 @@ with 'in' or continue it with ','.
 Instead, the following statement were read:
     $0
 
-prog: BIGOR VAR COMMA XOR 
+touist_code: BIGOR VAR COMMA XOR 
 ##
 ## Ends in an error in state: 141.
 ##
@@ -1041,7 +1041,7 @@ An expression is expected right after $1 to continue the comma-separated
 list of variables. Instead, the following statement were read:
     $0
 
-prog: VARTUPLE VAR COMMA XOR 
+touist_code: VARTUPLE VAR COMMA XOR 
 ##
 ## Ends in an error in state: 81.
 ##
@@ -1056,7 +1056,7 @@ list of expressions.
 The following statement does not seem to be an expression:
     $0
 
-prog: TUPLE VAR IN XOR 
+touist_code: TUPLE VAR IN XOR 
 ##
 ## Ends in an error in state: 44.
 ##
@@ -1069,7 +1069,7 @@ prog: TUPLE VAR IN XOR
 A set is required after $1.
 Instead, $0 was read.
 
-prog: DATA VAR AFFECT VAR WHEN 
+touist_code: DATA VAR AFFECT VAR WHEN 
 ##
 ## Ends in an error in state: 236.
 ##
@@ -1100,7 +1100,7 @@ Ill-formed affectation. The right-term $1 is expected to be an
 expression. Instead, the following statement were read:
     $0
 
-prog: DATA VAR AFFECT XOR 
+touist_code: DATA VAR AFFECT XOR 
 ##
 ## Ends in an error in state: 235.
 ##
@@ -1114,7 +1114,7 @@ Ill-formed affectation. On the right of '=' is expected an expression.
 Instead, the following statement were read:
     $0
 
-prog: DATA VAR XOR 
+touist_code: DATA VAR XOR 
 ##
 ## Ends in an error in state: 234.
 ##
@@ -1123,7 +1123,7 @@ prog: DATA VAR XOR
 ## The known suffix of the stack is as follows:
 ## global_var 
 ##
-prog: LET VAR XOR 
+touist_code: LET VAR XOR 
 ##
 ## Ends in an error in state: 123.
 ##
@@ -1140,7 +1140,7 @@ At this point, '=' is expected.
 Instead, the following statement were read:
     $0
 
-prog: DATA XOR 
+touist_code: DATA XOR 
 ##
 ## Ends in an error in state: 231.
 ##
@@ -1155,7 +1155,7 @@ At this point, an affectation is expected; example:
 Instead, the following statement were read:
     $0
 
-prog: IF VAR THEN VAR ELSE VAR WHEN 
+touist_code: IF VAR THEN VAR ELSE VAR WHEN 
 ##
 ## Ends in an error in state: 210.
 ##
@@ -1186,7 +1186,7 @@ with 'end' or continue the formula with 'and'.
 Instead, the following statement were read:
     $0
 
-prog: TUPLE IF VAR THEN VAR ELSE VAR WHEN 
+touist_code: TUPLE IF VAR THEN VAR ELSE VAR WHEN 
 ##
 ## Ends in an error in state: 71.
 ##
@@ -1219,7 +1219,7 @@ with 'end' or continue the expression with an operator on expressions (+,not...)
 Instead, the following statement were read:
     $0
 
-prog: TUPLE IF VAR THEN VAR WHEN 
+touist_code: TUPLE IF VAR THEN VAR WHEN 
 ##
 ## Ends in an error in state: 69.
 ##
@@ -1252,7 +1252,7 @@ with 'else' or continue the expression with an operator on expressions (+,not...
 Instead, the following statement were read:
     $0
 
-prog: IF VAR THEN VAR WHEN 
+touist_code: IF VAR THEN VAR WHEN 
 ##
 ## Ends in an error in state: 208.
 ##
@@ -1284,7 +1284,7 @@ the formula that with:
 Instead, the following statement were read:
     $0
 
-prog: IF VAR THEN VAR ELSE XOR 
+touist_code: IF VAR THEN VAR ELSE XOR 
 ##
 ## Ends in an error in state: 209.
 ##
@@ -1298,7 +1298,7 @@ Ill-formed 'if' statement. After $1, a formula is expected.
 Instead, the following statement were read:
     $0
 
-prog: TUPLE IF VAR THEN VAR ELSE XOR 
+touist_code: TUPLE IF VAR THEN VAR ELSE XOR 
 ##
 ## Ends in an error in state: 70.
 ##
@@ -1312,7 +1312,7 @@ Ill-formed 'if' statement. After $1, an expression is expected.
 Instead, the following statement were read:
     $0
 
-prog: IF VAR THEN XOR 
+touist_code: IF VAR THEN XOR 
 ##
 ## Ends in an error in state: 152.
 ##
@@ -1321,7 +1321,7 @@ prog: IF VAR THEN XOR
 ## The known suffix of the stack is as follows:
 ## IF exp THEN 
 ##
-prog: LET VAR AFFECT IF VAR THEN XOR 
+touist_code: LET VAR AFFECT IF VAR THEN XOR 
 ##
 ## Ends in an error in state: 131.
 ##
@@ -1331,7 +1331,7 @@ prog: LET VAR AFFECT IF VAR THEN XOR
 ## The known suffix of the stack is as follows:
 ## IF exp THEN 
 ##
-prog: TUPLE IF VAR THEN XOR 
+touist_code: TUPLE IF VAR THEN XOR 
 ##
 ## Ends in an error in state: 68.
 ##
@@ -1345,7 +1345,7 @@ Ill-formed $3 statement. After $1, an expression or formula is expected.
 Instead, the following statement were read:
     $0
 
-prog: IF VAR WHEN 
+touist_code: IF VAR WHEN 
 ##
 ## Ends in an error in state: 151.
 ##
@@ -1371,7 +1371,7 @@ prog: IF VAR WHEN
 ## The known suffix of the stack is as follows:
 ## IF exp 
 ##
-prog: LET VAR AFFECT IF VAR WHEN 
+touist_code: LET VAR AFFECT IF VAR WHEN 
 ##
 ## Ends in an error in state: 130.
 ##
@@ -1398,7 +1398,7 @@ prog: LET VAR AFFECT IF VAR WHEN
 ## The known suffix of the stack is as follows:
 ## IF exp 
 ##
-prog: TUPLE IF VAR WHEN 
+touist_code: TUPLE IF VAR WHEN 
 ##
 ## Ends in an error in state: 67.
 ##
@@ -1432,7 +1432,7 @@ with an operator on expressions.
 Instead, the following statement were read:
     $0
 
-prog: IF XOR 
+touist_code: IF XOR 
 ##
 ## Ends in an error in state: 150.
 ##
@@ -1441,7 +1441,7 @@ prog: IF XOR
 ## The known suffix of the stack is as follows:
 ## IF 
 ##
-prog: LET VAR AFFECT IF XOR 
+touist_code: LET VAR AFFECT IF XOR 
 ##
 ## Ends in an error in state: 129.
 ##
@@ -1457,7 +1457,7 @@ Instead, the following statement were read:
     $0
 Note: you cannot use a formula as condition for the 'if' statement.
 
-prog: LET VAR AFFECT LPAREN XOR 
+touist_code: LET VAR AFFECT LPAREN XOR 
 ##
 ## Ends in an error in state: 127.
 ##
@@ -1467,7 +1467,7 @@ prog: LET VAR AFFECT LPAREN XOR
 ## The known suffix of the stack is as follows:
 ## LPAREN 
 ##
-prog: TUPLE CARD XOR 
+touist_code: TUPLE CARD XOR 
 ##
 ## Ends in an error in state: 20.
 ##
@@ -1476,7 +1476,7 @@ prog: TUPLE CARD XOR
 ## The known suffix of the stack is as follows:
 ## CARD 
 ##
-prog: TUPLE EMPTY XOR 
+touist_code: TUPLE EMPTY XOR 
 ##
 ## Ends in an error in state: 18.
 ##
@@ -1485,7 +1485,7 @@ prog: TUPLE EMPTY XOR
 ## The known suffix of the stack is as follows:
 ## EMPTY 
 ##
-prog: TUPLE LPAREN XOR 
+touist_code: TUPLE LPAREN XOR 
 ##
 ## Ends in an error in state: 10.
 ##
@@ -1494,7 +1494,7 @@ prog: TUPLE LPAREN XOR
 ## The known suffix of the stack is as follows:
 ## LPAREN 
 ##
-prog: TUPLE SQRT XOR 
+touist_code: TUPLE SQRT XOR 
 ##
 ## Ends in an error in state: 8.
 ##
@@ -1503,7 +1503,7 @@ prog: TUPLE SQRT XOR
 ## The known suffix of the stack is as follows:
 ## SQRT 
 ##
-prog: TUPLE TOFLOAT XOR 
+touist_code: TUPLE TOFLOAT XOR 
 ##
 ## Ends in an error in state: 5.
 ##
@@ -1512,7 +1512,7 @@ prog: TUPLE TOFLOAT XOR
 ## The known suffix of the stack is as follows:
 ## TOFLOAT 
 ##
-prog: TUPLE TOINT XOR 
+touist_code: TUPLE TOINT XOR 
 ##
 ## Ends in an error in state: 4.
 ##
@@ -1527,7 +1527,7 @@ or continue with an operator over expressions.
 Instead, the following statement were read:
     $0
 
-prog: LET VAR AFFECT NOT XOR 
+touist_code: LET VAR AFFECT NOT XOR 
 ##
 ## Ends in an error in state: 126.
 ##
@@ -1537,7 +1537,7 @@ prog: LET VAR AFFECT NOT XOR
 ## The known suffix of the stack is as follows:
 ## NOT 
 ##
-prog: LET VAR AFFECT SUB XOR 
+touist_code: LET VAR AFFECT SUB XOR 
 ##
 ## Ends in an error in state: 125.
 ##
@@ -1547,7 +1547,7 @@ prog: LET VAR AFFECT SUB XOR
 ## The known suffix of the stack is as follows:
 ## SUB 
 ##
-prog: TUPLE NOT XOR 
+touist_code: TUPLE NOT XOR 
 ##
 ## Ends in an error in state: 9.
 ##
@@ -1556,7 +1556,7 @@ prog: TUPLE NOT XOR
 ## The known suffix of the stack is as follows:
 ## NOT 
 ##
-prog: TUPLE SUB XOR 
+touist_code: TUPLE SUB XOR 
 ##
 ## Ends in an error in state: 7.
 ##
@@ -1565,7 +1565,7 @@ prog: TUPLE SUB XOR
 ## The known suffix of the stack is as follows:
 ## SUB 
 ##
-prog: NOT XOR 
+touist_code: NOT XOR 
 ##
 ## Ends in an error in state: 120.
 ##
@@ -1574,7 +1574,7 @@ prog: NOT XOR
 ## The known suffix of the stack is as follows:
 ## NOT 
 ##
-prog: SUB XOR 
+touist_code: SUB XOR 
 ##
 ## Ends in an error in state: 119.
 ##
@@ -1589,7 +1589,7 @@ on its right side.
 Instead, the following statement were read:
     $0
 
-prog: LET VAR AFFECT TOP COLON VAR WHEN 
+touist_code: LET VAR AFFECT TOP COLON VAR WHEN 
 ##
 ## Ends in an error in state: 224.
 ##
@@ -1625,7 +1625,7 @@ $i will only be declared for the first '$i' and not in 'not($i)'.
 This is because '$i not($i)' is a list of formula, and 'let' expected a
 single formula.
 
-prog: LET VAR AFFECT TOP COLON XOR 
+touist_code: LET VAR AFFECT TOP COLON XOR 
 ##
 ## Ends in an error in state: 223.
 ##
@@ -1634,7 +1634,7 @@ prog: LET VAR AFFECT TOP COLON XOR
 ## The known suffix of the stack is as follows:
 ## LET local_var AFFECT formula COLON 
 ##
-prog: LET VAR AFFECT TOP WHEN 
+touist_code: LET VAR AFFECT TOP WHEN 
 ##
 ## Ends in an error in state: 222.
 ##
@@ -1667,7 +1667,7 @@ Instead, the following statement were read:
 Important: one single formula is expected, not a space-separated list
 of formulas.
 
-prog: LET VAR AFFECT VAR COLON VAR WHEN 
+touist_code: LET VAR AFFECT VAR COLON VAR WHEN 
 ##
 ## Ends in an error in state: 227.
 ##
@@ -1703,7 +1703,7 @@ $i will only be declared for the first '$i' and not in 'not($i)'.
 This is because '$i not($i)' is a list of formula, and 'let'
 expects a single formula.
 
-prog: LET VAR AFFECT VAR COLON XOR 
+touist_code: LET VAR AFFECT VAR COLON XOR 
 ##
 ## Ends in an error in state: 226.
 ##
@@ -1717,7 +1717,7 @@ Ill-formed $5 statement. The body of $5 is expected to be a formula.
 Instead, the following statement were read:
     $0
 
-prog: LET VAR AFFECT VAR WHEN 
+touist_code: LET VAR AFFECT VAR WHEN 
 ##
 ## Ends in an error in state: 225.
 ##
@@ -1750,7 +1750,7 @@ a continuation of the expression that was started by:
 Instead, the following statement were read:
     $0
 
-prog: LET VAR AFFECT XOR 
+touist_code: LET VAR AFFECT XOR 
 ##
 ## Ends in an error in state: 124.
 ##
@@ -1766,7 +1766,7 @@ expected to be an expression or formula.
 Instead, the following statement were read:
     $0
 
-prog: LET XOR 
+touist_code: LET XOR 
 ##
 ## Ends in an error in state: 122.
 ##
@@ -1781,7 +1781,7 @@ Ill-formed 'let' statement. At this point, a variable is expected.
 Instead, the following statement were read:
     $0
 
-prog: TUPLE DIFF XOR 
+touist_code: TUPLE DIFF XOR 
 ##
 ## Ends in an error in state: 19.
 ##
@@ -1790,7 +1790,7 @@ prog: TUPLE DIFF XOR
 ## The known suffix of the stack is as follows:
 ## DIFF 
 ##
-prog: TUPLE INTER XOR 
+touist_code: TUPLE INTER XOR 
 ##
 ## Ends in an error in state: 14.
 ##
@@ -1799,7 +1799,7 @@ prog: TUPLE INTER XOR
 ## The known suffix of the stack is as follows:
 ## INTER 
 ##
-prog: TUPLE SUBSET XOR 
+touist_code: TUPLE SUBSET XOR 
 ##
 ## Ends in an error in state: 6.
 ##
@@ -1808,7 +1808,7 @@ prog: TUPLE SUBSET XOR
 ## The known suffix of the stack is as follows:
 ## SUBSET 
 ##
-prog: TUPLE UNION XOR 
+touist_code: TUPLE UNION XOR 
 ##
 ## Ends in an error in state: 3.
 ##
@@ -1817,7 +1817,7 @@ prog: TUPLE UNION XOR
 ## The known suffix of the stack is as follows:
 ## UNION 
 ##
-prog: LPAREN XOR 
+touist_code: LPAREN XOR 
 ##
 ## Ends in an error in state: 121.
 ##
@@ -1831,7 +1831,7 @@ Ill-formed $1 statement. At this point, an expression was expected.
 Instead, the following statement were read:
     $0
 
-prog: TUPLE LBRACK TERM RPAREN 
+touist_code: TUPLE LBRACK TERM RPAREN 
 ##
 ## Ends in an error in state: 92.
 ##
@@ -1853,7 +1853,7 @@ with an ']' or continue the list of terms with a ','.
 Instead, the following statement were read:
     $0
 
-prog: TUPLE LBRACK VAR COMMA BOOL WHEN 
+touist_code: TUPLE LBRACK VAR COMMA BOOL WHEN 
 ##
 ## Ends in an error in state: 94.
 ##
@@ -1876,7 +1876,7 @@ with an ']' or continue the list of terms with a ','.
 Instead, the following statement were read:
     $0
 
-prog: TUPLE LBRACK VAR RANGE VAR WHEN 
+touist_code: TUPLE LBRACK VAR RANGE VAR WHEN 
 ##
 ## Ends in an error in state: 90.
 ##
@@ -1909,7 +1909,7 @@ with an ']' or continue the expression with an operator on expressions.
 Instead, the following statement were read:
     $0
 
-prog: TUPLE LBRACK VAR RANGE XOR 
+touist_code: TUPLE LBRACK VAR RANGE XOR 
 ##
 ## Ends in an error in state: 89.
 ##
@@ -1923,7 +1923,7 @@ Ill-formed range set. After $1, an expression is expected.
 Instead, the following statement were read:
     $0
 
-prog: TUPLE LBRACK XOR 
+touist_code: TUPLE LBRACK XOR 
 ##
 ## Ends in an error in state: 11.
 ##
@@ -1940,7 +1940,7 @@ Ill-formed set. At this point, an expression or a term or ']' is expected.
 Instead, the following statement were read:
     $0
 
-prog: TUPLE VAR ADD VAR UNION 
+touist_code: TUPLE VAR ADD VAR UNION 
 ##
 ## Ends in an error in state: 37.
 ##
@@ -1966,7 +1966,7 @@ prog: TUPLE VAR ADD VAR UNION
 ## The known suffix of the stack is as follows:
 ## exp ADD exp 
 ##
-prog: TUPLE VAR GE VAR UNION 
+touist_code: TUPLE VAR GE VAR UNION 
 ##
 ## Ends in an error in state: 49.
 ##
@@ -1992,7 +1992,7 @@ prog: TUPLE VAR GE VAR UNION
 ## The known suffix of the stack is as follows:
 ## exp GE exp 
 ##
-prog: TUPLE VAR AND VAR UNION 
+touist_code: TUPLE VAR AND VAR UNION 
 ##
 ## Ends in an error in state: 56.
 ##
@@ -2018,7 +2018,7 @@ prog: TUPLE VAR AND VAR UNION
 ## The known suffix of the stack is as follows:
 ## exp AND exp 
 ##
-prog: TUPLE VAR DIV VAR UNION 
+touist_code: TUPLE VAR DIV VAR UNION 
 ##
 ## Ends in an error in state: 35.
 ##
@@ -2044,7 +2044,7 @@ prog: TUPLE VAR DIV VAR UNION
 ## The known suffix of the stack is as follows:
 ## exp DIV exp 
 ##
-prog: TUPLE VAR EQUAL VAR UNION 
+touist_code: TUPLE VAR EQUAL VAR UNION 
 ##
 ## Ends in an error in state: 51.
 ##
@@ -2070,7 +2070,7 @@ prog: TUPLE VAR EQUAL VAR UNION
 ## The known suffix of the stack is as follows:
 ## exp EQUAL exp 
 ##
-prog: TUPLE VAR EQUIV VAR UNION 
+touist_code: TUPLE VAR EQUIV VAR UNION 
 ##
 ## Ends in an error in state: 60.
 ##
@@ -2096,7 +2096,7 @@ prog: TUPLE VAR EQUIV VAR UNION
 ## The known suffix of the stack is as follows:
 ## exp EQUIV exp 
 ##
-prog: TUPLE VAR GT VAR UNION 
+touist_code: TUPLE VAR GT VAR UNION 
 ##
 ## Ends in an error in state: 47.
 ##
@@ -2122,7 +2122,7 @@ prog: TUPLE VAR GT VAR UNION
 ## The known suffix of the stack is as follows:
 ## exp GT exp 
 ##
-prog: TUPLE VAR IMPLIES VAR UNION 
+touist_code: TUPLE VAR IMPLIES VAR UNION 
 ##
 ## Ends in an error in state: 58.
 ##
@@ -2148,7 +2148,7 @@ prog: TUPLE VAR IMPLIES VAR UNION
 ## The known suffix of the stack is as follows:
 ## exp IMPLIES exp 
 ##
-prog: TUPLE VAR IN VAR UNION 
+touist_code: TUPLE VAR IN VAR UNION 
 ##
 ## Ends in an error in state: 45.
 ##
@@ -2174,7 +2174,7 @@ prog: TUPLE VAR IN VAR UNION
 ## The known suffix of the stack is as follows:
 ## exp IN exp 
 ##
-prog: TUPLE VAR LE VAR UNION 
+touist_code: TUPLE VAR LE VAR UNION 
 ##
 ## Ends in an error in state: 43.
 ##
@@ -2200,7 +2200,7 @@ prog: TUPLE VAR LE VAR UNION
 ## The known suffix of the stack is as follows:
 ## exp LE exp 
 ##
-prog: TUPLE VAR LT VAR UNION 
+touist_code: TUPLE VAR LT VAR UNION 
 ##
 ## Ends in an error in state: 41.
 ##
@@ -2226,7 +2226,7 @@ prog: TUPLE VAR LT VAR UNION
 ## The known suffix of the stack is as follows:
 ## exp LT exp 
 ##
-prog: TUPLE VAR MUL VAR UNION 
+touist_code: TUPLE VAR MUL VAR UNION 
 ##
 ## Ends in an error in state: 31.
 ##
@@ -2252,7 +2252,7 @@ prog: TUPLE VAR MUL VAR UNION
 ## The known suffix of the stack is as follows:
 ## exp MUL exp 
 ##
-prog: TUPLE VAR NOTEQUAL VAR UNION 
+touist_code: TUPLE VAR NOTEQUAL VAR UNION 
 ##
 ## Ends in an error in state: 39.
 ##
@@ -2278,7 +2278,7 @@ prog: TUPLE VAR NOTEQUAL VAR UNION
 ## The known suffix of the stack is as follows:
 ## exp NOTEQUAL exp 
 ##
-prog: TUPLE VAR OR VAR UNION 
+touist_code: TUPLE VAR OR VAR UNION 
 ##
 ## Ends in an error in state: 54.
 ##
@@ -2304,7 +2304,7 @@ prog: TUPLE VAR OR VAR UNION
 ## The known suffix of the stack is as follows:
 ## exp OR exp 
 ##
-prog: TUPLE VAR SUB VAR UNION 
+touist_code: TUPLE VAR SUB VAR UNION 
 ##
 ## Ends in an error in state: 29.
 ##
@@ -2330,7 +2330,7 @@ prog: TUPLE VAR SUB VAR UNION
 ## The known suffix of the stack is as follows:
 ## exp SUB exp 
 ##
-prog: TUPLE VAR XOR VAR UNION 
+touist_code: TUPLE VAR XOR VAR UNION 
 ##
 ## Ends in an error in state: 27.
 ##
@@ -2361,7 +2361,7 @@ At this point, the expression $1 is expected to continue with
 an expression operator (+,and,<,...).
 Instead, found $0.
 
-prog: TUPLE VAR ADD XOR 
+touist_code: TUPLE VAR ADD XOR 
 ##
 ## Ends in an error in state: 36.
 ##
@@ -2370,7 +2370,7 @@ prog: TUPLE VAR ADD XOR
 ## The known suffix of the stack is as follows:
 ## exp ADD 
 ##
-prog: TUPLE VAR AND XOR 
+touist_code: TUPLE VAR AND XOR 
 ##
 ## Ends in an error in state: 55.
 ##
@@ -2379,7 +2379,7 @@ prog: TUPLE VAR AND XOR
 ## The known suffix of the stack is as follows:
 ## exp AND 
 ##
-prog: TUPLE VAR DIV XOR 
+touist_code: TUPLE VAR DIV XOR 
 ##
 ## Ends in an error in state: 34.
 ##
@@ -2388,7 +2388,7 @@ prog: TUPLE VAR DIV XOR
 ## The known suffix of the stack is as follows:
 ## exp DIV 
 ##
-prog: TUPLE VAR EQUAL XOR 
+touist_code: TUPLE VAR EQUAL XOR 
 ##
 ## Ends in an error in state: 50.
 ##
@@ -2397,7 +2397,7 @@ prog: TUPLE VAR EQUAL XOR
 ## The known suffix of the stack is as follows:
 ## exp EQUAL 
 ##
-prog: TUPLE VAR EQUIV XOR 
+touist_code: TUPLE VAR EQUIV XOR 
 ##
 ## Ends in an error in state: 59.
 ##
@@ -2406,7 +2406,7 @@ prog: TUPLE VAR EQUIV XOR
 ## The known suffix of the stack is as follows:
 ## exp EQUIV 
 ##
-prog: TUPLE VAR GE XOR 
+touist_code: TUPLE VAR GE XOR 
 ##
 ## Ends in an error in state: 48.
 ##
@@ -2415,7 +2415,7 @@ prog: TUPLE VAR GE XOR
 ## The known suffix of the stack is as follows:
 ## exp GE 
 ##
-prog: TUPLE VAR GT XOR 
+touist_code: TUPLE VAR GT XOR 
 ##
 ## Ends in an error in state: 46.
 ##
@@ -2424,7 +2424,7 @@ prog: TUPLE VAR GT XOR
 ## The known suffix of the stack is as follows:
 ## exp GT 
 ##
-prog: TUPLE VAR IMPLIES XOR 
+touist_code: TUPLE VAR IMPLIES XOR 
 ##
 ## Ends in an error in state: 57.
 ##
@@ -2433,7 +2433,7 @@ prog: TUPLE VAR IMPLIES XOR
 ## The known suffix of the stack is as follows:
 ## exp IMPLIES 
 ##
-prog: TUPLE VAR LE XOR 
+touist_code: TUPLE VAR LE XOR 
 ##
 ## Ends in an error in state: 42.
 ##
@@ -2442,7 +2442,7 @@ prog: TUPLE VAR LE XOR
 ## The known suffix of the stack is as follows:
 ## exp LE 
 ##
-prog: TUPLE VAR LT XOR 
+touist_code: TUPLE VAR LT XOR 
 ##
 ## Ends in an error in state: 40.
 ##
@@ -2451,7 +2451,7 @@ prog: TUPLE VAR LT XOR
 ## The known suffix of the stack is as follows:
 ## exp LT 
 ##
-prog: TUPLE VAR MOD XOR 
+touist_code: TUPLE VAR MOD XOR 
 ##
 ## Ends in an error in state: 32.
 ##
@@ -2460,7 +2460,7 @@ prog: TUPLE VAR MOD XOR
 ## The known suffix of the stack is as follows:
 ## exp MOD 
 ##
-prog: TUPLE VAR MUL XOR 
+touist_code: TUPLE VAR MUL XOR 
 ##
 ## Ends in an error in state: 30.
 ##
@@ -2469,7 +2469,7 @@ prog: TUPLE VAR MUL XOR
 ## The known suffix of the stack is as follows:
 ## exp MUL 
 ##
-prog: TUPLE VAR NOTEQUAL XOR 
+touist_code: TUPLE VAR NOTEQUAL XOR 
 ##
 ## Ends in an error in state: 38.
 ##
@@ -2478,7 +2478,7 @@ prog: TUPLE VAR NOTEQUAL XOR
 ## The known suffix of the stack is as follows:
 ## exp NOTEQUAL 
 ##
-prog: TUPLE VAR OR XOR 
+touist_code: TUPLE VAR OR XOR 
 ##
 ## Ends in an error in state: 53.
 ##
@@ -2487,7 +2487,7 @@ prog: TUPLE VAR OR XOR
 ## The known suffix of the stack is as follows:
 ## exp OR 
 ##
-prog: TUPLE VAR SUB XOR 
+touist_code: TUPLE VAR SUB XOR 
 ##
 ## Ends in an error in state: 28.
 ##
@@ -2496,7 +2496,7 @@ prog: TUPLE VAR SUB XOR
 ## The known suffix of the stack is as follows:
 ## exp SUB 
 ##
-prog: TUPLE VAR XOR XOR 
+touist_code: TUPLE VAR XOR XOR 
 ##
 ## Ends in an error in state: 26.
 ##
@@ -2510,7 +2510,7 @@ The operator over expressions $1 does not seem to be given an
 expression on its right; instead, got the following statement:
     $0
 
-prog: TUPLE VAR WHEN 
+touist_code: TUPLE VAR WHEN 
 ##
 ## Ends in an error in state: 85.
 ##
@@ -2532,7 +2532,7 @@ continue the comma-separated list of terms started by:
 Instead, the following statement were read:
     $0
 
-prog: TUPLE TERM XOR 
+touist_code: TUPLE TERM XOR 
 ##
 ## Ends in an error in state: 77.
 ##
@@ -2542,7 +2542,7 @@ prog: TUPLE TERM XOR
 ## The known suffix of the stack is as follows:
 ## term 
 ##
-prog: VARTUPLE TERM RBRACK 
+touist_code: VARTUPLE TERM RBRACK 
 ##
 ## Ends in an error in state: 114.
 ##
@@ -2557,7 +2557,7 @@ prog: VARTUPLE TERM RBRACK
 ## may provide an INCOMPLETE view of the future (what was expected next).
 ## In state 77, spurious reduction of production comma_list(term) -> term 
 ##
-prog: VARTUPLE VAR VARTUPLE 
+touist_code: VARTUPLE VAR VARTUPLE 
 ##
 ## Ends in an error in state: 116.
 ##
@@ -2578,7 +2578,7 @@ or a ',' for continuiing the comma-separated expression list.
 Instead, the following statement were read:
     $0
 
-prog: VARTUPLE XOR 
+touist_code: VARTUPLE XOR 
 ##
 ## Ends in an error in state: 1.
 ##
@@ -2595,7 +2595,7 @@ At this point, expecting a list of comma-separated expressions or terms.
 Instead, the following statement were read:
     $0
 
-prog: TUPLE XOR 
+touist_code: TUPLE XOR 
 ##
 ## Ends in an error in state: 12.
 ##
@@ -2612,7 +2612,7 @@ At this point, expecting a list of comma-separated expressions or terms.
 Instead, the following statement were read:
     $0
 
-prog: VAR ADD VAR WHEN 
+touist_code: VAR ADD VAR WHEN 
 ##
 ## Ends in an error in state: 183.
 ##
@@ -2636,7 +2636,7 @@ prog: VAR ADD VAR WHEN
 ## The known suffix of the stack is as follows:
 ## formula ADD formula 
 ##
-prog: VAR AND VAR WHEN 
+touist_code: VAR AND VAR WHEN 
 ##
 ## Ends in an error in state: 199.
 ##
@@ -2660,7 +2660,7 @@ prog: VAR AND VAR WHEN
 ## The known suffix of the stack is as follows:
 ## formula AND formula 
 ##
-prog: VAR EQUAL VAR WHEN 
+touist_code: VAR EQUAL VAR WHEN 
 ##
 ## Ends in an error in state: 195.
 ##
@@ -2684,7 +2684,7 @@ prog: VAR EQUAL VAR WHEN
 ## The known suffix of the stack is as follows:
 ## formula EQUAL formula 
 ##
-prog: VAR EQUIV VAR WHEN 
+touist_code: VAR EQUIV VAR WHEN 
 ##
 ## Ends in an error in state: 203.
 ##
@@ -2708,7 +2708,7 @@ prog: VAR EQUIV VAR WHEN
 ## The known suffix of the stack is as follows:
 ## formula EQUIV formula 
 ##
-prog: VAR GE VAR WHEN 
+touist_code: VAR GE VAR WHEN 
 ##
 ## Ends in an error in state: 193.
 ##
@@ -2732,7 +2732,7 @@ prog: VAR GE VAR WHEN
 ## The known suffix of the stack is as follows:
 ## formula GE formula 
 ##
-prog: VAR GT VAR WHEN 
+touist_code: VAR GT VAR WHEN 
 ##
 ## Ends in an error in state: 191.
 ##
@@ -2756,7 +2756,7 @@ prog: VAR GT VAR WHEN
 ## The known suffix of the stack is as follows:
 ## formula GT formula 
 ##
-prog: VAR IMPLIES VAR WHEN 
+touist_code: VAR IMPLIES VAR WHEN 
 ##
 ## Ends in an error in state: 201.
 ##
@@ -2780,7 +2780,7 @@ prog: VAR IMPLIES VAR WHEN
 ## The known suffix of the stack is as follows:
 ## formula IMPLIES formula 
 ##
-prog: VAR LE VAR WHEN 
+touist_code: VAR LE VAR WHEN 
 ##
 ## Ends in an error in state: 189.
 ##
@@ -2804,7 +2804,7 @@ prog: VAR LE VAR WHEN
 ## The known suffix of the stack is as follows:
 ## formula LE formula 
 ##
-prog: VAR LT VAR WHEN 
+touist_code: VAR LT VAR WHEN 
 ##
 ## Ends in an error in state: 187.
 ##
@@ -2828,7 +2828,7 @@ prog: VAR LT VAR WHEN
 ## The known suffix of the stack is as follows:
 ## formula LT formula 
 ##
-prog: VAR NOTEQUAL VAR WHEN 
+touist_code: VAR NOTEQUAL VAR WHEN 
 ##
 ## Ends in an error in state: 185.
 ##
@@ -2852,7 +2852,7 @@ prog: VAR NOTEQUAL VAR WHEN
 ## The known suffix of the stack is as follows:
 ## formula NOTEQUAL formula 
 ##
-prog: VAR OR VAR WHEN 
+touist_code: VAR OR VAR WHEN 
 ##
 ## Ends in an error in state: 197.
 ##
@@ -2876,7 +2876,7 @@ prog: VAR OR VAR WHEN
 ## The known suffix of the stack is as follows:
 ## formula OR formula 
 ##
-prog: VAR SUB VAR WHEN 
+touist_code: VAR SUB VAR WHEN 
 ##
 ## Ends in an error in state: 241.
 ##
@@ -2901,7 +2901,7 @@ prog: VAR SUB VAR WHEN
 ## The known suffix of the stack is as follows:
 ## formula SUB formula 
 ##
-prog: VAR WHEN 
+touist_code: VAR WHEN 
 ##
 ## Ends in an error in state: 239.
 ##
@@ -2925,7 +2925,7 @@ prog: VAR WHEN
 ## The known suffix of the stack is as follows:
 ## formula 
 ##
-prog: VAR XOR VAR WHEN 
+touist_code: VAR XOR VAR WHEN 
 ##
 ## Ends in an error in state: 175.
 ##
@@ -2955,7 +2955,7 @@ At this point, a continuation of the formula started by:
 is expected. Instead, the following statement was read:
     $0
 
-prog: LPAREN VAR WHEN 
+touist_code: LPAREN VAR WHEN 
 ##
 ## Ends in an error in state: 218.
 ##
@@ -2986,7 +2986,7 @@ or continue the formula started by:
 Instead, the following statement were read:
     $0
 
-prog: NOT VAR WHEN 
+touist_code: NOT VAR WHEN 
 ##
 ## Ends in an error in state: 220.
 ##
@@ -3020,7 +3020,7 @@ NOTE: a whitespace or a new line between two formulas is
 strictly equivalent to a logical 'and' and is only available
 at the 'root' level of your formula list.
 
-prog: VAR ADD XOR 
+touist_code: VAR ADD XOR 
 ##
 ## Ends in an error in state: 182.
 ##
@@ -3029,7 +3029,7 @@ prog: VAR ADD XOR
 ## The known suffix of the stack is as follows:
 ## formula ADD 
 ##
-prog: VAR AND XOR 
+touist_code: VAR AND XOR 
 ##
 ## Ends in an error in state: 198.
 ##
@@ -3038,7 +3038,7 @@ prog: VAR AND XOR
 ## The known suffix of the stack is as follows:
 ## formula AND 
 ##
-prog: VAR DIV XOR 
+touist_code: VAR DIV XOR 
 ##
 ## Ends in an error in state: 180.
 ##
@@ -3047,7 +3047,7 @@ prog: VAR DIV XOR
 ## The known suffix of the stack is as follows:
 ## formula DIV 
 ##
-prog: VAR EQUAL XOR 
+touist_code: VAR EQUAL XOR 
 ##
 ## Ends in an error in state: 194.
 ##
@@ -3056,7 +3056,7 @@ prog: VAR EQUAL XOR
 ## The known suffix of the stack is as follows:
 ## formula EQUAL 
 ##
-prog: VAR EQUIV XOR 
+touist_code: VAR EQUIV XOR 
 ##
 ## Ends in an error in state: 202.
 ##
@@ -3065,7 +3065,7 @@ prog: VAR EQUIV XOR
 ## The known suffix of the stack is as follows:
 ## formula EQUIV 
 ##
-prog: VAR GE XOR 
+touist_code: VAR GE XOR 
 ##
 ## Ends in an error in state: 192.
 ##
@@ -3074,7 +3074,7 @@ prog: VAR GE XOR
 ## The known suffix of the stack is as follows:
 ## formula GE 
 ##
-prog: VAR GT XOR 
+touist_code: VAR GT XOR 
 ##
 ## Ends in an error in state: 190.
 ##
@@ -3083,7 +3083,7 @@ prog: VAR GT XOR
 ## The known suffix of the stack is as follows:
 ## formula GT 
 ##
-prog: VAR IMPLIES XOR 
+touist_code: VAR IMPLIES XOR 
 ##
 ## Ends in an error in state: 200.
 ##
@@ -3092,7 +3092,7 @@ prog: VAR IMPLIES XOR
 ## The known suffix of the stack is as follows:
 ## formula IMPLIES 
 ##
-prog: VAR LE XOR 
+touist_code: VAR LE XOR 
 ##
 ## Ends in an error in state: 188.
 ##
@@ -3101,7 +3101,7 @@ prog: VAR LE XOR
 ## The known suffix of the stack is as follows:
 ## formula LE 
 ##
-prog: VAR LT XOR 
+touist_code: VAR LT XOR 
 ##
 ## Ends in an error in state: 186.
 ##
@@ -3110,7 +3110,7 @@ prog: VAR LT XOR
 ## The known suffix of the stack is as follows:
 ## formula LT 
 ##
-prog: VAR MUL XOR 
+touist_code: VAR MUL XOR 
 ##
 ## Ends in an error in state: 178.
 ##
@@ -3119,7 +3119,7 @@ prog: VAR MUL XOR
 ## The known suffix of the stack is as follows:
 ## formula MUL 
 ##
-prog: VAR NOTEQUAL XOR 
+touist_code: VAR NOTEQUAL XOR 
 ##
 ## Ends in an error in state: 184.
 ##
@@ -3128,7 +3128,7 @@ prog: VAR NOTEQUAL XOR
 ## The known suffix of the stack is as follows:
 ## formula NOTEQUAL 
 ##
-prog: VAR OR XOR 
+touist_code: VAR OR XOR 
 ##
 ## Ends in an error in state: 196.
 ##
@@ -3137,7 +3137,7 @@ prog: VAR OR XOR
 ## The known suffix of the stack is as follows:
 ## formula OR 
 ##
-prog: VAR SUB XOR 
+touist_code: VAR SUB XOR 
 ##
 ## Ends in an error in state: 240.
 ##
@@ -3147,7 +3147,7 @@ prog: VAR SUB XOR
 ## The known suffix of the stack is as follows:
 ## formula SUB 
 ##
-prog: VAR XOR XOR 
+touist_code: VAR XOR XOR 
 ##
 ## Ends in an error in state: 174.
 ##
@@ -3156,7 +3156,7 @@ prog: VAR XOR XOR
 ## The known suffix of the stack is as follows:
 ## formula XOR 
 ##
-prog: NOT VAR SUB XOR 
+touist_code: NOT VAR SUB XOR 
 ##
 ## Ends in an error in state: 176.
 ##
@@ -3171,7 +3171,7 @@ operand. Instead, the following statement were read:
     $0
 which does not seem to be a formula.
 
-prog: VARTUPLE TERM COMMA XOR 
+touist_code: VARTUPLE TERM COMMA XOR 
 ##
 ## Ends in an error in state: 78.
 ##
@@ -3186,7 +3186,7 @@ list of term.
 The following statement does not seem to be a term:
     $0
 
-prog: XOR 
+touist_code: XOR 
 ##
 ## Ends in an error in state: 0.
 ##

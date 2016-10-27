@@ -73,6 +73,8 @@ let rec string_of_ast = function
   | Atleast (x,y) -> "atleast(" ^ (string_of_ast x) ^ "," ^ (string_of_ast y) ^ ")"
   | Let (v,x,c) -> (string_of_ast v) ^ "=" ^ (string_of_ast x) ^ ": " ^ (string_of_ast c)
   | Affect (v,c) -> (string_of_ast v) ^ "=" ^ (string_of_ast c)
+  | Touist_code (f,None) -> (string_of_ast_list "\n" f)
+  | Touist_code (f,Some a) -> (string_of_ast_list "\n" f) ^ "\n" ^(string_of_ast_list "\n" a)
 
 and string_of_ast_type = function
   | Int    x               -> "int"
@@ -128,6 +130,7 @@ and string_of_ast_type = function
   | Atleast (x,y)          -> "operator atleast"
   | Let (v,x,c)            -> "operator let"
   | Affect (_,_)           -> "operator ="
+  | Touist_code (_,_)      -> "(touist code)"
 
 and string_of_set = function
   | GenSet.Empty  -> "[]"

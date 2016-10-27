@@ -33,10 +33,9 @@ module GenSet = struct
     | SSet of StringSet.t
 end
 
-type prog =
-  | Prog of ast list * ast list option
-and var = string * ast list option
-and ast =
+type var = string * ast list option
+and ast = (* Touist_code is the entry point *)
+  | Touist_code      of ast list * ast list option
   | Int              of int
   | Float            of float
   | Bool             of bool

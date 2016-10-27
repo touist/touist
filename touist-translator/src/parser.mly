@@ -41,7 +41,7 @@
 %token LET
 %token EOF
 
-%start <Syntax.prog> prog
+%start <Syntax.ast> touist_code
 
 
 
@@ -131,10 +131,10 @@ comma_list(T):
   | x=T { x::[] }
   | x=T COMMA l=comma_list(T) { x::l }
 
-(* [prog] is the entry point of the parser *)
-prog:
-  | c=formula* DATA a=affect* EOF { Prog (c, Some a) }
-  | c=formula* EOF { Prog (c, None) }
+(* [touist_code] is the entry point of the parser *)
+touist_code:
+  | c=formula* DATA a=affect* EOF { Touist_code (c, Some a) }
+  | c=formula* EOF { Touist_code (c, None) }
 
 term:
   | t=TERM { Term (t,None) }
