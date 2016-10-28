@@ -136,29 +136,39 @@ touist_code:
   | c=formula* DATA a=affect* EOF { Touist_code (c, Some a) }
   | c=formula* EOF { Touist_code (c, None) }
 
+(* Used in tuple expression; see tuple-variable and tuple-term *)
+indices:
+  | e=exp { e }
+  | t=term { t }
+
+(* a tuple-term is of the form abc(1,d,3): the indices can be *)
 term:
-  | t=TERM { Term (t,None) }
-  | t=TUPLE (*LPAREN*) l=comma_list(term) RPAREN { Term (t, Some l) }
-  | t=TUPLE (*LPAREN*) l=comma_list(exp) RPAREN { Term (t, Some l) }
+  | t=TERM { Term (t,None) } (* simple-term *)
+  | t=TUPLE (*LPAREN*) l=comma_list(indices) RPAREN (* tuple-term *)
+    { Term (t, Some l) }
+
 set:
   | LBRACK RBRACK { Set_decl [] }
   | LBRACK l=comma_list(exp) RBRACK { Set_decl l }
   | LBRACK l=comma_list(term) RBRACK { Set_decl l }
 
+(* a local var is a variable used in 'let', 'bigand', 'bigor'... *)
 local_var:
-  | v=VAR { Var (v,None) } (* var = string * exp list option *)
+  | v=VAR { Var (v,None) }
+  
+(* a global variable is a variable used in the 'data' block
+  for defining sets and constants; it can be of the form of a 
+  tuple-variable, i.e. with prefix+indices: '$i(1,a,d)'.
+  The indices can be either expression or term *)
 global_var:
-  | v=local_var { v }
-  | v=VARTUPLE (*LPAREN*) l=comma_list(exp) RPAREN { Var (v,Some l) }
-  | v=VARTUPLE (*LPAREN*) l=comma_list(term) RPAREN { Var (v,Some l) }
+  | v=local_var { v } (* simple-variable *)
+  | v=VARTUPLE (*LPAREN*) l=comma_list(indices) RPAREN (* tuple-variable *)
+    { Var (v,Some l) }
 
 affect:
   | v=global_var AFFECT e=exp { Affect (v,e) }
 
 exp:
-  (* This parametrized rule allows to "regroup" every "formula OPERATOR formula"
-    under the same rule. I refactored the explicit rules to that form  to try to
-    have clearer messages in parser.messages *)
   | LPAREN exp RPAREN { $2 }
   | INT   { Int   $1 }
   | FLOAT { Float $1 }

@@ -15,7 +15,7 @@
 # ------------------------------------------------------------------------------
 touist_code: ATLEAST VAR COMMA VAR WHEN 
 ##
-## Ends in an error in state: 169.
+## Ends in an error in state: 170.
 ##
 ## exp -> exp . ADD exp [ XOR SUB RPAREN OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
 ## exp -> exp . SUB exp [ XOR SUB RPAREN OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
@@ -41,7 +41,7 @@ touist_code: ATLEAST VAR COMMA VAR WHEN
 ##
 touist_code: TUPLE UNION VAR COMMA VAR WHEN 
 ##
-## Ends in an error in state: 112.
+## Ends in an error in state: 115.
 ##
 ## exp -> exp . ADD exp [ XOR SUB RPAREN OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
 ## exp -> exp . SUB exp [ XOR SUB RPAREN OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
@@ -67,7 +67,7 @@ touist_code: TUPLE UNION VAR COMMA VAR WHEN
 ##
 touist_code: ATMOST VAR COMMA VAR WHEN 
 ##
-## Ends in an error in state: 164.
+## Ends in an error in state: 165.
 ##
 ## exp -> exp . ADD exp [ XOR SUB RPAREN OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
 ## exp -> exp . SUB exp [ XOR SUB RPAREN OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
@@ -93,7 +93,7 @@ touist_code: ATMOST VAR COMMA VAR WHEN
 ##
 touist_code: TUPLE SUBSET VAR COMMA VAR WHEN 
 ##
-## Ends in an error in state: 104.
+## Ends in an error in state: 107.
 ##
 ## exp -> exp . ADD exp [ XOR SUB RPAREN OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
 ## exp -> exp . SUB exp [ XOR SUB RPAREN OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
@@ -145,7 +145,7 @@ touist_code: TUPLE INTER VAR COMMA VAR WHEN
 ##
 touist_code: EXACT VAR COMMA VAR WHEN 
 ##
-## Ends in an error in state: 136.
+## Ends in an error in state: 137.
 ##
 ## exp -> exp . ADD exp [ XOR SUB RPAREN OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
 ## exp -> exp . SUB exp [ XOR SUB RPAREN OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
@@ -204,7 +204,7 @@ Instead, the following statement were read:
 
 touist_code: ATLEAST VAR COMMA XOR 
 ##
-## Ends in an error in state: 168.
+## Ends in an error in state: 169.
 ##
 ## formula -> ATLEAST exp COMMA . exp RPAREN [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ##
@@ -213,7 +213,7 @@ touist_code: ATLEAST VAR COMMA XOR
 ##
 touist_code: ATMOST VAR COMMA XOR 
 ##
-## Ends in an error in state: 163.
+## Ends in an error in state: 164.
 ##
 ## formula -> ATMOST exp COMMA . exp RPAREN [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ##
@@ -222,7 +222,7 @@ touist_code: ATMOST VAR COMMA XOR
 ##
 touist_code: EXACT VAR COMMA XOR 
 ##
-## Ends in an error in state: 135.
+## Ends in an error in state: 136.
 ##
 ## formula -> EXACT exp COMMA . exp RPAREN [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ##
@@ -249,7 +249,7 @@ touist_code: TUPLE INTER VAR COMMA XOR
 ##
 touist_code: TUPLE SUBSET VAR COMMA XOR 
 ##
-## Ends in an error in state: 103.
+## Ends in an error in state: 106.
 ##
 ## exp -> SUBSET exp COMMA . exp RPAREN [ XOR WHEN VARTUPLE VAR THEN SUB RPAREN RBRACK RANGE OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL EOF END ELSE DIV COMMA COLON AND ADD ]
 ##
@@ -258,7 +258,7 @@ touist_code: TUPLE SUBSET VAR COMMA XOR
 ##
 touist_code: TUPLE UNION VAR COMMA XOR 
 ##
-## Ends in an error in state: 111.
+## Ends in an error in state: 114.
 ##
 ## exp -> UNION exp COMMA . exp RPAREN [ XOR WHEN VARTUPLE VAR THEN SUB RPAREN RBRACK RANGE OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL EOF END ELSE DIV COMMA COLON AND ADD ]
 ##
@@ -272,7 +272,7 @@ Instead, the following statement were read:
 
 touist_code: ATLEAST VAR WHEN 
 ##
-## Ends in an error in state: 167.
+## Ends in an error in state: 168.
 ##
 ## exp -> exp . ADD exp [ XOR SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COMMA AND ADD ]
 ## exp -> exp . SUB exp [ XOR SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COMMA AND ADD ]
@@ -298,7 +298,7 @@ touist_code: ATLEAST VAR WHEN
 ##
 touist_code: ATMOST VAR WHEN 
 ##
-## Ends in an error in state: 162.
+## Ends in an error in state: 163.
 ##
 ## exp -> exp . ADD exp [ XOR SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COMMA AND ADD ]
 ## exp -> exp . SUB exp [ XOR SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COMMA AND ADD ]
@@ -324,7 +324,7 @@ touist_code: ATMOST VAR WHEN
 ##
 touist_code: EXACT VAR WHEN 
 ##
-## Ends in an error in state: 134.
+## Ends in an error in state: 135.
 ##
 ## exp -> exp . ADD exp [ XOR SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COMMA AND ADD ]
 ## exp -> exp . SUB exp [ XOR SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COMMA AND ADD ]
@@ -402,7 +402,7 @@ touist_code: TUPLE INTER VAR WHEN
 ##
 touist_code: TUPLE NOT VAR UNION 
 ##
-## Ends in an error in state: 98.
+## Ends in an error in state: 101.
 ##
 ## exp -> exp . ADD exp [ XOR WHEN VARTUPLE VAR THEN SUB RPAREN RBRACK RANGE OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL EOF END ELSE DIV COMMA COLON AND ADD ]
 ## exp -> exp . SUB exp [ XOR WHEN VARTUPLE VAR THEN SUB RPAREN RBRACK RANGE OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL EOF END ELSE DIV COMMA COLON AND ADD ]
@@ -428,7 +428,7 @@ touist_code: TUPLE NOT VAR UNION
 ##
 touist_code: TUPLE SUBSET VAR WHEN 
 ##
-## Ends in an error in state: 102.
+## Ends in an error in state: 105.
 ##
 ## exp -> exp . ADD exp [ XOR SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COMMA AND ADD ]
 ## exp -> exp . SUB exp [ XOR SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COMMA AND ADD ]
@@ -454,7 +454,7 @@ touist_code: TUPLE SUBSET VAR WHEN
 ##
 touist_code: TUPLE UNION VAR WHEN 
 ##
-## Ends in an error in state: 110.
+## Ends in an error in state: 113.
 ##
 ## exp -> exp . ADD exp [ XOR SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COMMA AND ADD ]
 ## exp -> exp . SUB exp [ XOR SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COMMA AND ADD ]
@@ -538,7 +538,7 @@ touist_code: TUPLE CARD VAR WHEN
 ##
 touist_code: TUPLE SQRT VAR WHEN 
 ##
-## Ends in an error in state: 99.
+## Ends in an error in state: 102.
 ##
 ## exp -> exp . ADD exp [ XOR SUB RPAREN OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
 ## exp -> exp . SUB exp [ XOR SUB RPAREN OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
@@ -564,7 +564,7 @@ touist_code: TUPLE SQRT VAR WHEN
 ##
 touist_code: TUPLE TOFLOAT VAR WHEN 
 ##
-## Ends in an error in state: 106.
+## Ends in an error in state: 109.
 ##
 ## exp -> exp . ADD exp [ XOR SUB RPAREN OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
 ## exp -> exp . SUB exp [ XOR SUB RPAREN OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
@@ -590,7 +590,7 @@ touist_code: TUPLE TOFLOAT VAR WHEN
 ##
 touist_code: TUPLE TOINT VAR WHEN 
 ##
-## Ends in an error in state: 108.
+## Ends in an error in state: 111.
 ##
 ## exp -> exp . ADD exp [ XOR SUB RPAREN OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
 ## exp -> exp . SUB exp [ XOR SUB RPAREN OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
@@ -616,7 +616,7 @@ touist_code: TUPLE TOINT VAR WHEN
 ##
 touist_code: TUPLE LPAREN VAR WHEN 
 ##
-## Ends in an error in state: 96.
+## Ends in an error in state: 99.
 ##
 ## exp -> LPAREN exp . RPAREN [ XOR WHEN VARTUPLE VAR THEN SUB RPAREN RBRACK RANGE OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL EOF END ELSE DIV COMMA COLON AND ADD ]
 ## exp -> exp . ADD exp [ XOR SUB RPAREN OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
@@ -648,7 +648,7 @@ Instead, the following statement were read:
 
 touist_code: ATLEAST XOR 
 ##
-## Ends in an error in state: 166.
+## Ends in an error in state: 167.
 ##
 ## formula -> ATLEAST . exp COMMA exp RPAREN [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ##
@@ -657,7 +657,7 @@ touist_code: ATLEAST XOR
 ##
 touist_code: ATMOST XOR 
 ##
-## Ends in an error in state: 161.
+## Ends in an error in state: 162.
 ##
 ## formula -> ATMOST . exp COMMA exp RPAREN [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ##
@@ -666,7 +666,7 @@ touist_code: ATMOST XOR
 ##
 touist_code: EXACT XOR 
 ##
-## Ends in an error in state: 133.
+## Ends in an error in state: 134.
 ##
 ## formula -> EXACT . exp COMMA exp RPAREN [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ##
@@ -680,7 +680,7 @@ Instead, the following statement were read:
 
 touist_code: BIGAND VAR IN VAR COLON VAR WHEN 
 ##
-## Ends in an error in state: 206.
+## Ends in an error in state: 207.
 ##
 ## formula -> formula . ADD formula [ XOR SUB OR NOTEQUAL MUL LT LE IMPLIES GT GE EQUIV EQUAL END DIV AND ADD ]
 ## formula -> formula . SUB formula [ XOR SUB OR NOTEQUAL MUL LT LE IMPLIES GT GE EQUIV EQUAL END DIV AND ADD ]
@@ -704,7 +704,7 @@ touist_code: BIGAND VAR IN VAR COLON VAR WHEN
 ##
 touist_code: BIGOR VAR IN VAR COLON VAR WHEN 
 ##
-## Ends in an error in state: 215.
+## Ends in an error in state: 216.
 ##
 ## formula -> formula . ADD formula [ XOR SUB OR NOTEQUAL MUL LT LE IMPLIES GT GE EQUIV EQUAL END DIV AND ADD ]
 ## formula -> formula . SUB formula [ XOR SUB OR NOTEQUAL MUL LT LE IMPLIES GT GE EQUIV EQUAL END DIV AND ADD ]
@@ -738,7 +738,7 @@ is only allowed outside $6
 
 touist_code: BIGAND VAR IN VAR COLON XOR 
 ##
-## Ends in an error in state: 205.
+## Ends in an error in state: 206.
 ##
 ## formula -> BIGAND comma_list(local_var) IN comma_list(exp) COLON . formula END [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ##
@@ -747,7 +747,7 @@ touist_code: BIGAND VAR IN VAR COLON XOR
 ##
 touist_code: BIGOR VAR IN VAR COLON XOR 
 ##
-## Ends in an error in state: 214.
+## Ends in an error in state: 215.
 ##
 ## formula -> BIGOR comma_list(local_var) IN comma_list(exp) COLON . formula END [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ##
@@ -761,7 +761,7 @@ formula. Instead, the following statement were read:
 
 touist_code: BIGAND VAR IN VAR RPAREN 
 ##
-## Ends in an error in state: 157.
+## Ends in an error in state: 158.
 ##
 ## formula -> BIGAND comma_list(local_var) IN comma_list(exp) . COLON formula END [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ## formula -> BIGAND comma_list(local_var) IN comma_list(exp) . WHEN exp COLON formula END [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
@@ -773,11 +773,11 @@ touist_code: BIGAND VAR IN VAR RPAREN
 ## This implies that, although the LR(1) items shown above provide an
 ## accurate view of the past (what has been recognized so far), they
 ## may provide an INCOMPLETE view of the future (what was expected next).
-## In state 80, spurious reduction of production comma_list(exp) -> exp 
+## In state 93, spurious reduction of production comma_list(exp) -> exp 
 ##
 touist_code: BIGOR VAR IN VAR RPAREN 
 ##
-## Ends in an error in state: 145.
+## Ends in an error in state: 146.
 ##
 ## formula -> BIGOR comma_list(local_var) IN comma_list(exp) . COLON formula END [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ## formula -> BIGOR comma_list(local_var) IN comma_list(exp) . WHEN exp COLON formula END [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
@@ -789,7 +789,7 @@ touist_code: BIGOR VAR IN VAR RPAREN
 ## This implies that, although the LR(1) items shown above provide an
 ## accurate view of the past (what has been recognized so far), they
 ## may provide an INCOMPLETE view of the future (what was expected next).
-## In state 80, spurious reduction of production comma_list(exp) -> exp 
+## In state 93, spurious reduction of production comma_list(exp) -> exp 
 ##
 
 Ill-formed $4 statement. At this point, expecting either ':' or 'when' or
@@ -800,7 +800,7 @@ Instead, the following statement were read:
 
 touist_code: BIGAND VAR IN VAR WHEN VAR COLON VAR WHEN 
 ##
-## Ends in an error in state: 173.
+## Ends in an error in state: 174.
 ##
 ## formula -> formula . ADD formula [ XOR SUB OR NOTEQUAL MUL LT LE IMPLIES GT GE EQUIV EQUAL END DIV AND ADD ]
 ## formula -> formula . SUB formula [ XOR SUB OR NOTEQUAL MUL LT LE IMPLIES GT GE EQUIV EQUAL END DIV AND ADD ]
@@ -824,7 +824,7 @@ touist_code: BIGAND VAR IN VAR WHEN VAR COLON VAR WHEN
 ##
 touist_code: BIGOR VAR IN VAR WHEN VAR COLON VAR WHEN 
 ##
-## Ends in an error in state: 212.
+## Ends in an error in state: 213.
 ##
 ## formula -> formula . ADD formula [ XOR SUB OR NOTEQUAL MUL LT LE IMPLIES GT GE EQUIV EQUAL END DIV AND ADD ]
 ## formula -> formula . SUB formula [ XOR SUB OR NOTEQUAL MUL LT LE IMPLIES GT GE EQUIV EQUAL END DIV AND ADD ]
@@ -857,7 +857,7 @@ Explanation: $8 expects a formula, but 'a b' is a list of formulas.
 
 touist_code: BIGAND VAR IN VAR WHEN VAR COLON XOR 
 ##
-## Ends in an error in state: 160.
+## Ends in an error in state: 161.
 ##
 ## formula -> BIGAND comma_list(local_var) IN comma_list(exp) WHEN exp COLON . formula END [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ##
@@ -866,7 +866,7 @@ touist_code: BIGAND VAR IN VAR WHEN VAR COLON XOR
 ##
 touist_code: BIGOR VAR IN VAR WHEN VAR COLON XOR 
 ##
-## Ends in an error in state: 148.
+## Ends in an error in state: 149.
 ##
 ## formula -> BIGOR comma_list(local_var) IN comma_list(exp) WHEN exp COLON . formula END [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ##
@@ -880,7 +880,7 @@ Instead, the following statement were read:
 
 touist_code: BIGAND VAR IN VAR WHEN VAR WHEN 
 ##
-## Ends in an error in state: 159.
+## Ends in an error in state: 160.
 ##
 ## exp -> exp . ADD exp [ XOR SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COLON AND ADD ]
 ## exp -> exp . SUB exp [ XOR SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COLON AND ADD ]
@@ -906,7 +906,7 @@ touist_code: BIGAND VAR IN VAR WHEN VAR WHEN
 ##
 touist_code: BIGOR VAR IN VAR WHEN VAR WHEN 
 ##
-## Ends in an error in state: 147.
+## Ends in an error in state: 148.
 ##
 ## exp -> exp . ADD exp [ XOR SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COLON AND ADD ]
 ## exp -> exp . SUB exp [ XOR SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COLON AND ADD ]
@@ -939,7 +939,7 @@ Instead, the following statement were read:
 
 touist_code: BIGAND VAR IN VAR WHEN XOR 
 ##
-## Ends in an error in state: 158.
+## Ends in an error in state: 159.
 ##
 ## formula -> BIGAND comma_list(local_var) IN comma_list(exp) WHEN . exp COLON formula END [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ##
@@ -948,7 +948,7 @@ touist_code: BIGAND VAR IN VAR WHEN XOR
 ##
 touist_code: BIGOR VAR IN VAR WHEN XOR 
 ##
-## Ends in an error in state: 146.
+## Ends in an error in state: 147.
 ##
 ## formula -> BIGOR comma_list(local_var) IN comma_list(exp) WHEN . exp COLON formula END [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ##
@@ -962,7 +962,7 @@ Instead, the following statement were read:
 
 touist_code: BIGAND XOR 
 ##
-## Ends in an error in state: 154.
+## Ends in an error in state: 155.
 ##
 ## formula -> BIGAND . comma_list(local_var) IN comma_list(exp) COLON formula END [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ## formula -> BIGAND . comma_list(local_var) IN comma_list(exp) WHEN exp COLON formula END [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
@@ -972,7 +972,7 @@ touist_code: BIGAND XOR
 ##
 touist_code: BIGOR XOR 
 ##
-## Ends in an error in state: 139.
+## Ends in an error in state: 140.
 ##
 ## formula -> BIGOR . comma_list(local_var) IN comma_list(exp) COLON formula END [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ## formula -> BIGOR . comma_list(local_var) IN comma_list(exp) WHEN exp COLON formula END [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
@@ -988,7 +988,7 @@ Instead, the following statement were read:
 
 touist_code: BIGAND VAR IN XOR 
 ##
-## Ends in an error in state: 156.
+## Ends in an error in state: 157.
 ##
 ## formula -> BIGAND comma_list(local_var) IN . comma_list(exp) COLON formula END [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ## formula -> BIGAND comma_list(local_var) IN . comma_list(exp) WHEN exp COLON formula END [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
@@ -998,7 +998,7 @@ touist_code: BIGAND VAR IN XOR
 ##
 touist_code: BIGOR VAR IN XOR 
 ##
-## Ends in an error in state: 144.
+## Ends in an error in state: 145.
 ##
 ## formula -> BIGOR comma_list(local_var) IN . comma_list(exp) COLON formula END [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ## formula -> BIGOR comma_list(local_var) IN . comma_list(exp) WHEN exp COLON formula END [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
@@ -1013,7 +1013,7 @@ expressions that would refer to sets. Instead, the following statement were read
 
 touist_code: BIGOR VAR XOR 
 ##
-## Ends in an error in state: 140.
+## Ends in an error in state: 141.
 ##
 ## comma_list(local_var) -> local_var . [ IN ]
 ## comma_list(local_var) -> local_var . COMMA comma_list(local_var) [ IN ]
@@ -1029,7 +1029,7 @@ Instead, the following statement were read:
 
 touist_code: BIGOR VAR COMMA XOR 
 ##
-## Ends in an error in state: 141.
+## Ends in an error in state: 142.
 ##
 ## comma_list(local_var) -> local_var COMMA . comma_list(local_var) [ IN ]
 ##
@@ -1039,21 +1039,6 @@ touist_code: BIGOR VAR COMMA XOR
 
 An expression is expected right after $1 to continue the comma-separated
 list of variables. Instead, the following statement were read:
-    $0
-
-touist_code: VARTUPLE VAR COMMA XOR 
-##
-## Ends in an error in state: 81.
-##
-## comma_list(exp) -> exp COMMA . comma_list(exp) [ WHEN RPAREN RBRACK COLON ]
-##
-## The known suffix of the stack is as follows:
-## exp COMMA 
-##
-
-An expression is expected right after $1 to continue the comma-separated
-list of expressions. 
-The following statement does not seem to be an expression:
     $0
 
 touist_code: TUPLE VAR IN XOR 
@@ -1071,7 +1056,7 @@ Instead, $0 was read.
 
 touist_code: DATA VAR AFFECT VAR WHEN 
 ##
-## Ends in an error in state: 236.
+## Ends in an error in state: 237.
 ##
 ## affect -> global_var AFFECT exp . [ VARTUPLE VAR EOF ]
 ## exp -> exp . ADD exp [ XOR VARTUPLE VAR SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL EOF DIV AND ADD ]
@@ -1102,7 +1087,7 @@ expression. Instead, the following statement were read:
 
 touist_code: DATA VAR AFFECT XOR 
 ##
-## Ends in an error in state: 235.
+## Ends in an error in state: 236.
 ##
 ## affect -> global_var AFFECT . exp [ VARTUPLE VAR EOF ]
 ##
@@ -1116,7 +1101,7 @@ Instead, the following statement were read:
 
 touist_code: DATA VAR XOR 
 ##
-## Ends in an error in state: 234.
+## Ends in an error in state: 235.
 ##
 ## affect -> global_var . AFFECT exp [ VARTUPLE VAR EOF ]
 ##
@@ -1125,7 +1110,7 @@ touist_code: DATA VAR XOR
 ##
 touist_code: LET VAR XOR 
 ##
-## Ends in an error in state: 123.
+## Ends in an error in state: 124.
 ##
 ## formula -> LET local_var . AFFECT exp COLON formula [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ## formula -> LET local_var . AFFECT formula COLON formula [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
@@ -1142,9 +1127,9 @@ Instead, the following statement were read:
 
 touist_code: DATA XOR 
 ##
-## Ends in an error in state: 231.
+## Ends in an error in state: 232.
 ##
-## prog -> list(formula) DATA . list(affect) EOF [ # ]
+## touist_code -> list(formula) DATA . list(affect) EOF [ # ]
 ##
 ## The known suffix of the stack is as follows:
 ## list(formula) DATA 
@@ -1157,7 +1142,7 @@ Instead, the following statement were read:
 
 touist_code: IF VAR THEN VAR ELSE VAR WHEN 
 ##
-## Ends in an error in state: 210.
+## Ends in an error in state: 211.
 ##
 ## formula -> formula . ADD formula [ XOR SUB OR NOTEQUAL MUL LT LE IMPLIES GT GE EQUIV EQUAL END DIV AND ADD ]
 ## formula -> formula . SUB formula [ XOR SUB OR NOTEQUAL MUL LT LE IMPLIES GT GE EQUIV EQUAL END DIV AND ADD ]
@@ -1254,7 +1239,7 @@ Instead, the following statement were read:
 
 touist_code: IF VAR THEN VAR WHEN 
 ##
-## Ends in an error in state: 208.
+## Ends in an error in state: 209.
 ##
 ## formula -> formula . ADD formula [ XOR SUB OR NOTEQUAL MUL LT LE IMPLIES GT GE EQUIV EQUAL ELSE DIV AND ADD ]
 ## formula -> formula . SUB formula [ XOR SUB OR NOTEQUAL MUL LT LE IMPLIES GT GE EQUIV EQUAL ELSE DIV AND ADD ]
@@ -1286,7 +1271,7 @@ Instead, the following statement were read:
 
 touist_code: IF VAR THEN VAR ELSE XOR 
 ##
-## Ends in an error in state: 209.
+## Ends in an error in state: 210.
 ##
 ## formula -> IF exp THEN formula ELSE . formula END [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ##
@@ -1314,7 +1299,7 @@ Instead, the following statement were read:
 
 touist_code: IF VAR THEN XOR 
 ##
-## Ends in an error in state: 152.
+## Ends in an error in state: 153.
 ##
 ## formula -> IF exp THEN . formula ELSE formula END [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ##
@@ -1323,7 +1308,7 @@ touist_code: IF VAR THEN XOR
 ##
 touist_code: LET VAR AFFECT IF VAR THEN XOR 
 ##
-## Ends in an error in state: 131.
+## Ends in an error in state: 132.
 ##
 ## exp -> IF exp THEN . exp ELSE exp END [ XOR SUB RPAREN OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL ELSE DIV COLON AND ADD ]
 ## formula -> IF exp THEN . formula ELSE formula END [ XOR SUB RPAREN OR NOTEQUAL MUL LT LE IMPLIES GT GE EQUIV EQUAL ELSE DIV COLON AND ADD ]
@@ -1347,7 +1332,7 @@ Instead, the following statement were read:
 
 touist_code: IF VAR WHEN 
 ##
-## Ends in an error in state: 151.
+## Ends in an error in state: 152.
 ##
 ## exp -> exp . ADD exp [ XOR THEN SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
 ## exp -> exp . SUB exp [ XOR THEN SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
@@ -1373,7 +1358,7 @@ touist_code: IF VAR WHEN
 ##
 touist_code: LET VAR AFFECT IF VAR WHEN 
 ##
-## Ends in an error in state: 130.
+## Ends in an error in state: 131.
 ##
 ## exp -> exp . ADD exp [ XOR THEN SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
 ## exp -> exp . SUB exp [ XOR THEN SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
@@ -1434,7 +1419,7 @@ Instead, the following statement were read:
 
 touist_code: IF XOR 
 ##
-## Ends in an error in state: 150.
+## Ends in an error in state: 151.
 ##
 ## formula -> IF . exp THEN formula ELSE formula END [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ##
@@ -1443,7 +1428,7 @@ touist_code: IF XOR
 ##
 touist_code: LET VAR AFFECT IF XOR 
 ##
-## Ends in an error in state: 129.
+## Ends in an error in state: 130.
 ##
 ## exp -> IF . exp THEN exp ELSE exp END [ XOR SUB RPAREN OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL ELSE DIV COLON AND ADD ]
 ## formula -> IF . exp THEN formula ELSE formula END [ XOR SUB RPAREN OR NOTEQUAL MUL LT LE IMPLIES GT GE EQUIV EQUAL ELSE DIV COLON AND ADD ]
@@ -1459,7 +1444,7 @@ Note: you cannot use a formula as condition for the 'if' statement.
 
 touist_code: LET VAR AFFECT LPAREN XOR 
 ##
-## Ends in an error in state: 127.
+## Ends in an error in state: 128.
 ##
 ## exp -> LPAREN . exp RPAREN [ XOR SUB RPAREN OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL ELSE DIV COLON AND ADD ]
 ## formula -> LPAREN . formula RPAREN [ XOR SUB RPAREN OR NOTEQUAL MUL LT LE IMPLIES GT GE EQUIV EQUAL ELSE DIV COLON AND ADD ]
@@ -1529,7 +1514,7 @@ Instead, the following statement were read:
 
 touist_code: LET VAR AFFECT NOT XOR 
 ##
-## Ends in an error in state: 126.
+## Ends in an error in state: 127.
 ##
 ## exp -> NOT . exp [ XOR SUB RPAREN OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL ELSE DIV COLON AND ADD ]
 ## formula -> NOT . formula [ XOR SUB RPAREN OR NOTEQUAL MUL LT LE IMPLIES GT GE EQUIV EQUAL ELSE DIV COLON AND ADD ]
@@ -1539,7 +1524,7 @@ touist_code: LET VAR AFFECT NOT XOR
 ##
 touist_code: LET VAR AFFECT SUB XOR 
 ##
-## Ends in an error in state: 125.
+## Ends in an error in state: 126.
 ##
 ## exp -> SUB . exp [ XOR SUB RPAREN OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL ELSE DIV COLON AND ADD ]
 ## formula -> SUB . formula [ XOR SUB RPAREN OR NOTEQUAL MUL LT LE IMPLIES GT GE EQUIV EQUAL ELSE DIV COLON AND ADD ]
@@ -1567,7 +1552,7 @@ touist_code: TUPLE SUB XOR
 ##
 touist_code: NOT XOR 
 ##
-## Ends in an error in state: 120.
+## Ends in an error in state: 121.
 ##
 ## formula -> NOT . formula [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ##
@@ -1576,7 +1561,7 @@ touist_code: NOT XOR
 ##
 touist_code: SUB XOR 
 ##
-## Ends in an error in state: 119.
+## Ends in an error in state: 120.
 ##
 ## formula -> SUB . formula [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ##
@@ -1591,7 +1576,7 @@ Instead, the following statement were read:
 
 touist_code: LET VAR AFFECT TOP COLON VAR WHEN 
 ##
-## Ends in an error in state: 224.
+## Ends in an error in state: 225.
 ##
 ## formula -> formula . ADD formula [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ## formula -> formula . SUB formula [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
@@ -1627,7 +1612,7 @@ single formula.
 
 touist_code: LET VAR AFFECT TOP COLON XOR 
 ##
-## Ends in an error in state: 223.
+## Ends in an error in state: 224.
 ##
 ## formula -> LET local_var AFFECT formula COLON . formula [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ##
@@ -1636,7 +1621,7 @@ touist_code: LET VAR AFFECT TOP COLON XOR
 ##
 touist_code: LET VAR AFFECT TOP WHEN 
 ##
-## Ends in an error in state: 222.
+## Ends in an error in state: 223.
 ##
 ## formula -> formula . ADD formula [ XOR SUB OR NOTEQUAL MUL LT LE IMPLIES GT GE EQUIV EQUAL DIV COLON AND ADD ]
 ## formula -> formula . SUB formula [ XOR SUB OR NOTEQUAL MUL LT LE IMPLIES GT GE EQUIV EQUAL DIV COLON AND ADD ]
@@ -1669,7 +1654,7 @@ of formulas.
 
 touist_code: LET VAR AFFECT VAR COLON VAR WHEN 
 ##
-## Ends in an error in state: 227.
+## Ends in an error in state: 228.
 ##
 ## formula -> formula . ADD formula [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ## formula -> formula . SUB formula [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
@@ -1705,7 +1690,7 @@ expects a single formula.
 
 touist_code: LET VAR AFFECT VAR COLON XOR 
 ##
-## Ends in an error in state: 226.
+## Ends in an error in state: 227.
 ##
 ## formula -> LET local_var AFFECT exp COLON . formula [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ##
@@ -1719,7 +1704,7 @@ Instead, the following statement were read:
 
 touist_code: LET VAR AFFECT VAR WHEN 
 ##
-## Ends in an error in state: 225.
+## Ends in an error in state: 226.
 ##
 ## exp -> exp . ADD exp [ XOR SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COLON AND ADD ]
 ## exp -> exp . SUB exp [ XOR SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COLON AND ADD ]
@@ -1752,7 +1737,7 @@ Instead, the following statement were read:
 
 touist_code: LET VAR AFFECT XOR 
 ##
-## Ends in an error in state: 124.
+## Ends in an error in state: 125.
 ##
 ## formula -> LET local_var AFFECT . exp COLON formula [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ## formula -> LET local_var AFFECT . formula COLON formula [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
@@ -1768,7 +1753,7 @@ Instead, the following statement were read:
 
 touist_code: LET XOR 
 ##
-## Ends in an error in state: 122.
+## Ends in an error in state: 123.
 ##
 ## formula -> LET . local_var AFFECT exp COLON formula [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ## formula -> LET . local_var AFFECT formula COLON formula [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
@@ -1819,7 +1804,7 @@ touist_code: TUPLE UNION XOR
 ##
 touist_code: LPAREN XOR 
 ##
-## Ends in an error in state: 121.
+## Ends in an error in state: 122.
 ##
 ## formula -> LPAREN . formula RPAREN [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ##
@@ -1833,18 +1818,13 @@ Instead, the following statement were read:
 
 touist_code: TUPLE LBRACK TERM RPAREN 
 ##
-## Ends in an error in state: 92.
+## Ends in an error in state: 85.
 ##
-## set -> LBRACK comma_list(term) . RBRACK [ XOR WHEN VARTUPLE VAR THEN SUB RPAREN RBRACK RANGE OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL EOF END ELSE DIV COMMA COLON AND ADD ]
+## comma_list(term) -> term . [ RBRACK ]
+## comma_list(term) -> term . COMMA comma_list(term) [ RBRACK ]
 ##
 ## The known suffix of the stack is as follows:
-## LBRACK comma_list(term) 
-##
-## WARNING: This example involves spurious reductions.
-## This implies that, although the LR(1) items shown above provide an
-## accurate view of the past (what has been recognized so far), they
-## may provide an INCOMPLETE view of the future (what was expected next).
-## In state 77, spurious reduction of production comma_list(term) -> term 
+## term 
 ##
 
 Ill-formed set. At this point, either finish the comma-separated list of terms
@@ -1855,7 +1835,7 @@ Instead, the following statement were read:
 
 touist_code: TUPLE LBRACK VAR COMMA BOOL WHEN 
 ##
-## Ends in an error in state: 94.
+## Ends in an error in state: 97.
 ##
 ## set -> LBRACK comma_list(exp) . RBRACK [ XOR WHEN VARTUPLE VAR THEN SUB RPAREN RBRACK RANGE OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL EOF END ELSE DIV COMMA COLON AND ADD ]
 ##
@@ -1866,8 +1846,8 @@ touist_code: TUPLE LBRACK VAR COMMA BOOL WHEN
 ## This implies that, although the LR(1) items shown above provide an
 ## accurate view of the past (what has been recognized so far), they
 ## may provide an INCOMPLETE view of the future (what was expected next).
-## In state 80, spurious reduction of production comma_list(exp) -> exp 
-## In state 82, spurious reduction of production comma_list(exp) -> exp COMMA comma_list(exp) 
+## In state 93, spurious reduction of production comma_list(exp) -> exp 
+## In state 94, spurious reduction of production comma_list(exp) -> exp COMMA comma_list(exp) 
 ##
 
 Ill-formed set. At this point, either finish the comma-separated list of expressions
@@ -2510,71 +2490,53 @@ The operator over expressions $1 does not seem to be given an
 expression on its right; instead, got the following statement:
     $0
 
-touist_code: TUPLE VAR WHEN 
+touist_code: VARTUPLE TERM RBRACK 
 ##
-## Ends in an error in state: 85.
+## Ends in an error in state: 78.
 ##
-## term -> TUPLE comma_list(exp) . RPAREN [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN RBRACK OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COMMA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
+## comma_list(indices) -> indices . [ RPAREN ]
+## comma_list(indices) -> indices . COMMA comma_list(indices) [ RPAREN ]
 ##
 ## The known suffix of the stack is as follows:
-## TUPLE comma_list(exp) 
-##
-## WARNING: This example involves spurious reductions.
-## This implies that, although the LR(1) items shown above provide an
-## accurate view of the past (what has been recognized so far), they
-## may provide an INCOMPLETE view of the future (what was expected next).
-## In state 80, spurious reduction of production comma_list(exp) -> exp 
+## indices 
 ##
 
-At this point, either finish the tuple-term with ')' or use ',' to
-continue the comma-separated list of terms started by:
+At this point, the tuple-indices list either expects a closing ')' or
+a ',' for continuiing the comma-separated list of indices started by:
     $1
 Instead, the following statement were read:
     $0
 
-touist_code: TUPLE TERM XOR 
-##
-## Ends in an error in state: 77.
-##
-## comma_list(term) -> term . [ RPAREN RBRACK ]
-## comma_list(term) -> term . COMMA comma_list(term) [ RPAREN RBRACK ]
-##
-## The known suffix of the stack is as follows:
-## term 
-##
-touist_code: VARTUPLE TERM RBRACK 
-##
-## Ends in an error in state: 114.
-##
-## global_var -> VARTUPLE comma_list(term) . RPAREN [ XOR WHEN VARTUPLE VAR TUPLE TOP THEN TERM SUB RPAREN RBRACK RANGE OR NOTEQUAL NOT MUL MOD LT LPAREN LET LE INT IN IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COMMA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND AFFECT ADD ]
-##
-## The known suffix of the stack is as follows:
-## VARTUPLE comma_list(term) 
-##
-## WARNING: This example involves spurious reductions.
-## This implies that, although the LR(1) items shown above provide an
-## accurate view of the past (what has been recognized so far), they
-## may provide an INCOMPLETE view of the future (what was expected next).
-## In state 77, spurious reduction of production comma_list(term) -> term 
-##
 touist_code: VARTUPLE VAR VARTUPLE 
 ##
-## Ends in an error in state: 116.
+## Ends in an error in state: 80.
 ##
-## global_var -> VARTUPLE comma_list(exp) . RPAREN [ XOR WHEN VARTUPLE VAR TUPLE TOP THEN TERM SUB RPAREN RBRACK RANGE OR NOTEQUAL NOT MUL MOD LT LPAREN LET LE INT IN IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COMMA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND AFFECT ADD ]
+## exp -> exp . ADD exp [ XOR SUB RPAREN OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COMMA AND ADD ]
+## exp -> exp . SUB exp [ XOR SUB RPAREN OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COMMA AND ADD ]
+## exp -> exp . MUL exp [ XOR SUB RPAREN OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COMMA AND ADD ]
+## exp -> exp . DIV exp [ XOR SUB RPAREN OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COMMA AND ADD ]
+## exp -> exp . MOD exp [ XOR SUB RPAREN OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COMMA AND ADD ]
+## exp -> exp . AND exp [ XOR SUB RPAREN OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COMMA AND ADD ]
+## exp -> exp . OR exp [ XOR SUB RPAREN OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COMMA AND ADD ]
+## exp -> exp . XOR exp [ XOR SUB RPAREN OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COMMA AND ADD ]
+## exp -> exp . IMPLIES exp [ XOR SUB RPAREN OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COMMA AND ADD ]
+## exp -> exp . EQUIV exp [ XOR SUB RPAREN OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COMMA AND ADD ]
+## exp -> exp . EQUAL exp [ XOR SUB RPAREN OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COMMA AND ADD ]
+## exp -> exp . NOTEQUAL exp [ XOR SUB RPAREN OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COMMA AND ADD ]
+## exp -> exp . LT exp [ XOR SUB RPAREN OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COMMA AND ADD ]
+## exp -> exp . LE exp [ XOR SUB RPAREN OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COMMA AND ADD ]
+## exp -> exp . GT exp [ XOR SUB RPAREN OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COMMA AND ADD ]
+## exp -> exp . GE exp [ XOR SUB RPAREN OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COMMA AND ADD ]
+## exp -> exp . IN exp [ XOR SUB RPAREN OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COMMA AND ADD ]
+## indices -> exp . [ RPAREN COMMA ]
 ##
 ## The known suffix of the stack is as follows:
-## VARTUPLE comma_list(exp) 
-##
-## WARNING: This example involves spurious reductions.
-## This implies that, although the LR(1) items shown above provide an
-## accurate view of the past (what has been recognized so far), they
-## may provide an INCOMPLETE view of the future (what was expected next).
-## In state 80, spurious reduction of production comma_list(exp) -> exp 
+## exp 
 ##
 
-At this point, the $2 definition either expects a closing ')'
-or a ',' for continuiing the comma-separated expression list.
+the expression list either expects a closing ')' or a ',' for
+continuiing the comma-separated expression list started by:
+    $1
 Instead, the following statement were read:
     $0
 
@@ -2582,39 +2544,37 @@ touist_code: VARTUPLE XOR
 ##
 ## Ends in an error in state: 1.
 ##
-## global_var -> VARTUPLE . comma_list(exp) RPAREN [ XOR WHEN VARTUPLE VAR TUPLE TOP THEN TERM SUB RPAREN RBRACK RANGE OR NOTEQUAL NOT MUL MOD LT LPAREN LET LE INT IN IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COMMA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND AFFECT ADD ]
-## global_var -> VARTUPLE . comma_list(term) RPAREN [ XOR WHEN VARTUPLE VAR TUPLE TOP THEN TERM SUB RPAREN RBRACK RANGE OR NOTEQUAL NOT MUL MOD LT LPAREN LET LE INT IN IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COMMA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND AFFECT ADD ]
+## global_var -> VARTUPLE . comma_list(indices) RPAREN [ XOR WHEN VARTUPLE VAR TUPLE TOP THEN TERM SUB RPAREN RBRACK RANGE OR NOTEQUAL NOT MUL MOD LT LPAREN LET LE INT IN IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COMMA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND AFFECT ADD ]
 ##
 ## The known suffix of the stack is as follows:
 ## VARTUPLE 
 ##
 
-Ill-formed variable-tuple statement that was started by:
+Ill-formed tuple-variable statement that was started by:
     $1
-At this point, expecting a list of comma-separated expressions or terms.
-Instead, the following statement were read:
+At this point, expecting a list of comma-separated indices
+(term or expression). Instead, the following statement were read:
     $0
 
 touist_code: TUPLE XOR 
 ##
 ## Ends in an error in state: 12.
 ##
-## term -> TUPLE . comma_list(term) RPAREN [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN RBRACK OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COMMA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
-## term -> TUPLE . comma_list(exp) RPAREN [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN RBRACK OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COMMA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
+## term -> TUPLE . comma_list(indices) RPAREN [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN RBRACK OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COMMA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ##
 ## The known suffix of the stack is as follows:
 ## TUPLE 
 ##
 
-Ill-formed term-tuple statement that was started by:
+Ill-formed tuple-term statement that was started by:
     $1
-At this point, expecting a list of comma-separated expressions or terms.
-Instead, the following statement were read:
+At this point, expecting a list of comma-separated indices
+(term or expression). Instead, the following statement were read:
     $0
 
 touist_code: VAR ADD VAR WHEN 
 ##
-## Ends in an error in state: 183.
+## Ends in an error in state: 184.
 ##
 ## formula -> formula . ADD formula [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ## formula -> formula ADD formula . [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
@@ -2638,7 +2598,7 @@ touist_code: VAR ADD VAR WHEN
 ##
 touist_code: VAR AND VAR WHEN 
 ##
-## Ends in an error in state: 199.
+## Ends in an error in state: 200.
 ##
 ## formula -> formula . ADD formula [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ## formula -> formula . SUB formula [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
@@ -2662,7 +2622,7 @@ touist_code: VAR AND VAR WHEN
 ##
 touist_code: VAR EQUAL VAR WHEN 
 ##
-## Ends in an error in state: 195.
+## Ends in an error in state: 196.
 ##
 ## formula -> formula . ADD formula [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ## formula -> formula . SUB formula [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
@@ -2686,7 +2646,7 @@ touist_code: VAR EQUAL VAR WHEN
 ##
 touist_code: VAR EQUIV VAR WHEN 
 ##
-## Ends in an error in state: 203.
+## Ends in an error in state: 204.
 ##
 ## formula -> formula . ADD formula [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ## formula -> formula . SUB formula [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
@@ -2710,7 +2670,7 @@ touist_code: VAR EQUIV VAR WHEN
 ##
 touist_code: VAR GE VAR WHEN 
 ##
-## Ends in an error in state: 193.
+## Ends in an error in state: 194.
 ##
 ## formula -> formula . ADD formula [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ## formula -> formula . SUB formula [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
@@ -2734,7 +2694,7 @@ touist_code: VAR GE VAR WHEN
 ##
 touist_code: VAR GT VAR WHEN 
 ##
-## Ends in an error in state: 191.
+## Ends in an error in state: 192.
 ##
 ## formula -> formula . ADD formula [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ## formula -> formula . SUB formula [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
@@ -2758,7 +2718,7 @@ touist_code: VAR GT VAR WHEN
 ##
 touist_code: VAR IMPLIES VAR WHEN 
 ##
-## Ends in an error in state: 201.
+## Ends in an error in state: 202.
 ##
 ## formula -> formula . ADD formula [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ## formula -> formula . SUB formula [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
@@ -2782,7 +2742,7 @@ touist_code: VAR IMPLIES VAR WHEN
 ##
 touist_code: VAR LE VAR WHEN 
 ##
-## Ends in an error in state: 189.
+## Ends in an error in state: 190.
 ##
 ## formula -> formula . ADD formula [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ## formula -> formula . SUB formula [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
@@ -2806,7 +2766,7 @@ touist_code: VAR LE VAR WHEN
 ##
 touist_code: VAR LT VAR WHEN 
 ##
-## Ends in an error in state: 187.
+## Ends in an error in state: 188.
 ##
 ## formula -> formula . ADD formula [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ## formula -> formula . SUB formula [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
@@ -2830,7 +2790,7 @@ touist_code: VAR LT VAR WHEN
 ##
 touist_code: VAR NOTEQUAL VAR WHEN 
 ##
-## Ends in an error in state: 185.
+## Ends in an error in state: 186.
 ##
 ## formula -> formula . ADD formula [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ## formula -> formula . SUB formula [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
@@ -2854,7 +2814,7 @@ touist_code: VAR NOTEQUAL VAR WHEN
 ##
 touist_code: VAR OR VAR WHEN 
 ##
-## Ends in an error in state: 197.
+## Ends in an error in state: 198.
 ##
 ## formula -> formula . ADD formula [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ## formula -> formula . SUB formula [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
@@ -2878,7 +2838,7 @@ touist_code: VAR OR VAR WHEN
 ##
 touist_code: VAR SUB VAR WHEN 
 ##
-## Ends in an error in state: 241.
+## Ends in an error in state: 242.
 ##
 ## formula -> SUB formula . [ XOR VARTUPLE VAR TUPLE TOP TERM SUB OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF DIV DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ## formula -> formula . ADD formula [ XOR VARTUPLE VAR TUPLE TOP TERM SUB OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF DIV DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
@@ -2903,7 +2863,7 @@ touist_code: VAR SUB VAR WHEN
 ##
 touist_code: VAR WHEN 
 ##
-## Ends in an error in state: 239.
+## Ends in an error in state: 240.
 ##
 ## formula -> formula . ADD formula [ XOR VARTUPLE VAR TUPLE TOP TERM SUB OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF DIV DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ## formula -> formula . SUB formula [ XOR VARTUPLE VAR TUPLE TOP TERM SUB OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF DIV DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
@@ -2927,7 +2887,7 @@ touist_code: VAR WHEN
 ##
 touist_code: VAR XOR VAR WHEN 
 ##
-## Ends in an error in state: 175.
+## Ends in an error in state: 176.
 ##
 ## formula -> formula . ADD formula [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ## formula -> formula . SUB formula [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
@@ -2957,7 +2917,7 @@ is expected. Instead, the following statement was read:
 
 touist_code: LPAREN VAR WHEN 
 ##
-## Ends in an error in state: 218.
+## Ends in an error in state: 219.
 ##
 ## formula -> LPAREN formula . RPAREN [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ## formula -> formula . ADD formula [ XOR SUB RPAREN OR NOTEQUAL MUL LT LE IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
@@ -2988,7 +2948,7 @@ Instead, the following statement were read:
 
 touist_code: NOT VAR WHEN 
 ##
-## Ends in an error in state: 220.
+## Ends in an error in state: 221.
 ##
 ## formula -> formula . ADD formula [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ## formula -> formula . SUB formula [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
@@ -3022,7 +2982,7 @@ at the 'root' level of your formula list.
 
 touist_code: VAR ADD XOR 
 ##
-## Ends in an error in state: 182.
+## Ends in an error in state: 183.
 ##
 ## formula -> formula ADD . formula [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ##
@@ -3031,7 +2991,7 @@ touist_code: VAR ADD XOR
 ##
 touist_code: VAR AND XOR 
 ##
-## Ends in an error in state: 198.
+## Ends in an error in state: 199.
 ##
 ## formula -> formula AND . formula [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ##
@@ -3040,7 +3000,7 @@ touist_code: VAR AND XOR
 ##
 touist_code: VAR DIV XOR 
 ##
-## Ends in an error in state: 180.
+## Ends in an error in state: 181.
 ##
 ## formula -> formula DIV . formula [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ##
@@ -3049,7 +3009,7 @@ touist_code: VAR DIV XOR
 ##
 touist_code: VAR EQUAL XOR 
 ##
-## Ends in an error in state: 194.
+## Ends in an error in state: 195.
 ##
 ## formula -> formula EQUAL . formula [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ##
@@ -3058,7 +3018,7 @@ touist_code: VAR EQUAL XOR
 ##
 touist_code: VAR EQUIV XOR 
 ##
-## Ends in an error in state: 202.
+## Ends in an error in state: 203.
 ##
 ## formula -> formula EQUIV . formula [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ##
@@ -3067,7 +3027,7 @@ touist_code: VAR EQUIV XOR
 ##
 touist_code: VAR GE XOR 
 ##
-## Ends in an error in state: 192.
+## Ends in an error in state: 193.
 ##
 ## formula -> formula GE . formula [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ##
@@ -3076,7 +3036,7 @@ touist_code: VAR GE XOR
 ##
 touist_code: VAR GT XOR 
 ##
-## Ends in an error in state: 190.
+## Ends in an error in state: 191.
 ##
 ## formula -> formula GT . formula [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ##
@@ -3085,7 +3045,7 @@ touist_code: VAR GT XOR
 ##
 touist_code: VAR IMPLIES XOR 
 ##
-## Ends in an error in state: 200.
+## Ends in an error in state: 201.
 ##
 ## formula -> formula IMPLIES . formula [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ##
@@ -3094,7 +3054,7 @@ touist_code: VAR IMPLIES XOR
 ##
 touist_code: VAR LE XOR 
 ##
-## Ends in an error in state: 188.
+## Ends in an error in state: 189.
 ##
 ## formula -> formula LE . formula [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ##
@@ -3103,7 +3063,7 @@ touist_code: VAR LE XOR
 ##
 touist_code: VAR LT XOR 
 ##
-## Ends in an error in state: 186.
+## Ends in an error in state: 187.
 ##
 ## formula -> formula LT . formula [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ##
@@ -3112,7 +3072,7 @@ touist_code: VAR LT XOR
 ##
 touist_code: VAR MUL XOR 
 ##
-## Ends in an error in state: 178.
+## Ends in an error in state: 179.
 ##
 ## formula -> formula MUL . formula [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ##
@@ -3121,7 +3081,7 @@ touist_code: VAR MUL XOR
 ##
 touist_code: VAR NOTEQUAL XOR 
 ##
-## Ends in an error in state: 184.
+## Ends in an error in state: 185.
 ##
 ## formula -> formula NOTEQUAL . formula [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ##
@@ -3130,7 +3090,7 @@ touist_code: VAR NOTEQUAL XOR
 ##
 touist_code: VAR OR XOR 
 ##
-## Ends in an error in state: 196.
+## Ends in an error in state: 197.
 ##
 ## formula -> formula OR . formula [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ##
@@ -3139,7 +3099,7 @@ touist_code: VAR OR XOR
 ##
 touist_code: VAR SUB XOR 
 ##
-## Ends in an error in state: 240.
+## Ends in an error in state: 241.
 ##
 ## formula -> SUB . formula [ XOR VARTUPLE VAR TUPLE TOP TERM SUB OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF DIV DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ## formula -> formula SUB . formula [ XOR VARTUPLE VAR TUPLE TOP TERM SUB OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF DIV DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
@@ -3149,7 +3109,7 @@ touist_code: VAR SUB XOR
 ##
 touist_code: VAR XOR XOR 
 ##
-## Ends in an error in state: 174.
+## Ends in an error in state: 175.
 ##
 ## formula -> formula XOR . formula [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ##
@@ -3158,7 +3118,7 @@ touist_code: VAR XOR XOR
 ##
 touist_code: NOT VAR SUB XOR 
 ##
-## Ends in an error in state: 176.
+## Ends in an error in state: 177.
 ##
 ## formula -> formula SUB . formula [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ##
@@ -3173,16 +3133,17 @@ which does not seem to be a formula.
 
 touist_code: VARTUPLE TERM COMMA XOR 
 ##
-## Ends in an error in state: 78.
+## Ends in an error in state: 79.
 ##
-## comma_list(term) -> term COMMA . comma_list(term) [ RPAREN RBRACK ]
+## comma_list(indices) -> indices COMMA . comma_list(indices) [ RPAREN ]
 ##
 ## The known suffix of the stack is as follows:
-## term COMMA 
+## indices COMMA 
 ##
 
-A term is expected right after $1 to continue the comma-separated
-list of term.
+A tuple-index (term or expression) is expected after $1 to 
+continue the comma-separated list of term started by:
+    $2
 The following statement does not seem to be a term:
     $0
 
@@ -3190,7 +3151,7 @@ touist_code: XOR
 ##
 ## Ends in an error in state: 0.
 ##
-## prog' -> . prog [ # ]
+## touist_code' -> . touist_code [ # ]
 ##
 ## The known suffix of the stack is as follows:
 ## 
