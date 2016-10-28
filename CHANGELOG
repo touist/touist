@@ -5,6 +5,8 @@ v2.0.0
       Note that the sets are now after formulas. It will be soon possible
       to give the formulas and sets as two separate files, for genericity
       of the models (defined by the formulas) and the data (the sets).
+   - fixed the problem of "Clause is always true/false" when bigand or
+     bigor does not produce anything
   - gui:
     - merged the sets and formulas tabs in GUI; the solution is now to
       use the syntax <formulas> data <sets>. I'm still looking for
