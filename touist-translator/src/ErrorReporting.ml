@@ -282,12 +282,11 @@ let report text buffer checkpoint debug' : string =
                     Please report this problem to the compiler vendor.\n" s
   in
   (* Construct the full error message. *)
-  Printf.sprintf "%d:%d: syntax error %s.\n%s"
-    pos.pos_lnum
-    (pos.pos_cnum - pos.pos_bol + 1)
+  let message = Printf.sprintf "syntax error %s.\n%s"
     where
     message
   ^
   if !debug then
       Printf.sprintf "Debug: Automaton state: %d (see src/parser.messages)\n" s
   else ""
+in message

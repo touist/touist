@@ -228,6 +228,8 @@ public class Editor extends RSyntaxTextArea  {
         sp.setLineNumbersEnabled(true);
         sp.setFoldIndicatorEnabled(true);
         
+        E.addParser(new ErrorParser());
+        
         frame.add(sp, BorderLayout.CENTER);
         frame.setVisible(true);
     }

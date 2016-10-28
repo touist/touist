@@ -24,17 +24,28 @@
 package translation;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.PipedWriter;
+import java.io.Reader;
+import java.io.StringReader;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
+
+import org.scilab.forge.jlatexmath.Char;
+
+import com.sun.org.apache.bcel.internal.util.ByteSequence;
+import com.sun.xml.internal.bind.v2.runtime.unmarshaller.XsiNilLoader.Array;
 
 /**
  * @author Abdel
@@ -45,7 +56,7 @@ public class TranslatorSAT {
 	final private String outputTableFilePath = "out.table";
 	private String translatorProgramFilePath;
 	private Map<Integer,String> literalsMap = new HashMap<Integer,String>();
-	private List<TranslationError> errors;
+	private List<TranslationError> errors = new ArrayList<TranslationError>();
     private String currentPath = System.getProperty("user.dir");
 	private Process p;
 
@@ -53,6 +64,15 @@ public class TranslatorSAT {
 		this.translatorProgramFilePath = translatorProgramFilePath;
 	}
 
+	public boolean translate(String touistlFilePath) throws IOException, InterruptedException {
+		BufferedReader reader = new BufferedReader(new FileReader(touistlFilePath));
+		return translate(reader); 
+	}
+
+	public boolean translate(StringReader str) throws IOException, InterruptedException {
+		BufferedReader reader = new BufferedReader(str);
+		return translate(reader); 
+	}
 	/**
 	 * Calls the translator/compiler to transform the ".bigand" file to a
 	 * ".dimacs" file (along with a "mapping" file). This method also calls the
@@ -75,7 +95,7 @@ public class TranslatorSAT {
 	 * @throws IOException
 	 * @throws InterruptedException
 	 */
-	public boolean translate(String touistlFilePath) throws IOException, InterruptedException {
+	public boolean translate(BufferedReader reader) throws IOException, InterruptedException {
 		/* return_code from the Touistl translator (see touistc.ml):
   		| OK -> 0
   		| COMPILE_WITH_LINE_NUMBER_ERROR -> 1
@@ -92,42 +112,38 @@ public class TranslatorSAT {
 		 */
 		// Check if translatorProgramFilePath is there
 		String path = currentPath + File.separatorChar + translatorProgramFilePath;
-		String [] cmd = {path.toString(),"-sat","-table", outputTableFilePath, 
-				"-o", outputFilePath, touistlFilePath};
+		String [] cmd = {path.toString(),"-sat","-","-table",outputTableFilePath, 
+				"-o", outputFilePath, "--detailed-position"};
         System.out.println("translate(): cmd executed: "+Arrays.toString(cmd));
-		this.p = Runtime.getRuntime().exec(cmd);
-		int return_code = p.waitFor();
-		BufferedReader stdout = new BufferedReader(new InputStreamReader(
-				this.p.getInputStream()));
+		
+        this.p = Runtime.getRuntime().exec(cmd);
+
+        BufferedWriter toProcess = new BufferedWriter(new OutputStreamWriter(p.getOutputStream()));
+        String s = "";
+        while ((s = reader.readLine())!=null) {
+        	toProcess.write(s + "\n");
+        }
+        toProcess.flush();
+        toProcess.close();
+		
+        int return_code = p.waitFor();
+        
+		BufferedReader fromProcess = new BufferedReader(new InputStreamReader(p.getInputStream()));
 		List<String> linesStdout = new ArrayList<String>();
-		while (stdout.ready()) {
-			linesStdout.add(stdout.readLine());
-		}
-		BufferedReader stderr = new BufferedReader(new InputStreamReader(
+		while (fromProcess.ready())
+			linesStdout.add(fromProcess.readLine());
+
+		BufferedReader fromProcessErr = new BufferedReader(new InputStreamReader(
 				this.p.getErrorStream()));
 		String linesStdErr = "";
-		while (stderr.ready()) {
-			linesStdErr += stderr.readLine() + "\n";
+		while (fromProcessErr.ready()) {
+			linesStdErr += fromProcessErr.readLine() + "\n";
 		}
-		stderr.close();
-		stdout.close();
-		errors = new ArrayList<TranslationError>();
-		if(return_code == COMPILE_WITH_LINE_NUMBER_ERROR) {
-			System.err.println("translate(): the translator returned an error");
-			String file_name; int num_line; int num_col;
-			String message_error = "";
-		
-			System.err.println("translate(): "+linesStdErr);
-			StringTokenizer tokenizer = new StringTokenizer(linesStdErr,":");
-			num_line = Integer.parseInt(tokenizer.nextToken());
-			num_col = Integer.parseInt(tokenizer.nextToken());
-			while(tokenizer.hasMoreTokens()) { message_error += tokenizer.nextToken(); }
-			errors.add(new TranslationError(num_line,num_col,message_error));
-		}
-		if(return_code == COMPILE_NO_LINE_NUMBER_ERROR) {
-			System.err.println("translate(): the translator returned errors");
-			System.err.println("translate(): "+linesStdErr);
-			errors.add(new TranslationError(linesStdErr));
+		fromProcessErr.close();
+		fromProcess.close();
+
+		if(return_code != OK) {
+			errors = TranslationError.parse(linesStdErr);
 		}
 		if(return_code == OK) {
 			parseLiteralsMapFile(currentPath+File.separatorChar+outputTableFilePath);

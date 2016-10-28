@@ -81,6 +81,7 @@ let equiv_file_path = ref ""
 let input_equiv = ref stdin
 let use_old_dimacs = ref false
 let verbose = ref false
+let detailed_position = ref false (* display absolute position of error *)
 
 
 (* Used to write the "str" string into the "filename" file *)
@@ -97,9 +98,12 @@ let argIsInputFilePath (inputFilePath:string) : unit =
   input_file_path := inputFilePath
 
 (* Used by parse_with_error *)
-let print_position outx lexbuf =
+let print_position (lexbuf:Lexing.lexbuf) : string =
   let pos = lexbuf.lex_curr_p in
-  Printf.fprintf outx "%d:%d:" pos.pos_lnum (pos.pos_cnum - pos.pos_bol+1)
+  if not !detailed_position then Printf.sprintf "%d:%d:" pos.pos_lnum (pos.pos_cnum - pos.pos_bol+1)
+(* the detailed version of the position is 
+   'num_line:num_col:token_start:token_end:' (token positions are absolute) *)
+  else Printf.sprintf "%d:%d:%d:%d:" pos.pos_lnum (pos.pos_cnum - pos.pos_bol+1) (lexeme_start lexbuf) (lexeme_end lexbuf)
 
 (* [evaluate] handles exceptions when calling the evaluation function [Eval.eval].
  * Eval.eval takes an abstract syntaxic tree and check that it is semantically correct,
@@ -150,8 +154,7 @@ let lexer buffer : (Lexing.lexbuf -> Parser.token) =
         | [] -> failwith "One token at least must be returned in 'token rules' "
         | x::xs -> tokens := xs; x
       with Lexer.Error (msg,lexbuf) -> 
-        print_position !output lexbuf;
-        Printf.fprintf !output " %s\n" msg;
+        Printf.fprintf !output "%s %s\n" (print_position lexbuf) msg;
         exit (get_code COMPILE_WITH_LINE_NUMBER_ERROR)
 
 
@@ -168,7 +171,8 @@ let invoke_parser (text:string) (lexer:Lexing.lexbuf -> Parser.token) (buffer) :
   and supplier = Parser.MenhirInterpreter.lexer_lexbuf_to_supplier lexer lexbuf
   and succeed ast = ast
   and fail checkpoint =
-    Printf.fprintf stderr "%s" (ErrorReporting.report text !buffer checkpoint !debug_syntax);
+    let msg = (ErrorReporting.report text !buffer checkpoint !debug_syntax)
+    in Printf.fprintf stderr "%s %s\n" (print_position lexbuf) msg;
     exit (get_code COMPILE_WITH_LINE_NUMBER_ERROR)
   in
   Parser.MenhirInterpreter.loop_handle succeed fail supplier checkpoint
@@ -254,6 +258,7 @@ let () =
 
     ("--debug-formula-expansion", Arg.Set debug_formula_expansion,"Print how the formula is expanded (bigand...)");
     ("--use-old-dimacs", Arg.Set use_old_dimacs,"(just for try)");
+    ("--detailed-position", Arg.Set detailed_position,"Detailed position with 'num_line:num_col:token_start:token_end: '");
   ]
   in
   let usage = 
