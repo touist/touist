@@ -314,7 +314,8 @@ and eval_exp exp env =
   | Lesser_or_equal  (x,y) -> num_pred_op (eval_exp x env) (eval_exp y env) (<=) (<=) "<="
   | Greater_than     (x,y) -> num_pred_op (eval_exp x env) (eval_exp y env) (>) (>) ">"
   | Greater_or_equal (x,y) -> num_pred_op (eval_exp x env) (eval_exp y env) (>=) (>=) ">="
-  | e -> raise (Error ("this expression is not an 'evaluable' expression: " ^ string_of_exp e))
+  | Term (prefix,indices) -> Term (prefix,indices)
+  | e -> raise (Error ("this expression cannot be expanded: " ^ string_of_exp e))
 
 and eval_set set_decl env =
   let eval_form = List.map (fun x -> eval_exp x env) set_decl in
