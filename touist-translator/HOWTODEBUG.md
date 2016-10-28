@@ -102,6 +102,23 @@ messages in `parser.messages`:
 
         menhir --compile-errors parser.messages parser.mly > parser_messages.ml && ocamlbuild -use-ocamlfind -use-menhir -menhir "menhir --trace --table --inspection -v -la 2" -package menhirLib -package fileutils,str touistc.byte -tag debug -r
 
+## Missing error cases in parser.messages
+When updating parser.mly, you might sometimes create new error states
+that do not appear in your already-written parser.messages.
+This often leads to the error message:
+```
+1:14: syntax error after ',' and before 'a'.
+This is an unknown syntax error (92).
+Please report this problem to the compiler vendor.
+```
+meaning that the state 92 isn't in parser_messages.ml, and thus not in
+parser.messages. To fix that, anytime you modify parser.mly, check that
+no new errors have been intruduced:
+
+```
+menhir --list-errors src/parser.mly > parser.messages_updated
+menhir --compare-errors parser.messages_updated --compare-errors src/parser.messages --list-errors src/parser.mly
+```
 
 ## Testing your hand-written messages ##
 There are two ways to test if the messages actually work. The first one
