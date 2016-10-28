@@ -128,13 +128,14 @@ let minisatclauses_of_cnf (ast:ast) : Lit.t list list * (Lit.t,string) Hashtbl.t
       lit
   in process_cnf ast, lit_to_str, !num_lit - 1
 
-let instance_of_minisatclauses (clauses:Lit.t list list) : Minisat.t =
+let instance_of_minisatclauses (clauses:Lit.t list list) : Minisat.t * bool =
   let inst = Minisat.create () in
-  let rec add_clauses inst (l:Lit.t list list) : unit =
+  let rec add_clauses inst (l:Lit.t list list) : bool =
     match l with
-    | [] -> ()
-    | cur::next -> Minisat.add_clause_l inst cur; add_clauses inst next
-  in add_clauses inst clauses; inst
+    | [] -> true
+    | cur::next -> (Minisat.Raw.add_clause_a inst (Array.of_list cur)) && (add_clauses inst next)
+  in let has_next_model = add_clauses inst clauses
+  in inst, has_next_model
 
 let dimacs_of_minisatclauses (out:out_channel) nblits (clauses:Lit.t list list) : unit =
   let nbclauses = List.length clauses in
@@ -181,7 +182,6 @@ module ModelSet = struct
   let pprint table models = print_endline (fold (fun m acc -> (Model.pprint table m) ^ "=====\n" ^ acc) models "")
 end
 
-
 (* 1. Prevent current model from reappearing
    =========================================
    We must prevent the current model to reappear in future models;
@@ -192,11 +192,6 @@ end
    IMPORTANT: When adding the counter-clause, the problem can become unsat.
    [counter_current_model] returns false if the added clause makes the
    formula unsat right away. *)
-let counter_current_model instance (table:(Lit.t,string) Hashtbl.t) : bool =
- let counter_clause (l:Lit.t) _ acc = match Minisat.value instance l with
-  | V_true -> (Minisat.Lit.neg l)::acc | V_false -> l::acc | _ -> acc
- in let counter_clause = Hashtbl.fold counter_clause table []
- in Minisat.Raw.add_clause_a instance (Array.of_list counter_clause)
 
 (* 2. Avoid duplicates caused by fake literals (of the form '&6')
    ==============================================================
@@ -208,36 +203,28 @@ let counter_current_model instance (table:(Lit.t,string) Hashtbl.t) : bool =
 
    To use this function, you need a ModelSet ref already initialized, e.g. with
     let models = ref ModelSet.empty *)
-let is_duplicate instance (table:(Lit.t,string) Hashtbl.t) (prev_models:ModelSet.t ref) : bool =
-  let model (lit:Lit.t) name acc = match name.[0] with
-    | '&' -> acc | _ -> (lit, Minisat.value instance lit)::acc
-  in let model = (Hashtbl.fold model table []) in
-  (* 'mem' checks if this model is in the set of already-seen models *)
-  let is_duplicate = (ModelSet.mem model !prev_models) in
-  prev_models := (ModelSet.add model !prev_models);
-  is_duplicate
 
-(*let m = PairsSet.(empty |> add (2,3) |> add (5,7) |> add (11,13))*)
-
-(* [equivalent_models] returns true if each model of set1 is also in m2 and
-   vice-versa. Useful for checking that two formulas are equivalent.  *)
-let equivalent_models set1 set2 = ModelSet.equal set1 set2
-
-(* 1. Fetch the models
+(* 3. Fetch the models
    ===================
-   This is done calling multiple times [fetch_model]. If the first call
-   returns false, it means that this problem is unsat. If the second call
-   (or any subsequent call) returns false, there is no more models.
-   The general structure of the model fetching must be:
-      fetch_model -> next_model -> fetch_model -> next_model -> fetch_model...
-
+   Basically, we
+    (1) compute a model with Minisat.solve
+    (2) check if we already saw this model (duplicates because of &23 literals)
+    (3) prevent the same model from reappearing in adding the clause where all
+        lits are the negation of the valuation in the model
+    (4) go on with (1)
 *)
 (* limit is the limit of number of models you allow to be fetched.
    When limit = 0, all models will be fetched. *)
 let count = ref 0
 let find_models ?limit:(limit=0) cnf : (Lit.t,string) Hashtbl.t * (ModelSet.t ref) =
+  let counter_current_model instance (table:(Lit.t,string) Hashtbl.t) : bool =
+    let counter_clause (l:Lit.t) _ acc = match Minisat.value instance l with
+      | V_true -> (Minisat.Lit.neg l)::acc | V_false -> l::acc | _ -> acc
+    in let counter_clause = Hashtbl.fold counter_clause table []
+    in Minisat.Raw.add_clause_a instance (Array.of_list counter_clause)
+  in
   let clauses,table,_ = minisatclauses_of_cnf cnf in
-  let instance = instance_of_minisatclauses clauses in
+  let instance,_ = instance_of_minisatclauses clauses in
   let models = ref ModelSet.empty in (* for returning the models found *)
   (* searching for duplicate is slow on ModelSet. For checking a model hasn't
      appeared already, I use a way faster Hashtbl, ass it won't check on every
@@ -249,10 +236,10 @@ let find_models ?limit:(limit=0) cnf : (Lit.t,string) Hashtbl.t * (ModelSet.t re
     || not (Minisat.Raw.solve instance [||])
     then models
     else
-      let model = Model.model_of_instance instance table
+      let model = Model.model_of_instance instance table (* no &1 literals in it *)
       and has_next_model = counter_current_model instance table in
       let is_duplicate = Hashtbl.mem models_hash model in 
-      count := (!count + 1); if not is_duplicate then print_endline ((string_of_bool is_duplicate) ^" " ^(string_of_int !count));
+      count := (!count + 1); if is_duplicate then print_endline ((string_of_bool is_duplicate) ^" " ^(string_of_int !count));
       match is_duplicate,has_next_model with
       | true,false -> models (* is duplicate and no next model *)
       | true,true  -> solve_loop limit i (* is duplicate but has next *)
