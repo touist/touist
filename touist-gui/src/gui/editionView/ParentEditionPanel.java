@@ -57,7 +57,7 @@ import translation.TranslatorSAT;
  */
 public class ParentEditionPanel extends AbstractComponentPanel {
 
-    private static final int ERROR_MESSAGE_MAX_LENGTH = 60;
+    private static final int ERROR_MESSAGE_MAX_LENGTH = 76;
     private String jLabelErrorMessageText;
     private Thread testThread;
 
@@ -92,7 +92,7 @@ public class ParentEditionPanel extends AbstractComponentPanel {
         if (text.length() < ERROR_MESSAGE_MAX_LENGTH) {
             bottomMessage.setText(text);
         } else {
-            bottomMessage.setText(text.substring(0, ERROR_MESSAGE_MAX_LENGTH) + "...");
+            bottomMessage.setText(text.substring(0, ERROR_MESSAGE_MAX_LENGTH-18) + "... (click to view)");
         }
     }
 
