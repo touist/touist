@@ -83,13 +83,8 @@ let print_lit2str (out:out_channel) (table:(Lit.t,string) Hashtbl.t) ?prefix:(pr
   let print_lit_and_name lit name = Printf.fprintf out "%s %d\n" name (Lit.to_int lit)
   in Hashtbl.iter print_lit_and_name table
 
-(* [minisatclauses_of_cnf] translates the expression into an instance of Minisat.t,
-   which can then be used for solving the SAT problem with Minisat.Solve
-   In utop, you can test Minisat with
-       #require "minisat";;
-       open Minisat
-*)
-(*    ((((not &2) or a) and ((not &2) or b)) and (((not &1) or c) and ((not &1) or (not a)))) *)
+(* [minisatclauses_of_cnf] translates the expression into an instance of
+   list of list of literals. [[clause1],[clause2]...] *)
 let minisatclauses_of_cnf (ast:ast) : Lit.t list list * (Lit.t,string) Hashtbl.t * int = (* int = nb of literals *)
   (* num = a number that will serve to identify a literal
      lit = a literal that has a number inside it to identify it *)
@@ -121,12 +116,12 @@ let minisatclauses_of_cnf (ast:ast) : Lit.t list list * (Lit.t,string) Hashtbl.t
     | _ -> failwith ("CNF: was expecting a clause but got '" ^ (string_of_ast ast) ^ "'")
   and gen_lit (s:string) : Lit.t =
     try Hashtbl.find str_to_lit s
-    with Not_found ->
-      let lit = Minisat.Lit.make !num_lit in
-      Hashtbl.add str_to_lit s lit; Hashtbl.add lit_to_str lit s;
-      incr num_lit;
-      lit
-  in process_cnf ast, lit_to_str, !num_lit - 1
+    with Not_found -> 
+      (let lit = Minisat.Lit.make !num_lit in
+        Hashtbl.add str_to_lit s lit; Hashtbl.add lit_to_str lit s;
+        incr num_lit;
+        lit)
+  in let clauses = process_cnf ast in clauses, lit_to_str, !num_lit - 1
 
 let instance_of_minisatclauses (clauses:Lit.t list list) : Minisat.t * bool =
   let inst = Minisat.create () in
