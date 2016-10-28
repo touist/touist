@@ -1,3 +1,5 @@
+v1.4.2
+    - (regression) possible to declare a set with terms: [a,b,c]...
 v1.4.1
     - (regression) output of the table (id,name) had been inverted (!)
 v1.4.0
