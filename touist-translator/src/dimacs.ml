@@ -225,7 +225,6 @@ let find_models ?limit:(limit=0) cnf : (Lit.t,string) Hashtbl.t * (ModelSet.t re
       let model = Model.model_of_instance instance table (* no &1 literals in it *)
       and has_next_model = counter_current_model instance table in
       let is_duplicate = Hashtbl.mem models_hash model in 
-      count := (!count + 1); if is_duplicate then print_endline ((string_of_bool is_duplicate) ^" " ^(string_of_int !count));
       match is_duplicate,has_next_model with
       | true,false -> models (* is duplicate and no next model *)
       | true,true  -> solve_loop limit i (* is duplicate but has next *)
