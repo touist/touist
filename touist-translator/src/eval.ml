@@ -757,7 +757,7 @@ and eval_ast_no_expansion ast env =
   | If (x,y,z) ->
       let test = eval_test x env in
       if test then eval_ast_no_expansion y env else eval_ast_no_expansion z env
-  | Let (Var v,x,c) -> eval_ast_no_expansion c (((expand_var_name v env),x)::env)
+  | Let (Var v,x,c) -> eval_ast_no_expansion c (((expand_var_name v env),eval_ast x env)::env)
   | e -> raise (Error ("this expression is not a formula: " ^ string_of_ast e))
 
 
