@@ -92,17 +92,26 @@ let minisatclauses_of_cnf (ast:ast) : Lit.t list list * (Lit.t,string) Hashtbl.t
   let num_lit = ref 1 in
   let rec process_cnf ast : Minisat.Lit.t list list = match ast with
     | And  (x,y) -> (process_cnf x) @ (process_cnf y)
-    | x when Cnf.is_clause x -> [process_clause x]
+    | x when Cnf.is_clause x -> begin 
+        match process_clause x with
+        | [] -> let lit=(gen_lit ("&bot"^(string_of_int !num_lit))) 
+          in [[lit]] @ [[Lit.neg lit]]
+        (* This [] is caused by Bottom that was alone in the clause. We must 
+           trigger the Unsat case; to do so, we add '&bot12 and not &bot12'*)
+        | x -> [x]
+      end
     | _ -> failwith ("CNF: was expecting a conjunction of clauses but got '" ^ (string_of_ast ast) ^ "'")
   and process_clause (ast:ast) : Minisat.Lit.t list = match ast with
     | Term (str, None)        -> (gen_lit str)::[]
     | Not (Term (str, None)) -> (Minisat.Lit.neg (gen_lit str))::[]
     | Bottom -> [] (* if Bot is the only one in the clause, then the whole formula is false *)
-    | Top -> let lit=(gen_lit ("&top"^(string_of_int !num_lit))) in lit::(Lit.neg lit)::[](* the clause shouldn't be added at all... but we choose to traduce it anyway *)
+    | Top -> (* The clause shouldn't be added because Top is found. Instead of
+                not adding the clause, we translate it by '&top12 or not &top12'*)
+      let lit=(gen_lit ("&top"^(string_of_int !num_lit))) in lit::(Lit.neg lit)::[]
     | Or (x,y) ->
         (match process_clause x,process_clause y with 
-          | [],x | x,[] -> x (* [] is created by Bottom -> remove    *)
-          | x,y -> x @ y)    (* it as soon as another literal exists *)
+          | [],x | x,[] -> x (* [] is created by Bottom; remove [] as soon as another literal exists in the clause *)
+          | x,y -> x @ y)
     | _ -> failwith ("CNF: was expecting a clause but got '" ^ (string_of_ast ast) ^ "'")
   and gen_lit (s:string) : Lit.t =
     try Hashtbl.find str_to_lit s
