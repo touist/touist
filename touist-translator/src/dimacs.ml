@@ -19,7 +19,7 @@ open Syntax
 open Pprint
 open Minisat
 
-let to_dimacs (prop:Syntax.exp) : string * (string,int) Hashtbl.t =
+let to_dimacs (prop:Syntax.ast) : string * (string,int) Hashtbl.t =
   let table    = Hashtbl.create 10
   and num_sym  = ref 1
   and nbclause = ref 0 in
@@ -89,24 +89,24 @@ let string_of_lit2str (table:(Lit.t,string) Hashtbl.t) ?prefix:(prefix="") =
        open Minisat
 *)
 (*    ((((not &2) or a) and ((not &2) or b)) and (((not &1) or c) and ((not &1) or (not a)))) *)
-let minisat_of_cnf (exp:exp) : Minisat.t * (Lit.t,string) Hashtbl.t =
+let minisat_of_cnf (ast:ast) : Minisat.t * (Lit.t,string) Hashtbl.t =
   let inst = Minisat.create () in
   (* num = a number that will serve to identify a literal
      lit = a literal that has a number inside it to identify it *)
   let str_to_lit = Hashtbl.create 500 in
   let lit_to_str = Hashtbl.create 500 in (* this duplicate is for the return value *)
   let num_lit = ref 1 in
-  let rec process_cnf exp : Minisat.Lit.t list list = match exp with
+  let rec process_cnf ast : Minisat.Lit.t list list = match ast with
     | And  (x,y) when Cnf.is_clause x -> [process_clause x] @ process_cnf y
     | And  (y,x) when Cnf.is_clause x -> [process_clause x] @ process_cnf y
     | And  (x,y) -> (process_cnf x) @ (process_cnf y)
     | x when Cnf.is_clause x -> [process_clause x]
-    | _ -> failwith ("CNF: was expecting a conjunction of clauses but got '" ^ (string_of_exp exp) ^ "'")
-  and process_clause (exp:exp) : Minisat.Lit.t list = match exp with
+    | _ -> failwith ("CNF: was expecting a conjunction of clauses but got '" ^ (string_of_ast ast) ^ "'")
+  and process_clause (ast:ast) : Minisat.Lit.t list = match ast with
     | Term (str, None)        -> (gen_lit str)::[]
     | Not (Term (str, None)) -> (Minisat.Lit.neg (gen_lit str))::[]
     | Or (x,y)               -> (process_clause x) @ (process_clause y)
-    | _ -> failwith ("CNF: was expecting a clause but got '" ^ (string_of_exp exp) ^ "'")
+    | _ -> failwith ("CNF: was expecting a clause but got '" ^ (string_of_ast ast) ^ "'")
   and gen_lit (s:string) : Minisat.Lit.t =
     try Hashtbl.find str_to_lit s
     with Not_found ->
@@ -121,7 +121,7 @@ let minisat_of_cnf (exp:exp) : Minisat.t * (Lit.t,string) Hashtbl.t =
     Minisat.add_clause_l inst cur;
     add_clauses inst next
   in
-  process_cnf exp |> add_clauses inst; inst, lit_to_str
+  process_cnf ast |> add_clauses inst; inst, lit_to_str
 
 (* for printing the Minisat.value type *)
 let string_of_value = function

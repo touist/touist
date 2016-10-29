@@ -106,13 +106,13 @@ let print_position outx lexbuf =
  * [ast] means it is of type Syntax.prog,
  * i.e. the "root" type in lexer.mll
  *)
-let evaluate (ast:Syntax.prog) : Syntax.exp =
+let evaluate (ast:Syntax.prog) : Syntax.ast =
   try Eval.eval ast [] with
   | Eval.Error msg ->
     Printf.fprintf stderr "%s\n" msg;
     exit (get_code COMPILE_NO_LINE_NUMBER_ERROR)
 
-let transform_to_cnf (evaluated_ast:Syntax.exp) : Syntax.exp =
+let transform_to_cnf (evaluated_ast:Syntax.ast) : Syntax.ast =
   try Cnf.transform_to_cnf evaluated_ast !debug_cnf 
   with Cnf.Error msg ->
     Printf.fprintf stderr "%s\n" msg;
@@ -188,7 +188,7 @@ let rec string_of_file (input:in_channel) : string =
 (* [ast_of_channel] takes an opened file and return its Abstract Syntaxic Tree.
    NOTE: this AST is already evaluated (the variables have been handled and
    everything). At this point, the AST can be transformed to DIMACS, SMT... *)
-let ast_of_channel (input:in_channel) : Syntax.exp =
+let ast_of_channel (input:in_channel) : Syntax.ast =
     let text_input = string_of_file input in
     let buffer = ref ErrorReporting.Zero in
     let ast = invoke_parser text_input (lexer buffer) buffer in
