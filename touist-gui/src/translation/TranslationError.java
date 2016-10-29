@@ -72,7 +72,7 @@ public class TranslationError {
 		return posStart;
 	}
 	public int getPosEnd() {
-		return posStart;
+		return posEnd;
 	}
 
 	public int getColumnInCode() {

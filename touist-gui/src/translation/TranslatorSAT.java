@@ -31,21 +31,11 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.io.PipedWriter;
-import java.io.Reader;
 import java.io.StringReader;
-import java.io.Writer;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.StringTokenizer;
-
-import org.scilab.forge.jlatexmath.Char;
-
-import com.sun.org.apache.bcel.internal.util.ByteSequence;
-import com.sun.xml.internal.bind.v2.runtime.unmarshaller.XsiNilLoader.Array;
 
 /**
  * @author Abdel

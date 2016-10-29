@@ -30,7 +30,7 @@ public class ErrorParserNotice implements ParserNotice {
 
 	@Override
 	public boolean containsPosition(int i) {
-		return err.getPosStart()-4 <= i && i <= err.getPosStart()+4;
+		return err.getPosStart()-1 <= i && i <= err.getPosEnd()+1;
 	}
 
 	@Override
@@ -45,7 +45,7 @@ public class ErrorParserNotice implements ParserNotice {
 
 	@Override
 	public int getLength() {
-		return err.getPosEnd()-err.getPosStart()+1;
+		return err.getPosEnd()-err.getPosStart();
 	}
 
 	@Override
@@ -80,7 +80,12 @@ public class ErrorParserNotice implements ParserNotice {
 
 	@Override
 	public String getToolTipText() {
-		return "line "+err.getRowInCode()+", col "+err.getColumnInCode()+": "+getMessage();
+		if(getKnowsOffsetAndLength()) {
+			return "line "+err.getRowInCode()+", col "+err.getColumnInCode()+": "+getMessage();
+		}
+		else {
+			return "unknown line and col: "+getMessage();
+		}
 	}
 
 }
