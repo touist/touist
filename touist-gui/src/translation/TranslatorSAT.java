@@ -49,9 +49,14 @@ public class TranslatorSAT {
 	private List<TranslationError> errors = new ArrayList<TranslationError>();
     private String currentPath = System.getProperty("user.dir");
 	private Process p;
+	private List<String> options = new ArrayList<String>();
 
 	public TranslatorSAT(String translatorProgramFilePath) {
 		this.translatorProgramFilePath = translatorProgramFilePath;
+	}
+	public TranslatorSAT(String translatorProgramFilePath,List<String> options) {
+		this.translatorProgramFilePath = translatorProgramFilePath;
+		this.options = options;
 	}
 
 	public boolean translate(String touistlFilePath) throws IOException, InterruptedException {
@@ -101,12 +106,22 @@ public class TranslatorSAT {
 		 * num_row:num_col: message
 		 */
 		// Check if translatorProgramFilePath is there
-		String path = currentPath + File.separatorChar + translatorProgramFilePath;
-		String [] cmd = {path.toString(),"-sat","-","-table",outputTableFilePath, 
-				"-o", outputFilePath, "--detailed-position"};
-        System.out.println("translate(): cmd executed: "+Arrays.toString(cmd));
+		String touistcPath = currentPath + File.separatorChar + translatorProgramFilePath;
+		List<String> cmd = new ArrayList<String>();
 		
-        this.p = Runtime.getRuntime().exec(cmd);
+		cmd.add(touistcPath);
+		cmd.add("-sat");
+		cmd.add("-");
+		cmd.add("-table");
+		cmd.add(outputTableFilePath);
+		cmd.add("-o");
+		cmd.add(outputFilePath);
+		cmd.add("--detailed-position");
+		cmd.addAll(options);
+		
+        System.out.println("translate(): cmd executed: "+cmd.toString());
+		
+        this.p = Runtime.getRuntime().exec(cmd.toArray(new String[0]));
 
         BufferedWriter toProcess = new BufferedWriter(new OutputStreamWriter(p.getOutputStream()));
         String s = "";

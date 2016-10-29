@@ -81,6 +81,8 @@ let equiv_file_path = ref ""
 let input_equiv = ref stdin
 let use_old_dimacs = ref false
 let verbose = ref false
+let linter = ref false (* for displaying syntax errors (during parse only) *)
+let linter_and_expand = ref false (* same but with semantic errors (during eval)*)
 let detailed_position = ref false (* display absolute position of error *)
 
 
@@ -206,7 +208,7 @@ let ast_of_channel (input:in_channel) : Syntax.ast =
     let buffer = ref ErrorReporting.Zero in
     let ast = invoke_parser text_input (lexer buffer) buffer in
     if !verbose then print_endline "parsing finished";
-    evaluate ast
+    ast
 
 let minisatclauses_of_cnf cnf =
   if !verbose then print_endline "cnf to clauses begins";
@@ -258,6 +260,8 @@ let () =
 
     ("--debug-formula-expansion", Arg.Set debug_formula_expansion,"Print how the formula is expanded (bigand...)");
     ("--use-old-dimacs", Arg.Set use_old_dimacs,"(just for try)");
+    ("--linter", Arg.Set linter,"Display parse errors and exit");
+    ("--linter-expand", Arg.Set linter_and_expand,"Same as --linter but with semantic errors");
     ("--detailed-position", Arg.Set detailed_position,"Detailed position with 'num_line:num_col:token_start:token_end: '");
   ]
   in
@@ -338,21 +342,26 @@ let () =
     else
       (* B. solve not asked: print the DIMACS file *)
       let ast = (ast_of_channel !input) in
-      let table_prefix = (if !output == !output_table then "c " else "") in
-      if not !use_old_dimacs then begin
-        let cnf = transform_to_cnf ast in
-        let clauses,tbl,nblits =  minisatclauses_of_cnf cnf in
-        Dimacs.dimacs_of_minisatclauses !output nblits clauses;
-        Dimacs.print_lit2str !output_table tbl ~prefix:table_prefix
-      end
-      else begin
-        let dimacs,table = transform_to_cnf ast |> Dimacs.to_dimacs in
-        Printf.fprintf !output "%s" dimacs;
-        Printf.fprintf !output_table "%s" (Dimacs.string_of_table table ~prefix:table_prefix)
-      end
-      (* ~prefix:"" is an optionnal argument that allows to add the 'c' before
-         each line of the table display, when and only when everything is
-         outputed in a single file. Example:
+      if !linter then exit (get_code OK) (* linter = only show syntax errors *)
+      else
+        let ast_expanded = evaluate ast in
+        if !linter_and_expand then exit (get_code OK)
+        else
+          let table_prefix = (if !output == !output_table then "c " else "") in
+          if not !use_old_dimacs then begin
+            let cnf = transform_to_cnf ast_expanded in
+            let clauses,tbl,nblits =  minisatclauses_of_cnf cnf in
+            Dimacs.dimacs_of_minisatclauses !output nblits clauses;
+            Dimacs.print_lit2str !output_table tbl ~prefix:table_prefix
+          end
+          else begin
+            let dimacs,table = transform_to_cnf ast_expanded |> Dimacs.to_dimacs in
+            Printf.fprintf !output "%s" dimacs;
+            Printf.fprintf !output_table "%s" (Dimacs.string_of_table table ~prefix:table_prefix)
+          end
+          (* ~prefix:"" is an optionnal argument that allows to add the 'c' before
+             each line of the table display, when and only when everything is
+             outputed in a single file. Example:
              c 98 p(1,2,3)     -> c means 'comment' in any DIMACS file   *)
 
   else if (!smt_logic <> "") then
