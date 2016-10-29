@@ -80,6 +80,7 @@ let debug_formula_expansion = ref false
 let equiv_file_path = ref ""
 let input_equiv = ref stdin
 let use_old_dimacs = ref false
+let verbose = ref false
 
 
 (* Used to write the "str" string into the "filename" file *)
@@ -108,13 +109,21 @@ let print_position outx lexbuf =
  * i.e. the "root" type in lexer.mll
  *)
 let evaluate (ast:Syntax.ast) : Syntax.ast =
-  try Eval.eval ast with
+  if !verbose then print_endline "evaluation begins";
+  try let expanded = Eval.eval ast in   
+    if !verbose then print_endline "evaluation finished";
+    expanded
+  with
   | Eval.Error msg ->
     Printf.fprintf stderr "%s\n" msg;
     exit (get_code COMPILE_NO_LINE_NUMBER_ERROR)
 
 let transform_to_cnf (evaluated_ast:Syntax.ast) : Syntax.ast =
-  try Cnf.transform_to_cnf evaluated_ast !debug_cnf 
+  if !verbose then print_endline "cnf transformation begins";
+  try 
+    let cnf = Cnf.transform_to_cnf evaluated_ast !debug_cnf in
+    if !verbose then print_endline "cnf transformation finished";
+    cnf
   with Cnf.Error msg ->
       (Printf.fprintf stderr "%s\n" msg;
        exit (get_code COMPILE_NO_LINE_NUMBER_ERROR))
@@ -188,10 +197,29 @@ let rec string_of_file (input:in_channel) : string =
    NOTE: this AST is already evaluated (the variables have been handled and
    everything). At this point, the AST can be transformed to DIMACS, SMT... *)
 let ast_of_channel (input:in_channel) : Syntax.ast =
+  if !verbose then print_endline "parsing begins";
     let text_input = string_of_file input in
     let buffer = ref ErrorReporting.Zero in
     let ast = invoke_parser text_input (lexer buffer) buffer in
+    if !verbose then print_endline "parsing finished";
     evaluate ast
+
+let minisatclauses_of_cnf cnf =
+  if !verbose then print_endline "cnf to clauses begins";
+  let clauses,tbl,nblits =  Dimacs.minisatclauses_of_cnf cnf in
+  if !verbose then print_endline "cnf to clauses finished";
+  clauses,tbl,nblits
+
+let models_of_dimacs cnf =
+  if !verbose then print_endline "solve begins";
+  let table,models = Dimacs.find_models cnf in
+  if !verbose then print_endline "solve begins";
+  table,models
+let dimacs_of_minisatclauses nblits clauses =
+  if !verbose then print_endline "clauses to dimacs begins";
+  let str = Dimacs.dimacs_of_minisatclauses nblits clauses in
+  if !verbose then print_endline "clauses to dimacs finished";
+  str
 
 (* The main program *)
 let () =
@@ -216,6 +244,7 @@ let () =
       ("--debug-syntax", Arg.Set debug_syntax, "Print information for debugging
     syntax errors given by parser.messages");
     ("--debug-cnf", Arg.Set debug_cnf,"Print step by step CNF transformation");
+    ("--verbose", Arg.Set verbose,"Print info on what is happening step by step");
     ("--solve", Arg.Set solve_sat,"Solve the problem and print the first model if it exists");
     ("--limit", Arg.Set_int limit,"(with --solve) Instead of one model, return N models if they exist.
                                             With 0, return every possible model.");
@@ -289,14 +318,14 @@ let () =
     (* A. solve has been asked *)
     if !solve_sat then
       if !equiv_file_path <> "" then begin
-        let _,models = transform_to_cnf (ast_of_channel !input) |> Dimacs.find_models
-        and _,models2 = transform_to_cnf (ast_of_channel !input_equiv) |> Dimacs.find_models in
+        let _,models = transform_to_cnf (ast_of_channel !input) |> models_of_dimacs
+        and _,models2 = transform_to_cnf (ast_of_channel !input_equiv) |> models_of_dimacs in
         match Dimacs.ModelSet.equal !models !models2 with
         | true -> Printf.fprintf !output "Equivalent\n"; exit 0
         | false -> Printf.fprintf !output "Not equivalent\n"; exit 1
       end
       else
-        let table,models = transform_to_cnf (ast_of_channel !input) |> Dimacs.find_models in
+        let table,models = transform_to_cnf (ast_of_channel !input) |> models_of_dimacs in
         match Dimacs.ModelSet.cardinal !models with
         | i when !only_count -> Printf.fprintf !output "%d\n" i; exit 0
         | 0 -> Printf.fprintf !output "Unsat\n"; exit 1
@@ -306,7 +335,8 @@ let () =
       let ast = (ast_of_channel !input) in
       let table_prefix = (if !output == !output_table then "c " else "") in
       if not !use_old_dimacs then begin
-        let clauses,tbl,nblits = transform_to_cnf ast |> Dimacs.minisatclauses_of_cnf in
+        let cnf = transform_to_cnf ast in
+        let clauses,tbl,nblits =  minisatclauses_of_cnf cnf in
         Dimacs.dimacs_of_minisatclauses !output nblits clauses;
         Dimacs.print_lit2str !output_table tbl ~prefix:table_prefix
       end
