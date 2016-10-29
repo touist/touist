@@ -154,7 +154,7 @@ let lexer buffer : (Lexing.lexbuf -> Parser.token) =
         | [] -> failwith "One token at least must be returned in 'token rules' "
         | x::xs -> tokens := xs; x
       with Lexer.Error (msg,lexbuf) -> 
-        Printf.fprintf !output "%s %s\n" (print_position lexbuf) msg;
+        Printf.fprintf stderr "%s %s\n" (print_position lexbuf) msg;
         exit (get_code COMPILE_WITH_LINE_NUMBER_ERROR)
 
 
@@ -333,7 +333,7 @@ let () =
         let table,models = transform_to_cnf (ast_of_channel !input) |> models_of_dimacs in
         match Dimacs.ModelSet.cardinal !models with
         | i when !only_count -> Printf.fprintf !output "%d\n" i; exit 0
-        | 0 -> Printf.fprintf !output "Unsat\n"; exit 1
+        | 0 -> Printf.fprintf stderr "Unsat\n"; exit 1
         | i -> Dimacs.ModelSet.pprint table !models; exit 0
     else
       (* B. solve not asked: print the DIMACS file *)
