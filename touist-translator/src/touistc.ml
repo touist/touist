@@ -109,7 +109,7 @@ let print_position (lexbuf:Lexing.lexbuf) : string =
  * Eval.eval takes an abstract syntaxic tree and check that it is semantically correct,
  * creates the variables and everything.
  *
- * [ast] means it is of type Syntax.prog,
+ * [ast] means it is of type Syntax.ast,
  * i.e. the "root" type in lexer.mll
  *)
 let evaluate (ast:Syntax.ast) : Syntax.ast =
