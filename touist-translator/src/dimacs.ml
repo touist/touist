@@ -19,20 +19,25 @@ open Syntax
 open Pprint
 open Minisat
 
-(* [print_lit2str] gives a string where each like contain 'p(1,2) 98'
-   where 98 is the literal id number (given automatically) of the DIMACS format
-   and 'p(1,2)' is the name of the literal (given by the user).
+(* [print_table] prints the correspondance table between literals (= numbers)
+   and user-defined proposition names, e.g.,
+       'p(1,2) 98'
+   where 98 is the literal id number (given automatically) and 'p(1,2)' is the
+   name of this proposition.
    NOTE: you can add a prefix to 'p(1,2) 98', e.g.
-     string_of_table table ~prefix:"c "
+     string_of_table ~prefix:"c " table
    in order to have all lines beginning by 'c' (=comment) in order to comply to
    the DIMACS format. *)
-let print_lit2str (out:out_channel) (table:(Lit.t,string) Hashtbl.t) ?prefix:(prefix="") =
+let print_table (out:out_channel) (table:(Lit.t,string) Hashtbl.t) ?prefix:(prefix="") =
   let print_lit_and_name lit name = Printf.fprintf out "%s %d\n" name (Lit.to_int lit)
   in Hashtbl.iter print_lit_and_name table
 
-(* [minisatclauses_of_cnf] translates the expression into an instance of
-   list of list of literals. [[clause1],[clause2]...] *)
-let minisatclauses_of_cnf (ast:ast) : Lit.t list list * (Lit.t,string) Hashtbl.t * int = (* int = nb of literals *)
+(* [cnf_to_clauses] translates the cnf into a list of clauses (clause = list of
+   literals). Returns
+   - the list of clauses,
+   - the table literal-to-name (Lit.t doesn't store the proposition name)
+   Note that the total number of literals is exactly equal to the table size. *)
+let cnf_to_clauses (ast:ast) : Lit.t list list * (Lit.t,string) Hashtbl.t =
   (* num = a number that will serve to identify a literal
      lit = a literal that has a number inside it to identify it *)
   let str_to_lit = Hashtbl.create 500 in
@@ -68,18 +73,20 @@ let minisatclauses_of_cnf (ast:ast) : Lit.t list list * (Lit.t,string) Hashtbl.t
         Hashtbl.add str_to_lit s lit; Hashtbl.add lit_to_str lit s;
         incr num_lit;
         lit)
-  in let clauses = process_cnf ast in clauses, lit_to_str, !num_lit - 1
+  in let clauses = process_cnf ast in clauses, lit_to_str
 
-let instance_of_minisatclauses (clauses:Lit.t list list) : Minisat.t * bool =
-  let inst = Minisat.create () in
-  let rec add_clauses inst (l:Lit.t list list) : bool =
+(* [clauses_to_solver] takes a list of clauses (clause = list of literals)
+   and generates an intance of minisat solver. *)
+let clauses_to_solver (clauses:Lit.t list list) : Minisat.t * bool =
+  let solver = Minisat.create () in
+  let rec add_clauses solver (l:Lit.t list list) : bool =
     match l with
     | [] -> true
-    | cur::next -> (Minisat.Raw.add_clause_a inst (Array.of_list cur)) && (add_clauses inst next)
-  in let has_next_model = add_clauses inst clauses
-  in inst, has_next_model
+    | cur::next -> (Minisat.Raw.add_clause_a solver (Array.of_list cur)) && (add_clauses solver next)
+  in let has_next_model = add_clauses solver clauses
+  in solver, has_next_model
 
-let dimacs_of_minisatclauses (out:out_channel) nblits (clauses:Lit.t list list) : unit =
+let print_clauses_to_dimacs (out:out_channel) nblits (clauses:Lit.t list list) : unit =
   let nbclauses = List.length clauses in
   let rec string_of_clause (cl:Lit.t list) = match cl with
     | [] -> "0"
@@ -108,11 +115,11 @@ struct
      1 prop(1,2,9)
      O prop(1,4,2)... *)
   let pprint table model = List.fold_left (fun acc x -> match x with a,b -> ((Hashtbl.find table a) ^ " " ^ (string_of_value b) ^ "\n" ^ acc)) "" model
-  (* [model_of_instance] retrieves the valuations from a current 'solve' of a
+  (* [get_solver_model] retrieves the valuations from a current 'solve' of a
      Minisat.t and put them into a Model. *)
-  let model_of_instance instance (table:(Lit.t,string) Hashtbl.t) =
+  let get_solver_model solver (table:(Lit.t,string) Hashtbl.t) =
     let model (lit:Lit.t) name acc = match name.[0] with
-    | '&' -> acc | _ -> (lit, Minisat.value instance lit)::acc
+    | '&' -> acc | _ -> (lit, Minisat.value solver lit)::acc
     in let model = (Hashtbl.fold model table []) in
     model
 end
@@ -158,15 +165,15 @@ end
 (* limit is the limit of number of models you allow to be fetched.
    When limit = 0, all models will be fetched. *)
 let count = ref 0
-let find_models ?limit:(limit=0) cnf : (Lit.t,string) Hashtbl.t * (ModelSet.t ref) =
-  let counter_current_model instance (table:(Lit.t,string) Hashtbl.t) : bool =
-    let counter_clause (l:Lit.t) _ acc = match Minisat.value instance l with
+let solve_cnf ?limit:(limit=0) cnf : (Lit.t,string) Hashtbl.t * (ModelSet.t ref) =
+  let counter_current_model solver (table:(Lit.t,string) Hashtbl.t) : bool =
+    let counter_clause (l:Lit.t) _ acc = match Minisat.value solver l with
       | V_true -> (Minisat.Lit.neg l)::acc | V_false -> l::acc | _ -> acc
     in let counter_clause = Hashtbl.fold counter_clause table []
-    in Minisat.Raw.add_clause_a instance (Array.of_list counter_clause)
+    in Minisat.Raw.add_clause_a solver (Array.of_list counter_clause)
   in
-  let clauses,table,_ = minisatclauses_of_cnf cnf in
-  let instance,_ = instance_of_minisatclauses clauses in
+  let clauses,table = cnf_to_clauses cnf in
+  let solver,_ = clauses_to_solver clauses in
   let models = ref ModelSet.empty in (* for returning the models found *)
   (* searching for duplicate is slow on ModelSet. For checking a model hasn't
      appeared already, I use a way faster Hashtbl, ass it won't check on every
@@ -174,12 +181,12 @@ let find_models ?limit:(limit=0) cnf : (Lit.t,string) Hashtbl.t * (ModelSet.t re
   let models_hash = (Hashtbl.create 100) in
   let rec solve_loop limit i =
     if not (i<limit || limit==0) (* limit=0 means no limit *)
-    || not (Minisat.Raw.simplify instance)
-    || not (Minisat.Raw.solve instance [||])
+    || not (Minisat.Raw.simplify solver)
+    || not (Minisat.Raw.solve solver [||])
     then models
     else
-      let model = Model.model_of_instance instance table (* no &1 literals in it *)
-      and has_next_model = counter_current_model instance table in
+      let model = Model.get_solver_model solver table (* no &1 literals in it *)
+      and has_next_model = counter_current_model solver table in
       let is_duplicate = Hashtbl.mem models_hash model in 
       match is_duplicate,has_next_model with
       | true,false -> models (* is duplicate and no next model *)

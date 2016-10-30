@@ -96,7 +96,7 @@ let print_debug (prefix:string) depth (formulas:ast list) : unit =
   in print_endline ((indent depth) ^ (string_of_int depth) ^ " " ^ prefix
                     ^ (string_of_asts formulas))
 
-(* `strop` is a type is used in [to_cnf] in order to stop it after a number of
+(* `stop` is a type is used in [to_cnf] in order to stop it after a number of
    recursions. See (1) below *)
 type stop = No | Yes of int
 
@@ -182,7 +182,7 @@ let rec to_cnf depth (stop:stop) (ast:ast) : ast =
     if !debug then print_debug "out: " depth [cnf];
     cnf
 
-(* [transform_to_cnf] is the entry point  for [to_cnf] *)
-let transform_to_cnf (ast:ast) debug_mode : ast =
+(* [ast_to_cnf] is the entry point  for [to_cnf] *)
+let ast_to_cnf (ast:ast) debug_mode : ast =
   debug := debug_mode;
   to_cnf 0 No ast

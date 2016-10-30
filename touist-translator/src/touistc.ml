@@ -84,11 +84,6 @@ let linter = ref false (* for displaying syntax errors (during parse only) *)
 let linter_and_expand = ref false (* same but with semantic errors (during eval)*)
 let detailed_position = ref false (* display absolute position of error *)
 
-(* Used in Arg.parse when a parameter without any preceeding -flag (-f, -x...)
-   Here, this kind of parameter is considered as an inputFilePath *)
-let argIsInputFilePath (inputFilePath:string) : unit =
-  input_file_path := inputFilePath
-
 (* [print_position] will print the position of the error; the two positions
    correspond to where the error starts and where it ends. Example of call:
        print_position Lexing.dummy_pos ()          <- the () is necessary
@@ -99,43 +94,15 @@ let argIsInputFilePath (inputFilePath:string) : unit =
    same position on the two parameters.*)
 let print_position (err:position) ?area:(start_err,end_err=err,err) (): string =
   let simple = Printf.sprintf "%d:%d:" err.pos_lnum (err.pos_cnum - err.pos_bol+1) in
-(* The detailed version of the position is 'num_line:num_col:token_start:token_end:' 
-   (token positions are absolute).*)
+  (* The detailed version of the position is 'num_line:num_col:token_start:token_end:' 
+     (token positions are absolute).*)
   if !detailed_position then
     simple ^ Printf.sprintf "%d:%d:" start_err.pos_cnum end_err.pos_cnum
   else
     simple
-      
 
-
-(* [evaluate] handles exceptions when calling the evaluation function [Eval.eval].
- * Eval.eval takes an abstract syntaxic tree and check that it is semantically correct,
- * creates the variables and everything.
- *
- * [ast] means it is of type Syntax.ast,
- * i.e. the "root" type in lexer.mll
- *)
-let evaluate (ast:Syntax.ast) : Syntax.ast =
-  if !verbose then print_endline "evaluation begins";
-  try let expanded = Eval.eval ast in   
-    if !verbose then print_endline "evaluation finished";
-    expanded
-  with
-  | Eval.Error msg ->
-    Printf.fprintf stderr "%s\n" msg;
-    exit (get_code COMPILE_NO_LINE_NUMBER_ERROR)
-
-let transform_to_cnf (evaluated_ast:Syntax.ast) : Syntax.ast =
-  if !verbose then print_endline "cnf transformation begins";
-  try 
-    let cnf = Cnf.transform_to_cnf evaluated_ast !debug_cnf in
-    if !verbose then print_endline "cnf transformation finished";
-    cnf
-  with Cnf.Error msg ->
-      (Printf.fprintf stderr "%s\n" msg;
-       exit (get_code COMPILE_NO_LINE_NUMBER_ERROR))
-
-(* [lexer] is an intermediate to the [Lexer.token] function (in lexer.mll);
+(* [lexer] is used [invoke_parser] in order to get the next token of the input
+   stream. It is an intermediate to the [Lexer.token] function (in lexer.mll);
    - Rationale: the parser only accepts Parser.token; but [Lexer.token] returns
      Parser.token list. [lexer] acts as a buffer, returning one by one the list
      of tokens returned by [Lexer.token].
@@ -161,8 +128,8 @@ let lexer buffer : (Lexing.lexbuf -> Parser.token) =
         exit (get_code COMPILE_WITH_LINE_NUMBER_ERROR)
 
 
-(*  [invoke_parser] is in charge of calling the parser. It uses
-    the incremental API, which allows us to do our own error handling.
+(*  [invoke_parser] is used by [parse_to_ast] for calling the parser. It uses
+    the incremental API of menhirLib, which allows us to do our own error handling.
     WARNING: for now, the `pos_fname` that should contain the filename
     needed by menhirlib (just for error handling) contains
     "foo.touistl"... For now, the name of the input file name is not
@@ -182,15 +149,14 @@ let invoke_parser (text:string) (lexer:Lexing.lexbuf -> Parser.token) (buffer) :
   in
   Parser.MenhirInterpreter.loop_handle succeed fail supplier checkpoint
 
-(* [print_solve] outputs the result of a Minisat.solve; the result is passed
-   using 'inst' (as 'instance'). One result corresponds to one model.
+(* [print_solve] outputs the result of the solver.
    'show_hidden' indicates that the hidden literals introduced during
    CNF conversion should be shown. *)
-let print_solve output (inst:Minisat.t) (table:(string, Minisat.Lit.t) Hashtbl.t) show_hidden =
-  let string_of_value inst (lit:Minisat.Lit.t) = match Minisat.value inst lit with
+let print_solve output (solver:Minisat.t) (table:(string, Minisat.Lit.t) Hashtbl.t) show_hidden =
+  let string_of_value solver (lit:Minisat.Lit.t) = match Minisat.value solver lit with
     | V_true -> "1" | V_false -> "0" | V_undef -> "?"
   in let print_value_and_name name lit = if show_hidden || name.[0] != '&'
-    then Printf.fprintf output "%s %s\n" (string_of_value inst lit) name
+       then Printf.fprintf output "%s %s\n" (string_of_value solver lit) name
   in Hashtbl.iter print_value_and_name table
 
 (* [string_of_file] takes an opened file and returns a string of its content. *)
@@ -202,55 +168,88 @@ let rec string_of_file (input:in_channel) : string =
     done; ""
   with End_of_file -> !text
 
-(* [ast_of_channel] takes an opened file and return its Abstract Syntaxic Tree.
-   NOTE: this AST is already evaluated (the variables have been handled and
-   everything). At this point, the AST can be transformed to DIMACS, SMT... *)
-let ast_of_channel (input:in_channel) : Syntax.ast =
+(* [parse_to_ast] takes an opened file and return its Abstract Syntaxic Tree.*)
+let parse_to_ast (input:in_channel) : Syntax.ast =
   if !verbose then print_endline "parsing begins";
-    let text_input = string_of_file input in
-    let buffer = ref ErrorReporting.Zero in
-    let ast = invoke_parser text_input (lexer buffer) buffer in
-    if !verbose then print_endline "parsing finished";
-    ast
+  let text_input = string_of_file input in
+  let buffer = ref ErrorReporting.Zero in
+  let ast = invoke_parser text_input (lexer buffer) buffer in
+  if !verbose then print_endline "parsing finished";
+  ast
 
-let minisatclauses_of_cnf cnf =
+(* [eval_ast] expands the bigand, bigor, exact... of an ast to produce a valid
+   formula. This function handles exceptions when calling the evaluation 
+   function [Eval.eval].
+   Eval.eval takes an abstract syntaxic tree and check that it is semantically 
+   correct, creates the variables, expands variables/bigand/bigor/exact/etc...
+   The result of [Eval.eval] is a correct logical formula.
+   NOTE: ast = Syntax.ast, i.e. the "root" type in lexer.mll *)
+let eval_ast (ast:Syntax.ast) : Syntax.ast =
+  if !verbose then print_endline "evaluation begins";
+  try let expanded = Eval.eval ast in   
+    if !verbose then print_endline "evaluation finished";
+    expanded
+  with
+  | Eval.Error msg ->
+    Printf.fprintf stderr "%s\n" msg;
+    exit (get_code COMPILE_NO_LINE_NUMBER_ERROR)
+
+(* [ast_to_cnf] transforms the evaluated ast to cnf.
+   It wraps Cnf.ast_to_cnf to handle the error exceptions and
+   return nice error messages. *)
+let ast_to_cnf (evaluated_ast:Syntax.ast) : Syntax.ast =
+  if !verbose then print_endline "cnf transformation begins";
+  try 
+    let cnf = Cnf.ast_to_cnf evaluated_ast !debug_cnf in
+    if !verbose then print_endline "cnf transformation finished";
+    cnf
+  with Cnf.Error msg ->
+    (Printf.fprintf stderr "%s\n" msg;
+     exit (get_code COMPILE_NO_LINE_NUMBER_ERROR))
+
+(* [cnf_to_clauses] takes a cnf and transforms it to list of clauses.
+   tbl contains the literal-to-name correspondance table. 
+   The number of literals is (Hashtbl.length tbl) *)
+let cnf_to_clauses cnf =
   if !verbose then print_endline "cnf to clauses begins";
-  let clauses,tbl,nblits =  Dimacs.minisatclauses_of_cnf cnf in
+  let clauses,tbl =  Dimacs.cnf_to_clauses cnf in
   if !verbose then print_endline "cnf to clauses finished";
-  clauses,tbl,nblits
+  clauses,tbl
 
-let models_of_dimacs cnf =
+(* [solve_cnf] takes an evaluated ast and returns the models and the
+   table literal-to-name *)
+let solve_cnf cnf =
   if !verbose then print_endline "solve begins";
-  let table,models = Dimacs.find_models cnf in
+  let table,models = Dimacs.solve_cnf cnf in
   if !verbose then print_endline "solve begins";
   table,models
-let dimacs_of_minisatclauses nblits clauses =
-  if !verbose then print_endline "clauses to dimacs begins";
-  let str = Dimacs.dimacs_of_minisatclauses nblits clauses in
-  if !verbose then print_endline "clauses to dimacs finished";
-  str
+
+(* [process_arg_alone] is the function called by the command-line argument
+   parser when it finds an argument with no preceeding -flag (-f, -x...).
+   In our case, an argument not preceeded by a flag is the touistl input file. *)
+let process_arg_alone (file_path:string) : unit = input_file_path := file_path
 
 (* The main program *)
 let () =
   let cmd = (FilePath.basename Sys.argv.(0)) in (* ./touistl exec. name *)
-  let argspecs = (* This list enumerates the different flags (-x,-f...)*)
-    [ (* "-flag", Arg.toSomething (ref var), "Usage for this flag"*)
-      ("-o", Arg.Set_string (output_file_path), "OUTPUT is the translated file");
-      ("-table", Arg.Set_string (output_table_file_path),
-       "TABLE (-sat only) The output file that contains the literals table.
+  let argspecs = [ (* This list enumerates the different flags (-x,-f...)*)
+    (* "-flag", Arg.toSomething (ref var), "Usage for this flag"*)
+    ("-o", Arg.Set_string (output_file_path), "OUTPUT is the translated file");
+    ("-table", Arg.Set_string (output_table_file_path),
+     "TABLE (-sat only) The output file that contains the literals table.
       By default, prints to stdout.");
-      ("-sat", Arg.Set sat_mode, "Select the SAT solver");
-      ("-smt2", Arg.Set_string (smt_logic), (
-          "LOGIC Select the SMT solver with the specified LOGIC:
+    ("-sat", Arg.Set sat_mode, "Select the SAT solver");
+    ("-smt2", Arg.Set_string (smt_logic), (
+        "LOGIC Select the SMT solver with the specified LOGIC:
         QF_IDL allows to deal with boolean and integer, E.g, x - y < b
         QF_RDL is the same as QF_IDL but with reals
         QF_LIA (not documented)
         QF_LRA (not documented)
-    See http://smtlib.cs.uiowa.edu/logics.shtml for more info."
-        ));
-      ("--version", Arg.Set version_asked, "Display version number");
-      ("-", Arg.Set use_stdin,"reads from stdin instead of file");
-      ("--debug-syntax", Arg.Set debug_syntax, "Print information for debugging
+       See http://smtlib.cs.uiowa.edu/logics.shtml for more info."
+      ));
+    ("--version", Arg.Set version_asked, "Display version number");
+    ("-", Arg.Set use_stdin,"reads from stdin instead of file");
+    ("--debug-syntax", Arg.Set debug_syntax, "Print information for debugging
     syntax errors given by parser.messages");
     ("--debug-cnf", Arg.Set debug_cnf,"Print step by step CNF transformation");
     ("--verbose", Arg.Set verbose,"Print info on what is happening step by step");
@@ -259,25 +258,22 @@ let () =
                                             With 0, return every possible model.");
     ("--count", Arg.Set only_count,"(with --solve) Instead of displaying models, return the number of models");
     ("--show-hidden", Arg.Set show_hidden_lits,"(with --solve) Show the hidden '&a' literals used when translating to CNF");
-    ("--equiv", Arg.Set_string equiv_file_path,"(with --solve) Check that the given INPUT2 has the same models as INPUT (equivalency)");
-
+    ("--equiv", Arg.Set_string equiv_file_path,"INPUT2 (with --solve) Check that INPUT2 has the same models as INPUT (equivalency)");
     ("--debug-formula-expansion", Arg.Set debug_formula_expansion,"Print how the formula is expanded (bigand...)");
     ("--linter", Arg.Set linter,"Display parse errors and exit");
     ("--linter-expand", Arg.Set linter_and_expand,"Same as --linter but with semantic errors");
     ("--detailed-position", Arg.Set detailed_position,"Detailed position with 'num_line:num_col:token_start:token_end: '");
   ]
   in
-  let usage = 
-    "TouistL compiles files from the TouIST Language \
-    to SAT-DIMACS/SMT-LIB2 \n\
-    Usage: " ^ cmd ^ " -sat [-o OUTPUT] [-table TABLE] (INPUT | -)\n\
-    Usage: " ^ cmd ^ " -smt2 (QF_IDL|QF_RDL|QF_LIA|QF_LRA) [-o OUTPUT] (INPUT | -) \n\
-    Note: in -sat mode, if TABLE and OUTPUT aren't given, both output will be mixed in stdout."
+  let usage =
+    "TouistL compiles files from the TouIST Language to SAT-DIMACS/SMT-LIB2.\n"^
+    "Usage: " ^ cmd ^ " -sat [-o OUTPUT] [-table TABLE] (INPUT | -)\n"^
+    "Usage: " ^ cmd ^ " -smt2 (QF_IDL|QF_RDL|QF_LIA|QF_LRA) [-o OUTPUT] (INPUT | -)\n"^
+    "Note: in -sat mode, if TABLE and OUTPUT aren't given, both output will be mixed in stdout."
   in
-
   (* Step 1: we parse the args. If an arg. is "alone", we suppose
-   * it is a inputFilePath *)
-  Arg.parse argspecs argIsInputFilePath usage; (* parses the arguments *)
+   * it is the touistl input file (this is handled by [process_arg_alone]) *)
+  Arg.parse argspecs process_arg_alone usage; (* parses the arguments *)
 
   (* Step 1.5: if we are asked the version number
    * NOTE: !version_asked means like in C, *version_asked.
@@ -288,7 +284,6 @@ let () =
   );
 
   (* Step 2: we see if we got every parameter we need *)
-
 
   (* Check (file | -) and open input and output *)
   if (!input_file_path = "") && not !use_stdin (* NOTE: !var is like *var in C *)
@@ -321,48 +316,45 @@ let () =
      print_endline ("Example: -smt2 QF_IDL");
      exit (get_code OTHER));
 
-  (* *)
-
+  (* linter = only show syntax errors *)  
+  if !linter then 
+    (let _ = parse_to_ast !input in (); exit (get_code OK));
+  if !linter_and_expand then (* same but adds the semantic (using [eval_ast]) *)
+    (let _ = parse_to_ast !input |> eval_ast in (); exit (get_code OK));
 
   (* Step 3: translation *)
   if (!sat_mode) then
     (* A. solve has been asked *)
     if !solve_sat then
       if !equiv_file_path <> "" then begin
-        let _,models = transform_to_cnf (ast_of_channel !input) |> models_of_dimacs
-        and _,models2 = transform_to_cnf (ast_of_channel !input_equiv) |> models_of_dimacs in
+        let _,models = parse_to_ast !input |> eval_ast |> ast_to_cnf |> solve_cnf
+        and _,models2 = parse_to_ast !input_equiv |> eval_ast |> ast_to_cnf |> solve_cnf in
         match Dimacs.ModelSet.equal !models !models2 with
         | true -> Printf.fprintf !output "Equivalent\n"; exit 0
         | false -> Printf.fprintf !output "Not equivalent\n"; exit 1
       end
       else
-        let table,models = transform_to_cnf (ast_of_channel !input) |> models_of_dimacs in
+        let table,models = parse_to_ast !input |> eval_ast |> ast_to_cnf |> solve_cnf in
         match Dimacs.ModelSet.cardinal !models with
         | i when !only_count -> Printf.fprintf !output "%d\n" i; exit 0
         | 0 -> Printf.fprintf stderr "Unsat\n"; exit 1
         | i -> Dimacs.ModelSet.pprint table !models; exit 0
     else
       (* B. solve not asked: print the DIMACS file *)
-      let ast = (ast_of_channel !input) in
-      if !linter then exit (get_code OK) (* linter = only show syntax errors *)
-      else
-        let ast_expanded = evaluate ast in
-        if !linter_and_expand then exit (get_code OK)
-        else
-          let table_prefix = (if !output == !output_table then "c " else "") in
-          let cnf = transform_to_cnf ast_expanded in
-          let clauses,tbl,nblits =  minisatclauses_of_cnf cnf in
-          Dimacs.dimacs_of_minisatclauses !output nblits clauses;
-          Dimacs.print_lit2str !output_table tbl ~prefix:table_prefix
-          (* ~prefix:"" is an optionnal argument that allows to add the 'c' before
-             each line of the table display, when and only when everything is
-             outputed in a single file. Example:
-             c 98 p(1,2,3)     -> c means 'comment' in any DIMACS file   *)
+      let clauses,tbl = parse_to_ast !input |> eval_ast |> ast_to_cnf |> cnf_to_clauses in
+      (* tbl contains the literal-to-name correspondance table. 
+         The number of literals is (Hashtbl.length tbl) *)
+      Dimacs.print_clauses_to_dimacs !output (Hashtbl.length tbl) clauses;
+      Dimacs.print_table !output_table ~prefix:(if !output == !output_table then "c " else "") tbl
+        (* table_prefix allows to add the 'c' before each line of the table
+           display, when and only when everything is outputed in a single
+           file. Example:
+              c 98 p(1,2,3)     -> c means 'comment' in any DIMACS file   *)
 
-  else if (!smt_logic <> "") then
-    let smt = Smt.to_smt2 (String.uppercase !smt_logic) (ast_of_channel !input) in
-      Buffer.output_buffer !output smt;
-
+  else if (!smt_logic <> "") then begin
+    let smt = Smt.to_smt2 (String.uppercase !smt_logic) (parse_to_ast !input) in
+    Buffer.output_buffer !output smt;
+  end;
 
   close_out !output;
   close_out !output_table;
