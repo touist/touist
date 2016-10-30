@@ -216,14 +216,6 @@ let cnf_to_clauses cnf =
   if !verbose then print_endline "cnf to clauses finished";
   clauses,tbl
 
-(* [solve_cnf] takes an evaluated ast and returns the models and the
-   table literal-to-name *)
-let solve_cnf cnf =
-  if !verbose then print_endline "solve begins";
-  let table,models = Dimacs.solve_cnf cnf in
-  if !verbose then print_endline "solve begins";
-  table,models
-
 (* [process_arg_alone] is the function called by the command-line argument
    parser when it finds an argument with no preceeding -flag (-f, -x...).
    In our case, an argument not preceeded by a flag is the touistl input file. *)
@@ -327,18 +319,25 @@ let () =
     (* A. solve has been asked *)
     if !solve_sat then
       if !equiv_file_path <> "" then begin
-        let _,models = parse_to_ast !input |> eval_ast |> ast_to_cnf |> solve_cnf
-        and _,models2 = parse_to_ast !input_equiv |> eval_ast |> ast_to_cnf |> solve_cnf in
+        let models = parse_to_ast !input |> eval_ast |> ast_to_cnf |> cnf_to_clauses |> Dimacs.solve_clauses
+        and models2 = parse_to_ast !input_equiv |> eval_ast |> ast_to_cnf |> cnf_to_clauses |> Dimacs.solve_clauses in
         match Dimacs.ModelSet.equal !models !models2 with
         | true -> Printf.fprintf !output "Equivalent\n"; exit 0
         | false -> Printf.fprintf !output "Not equivalent\n"; exit 1
       end
       else
-        let table,models = parse_to_ast !input |> eval_ast |> ast_to_cnf |> solve_cnf in
+        let clauses,table = parse_to_ast !input |> eval_ast |> ast_to_cnf |> cnf_to_clauses in
+        let models =
+          (if !only_count then Dimacs.solve_clauses (clauses,table)
+           else 
+             let print_model model i = Printf.fprintf !output "==== model %d\n%s" i (Dimacs.Model.pprint table model)
+              in Dimacs.solve_clauses ~limit:!limit ~print:print_model (clauses,table))
+        in
         match Dimacs.ModelSet.cardinal !models with
         | i when !only_count -> Printf.fprintf !output "%d\n" i; exit 0
         | 0 -> Printf.fprintf stderr "Unsat\n"; exit 1
-        | i -> Dimacs.ModelSet.pprint table !models; exit 0
+        | i -> (* case where we already printed models in [solve_clause] *)
+          Printf.fprintf !output "==== Found %d models, limit is %d (--limit N for more models)\n" !limit i; exit 0
     else
       (* B. solve not asked: print the DIMACS file *)
       let clauses,tbl = parse_to_ast !input |> eval_ast |> ast_to_cnf |> cnf_to_clauses in

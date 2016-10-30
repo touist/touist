@@ -110,11 +110,11 @@ struct
   type t = (Minisat.Lit.t * Minisat.value) list
   let compare l1 l2 = Pervasives.compare l1 l2
   (* [dump] gives a string under the form (0,1)(1,2)(1,3)(0,4)... *)
-  let dump l = List.fold_left (fun acc x -> match x with a,b -> ("("^(Lit.to_string a) ^ "," ^ (string_of_value b) ^ ")" ^ acc)) "" l
+  let dump l = List.fold_left (fun acc x -> match x with l,v -> ("("^(string_of_value v) ^ "," ^ (Lit.to_string l) ^ ")" ^ acc)) "" l
   (* [pprint] gives a string under the form
      1 prop(1,2,9)
      O prop(1,4,2)... *)
-  let pprint table model = List.fold_left (fun acc x -> match x with a,b -> ((Hashtbl.find table a) ^ " " ^ (string_of_value b) ^ "\n" ^ acc)) "" model
+  let pprint table model = List.fold_left (fun acc (n,v) -> ((string_of_value v) ^" "^ (Hashtbl.find table n) ^ "\n" ^ acc)) "" model
 end
 
 (* A set that contains all the models already found. *)
@@ -126,15 +126,23 @@ end
 
 (* [get_model] retrieves the valuations from the current state of the solver
    and put them into a Model.t.
-   [keep_lit] must return false if the literal that is mapped to the given
+   [discard] must return true if the literal that is mapped to the given
    proposition name shouldn't be in the model. *)
-let get_model solver (table:(Lit.t,string) Hashtbl.t) (keep_lit:string->bool): Model.t =
-  Hashtbl.fold (fun lit name acc -> if keep_lit name then (lit,Minisat.value solver lit)::acc else acc) table []
+let get_model solver (table:(Lit.t,string) Hashtbl.t) (discard:string->bool): Model.t =
+  Hashtbl.fold (fun lit name acc -> 
+      if not (discard name) then (lit,Minisat.value solver lit)::acc else acc) 
+    table []
 
 (* [is_dummy] filters the 'dummy' literals that were introduced during
    cnf conversion; these literals are identified by their prefix '&'.
    Returns true if the given name corresponds to is a dummy literal *)
 let is_dummy (name:string) : bool = name.[0] == '&'
+
+(* [print_clause] dumps the clause in its literal-number form:
+   e.g., 1 -5 3 9 -2 -7 *)
+let print_clause (clause:Lit.t list) : unit =
+  let str = List.fold_left (fun acc lit -> (Lit.to_string lit) ^" "^ acc) "" clause
+  in Printf.fprintf stderr "%s\n=====\n" str
 
 (* 1. Prevent current model from reappearing
    =========================================
@@ -168,16 +176,20 @@ let is_dummy (name:string) : bool = name.[0] == '&'
     (4) go on with (1)
 *)
 (* limit is the limit of number of models you allow to be fetched.
-   When limit = 0, all models will be fetched. *)
-let count = ref 0
-let solve_cnf ?limit:(limit=0) cnf : (Lit.t,string) Hashtbl.t * (ModelSet.t ref) =
+   When limit = 0, all models will be fetched.
+   [print] can be used to print the models as they appear, because finding a
+   model can be very long. *)
+let solve_clauses
+    ?(print: Model.t -> int -> unit = fun m i ->())
+    ?(limit: int = 0)
+    (clauses,table : Lit.t list list * (Lit.t,string) Hashtbl.t)
+  : (ModelSet.t ref) =
   let counter_current_model solver (table:(Lit.t,string) Hashtbl.t) : bool =
     let counter_clause (l:Lit.t) _ acc = match Minisat.value solver l with
       | V_true -> (Minisat.Lit.neg l)::acc | V_false -> l::acc | _ -> acc
     in let counter_clause = Hashtbl.fold counter_clause table []
     in Minisat.Raw.add_clause_a solver (Array.of_list counter_clause)
   in
-  let clauses,table = cnf_to_clauses cnf in
   let solver,_ = clauses_to_solver clauses in
   let models = ref ModelSet.empty in (* for returning the models found *)
   (* searching for duplicate is slow on ModelSet. For checking a model hasn't
@@ -192,15 +204,15 @@ let solve_cnf ?limit:(limit=0) cnf : (Lit.t,string) Hashtbl.t * (ModelSet.t ref)
     else
       let model = get_model solver table (is_dummy) (* is_dummy removes &1 lits *)
       and has_next_model = counter_current_model solver table in
-      let is_duplicate = Hashtbl.mem models_hash model in 
+      let is_duplicate = Hashtbl.mem models_hash model in
       match is_duplicate,has_next_model with
       | true,false -> models (* is duplicate and no next model *)
       | true,true  -> solve_loop limit i (* is duplicate but has next *)
       | false, true ->  (* both not duplicate and has next *)
-        models := ModelSet.add model !models;
+        models := ModelSet.add model !models; print model i;
         Hashtbl.add models_hash model ();
-        solve_loop  limit (i+1)
+        solve_loop limit (i+1)
       | false, false -> (* is not duplicate and no next model *)
-        models := ModelSet.add model !models;
+        models := ModelSet.add model !models; print model i;
         models
-  in table, solve_loop limit 0
+  in solve_loop limit 0
