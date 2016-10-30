@@ -1081,8 +1081,10 @@ touist_code: DATA VAR AFFECT VAR WHEN
 ## global_var AFFECT exp 
 ##
 
-Ill-formed affectation. The right-term $1 is expected to be an
-expression. Instead, the following statement were read:
+Ill-formed affectation. The right-term 
+    $1 
+is expected to be an expression.
+Instead, the following statement were read:
     $0
 
 touist_code: DATA VAR AFFECT XOR 
