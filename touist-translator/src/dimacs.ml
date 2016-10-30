@@ -19,66 +19,13 @@ open Syntax
 open Pprint
 open Minisat
 
-let to_dimacs (prop:Syntax.ast) : string * (string,int) Hashtbl.t =
-  let table    = Hashtbl.create 10
-  and num_sym  = ref 1
-  and nbclause = ref 0 in
-  let rec go acc = function
-    | Top -> failwith "Clause is always true"
-    | Bottom -> failwith "Clause is alway false"
-    | Term (x, None)        -> acc ^ string_of_int (gensym x)
-    | Term (x, _)           -> failwith ("unevaluated term: " ^ x)
-    | Not (Term (x, None)) -> acc ^ string_of_int (- (gensym x))
-    | And (x, y) -> incr nbclause; (go acc x) ^ " 0\n" ^ (go acc y)
-    | Or  (x, y) -> (go acc x) ^ " " ^ (go acc y)
-    | _ -> failwith "non CNF clause"
-  and gensym x =
-    try Hashtbl.find table x
-    with Not_found ->
-      let n = !num_sym in
-      Hashtbl.add table x n; incr num_sym; n
-  in
-  let str = (go "" prop) ^ " 0\n" in
-  let header =
-    "c CNF format file\np cnf " ^ string_of_int (Hashtbl.length table)
-                                ^ " "
-                                ^ string_of_int (!nbclause+1)
-                                ^ "\n"
-  in
-  header ^ str, table
-
-let to_text prop =
-  let table    = Hashtbl.create 10
-  and nbclause = ref 0 in
-  let rec go acc = function
-    | Top -> (*failwith "Clause is always true"*) "VTop"
-    | Bottom -> (*failwith "Clause is alway false"*) "VBot"
-    | Term (x, None)        -> acc ^ x
-    | Term (x, _)           -> failwith ("unevaluated term: " ^ x)
-    | Not (Term (x, None)) -> acc ^ "-" ^ x
-    | And (x, y) -> incr nbclause; (go acc x) ^ " \n" ^ (go acc y)
-    | Or  (x, y) -> (go acc x) ^ " v " ^ (go acc y)
-    | _ -> failwith "non CNF formula"
-  in
-  let str = (go "" prop) ^ " 0\n" in
-  let header =
-    "c CNF format file\np cnf " ^ string_of_int (Hashtbl.length table)
-                                ^ " "
-                                ^ string_of_int (!nbclause+1)
-                                ^ "\n"
-  in
-  header ^ str, table
-
-(* [string_of_table] gives a string where each like contain 'p(1,2) 98'
+(* [print_lit2str] gives a string where each like contain 'p(1,2) 98'
    where 98 is the literal id number (given automatically) of the DIMACS format
    and 'p(1,2)' is the name of the literal (given by the user).
    NOTE: you can add a prefix to 'p(1,2) 98', e.g.
      string_of_table table ~prefix:"c "
    in order to have all lines beginning by 'c' (=comment) in order to comply to
    the DIMACS format. *)
-let string_of_table (table:(string,int) Hashtbl.t) ?prefix:(prefix="") =
-  Hashtbl.fold (fun name lit acc -> acc ^ prefix ^ name ^ " " ^ (string_of_int lit) ^ "\n") table ""
-
 let print_lit2str (out:out_channel) (table:(Lit.t,string) Hashtbl.t) ?prefix:(prefix="") =
   let print_lit_and_name lit name = Printf.fprintf out "%s %d\n" name (Lit.to_int lit)
   in Hashtbl.iter print_lit_and_name table

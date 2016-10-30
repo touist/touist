@@ -79,7 +79,6 @@ let show_hidden_lits = ref false
 let debug_formula_expansion = ref false
 let equiv_file_path = ref ""
 let input_equiv = ref stdin
-let use_old_dimacs = ref false
 let verbose = ref false
 let linter = ref false (* for displaying syntax errors (during parse only) *)
 let linter_and_expand = ref false (* same but with semantic errors (during eval)*)
@@ -272,7 +271,6 @@ let () =
     ("--equiv", Arg.Set_string equiv_file_path,"(with --solve) Check that the given INPUT2 has the same models as INPUT (equivalency)");
 
     ("--debug-formula-expansion", Arg.Set debug_formula_expansion,"Print how the formula is expanded (bigand...)");
-    ("--use-old-dimacs", Arg.Set use_old_dimacs,"(just for try)");
     ("--linter", Arg.Set linter,"Display parse errors and exit");
     ("--linter-expand", Arg.Set linter_and_expand,"Same as --linter but with semantic errors");
     ("--detailed-position", Arg.Set detailed_position,"Detailed position with 'num_line:num_col:token_start:token_end: '");
@@ -361,17 +359,10 @@ let () =
         if !linter_and_expand then exit (get_code OK)
         else
           let table_prefix = (if !output == !output_table then "c " else "") in
-          if not !use_old_dimacs then begin
-            let cnf = transform_to_cnf ast_expanded in
-            let clauses,tbl,nblits =  minisatclauses_of_cnf cnf in
-            Dimacs.dimacs_of_minisatclauses !output nblits clauses;
-            Dimacs.print_lit2str !output_table tbl ~prefix:table_prefix
-          end
-          else begin
-            let dimacs,table = transform_to_cnf ast_expanded |> Dimacs.to_dimacs in
-            Printf.fprintf !output "%s" dimacs;
-            Printf.fprintf !output_table "%s" (Dimacs.string_of_table table ~prefix:table_prefix)
-          end
+          let cnf = transform_to_cnf ast_expanded in
+          let clauses,tbl,nblits =  minisatclauses_of_cnf cnf in
+          Dimacs.dimacs_of_minisatclauses !output nblits clauses;
+          Dimacs.print_lit2str !output_table tbl ~prefix:table_prefix
           (* ~prefix:"" is an optionnal argument that allows to add the 'c' before
              each line of the table display, when and only when everything is
              outputed in a single file. Example:
