@@ -27,6 +27,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -47,7 +48,7 @@ public class TranslatorSMT {
 	private String currentPath = System.getProperty("user.dir");
 	private Process p;
 
-	public TranslatorSMT(String translatorProgramFilePath) {
+	public TranslatorSMT() {
 		this.translatorProgramFilePath = translatorProgramFilePath;
 	}
 
@@ -83,8 +84,11 @@ public class TranslatorSMT {
 		 * num_row:num_col: message
 		 */
 		// Check if translatorProgramFilePath is there
-		String path = currentPath + File.separatorChar + translatorProgramFilePath;
-		String [] cmd = {path.toString(),"-o", outputFilePath,"-smt2", logic, touistlFilePath};
+		// This trick is because of linux that sets "user.dir" = $HOME instead of $CWD
+		File touistc = new File(ClassLoader.getSystemClassLoader().getResource(".").getPath());
+		String pathtouistc = touistc.getAbsolutePath() + File.separator + "external" + File.separator + "touistc";
+	
+		String [] cmd = {pathtouistc,"-o", outputFilePath,"-smt2", logic, touistlFilePath};
 		System.out.println("translate(): cmd executed: "+Arrays.toString(cmd));
 		this.p = Runtime.getRuntime().exec(cmd);
 		int return_code = p.waitFor();

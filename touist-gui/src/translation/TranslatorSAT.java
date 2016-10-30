@@ -32,6 +32,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.StringReader;
+import java.net.URL;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -44,18 +46,15 @@ import java.util.Map;
 public class TranslatorSAT {
 	final private String outputFilePath = "out.cnf";
 	final private String outputTableFilePath = "out.table";
-	private String translatorProgramFilePath;
 	private Map<Integer,String> literalsMap = new HashMap<Integer,String>();
 	private List<TranslationError> errors = new ArrayList<TranslationError>();
     private String currentPath = System.getProperty("user.dir");
 	private Process p;
 	private List<String> options = new ArrayList<String>();
 
-	public TranslatorSAT(String translatorProgramFilePath) {
-		this.translatorProgramFilePath = translatorProgramFilePath;
+	public TranslatorSAT() {
 	}
-	public TranslatorSAT(String translatorProgramFilePath,List<String> options) {
-		this.translatorProgramFilePath = translatorProgramFilePath;
+	public TranslatorSAT(List<String> options) {
 		this.options = options;
 	}
 
@@ -106,10 +105,14 @@ public class TranslatorSAT {
 		 * num_row:num_col: message
 		 */
 		// Check if translatorProgramFilePath is there
-		String touistcPath = currentPath + File.separatorChar + translatorProgramFilePath;
+		
+		// This trick is because of linux that sets "user.dir" = $HOME instead of $CWD
+		File touistc = new File(ClassLoader.getSystemClassLoader().getResource(".").getPath());
+		String pathtouistc = touistc.getAbsolutePath() + File.separator + "external" + File.separator + "touistc";
+
 		List<String> cmd = new ArrayList<String>();
 		
-		cmd.add(touistcPath);
+		cmd.add(pathtouistc);
 		cmd.add("-sat");
 		cmd.add("-");
 		cmd.add("-table");
