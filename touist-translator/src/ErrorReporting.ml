@@ -85,18 +85,34 @@ let show f buffer : string =
       (* In the most likely case, we have read two tokens. *)
       Printf.sprintf "after '%s' and before '%s'" (f valid) (f invalid)
 
-(* [last buffer] returns the last element of the buffer (that is, the
-   invalid token). *)
-
-let last buffer =
+(* [exact_pos] returns the start position of the invalid token;
+   this is useful for giving the user a one-position indication of where
+   the error is. *)
+let exact_pos buffer : position =
   match buffer with
   | Zero ->
       (* The buffer cannot be empty. If we have read no tokens, we
          cannot have detected a syntax error. *)
       assert false
   | One invalid
-  | Two (_, invalid) ->
-      invalid
+  | Two (_, invalid) -> let start_pos,_ = invalid in start_pos
+
+(* [area_pos] returns the area (= start and end positions) where the error
+   was found; this is useful for red-underlying the error in an IDE.
+   It will give the beginning of the token preceeding the invalid token
+   and the end of the invalid token.
+   If there is no preceeding token, returns the invalid token twice.
+   NOTE: position = Lexing.position *)
+
+let area_pos (buffer : (position*position) buffer) : position * position =
+  match buffer with
+  | Zero ->
+      (* The buffer cannot be empty. If we have read no tokens, we
+         cannot have detected a syntax error. *)
+      assert false
+  | One invalid -> let (startpos,endpos) = invalid in (startpos,endpos)
+  | Two (previous, invalid) -> let (startpos,_),(_,endpos) = previous,invalid
+    in startpos, endpos
 
 (* -------------------------------------------------------------------------- *)
 
@@ -260,12 +276,6 @@ let fragments text checkpoint (message : string) : string =
 
 let report text buffer checkpoint debug' : string =
   debug := debug'; (* Sets the debug flag for the whole ErrorReporting.ml file *)
-  (* Extract the position where the error occurred, that is, the start
-     position of the invalid token. We display it as a filename, a  (1-based)
-     line number, and a (1-based) column number. *)
-  let (pos, _) = last buffer in
-  (* Construct a readable description of where the error occurred, that is,
-     after which token and before which token. *)
   let where = show (extract text) buffer in
   (* Find out in which state the parser failed. *)
   let s : int = state checkpoint in
@@ -279,7 +289,7 @@ let report text buffer checkpoint debug' : string =
        should not happen, since our list of erroneous states is
        supposed to be complete! -- produce a generic message. *)
     Printf.sprintf "This is an unknown syntax error (%d).\n\
-                    Please report this problem to the compiler vendor.\n" s
+                    This means the error %d is missing in parser.messages.\n" s s
   in
   (* Construct the full error message. *)
   let message = Printf.sprintf "syntax error %s.\n%s"

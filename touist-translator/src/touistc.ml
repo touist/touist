@@ -99,13 +99,24 @@ let write_to_file (filename:string) (str:string) =
 let argIsInputFilePath (inputFilePath:string) : unit =
   input_file_path := inputFilePath
 
-(* Used by parse_with_error *)
-let print_position (lexbuf:Lexing.lexbuf) : string =
-  let pos = lexbuf.lex_curr_p in
-  if not !detailed_position then Printf.sprintf "%d:%d:" pos.pos_lnum (pos.pos_cnum - pos.pos_bol+1)
-(* the detailed version of the position is 
-   'num_line:num_col:token_start:token_end:' (token positions are absolute) *)
-  else Printf.sprintf "%d:%d:%d:%d:" pos.pos_lnum (pos.pos_cnum - pos.pos_bol+1) (lexeme_start lexbuf) (lexeme_end lexbuf)
+(* [print_position] will print the position of the error; the two positions
+   correspond to where the error starts and where it ends. Example of call:
+       print_position Lexing.dummy_pos ()          <- the () is necessary
+       print_position Lexing.dummy_pos (Lexing.dummy_pos,Lexing.dummy_pos) ()
+   Optionnal argument 'area', combined with the boolean !detailed_position,
+   ativates the output of the area where the error is.
+   If you only ONE position for an error, just call [print_position] with the
+   same position on the two parameters.*)
+let print_position (err:position) ?area:(start_err,end_err=err,err) (): string =
+  let simple = Printf.sprintf "%d:%d:" err.pos_lnum (err.pos_cnum - err.pos_bol+1) in
+(* The detailed version of the position is 'num_line:num_col:token_start:token_end:' 
+   (token positions are absolute).*)
+  if !detailed_position then
+    simple ^ Printf.sprintf "%d:%d:" start_err.pos_cnum end_err.pos_cnum
+  else
+    simple
+      
+
 
 (* [evaluate] handles exceptions when calling the evaluation function [Eval.eval].
  * Eval.eval takes an abstract syntaxic tree and check that it is semantically correct,
@@ -156,7 +167,7 @@ let lexer buffer : (Lexing.lexbuf -> Parser.token) =
         | [] -> failwith "One token at least must be returned in 'token rules' "
         | x::xs -> tokens := xs; x
       with Lexer.Error (msg,lexbuf) -> 
-        Printf.fprintf stderr "%s %s\n" (print_position lexbuf) msg;
+        Printf.fprintf stderr "%s %s\n" (print_position lexbuf.lex_curr_p ()) msg;
         exit (get_code COMPILE_WITH_LINE_NUMBER_ERROR)
 
 
@@ -174,7 +185,9 @@ let invoke_parser (text:string) (lexer:Lexing.lexbuf -> Parser.token) (buffer) :
   and succeed ast = ast
   and fail checkpoint =
     let msg = (ErrorReporting.report text !buffer checkpoint !debug_syntax)
-    in Printf.fprintf stderr "%s %s\n" (print_position lexbuf) msg;
+    and exactpos = ErrorReporting.exact_pos !buffer (* exact position of error*)
+    and firstpos,lastpos = ErrorReporting.area_pos !buffer (* error area *)
+    in Printf.fprintf stderr "%s %s\n" (print_position exactpos ~area:(firstpos,lastpos) ()) msg;
     exit (get_code COMPILE_WITH_LINE_NUMBER_ERROR)
   in
   Parser.MenhirInterpreter.loop_handle succeed fail supplier checkpoint
