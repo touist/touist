@@ -7,7 +7,13 @@ v2.0.0
       of the models (defined by the formulas) and the data (the sets).
    - fixed the problem of "Clause is always true/false" when bigand or
      bigor does not produce anything
+   - added --linter for syntax errors and --linter-expand for syntax+
+     semantic errors. The first is fast, the second is a bit slower.
+   - added --verbose to have a sense of what is happening when the
+     compiler is taking a long time to anwser.
   - gui:
+    - now shows the errors in the editor we red-underlyings; you can
+      see the error hovering the mouse over the error.
     - merged the sets and formulas tabs in GUI; the solution is now to
       use the syntax <formulas> data <sets>. I'm still looking for
       a way to separate formulas and sets in GUI, e.g., two separate
