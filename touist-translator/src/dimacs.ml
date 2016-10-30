@@ -115,13 +115,6 @@ struct
      1 prop(1,2,9)
      O prop(1,4,2)... *)
   let pprint table model = List.fold_left (fun acc x -> match x with a,b -> ((Hashtbl.find table a) ^ " " ^ (string_of_value b) ^ "\n" ^ acc)) "" model
-  (* [get_solver_model] retrieves the valuations from a current 'solve' of a
-     Minisat.t and put them into a Model. *)
-  let get_solver_model solver (table:(Lit.t,string) Hashtbl.t) =
-    let model (lit:Lit.t) name acc = match name.[0] with
-    | '&' -> acc | _ -> (lit, Minisat.value solver lit)::acc
-    in let model = (Hashtbl.fold model table []) in
-    model
 end
 
 (* A set that contains all the models already found. *)
@@ -130,6 +123,18 @@ module ModelSet = struct
   let dump models = print_endline (fold (fun m acc -> (Model.dump m) ^ "\n" ^ acc) models "")
   let pprint table models = print_endline (fold (fun m acc -> (Model.pprint table m) ^ "=====\n" ^ acc) models "")
 end
+
+(* [get_model] retrieves the valuations from the current state of the solver
+   and put them into a Model.t.
+   [keep_lit] must return false if the literal that is mapped to the given
+   proposition name shouldn't be in the model. *)
+let get_model solver (table:(Lit.t,string) Hashtbl.t) (keep_lit:string->bool): Model.t =
+  Hashtbl.fold (fun lit name acc -> if keep_lit name then (lit,Minisat.value solver lit)::acc else acc) table []
+
+(* [is_dummy] filters the 'dummy' literals that were introduced during
+   cnf conversion; these literals are identified by their prefix '&'.
+   Returns true if the given name corresponds to is a dummy literal *)
+let is_dummy (name:string) : bool = name.[0] == '&'
 
 (* 1. Prevent current model from reappearing
    =========================================
@@ -185,7 +190,7 @@ let solve_cnf ?limit:(limit=0) cnf : (Lit.t,string) Hashtbl.t * (ModelSet.t ref)
     || not (Minisat.Raw.solve solver [||])
     then models
     else
-      let model = Model.get_solver_model solver table (* no &1 literals in it *)
+      let model = get_model solver table (is_dummy) (* is_dummy removes &1 lits *)
       and has_next_model = counter_current_model solver table in
       let is_duplicate = Hashtbl.mem models_hash model in 
       match is_duplicate,has_next_model with
