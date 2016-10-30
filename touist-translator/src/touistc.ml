@@ -84,15 +84,6 @@ let linter = ref false (* for displaying syntax errors (during parse only) *)
 let linter_and_expand = ref false (* same but with semantic errors (during eval)*)
 let detailed_position = ref false (* display absolute position of error *)
 
-
-(* Used to write the "str" string into the "filename" file *)
-let write_to_file (filename:string) (str:string) =
-  let out = open_out filename in
-  try
-    Printf.fprintf out "%s" str;
-    close_out out
-  with x -> close_out out; raise x
-
 (* Used in Arg.parse when a parameter without any preceeding -flag (-f, -x...)
    Here, this kind of parameter is considered as an inputFilePath *)
 let argIsInputFilePath (inputFilePath:string) : unit =
