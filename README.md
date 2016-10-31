@@ -5,11 +5,7 @@ TouIST, the IDE for propositional logic
 [![Appveyor (Windows)](https://ci.appveyor.com/api/projects/status/rayupfflmut8xbe0?svg=true)](https://ci.appveyor.com/project/maelvalais/touist-kila4)
 
 ## I want to try
-[Get the latest release here](https://github.com/touist/touist/releases). Touist works on **macOS** (x86_64 only), **Linux** x86\_64 and **Windows** (x86 or x64\_86). 
-
-- For macOS and Windows users, just download, unzip and double-click on `touist.jar`. 
-- For linux users, double-clicking on `touist.jar` won't work because the `$CWD` when cliking on touist.jar is `$HOME` instead of the actual `$CWD`. 
-Workaround: use the command `java -jar touist.jar` instead of clicking on touist.jar.
+[Get the latest release here](https://github.com/touist/touist/releases). Touist works on **macOS** (x86_64 only), **Linux** x86\_64 and **Windows** (x86 or x64\_86). Just download, unzip and double-click on `touist.jar` (you can also use the command-line `touistc` in `./external/`)
 
 ## Description
 
