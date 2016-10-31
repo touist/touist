@@ -225,7 +225,7 @@ public class ParentEditionPanel extends AbstractComponentPanel {
     }//GEN-LAST:event_importButtonActionPerformed
 
     /**
-     * For Java RE 6 compatibility (p.isAlive() is JavaRE7)
+     * For java jre 1.6 and 1.7 compatibility (p.isAlive() is java jre >= 1.8)
      */
 	private boolean isAlive(Process process) {
 	    try {

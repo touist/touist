@@ -46,7 +46,7 @@
 	-->
 	<path id="touist.classpath-for-debug">
 		<pathelement location="${touist.build.dir}"/>
-		<pathelement location="${touist.dir}/resources"/>
+		<pathelement location="${touist.resources.dir}"/>
 		<pathelement location="${touist.libs.dir}/rsyntaxtextarea-2.5.6.jar"/>
 		<pathelement location="${touist.libs.dir}/java-cup-11b.jar"/>
 		<pathelement location="${touist.libs.dir}/jlatexmath-1.0.3.jar"/>
@@ -72,6 +72,15 @@
 		<echo message="To enable debug mode (when developping) please run `ant build-debug` instead."/>
 		<echo message="NOTE: the `ant run` task automatically calls `ant build-debug` and does -Ddebug=true."/>
 		<echo message="******************************************************************"/>		
+		
+		<copy todir="${touist.build.dir}/external" flatten="false">
+			<fileset dir="${touist.external.dir}">
+				<exclude name="**/*.zip"/><!--Ignore the yices-smt2.zip--> 
+			</fileset>
+		</copy>
+		<!-- When copying, permissions often get lost... -->
+		<chmod dir="${touist.build.dir}/external" perm="ugo+x" includes="*"/>
+		
 		<mkdir dir="${touist.build.dir}"/>
 		<javac destdir="${touist.build.dir}" includeantruntime="false" 
 			source="${source}" target="${target}">
@@ -82,6 +91,15 @@
 		</javac>
 	</target>
 	<target name="build-debug" depends="update-version-string">
+		
+		<copy todir="${touist.build.dir}/external" flatten="false">
+			<fileset dir="${touist.external.dir}">
+				<exclude name="**/*.zip"/><!--Ignore the yices-smt2.zip--> 
+			</fileset>
+		</copy>
+		<!-- When copying, permissions often get lost... -->
+		<chmod dir="${touist.build.dir}/external" perm="ugo+x" includes="*"/>
+		
 		<mkdir dir="${touist.build.dir}"/>
 		<javac debug="true" debuglevel="${debuglevel}" 
 			destdir="${touist.build.dir}" includeantruntime="false" 
@@ -113,7 +131,7 @@
 		separated from your build tree, you can use `and dist`.
 	-->
 	<target name="build-jar" depends="build">
-		<jar destfile="${touist.dir}/touist.jar" filesetmanifest="mergewithoutmain">
+		<jar destfile="${touist.dir}/touist.jar" filesetmanifest="mergewithoutmain" preserve0permissions="true">
 			<manifest>
 				<attribute name="Main-Class" value="touist.TouIST"/>
 				<attribute name="Class-Path" value="."/>
@@ -123,12 +141,13 @@
 				<attribute name="Implementation-Vendor" 
 					value="Institut de Recherche en Informatique de Toulouse"/>
 			</manifest>
-			<zipfileset dir="${touist.dir}/resources"/>
+			<zipfileset dir="${touist.resources.dir}"/>
 			<zipfileset dir="${touist.build.dir}"/>
 			<zipfileset src= "${touist.libs.dir}/java-cup-11b.jar"/>
 			<zipfileset src= "${touist.libs.dir}/rsyntaxtextarea-2.5.6.jar"/>
 			<zipfileset src= "${touist.libs.dir}/jlatexmath-1.0.3.jar"/>
 		</jar>
+		<chmod file="${touist.dir}/touist.jar" perm="ugo+x"/>
 	</target>
 	<target name="jar" depends="build-jar" /> <!-- Simple alias for build-jar -->
 
@@ -150,13 +169,14 @@
 	<target name="dist" depends="build-jar">
 		<!-- Copy the external binaries into dist/ -->
 		<copy file="${touist.dir}/touist.jar" todir="${touist.dist.dir}"/>
-		<copy todir="${touist.dist.dir}/external" flatten="true">
+		<copy todir="${touist.dist.dir}/external" flatten="false">
 			<fileset dir="${touist.external.dir}">
 				<exclude name="**/*.zip"/><!--Ignore the yices-smt2.zip--> 
 			</fileset>
 		</copy>
 		<!-- When copying, permissions often get lost... -->
 		<chmod dir="${touist.dist.dir}/external" perm="ugo+x" includes="*"/>
+		<chmod file="${touist.dist.dir}/touist.jar" perm="ugo+x"/>
 	</target>
 
 

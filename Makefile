@@ -1,3 +1,4 @@
+.PHONY: all help build run clean zip
 all: help check-requirements build
 help:
 	@echo "============"
@@ -26,7 +27,7 @@ run: touist-gui/build/*
 
 clean:
 	cd touist-gui && ant clean
-	cd touist-translator && make clean
+	cd touist-translator && make clean distclean
 
 
 smt:
@@ -37,20 +38,26 @@ smt:
 
 
 ##### Check for tools/programs required ######
-check-requirements:
+check-requirements: opam m4 ant git
 	@command -v javac || (echo \
-	"javac is not installed. \
-	Install Java JDK with 'apt-get default-jdk'." && exit 2)
-	@command -v ant || (echo \
-	"ant is not installed.\
-	Install it with 'apt-get install ant'." && exit 3)
-	@command -v opam || (echo \
-	"opam is not installed.\
-	Install it with 'apt-get install opam'." && exit 4)
+	"javac is not installed.\n \
+	Install Java JDK with\n\n    sudo apt install default-jdk'.\n" && exit 2)
 	@command -v ocamlfind || (echo \
-	"ocamlfind is not installed.\
-	Install it with 'opam install ocamlfind'." && exit 5)
+	"ocamlfind is not installed.\n\
+	Install it with\n\n    opam install -y ocamlfind\n" && exit 3)
+
+%:
+	@command -v $@ || (echo \
+	"$@ is not installed.\n\
+	Install it with\n\n    sudo apt install $@\n" && exit 5)
+
 
 check-opam-packages:
-	@ocamlfind query menhirLib fileutils minisat str \
-		|| (echo "Install it with 'opam install <package>'" && exit 6)
+	@ocamlfind query menhirLib fileutils minisat \
+		|| (echo \
+	    'Install opam packages with:\n\n'\
+		'  opam init && eval `opam config env`\n'\
+		'  opam install -y menhir fileutils\n'\
+		'  opam pin add -y minisat'\
+	    ''\''https://github.com/maelvalais/ocaml-minisat.git#v0.0.2'\''\n'\
+	&& exit 6)

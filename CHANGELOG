@@ -19,6 +19,8 @@ v2.0.0
       a way to separate formulas and sets in GUI, e.g., two separate
       files that have each its own tab
     - when error message is too large, added 'click to view' message
+    - linux: "solve" now works properly when touist.jar is opened by
+      icon-clicking
 v1.4.2
     - (regression) possible to declare a set with terms: [a,b,c]...
 v1.4.1

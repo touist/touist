@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.Map;
 
@@ -86,7 +87,7 @@ public class SolverTestSAT4J extends Solver {
 	}
 
     /**
-     * For Java RE 6 compatibility (p.isAlive() is JavaRE7)
+     * For java jre 1.6 and 1.7 compatibility (p.isAlive() is java jre >= 1.8)
      */
 	private boolean isAlive(Process process) {
 	    try {
@@ -109,9 +110,12 @@ public class SolverTestSAT4J extends Solver {
 		 * parse issue 3 = wrong dimacs content 4 = error with the streamreader
 		 * 5 = solver timeout
 		 */
-		String [] command = { "java", "-jar",
-				"external" + Character.toString(File.separatorChar) + "minisat.jar" 
-				, getDimacsFilePath() } ;
+		// This trick is because of linux that sets "user.dir" = $HOME instead of $CWD
+		File minisat = new File(ClassLoader.getSystemClassLoader().getResource(".").getPath());
+		String pathminisat = minisat.getAbsolutePath() + File.separator + "external" + File.separator + "minisat.jar";
+	
+
+		String [] command = { "java", "-jar",pathminisat, this.dimacsFilePath} ;
 		System.out.println("launch(): cmd executed: "+Arrays.toString(command));
 		this.p = Runtime.getRuntime().exec(command);
 		stderr = new BufferedReader(new InputStreamReader(p.getErrorStream()));

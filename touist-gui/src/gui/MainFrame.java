@@ -52,8 +52,8 @@ import translation.TranslatorSMT;
 public class MainFrame extends javax.swing.JFrame {
     private TouistProperties properties = new TouistProperties();
     private TextInEditor clause = new TextInEditor();
-    private TranslatorSAT translatorSAT = new TranslatorSAT("external"+File.separatorChar+"touistc");
-    private TranslatorSMT translatorSMT = new TranslatorSMT("external"+File.separatorChar+"touistc");
+    private TranslatorSAT translatorSAT = new TranslatorSAT();
+    private TranslatorSMT translatorSMT = new TranslatorSMT();
     private Solver solver;
     private ModelList models;
     private SolverSelection solverSelection = new SolverSelection();

@@ -26,7 +26,7 @@ public class ErrorParser extends AbstractParser {
 			TranslatorSAT translator = null;
 			List<String> options = new ArrayList<String>();
 			options.add("--linter");
-			translator = new TranslatorSAT("external"+File.separatorChar+"touistc",options);
+			translator = new TranslatorSAT(options);
 			try {
 				translator.translate(new StringReader(code.getText(0, code.getLength())));
 				for (TranslationError error : translator.getErrors()) {
