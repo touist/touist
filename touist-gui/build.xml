@@ -131,7 +131,7 @@
 		separated from your build tree, you can use `and dist`.
 	-->
 	<target name="build-jar" depends="build">
-		<jar destfile="${touist.dir}/touist.jar" filesetmanifest="mergewithoutmain" preserve0permissions="true">
+		<jar destfile="${touist.dir}/touist.jar" filesetmanifest="mergewithoutmain">
 			<manifest>
 				<attribute name="Main-Class" value="touist.TouIST"/>
 				<attribute name="Class-Path" value="."/>
@@ -142,7 +142,7 @@
 					value="Institut de Recherche en Informatique de Toulouse"/>
 			</manifest>
 			<zipfileset dir="${touist.resources.dir}"/>
-			<zipfileset dir="${touist.build.dir}"/>
+            <zipfileset dir="${touist.build.dir}" includes="*.class"/>
 			<zipfileset src= "${touist.libs.dir}/java-cup-11b.jar"/>
 			<zipfileset src= "${touist.libs.dir}/rsyntaxtextarea-2.5.6.jar"/>
 			<zipfileset src= "${touist.libs.dir}/jlatexmath-1.0.3.jar"/>
