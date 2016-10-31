@@ -59,7 +59,7 @@ install:
     # This step is a workaround based on a snapshot of wodi (ocaml+cygwin). Because installing ocaml+opam
     # seems (for now) impossible, I chose to upload this wodi32.zip on my dropbox ; it contains everything
     # needed for touist-translator.
-  #- ps: rm -recurse -force c:\ocaml32
+  - appveyor.yml javac -version
   - ps: 'Invoke-WebRequest http://cygwin.com/$env:CYG_SETUP -OutFile "$env:CYG_SETUP"'
   - '%CYG_SETUP% --quiet-mode --no-shortcuts --only-site --root "%CYG_ROOT%" --site "%CYG_MIRROR%" --local-package-dir "%CYG_CACHE%" --packages rsync,patch,diffutils,curl,make,unzip,git,m4,perl,mingw64-i686-gcc-core --upgrade-also'
   - '%CYG_BASH% -lc "curl -O https://dl.dropboxusercontent.com/s/eo4igttab8ipyle/opam32.tar.xz"'
@@ -83,15 +83,15 @@ before_build:
 
 build_script:
   # Build touistc (touist-translator)
-  # NOTE: I had to add the 2>&1 because when something writes to stderr,
-  # Powershell thinks there was an error...
+  # IMPORTANT: I had to add the 2>&1 because when something writes to
+  # stderr, Powershell thinks there was an error... -_-
   - '%CYG_BASH% -lc "cd /cygdrive/c/touist/touist-translator && ./configure --bindir ../touist-gui/external 2>&1"'
   - '%CYG_BASH% -lc "cd /cygdrive/c/touist/touist-translator && make 2>&1"'
   - '%CYG_BASH% -lc "cd /cygdrive/c/touist/touist-translator && make install 2>&1"'
 
   # Build touist.jar (touist-gui)
   - ps: cd c:\touist\touist-gui
-  - ps: ant zip
+  - ps: ant -e zip
   - ps: $zip=$(Get-ChildItem -name -include touist*.zip) # The artifact's name for later use
   - ps: echo $zip
 

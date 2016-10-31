@@ -36,6 +36,7 @@ cache:
 
 before_install:
   # Install packages using brew on osx environment
+  - javac -version
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update && brew install opam ant; fi
   - opam init --auto-setup
   - eval `opam config env`
@@ -56,8 +57,8 @@ install:
 
   # Build touist.jar (touist-gui)
   - cd ../touist-gui
-  - chmod ugo+x external/touistc  
-  - ant zip
+  - chmod ugo+x external/touistc
+  - ant -e zip
   - zip=$(ls | grep 'touist.*\.zip' | head -1) # The artifact's name for later use
   - echo $zip
 
