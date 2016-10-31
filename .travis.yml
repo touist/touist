@@ -30,6 +30,10 @@ addons:
     packages:
     - opam
 
+cache:
+  directories:
+    - $HOME/.opam
+
 before_install:
   # Install packages using brew on osx environment
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update && brew install opam ant; fi
