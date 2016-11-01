@@ -236,7 +236,9 @@ Comment     = ";;"[^\n]*
 	"+" | "," | "-" |
 	".." |
 	"/" | "!=" | ":" | "<" | "=" | "==" | ">" | "=>" | "<=>" | "<=" |
-	"(" | ")" | "[" | "]" | "*" 	{ addToken(Token.OPERATOR); }   
+	"[" | "]" | "*" 	{ addToken(Token.OPERATOR); }
+	
+	"(" | ")" { addToken(Token.SEPARATOR); }
    
 	/* Numbers */   
 	{Integer}			{ addToken(Token.LITERAL_NUMBER_DECIMAL_INT); }   
