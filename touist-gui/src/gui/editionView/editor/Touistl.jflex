@@ -198,14 +198,7 @@ Comment     = ";;"[^\n]*
 	"then" |
 	"else"  |
 	"when"
-			{ addToken(Token.RESERVED_WORD); }   
-   
-	/* Data types */   
-	"constant" |   
-	"set" |   
-	"double" |   
-	"float" |   
-	"int"		{ addToken(Token.DATA_TYPE); }   
+			{ addToken(Token.RESERVED_WORD); }    
    
 	/* Functions */   
 	"bigand" |   
@@ -239,9 +232,9 @@ Comment     = ";;"[^\n]*
 
 
 	/* Operators. */   
-	"!" | "%" | "&&" | "+" | "," | "-" | "--" | "-=" |   
-	"/" | "!=" | ":" | "<" | "=" | "==" | ">" | "=>" | "<=>" | 
-	"||" | "(" | ")" | "[" | "]" | "," | "*" | "."	{ addToken(Token.OPERATOR); }   
+	"+" | "," | "-" |
+	"/" | "!=" | ":" | "<" | "=" | "==" | ">" | "=>" | "<=>" |
+	"(" | ")" | "[" | "]" | "*" 	{ addToken(Token.OPERATOR); }   
    
 	/* Numbers */   
 	{Integer}			{ addToken(Token.LITERAL_NUMBER_DECIMAL_INT); }   
