@@ -18,6 +18,7 @@ v2.0.0
       use the syntax <formulas> data <sets>. I'm still looking for
       a way to separate formulas and sets in GUI, e.g., two separate
       files that have each its own tab
+    - matching parenthesis are now hightlighted
     - when error message is too large, added 'click to view' message
     - linux: "solve" now works properly when touist.jar is opened by
       icon-clicking

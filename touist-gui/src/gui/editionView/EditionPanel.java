@@ -120,9 +120,6 @@ public class EditionPanel extends AbstractComponentPanel {
              editorTextArea = new Editor();
              editorTextArea.getDocument().addDocumentListener(new UpdateLatexListener());
              editorTextArea.addParser(new ErrorParser());
-             editorTextArea.setAnimateBracketMatching(true);
-             editorTextArea.setBracketMatchingEnabled(true);
-             editorTextArea.setPaintMatchedBracketPair(true);
         }
         catch (IOException e) {
             System.err.println("Erreur lancement éditeur");
