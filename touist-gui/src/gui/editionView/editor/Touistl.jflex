@@ -201,6 +201,7 @@ Comment     = ";;"[^\n]*
 			{ addToken(Token.RESERVED_WORD); }    
    
 	/* Functions */   
+	"let" |
 	"bigand" |   
 	"bigor" |   
 	"in" |   
@@ -233,8 +234,8 @@ Comment     = ";;"[^\n]*
 
 	/* Operators. */   
 	"+" | "," | "-" |
-	".." | "<=" |
-	"/" | "!=" | ":" | "<" | "=" | "==" | ">" | "=>" | "<=>" |
+	".." |
+	"/" | "!=" | ":" | "<" | "=" | "==" | ">" | "=>" | "<=>" | "<=" |
 	"(" | ")" | "[" | "]" | "*" 	{ addToken(Token.OPERATOR); }   
    
 	/* Numbers */   
