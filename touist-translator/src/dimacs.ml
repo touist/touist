@@ -28,8 +28,8 @@ open Minisat
      string_of_table ~prefix:"c " table
    in order to have all lines beginning by 'c' (=comment) in order to comply to
    the DIMACS format. *)
-let print_table (out:out_channel) (table:(Lit.t,string) Hashtbl.t) ?prefix:(prefix="") =
-  let print_lit_and_name lit name = Printf.fprintf out "%s %d\n" name (Lit.to_int lit)
+let print_table (out:out_channel) ?(prefix="") (table:(Lit.t,string) Hashtbl.t) =
+  let print_lit_and_name lit name = Printf.fprintf out "%s%s %d\n" prefix name (Lit.to_int lit)
   in Hashtbl.iter print_lit_and_name table
 
 (* [cnf_to_clauses] translates the cnf into a list of clauses (clause = list of
