@@ -1,3 +1,6 @@
+v2.0.1
+  - gui:
+    - fixed crash when touist.jar was opened from inside the zip archive
 v2.0.0
   - touistc:
     - simplified 'begin sets end sets begin formula end formula'; syntax is

@@ -469,10 +469,8 @@ public class ParentEditionPanel extends AbstractComponentPanel {
         try {
             getFrame().getTextInEditor().saveToFile(bigAndFilePath);
         } catch (IOException ex) {
-            ex.printStackTrace();
-            errorMessage = "Couldn't create file '" + bigAndFilePath + "'";
+            errorMessage = "Couldn't create file '" + bigAndFilePath + "':\n"+ex.getMessage();
             showErrorMessage(errorMessage, getFrame().getLang().getWord(Lang.ERROR_TRADUCTION));
-            System.exit(0);
             return State.EDITION;
         }
         
