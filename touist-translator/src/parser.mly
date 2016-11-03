@@ -175,6 +175,7 @@ exp:
   | BOOL  { Bool  $1 }
   | v=global_var { v }
   | s=set { s }
+  | t=term { t } (* because we need to write 'when $Color != Blue' *)
   | SUB exp { Neg $2 } %prec high_precedence
   | exp ADD exp { Add ($1, $3) }
   | exp SUB exp { Sub ($1, $3) }
