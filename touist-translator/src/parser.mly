@@ -90,9 +90,10 @@
  *     not(a)
  * the minus sign MUST be reduced as fast as possible. *)
 
-%on_error_reduce comma_list(VAR)
+%on_error_reduce comma_list(local_var)
 %on_error_reduce comma_list(exp)
-%on_error_reduce comma_list(TERM)
+%on_error_reduce comma_list(term)
+%on_error_reduce comma_list(indices)
 (* %on_error_reduce is a nice "trick" to display a a more accurate
    context when an error is handled. For example, with this text:
 
