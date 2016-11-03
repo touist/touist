@@ -4,6 +4,8 @@ v2.0.1
   - touistc:
     - when dimacs and table both printing on stdout, the table now
       begins with 'c' to be able to pipe directly to a solver
+    - added possibility of using a term in a 'when' or 'if' statement, e.g.,
+      'bigand $i in [a,b,c] when $i != a: p($i) end
 v2.0.0
   - touistc:
     - simplified 'begin sets end sets begin formula end formula'; syntax is
