@@ -25,23 +25,21 @@ end)
 
 module StringSet = Set_ext.Make(String)
 
-module GenSet = struct
-  type t =
-    | Empty
-    | ISet of IntSet.t
-    | FSet of FloatSet.t
-    | SSet of StringSet.t
-end
-
-type var = string * ast list option
+type set =
+  | EmptySet
+  | ISet of IntSet.t
+  | FSet of FloatSet.t
+  | SSet of StringSet.t
+    
+type loc = Lexing.position * Lexing.position
 and ast = (* Touist_code is the entry point *)
   | Touist_code      of ast list * ast list option
   | Int              of int
   | Float            of float
   | Bool             of bool
-  | Var              of var (* Var and Term are the ONLY to be able to *)
-  | Term             of var (* have the var type to avoid spagetti in ast *)
-  | Set              of GenSet.t
+  | Var              of string * ast list option * loc
+  | Term             of string * ast list option
+  | Set              of set
   | Set_decl         of ast list
   | Neg              of ast
   | Add              of ast * ast

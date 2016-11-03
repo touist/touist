@@ -37,7 +37,7 @@ exception Error of string
       and is a recursive tree representing a formula, using Or, And, Implies...
       Example: the formula (1) has the abstract syntax tree (2):
           (a or b) and not c                          (1) natural language
-          And (Or (Term a, Term b),Not (Term c))   (2) abstract syntax tree
+          And (Or (Term (p,i), Term (p,i)),Not (Term (p,i)))   (2) abstract syntax tree
     - CNF:
       a Conjunctive Normal Form is an AST that has a special structure with
       is a conjunction of disjunctions of literals. For example:
@@ -64,12 +64,12 @@ let rec is_clause (ast: ast) : bool = match ast with
           `d  and  ((a or not b) and (not c))`
     doesn't need to be modified because it is already in CNF.  *)
 let rec push_lit (lit:ast) (cnf:ast) : ast = match cnf with
-  | Top           -> Top
-  | Bottom        -> lit
-  | Term x        -> Or (lit, Term x)
-  | Not (Term x) -> Or (lit, Not (Term x))
-  | And (x,y)    -> And (push_lit lit x, push_lit lit y)
-  | Or (x,y)     -> Or (lit, Or (x,y))
+  | Top              -> Top
+  | Bottom           -> lit
+  | Term (p,i)       -> Or (lit, Term (p,i)) (* p,i = prefix, indices *)
+  | Not (Term (p,i)) -> Or (lit, Not (Term (p,i)))
+  | And (x,y)        -> And (push_lit lit x, push_lit lit y)
+  | Or (x,y)         -> Or (lit, Or (x,y))
   | x -> raise (Error ("this doesn't seem to be a formula: '" ^ (string_of_ast x) ^ "'"))
 
 
@@ -128,7 +128,7 @@ let rec to_cnf depth (stop:stop) (ast:ast) : ast =
     let cnf = begin match ast with
     | Top    -> Top
     | Bottom -> Bottom
-    | Term a -> Term a
+    | Term (p,i) -> Term (p,i)
     | And (x,y) -> let (x,y) = (to_cnf x, to_cnf y) in
       begin
         match x,y with
@@ -141,7 +141,7 @@ let rec to_cnf depth (stop:stop) (ast:ast) : ast =
         match x with
         | Top        -> Bottom
         | Bottom     -> Top
-        | Term a     -> Not (Term a)
+        | Term (p,i)     -> Not (Term (p,i))
         | Not x     -> to_cnf x
         | And (x,y) -> to_cnf (Or (Not x, Not y))           (* De Morgan *)
         | Or (x,y)  -> And (to_cnf (Not x), to_cnf (Not y)) (* De Morgan *)
@@ -153,8 +153,8 @@ let rec to_cnf depth (stop:stop) (ast:ast) : ast =
         match x,y with
         | Bottom, z | z, Bottom   -> z
         | Top, _ | _, Top         -> Top
-        | Term a, z | z, Term a   -> push_lit (Term a) z
-        | Not (Term a),z | z,Not (Term a) -> push_lit (Not (Term a)) z
+        | Term (p,i), z | z, Term (p,i)   -> push_lit (Term (p,i)) z
+        | Not (Term (p,i)),z | z,Not (Term (p,i)) -> push_lit (Not (Term (p,i))) z
         | x,y when is_clause x && is_clause y -> Or (x, y)
         | x,y -> (* At this point, either x or y is a conjunction
                     => Tseytin transform (see explanations below) *)

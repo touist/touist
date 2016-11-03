@@ -130,21 +130,23 @@ let lexer buffer : (Lexing.lexbuf -> Parser.token) =
 
 (*  [invoke_parser] is used by [parse_to_ast] for calling the parser. It uses
     the incremental API of menhirLib, which allows us to do our own error handling.
+    parser is the 'entry point' of the parser that is defined in parser.mly,e.g.,
+      %start <Syntax.ast> touist_simple, touist_smt
     WARNING: for now, the `pos_fname` that should contain the filename
     needed by menhirlib (just for error handling) contains
     "foo.touistl"... For now, the name of the input file name is not
     indicated to the user: useless because we only handle a single touistl file *)
-let invoke_parser (text:string) (lexer:Lexing.lexbuf -> Parser.token) (buffer) : Syntax.ast =
+let invoke_parser (parser) (text:string) (lexer:Lexing.lexbuf -> Parser.token) (buffer) : Syntax.ast =
   let lexbuf = Lexing.from_string text in
   lexbuf.lex_curr_p <- {lexbuf.lex_curr_p with pos_fname = "foo.touistl"; pos_lnum = 1};
-  let checkpoint = Parser.Incremental.touist_code lexbuf.lex_curr_p
+  let checkpoint = parser lexbuf.lex_curr_p
   and supplier = Parser.MenhirInterpreter.lexer_lexbuf_to_supplier lexer lexbuf
   and succeed ast = ast
   and fail checkpoint =
     let msg = (ErrorReporting.report text !buffer checkpoint !debug_syntax)
     and exactpos = ErrorReporting.exact_pos !buffer (* exact position of error*)
     and firstpos,lastpos = ErrorReporting.area_pos !buffer (* error area *)
-    in Printf.fprintf stderr "%s %s\n" (print_position exactpos ~area:(firstpos,lastpos) ()) msg;
+    in Printf.fprintf stderr "%s %s" (print_position exactpos ~area:(firstpos,lastpos) ()) msg;
     exit (get_code COMPILE_WITH_LINE_NUMBER_ERROR)
   in
   Parser.MenhirInterpreter.loop_handle succeed fail supplier checkpoint
@@ -169,13 +171,16 @@ let rec string_of_file (input:in_channel) : string =
   with End_of_file -> !text
 
 (* [parse_to_ast] takes an opened file and return its Abstract Syntaxic Tree.*)
-let parse_to_ast (input:in_channel) : Syntax.ast =
+let parse_to_ast parser (input:in_channel) : Syntax.ast =
   if !verbose then print_endline "parsing begins";
   let text_input = string_of_file input in
   let buffer = ref ErrorReporting.Zero in
-  let ast = invoke_parser text_input (lexer buffer) buffer in
+  let ast = invoke_parser parser text_input (lexer buffer) buffer in
   if !verbose then print_endline "parsing finished";
   ast
+
+let parse_simple_to_ast = parse_to_ast Parser.Incremental.touist_simple
+let parse_smt_to_ast = parse_to_ast Parser.Incremental.touist_smt
 
 (* [eval_ast] expands the bigand, bigor, exact... of an ast to produce a valid
    formula. This function handles exceptions when calling the evaluation 
@@ -193,6 +198,9 @@ let eval_ast (ast:Syntax.ast) : Syntax.ast =
   | Eval.Error msg ->
     Printf.fprintf stderr "%s\n" msg;
     exit (get_code COMPILE_NO_LINE_NUMBER_ERROR)
+  | Eval.ErrorWithLoc (msg,(startpos,endpos))  ->
+    Printf.fprintf stderr "%s %s\n" (print_position startpos ~area:(startpos,endpos) ()) msg;
+    exit (get_code COMPILE_WITH_LINE_NUMBER_ERROR)
 
 (* [ast_to_cnf] transforms the evaluated ast to cnf.
    It wraps Cnf.ast_to_cnf to handle the error exceptions and
@@ -310,23 +318,23 @@ let () =
 
   (* linter = only show syntax errors *)  
   if !linter then 
-    (let _ = parse_to_ast !input in (); exit (get_code OK));
+    (let _ = parse_simple_to_ast !input in (); exit (get_code OK));
   if !linter_and_expand then (* same but adds the semantic (using [eval_ast]) *)
-    (let _ = parse_to_ast !input |> eval_ast in (); exit (get_code OK));
+    (let _ = parse_simple_to_ast !input |> eval_ast in (); exit (get_code OK));
 
   (* Step 3: translation *)
   if (!sat_mode) then
     (* A. solve has been asked *)
     if !solve_sat then
       if !equiv_file_path <> "" then begin
-        let models = parse_to_ast !input |> eval_ast |> ast_to_cnf |> cnf_to_clauses |> Dimacs.solve_clauses
-        and models2 = parse_to_ast !input_equiv |> eval_ast |> ast_to_cnf |> cnf_to_clauses |> Dimacs.solve_clauses in
+        let models = parse_simple_to_ast !input |> eval_ast |> ast_to_cnf |> cnf_to_clauses |> Dimacs.solve_clauses
+        and models2 = parse_simple_to_ast !input_equiv |> eval_ast |> ast_to_cnf |> cnf_to_clauses |> Dimacs.solve_clauses in
         match Dimacs.ModelSet.equal !models !models2 with
         | true -> Printf.fprintf !output "Equivalent\n"; exit 0
         | false -> Printf.fprintf !output "Not equivalent\n"; exit 1
       end
       else
-        let clauses,table = parse_to_ast !input |> eval_ast |> ast_to_cnf |> cnf_to_clauses in
+        let clauses,table = parse_simple_to_ast !input |> eval_ast |> ast_to_cnf |> cnf_to_clauses in
         let models =
           (if !only_count then Dimacs.solve_clauses (clauses,table)
            else 
@@ -340,7 +348,7 @@ let () =
           Printf.fprintf !output "==== Found %d models, limit is %d (--limit N for more models)\n" !limit i; exit 0
     else
       (* B. solve not asked: print the DIMACS file *)
-      let clauses,tbl = parse_to_ast !input |> eval_ast |> ast_to_cnf |> cnf_to_clauses in
+      let clauses,tbl = parse_simple_to_ast !input |> eval_ast |> ast_to_cnf |> cnf_to_clauses in
       (* tbl contains the literal-to-name correspondance table. 
          The number of literals is (Hashtbl.length tbl) *)
       Dimacs.print_clauses_to_dimacs !output (Hashtbl.length tbl) clauses;
@@ -351,7 +359,7 @@ let () =
               c 98 p(1,2,3)     -> c means 'comment' in any DIMACS file   *)
 
   else if (!smt_logic <> "") then begin
-    let smt = Smt.to_smt2 (String.uppercase !smt_logic) (parse_to_ast !input) in
+    let smt = Smt.to_smt2 (String.uppercase !smt_logic) (parse_smt_to_ast !input) in
     Buffer.output_buffer !output smt;
   end;
 
