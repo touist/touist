@@ -32,6 +32,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.StringReader;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -106,9 +108,7 @@ public class TranslatorSAT {
 		 */
 		// Check if translatorProgramFilePath is there
 		
-		// This trick is because of linux that sets "user.dir" = $HOME instead of $CWD
-		File touistc = new File(ClassLoader.getSystemClassLoader().getResource(".").getPath());
-		String pathtouistc = touistc.getAbsolutePath() + File.separator + "external" + File.separator + "touistc";
+		String pathtouistc = getTouistDir() + File.separator + "external" + File.separator + "touistc";
 
 		List<String> cmd = new ArrayList<String>();
 		
@@ -220,4 +220,26 @@ public class TranslatorSAT {
 		br.close();
 	}
 
+	
+	/**
+	 * We use this for getting the actual place where touist.jar is located in.
+	 * We do not use getProperty("user.dir") because on linux, it returns (when
+	 * opening by clicking on touist.jar) the $HOME instead of the actual place where
+	 * touist.jar is.
+	 * @return
+	 */
+	private String getTouistDir() {
+		URL url = ClassLoader.getSystemClassLoader().getResource(".");
+		URI uri = null;
+		// URISyntaxException should ne ever be thrown because we expect getResource(".")
+		// to give a correct URL
+		try {
+			uri = new URI(url.toString());
+		} catch (URISyntaxException e) {
+			System.err.println("Something went wrong when trying to get where touist.jar is located:\n" + e.getMessage());
+		}
+		File path = new File(uri);
+		return path.getAbsolutePath();
+	}
+	
 }

@@ -1,3 +1,7 @@
+v2.1.1
+  - gui:
+    - fixed a bug that was preventing from ./external/touistc to be run when
+      the path contains whitespaces
 v2.1.0
   - gui: 
     - semantic errors (that only appear when pressing 'Solve' are now

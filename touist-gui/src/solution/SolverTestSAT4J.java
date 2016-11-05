@@ -30,6 +30,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Map;
@@ -110,10 +112,8 @@ public class SolverTestSAT4J extends Solver {
 		 * parse issue 3 = wrong dimacs content 4 = error with the streamreader
 		 * 5 = solver timeout
 		 */
-		// This trick is because of linux that sets "user.dir" = $HOME instead of $CWD
-		File minisat = new File(ClassLoader.getSystemClassLoader().getResource(".").getPath());
-		String pathminisat = minisat.getAbsolutePath() + File.separator + "external" + File.separator + "minisat.jar";
-	
+
+		String pathminisat = getTouistDir() + File.separator + "external" + File.separator + "minisat.jar";
 
 		String [] command = { "java", "-jar",pathminisat, this.dimacsFilePath} ;
 		System.out.println("launch(): cmd executed: "+Arrays.toString(command));
@@ -213,5 +213,26 @@ public class SolverTestSAT4J extends Solver {
 	 */
 	protected Map<Integer, String> getLiteralsMap() {
 		return literalsMap;
+	}
+	
+	/**
+	 * We use this for getting the actual place where touist.jar is located in.
+	 * We do not use getProperty("user.dir") because on linux, it returns (when
+	 * opening by clicking on touist.jar) the $HOME instead of the actual place where
+	 * touist.jar is.
+	 * @return
+	 */
+	private String getTouistDir() {
+		URL url = ClassLoader.getSystemClassLoader().getResource(".");
+		URI uri = null;
+		// URISyntaxException should ne ever be thrown because we expect getResource(".")
+		// to give a correct URL
+		try {
+			uri = new URI(url.toString());
+		} catch (URISyntaxException e) {
+			System.err.println("Something went wrong when trying to get where touist.jar is located:\n" + e.getMessage());
+		}
+		File path = new File(uri);
+		return path.getAbsolutePath();
 	}
 }
