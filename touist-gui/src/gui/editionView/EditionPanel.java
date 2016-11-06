@@ -40,6 +40,7 @@ import javax.swing.event.CaretListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
+import org.fife.ui.rsyntaxtextarea.parser.Parser;
 import org.fife.ui.rtextarea.RTextScrollPane;
 import org.scilab.forge.jlatexmath.TeXConstants;
 import org.scilab.forge.jlatexmath.TeXFormula;
@@ -52,6 +53,7 @@ import org.scilab.forge.jlatexmath.TeXIcon;
 public class EditionPanel extends AbstractComponentPanel {
 
     private Editor editorTextArea;
+    private ErrorParser parser;
     private int rightPanelWidth;
     private JLabel latexLabel;
     private int zoom = 0;
@@ -119,7 +121,7 @@ public class EditionPanel extends AbstractComponentPanel {
         try {
              editorTextArea = new Editor();
              editorTextArea.getDocument().addDocumentListener(new UpdateLatexListener());
-             editorTextArea.addParser(new ErrorParser());
+             editorTextArea.addParser(parser = new ErrorParser());
         }
         catch (IOException e) {
             System.err.println("Erreur lancement éditeur");
@@ -241,4 +243,12 @@ public class EditionPanel extends AbstractComponentPanel {
     public void updateLanguage() {
         snippetsContainer.updateLanguage();
     }
+
+	public Editor getEditorTextArea() {
+		return editorTextArea;
+	}
+
+	public ErrorParser getParser() {
+		return parser;
+	}
 }
