@@ -38,4 +38,11 @@ FORCE:
 clean:
 	cd $(SRC) && rm -f parser_messages.ml version.ml
 
+# For finding the errors that should be in parser.messages but are not
+# because parser.mly has been updated and some new errors appeared.
+missing:
+	menhir --list-errors src/parser.mly > parser.messages_updated
+	menhir --compare-errors parser.messages_updated --compare-errors src/parser.messages --list-errors src/parser.mly
+
+
 # vim:ft=make
