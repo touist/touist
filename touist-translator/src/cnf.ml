@@ -22,7 +22,7 @@ exception Error of string
 (*  Vocabulary:
     - Literal:
       a possibly negated proposition; we denote them as a, b... and
-      their type is homogenous to Term _ or Not(Term _) or Top or Bottom. Exples:
+      their type is homogenous to Prop _ or Not(Prop _) or Top or Bottom. Exples:
           a                                         is a literal
           not b                                     is a literal
     - Clause:
@@ -37,7 +37,7 @@ exception Error of string
       and is a recursive tree representing a formula, using Or, And, Implies...
       Example: the formula (1) has the abstract syntax tree (2):
           (a or b) and not c                          (1) natural language
-          And (Or (Term a, Term b),Not (Term c))   (2) abstract syntax tree
+          And (Or (Prop x, Prop x),Not (Prop x))   (2) abstract syntax tree
     - CNF:
       a Conjunctive Normal Form is an AST that has a special structure with
       is a conjunction of disjunctions of literals. For example:
@@ -48,7 +48,7 @@ exception Error of string
 (* [is_clause] checks that the given AST is a clause. This function can only
    be called on an AST containing Or, And or Not. No Equiv or Implies! *)
 let rec is_clause (ast: ast) : bool = match ast with
-  | Top | Bottom | Term _ | Not (Term _) -> true
+  | Top | Bottom | Prop _ | Not (Prop _) -> true
   | Or (x,y) -> is_clause x && is_clause y
   | And _ -> false
   | x -> false
@@ -64,22 +64,22 @@ let rec is_clause (ast: ast) : bool = match ast with
           `d  and  ((a or not b) and (not c))`
     doesn't need to be modified because it is already in CNF.  *)
 let rec push_lit (lit:ast) (cnf:ast) : ast = match cnf with
-  | Top           -> Top
-  | Bottom        -> lit
-  | Term x        -> Or (lit, Term x)
-  | Not (Term x) -> Or (lit, Not (Term x))
-  | And (x,y)    -> And (push_lit lit x, push_lit lit y)
-  | Or (x,y)     -> Or (lit, Or (x,y))
+  | Top              -> Top
+  | Bottom           -> lit
+  | Prop x           -> Or (lit, Prop x) (* p,i = prefix, indices *)
+  | Not (Prop x)     -> Or (lit, Not (Prop x))
+  | And (x,y)        -> And (push_lit lit x, push_lit lit y)
+  | Or (x,y)         -> Or (lit, Or (x,y))
   | x -> raise (Error ("this doesn't seem to be a formula: '" ^ (string_of_ast x) ^ "'"))
 
 
-(* [genterm] generates a (Term &i) with i being a self-incrementing index.
+(* [genterm] generates a (Prop &i) with i being a self-incrementing index.
  * This function allows to speed up and simplify the translation of some
  * forms of Or.
  * NOTE: OCaml's functions can't have 0 param: we use the unit `()`. *)
 let dummy_term_count = ref 0
 let genterm () =
-  incr dummy_term_count; Term ("&" ^ (string_of_int !dummy_term_count), None)
+  incr dummy_term_count; Prop ("&" ^ (string_of_int !dummy_term_count))
 
 
 let debug = ref false (* The debug flag activated by --debug-cnf *)
@@ -128,7 +128,7 @@ let rec to_cnf depth (stop:stop) (ast:ast) : ast =
     let cnf = begin match ast with
     | Top    -> Top
     | Bottom -> Bottom
-    | Term a -> Term a
+    | Prop x -> Prop x
     | And (x,y) -> let (x,y) = (to_cnf x, to_cnf y) in
       begin
         match x,y with
@@ -141,7 +141,7 @@ let rec to_cnf depth (stop:stop) (ast:ast) : ast =
         match x with
         | Top        -> Bottom
         | Bottom     -> Top
-        | Term a     -> Not (Term a)
+        | Prop x     -> Not (Prop x)
         | Not x     -> to_cnf x
         | And (x,y) -> to_cnf (Or (Not x, Not y))           (* De Morgan *)
         | Or (x,y)  -> And (to_cnf (Not x), to_cnf (Not y)) (* De Morgan *)
@@ -153,8 +153,8 @@ let rec to_cnf depth (stop:stop) (ast:ast) : ast =
         match x,y with
         | Bottom, z | z, Bottom   -> z
         | Top, _ | _, Top         -> Top
-        | Term a, z | z, Term a   -> push_lit (Term a) z
-        | Not (Term a),z | z,Not (Term a) -> push_lit (Not (Term a)) z
+        | Prop x, z | z, Prop x   -> push_lit (Prop x) z
+        | Not (Prop x),z | z,Not (Prop x) -> push_lit (Not (Prop x)) z
         | x,y when is_clause x && is_clause y -> Or (x, y)
         | x,y -> (* At this point, either x or y is a conjunction
                     => Tseytin transform (see explanations below) *)

@@ -13,35 +13,29 @@
  * http://www.gnu.org/licenses/lgpl-2.1.html
  *)
 
-module IntSet = Set_ext.Make(struct
-  type t = int
-  let compare = Pervasives.compare
-end)
+module IntSet = Set_ext.Make(
+  struct
+    type t = int
+    let compare = Pervasives.compare
+  end)
 
-module FloatSet = Set_ext.Make(struct
-  type t = float
-  let compare = Pervasives.compare
-end)
+module FloatSet = Set_ext.Make(
+  struct
+    type t = float
+    let compare = Pervasives.compare
+  end)
 
-module StringSet = Set_ext.Make(String)
+module PropSet = Set_ext.Make(String)
 
-module GenSet = struct
-  type t =
-    | Empty
-    | ISet of IntSet.t
-    | FSet of FloatSet.t
-    | SSet of StringSet.t
-end
-
-type var = string * ast list option
+type loc = Lexing.position * Lexing.position
+and var = string * ast list option * loc
 and ast = (* Touist_code is the entry point *)
   | Touist_code      of ast list * ast list option
   | Int              of int
   | Float            of float
   | Bool             of bool
-  | Var              of var (* Var and Term are the ONLY to be able to *)
-  | Term             of var (* have the var type to avoid spagetti in ast *)
-  | Set              of GenSet.t
+  | Var              of var
+  | Set              of set
   | Set_decl         of ast list
   | Neg              of ast
   | Add              of ast * ast
@@ -75,10 +69,26 @@ and ast = (* Touist_code is the entry point *)
   | Subset           of ast * ast
   | In               of ast * ast
   | If               of ast * ast * ast
-  | Exact    of ast * ast
-  | Atleast  of ast * ast
-  | Atmost   of ast * ast
-  | Bigand   of ast list * ast list * ast option * ast
-  | Bigor    of ast list * ast list * ast option * ast
-  | Let      of ast * ast * ast
-  | Affect   of ast * ast
+  | Exact            of ast * ast
+  | Atleast          of ast * ast
+  | Atmost           of ast * ast
+  | Bigand           of ast list * ast list * ast option * ast
+  | Bigor            of ast list * ast list * ast option * ast
+  | Let              of ast * ast * ast
+  | Affect           of ast * ast
+  | UnexpProp        of string * ast list option
+  | Prop             of string
+  (* UnexpProp is a proposition that contains unexpandable variables; we cannot
+     tranform UnexpProp into Prop before knowing what is the content of the
+     variables. Examples:
+         abcd(1,$d,$i,a)       <- not a full-string yet
+     Prop contains the actual proposition after the evaluation has been run.
+     Example: if $d=foo and $i=123, then Prop is:
+         abcd(1,foo,123,a)     <- an actual string that represents an actual
+                                  logical proposition
+  *)
+and set =
+  | EmptySet
+  | ISet of IntSet.t
+  | FSet of FloatSet.t
+  | SSet of PropSet.t

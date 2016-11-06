@@ -289,7 +289,7 @@ let report text buffer checkpoint debug' : string =
        should not happen, since our list of erroneous states is
        supposed to be complete! -- produce a generic message. *)
     Printf.sprintf "This is an unknown syntax error (%d).\n\
-                    This means the error %d is missing in parser.messages.\n" s s
+                    This error %d is missing in parser.messages (see HOWTODEBUG.md).\n" s s
   in
   (* Construct the full error message. *)
   let message = Printf.sprintf "syntax error %s.\n%s"

@@ -1,3 +1,23 @@
+v2.1.0
+  - gui: 
+    - semantic errors (that only appear when pressing 'Solve' are now
+      displayed) are now displayed like the syntaxic errors (still after
+      'Solve')
+  - touistc:
+    - it is now possible to do the affectations before the formulas, with
+      no separator between sets and formulas. It is still possible to affect
+      after formulas with the separation keyword 'data'. You can only affect
+      before or after, not both.
+    - semantic errors (e.g., variables with wrong type) are now giving
+      a location (line, column). Some errors still lack the location but 99%
+      of them are covered.
+    - (internal) revamped the grammar specification to make it clear. The
+      'simple' and 'smt-augmented' grammars are now well separated.
+      Many error messages have been re-worked; among them, suggestions of
+      operators when an expression continuation is expected.
+      The number of messages goes from 89 to 144.
+    - merged 'term' and 'tuple-term' into one single concept: the proposition.
+      A proposition can be either 'abcd' or 'abcd(1,cd,56,$i)'.
 v2.0.1
   - gui:
     - fixed crash when touist.jar was opened from inside the zip archive

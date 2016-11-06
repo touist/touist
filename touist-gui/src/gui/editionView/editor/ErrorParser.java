@@ -17,25 +17,46 @@ import translation.TranslationError;
 import translation.TranslatorSAT;
 
 public class ErrorParser extends AbstractParser {
-
+	private List<TranslationError> bufferErrors;
+	
+	
 	@Override
 	public ParseResult parse(RSyntaxDocument code, String lang) {
 		DefaultParseResult result = new DefaultParseResult(this);
 		lang = "sat";
-		if(lang == "sat" && code.getLength()!=0) {
-			TranslatorSAT translator = null;
-			List<String> options = new ArrayList<String>();
-			options.add("--linter");
-			translator = new TranslatorSAT(options);
+		if(lang != "sat" || code.getLength()==0)
+			return result;
+		if(bufferErrors == null) {
 			try {
-				translator.translate(new StringReader(code.getText(0, code.getLength())));
-				for (TranslationError error : translator.getErrors()) {
-					result.addNotice(new ErrorParserNotice(this, error));
-				}
+				bufferErrors = linter(new StringReader(code.getText(0, code.getLength())));
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}
+		
+		for (TranslationError error : bufferErrors) {
+			result.addNotice(new ErrorParserNotice(this, error));
+		}
+		bufferErrors = null;
 		return result;
+	}
+	
+	/**
+	 * When a call to the translator has been made somewhere else than using linter(),
+	 * this function allows to use these errors instead of calling linter() when
+	 * the Editor will call parser
+	 * @param errors
+	 */
+	public void linterFromExisting(List<TranslationError> errors) {
+		bufferErrors = errors;
+	}
+	
+	public List<TranslationError> linter(StringReader s) throws IOException, InterruptedException {
+		TranslatorSAT translator = null;
+		List<String> options = new ArrayList<String>();
+		options.add("--linter");
+		translator = new TranslatorSAT(options);
+		translator.translate(s);
+		return translator.getErrors();
 	}
 }

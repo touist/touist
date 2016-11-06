@@ -483,6 +483,9 @@ public class ParentEditionPanel extends AbstractComponentPanel {
                             errorMessage += error + "\n";
                     }
                     setJLabelErrorMessageText(errorMessage);
+                    
+                    this.editor.getParser().linterFromExisting(getFrame().getTranslatorSAT().getErrors());
+                    this.editor.getEditorTextArea().forceReparsing(0);
 
                     System.out.println("Traduction error : " + "\n" + errorMessage + "\n");
                     /*uncomment the following line to have a popup once an error is detected*/
