@@ -75,7 +75,7 @@ let raise_type_error2 operator op1 exp1 op2 exp2 (expected_types:string) =
       "incorrect types with '"^(string_of_ast_type operator)^"', which expects "^expected_types ^".\n"^
       "The content of the variable '"^(string_of_ast var)^"' has type "^(string_of_ast_type content)^":\n"^
       "    "^(string_of_ast content)^"\n"^
-      "The other operand is of type "^(string_of_ast_type other_expanded)^":\n"^
+      "The other operand is of type '"^(string_of_ast_type other_expanded)^"':\n"^
       "    "^(string_of_ast other_expanded)^"", loc))
 
 (* [raise_set_decl] is the same as [raise_type_error2] but between one element
@@ -92,8 +92,8 @@ let raise_set_decl ast elmt elmt_expanded set set_expanded (expected_types:strin
       "    "^(string_of_ast set_expanded)^"", loc))
   | _ -> raise (Error (
       "Ill-formed set declaration. It expects "^expected_types^".\n"^
-      "One of the elements is of type '"^(string_of_ast_type elmt_expanded)^"\n"^
-      "    "^(string_of_ast elmt)^":\n"^
+      "One of the elements is of type '"^(string_of_ast_type elmt_expanded)^"':\n"^
+      "    "^(string_of_ast elmt)^"\n"^
       "This element has been expanded to\n"^
       "    "^(string_of_ast elmt_expanded)^"\n"^
       "Up to now, the set declaration\n"^
@@ -124,12 +124,12 @@ let check_nb_vars_and_sets (ast:ast) (vars: ast list) (sets: ast list) : unit =
 (* [process_empty] is necessary because of how 'clunky' have been implemented
    the set capabilities (type 'set', EmptySet, ISet, IntSet.empty.....).
    If 'set' is EmptySet, transform it into a typed IntSet.empty,
-   FloatSet.empty or StringSet.empty, depending on the type of 'set_type'.
+   FloatSet.empty or PropSet.empty, depending on the type of 'set_type'.
    If 'set' isn't an empty set, then return 'set'.*)
 let process_empty (set:ast) (set_type:ast) : ast = match set,set_type with
   | Set EmptySet, Set (ISet _) -> Set (ISet IntSet.empty)
   | Set EmptySet, Set (FSet _) -> Set (FSet FloatSet.empty)
-  | Set EmptySet, Set (SSet _) -> Set (SSet StringSet.empty)
+  | Set EmptySet, Set (SSet _) -> Set (SSet PropSet.empty)
   | Set EmptySet, Set (EmptySet)  -> Set (ISet IntSet.empty) (* arbitrary *)
   | _,_ -> set
 
@@ -244,7 +244,7 @@ and eval_ast (ast:ast) (env:env) =
       match process_empty x' y', process_empty y' x' with
       | Set (ISet a), Set (ISet b) -> Set (ISet (IntSet.union a b))
       | Set (FSet a), Set (FSet b) -> Set (FSet (FloatSet.union a b))
-      | Set (SSet a), Set (SSet b) -> Set (SSet (StringSet.union a b))
+      | Set (SSet a), Set (SSet b) -> Set (SSet (PropSet.union a b))
       | _,_ -> raise_type_error2 ast x y x' y' "a set of float, int or prop"
     end
   | Inter (x,y) -> begin
@@ -252,7 +252,7 @@ and eval_ast (ast:ast) (env:env) =
       match process_empty x' y', process_empty y' x' with
       | Set (ISet a), Set (ISet b) -> Set (ISet (IntSet.inter a b))
       | Set (FSet a), Set (FSet b) -> Set (FSet (FloatSet.inter a b))
-      | Set (SSet a), Set (SSet b) -> Set (SSet (StringSet.inter a b))
+      | Set (SSet a), Set (SSet b) -> Set (SSet (PropSet.inter a b))
       | _,_ -> raise_type_error2 ast x y x' y' "a set of float, int or prop"
     end
   | Diff (x,y) -> begin
@@ -260,7 +260,7 @@ and eval_ast (ast:ast) (env:env) =
       match process_empty x' y', process_empty y' x' with
       | Set (ISet a), Set (ISet b) -> Set (ISet (IntSet.diff a b))
       | Set (FSet a), Set (FSet b) -> Set (FSet (FloatSet.diff a b))
-      | Set (SSet a), Set (SSet b) -> Set (SSet (StringSet.diff a b))
+      | Set (SSet a), Set (SSet b) -> Set (SSet (PropSet.diff a b))
       | _,_ -> raise_type_error2 ast x y x' y' "a set of float, int or prop"
     end
   | Range (x,y) ->
@@ -282,7 +282,7 @@ and eval_ast (ast:ast) (env:env) =
       | Set (EmptySet)    -> Bool true
       | Set (ISet x) -> Bool (IntSet.is_empty x)
       | Set (FSet x) -> Bool (FloatSet.is_empty x)
-      | Set (SSet x) -> Bool (StringSet.is_empty x)
+      | Set (SSet x) -> Bool (PropSet.is_empty x)
       | x' -> raise_type_error ast x x' "a set of float, int or prop"
     end
   | Card x -> begin
@@ -290,7 +290,7 @@ and eval_ast (ast:ast) (env:env) =
       | Set (EmptySet)    -> Int 0
       | Set (ISet x) -> Int (IntSet.cardinal x)
       | Set (FSet x) -> Int (FloatSet.cardinal x)
-      | Set (SSet x) -> Int (StringSet.cardinal x)
+      | Set (SSet x) -> Int (PropSet.cardinal x)
       | x' -> raise_type_error ast x x' "a set of float, int or prop"
     end
   | Subset (x,y) -> begin
@@ -298,7 +298,7 @@ and eval_ast (ast:ast) (env:env) =
       match process_empty x' y', process_empty y' x' with
       | Set (ISet a), Set (ISet b) -> Bool (IntSet.subset a b)
       | Set (FSet a), Set (FSet b) -> Bool (FloatSet.subset a b)
-      | Set (SSet a), Set (SSet b) -> Bool (StringSet.subset a b)
+      | Set (SSet a), Set (SSet b) -> Bool (PropSet.subset a b)
       | _,_ -> raise_type_error2 ast x y x' y' "a set of float, int or prop"
     end
   | In (x,y) ->
@@ -306,17 +306,17 @@ and eval_ast (ast:ast) (env:env) =
       | _, Set (EmptySet) -> Bool false (* nothing can be in an empty set!*)
       | Int x, Set (ISet y) -> Bool (IntSet.mem x y)
       | Float x', Set (FSet y') -> Bool (FloatSet.mem x' y')
-      | Term (x',None), Set (SSet y') -> Bool (StringSet.mem x' y')
+      | Prop x', Set (SSet y') -> Bool (PropSet.mem x' y')
       | x',y' -> raise_type_error2 ast x x' y y' "an int, float or prop (left-hand) and a set (right-hand)"
     end
   | Equal (x,y) -> begin let x',y' = eval_ast x env, eval_ast y env in
       match process_empty x' y', process_empty y' x' with
       | Int x, Int y -> Bool (x = y)
       | Float x, Float y -> Bool (x = y)
-      | Term (x,None), Term (y,None) -> Bool (x = y)
+      | Prop x, Prop y -> Bool (x = y)
       | Set (ISet a), Set (ISet b) -> Bool (IntSet.equal a b)
       | Set (FSet a), Set (FSet b) -> Bool (FloatSet.equal a b)
-      | Set (SSet a), Set (SSet b) -> Bool (StringSet.equal a b)
+      | Set (SSet a), Set (SSet b) -> Bool (PropSet.equal a b)
       | x',y' -> raise_type_error2 ast x x' y y' "an int, float, prop or set"
     end
   | Not_equal (x,y) -> eval_ast (Not (Equal (x,y))) env
@@ -336,27 +336,28 @@ and eval_ast (ast:ast) (env:env) =
       | Int x, Int y -> Bool (x >= y)
       | Float x, Float y -> Bool (x >= y)
       | x',y' -> raise_type_error2 ast x y x' y' "a float or int")
-  | Term (prefix,indices) -> Term (prefix,indices)
+  | UnexpProp (p,i) -> Prop (expand_var_name (p,i) env)
+  | Prop x -> Prop x
   | e -> raise (Error ("this expression cannot be expanded: " ^ string_of_ast e))
 
 and eval_set_decl (set_decl:ast) (env:env) =
   let sets = (match set_decl with Set_decl sets -> sets | _ -> failwith "shoulnt happen: non-Set_decl in eval_set_decl") in
   let sets_expanded = List.map (fun x -> eval_ast x env) sets in
-  let unwrap_int elmt elmt_expanded = match elmt with
+  let unwrap_int elmt elmt_expanded = match elmt_expanded with
     | Int x -> x
     | _ -> raise_set_decl set_decl elmt elmt_expanded
              (Set_decl sets) (Set_decl sets_expanded)
-             "at this point a\ncomma-separated list of integers, because previous elements of the list had this type"
-  and unwrap_float elmt elmt_expanded = match elmt with
+             "at this point a\ncomma-separated list of integers, because previous elements\nof the list had this type"
+  and unwrap_float elmt elmt_expanded = match elmt_expanded with
     | Float x -> x
     | _ -> raise_set_decl set_decl elmt elmt_expanded
              (Set_decl sets) (Set_decl sets_expanded)
-             "at this point a\ncomma-separated list of floats, because previous elements of the list had this type"
-  and unwrap_str elmt elmt_expanded = match elmt with
-    | Term (x,None) -> x
+             "at this point a\ncomma-separated list of floats, because previous elements\nof the list had this type"
+  and unwrap_str elmt elmt_expanded = match elmt_expanded with
+    | Prop x -> x
     | _ -> raise_set_decl set_decl elmt elmt_expanded
              (Set_decl sets) (Set_decl sets_expanded)
-             "at this point a\ncomma-separated list of non-parenthesis propositions, because previous elements of the list had this type"
+             "at this point a\ncomma-separated list of propositions, because previous elements\nof the list had this type"
 
   in (* this match-with uses the first element of the list to set the set type
         (ISet, FSet, SSet...)*)
@@ -364,10 +365,10 @@ and eval_set_decl (set_decl:ast) (env:env) =
   | [],[] -> Set (EmptySet) (*   (fun -> function Int x->x   *)
   | _,(Int _)::_ -> Set (ISet (IntSet.of_list (List.map2 unwrap_int sets sets_expanded)))
   | _,(Float _)::_ -> Set (FSet (FloatSet.of_list (List.map2 unwrap_float sets sets_expanded)))
-  | _,(Term (_,None))::_ -> Set (SSet (StringSet.of_list (List.map2 unwrap_str sets sets_expanded)))
+  | _,(Prop _)::_ -> Set (SSet (PropSet.of_list (List.map2 unwrap_str sets sets_expanded)))
   | x::_,x'::_ -> raise_set_decl set_decl x x'
                     (Set_decl sets) (Set_decl sets_expanded)
-                    "elements of type int,\nfloat or non-parenthesis propositon"
+                    "elements of type int,\nfloat or propositon"
   | [],x::_ | x::_,[] -> failwith "shouldn't happen: len(sets)!=len(sets_expanded)"
 
 (* [eval_ast_formula] evaluates formulas; nothing in formulas should be
@@ -389,8 +390,8 @@ and eval_ast_formula (ast:ast) (env:env) : ast =
       match eval_ast_formula x env, eval_ast_formula y env with
       | Int x', Int y'     -> Int   (x' +  y')
       | Float x', Float y' -> Float (x' +. y')
-      | Int _, Term _
-      | Term _, Int _ -> Add (x,y)
+      | Int _, Prop _
+      | Prop _, Int _ -> Add (x,y)
       | x', y' -> Add (x', y')
       (*| _,_ -> raise (Error (string_of_ast ast))*)
     end
@@ -399,7 +400,7 @@ and eval_ast_formula (ast:ast) (env:env) : ast =
       match eval_ast_formula x env, eval_ast_formula y env with
       | Int x', Int y'     -> Int   (x' -  y')
       | Float x', Float y' -> Float (x' -. y')
-      (*| Term (p,i)', Term (p,i)' -> Sub (Term (p,i)', Term (p,i)')*)
+      (*| Prop x', Prop x' -> Sub (Prop x', Prop x')*)
       | x', y' -> Sub (x', y')
       (*| _,_ -> raise (Error (string_of_ast ast))*)
     end
@@ -427,7 +428,8 @@ and eval_ast_formula (ast:ast) (env:env) : ast =
   | Greater_or_equal (x,y) -> Greater_or_equal (eval_ast_formula x env, eval_ast_formula y env)
   | Top    -> Top
   | Bottom -> Bottom
-  | Term (p,i) -> Term ((expand_var_name (p,i) env), None)
+  | UnexpProp (p,i) -> Prop (expand_var_name (p,i) env)
+  | Prop x -> Prop x
   | Var (p,i,loc) -> (* p,i = prefix,indices *)
     (* name = prefix + indices. 
        Example with $v(a,b,c):
@@ -440,7 +442,7 @@ and eval_ast_formula (ast:ast) (env:env) : ast =
         match content with
         | Int x' -> Int x'
         | Float x' -> Float x'
-        | Term (p,i) -> Term (p,i)
+        | Prop x -> Prop x
         | _ -> raise (ErrorWithLoc (
             "'" ^ name ^ "' has been declared locally (in bigand, bigor or let)\n" ^
             "Locally declared variables must be scalar (float, int or term).\n" ^
@@ -453,7 +455,7 @@ and eval_ast_formula (ast:ast) (env:env) : ast =
         match content with
         | Int x' -> Int x'
         | Float x' -> Float x'
-        | Term (p,i) -> Term (p,i)
+        | Prop x -> Prop x
         | _ -> raise (ErrorWithLoc (
             "the global variable '" ^ name ^ "' should be a scalar (number or term).\n" ^
             "Instead, the content of the variable has type '"^(string_of_ast_type content)^"':\n"^
@@ -482,14 +484,14 @@ and eval_ast_formula (ast:ast) (env:env) : ast =
           let term = match content with
             | Int x -> Int x
             | Float x -> Float x
-            | Term (p,i) -> Term (p,i)
+            | Prop x -> Prop x
             | wrong -> raise (ErrorWithLoc (
                 "'" ^ name ^ "' has not been declared; maybe you wanted '"^prefix^"' to expand\n" ^
                 "in order to produce an expanded version <"^prefix^"-content>("^(string_of_ast_list "," indices)^")." ^
                 "But the content of the variable '"^prefix^"' has type '"^(string_of_ast_type wrong)^"':\n"^
                 "    "^(string_of_ast wrong)^"\n'"^
                 "which is not a term or a number, so it cannot be expanded as explained above.", loc_affect))
-          in eval_ast_formula (Term ((string_of_ast term), Some indices)) env
+          in eval_ast_formula (UnexpProp ((string_of_ast term), Some indices)) env
       (* Case 5. the variable was of the form '$v(1,2,3)' and was not declared
          and '$v' is not either declared, so we can safely guess that this var has not been declared. *)
       with Not_found -> raise (ErrorWithLoc ("'" ^ name ^ "' has not been declared", loc))
@@ -514,17 +516,17 @@ and eval_ast_formula (ast:ast) (env:env) : ast =
   | Equiv   (x,y) -> Equiv (eval_ast_formula x env, eval_ast_formula y env)
   | Exact (x,y) -> begin
       match eval_ast x env, eval_ast y env with
-      | Int x, Set (SSet s) -> exact_str (StringSet.exact x s)
+      | Int x, Set (SSet s) -> exact_str (PropSet.exact x s)
       | x',y' -> raise_type_error2 ast x y x' y' "int (left-hand) and a set of prop (right-hand)"
     end
   | Atleast (x,y) -> begin
       match eval_ast x env, eval_ast y env with
-      | Int x, Set (SSet s) -> atleast_str (StringSet.atleast x s)
+      | Int x, Set (SSet s) -> atleast_str (PropSet.atleast x s)
       | x',y' -> raise_type_error2 ast x y x' y' "int (left-hand) and a set of prop (right-hand)"
     end
   | Atmost (x,y) ->begin
       match eval_ast x env, eval_ast y env with
-      | Int x, Set (SSet s) -> atmost_str (StringSet.atmost x s)
+      | Int x, Set (SSet s) -> atmost_str (PropSet.atmost x s)
       | x',y' -> raise_type_error2 ast x y x' y' "int (left-hand) and a set of prop (right-hand)"
     end
   (* What is returned by bigand or bigor when they do not
@@ -552,7 +554,7 @@ and eval_ast_formula (ast:ast) (env:env) : ast =
           | Set (EmptySet)  -> bigand_empty env (p,i,loc) [] test e
           | Set (ISet a) -> bigand_int   env (p,i,loc) (IntSet.elements a)    test e
           | Set (FSet a) -> bigand_float env (p,i,loc) (FloatSet.elements a)  test e
-          | Set (SSet a) -> bigand_str   env (p,i,loc) (StringSet.elements a) test e
+          | Set (SSet a) -> bigand_str   env (p,i,loc) (PropSet.elements a) test e
           | y' -> raise_type_error ast y y' "a comma-separated list of sets after 'in'"
         end
       | x::xs,y::ys ->
@@ -572,7 +574,7 @@ and eval_ast_formula (ast:ast) (env:env) : ast =
           | Set (EmptySet)  -> bigor_empty env (p,i,loc) [] test e
           | Set (ISet a) -> bigor_int   env (p,i,loc) (IntSet.elements a)    test e
           | Set (FSet a) -> bigor_float env (p,i,loc) (FloatSet.elements a)  test e
-          | Set (SSet a) -> bigor_str   env (p,i,loc) (StringSet.elements a) test e
+          | Set (SSet a) -> bigor_str   env (p,i,loc) (PropSet.elements a) test e
           | y' -> raise_type_error ast y y' "a comma-separated list of sets after 'in'"
         end
       | x::xs,y::ys ->
@@ -590,9 +592,9 @@ and eval_ast_formula (ast:ast) (env:env) : ast =
 and exact_str lst =
   let rec go = function
     | [],[]       -> Top
-    | t::ts,[]    -> And (And (Term (t,None), Top), go (ts,[]))
-    | [],f::fs    -> And (And (Top, Not (Term (f,None))), go ([],fs))
-    | t::ts,f::fs -> And (And (Term (t,None), Not (Term (f,None))), go (ts,fs))
+    | t::ts,[]    -> And (And (Prop t, Top), go (ts,[]))
+    | [],f::fs    -> And (And (Top, Not (Prop f)), go ([],fs))
+    | t::ts,f::fs -> And (And (Prop t, Not (Prop f)), go (ts,fs))
   in
   match lst with
   | []    -> Bottom
@@ -604,10 +606,10 @@ and atleast_str lst =
 and atmost_str lst =
   List.fold_left (fun acc str ->
       Or (acc, List.fold_left (fun acc' str' ->
-          And (acc', Not (Term (str',None)))) Top str)) Bottom lst
+          And (acc', Not (Prop str'))) Top str)) Bottom lst
 
 and formula_of_string_list =
-  List.fold_left (fun acc str -> And (acc, Term (str,None))) Top
+  List.fold_left (fun acc str -> And (acc, Prop str)) Top
 
 and and_of_term_list =
   List.fold_left (fun acc t -> And (acc, t)) Top
@@ -629,9 +631,9 @@ and bigand_str env var values test ast =
   let ast' = If (test,ast,Top) and name,_,loc = var in
   match values with
   | []    -> Top
-  | [x]   -> eval_ast_formula ast' ((name, (Term  (x,None),loc))::env)
+  | [x]   -> eval_ast_formula ast' ((name, (Prop x,loc))::env)
   | x::xs ->
-    And (eval_ast_formula ast' ((name, (Term  (x,None),loc))::env), bigand_str env var xs test ast)
+    And (eval_ast_formula ast' ((name, (Prop x,loc))::env), bigand_str env var xs test ast)
 and bigor_empty env var values test ast = Bottom
 and bigor_int env var values test ast =
   let ast' = If (test,ast,Bottom) and name,_,loc = var in
@@ -649,9 +651,9 @@ and bigor_str env var values test ast =
   let ast' = If (test,ast,Bottom) and name,_,loc = var in
   match values with
   | []    -> Bottom
-  | [x]   -> eval_ast_formula ast' ((name, (Term  (x,None),loc))::env)
+  | [x]   -> eval_ast_formula ast' ((name, (Prop x,loc))::env)
   | x::xs ->
-    Or (eval_ast_formula ast' ((name, (Term (x,None),loc))::env), bigor_str env var xs test ast)
+    Or (eval_ast_formula ast' ((name, (Prop x,loc))::env), bigor_str env var xs test ast)
 
 and expand_var_name (prefix,indices:string * ast list option) (env:env) =
   match (prefix,indices) with

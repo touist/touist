@@ -44,12 +44,12 @@ let to_smt2 logic formula =
   in
 
   let rec term_expr = function
-    | Term (_,None)
-    | Neg (Term _)
-    | Add (Term _, Term _)
-    | Sub (Term _, Term _)
-    | Mul (Term _, Term _)
-    | Div (Term _, Term _) -> true
+    | Prop _
+    | Neg (Prop _)
+    | Add (Prop _, Prop _)
+    | Sub (Prop _, Prop _)
+    | Mul (Prop _, Prop _)
+    | Div (Prop _, Prop _) -> true
     | Neg x -> term_expr x
     | Add (x,y)
     | Sub (x,y)
@@ -59,57 +59,57 @@ let to_smt2 logic formula =
   in
 
   let rec gen_var typ = function
-    | Term (x,None) -> add_var x typ
-    | Add              (Term (x,None), Int _)
-    | Add              (Int _, Term (x,None))
-    | Sub              (Term (x,None), Int _)
-    | Sub              (Int _, Term (x,None))
-    | Mul              (Term (x,None), Int _)
-    | Mul              (Int _, Term (x,None))
-    | Div              (Term (x,None), Int _)
-    | Div              (Int _, Term (x,None))
-    | Lesser_than      (Term (x,None), Int _)
-    | Lesser_than      (Int _, Term (x,None))
-    | Lesser_or_equal  (Term (x,None), Int _)
-    | Lesser_or_equal  (Int _, Term (x,None))
-    | Greater_than     (Term (x,None), Int _)
-    | Greater_than     (Int _, Term (x,None))
-    | Greater_or_equal (Int _, Term (x,None))
-    | Greater_or_equal (Term (x,None), Int _)
-    | Equal            (Term (x,None), Int _)
-    | Equal            (Int _, Term (x,None))
-    | Not_equal        (Term (x,None), Int _)
-    | Not_equal        (Int _, Term (x,None)) -> add_var x "Int"
-    | Add              (Term (x,None), Float _)
-    | Add              (Float _, Term (x,None))
-    | Sub              (Term (x,None), Float _)
-    | Sub              (Float _, Term (x,None))
-    | Mul              (Term (x,None), Float _)
-    | Mul              (Float _, Term (x,None))
-    | Div              (Term (x,None), Float _)
-    | Div              (Float _, Term (x,None))
-    | Lesser_than      (Term (x,None), Float _)
-    | Lesser_than      (Float _, Term (x,None))
-    | Lesser_or_equal  (Term (x,None), Float _)
-    | Lesser_or_equal  (Float _, Term (x,None))
-    | Greater_than     (Term (x,None), Float _)
-    | Greater_than     (Float _, Term (x,None))
-    | Greater_or_equal (Term (x,None), Float _)
-    | Greater_or_equal (Float _, Term (x,None))
-    | Equal            (Term (x,None), Float _)
-    | Equal            (Float _, Term (x,None))
-    | Not_equal        (Term (x,None), Float _)
-    | Not_equal        (Float _, Term (x,None)) -> add_var x "Real"
-    | Add              (Term (x,None), Term (y,None))
-    | Sub              (Term (x,None), Term (y,None))
-    | Mul              (Term (x,None), Term (y,None))
-    | Div              (Term (x,None), Term (y,None))
-    | Lesser_than      (Term (x,None), Term (y,None))
-    | Lesser_or_equal  (Term (x,None), Term (y,None))
-    | Greater_than     (Term (x,None), Term (y,None))
-    | Greater_or_equal (Term (x,None), Term (y,None))
-    | Equal            (Term (x,None), Term (y,None))
-    | Not_equal        (Term (x,None), Term (y,None)) ->
+    | Prop x -> add_var x typ
+    | Add              (Prop x, Int _)
+    | Add              (Int _, Prop x)
+    | Sub              (Prop x, Int _)
+    | Sub              (Int _, Prop x)
+    | Mul              (Prop x, Int _)
+    | Mul              (Int _, Prop x)
+    | Div              (Prop x, Int _)
+    | Div              (Int _, Prop x)
+    | Lesser_than      (Prop x, Int _)
+    | Lesser_than      (Int _, Prop x)
+    | Lesser_or_equal  (Prop x, Int _)
+    | Lesser_or_equal  (Int _, Prop x)
+    | Greater_than     (Prop x, Int _)
+    | Greater_than     (Int _, Prop x)
+    | Greater_or_equal (Int _, Prop x)
+    | Greater_or_equal (Prop x, Int _)
+    | Equal            (Prop x, Int _)
+    | Equal            (Int _, Prop x)
+    | Not_equal        (Prop x, Int _)
+    | Not_equal        (Int _, Prop x) -> add_var x "Int"
+    | Add              (Prop x, Float _)
+    | Add              (Float _, Prop x)
+    | Sub              (Prop x, Float _)
+    | Sub              (Float _, Prop x)
+    | Mul              (Prop x, Float _)
+    | Mul              (Float _, Prop x)
+    | Div              (Prop x, Float _)
+    | Div              (Float _, Prop x)
+    | Lesser_than      (Prop x, Float _)
+    | Lesser_than      (Float _, Prop x)
+    | Lesser_or_equal  (Prop x, Float _)
+    | Lesser_or_equal  (Float _, Prop x)
+    | Greater_than     (Prop x, Float _)
+    | Greater_than     (Float _, Prop x)
+    | Greater_or_equal (Prop x, Float _)
+    | Greater_or_equal (Float _, Prop x)
+    | Equal            (Prop x, Float _)
+    | Equal            (Float _, Prop x)
+    | Not_equal        (Prop x, Float _)
+    | Not_equal        (Float _, Prop x) -> add_var x "Real"
+    | Add              (Prop x, Prop y)
+    | Sub              (Prop x, Prop y)
+    | Mul              (Prop x, Prop y)
+    | Div              (Prop x, Prop y)
+    | Lesser_than      (Prop x, Prop y)
+    | Lesser_or_equal  (Prop x, Prop y)
+    | Greater_than     (Prop x, Prop y)
+    | Greater_or_equal (Prop x, Prop y)
+    | Equal            (Prop x, Prop y)
+    | Not_equal        (Prop x, Prop y) ->
         begin
           try
             let x_type = Hashtbl.find vtbl x in
@@ -149,7 +149,7 @@ let to_smt2 logic formula =
     | Greater_or_equal (x, Int _)
     | Greater_or_equal (Int _, x)->
         let rec go = function
-          | Term (x,None) -> add_var x "Int"
+          | Prop x -> add_var x "Int"
           | Add (x,y)
           | Sub (x,y)
           | Mul (x,y)
@@ -178,7 +178,7 @@ let to_smt2 logic formula =
     | Greater_or_equal (x, Float _)
     | Greater_or_equal (Float _, x) ->
         let rec go = function
-          | Term (x,None) -> add_var x "Real"
+          | Prop x -> add_var x "Real"
           | Add (x,y)
           | Sub (x,y)
           | Mul (x,y)
@@ -257,7 +257,7 @@ let to_smt2 logic formula =
   let rec write = function
     | Top                        -> "true"
     | Bottom                     -> "false"
-    | Term              (x,None) -> sanitize_var x
+    | Prop              x -> sanitize_var x
     | Int x ->
         if x < 0 then
           "(- " ^ string_of_int (-x) ^ ")"

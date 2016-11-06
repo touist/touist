@@ -160,9 +160,9 @@ indices: i=int | i=float | i=prop { i }
 (* a tuple_term is of the form abc(1,d,3): the indices can be *)
 prop:
   | v=var { v }
-  | t=TERM { Term (t,None) } (* simple_term *)
+  | t=TERM { Prop t } (* simple_term *)
   | t=TUPLE (*LPAREN*) l=comma_list(indices) RPAREN (* tuple_term *)
-    { Term (t, Some l) }
+    { UnexpProp (t, Some l) }
 
 (* For now, we don't check the type of the variables during the parsing.
    This means that all variables are untyped during parsing.

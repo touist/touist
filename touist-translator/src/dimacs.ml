@@ -55,8 +55,8 @@ let cnf_to_clauses (ast:ast) : Lit.t list list * (Lit.t,string) Hashtbl.t =
       end
     | _ -> failwith ("CNF: was expecting a conjunction of clauses but got '" ^ (string_of_ast ast) ^ "'")
   and process_clause (ast:ast) : Minisat.Lit.t list = match ast with
-    | Term (str, None)        -> (gen_lit str)::[]
-    | Not (Term (str, None)) -> (Minisat.Lit.neg (gen_lit str))::[]
+    | Prop str        -> (gen_lit str)::[]
+    | Not (Prop str) -> (Minisat.Lit.neg (gen_lit str))::[]
     | Bottom -> [] (* if Bot is the only one in the clause, then the whole formula is false *)
     | Top -> (* The clause shouldn't be added because Top is found. Instead of
                 not adding the clause, we translate it by '&top12 or not &top12'*)

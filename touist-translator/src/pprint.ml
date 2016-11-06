@@ -6,8 +6,8 @@ let rec string_of_ast = function
   | Bool   x -> string_of_bool x
   | Top    -> "top"
   | Bottom -> "bot"
-  | Term (x,None)   -> x
-  | Term (x,Some y) -> x ^ "(" ^ (string_of_ast_list ", " y) ^ ")"
+  | Prop x | UnexpProp (x, None)-> x
+  | UnexpProp (x,Some y) -> x ^ "(" ^ (string_of_ast_list ", " y) ^ ")"
   | Var (x,None,_)   -> x
   | Var (x,Some y,_) -> x ^ "(" ^ (string_of_ast_list ", " y) ^ ")"
   | Set    x -> string_of_set x
@@ -82,8 +82,8 @@ and string_of_ast_type = function
   | Bool      x            -> "bool"
   | Top                    -> "top"
   | Bottom                 -> "bot"
-  | Term (x,None)          -> "proposition"
-  | Term (x,Some y)        -> "tuple-proposition"
+  | UnexpProp (_,_)        -> "unexpanded proposition"
+  | Prop x                 -> "proposition"
   | Var (x,None,_)         -> "variable"
   | Var (x,Some y,_)       -> "tuple-variable"
   | Set (EmptySet)     -> "empty set"
@@ -138,7 +138,7 @@ and string_of_set = function
       string_of_intset s
   | FSet s -> (*string_of_a_list string_of_float (FloatSet.elements s)*)
       string_of_floatset s
-  | SSet s -> (*string_of_a_list (fun x -> x) (StringSet.elements s)*)
+  | SSet s -> (*string_of_a_list (fun x -> x) (PropSet.elements s)*)
       string_of_strset s
 
 and string_of_ast_list sep el = String.concat sep (List.map string_of_ast el)
@@ -153,4 +153,4 @@ and string_of_floatset s =
   "[" ^ (String.concat ", " (List.map string_of_float (FloatSet.elements s))) ^ "]"
 
 and string_of_strset s =
-  "[" ^ (String.concat ", " (StringSet.elements s)) ^ "]"
+  "[" ^ (String.concat ", " (PropSet.elements s)) ^ "]"
