@@ -20,6 +20,7 @@ let rec string_of_ast = function
   | Mod (x,y) -> "(" ^ (string_of_ast x) ^ " mod " ^ (string_of_ast y) ^ ")"
   | Sqrt     x -> "sqrt("  ^ (string_of_ast x) ^ ")"
   | To_int   x -> "int("   ^ (string_of_ast x) ^ ")"
+  | Abs   x -> "int("   ^ (string_of_ast x) ^ ")"
   | To_float x -> "float(" ^ (string_of_ast x) ^ ")"
   | Not     x     -> "not " ^ string_of_ast x
   | And     (x,y) -> (string_of_ast x) ^ " and " ^ (string_of_ast y)
@@ -100,6 +101,7 @@ and string_of_ast_type = function
   | Sqrt     x             -> "sqrt()"
   | To_int   x             -> "int()"
   | To_float x             -> "float()"
+  | Abs x                  -> "abs()"
   | Not x                  -> "not"
   | And     (x,y)          -> "and"
   | Or      (x,y)          -> "or"

@@ -24,7 +24,7 @@
 %token <string> TERM
 %token <string> TUPLE
 %token <string> VARTUPLE
-%token ADD SUB MUL DIV MOD SQRT TOINT TOFLOAT
+%token ADD SUB MUL DIV MOD SQRT TOINT TOFLOAT ABS
 %token AND OR XOR IMPLIES EQUIV NOT
 %token EQUAL NOTEQUAL LE LT GE GT
 %token IN WHEN
@@ -195,19 +195,23 @@ in_parenthesis(T): LPAREN x=T RPAREN { x }
 
 num: x=float | x=int {x}
 
-num_operations(T):
+num_operations_standard(T):
   | x=T    ADD     y=T  { Add (x,y) }
   | x=T    SUB     y=T  { Sub (x,y) } %prec sub_prec
   |        SUB     x=T  { Neg x     } %prec neg_prec
   | x=T    MUL     y=T  { Mul (x,y) }
   | x=T    DIV     y=T  { Div (x,y) }
+
+num_operations_others(T):
   | x=T    MOD     y=T  { Mod (x,y) }
+  | ABS (*LPAREN*) x=T RPAREN { Abs x     }
 
 int:
   | x=INT { Int x }
   | x=var
   | x=in_parenthesis(int)
-  | x=num_operations(int)
+  | x=num_operations_standard(int)
+  | x=num_operations_others(int)
   | x=if_statement(int)
   | TOINT (*LPAREN*) x=num RPAREN { To_int x }
   | CARD  (*LPAREN*) s=any_set RPAREN { Card s }
@@ -216,7 +220,8 @@ float:
   | x=FLOAT { Float x }
   | x=var
   | x=in_parenthesis(float)
-  | x=num_operations(float)
+  | x=num_operations_standard(float)
+  | x=num_operations_others(float)
   | x=if_statement(float) { x }
   | SQRT    (*LPAREN*) x=float RPAREN { Sqrt x }
   | TOFLOAT (*LPAREN*) x=num RPAREN { To_float x }

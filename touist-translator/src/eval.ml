@@ -213,6 +213,10 @@ and eval_ast (ast:ast) (env:env) =
       | Int x   -> Float (float_of_int x)
       | Float x -> Float x
       | x' -> raise_type_error ast x x' "a float or integer")
+  | Abs x -> (match eval_ast x env with
+      | Int x   -> Int (abs x)
+      | Float x -> Float (abs_float x)
+      | x' -> raise_type_error ast x x' "a float or integer")
   | Not x -> (match eval_ast x env with
       | Bool x -> Bool (not x)
       | x' -> raise_type_error ast x x' "a boolean")
