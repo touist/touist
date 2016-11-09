@@ -46,6 +46,7 @@ and ast = (* Touist_code is the entry point *)
   | Sqrt             of ast
   | To_int           of ast
   | To_float         of ast
+  | Abs              of ast
   | Top
   | Bottom
   | Not              of ast

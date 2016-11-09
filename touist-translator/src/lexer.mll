@@ -67,6 +67,7 @@
     "sqrt(",         SQRT;
     "int(",          TOINT;
     "float(",        TOFLOAT;
+    "abs(",          ABS;
     "and",           AND;
     "or",            OR;
     "xor",           XOR;
