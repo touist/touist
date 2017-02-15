@@ -52,7 +52,7 @@ cache:
   - '%CYG_CACHE% -> appveyor.yml'
   - C:\ant -> appveyor.yml
   - C:\yices -> appveyor.yml
-  - '$CYG_ROOT\home\appveyor\.opam -> appveyor.yml'
+  - '%CYG_ROOT%\home\appveyor\.opam -> appveyor.yml'
 
 # Scripts that run after cloning repository. "ps:" means windows PowerShell
 install:
@@ -70,7 +70,7 @@ install:
   - '%CYG_BASH% -lc "opam install -y fileutils menhir"'
     # I download apache-ant directly from the web because `choco install ant` was re-installing
     # the jdk8 on each build, making them last much more time.
-  - ps: If(-Not(Test-Path c:\ant)){Invoke-WebRequest "http://www.us.apache.org/dist/ant/binaries/apache-ant-1.9.7-bin.zip" -OutFile c:\ant.zip}
+  - ps: If(-Not(Test-Path c:\ant)){Invoke-WebRequest "http://www.us.apache.org/dist/ant/binaries/apache-ant-1.9.9-bin.zip" -OutFile c:\ant.zip}
   - ps: If(-Not(Test-Path c:\ant)){ 7z x c:\ant.zip -oc:\ | Out-Null; rm c:\ant.zip; mv c:\apache-ant* c:\ant }
   - ps: $env:Path = $env:Path + ";C:\ant\bin"
 
