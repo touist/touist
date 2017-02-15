@@ -52,7 +52,7 @@ cache:
   - '%CYG_CACHE% -> appveyor.yml'
   - C:\ant -> appveyor.yml
   - C:\yices -> appveyor.yml
-  - '$CYG_ROOT\home\appveyor\.opam -> appveyor.yml'
+  - '%CYG_ROOT%\home\appveyor\.opam -> appveyor.yml'
 
 # Scripts that run after cloning repository. "ps:" means windows PowerShell
 install:
