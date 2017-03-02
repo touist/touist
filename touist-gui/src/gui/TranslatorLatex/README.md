@@ -23,6 +23,6 @@ Now, put those `.jar` in the `TranslatorLatex` folder and do:
 
 ## Known errors
 
-If `jflex` tells you it cannot handle that much warnings, then use the command:
+If `jflex` tells you it cannot handle that many warnings, then use the command:
 
     java -jar java-cup-11b.jar -expect 900 Latex.cup
