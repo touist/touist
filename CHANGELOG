@@ -1,3 +1,6 @@
+v2.1.4
+  - gui:
+    - on macOS, use system's menu bar look and feel
 v2.1.3
   - gui:
     - fixed a bug in the latex viwer that was removing the carriage return
