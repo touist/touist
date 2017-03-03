@@ -2,9 +2,10 @@
 
 ### Prerequisites
 Before you go, make sure you have the following installed:
-- `ocaml` **4.01.0** (or latest)
-- `menhir` (equivalent of ocamlyacc)
+- `ocaml` **>= 4.02.3**
+- `menhir` **>= 20150118** (an equivalent of ocamlyacc)
 - `fileutils` (for reading/writing POSIX files)
+- `minisat` (for solving SAT problems)
 
 **Note**: the binary `touistc` produced must be moved into `./touist-gui/external`. After moving it, you go into `./touist-gui` and run `ant`.
 
@@ -12,22 +13,19 @@ Before you go, make sure you have the following installed:
 ```shell
 apt-get install opam
 opam install menhir fileutils
+opam pin add -y minisat "https://github.com/maelvalais/ocaml-minisat.git#v0.0.2"
 make
 ```
 ### Build it on Mac OS X
 ```shell
 ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
 brew install opam
-opam install menhir fileutils
+opam install menhir fileutils minisat
+opam pin add -y minisat "https://github.com/maelvalais/ocaml-minisat.git#v0.0.2"
 make
 ```
 ### Build it on windows
-First, you need to install `wodi`. 
-Then, in `wodi`, you must install `menhir` and `fileutils`.
-Then, just launch `make` in `touist-translator`.
-### Build it without `make`
-Alternatively, you can build by using `ocamlbuild -use-menhir -package fileutils
-touistc.native`
+Just follow the instructions for installing [Opam and Ocaml on windows](http://fdopen.github.io/opam-repository-mingw/installation/) (link working on 2016-10-26). Thanks to fdopen on github, we have opam on windows!
 
 ## What is `oasis`?
 
@@ -38,9 +36,10 @@ As you probably noticed, there is a file named `_oasis`. This file contains the 
 ## Notes on version numbers
 
 To be able to have a version number synchronized with the `git` version,
-the script `./generate-version-number.sh` will try to run the command 
+the makefile `TopMakefile` (run it with `make -f TopMakefile` will try to run
+the command:
 
 	git describe --tags
 
-and put the result into `version.ml`. If `git` is not found, the version
+and put the result into `src/version.ml`. If `git` is not found, the version
 number will be `n/a`.

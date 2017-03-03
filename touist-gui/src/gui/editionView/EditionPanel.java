@@ -26,6 +26,7 @@ package gui.editionView;
 import gui.AbstractComponentPanel;
 import gui.TranslatorLatex.TranslationLatex;
 import gui.editionView.editor.Editor;
+import gui.editionView.editor.ErrorParser;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
@@ -39,6 +40,7 @@ import javax.swing.event.CaretListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
+import org.fife.ui.rsyntaxtextarea.parser.Parser;
 import org.fife.ui.rtextarea.RTextScrollPane;
 import org.scilab.forge.jlatexmath.TeXConstants;
 import org.scilab.forge.jlatexmath.TeXFormula;
@@ -51,6 +53,7 @@ import org.scilab.forge.jlatexmath.TeXIcon;
 public class EditionPanel extends AbstractComponentPanel {
 
     private Editor editorTextArea;
+    private ErrorParser parser;
     private int rightPanelWidth;
     private JLabel latexLabel;
     private int zoom = 0;
@@ -69,6 +72,7 @@ public class EditionPanel extends AbstractComponentPanel {
             }
             catch (Exception exc) {
                 System.err.println("Erreur lors de la conversion latex");
+                System.err.println(exc.toString());
             }
     }
     
@@ -105,7 +109,7 @@ public class EditionPanel extends AbstractComponentPanel {
                 zoom(-e.getWheelRotation());
             }
             else {
-                jScrollPane1.getMouseWheelListeners()[0].mouseWheelMoved(e);
+                latexScroller.getMouseWheelListeners()[0].mouseWheelMoved(e);
             }
         }
         
@@ -117,15 +121,16 @@ public class EditionPanel extends AbstractComponentPanel {
         try {
              editorTextArea = new Editor();
              editorTextArea.getDocument().addDocumentListener(new UpdateLatexListener());
+             editorTextArea.addParser(parser = new ErrorParser());
         }
         catch (IOException e) {
             System.err.println("Erreur lancement éditeur");
         }
         
-        jPanel1.addMouseWheelListener(new ScaleLatexListener());
+        latexView.addMouseWheelListener(new ScaleLatexListener());
         
-        jPanel1.setLayout(new FlowLayout());
-        jPanel1.add(latexLabel = new JLabel(),FlowLayout.LEFT);
+        latexView.setLayout(new FlowLayout());
+        latexView.add(latexLabel = new JLabel(),FlowLayout.LEFT);
         latexLabel.setVisible(true);
         
         
@@ -134,7 +139,7 @@ public class EditionPanel extends AbstractComponentPanel {
             @Override
             public void caretUpdate(CaretEvent e) {
                 // +1 car par défaut, on compte à partir de 0.
-                ((ParentEditionPanel)getParent().getParent()).setJLabelCaretPositionText(
+                ((ParentEditionPanel)getParent()).setJLabelCaretPositionText(
                         (editorTextArea.getCaretLineNumber() + 1)
                         + ":"
                         + (editorTextArea.getCaretOffsetFromLineStart() + 1)
@@ -148,14 +153,14 @@ public class EditionPanel extends AbstractComponentPanel {
         sp.setFoldIndicatorEnabled(true);
         editorContainer.add(sp, BorderLayout.CENTER);
         
-        palettePanel2.setEditorTextArea(editorTextArea);  
-        jSplitPane1.setResizeWeight(0.5);
-        jSplitPane2.setDividerSize(3);
+        snippetsContainer.setEditorTextArea(editorTextArea);  
+        codeAndLatexView.setResizeWeight(0.5);
+        snippetsAndCodeAndLatex.setDividerSize(3);
     }
     
-    public void initPalette(PalettePanel.PaletteType type) {
-        palettePanel2.initPaletteContent(type);
-        jSplitPane2.setDividerLocation(120);
+    public void initPalette() {
+        snippetsContainer.initPaletteContent();
+        snippetsAndCodeAndLatex.setDividerLocation(120);
     }
 
     public String getText() {
@@ -175,67 +180,75 @@ public class EditionPanel extends AbstractComponentPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jSplitPane2 = new javax.swing.JSplitPane();
-        jSplitPane1 = new javax.swing.JSplitPane();
+        snippetsAndCodeAndLatex = new javax.swing.JSplitPane();
+        codeAndLatexView = new javax.swing.JSplitPane();
         editorContainer = new javax.swing.JPanel();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        jPanel1 = new javax.swing.JPanel();
-        jScrollPane2 = new javax.swing.JScrollPane();
-        palettePanel2 = new gui.editionView.PalettePanel(editorTextArea);
+        latexScroller = new javax.swing.JScrollPane();
+        latexView = new javax.swing.JPanel();
+        snippetsScroller = new javax.swing.JScrollPane();
+        snippetsContainer = new gui.editionView.SnippetContainer(editorTextArea);
 
-        jSplitPane1.setDividerLocation(400);
-        jSplitPane1.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-        jSplitPane1.setOneTouchExpandable(true);
+        codeAndLatexView.setDividerLocation(400);
+        codeAndLatexView.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        codeAndLatexView.setOneTouchExpandable(true);
 
         editorContainer.setLayout(new java.awt.BorderLayout());
-        jSplitPane1.setLeftComponent(editorContainer);
+        codeAndLatexView.setLeftComponent(editorContainer);
 
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        javax.swing.GroupLayout latexViewLayout = new javax.swing.GroupLayout(latexView);
+        latexView.setLayout(latexViewLayout);
+        latexViewLayout.setHorizontalGroup(
+            latexViewLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 324, Short.MAX_VALUE)
         );
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        latexViewLayout.setVerticalGroup(
+            latexViewLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 495, Short.MAX_VALUE)
         );
 
-        jScrollPane1.setViewportView(jPanel1);
+        latexScroller.setViewportView(latexView);
 
-        jSplitPane1.setRightComponent(jScrollPane1);
+        codeAndLatexView.setRightComponent(latexScroller);
 
-        jSplitPane2.setRightComponent(jSplitPane1);
+        snippetsAndCodeAndLatex.setRightComponent(codeAndLatexView);
 
-        jScrollPane2.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-        jScrollPane2.setViewportView(palettePanel2);
+        snippetsScroller.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        snippetsScroller.setViewportView(snippetsContainer);
 
-        jSplitPane2.setLeftComponent(jScrollPane2);
+        snippetsAndCodeAndLatex.setLeftComponent(snippetsScroller);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jSplitPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 600, Short.MAX_VALUE)
+            .addComponent(snippetsAndCodeAndLatex, javax.swing.GroupLayout.DEFAULT_SIZE, 600, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jSplitPane2, javax.swing.GroupLayout.Alignment.TRAILING)
+            .addComponent(snippetsAndCodeAndLatex, javax.swing.GroupLayout.Alignment.TRAILING)
         );
     }// </editor-fold>//GEN-END:initComponents
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JSplitPane codeAndLatexView;
     private javax.swing.JPanel editorContainer;
-    private javax.swing.JPanel jPanel1;
-    private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JSplitPane jSplitPane1;
-    private javax.swing.JSplitPane jSplitPane2;
-    private gui.editionView.PalettePanel palettePanel2;
+    private javax.swing.JScrollPane latexScroller;
+    private javax.swing.JPanel latexView;
+    private javax.swing.JSplitPane snippetsAndCodeAndLatex;
+    private gui.editionView.SnippetContainer snippetsContainer;
+    private javax.swing.JScrollPane snippetsScroller;
     // End of variables declaration//GEN-END:variables
 
     @Override
     public void updateLanguage() {
-        palettePanel2.updateLanguage();
+        snippetsContainer.updateLanguage();
     }
+
+	public Editor getEditorTextArea() {
+		return editorTextArea;
+	}
+
+	public ErrorParser getParser() {
+		return parser;
+	}
 }

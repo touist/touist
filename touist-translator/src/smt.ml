@@ -1,5 +1,5 @@
 (*
- * smt.ml: processes the "semantically correct" abstract syntaxic tree 
+ * smt.ml: processes the "semantically correct" abstract syntaxic tree
  *         given by [eval] and produces a string in SMT-LIB2 format.
  *         [to_smt2] is the main function.
  *
@@ -9,8 +9,8 @@
  * https://github.com/touist/touist
  *
  * Copyright Institut de Recherche en Informatique de Toulouse, France
- * This program and the accompanying materials are made available 
- * under the terms of the GNU Lesser General Public License (LGPL) 
+ * This program and the accompanying materials are made available
+ * under the terms of the GNU Lesser General Public License (LGPL)
  * version 2.1 which accompanies this distribution, and is available at
  * http://www.gnu.org/licenses/lgpl-2.1.html
  *)
@@ -21,7 +21,7 @@ let to_smt2 logic formula =
   let vtbl = Hashtbl.create 10 in
   let out  = Buffer.create 1000 in
   Buffer.add_string out ("(set-logic " ^ logic ^ ")\n");
- 
+
   let write_to_buf = Buffer.add_string out in
 
   let add_var name typ =
@@ -35,81 +35,81 @@ let to_smt2 logic formula =
   let decl_assert body   = "(assert " ^ body ^ ")\n" in
   let decl_bin_op op x y = "(" ^ op ^ " " ^ x ^ " " ^ y ^ ")" in
   let decl_un_op  op x   = "(" ^ op ^ " " ^ x ^ ")" in
-  
+
   let sanitize_var name =
     String.map (fun c ->
       if (c = '(') ||
          (c = ')') ||
          (c = ',') || (c = ' ') then '_' else c) name
   in
-  
+
   let rec term_expr = function
-    | Term (_,None)
-    | CNeg (Term _)
-    | CAdd (Term _, Term _)
-    | CSub (Term _, Term _)
-    | CMul (Term _, Term _)
-    | CDiv (Term _, Term _) -> true
-    | CNeg x -> term_expr x
-    | CAdd (x,y)
-    | CSub (x,y)
-    | CMul (x,y)
-    | CDiv (x,y) -> term_expr x && term_expr y
+    | Prop _
+    | Neg (Prop _)
+    | Add (Prop _, Prop _)
+    | Sub (Prop _, Prop _)
+    | Mul (Prop _, Prop _)
+    | Div (Prop _, Prop _) -> true
+    | Neg x -> term_expr x
+    | Add (x,y)
+    | Sub (x,y)
+    | Mul (x,y)
+    | Div (x,y) -> term_expr x && term_expr y
     | _ -> false
   in
 
   let rec gen_var typ = function
-    | Term (x,None) -> add_var x typ
-    | CAdd              (Term (x,None), CInt _)
-    | CAdd              (CInt _, Term (x,None))
-    | CSub              (Term (x,None), CInt _)
-    | CSub              (CInt _, Term (x,None))
-    | CMul              (Term (x,None), CInt _)
-    | CMul              (CInt _, Term (x,None))
-    | CDiv              (Term (x,None), CInt _)
-    | CDiv              (CInt _, Term (x,None))
-    | CLesser_than      (Term (x,None), CInt _)
-    | CLesser_than      (CInt _, Term (x,None))
-    | CLesser_or_equal  (Term (x,None), CInt _)
-    | CLesser_or_equal  (CInt _, Term (x,None))
-    | CGreater_than     (Term (x,None), CInt _)
-    | CGreater_than     (CInt _, Term (x,None))
-    | CGreater_or_equal (CInt _, Term (x,None))
-    | CGreater_or_equal (Term (x,None), CInt _)
-    | CEqual            (Term (x,None), CInt _)
-    | CEqual            (CInt _, Term (x,None))
-    | CNot_equal        (Term (x,None), CInt _)
-    | CNot_equal        (CInt _, Term (x,None)) -> add_var x "Int"
-    | CAdd              (Term (x,None), CFloat _)
-    | CAdd              (CFloat _, Term (x,None))
-    | CSub              (Term (x,None), CFloat _)
-    | CSub              (CFloat _, Term (x,None))
-    | CMul              (Term (x,None), CFloat _)
-    | CMul              (CFloat _, Term (x,None))
-    | CDiv              (Term (x,None), CFloat _)
-    | CDiv              (CFloat _, Term (x,None))
-    | CLesser_than      (Term (x,None), CFloat _)
-    | CLesser_than      (CFloat _, Term (x,None))
-    | CLesser_or_equal  (Term (x,None), CFloat _)
-    | CLesser_or_equal  (CFloat _, Term (x,None))
-    | CGreater_than     (Term (x,None), CFloat _)
-    | CGreater_than     (CFloat _, Term (x,None))
-    | CGreater_or_equal (Term (x,None), CFloat _)
-    | CGreater_or_equal (CFloat _, Term (x,None))
-    | CEqual            (Term (x,None), CFloat _)
-    | CEqual            (CFloat _, Term (x,None))
-    | CNot_equal        (Term (x,None), CFloat _)
-    | CNot_equal        (CFloat _, Term (x,None)) -> add_var x "Real"
-    | CAdd              (Term (x,None), Term (y,None))
-    | CSub              (Term (x,None), Term (y,None))
-    | CMul              (Term (x,None), Term (y,None))
-    | CDiv              (Term (x,None), Term (y,None))
-    | CLesser_than      (Term (x,None), Term (y,None))
-    | CLesser_or_equal  (Term (x,None), Term (y,None))
-    | CGreater_than     (Term (x,None), Term (y,None))
-    | CGreater_or_equal (Term (x,None), Term (y,None))
-    | CEqual            (Term (x,None), Term (y,None))
-    | CNot_equal        (Term (x,None), Term (y,None)) ->
+    | Prop x -> add_var x typ
+    | Add              (Prop x, Int _)
+    | Add              (Int _, Prop x)
+    | Sub              (Prop x, Int _)
+    | Sub              (Int _, Prop x)
+    | Mul              (Prop x, Int _)
+    | Mul              (Int _, Prop x)
+    | Div              (Prop x, Int _)
+    | Div              (Int _, Prop x)
+    | Lesser_than      (Prop x, Int _)
+    | Lesser_than      (Int _, Prop x)
+    | Lesser_or_equal  (Prop x, Int _)
+    | Lesser_or_equal  (Int _, Prop x)
+    | Greater_than     (Prop x, Int _)
+    | Greater_than     (Int _, Prop x)
+    | Greater_or_equal (Int _, Prop x)
+    | Greater_or_equal (Prop x, Int _)
+    | Equal            (Prop x, Int _)
+    | Equal            (Int _, Prop x)
+    | Not_equal        (Prop x, Int _)
+    | Not_equal        (Int _, Prop x) -> add_var x "Int"
+    | Add              (Prop x, Float _)
+    | Add              (Float _, Prop x)
+    | Sub              (Prop x, Float _)
+    | Sub              (Float _, Prop x)
+    | Mul              (Prop x, Float _)
+    | Mul              (Float _, Prop x)
+    | Div              (Prop x, Float _)
+    | Div              (Float _, Prop x)
+    | Lesser_than      (Prop x, Float _)
+    | Lesser_than      (Float _, Prop x)
+    | Lesser_or_equal  (Prop x, Float _)
+    | Lesser_or_equal  (Float _, Prop x)
+    | Greater_than     (Prop x, Float _)
+    | Greater_than     (Float _, Prop x)
+    | Greater_or_equal (Prop x, Float _)
+    | Greater_or_equal (Float _, Prop x)
+    | Equal            (Prop x, Float _)
+    | Equal            (Float _, Prop x)
+    | Not_equal        (Prop x, Float _)
+    | Not_equal        (Float _, Prop x) -> add_var x "Real"
+    | Add              (Prop x, Prop y)
+    | Sub              (Prop x, Prop y)
+    | Mul              (Prop x, Prop y)
+    | Div              (Prop x, Prop y)
+    | Lesser_than      (Prop x, Prop y)
+    | Lesser_or_equal  (Prop x, Prop y)
+    | Greater_than     (Prop x, Prop y)
+    | Greater_or_equal (Prop x, Prop y)
+    | Equal            (Prop x, Prop y)
+    | Not_equal        (Prop x, Prop y) ->
         begin
           try
             let x_type = Hashtbl.find vtbl x in
@@ -122,175 +122,175 @@ let to_smt2 logic formula =
               add_var x typ;
               add_var y typ
         end
-    | CNot x -> gen_var typ x
-    | CAnd     (x,y)
-    | COr      (x,y)
-    | CXor     (x,y)
-    | CImplies (x,y)
-    | CEquiv   (x,y) -> gen_var "Bool" x; gen_var "Bool" y
-    | CAdd              (x, CInt _) 
-    | CAdd              (CInt _, x) 
-    | CSub              (x, CInt _) 
-    | CSub              (CInt _, x) 
-    | CMul              (x, CInt _) 
-    | CMul              (CInt _, x) 
-    | CDiv              (x, CInt _) 
-    | CDiv              (CInt _, x)
-    | CEqual            (x, CInt _)
-    | CEqual            (CInt _, x)
-    | CNot_equal        (x, CInt _)
-    | CNot_equal        (CInt _, x)
-    | CLesser_than      (x, CInt _)
-    | CLesser_than      (CInt _, x)
-    | CLesser_or_equal  (x, CInt _)
-    | CLesser_or_equal  (CInt _, x)
-    | CGreater_than     (x, CInt _)
-    | CGreater_than     (CInt _, x)
-    | CGreater_or_equal (x, CInt _)
-    | CGreater_or_equal (CInt _, x)->
+    | Not x -> gen_var typ x
+    | And     (x,y)
+    | Or      (x,y)
+    | Xor     (x,y)
+    | Implies (x,y)
+    | Equiv   (x,y) -> gen_var "Bool" x; gen_var "Bool" y
+    | Add              (x, Int _)
+    | Add              (Int _, x)
+    | Sub              (x, Int _)
+    | Sub              (Int _, x)
+    | Mul              (x, Int _)
+    | Mul              (Int _, x)
+    | Div              (x, Int _)
+    | Div              (Int _, x)
+    | Equal            (x, Int _)
+    | Equal            (Int _, x)
+    | Not_equal        (x, Int _)
+    | Not_equal        (Int _, x)
+    | Lesser_than      (x, Int _)
+    | Lesser_than      (Int _, x)
+    | Lesser_or_equal  (x, Int _)
+    | Lesser_or_equal  (Int _, x)
+    | Greater_than     (x, Int _)
+    | Greater_than     (Int _, x)
+    | Greater_or_equal (x, Int _)
+    | Greater_or_equal (Int _, x)->
         let rec go = function
-          | Term (x,None) -> add_var x "Int"
-          | CAdd (x,y)
-          | CSub (x,y)
-          | CMul (x,y)
-          | CDiv (x,y) -> go x; go y
+          | Prop x -> add_var x "Int"
+          | Add (x,y)
+          | Sub (x,y)
+          | Mul (x,y)
+          | Div (x,y) -> go x; go y
           | _ -> failwith "not a term exp"
         in
         if term_expr x then go x else ()
-    | CAdd              (x, CFloat _) 
-    | CAdd              (CFloat _, x) 
-    | CSub              (x, CFloat _) 
-    | CSub              (CFloat _, x) 
-    | CMul              (x, CFloat _) 
-    | CMul              (CFloat _, x) 
-    | CDiv              (x, CFloat _) 
-    | CDiv              (CFloat _, x)
-    | CEqual            (x, CFloat _)
-    | CEqual            (CFloat _, x)
-    | CNot_equal        (x, CFloat _)
-    | CNot_equal        (CFloat _, x)
-    | CLesser_than      (x, CFloat _)
-    | CLesser_than      (CFloat _, x)
-    | CLesser_or_equal  (x, CFloat _)
-    | CLesser_or_equal  (CFloat _, x)
-    | CGreater_than     (x, CFloat _)
-    | CGreater_than     (CFloat _, x)
-    | CGreater_or_equal (x, CFloat _)
-    | CGreater_or_equal (CFloat _, x) ->
+    | Add              (x, Float _)
+    | Add              (Float _, x)
+    | Sub              (x, Float _)
+    | Sub              (Float _, x)
+    | Mul              (x, Float _)
+    | Mul              (Float _, x)
+    | Div              (x, Float _)
+    | Div              (Float _, x)
+    | Equal            (x, Float _)
+    | Equal            (Float _, x)
+    | Not_equal        (x, Float _)
+    | Not_equal        (Float _, x)
+    | Lesser_than      (x, Float _)
+    | Lesser_than      (Float _, x)
+    | Lesser_or_equal  (x, Float _)
+    | Lesser_or_equal  (Float _, x)
+    | Greater_than     (x, Float _)
+    | Greater_than     (Float _, x)
+    | Greater_or_equal (x, Float _)
+    | Greater_or_equal (Float _, x) ->
         let rec go = function
-          | Term (x,None) -> add_var x "Real"
-          | CAdd (x,y)
-          | CSub (x,y)
-          | CMul (x,y)
-          | CDiv (x,y) -> go x; go y
+          | Prop x -> add_var x "Real"
+          | Add (x,y)
+          | Sub (x,y)
+          | Mul (x,y)
+          | Div (x,y) -> go x; go y
           | _ -> failwith "not a term exp"
         in
         if term_expr x then go x else ()
-    | CAdd              (x, y) 
-    | CSub              (x, y) 
-    | CMul              (x, y) 
-    | CDiv              (x, y) 
-    | CEqual            (x, y)
-    | CNot_equal        (x, y)
-    | CLesser_than      (x, y)
-    | CLesser_or_equal  (x, y)
-    | CGreater_than     (x, y)
-    | CGreater_or_equal (x, y) -> gen_var typ x; gen_var typ y
+    | Add              (x, y)
+    | Sub              (x, y)
+    | Mul              (x, y)
+    | Div              (x, y)
+    | Equal            (x, y)
+    | Not_equal        (x, y)
+    | Lesser_than      (x, y)
+    | Lesser_or_equal  (x, y)
+    | Greater_than     (x, y)
+    | Greater_or_equal (x, y) -> gen_var typ x; gen_var typ y
     | _ -> ()
   in
 
   let rec parse = function
-    | CEqual            (x, CInt y) -> gen_var "Int" x(*; CEqual (x, CInt y)*)
-    | CEqual            (CInt x, y) -> gen_var "Int" y(*; CEqual (CInt x, y)*)
-    | CNot_equal        (x, CInt y) -> gen_var "Int" x(*; CNot_equal (x, CInt
+    | Equal            (x, Int y) -> gen_var "Int" x(*; Equal (x, Int y)*)
+    | Equal            (Int x, y) -> gen_var "Int" y(*; Equal (Int x, y)*)
+    | Not_equal        (x, Int y) -> gen_var "Int" x(*; Not_equal (x, Int
     y)*)
-    | CNot_equal        (CInt x, y) -> gen_var "Int" y(*; CNot_equal (CInt x,
+    | Not_equal        (Int x, y) -> gen_var "Int" y(*; Not_equal (Int x,
     y)*)
-    | CLesser_than      (x, CInt y) -> gen_var "Int" x(*; CLesser_than (x, CInt
+    | Lesser_than      (x, Int y) -> gen_var "Int" x(*; Lesser_than (x, Int
     y)*)
-    | CLesser_than      (CInt x, y) -> gen_var "Int" y(*; CLesser_than (CInt x,
+    | Lesser_than      (Int x, y) -> gen_var "Int" y(*; Lesser_than (Int x,
     y)*)
-    | CLesser_or_equal  (x, CInt y) -> gen_var "Int" x(*; CLesser_or_equal (x,
-    CInt y)*)
-    | CLesser_or_equal  (CInt x, y) -> gen_var "Int" y(*; CLesser_or_equal (CInt
+    | Lesser_or_equal  (x, Int y) -> gen_var "Int" x(*; Lesser_or_equal (x,
+    Int y)*)
+    | Lesser_or_equal  (Int x, y) -> gen_var "Int" y(*; Lesser_or_equal (Int
     x, y)*)
-    | CGreater_than     (x, CInt y) -> gen_var "Int" x(*; CGreater_than (x, CInt
+    | Greater_than     (x, Int y) -> gen_var "Int" x(*; Greater_than (x, Int
     y)*)
-    | CGreater_than     (CInt x, y) -> gen_var "Int" y(*; CGreater_than (CInt x,
+    | Greater_than     (Int x, y) -> gen_var "Int" y(*; Greater_than (Int x,
     y)*)
-    | CGreater_or_equal (x, CInt y) -> gen_var "Int" x(*; CGreater_or_equal (x,
-    CInt y)*)
-    | CGreater_or_equal (CInt x, y) -> gen_var "Int" y(*; CGreater_or_equal
-    (CInt x, y)*)
-    | CEqual            (x, CFloat y) -> gen_var "Real" x(*; CEqual (x, CFloat
+    | Greater_or_equal (x, Int y) -> gen_var "Int" x(*; Greater_or_equal (x,
+    Int y)*)
+    | Greater_or_equal (Int x, y) -> gen_var "Int" y(*; Greater_or_equal
+    (Int x, y)*)
+    | Equal            (x, Float y) -> gen_var "Real" x(*; Equal (x, Float
     y)*)
-    | CEqual            (CFloat x, y) -> gen_var "Real" y(*; CEqual (CFloat x,
+    | Equal            (Float x, y) -> gen_var "Real" y(*; Equal (Float x,
     y)*)
-    | CNot_equal        (x, CFloat y) -> gen_var "Real" x(*; CNot_equal (x,
-    CFloat y)*)
-    | CNot_equal        (CFloat x, y) -> gen_var "Real" y(*; CNot_equal (CFloat
+    | Not_equal        (x, Float y) -> gen_var "Real" x(*; Not_equal (x,
+    Float y)*)
+    | Not_equal        (Float x, y) -> gen_var "Real" y(*; Not_equal (Float
     x, y)*)
-    | CLesser_than      (x, CFloat y) -> gen_var "Real" x(*; CLesser_than (x,
-    CFloat y)*)
-    | CLesser_than      (CFloat x, y) -> gen_var "Real" y(*; CLesser_than
-    (CFloat x, y)*)
-    | CLesser_or_equal  (x, CFloat y) -> gen_var "Real" x(*; CLesser_or_equal
-    (x, CFloat y)*)
-    | CLesser_or_equal  (CFloat x, y) -> gen_var "Real" y(*; CLesser_or_equal
-    (CFloat x, y)*)
-    | CGreater_than     (x, CFloat y) -> gen_var "Real" x(*; CGreater_than (x,
-    CFloat y)*)
-    | CGreater_than     (CFloat x, y) -> gen_var "Real" y(*; CGreater_than
-    (CFloat x, y)*)
-    | CGreater_or_equal (x, CFloat y) -> gen_var "Real" x(*; CGreater_or_equal
-    (x, CFloat y)*)
-    | CGreater_or_equal (CFloat x, y) -> gen_var "Real" y(*; CGreater_or_equal
-    (CFloat x, y)*)
-    | CAnd     (x, y) -> gen_var "Bool" x; gen_var "Bool" y(*; CAnd (x, y)*)
-    | COr      (x, y) -> gen_var "Bool" x; gen_var "Bool" y(*; COr  (x, y)*)
-    | CXor     (x, y) -> gen_var "Bool" x; gen_var "Bool" y(*; CXor (x, y)*)
-    | CImplies (x, y) -> gen_var "Bool" x; gen_var "Bool" y(*; CImplies (x, y)*)
-    | CEquiv   (x, y) -> gen_var "Bool" x; gen_var "Bool" y(*; CEquiv (x, y)*)
+    | Lesser_than      (x, Float y) -> gen_var "Real" x(*; Lesser_than (x,
+    Float y)*)
+    | Lesser_than      (Float x, y) -> gen_var "Real" y(*; Lesser_than
+    (Float x, y)*)
+    | Lesser_or_equal  (x, Float y) -> gen_var "Real" x(*; Lesser_or_equal
+    (x, Float y)*)
+    | Lesser_or_equal  (Float x, y) -> gen_var "Real" y(*; Lesser_or_equal
+    (Float x, y)*)
+    | Greater_than     (x, Float y) -> gen_var "Real" x(*; Greater_than (x,
+    Float y)*)
+    | Greater_than     (Float x, y) -> gen_var "Real" y(*; Greater_than
+    (Float x, y)*)
+    | Greater_or_equal (x, Float y) -> gen_var "Real" x(*; Greater_or_equal
+    (x, Float y)*)
+    | Greater_or_equal (Float x, y) -> gen_var "Real" y(*; Greater_or_equal
+    (Float x, y)*)
+    | And     (x, y) -> gen_var "Bool" x; gen_var "Bool" y(*; And (x, y)*)
+    | Or      (x, y) -> gen_var "Bool" x; gen_var "Bool" y(*; Or  (x, y)*)
+    | Xor     (x, y) -> gen_var "Bool" x; gen_var "Bool" y(*; Xor (x, y)*)
+    | Implies (x, y) -> gen_var "Bool" x; gen_var "Bool" y(*; Implies (x, y)*)
+    | Equiv   (x, y) -> gen_var "Bool" x; gen_var "Bool" y(*; Equiv (x, y)*)
     | _ -> failwith "parse error"
   in
-  
+
   let rec write = function
     | Top                        -> "true"
     | Bottom                     -> "false"
-    | Term              (x,None) -> sanitize_var x
-    | CInt x -> 
+    | Prop              x -> sanitize_var x
+    | Int x ->
         if x < 0 then
           "(- " ^ string_of_int (-x) ^ ")"
         else
           string_of_int   x
-    | CFloat x ->
+    | Float x ->
         let x'  = string_of_float x in
         let x'' = if x'.[String.length x' - 1] = '.' then x' ^ "0" else x' in
         if x''.[0] = '-' then
           "(- " ^ String.sub x'' 1 (String.length x'' - 1) ^ ")"
         else
           x''
-    | CNot              x        -> decl_un_op  "not" (write x)
-    | CAnd              (x,y)    -> decl_bin_op "and" (write x) (write y)
-    | COr               (x,y)    -> decl_bin_op "or"  (write x) (write y)
-    | CXor              (x,y)    -> decl_bin_op "xor" (write x) (write y)
-    | CImplies          (x,y)    -> decl_bin_op "=>" (write x) (write y)
-    | CEquiv            (x,y)    -> write (CAnd (CImplies (x,y), CImplies (y,x)))
-    | CNeg              (CInt x) -> "(- " ^ string_of_int (-x) ^ ")"
-    | CNeg              (CFloat x) -> "(- " ^ string_of_float (-.x) ^ ")"
-    | CAdd              (x,y)    -> decl_bin_op "+" (write x) (write y)
-    | CSub              (x,y)    -> decl_bin_op "-" (write x) (write y)
-    | CMul              (x,y)    -> decl_bin_op "*" (write x) (write y)
-    | CDiv              (x,y)    -> decl_bin_op "/" (write x) (write y)
-    | CEqual            (x,y)    -> decl_bin_op "=" (write x) (write y)
-    | CNot_equal        (x,y)    -> write (CNot (CEqual (x,y)))
-    | CLesser_than      (x,y)    -> decl_bin_op "<" (write x) (write y)
-    | CLesser_or_equal  (x,y)    -> decl_bin_op "<=" (write x) (write y)
-    | CGreater_than     (x,y)    -> decl_bin_op ">" (write x) (write y)
-    | CGreater_or_equal (x,y)    -> decl_bin_op ">=" (write x) (write y)
+    | Not              x        -> decl_un_op  "not" (write x)
+    | And              (x,y)    -> decl_bin_op "and" (write x) (write y)
+    | Or               (x,y)    -> decl_bin_op "or"  (write x) (write y)
+    | Xor              (x,y)    -> decl_bin_op "xor" (write x) (write y)
+    | Implies          (x,y)    -> decl_bin_op "=>" (write x) (write y)
+    | Equiv            (x,y)    -> write (And (Implies (x,y), Implies (y,x)))
+    | Neg              (Int x) -> "(- " ^ string_of_int (-x) ^ ")"
+    | Neg              (Float x) -> "(- " ^ string_of_float (-.x) ^ ")"
+    | Add              (x,y)    -> decl_bin_op "+" (write x) (write y)
+    | Sub              (x,y)    -> decl_bin_op "-" (write x) (write y)
+    | Mul              (x,y)    -> decl_bin_op "*" (write x) (write y)
+    | Div              (x,y)    -> decl_bin_op "/" (write x) (write y)
+    | Equal            (x,y)    -> decl_bin_op "=" (write x) (write y)
+    | Not_equal        (x,y)    -> write (Not (Equal (x,y)))
+    | Lesser_than      (x,y)    -> decl_bin_op "<" (write x) (write y)
+    | Lesser_or_equal  (x,y)    -> decl_bin_op "<=" (write x) (write y)
+    | Greater_than     (x,y)    -> decl_bin_op ">" (write x) (write y)
+    | Greater_or_equal (x,y)    -> decl_bin_op ">=" (write x) (write y)
     | _ -> failwith "error smt write"
   in
-  
+
   (*gen_var formula;*)
   (*gen formula;*)
   parse formula;

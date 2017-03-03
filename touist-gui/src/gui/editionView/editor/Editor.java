@@ -174,6 +174,11 @@ public class Editor extends RSyntaxTextArea  {
         snipetsBegin = new ArrayList<Integer>();
         snipetsEnd = new ArrayList<Integer>();
         
+        // Note: I disabled ctrl+left and ctrl+right for moving through snippet tokens
+        // because it was disabling the possibilty of moving through the text word by word on
+        // Windows.
+        
+        /*
         this.getDocument().addDocumentListener(new SnippetListener());
         String rightKeyStrokeAndKey = "control RIGHT";
         KeyStroke rightKeyStroke = KeyStroke.getKeyStroke(rightKeyStrokeAndKey);
@@ -183,6 +188,7 @@ public class Editor extends RSyntaxTextArea  {
         KeyStroke leftKeyStroke = KeyStroke.getKeyStroke(leftKeyStrokeAndKey);
         this.getInputMap().put(leftKeyStroke, leftKeyStrokeAndKey);
         this.getActionMap().put(leftKeyStrokeAndKey, new SnippetLeftAction(this));
+        */
         
 
     }
@@ -227,6 +233,8 @@ public class Editor extends RSyntaxTextArea  {
         RTextScrollPane sp = new RTextScrollPane(E);
         sp.setLineNumbersEnabled(true);
         sp.setFoldIndicatorEnabled(true);
+        
+        E.addParser(new ErrorParser());
         
         frame.add(sp, BorderLayout.CENTER);
         frame.setVisible(true);

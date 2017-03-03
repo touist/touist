@@ -25,7 +25,7 @@ public class AboutPanel extends javax.swing.JPanel {
      */
     public AboutPanel() {
         initComponents();
-        jLabel5.setText(properties.getProperty("version"));
+        versionNumber.setText(properties.getProperty("version"));
     }
 
     /**
@@ -37,34 +37,32 @@ public class AboutPanel extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jLabel1 = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
-        jLabel3 = new javax.swing.JLabel();
-        jLabel4 = new javax.swing.JLabel();
-        jButton1 = new javax.swing.JButton();
-        jLabel5 = new javax.swing.JLabel();
+        Nothing = new javax.swing.JLabel();
+        logoLaboratory = new javax.swing.JLabel();
+        appTitle = new javax.swing.JLabel();
+        appSubtitle = new javax.swing.JLabel();
+        linkToGithub = new javax.swing.JButton();
+        versionNumber = new javax.swing.JLabel();
 
-        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/logo.png"))); // NOI18N
+        logoLaboratory.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/irit.png"))); // NOI18N
 
-        jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/irit.png"))); // NOI18N
+        appTitle.setFont(new java.awt.Font("Tahoma", 1, 36)); // NOI18N
+        appTitle.setText("TouIST");
 
-        jLabel3.setFont(new java.awt.Font("Tahoma", 1, 36)); // NOI18N
-        jLabel3.setText("TouIST");
+        appSubtitle.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
+        appSubtitle.setText("TOUlouse Integrated Satisfiability Tool");
 
-        jLabel4.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
-        jLabel4.setText("TOUlouse Integrated Satisfiability Tool");
-
-        jButton1.setForeground(new java.awt.Color(0, 0, 255));
-        jButton1.setText("github.com/touist/touist");
-        jButton1.setBorderPainted(false);
-        jButton1.setContentAreaFilled(false);
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        linkToGithub.setForeground(new java.awt.Color(0, 0, 255));
+        linkToGithub.setText("github.com/touist/touist");
+        linkToGithub.setBorderPainted(false);
+        linkToGithub.setContentAreaFilled(false);
+        linkToGithub.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+                linkToGithubActionPerformed(evt);
             }
         });
 
-        jLabel5.setText("Version 1.0.0");
+        versionNumber.setText("Version 1.0.0");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -72,24 +70,24 @@ public class AboutPanel extends javax.swing.JPanel {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jLabel1)
+                .addComponent(Nothing)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addGap(18, 18, 18)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jLabel3)
-                                    .addComponent(jLabel4)
-                                    .addComponent(jLabel5))
-                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                    .addComponent(appTitle)
+                                    .addComponent(appSubtitle)
+                                    .addComponent(versionNumber))
+                                .addGap(0, 0, Short.MAX_VALUE))
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                                 .addGap(0, 0, Short.MAX_VALUE)
-                                .addComponent(jButton1)
-                                .addContainerGap())))
+                                .addComponent(linkToGithub)))
+                        .addContainerGap())
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jLabel2)
+                        .addComponent(logoLaboratory)
                         .addGap(24, 24, 24))))
         );
         layout.setVerticalGroup(
@@ -98,23 +96,23 @@ public class AboutPanel extends javax.swing.JPanel {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel3)
+                        .addComponent(appTitle)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jLabel4)
+                        .addComponent(appSubtitle)
                         .addGap(18, 18, 18)
-                        .addComponent(jLabel5)
+                        .addComponent(versionNumber)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jButton1)
+                        .addComponent(linkToGithub)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jLabel2)
+                        .addComponent(logoLaboratory)
                         .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel1)
+                        .addComponent(Nothing)
                         .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
         );
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+    private void linkToGithubActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_linkToGithubActionPerformed
         if (Desktop.isDesktopSupported()) {
             try {
                 URI uri = null;
@@ -130,15 +128,15 @@ public class AboutPanel extends javax.swing.JPanel {
         } else {
             // do nothing
         }
-    }//GEN-LAST:event_jButton1ActionPerformed
+    }//GEN-LAST:event_linkToGithubActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton1;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
-    private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel Nothing;
+    private javax.swing.JLabel appSubtitle;
+    private javax.swing.JLabel appTitle;
+    private javax.swing.JButton linkToGithub;
+    private javax.swing.JLabel logoLaboratory;
+    private javax.swing.JLabel versionNumber;
     // End of variables declaration//GEN-END:variables
 }

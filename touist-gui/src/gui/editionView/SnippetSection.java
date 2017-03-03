@@ -35,7 +35,7 @@ import javax.swing.ImageIcon;
  *
  * @author Skander
  */
-public class PaletteSectionPanel extends javax.swing.JPanel {
+public class SnippetSection extends javax.swing.JPanel {
 
     private List<InsertionButton> buttons;
     private ImageIcon foldedIcon;
@@ -44,13 +44,13 @@ public class PaletteSectionPanel extends javax.swing.JPanel {
 
     
     /**
-     * Creates new form NewPaletteSectionPanel
+     * Creates new form SnippetSection
      * @param name section name.
      */
-    public PaletteSectionPanel(String name) {
+    public SnippetSection(String name) {
         initComponents();
-        jLabelName.setText(name);
-        jButtonFold.setText("");
+        snippetSectionName.setText(name);
+        snippetExpandButton.setText("");
         try {
 			foldedIcon = new ImageIcon(ImageIO.read(getClass().getResourceAsStream("/images/paletteSectionFolded.png")));
 	        unfoldedIcon = new ImageIcon(ImageIO.read(getClass().getResourceAsStream("/images/paletteSectionUnfolded.png")));
@@ -58,13 +58,13 @@ public class PaletteSectionPanel extends javax.swing.JPanel {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-        jButtonFold.setIcon(foldedIcon);
+        snippetExpandButton.setIcon(foldedIcon);
         buttons = new ArrayList<InsertionButton>();
         isFold = true;
     }
     
     public void setText(String name) {
-    	jLabelName.setText(name);
+    	snippetSectionName.setText(name);
     }
     
     public List<InsertionButton> getButtons() {
@@ -80,65 +80,65 @@ public class PaletteSectionPanel extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jLabelName = new javax.swing.JLabel();
-        jButtonFold = new javax.swing.JButton();
-        jPanelsContent = new javax.swing.JPanel();
+        snippetSectionName = new javax.swing.JLabel();
+        snippetExpandButton = new javax.swing.JButton();
+        snippetContainer = new javax.swing.JPanel();
 
         setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
-        jLabelName.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
-        jLabelName.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabelName.setText("<section>");
+        snippetSectionName.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+        snippetSectionName.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        snippetSectionName.setText("<section>");
 
-        jButtonFold.setText(">");
-        jButtonFold.setBorderPainted(false);
-        jButtonFold.setContentAreaFilled(false);
-        jButtonFold.setFocusable(false);
-        jButtonFold.setMargin(new java.awt.Insets(0, 0, 0, 0));
-        jButtonFold.setPreferredSize(new java.awt.Dimension(22, 22));
-        jButtonFold.addActionListener(new java.awt.event.ActionListener() {
+        snippetExpandButton.setText(">");
+        snippetExpandButton.setBorderPainted(false);
+        snippetExpandButton.setContentAreaFilled(false);
+        snippetExpandButton.setFocusable(false);
+        snippetExpandButton.setMargin(new java.awt.Insets(0, 0, 0, 0));
+        snippetExpandButton.setPreferredSize(new java.awt.Dimension(22, 22));
+        snippetExpandButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButtonFoldActionPerformed(evt);
+                snippetExpandButtonActionPerformed(evt);
             }
         });
 
-        jPanelsContent.setLayout(new java.awt.GridLayout(1, 1));
+        snippetContainer.setLayout(new java.awt.GridLayout(1, 1));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanelsContent, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(snippetContainer, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(layout.createSequentialGroup()
-                .addComponent(jLabelName, javax.swing.GroupLayout.PREFERRED_SIZE, 10, Short.MAX_VALUE)
+                .addComponent(snippetSectionName, javax.swing.GroupLayout.PREFERRED_SIZE, 10, Short.MAX_VALUE)
                 .addGap(0, 0, 0)
-                .addComponent(jButtonFold, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addComponent(snippetExpandButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jButtonFold, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabelName, javax.swing.GroupLayout.Alignment.TRAILING))
-                .addComponent(jPanelsContent, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(snippetExpandButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(snippetSectionName, javax.swing.GroupLayout.Alignment.TRAILING))
+                .addComponent(snippetContainer, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jButtonFoldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonFoldActionPerformed
+    private void snippetExpandButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_snippetExpandButtonActionPerformed
         isFold = !isFold;
         if (isFold) {
-            jButtonFold.setIcon(foldedIcon);
-            jPanelsContent.removeAll();
-            jPanelsContent.updateUI();
+            snippetExpandButton.setIcon(foldedIcon);
+            snippetContainer.removeAll();
+            snippetContainer.updateUI();
         } else {
-            jButtonFold.setIcon(unfoldedIcon);
-            jPanelsContent.setLayout(new GridLayout(buttons.size(), 1));
+            snippetExpandButton.setIcon(unfoldedIcon);
+            snippetContainer.setLayout(new GridLayout(buttons.size(), 1));
             for (InsertionButton button : buttons) {
-                jPanelsContent.add(button);
+                snippetContainer.add(button);
             }
-            jPanelsContent.updateUI();
+            snippetContainer.updateUI();
         }
-    }//GEN-LAST:event_jButtonFoldActionPerformed
+    }//GEN-LAST:event_snippetExpandButtonActionPerformed
 
 public void addInsertButton(InsertionButton button) {
     buttons.add(button);
@@ -147,25 +147,25 @@ public void addInsertButton(InsertionButton button) {
 
 public void fold() {
     isFold = true;
-    jButtonFold.setIcon(foldedIcon);
-    jPanelsContent.removeAll();
-    jPanelsContent.updateUI();
+    snippetExpandButton.setIcon(foldedIcon);
+    snippetContainer.removeAll();
+    snippetContainer.updateUI();
 }
 
 public void unfold() {
     isFold = false;
-    jButtonFold.setIcon(unfoldedIcon);
-    jPanelsContent.setLayout(new GridLayout(buttons.size(), 1));
+    snippetExpandButton.setIcon(unfoldedIcon);
+    snippetContainer.setLayout(new GridLayout(buttons.size(), 1));
     for (InsertionButton button : buttons) {
-        jPanelsContent.add(button);
+        snippetContainer.add(button);
     }
     updateUI();
 }
 
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButtonFold;
-    private javax.swing.JLabel jLabelName;
-    private javax.swing.JPanel jPanelsContent;
+    private javax.swing.JPanel snippetContainer;
+    private javax.swing.JButton snippetExpandButton;
+    private javax.swing.JLabel snippetSectionName;
     // End of variables declaration//GEN-END:variables
 }

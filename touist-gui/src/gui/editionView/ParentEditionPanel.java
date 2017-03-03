@@ -32,6 +32,7 @@ import gui.SolverSelection.SolverType;
 import gui.State;
 
 import java.awt.AWTException;
+import java.awt.FileDialog;
 import java.awt.Robot;
 import java.awt.event.KeyEvent;
 import java.io.File;
@@ -56,7 +57,7 @@ import translation.TranslatorSAT;
  */
 public class ParentEditionPanel extends AbstractComponentPanel {
 
-    private static final int ERROR_MESSAGE_MAX_LENGTH = 60;
+    private static final int ERROR_MESSAGE_MAX_LENGTH = 76;
     private String jLabelErrorMessageText;
     private Thread testThread;
 
@@ -68,19 +69,18 @@ public class ParentEditionPanel extends AbstractComponentPanel {
         
         testThread = new Thread();
         
-        editorPanelFormulas.initPalette(PalettePanel.PaletteType.FORMULA);
-        editorPanelSets.initPalette(PalettePanel.PaletteType.SET);
+        editor.initPalette();
         jLabelErrorMessageText = "";
-        jLabelErrorMessage.setText(jLabelErrorMessageText);
+        bottomMessage.setText(jLabelErrorMessageText);
         
-        jComboBox1.removeAllItems();
+        selectSatOrSmt.removeAllItems();
         for (SolverType solverType : SolverSelection.SolverType.values()) {
-            jComboBox1.addItem(solverType);
+            selectSatOrSmt.addItem(solverType);
         }
     }
     
     public void updateComboBoxSelectedSolver() {
-        jComboBox1.setSelectedItem(getFrame().getSolverSelection().getSelectedSolver());
+        selectSatOrSmt.setSelectedItem(getFrame().getSolverSelection().getSelectedSolver());
     }
     
     /**
@@ -90,9 +90,9 @@ public class ParentEditionPanel extends AbstractComponentPanel {
     private void setJLabelErrorMessageText(String text) {
         jLabelErrorMessageText = text;
         if (text.length() < ERROR_MESSAGE_MAX_LENGTH) {
-            jLabelErrorMessage.setText(text);
+            bottomMessage.setText(text);
         } else {
-            jLabelErrorMessage.setText(text.substring(0, ERROR_MESSAGE_MAX_LENGTH) + "...");
+            bottomMessage.setText(text.substring(0, ERROR_MESSAGE_MAX_LENGTH-18) + "... (click to view)");
         }
     }
 
@@ -105,29 +105,23 @@ public class ParentEditionPanel extends AbstractComponentPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jFileChooser1 = new javax.swing.JFileChooser(new File(System.getProperty("user.dir")));
-        jOptionPane1 = new javax.swing.JOptionPane();
-        jTabbedPane1 = new javax.swing.JTabbedPane();
-        editorPanelFormulas = new gui.editionView.EditionPanel();
-        editorPanelSets = new gui.editionView.EditionPanel();
-        testButton = new javax.swing.JButton();
+        fileChooser = new javax.swing.JFileChooser();
+        popupMessage = new javax.swing.JOptionPane();
+        editor = new gui.editionView.EditionPanel();
+        solveButton = new javax.swing.JButton();
         importButton = new javax.swing.JButton();
-        jLabelErrorMessage = new javax.swing.JLabel();
-        jLabelCaretPosition = new javax.swing.JLabel();
-        jComboBox1 = new javax.swing.JComboBox();
+        bottomMessage = new javax.swing.JLabel();
+        cursorPosition = new javax.swing.JLabel();
+        selectSatOrSmt = new javax.swing.JComboBox();
         exportButton = new javax.swing.JButton();
 
-        jFileChooser1.setFileSelectionMode(JFileChooser.FILES_ONLY);
-        jFileChooser1.addChoosableFileFilter(new FileNameExtensionFilter("Touistl files(touistl)","touistl"));
+        fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+        fileChooser.addChoosableFileFilter(new FileNameExtensionFilter("Touistl files(touistl)","touistl"));
 
-        jTabbedPane1.setToolTipText("");
-        jTabbedPane1.addTab("Formulas", editorPanelFormulas);
-        jTabbedPane1.addTab("Sets", editorPanelSets);
-
-        testButton.setText("Solve");
-        testButton.addActionListener(new java.awt.event.ActionListener() {
+        solveButton.setText("Solve");
+        solveButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                testButtonActionPerformed(evt);
+                solveButtonActionPerformed(evt);
             }
         });
 
@@ -138,20 +132,20 @@ public class ParentEditionPanel extends AbstractComponentPanel {
             }
         });
 
-        jLabelErrorMessage.setForeground(new java.awt.Color(255, 0, 0));
-        jLabelErrorMessage.setText("<Error message>");
-        jLabelErrorMessage.addMouseListener(new java.awt.event.MouseAdapter() {
+        bottomMessage.setForeground(new java.awt.Color(255, 0, 0));
+        bottomMessage.setText("<Error message>");
+        bottomMessage.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                jLabelErrorMessageMouseClicked(evt);
+                bottomMessageMouseClicked(evt);
             }
         });
 
-        jLabelCaretPosition.setText("1:1");
+        cursorPosition.setText("1:1");
 
-        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "SAT", "SMT" }));
-        jComboBox1.addActionListener(new java.awt.event.ActionListener() {
+        selectSatOrSmt.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "SAT", "SMT" }));
+        selectSatOrSmt.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jComboBox1ActionPerformed(evt);
+                selectSatOrSmtActionPerformed(evt);
             }
         });
 
@@ -166,33 +160,36 @@ public class ParentEditionPanel extends AbstractComponentPanel {
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jTabbedPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 992, Short.MAX_VALUE)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+            .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jLabelCaretPosition)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jLabelErrorMessage)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(exportButton, javax.swing.GroupLayout.PREFERRED_SIZE, 66, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(importButton, javax.swing.GroupLayout.PREFERRED_SIZE, 66, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(testButton, javax.swing.GroupLayout.PREFERRED_SIZE, 129, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addComponent(cursorPosition)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(bottomMessage)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 497, Short.MAX_VALUE)
+                        .addComponent(exportButton)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(importButton)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(solveButton)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(selectSatOrSmt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(editor, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addComponent(jTabbedPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 510, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(editor, javax.swing.GroupLayout.DEFAULT_SIZE, 511, Short.MAX_VALUE)
+                .addGap(4, 4, 4)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(testButton)
+                    .addComponent(solveButton)
                     .addComponent(importButton)
-                    .addComponent(jLabelCaretPosition)
-                    .addComponent(jLabelErrorMessage)
-                    .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(cursorPosition)
+                    .addComponent(bottomMessage)
+                    .addComponent(selectSatOrSmt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(exportButton))
                 .addContainerGap())
         );
@@ -229,7 +226,7 @@ public class ParentEditionPanel extends AbstractComponentPanel {
     }//GEN-LAST:event_importButtonActionPerformed
 
     /**
-     * For Java RE 6 compatibility (p.isAlive() is JavaRE7)
+     * For java jre 1.6 and 1.7 compatibility (p.isAlive() is java jre >= 1.8)
      */
 	private boolean isAlive(Process process) {
 	    try {
@@ -241,12 +238,12 @@ public class ParentEditionPanel extends AbstractComponentPanel {
 	}
     
 	private boolean isStopInsteadOfTest = false;
-    private void testButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_testButtonActionPerformed
+    private void solveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_solveButtonActionPerformed
         switch(((MainFrame)(getRootPane().getParent())).state) {
             case EDITION :
                 setJLabelErrorMessageText("");
                 
-                this.testButton.setText(isStopInsteadOfTest
+                this.solveButton.setText(isStopInsteadOfTest
                 		?getFrame().getLang().getWord("ParentEditionPanel.testButton.text")
                 		:getFrame().getLang().getWord("ParentEditionPanel.stopButton.text"));
                 isStopInsteadOfTest = (isStopInsteadOfTest)?false:true;
@@ -273,7 +270,7 @@ public class ParentEditionPanel extends AbstractComponentPanel {
                 Runnable r = new Runnable() {
                     public void run() {
                         State state = initResultView();
-                        testButton.setText(getFrame().getLang().getWord("ParentEditionPanel.testButton.text"));
+                        solveButton.setText(getFrame().getLang().getWord("ParentEditionPanel.testButton.text"));
                         isStopInsteadOfTest = false;
                         if (state != State.EDITION) {
                             setState(state);
@@ -306,7 +303,7 @@ public class ParentEditionPanel extends AbstractComponentPanel {
             default : 
                 System.out.println("Undefined action set for the state : " + getState());
         }
-    }//GEN-LAST:event_testButtonActionPerformed
+    }//GEN-LAST:event_solveButtonActionPerformed
 
     private void exportButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exportButtonActionPerformed
         switch(((MainFrame)(getRootPane().getParent())).state) {
@@ -337,76 +334,77 @@ public class ParentEditionPanel extends AbstractComponentPanel {
                 System.out.println("Undefined action set for the state : " + getState());
         }    }//GEN-LAST:event_exportButtonActionPerformed
 
-    private void jLabelErrorMessageMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabelErrorMessageMouseClicked
+    private void bottomMessageMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_bottomMessageMouseClicked
         if (jLabelErrorMessageText.length() > ERROR_MESSAGE_MAX_LENGTH) {
             JOptionPane.showMessageDialog(this,
                     jLabelErrorMessageText, 
                     getFrame().getLang().getWord(Lang.ERROR_MESSAGE_TITLE), 
                     JOptionPane.ERROR_MESSAGE);
         }
-    }//GEN-LAST:event_jLabelErrorMessageMouseClicked
+    }//GEN-LAST:event_bottomMessageMouseClicked
 
-    private void jComboBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox1ActionPerformed
+    private void selectSatOrSmtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_selectSatOrSmtActionPerformed
         try {
-            if (jComboBox1.getSelectedItem() instanceof SolverType) {
-                getFrame().getSolverSelection().setSelectedSolver((SolverType)(jComboBox1.getSelectedItem()));
+            if (selectSatOrSmt.getSelectedItem() instanceof SolverType) {
+                getFrame().getSolverSelection().setSelectedSolver((SolverType)(selectSatOrSmt.getSelectedItem()));
             }
         } catch (NullPointerException ex) {
         }
-    }//GEN-LAST:event_jComboBox1ActionPerformed
+    }//GEN-LAST:event_selectSatOrSmtActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private gui.editionView.EditionPanel editorPanelFormulas;
-    private gui.editionView.EditionPanel editorPanelSets;
+    private javax.swing.JLabel bottomMessage;
+    private javax.swing.JLabel cursorPosition;
+    private gui.editionView.EditionPanel editor;
     private javax.swing.JButton exportButton;
+    private javax.swing.JFileChooser fileChooser;
     private javax.swing.JButton importButton;
-    private javax.swing.JComboBox jComboBox1;
-    private javax.swing.JFileChooser jFileChooser1;
-    private javax.swing.JLabel jLabelCaretPosition;
-    private javax.swing.JLabel jLabelErrorMessage;
-    private javax.swing.JOptionPane jOptionPane1;
-    private javax.swing.JTabbedPane jTabbedPane1;
-    private javax.swing.JButton testButton;
+    private javax.swing.JOptionPane popupMessage;
+    private javax.swing.JComboBox selectSatOrSmt;
+    private javax.swing.JButton solveButton;
     // End of variables declaration//GEN-END:variables
 
     public void importHandler() {
-        String path = getFrame().getDefaultDirectoryPath();
-        int returnVal;
-        getFrame().getClause().setFormules("");
-        getFrame().getClause().setSets("");
-        
-        returnVal = jFileChooser1.showOpenDialog(this);
-        
-        if (returnVal == JFileChooser.APPROVE_OPTION && jFileChooser1.getSelectedFile() != null) {
-            path = jFileChooser1.getSelectedFile().getPath();
+
+		FileDialog d = new FileDialog(getFrame()); 
+		d.setDirectory(getFrame().getDefaultDirectoryPath());
+    	d.setMode(FileDialog.LOAD);
+    	d.setVisible(true);
+    	
+        getFrame().getTextInEditor().set("");
+
+        if (d.getFile() != null) 
+        {
+        	String path = d.getDirectory() + d.getFile();
 
             try {
-                getFrame().getClause().uploadFile(path);
+                getFrame().getTextInEditor().loadFile(path);
             } catch(Exception e) {
-                //TODO handle error message
-                System.out.println("Error : Failed to load the file : " + path);
-                e.printStackTrace();
+                System.err.println("Failed to load file: " + path);
+                showErrorMessage(e,"Failed to load file: '" + path + "'","");
+
             }
 
             //Réinitialisation des sets et des formules
-            String text = getFrame().getClause().getFormules();
-            editorPanelFormulas.setText(text);
-            text = getFrame().getClause().getSets();
-            editorPanelSets.setText(text);
+            String text = getFrame().getTextInEditor().get();
+            editor.setText(text);
         }   
     }
-    
+
     public void exportHandler() {
-        getFrame().getClause().setFormules("");
-        getFrame().getClause().setSets("");
-        getFrame().getClause().addFormules(editorPanelFormulas.getText());
-        getFrame().getClause().addSets(editorPanelSets.getText());
-        
-        int returnVal = jFileChooser1.showDialog(this,getFrame().getLang().getWord(Lang.EDITION_FILE_CHOOSER));
+        getFrame().getTextInEditor().set(editor.getText());
+
+    	FileDialog d = new FileDialog(getFrame()); 
+    	d.setDirectory(getFrame().getDefaultDirectoryPath());
+    	d.setMode(FileDialog.SAVE);
+    	d.setVisible(true);
+
+    	String path;
         try {
-            if(returnVal == JFileChooser.APPROVE_OPTION){
-                getFrame().getClause().saveToFile(jFileChooser1.getSelectedFile().getPath());
+            if(d.getFile() != null){
+            	 path = d.getDirectory() + d.getFile();
+                getFrame().getTextInEditor().saveToFile(path);
             }
         } catch (IOException e) {
             String warningWindowTitle = getFrame().getLang().getWord(Lang.EDITION_EXPORT_FAILURE_TITLE);
@@ -416,7 +414,7 @@ public class ParentEditionPanel extends AbstractComponentPanel {
     }
     
     private void showErrorMessage(String message, String title) {
-        jOptionPane1.showMessageDialog(getParent(), 
+        popupMessage.showMessageDialog(getParent(), 
                         message, 
                         title, 
                         JOptionPane.ERROR_MESSAGE);
@@ -452,40 +450,10 @@ public class ParentEditionPanel extends AbstractComponentPanel {
         }
     }
     
-    private TranslationError guiTranslationErrorAdapter(TranslationError error) {
-        TranslatorSAT t = new TranslatorSAT("");
-        TranslationError adaptedError;
-        int row = error.getRowInCode();
-        String sets = getFrame().getClause().getSets();
-        int nbRowsInSets = 1;
-        int setShift = (getFrame().getClause().getSets().isEmpty()) ? 0 : -1; // -1 pour tenir compte de "begin sets";
-        int formulasShift = (getFrame().getClause().getSets().isEmpty()) ? 0 : -3; // -3 pour tenir compte de "begin sets", "end sets" et "begin formulas"
-        
-        for (int i=0; i<sets.length(); i++) {
-            if (sets.charAt(i) == '\n') {
-                nbRowsInSets++;
-            }
-        }
-        if (row < nbRowsInSets) {
-            // l'erreur est dans les sets
-            adaptedError = new TranslationError(row - setShift,
-                    error.getColumnInCode(), 
-                    error.getErrorMessage() + getFrame().getLang().getWord(Lang.ERROR_TRADUCTION_IN_SETS));
-        } else {
-            // l'erreur est dans les formules
-            adaptedError = new TranslationError(row-nbRowsInSets - formulasShift, 
-                    error.getColumnInCode(), 
-                    error.getErrorMessage() + getFrame().getLang().getWord(Lang.ERROR_TRADUCTION_IN_FORMULAS));
-        }
-        return adaptedError;
-    }
 
     private State initResultView() {
         // Initialisation de BaseDeClause
-        getFrame().getClause().setFormules("");
-        getFrame().getClause().setSets("");
-        getFrame().getClause().addFormules(editorPanelFormulas.getText());
-        getFrame().getClause().addSets(editorPanelSets.getText());
+        getFrame().getTextInEditor().set(editor.getText());
         
         /*
         Faire appel au solveur avec les fichiers générés par le traducteur
@@ -500,17 +468,15 @@ public class ParentEditionPanel extends AbstractComponentPanel {
         
         
         try {
-            getFrame().getClause().saveToFile(bigAndFilePath);
+            getFrame().getTextInEditor().saveToFile(bigAndFilePath);
         } catch (IOException ex) {
-            ex.printStackTrace();
-            errorMessage = "Couldn't create file '" + bigAndFilePath + "'";
+            errorMessage = "Couldn't create file '" + bigAndFilePath + "':\n"+ex.getMessage();
             showErrorMessage(errorMessage, getFrame().getLang().getWord(Lang.ERROR_TRADUCTION));
-            System.exit(0);
             return State.EDITION;
         }
         
         // Button "Solve" now displays "Translating...
-        testButton.setText("Translating");
+        solveButton.setText("Translating");
 
         if (getFrame().getSolverSelection().getSelectedSolver() == SolverSelection.SolverType.SAT) {
            
@@ -518,13 +484,12 @@ public class ParentEditionPanel extends AbstractComponentPanel {
                 if(! getFrame().getTranslatorSAT().translate(bigAndFilePath)) {
                     errorMessage = "";
                     for (TranslationError error : getFrame().getTranslatorSAT().getErrors()) {
-                            if(error.hasRowAndColumn()) {
-                                    errorMessage += guiTranslationErrorAdapter(error) + "\n";
-                            } else { 
-                                    errorMessage += error + "\n";
-                            }
+                            errorMessage += error + "\n";
                     }
                     setJLabelErrorMessageText(errorMessage);
+                    
+                    this.editor.getParser().linterFromExisting(getFrame().getTranslatorSAT().getErrors());
+                    this.editor.getEditorTextArea().forceReparsing(0);
 
                     System.out.println("Traduction error : " + "\n" + errorMessage + "\n");
                     /*uncomment the following line to have a popup once an error is detected*/
@@ -543,7 +508,7 @@ public class ParentEditionPanel extends AbstractComponentPanel {
                 return State.EDITION;
             }
 
-            testButton.setText("Solving");
+            solveButton.setText("Solving");
 
             //Add CurrentPath/dimacsFile
             String translatedFilePath = getFrame().getTranslatorSAT().getDimacsFilePath();
@@ -613,11 +578,7 @@ public class ParentEditionPanel extends AbstractComponentPanel {
                 if(! getFrame().getTranslatorSMT().translate(bigAndFilePath, logic)) {
                     errorMessage = "";
                     for (TranslationError error : getFrame().getTranslatorSAT().getErrors()) {
-                            if(error.hasRowAndColumn()) {
-                                    errorMessage += guiTranslationErrorAdapter(error) + "\n";
-                            } else { 
-                                    errorMessage += error + "\n";
-                            }
+                    	errorMessage += error + "\n";
                     }
                     setJLabelErrorMessageText(errorMessage);
 
@@ -657,7 +618,7 @@ public class ParentEditionPanel extends AbstractComponentPanel {
     }
     
     public void setJLabelCaretPositionText(String text) {
-        jLabelCaretPosition.setText(text);
+        cursorPosition.setText(text);
     }
 
     public void undo() {
@@ -685,29 +646,21 @@ public class ParentEditionPanel extends AbstractComponentPanel {
     }
     
     public void zoom(int n) {
-        if(jTabbedPane1.getSelectedIndex() <= 1) {
-            ((EditionPanel)jTabbedPane1.getSelectedComponent()).zoom(n);
-        }
+    	editor.zoom(n);
     }
     
     @Override
     public void updateLanguage() {
-        jTabbedPane1.setToolTipText("");
         importButton.setText(getFrame().getLang().getWord(Lang.EDITION_IMPORT));
         importButton.setToolTipText(getFrame().getLang().getWord("ParentEditionPanel.importButton.tooltip"));
         exportButton.setText(getFrame().getLang().getWord(Lang.EDITION_EXPORT));
         exportButton.setToolTipText(getFrame().getLang().getWord("ParentEditionPanel.exportButton.tooltip"));
-        testButton.setText(getFrame().getLang().getWord(Lang.EDITION_TEST));
-        testButton.setToolTipText(getFrame().getLang().getWord("ParentEditionPanel.testButton.tooltip")); 
-        editorPanelFormulas.updateLanguage();
-        editorPanelSets.updateLanguage();
-        jTabbedPane1.setTitleAt(0, getFrame().getLang().getWord(Lang.EDITION_TAB_FORMULAS));
-        jTabbedPane1.setTitleAt(1, getFrame().getLang().getWord(Lang.EDITION_TAB_SETS));
-        jTabbedPane1.setToolTipTextAt(0, getFrame().getLang().getWord("ParentEditionPanel.editorPanelFormulas.TabConstraints.tabTooltip"));
-        jTabbedPane1.setToolTipTextAt(1, getFrame().getLang().getWord("ParentEditionPanel.editorPanelSets.TabConstraints.tabTooltip"));
-        jComboBox1.setToolTipText(getFrame().getLang().getWord("ParentEditionPanel.comboBoxSATSMT.tooltip"));
-        jLabelCaretPosition.setToolTipText(getFrame().getLang().getWord("ParentEditionPanel.jLabelCaretPosition.tooltip"));
-        jLabelErrorMessage.setToolTipText(getFrame().getLang().getWord("ParentEditionPanel.jLabelErrorMessage.tooltip"));
+        solveButton.setText(getFrame().getLang().getWord(Lang.EDITION_TEST));
+        solveButton.setToolTipText(getFrame().getLang().getWord("ParentEditionPanel.testButton.tooltip")); 
+        editor.updateLanguage();
+        selectSatOrSmt.setToolTipText(getFrame().getLang().getWord("ParentEditionPanel.comboBoxSATSMT.tooltip"));
+        cursorPosition.setToolTipText(getFrame().getLang().getWord("ParentEditionPanel.jLabelCaretPosition.tooltip"));
+        bottomMessage.setToolTipText(getFrame().getLang().getWord("ParentEditionPanel.jLabelErrorMessage.tooltip"));
         updateUI();
     }
 }

@@ -41,13 +41,17 @@ public class Lang {
 
     public Lang(Locale language){
         initSupportedLanguages();
-        this.language = language;
-        translation = ResourceBundle.getBundle(supportedLanguages.get(language));
+        setLanguage(language);
     }
     
     public void setLanguage(Locale language){
         this.language = language;
-        translation = ResourceBundle.getBundle(supportedLanguages.get(language));
+        try {
+        	translation = ResourceBundle.getBundle(supportedLanguages.get(language));
+        } catch(Exception e)
+        {
+        	translation = ResourceBundle.getBundle(supportedLanguages.get(Locale.ENGLISH));
+        }
     }
 
     public String getWord(String keyword){
@@ -73,6 +77,7 @@ public class Lang {
         supportedLanguages = new HashMap<Locale,String>();
         supportedLanguages.put(Locale.ENGLISH, "lang.en_US"); // "lang" is the package
         supportedLanguages.put(Locale.FRENCH, "lang.fr_FR");
+        supportedLanguages.put(Locale.FRANCE, "lang.fr_FR");
     }
     
     public static final String FRAME_TITLE = "MainFrame.title";
@@ -85,8 +90,6 @@ public class Lang {
     public static final String EDITION_IMPORT = "ParentEditionPanel.importButton.text";
     public static final String EDITION_EXPORT = "ParentEditionPanel.exportButton.text";
     public static final String EDITION_TEST = "ParentEditionPanel.testButton.text";
-    public static final String EDITION_TAB_FORMULAS = "ParentEditionPanel.editorPanelFormulas.TabConstraints.tabTitle";
-    public static final String EDITION_TAB_SETS = "ParentEditionPanel.editorPanelSets.TabConstraints.tabTitle";
     public static final String EDITION_EXPORT_FAILURE_TITLE = "ParentEditionPanel.exportFailure.title";
     public static final String EDITION_EXPORT_FAILURE_TEXT = "ParentEditionPanel.exportFailure.text";
     public static final String EDITION_MENUITEM_SAVEFILE = "EditionMenuBar.jMenuItemSaveFile.text";
@@ -97,7 +100,7 @@ public class Lang {
     public static final String EDITION_MENUITEM_REDO = "EditionMenuBar.jMenuItemRedo.text";
     public static final String EDITION_MENUITEM_ZOOMMORE = "EditionMenuBar.jMenuItemZoomMore.text";
     public static final String EDITION_MENUITEM_ZOOMLESS = "EditionMenuBar.jMenuItemZoomLess.text";
-    public static final String PALETTE_TEXT = "PalettePanel.jLabel1.text";
+    public static final String PALETTE_TEXT = "SnippetContainer.jLabel1.text";
     public static final String RESULTS_NEXT = "ResultsPanel.jButtonNext.text";
     public static final String RESULTS_PREVIOUS = "ResultsPanel.jButtonPrevious.text";
     public static final String RESULTS_RETURN = "ResultsPanel.jButtonEditor.text";

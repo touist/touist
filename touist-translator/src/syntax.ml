@@ -7,102 +7,89 @@
  * https://github.com/touist/touist
  *
  * Copyright Institut de Recherche en Informatique de Toulouse, France
- * This program and the accompanying materials are made available 
- * under the terms of the GNU Lesser General Public License (LGPL) 
+ * This program and the accompanying materials are made available
+ * under the terms of the GNU Lesser General Public License (LGPL)
  * version 2.1 which accompanies this distribution, and is available at
  * http://www.gnu.org/licenses/lgpl-2.1.html
  *)
 
-module IntSet = Set_ext.Make(struct
-  type t = int
-  let compare = Pervasives.compare
-end)
+module IntSet = Set_ext.Make(
+  struct
+    type t = int
+    let compare = Pervasives.compare
+  end)
 
-module FloatSet = Set_ext.Make(struct
-  type t = float
-  let compare = Pervasives.compare
-end)
+module FloatSet = Set_ext.Make(
+  struct
+    type t = float
+    let compare = Pervasives.compare
+  end)
 
-module StringSet = Set_ext.Make(String)
+module PropSet = Set_ext.Make(String)
 
-module GenSet = struct
-  type t =
-    | Empty
-    | ISet of IntSet.t
-    | FSet of FloatSet.t
-    | SSet of StringSet.t
-end
-
-type prog =
-  | Prog of affect list option * clause list
-and affect =
-  | Affect of var * exp
-and var = string * exp list option
-and exp =
+type loc = Lexing.position * Lexing.position
+and var = string * ast list option * loc
+and ast = (* Touist_code is the entry point *)
+  | Touist_code      of ast list * ast list option
   | Int              of int
   | Float            of float
   | Bool             of bool
   | Var              of var
-  | Set              of GenSet.t
-  | Set_decl         of exp list
-  | Clause           of clause
-  | Neg              of exp
-  | Add              of exp * exp
-  | Sub              of exp * exp
-  | Mul              of exp * exp
-  | Div              of exp * exp
-  | Mod              of exp * exp
-  | Sqrt             of exp
-  | To_int           of exp
-  | To_float         of exp
-  | Not              of exp
-  | And              of exp * exp
-  | Or               of exp * exp
-  | Xor              of exp * exp
-  | Implies          of exp * exp
-  | Equiv            of exp * exp
-  | Equal            of exp * exp
-  | Not_equal        of exp * exp
-  | Lesser_than      of exp * exp
-  | Lesser_or_equal  of exp * exp
-  | Greater_than     of exp * exp
-  | Greater_or_equal of exp * exp
-  | Union            of exp * exp
-  | Inter            of exp * exp
-  | Diff             of exp * exp
-  | Range            of exp * exp
-  | Empty            of exp
-  | Card             of exp
-  | Subset           of exp * exp
-  | In               of exp * exp
-  | If               of exp * exp * exp
-and clause =
-  | CInt              of int
-  | CFloat            of float
-  | CNeg              of clause
-  | CAdd              of clause * clause 
-  | CSub              of clause * clause 
-  | CMul              of clause * clause 
-  | CDiv              of clause * clause 
-  | CEqual            of clause * clause 
-  | CNot_equal        of clause * clause 
-  | CLesser_than      of clause * clause 
-  | CLesser_or_equal  of clause * clause 
-  | CGreater_than     of clause * clause 
-  | CGreater_or_equal of clause * clause 
+  | Set              of set
+  | Set_decl         of ast list
+  | Neg              of ast
+  | Add              of ast * ast
+  | Sub              of ast * ast
+  | Mul              of ast * ast
+  | Div              of ast * ast
+  | Mod              of ast * ast
+  | Sqrt             of ast
+  | To_int           of ast
+  | To_float         of ast
+  | Abs              of ast
   | Top
   | Bottom
-  | Term     of var
-  | CVar     of var
-  | CNot     of clause
-  | CAnd     of clause * clause
-  | COr      of clause * clause
-  | CXor     of clause * clause
-  | CImplies of clause * clause
-  | CEquiv   of clause * clause
-  | Exact    of exp * exp
-  | Atleast  of exp * exp
-  | Atmost   of exp * exp
-  | Bigand   of string list * exp list * exp option * clause
-  | Bigor    of string list * exp list * exp option * clause
-  | CIf      of exp * clause * clause
+  | Not              of ast
+  | And              of ast * ast
+  | Or               of ast * ast
+  | Xor              of ast * ast
+  | Implies          of ast * ast
+  | Equiv            of ast * ast
+  | Equal            of ast * ast
+  | Not_equal        of ast * ast
+  | Lesser_than      of ast * ast
+  | Lesser_or_equal  of ast * ast
+  | Greater_than     of ast * ast
+  | Greater_or_equal of ast * ast
+  | Union            of ast * ast
+  | Inter            of ast * ast
+  | Diff             of ast * ast
+  | Range            of ast * ast
+  | Empty            of ast
+  | Card             of ast
+  | Subset           of ast * ast
+  | In               of ast * ast
+  | If               of ast * ast * ast
+  | Exact            of ast * ast
+  | Atleast          of ast * ast
+  | Atmost           of ast * ast
+  | Bigand           of ast list * ast list * ast option * ast
+  | Bigor            of ast list * ast list * ast option * ast
+  | Let              of ast * ast * ast
+  | Affect           of ast * ast
+  | UnexpProp        of string * ast list option
+  | Prop             of string
+  (* UnexpProp is a proposition that contains unexpandable variables; we cannot
+     tranform UnexpProp into Prop before knowing what is the content of the
+     variables. Examples:
+         abcd(1,$d,$i,a)       <- not a full-string yet
+     Prop contains the actual proposition after the evaluation has been run.
+     Example: if $d=foo and $i=123, then Prop is:
+         abcd(1,foo,123,a)     <- an actual string that represents an actual
+                                  logical proposition
+  *)
+and set =
+  | EmptySet
+  | ISet of IntSet.t
+  | FSet of FloatSet.t
+  | SSet of PropSet.t

@@ -4,8 +4,17 @@
 #
 # Note that menhirLib is required to be >= 20150118 because the feature
 # "incremental API" has been introduced at that version.
-#
-# To install oasis: `opam install oasis`
+###############
+# To install oasis:
+#     opam install oasis
+# To install menhir, fileutils:
+#     opam install menhir fileutils
+# To install minisat:
+#     opam pin add -y minisat "https://github.com/maelvalais/ocaml-minisat.git#0.0.2"
+###############
+# To force using 'bytecode' over 'native' binary for debugging with
+# ocamldebug or utop, launch:
+#     ./configure --override is_native false
 #
 
 OASISFormat:  0.4
@@ -16,18 +25,23 @@ Synopsis:     This package is a compiler to the DIMACS file format
 Authors:      Olivier Lezaud
 License:      LGPL
 Plugins:      META (0.4), DevFiles (0.4)
-
-BuildDepends: menhirLib (>= 20150118), fileutils (>= 0.4.0), str
 BuildType: ocamlbuild (0.4)
 AlphaFeatures: ocamlbuild_more_args
-XOCamlbuildExtraArgs: -use-menhir -menhir \"menhir --table --inspection -v -la 2\"
-PreBuildCommand: sh generate-version-number.sh
+
+PreBuildCommand: make -f TopMakefile
+PostCleanCommand: make -f TopMakefile clean
+
+XOCamlbuildExtraArgs: -use-menhir -menhir \"menhir --table --inspection -v -la 2
+#if flag(trace)
+#  XOCamlbuildExtraArgs+: --trace
+XOCamlbuildExtraArgs+: \" -pkg menhirLib,fileutils,str,minisat
 
 Executable touistc
   Path:           src
-  BuildTools:     ocamlbuild
+  BuildTools:     ocamlbuild, git, menhir
   CompiledObject: best
   MainIs:         touistc.ml
+  BuildDepends: menhirLib (>= 20150118), fileutils (>= 0.4.0), str, minisat
 
 SourceRepository touist
   Type:           git

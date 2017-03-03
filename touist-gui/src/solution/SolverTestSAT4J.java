@@ -30,6 +30,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.Map;
 
@@ -86,7 +89,7 @@ public class SolverTestSAT4J extends Solver {
 	}
 
     /**
-     * For Java RE 6 compatibility (p.isAlive() is JavaRE7)
+     * For java jre 1.6 and 1.7 compatibility (p.isAlive() is java jre >= 1.8)
      */
 	private boolean isAlive(Process process) {
 	    try {
@@ -109,9 +112,10 @@ public class SolverTestSAT4J extends Solver {
 		 * parse issue 3 = wrong dimacs content 4 = error with the streamreader
 		 * 5 = solver timeout
 		 */
-		String [] command = { "java", "-jar",
-				"external" + Character.toString(File.separatorChar) + "minisat.jar" 
-				, getDimacsFilePath() } ;
+
+		String pathminisat = getTouistDir() + File.separator + "external" + File.separator + "minisat.jar";
+
+		String [] command = { "java", "-jar",pathminisat, this.dimacsFilePath} ;
 		System.out.println("launch(): cmd executed: "+Arrays.toString(command));
 		this.p = Runtime.getRuntime().exec(command);
 		stderr = new BufferedReader(new InputStreamReader(p.getErrorStream()));
@@ -209,5 +213,26 @@ public class SolverTestSAT4J extends Solver {
 	 */
 	protected Map<Integer, String> getLiteralsMap() {
 		return literalsMap;
+	}
+	
+	/**
+	 * We use this for getting the actual place where touist.jar is located in.
+	 * We do not use getProperty("user.dir") because on linux, it returns (when
+	 * opening by clicking on touist.jar) the $HOME instead of the actual place where
+	 * touist.jar is.
+	 * @return
+	 */
+	private String getTouistDir() {
+		URL url = ClassLoader.getSystemClassLoader().getResource(".");
+		URI uri = null;
+		// URISyntaxException should ne ever be thrown because we expect getResource(".")
+		// to give a correct URL
+		try {
+			uri = new URI(url.toString());
+		} catch (URISyntaxException e) {
+			System.err.println("Something went wrong when trying to get where touist.jar is located:\n" + e.getMessage());
+		}
+		File path = new File(uri);
+		return path.getAbsolutePath();
 	}
 }

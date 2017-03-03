@@ -1,4 +1,103 @@
-v1.3.0 (to be released)
+v2.1.3
+  - gui:
+    - fixed a bug in the latex viwer that was removing the carriage return
+      when a line was beginning with a '('.
+    - ctrl+left and ctrl+right are now working properly for moving
+      word by word in the text editor on Windows
+v2.1.2
+  - touistc:
+    - abs() is now supported (absolute value)
+v2.1.1
+  - gui:
+    - fixed a bug that was preventing from ./external/touistc to be run when
+      the path contains whitespaces
+v2.1.0
+  - gui: 
+    - semantic errors (that only appear when pressing 'Solve' are now
+      displayed) are now displayed like the syntaxic errors (still after
+      'Solve')
+  - touistc:
+    - it is now possible to do the affectations before the formulas, with
+      no separator between sets and formulas. It is still possible to affect
+      after formulas with the separation keyword 'data'. You can only affect
+      before or after, not both.
+    - semantic errors (e.g., variables with wrong type) are now giving
+      a location (line, column). Some errors still lack the location but 99%
+      of them are covered.
+    - (internal) revamped the grammar specification to make it clear. The
+      'simple' and 'smt-augmented' grammars are now well separated.
+      Many error messages have been re-worked; among them, suggestions of
+      operators when an expression continuation is expected.
+      The number of messages goes from 89 to 144.
+    - merged 'term' and 'tuple-term' into one single concept: the proposition.
+      A proposition can be either 'abcd' or 'abcd(1,cd,56,$i)'.
+v2.0.1
+  - gui:
+    - fixed crash when touist.jar was opened from inside the zip archive
+  - touistc:
+    - when dimacs and table both printing on stdout, the table now
+      begins with 'c' to be able to pipe directly to a solver
+    - added possibility of using a term in a 'when' or 'if' statement, e.g.,
+      'bigand $i in [a,b,c] when $i != a: p($i) end
+v2.0.0
+  - touistc:
+    - simplified 'begin sets end sets begin formula end formula'; syntax is
+        <formulas> data <sets>
+      Note that the sets are now after formulas. It will be soon possible
+      to give the formulas and sets as two separate files, for genericity
+      of the models (defined by the formulas) and the data (the sets).
+   - fixed the problem of "Clause is always true/false" when bigand or
+     bigor does not produce anything
+   - added --linter for syntax errors and --linter-expand for syntax+
+     semantic errors. The first is fast, the second is a bit slower.
+   - added --verbose to have a sense of what is happening when the
+     compiler is taking a long time to anwser.
+  - gui:
+    - now shows the errors in the editor we red-underlyings; you can
+      see the error hovering the mouse over the error.
+    - merged the sets and formulas tabs in GUI; the solution is now to
+      use the syntax <formulas> data <sets>. I'm still looking for
+      a way to separate formulas and sets in GUI, e.g., two separate
+      files that have each its own tab
+    - matching parenthesis are now hightlighted
+    - when error message is too large, added 'click to view' message
+    - linux: "solve" now works properly when touist.jar is opened by
+      icon-clicking
+v1.4.2
+    - (regression) possible to declare a set with terms: [a,b,c]...
+v1.4.1
+    - (regression) output of the table (id,name) had been inverted (!)
+v1.4.0
+  - touistc:
+    - touistc is now able to solve SAT problems on its own. You can use
+      '--solve' to return the first model of your problem, '--count' for
+      counting the number of models), '--limit i' for setting a limit to
+      the number of models returned (or 0 for no limit). Way faster that
+      the java call to minisat.jar!
+    - Added --equiv that allows to test the equivalency of two files.
+      Note that it is not an actual equivalence as both problems must 
+      have the exact same set of propositions/literals.
+    - (internal) merged exp and clause types for less code redundancy
+    - added support for local variables of the form 'let $i=1: p($i)'.
+      A 'let' variable is local to the clause it precedes, e.g., p($i) 
+  - gui:
+    - added support for local variables of the form
+      'let $i=1: p($i) end'. For now, the scope of these variables is
+      not actually limited to the current context (the current clause);
+      the variables exist even after 'end'.
+v1.3.1
+  - touistc:
+    - fixed `a (b)` recognized as `a(b)` instead of `a and b`
+    - added --debug-formula-expansion which prints the "expanded" version
+      of bigand, bigor, exact and numerical expressions; helps for debugging
+      complex formulas!
+  - gui:
+    - select the system language automatically
+    - fix "export" button not working
+    - export and import are now use the operating system UI (jre>=1.7)
+    - jre>=1.7 is now required; it solves the wierd mac problem that says
+      that you need to install the JDK for using command-line functions
+v1.3.0
   - touist.jar:
     - fix touist hanging on "solve" on some unsatisfiable formulas
     - fix subset(.,.) construct not displayed in latex display
@@ -31,7 +130,7 @@ v1.1.3
 v1.1.2 (2016/04/03)
   - fix problem with whitespaces in path names (Victor David)
   - touistc: In SMT mode, "Float" was produced instead of "Real" (Frédéric Maris)
-  - touistc: Now display a proper error when -smt2 is given with no logic	(Maël Valais)
+  - touistc: Now display a proper error when -smt2 is given with no logic    (Maël Valais)
   - gui: the left "snippets" panel has now a correct size (Maël Valais)
   - gui: more explicit error message when touistc is missing (Maël Valais)
 

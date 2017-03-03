@@ -2,11 +2,14 @@ TouIST, the IDE for propositional logic
 =======================================
 
 [![Travis (Linux/Mac) build state](https://travis-ci.org/touist/touist.svg?branch=master)](https://travis-ci.org/touist/touist)
-[![AppVeyor (Windows) build state](https://ci.appveyor.com/api/projects/status/github/touist/touist?branch=master&svg=true)](https://ci.appveyor.com/project/touist/touist/branch/master)
+[![Appveyor (Windows)](https://ci.appveyor.com/api/projects/status/rayupfflmut8xbe0?svg=true)](https://ci.appveyor.com/project/maelvalais/touist-kila4)
 
-[Get the latest release here](https://github.com/touist/touist/releases). Touist works on osx-x64, linux-x64 and windows-x86.
+## I want to try
+[Get the latest release here](https://github.com/touist/touist/releases). Touist works on **macOS** (x86_64 only), **Linux** x86\_64 and **Windows** (x86 or x64\_86). Just download, unzip and double-click on `touist.jar` (you can also use the command-line `touistc` in `./external/`)
 
-TouIST is a user-friendly tool for solving propositionnal logic problems using a high-level logic language (known as the _bigand_ format or syntax or language). This language allows complex expressions like _big and_, _sets_... 
+## Description
+
+TouIST is a user-friendly tool for solving propositionnal logic problems using a high-level logic language (known as the _bigand_ format or syntax or language). This language allows complex expressions like _big and_, _sets_...
 
 We can for example solve the problem "Wolf, Sheep, Cabbage", or a sudoku, or any problem that can be expressed in propositionnal logic.
 
@@ -26,7 +29,7 @@ We have some issues with compiling the ocaml translator for Windows. Some of the
 
 
 ## What is Touist made of?
-Touist uses Java (>= jre6) and embeds an architecture-specific binary, [touistc](https://github.com/touist/touist/tree/master/touist-translator) (we coded it in ocaml), which translates touistl language to dimacs. The dimacs files are then given to another binary, the SAT (or SMT) solver, and then displayed to the user.
+Touist uses Java (>= jre7) and embeds an architecture-specific binary, [touistc](https://github.com/touist/touist/tree/master/touist-translator) (we coded it in ocaml), which translates touistl language to dimacs. The dimacs files are then given to another binary, the SAT (or SMT) solver, and then displayed to the user.
 
 _touistc_ can also be used in command-line.
 
@@ -42,4 +45,3 @@ Here is a small figure showing the architecture of the whole program:
 You can report bugs by creating a new Github issue. Feature requests can also be submitted using the issue system.  
 
 You can contribute to the project by forking/pull-requesting.
-

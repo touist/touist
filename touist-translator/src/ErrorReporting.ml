@@ -1,10 +1,10 @@
 (*
- * ErrorReporting.ml: handles errors produced by the menhir 
+ * ErrorReporting.ml: handles errors produced by the menhir
  *              incremental parser.
  *              [report] is the main function.
- *                    
- *              To understand what is a checkpoint and everything, you can 
- *              check the menhir incremental parser API in 
+ *
+ *              To understand what is a checkpoint and everything, you can
+ *              check the menhir incremental parser API in
  *              IncrementalEngine.ml (google it)
  *
  * Project TouIST, 2015. Easily formalize and solve real-world sized problems
@@ -13,8 +13,8 @@
  * https://github.com/FredMaris/touist
  *
  * Copyright Institut de Recherche en Informatique de Toulouse, France
- * This program and the accompanying materials are made available 
- * under the terms of the GNU Lesser General Public License (LGPL) 
+ * This program and the accompanying materials are made available
+ * under the terms of the GNU Lesser General Public License (LGPL)
  * version 2.1 which accompanies this distribution, and is available at
  * http://www.gnu.org/licenses/lgpl-2.1.html
  *
@@ -22,19 +22,19 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
- * 
  *
- * A huge part of this code has been inspired by cparser/ErrorReports.ml 
+ *
+ * A huge part of this code has been inspired by cparser/ErrorReports.ml
  * contained in the project AbsInt/CompCert. Here are the terms:
  *
- * The Compcert verified compiler                      
- * Jacques-Henri Jourdan, INRIA Paris-Rocquencourt            
- * Copyright Institut National de Recherche en Informatique et en     
- * Automatique.  All rights reserved.  This file is distributed       
- * under the terms of the GNU General Public License as published by  
- * the Free Software Foundation, either version 2 of the License, or  
- * (at your option) any later version.  This file is also distributed 
- * under the terms of the INRIA Non-Commercial License Agreement. 
+ * The Compcert verified compiler
+ * Jacques-Henri Jourdan, INRIA Paris-Rocquencourt
+ * Copyright Institut National de Recherche en Informatique et en
+ * Automatique.  All rights reserved.  This file is distributed
+ * under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 2 of the License, or
+ * (at your option) any later version.  This file is also distributed
+ * under the terms of the INRIA Non-Commercial License Agreement.
  *)
 
 open Lexing
@@ -85,18 +85,34 @@ let show f buffer : string =
       (* In the most likely case, we have read two tokens. *)
       Printf.sprintf "after '%s' and before '%s'" (f valid) (f invalid)
 
-(* [last buffer] returns the last element of the buffer (that is, the
-   invalid token). *)
-
-let last buffer =
+(* [exact_pos] returns the start position of the invalid token;
+   this is useful for giving the user a one-position indication of where
+   the error is. *)
+let exact_pos buffer : position =
   match buffer with
   | Zero ->
       (* The buffer cannot be empty. If we have read no tokens, we
          cannot have detected a syntax error. *)
       assert false
   | One invalid
-  | Two (_, invalid) ->
-      invalid
+  | Two (_, invalid) -> let start_pos,_ = invalid in start_pos
+
+(* [area_pos] returns the area (= start and end positions) where the error
+   was found; this is useful for red-underlying the error in an IDE.
+   It will give the beginning of the token preceeding the invalid token
+   and the end of the invalid token.
+   If there is no preceeding token, returns the invalid token twice.
+   NOTE: position = Lexing.position *)
+
+let area_pos (buffer : (position*position) buffer) : position * position =
+  match buffer with
+  | Zero ->
+      (* The buffer cannot be empty. If we have read no tokens, we
+         cannot have detected a syntax error. *)
+      assert false
+  | One invalid -> let (startpos,endpos) = invalid in (startpos,endpos)
+  | Two (previous, invalid) -> let (startpos,_),(_,endpos) = previous,invalid
+    in startpos, endpos
 
 (* -------------------------------------------------------------------------- *)
 
@@ -198,7 +214,7 @@ let element checkpoint i : element =
          made. We fail in a non-fatal way. *)
       raise Not_found
   | S.Cons (Element (a, b, p1, p2), _) ->
-      match i with 
+      match i with
       | 0 -> let p1',p2' = (positions (match checkpoint with HandlingError env -> env)) in
         Element (a, b, p1', p2')
       | _ -> Element (a, b, p1, p2)
@@ -259,17 +275,11 @@ let fragments text checkpoint (message : string) : string =
    we need not care about that here. *)
 
 let report text buffer checkpoint debug' : string =
-  debug := debug'; (* Sets the debug flag for the whole ErrorReporting.ml file *) 
-  (* Extract the position where the error occurred, that is, the start
-     position of the invalid token. We display it as a filename, a  (1-based)
-     line number, and a (1-based) column number. *)
-  let (pos, _) = last buffer in
-  (* Construct a readable description of where the error occurred, that is,
-     after which token and before which token. *)
+  debug := debug'; (* Sets the debug flag for the whole ErrorReporting.ml file *)
   let where = show (extract text) buffer in
   (* Find out in which state the parser failed. *)
   let s : int = state checkpoint in
-  (* Choose an error message, based on the state number [s]. 
+  (* Choose an error message, based on the state number [s].
      Then, customize it, based on dynamic information. *)
   let message = try
     Parser_messages.message s |>
@@ -279,20 +289,14 @@ let report text buffer checkpoint debug' : string =
        should not happen, since our list of erroneous states is
        supposed to be complete! -- produce a generic message. *)
     Printf.sprintf "This is an unknown syntax error (%d).\n\
-                    Please report this problem to the compiler vendor.\n" s
+                    This error %d is missing in parser.messages (see HOWTODEBUG.md).\n" s s
   in
   (* Construct the full error message. *)
-  Printf.sprintf "%d:%d: syntax error %s.\n%s"
-    pos.pos_lnum
-    (pos.pos_cnum - pos.pos_bol + 1)
+  let message = Printf.sprintf "syntax error %s.\n%s"
     where
-    message 
+    message
   ^
-  if !debug then 
+  if !debug then
       Printf.sprintf "Debug: Automaton state: %d (see src/parser.messages)\n" s
   else ""
-
-
-  
-
-
+in message

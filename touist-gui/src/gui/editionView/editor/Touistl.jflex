@@ -6,7 +6,7 @@
  * This library is distributed under a modified BSD license.  See the included
  * RSyntaxTextArea.License.txt file for details.
  */
-package gui.editor;
+package gui.editionView.editor;
 
 import java.io.*;
 import javax.swing.text.Segment;
@@ -126,7 +126,7 @@ import org.fife.ui.rsyntaxtextarea.*;
 			return yylex();
 		} catch (IOException ioe) {
 			ioe.printStackTrace();
-			return new Token();
+			return new TokenImpl();
 		}
 
 	}
@@ -138,7 +138,7 @@ import org.fife.ui.rsyntaxtextarea.*;
 	 * @return      <code>true</code> if EOF was reached, otherwise
 	 *              <code>false</code>.
 	 */
-	private boolean zzRefill() {
+	private boolean zzRefill() { // Patched version to keep!
 		return zzCurrentPos>=s.offset+s.count;
 	}
 
@@ -153,7 +153,7 @@ import org.fife.ui.rsyntaxtextarea.*;
 	 *
 	 * @param reader   the new input stream 
 	 */
-	public final void yyreset(java.io.Reader reader) {
+	public final void yyreset(java.io.Reader reader) { // Patched version to keep!
 		// 's' has been updated.
 		zzBuffer = s.array;
 		/*
@@ -193,23 +193,15 @@ Comment     = ";;"[^\n]*
 
    
 	/* Keywords */   
-	"begin" |   
-	"sets" |   
-	"formula" |
+	"data" |   
 	"if" |
 	"then" |
 	"else"  |
 	"when"
-			{ addToken(Token.RESERVED_WORD); }   
-   
-	/* Data types */   
-	"constant" |   
-	"set" |   
-	"double" |   
-	"float" |   
-	"int"		{ addToken(Token.DATA_TYPE); }   
+			{ addToken(Token.RESERVED_WORD); }    
    
 	/* Functions */   
+	"let" |
 	"bigand" |   
 	"bigor" |   
 	"in" |   
@@ -241,9 +233,12 @@ Comment     = ";;"[^\n]*
 
 
 	/* Operators. */   
-	"!" | "%" | "&&" | "+" | "," | "-" | "--" | "-=" |   
-	"/" | "!=" | ":" | "<" | "=" | "==" | ">" | "=>" | "<=>" | 
-	"||" | "(" | ")" | "[" | "]" | "," | "*" | "."	{ addToken(Token.OPERATOR); }   
+	"+" | "," | "-" |
+	".." |
+	"/" | "!=" | ":" | "<" | "=" | "==" | ">" | "=>" | "<=>" | "<=" |
+	"[" | "]" | "*" 	{ addToken(Token.OPERATOR); }
+	
+	"(" | ")" { addToken(Token.SEPARATOR); }
    
 	/* Numbers */   
 	{Integer}			{ addToken(Token.LITERAL_NUMBER_DECIMAL_INT); }   

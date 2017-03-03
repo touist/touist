@@ -1,0 +1,48 @@
+#
+# TopMakefile
+# Maël Valais, 2016-10-22 18:38
+#
+# Pre-build makefile for building touistc
+#
+# Builds everything needed before launching the real build process:
+# - git-produced 'version.ml'
+# - menhir-produced 'parser.messages' and 'parser_messages.ml'
+#
+# The purpose of this makefile is only to be called (by the oasis-generated
+# setup.ml) when using ./configure + make
+#
+
+SRC=src
+# If git is present, then ROOT_GIT will be set with the project root path
+# elsewise, ROOT_GIT will not be defined at all
+
+targets = $(SRC)/parser_messages.ml $(SRC)/version.ml
+
+all: $(targets)
+
+# Produced by menhir
+%parser.messages: %parser.mly
+	if [ -f $@ ]; then menhir $< --update-errors $@ > tmp && mv tmp $@; fi
+	if [ ! -f $@ ]; then menhir $< --list-errors > $@; fi
+
+# Produced by menhir
+%parser_messages.ml: %parser.messages %parser.mly
+	menhir --compile-errors $^ > $@
+
+# Produced by git
+%version.ml: FORCE
+	@echo "let version=\"`if which git 1>&2 2>/dev/null; then git describe --tags; else echo "n/a"; fi`\"" > $@
+# A dummy target to force version.ml to rebuild each time
+FORCE:
+
+clean:
+	cd $(SRC) && rm -f parser_messages.ml version.ml
+
+# For finding the errors that should be in parser.messages but are not
+# because parser.mly has been updated and some new errors appeared.
+missing:
+	menhir --list-errors src/parser.mly > parser.messages_updated
+	menhir --compare-errors parser.messages_updated --compare-errors src/parser.messages --list-errors src/parser.mly
+
+
+# vim:ft=make

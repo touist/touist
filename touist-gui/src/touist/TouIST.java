@@ -109,7 +109,7 @@ public class TouIST {
 		}
 	}
 	public static void solvetouISTL(String path,int nb,boolean control,String pathSave) throws IOException, InterruptedException{
-		TranslatorSAT translator = new TranslatorSAT("compiler"+File.separatorChar+"touistc.native");
+		TranslatorSAT translator = new TranslatorSAT();
 		if(translator.translate(path))
 		{
 			// Minisat solver= new Minisat(translator.getDimacsFilePath(),nb,translator.getLiteralsMap());
@@ -194,7 +194,7 @@ public class TouIST {
 		//           Output(pathSave,str.toString());
 	}
 	public static void translate(String path,String nameCnf,String nameTable) throws IOException, InterruptedException{
-		TranslatorSAT translator = new TranslatorSAT("compiler"+File.separatorChar+"touistc.native");
+		TranslatorSAT translator = new TranslatorSAT();
 		//translator.setOutputFilePath(nameCnf);
 		//translator.setOutputTableFilePath(nameTable);
 		if(translator.translate(path))
@@ -217,8 +217,8 @@ public class TouIST {
 	}
 	public static void main(String[] args) throws IOException, InterruptedException, FileNotFoundException, SolverExecutionException {
 		String version = System.getProperty("java.version");
-		if(Float.valueOf(version.substring(0,3)) < 1.6) {
-			JOptionPane.showMessageDialog(null, "Your java version is "+version+" but version higher or equal to 1.6 is required");
+		if(Float.valueOf(version.substring(0,3)) < 1.7) {
+			JOptionPane.showMessageDialog(null, "Your java version is "+version+" but version higher or equal to 1.7 is required");
 			return;
 		}
 		if(args.length==0) {

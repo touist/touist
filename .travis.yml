@@ -30,12 +30,18 @@ addons:
     packages:
     - opam
 
+cache:
+  directories:
+    - $HOME/.opam
+
 before_install:
   # Install packages using brew on osx environment
+  - javac -version
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update && brew install opam ant; fi
   - opam init --auto-setup
   - eval `opam config env`
-  - opam install --yes ocamlfind menhir fileutils
+  - opam pin add -y minisat "https://github.com/maelvalais/ocaml-minisat.git#v0.0.2"
+  - opam install --yes ocamlfind menhir fileutils minisat
   # Put the dependency yices-smt2 to external/
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then file=yices-2.4.2-x86_64-apple-darwin15.2.0-static-gmp.tar.gz; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then file=yices-2.4.2-x86_64-unknown-linux-gnu-static-gmp.tar.gz; fi
@@ -51,8 +57,8 @@ install:
 
   # Build touist.jar (touist-gui)
   - cd ../touist-gui
-  - chmod ugo+x external/touistc  
-  - ant zip
+  - chmod ugo+x external/touistc
+  - ant -e zip
   - zip=$(ls | grep 'touist.*\.zip' | head -1) # The artifact's name for later use
   - echo $zip
 

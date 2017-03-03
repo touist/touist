@@ -1,22 +1,24 @@
 package gui.TranslatorLatex;
 
-terminal BEGIN,END,SETS,FORMULA,IF,THEN,ELSE;
+terminal END,DATA,IF,THEN,ELSE;
 terminal CONSTANT,SET,INT,FLOAT; 
 terminal BIGAND,BIGOR,IN,NOT,OR,AND,EMPTY,SUBSET,CARD,SQRT,MOD,WHITESPACE;
 terminal TRUE,FALSE,TOP,BOT,AFFECT,EQUAL,DIFFERENT,LESSER,LESSER_OR_EQUAL;
 terminal GREATER,GREATER_OR_EQUAL,BOOL_AND,BOOL_OR,IMPLIQUE,EQUIV,LPAR,RPAR;
 terminal ADD,MULTIPLY,SUBSTRACT,DIVIDE,LCRO,RCRO,DODOT,COMMA,TWODOT,XOR;
 terminal COMMENT,DOT,UNION,INTER,DIFF,WHEN,NEWLINE;
-terminal ATLEAST,EXACT,ATMOST;
+terminal ATLEAST,EXACT,ATMOST,LET;
 
 
 
 terminal String VAR;
+terminal String VARTUPLE;
 terminal String INTEGER;
 terminal String DOUBLENUMBER;
-terminal String IDENTIFIER;
+terminal String TERM;
+terminal String TERMTUPLE;
 terminal String ALPHA;
-terminal String ERROR_IDENTIFIER;
+terminal String ERROR_TERM;
 terminal String LATEX;
 
 non terminal String formule;
@@ -57,25 +59,27 @@ precedence left AFFECT;
 precedence left RPAR;
 precedence left LPAR;
 
-
-program ::= affect:a {: RESULT = new String(a); :}
-			|expr:f {: RESULT = new String(f); :}
-			|affect:a program:p {: RESULT = new String(a+"\\\\"+p); :}
-			|expr:f program:p {: RESULT = new String(f+"\\\\"+p); :}
-			|error
+ 
+program ::=   affect:a {: RESULT = new String(a); :}
+			| expr:f {: RESULT = new String(f); :}
+			| affect:a program:p {: RESULT = new String(a+"\\\\"+p); :}
+			| expr:f program:p  {: RESULT = new String(f+"\\\\"+p); :}
+			| DATA program:p {: RESULT = new String("\\dots \\\\"+p); :} 
+			| DATA {: RESULT = new String("\\dots \\\\"); :}
+			| error:e {: System.err.println(e); :}
 ;
 
 
 affect ::= var:v AFFECT expr:e {: RESULT = new String(v+"="+e);:}
 ;
 
-expr ::=IF expr:b THEN expr:e1 ELSE expr:e2  {: RESULT = new String("if\\;"+b+"\\;then\\;"+e1+"\\;else\\;"+e2);:}
+expr ::= IF expr:b THEN expr:e1 ELSE expr:e2  {: RESULT = new String("if\\;"+b+"\\;then\\;"+e1+"\\;else\\;"+e2);:}
 		|LPAR expr:b RPAR {: RESULT = new String("("+b+")");:}
 		|expr:s DOT LPAR expr:e RPAR {: RESULT = new String(s+".("+e+")");:}
 		| bool:b {: RESULT = b;:}
 		| var:v {: RESULT = v;:}
 		| expr:n IN expr:s {: RESULT = new String(n+" \\in "+s);:}
-		| IDENTIFIER:i IN expr:s {: RESULT = new String(i+" \\in "+s);:}
+		| TERM:i IN expr:s {: RESULT = new String(i+" \\in "+s);:}
 		| SUBSET LPAR expr:s1 COMMA expr:s2 RPAR {: RESULT = new String(s1+" \\subset "+s2);:}
 		| expr:n1 EQUAL expr:n2 {: RESULT = new String(n1+" == "+n2);:}
 		| expr:n1 DIFFERENT expr:n2 {: RESULT = new String(n1+" != "+n2);:}
@@ -92,8 +96,8 @@ expr ::=IF expr:b THEN expr:e1 ELSE expr:e2  {: RESULT = new String("if\\;"+b+"\
 		| expr:b1 EQUIV expr:b2 {: RESULT = new String(b1+" \\Leftrightarrow "+b2);:}
 		| TOP {: RESULT = new String("\\top");:}
 		| BOT {: RESULT = new String("\\bot");:}
-		| IDENTIFIER:i LPAR term_option:t RPAR {: RESULT = new String(i+"("+t+")");:}
-		| IDENTIFIER:i {: RESULT = new String(i);:}
+		| TERMTUPLE:i term_option:t RPAR {: RESULT = new String(i+"("+t+")");:}
+		| TERM:i {: RESULT = new String(i);:}
 		| expr:c1 AND expr:c2 {: RESULT = new String(c1+" \\wedge "+c2);:}
 		| expr:c1 OR expr:c2 {: RESULT = new String(c1+" \\vee "+c2);:}
 		| expr:c1 XOR expr:c2 {: RESULT = new String(c1+" \\oplus "+c2);:}
@@ -119,6 +123,8 @@ expr ::=IF expr:b THEN expr:e1 ELSE expr:e2  {: RESULT = new String("if\\;"+b+"\
 		| ATLEAST LPAR expr:s1 COMMA expr:s2 COMMA expr:s3 COMMA expr:s4 RPAR  {: RESULT = new String("(\\geqslant_{"+s2+" \\in "+s3+"}^{"+s1+"}"+s4+")");:}
 		| EXACT LPAR expr:s1 COMMA expr:s2 COMMA expr:s3 COMMA expr:s4 RPAR  {: RESULT = new String("(=_{"+s2+" \\in "+s3+"}^{"+s1+"}"+s4+")");:}
 		| ATMOST LPAR expr:s1 COMMA expr:s2 COMMA expr:s3 COMMA expr:s4 RPAR  {: RESULT = new String("(\\leqslant_{"+s2+" \\in "+s3+"}^{"+s1+"}"+s4+")");:}
+		| LET expr:s1 AFFECT expr:s2 TWODOT expr:s3  {: RESULT = new String(s1+"="+s2+"\\\\"+s3);:}
+		
 ;
 
 
@@ -137,7 +143,7 @@ set_decl ::= atom:a {: RESULT = a;:}
 
 
 			
-term_option ::= IDENTIFIER:i {: RESULT = new String(i);:}
+term_option ::= TERM:i {: RESULT = new String(i);:}
 				| expr:e {: RESULT = e;:}
 				| expr:e COMMA term_option:t {: RESULT = new String(e+","+t);:}
 ;
@@ -149,10 +155,10 @@ big_body ::= var_list:v IN set_list:s WHEN expr:b TWODOT expr:e END
 ;
 
 var ::= VAR:v {: RESULT = new String("\\textbf{"+v+"}");:}
-		|VAR:v LPAR term_option:t RPAR {: RESULT = new String("\\textbf{"+v+"}("+t+")"); :}
-		|VAR:v LPAR IDENTIFIER:i RPAR {: RESULT = new String("\\textbf{"+v+"}("+i+")"); :}
+		|VARTUPLE:v term_option:t RPAR {: RESULT = new String("\\textbf{"+v+"}("+t+")"); :}
+		|VARTUPLE:v TERM:i RPAR {: RESULT = new String("\\textbf{"+v+"}("+i+")"); :}
 ;
-atom ::= IDENTIFIER:i {: RESULT = new String(i);:}
+atom ::= TERM:i {: RESULT = new String(i);:}
 		| bool:b {: RESULT = b;:}
 		| nb:n {: RESULT = n;:}
 ;

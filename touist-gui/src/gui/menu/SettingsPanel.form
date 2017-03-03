@@ -23,26 +23,26 @@
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="0" attributes="0">
-              <Component id="jTabbedPane1" min="-2" pref="391" max="-2" attributes="0"/>
+              <Component id="tabs" min="-2" pref="391" max="-2" attributes="0"/>
               <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
     <DimensionLayout dim="1">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Component id="jTabbedPane1" min="-2" pref="233" max="-2" attributes="0"/>
+          <Component id="tabs" min="-2" pref="233" max="-2" attributes="0"/>
       </Group>
     </DimensionLayout>
   </Layout>
   <SubComponents>
-    <Container class="javax.swing.JTabbedPane" name="jTabbedPane1">
+    <Container class="javax.swing.JTabbedPane" name="tabs">
       <AccessibilityProperties>
         <Property name="AccessibleContext.accessibleName" type="java.lang.String" value="General"/>
       </AccessibilityProperties>
 
       <Layout class="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout"/>
       <SubComponents>
-        <Container class="javax.swing.JPanel" name="jPanelGeneral">
+        <Container class="javax.swing.JPanel" name="generalSettings">
           <Constraints>
             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
               <JTabbedPaneConstraints tabName="General">
@@ -58,13 +58,13 @@
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Group type="102" attributes="0">
-                              <Component id="jLabelDefaultDirectory" min="-2" max="-2" attributes="0"/>
+                              <Component id="labelDefaultDirectory" min="-2" max="-2" attributes="0"/>
                               <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                           </Group>
                           <Group type="102" attributes="0">
-                              <Component id="jTextFieldPath" pref="279" max="32767" attributes="0"/>
+                              <Component id="pathDefaultDirectory" pref="284" max="32767" attributes="0"/>
                               <EmptySpace type="separate" max="-2" attributes="0"/>
-                              <Component id="jButtonChangeDirectory" min="-2" max="-2" attributes="0"/>
+                              <Component id="changeDefaultDirectory" min="-2" max="-2" attributes="0"/>
                           </Group>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
@@ -75,40 +75,40 @@
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" alignment="0" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="jLabelDefaultDirectory" min="-2" max="-2" attributes="0"/>
+                      <Component id="labelDefaultDirectory" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="3" attributes="0">
-                          <Component id="jTextFieldPath" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="jButtonChangeDirectory" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="pathDefaultDirectory" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="changeDefaultDirectory" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
-                      <EmptySpace pref="151" max="32767" attributes="0"/>
+                      <EmptySpace pref="162" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
           </Layout>
           <SubComponents>
-            <Component class="javax.swing.JLabel" name="jLabelDefaultDirectory">
+            <Component class="javax.swing.JLabel" name="labelDefaultDirectory">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Default directory"/>
               </Properties>
             </Component>
-            <Component class="javax.swing.JTextField" name="jTextFieldPath">
+            <Component class="javax.swing.JTextField" name="pathDefaultDirectory">
               <Properties>
                 <Property name="editable" type="boolean" value="false"/>
                 <Property name="text" type="java.lang.String" value="path"/>
               </Properties>
             </Component>
-            <Component class="javax.swing.JButton" name="jButtonChangeDirectory">
+            <Component class="javax.swing.JButton" name="changeDefaultDirectory">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Change"/>
               </Properties>
               <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButtonChangeDirectoryActionPerformed"/>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="changeDefaultDirectoryActionPerformed"/>
               </Events>
             </Component>
           </SubComponents>
         </Container>
-        <Container class="javax.swing.JPanel" name="jPanelSolver">
+        <Container class="javax.swing.JPanel" name="solverSettings">
           <Constraints>
             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
               <JTabbedPaneConstraints tabName="Solver">
@@ -126,15 +126,15 @@
                           <Group type="102" attributes="0">
                               <EmptySpace min="21" pref="21" max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
-                                  <Component id="jRadioButtonSMTLQFRDL" min="-2" max="-2" attributes="0"/>
-                                  <Component id="jRadioButtonSMTLQFLIA" min="-2" max="-2" attributes="0"/>
-                                  <Component id="jRadioButtonSMTLQFLRA" alignment="0" min="-2" max="-2" attributes="0"/>
-                                  <Component id="jRadioButtonSMTLQFIDL" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Component id="SMTLQFRDL" min="-2" max="-2" attributes="0"/>
+                                  <Component id="SMTLQFLIA" min="-2" max="-2" attributes="0"/>
+                                  <Component id="SMTLQFLRA" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Component id="SMTLQFIDL" alignment="0" min="-2" max="-2" attributes="0"/>
                               </Group>
                           </Group>
-                          <Component id="jRadioButtonSAT4J" alignment="0" min="-2" max="-2" attributes="0"/>
-                          <Component id="jRadioButtonYCES" alignment="0" min="-2" max="-2" attributes="0"/>
-                          <Component id="jLabelSolver" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="SAT4J" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="YCES" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="chooseSolverText" alignment="0" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace pref="264" max="32767" attributes="0"/>
                   </Group>
@@ -144,82 +144,82 @@
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" alignment="1" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="jLabelSolver" min="-2" max="-2" attributes="0"/>
+                      <Component id="chooseSolverText" min="-2" max="-2" attributes="0"/>
                       <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                      <Component id="jRadioButtonSAT4J" min="-2" max="-2" attributes="0"/>
+                      <Component id="SAT4J" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="jRadioButtonYCES" min="-2" max="-2" attributes="0"/>
+                      <Component id="YCES" min="-2" max="-2" attributes="0"/>
                       <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                      <Component id="jRadioButtonSMTLQFLRA" min="-2" max="-2" attributes="0"/>
+                      <Component id="SMTLQFLRA" min="-2" max="-2" attributes="0"/>
                       <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                      <Component id="jRadioButtonSMTLQFLIA" min="-2" max="-2" attributes="0"/>
+                      <Component id="SMTLQFLIA" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="jRadioButtonSMTLQFRDL" min="-2" max="-2" attributes="0"/>
+                      <Component id="SMTLQFRDL" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="jRadioButtonSMTLQFIDL" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace pref="29" max="32767" attributes="0"/>
+                      <Component id="SMTLQFIDL" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
           </Layout>
           <SubComponents>
-            <Component class="javax.swing.JRadioButton" name="jRadioButtonSAT4J">
+            <Component class="javax.swing.JRadioButton" name="SAT4J">
               <Properties>
                 <Property name="selected" type="boolean" value="true"/>
                 <Property name="text" type="java.lang.String" value="SAT4J"/>
               </Properties>
               <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jRadioButtonSAT4JActionPerformed"/>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="SAT4JActionPerformed"/>
               </Events>
             </Component>
-            <Component class="javax.swing.JRadioButton" name="jRadioButtonYCES">
+            <Component class="javax.swing.JRadioButton" name="YCES">
               <Properties>
                 <Property name="text" type="java.lang.String" value="YCES"/>
               </Properties>
               <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jRadioButtonYCESActionPerformed"/>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="YCESActionPerformed"/>
               </Events>
             </Component>
-            <Component class="javax.swing.JRadioButton" name="jRadioButtonSMTLQFLRA">
+            <Component class="javax.swing.JRadioButton" name="SMTLQFLRA">
               <Properties>
                 <Property name="text" type="java.lang.String" value="SMT_QF_LRA"/>
               </Properties>
               <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jRadioButtonSMTLQFLRAActionPerformed"/>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="SMTLQFLRAActionPerformed"/>
               </Events>
             </Component>
-            <Component class="javax.swing.JRadioButton" name="jRadioButtonSMTLQFLIA">
+            <Component class="javax.swing.JRadioButton" name="SMTLQFLIA">
               <Properties>
                 <Property name="text" type="java.lang.String" value="SMT_QF_LIA"/>
               </Properties>
               <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jRadioButtonSMTLQFLIAActionPerformed"/>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="SMTLQFLIAActionPerformed"/>
               </Events>
             </Component>
-            <Component class="javax.swing.JRadioButton" name="jRadioButtonSMTLQFRDL">
+            <Component class="javax.swing.JRadioButton" name="SMTLQFRDL">
               <Properties>
                 <Property name="text" type="java.lang.String" value="SMT_QF_RDL"/>
               </Properties>
               <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jRadioButtonSMTLQFRDLActionPerformed"/>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="SMTLQFRDLActionPerformed"/>
               </Events>
             </Component>
-            <Component class="javax.swing.JRadioButton" name="jRadioButtonSMTLQFIDL">
+            <Component class="javax.swing.JRadioButton" name="SMTLQFIDL">
               <Properties>
                 <Property name="text" type="java.lang.String" value="SMT_QF_IDL"/>
               </Properties>
               <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jRadioButtonSMTLQFIDLActionPerformed"/>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="SMTLQFIDLActionPerformed"/>
               </Events>
             </Component>
-            <Component class="javax.swing.JLabel" name="jLabelSolver">
+            <Component class="javax.swing.JLabel" name="chooseSolverText">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Choose your solver"/>
               </Properties>
             </Component>
           </SubComponents>
         </Container>
-        <Container class="javax.swing.JPanel" name="jPanelLanguage">
+        <Container class="javax.swing.JPanel" name="languageSettings">
           <Constraints>
             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
               <JTabbedPaneConstraints tabName="Language">
@@ -233,10 +233,10 @@
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" alignment="0" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="jLabelLanguage" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace pref="78" max="32767" attributes="0"/>
-                      <Component id="jComboBoxLanguages" min="-2" pref="128" max="-2" attributes="0"/>
-                      <EmptySpace pref="123" max="32767" attributes="0"/>
+                      <Component id="chooseLanguageText" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace pref="83" max="32767" attributes="0"/>
+                      <Component id="choiceLanguage" min="-2" pref="128" max="-2" attributes="0"/>
+                      <EmptySpace pref="128" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -245,21 +245,21 @@
                   <Group type="102" alignment="0" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="3" attributes="0">
-                          <Component id="jLabelLanguage" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="jComboBoxLanguages" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="chooseLanguageText" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="choiceLanguage" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
-                      <EmptySpace pref="174" max="32767" attributes="0"/>
+                      <EmptySpace pref="187" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
           </Layout>
           <SubComponents>
-            <Component class="javax.swing.JLabel" name="jLabelLanguage">
+            <Component class="javax.swing.JLabel" name="chooseLanguageText">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Language"/>
               </Properties>
             </Component>
-            <Component class="javax.swing.JComboBox" name="jComboBoxLanguages">
+            <Component class="javax.swing.JComboBox" name="choiceLanguage">
               <Properties>
                 <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
                   <StringArray count="4">
@@ -271,7 +271,7 @@
                 </Property>
               </Properties>
               <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jComboBoxLanguagesActionPerformed"/>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="choiceLanguageActionPerformed"/>
               </Events>
             </Component>
           </SubComponents>

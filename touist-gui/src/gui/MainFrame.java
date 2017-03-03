@@ -38,7 +38,7 @@ import java.util.Locale;
 import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 
-import solution.BaseDeClauses;
+import solution.TextInEditor;
 import solution.ModelList;
 import solution.Solver;
 import touist.TouistProperties;
@@ -51,9 +51,9 @@ import translation.TranslatorSMT;
  */
 public class MainFrame extends javax.swing.JFrame {
     private TouistProperties properties = new TouistProperties();
-    private BaseDeClauses clause = new BaseDeClauses();
-    private TranslatorSAT translatorSAT = new TranslatorSAT("external"+File.separatorChar+"touistc");
-    private TranslatorSMT translatorSMT = new TranslatorSMT("external"+File.separatorChar+"touistc");
+    private TextInEditor clause = new TextInEditor();
+    private TranslatorSAT translatorSAT = new TranslatorSAT();
+    private TranslatorSMT translatorSMT = new TranslatorSMT();
     private Solver solver;
     private ModelList models;
     private SolverSelection solverSelection = new SolverSelection();
@@ -88,7 +88,7 @@ public class MainFrame extends javax.swing.JFrame {
      * Creates new form MainFrame
      */
     public MainFrame() {
-        lang = new Lang(Locale.ENGLISH);
+        lang = new Lang(Locale.getDefault());
         
     	cards = new JPanel(new CardLayout());
     	editorPanel1 = new ParentEditionPanel();
@@ -124,7 +124,7 @@ public class MainFrame extends javax.swing.JFrame {
         editionMenuBar.updateLanguage();
     }
 
-    public BaseDeClauses getClause() {
+    public TextInEditor getTextInEditor() {
         return clause;
     }
 

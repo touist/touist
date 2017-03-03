@@ -1,14 +1,14 @@
 (*
  * parser.mly: the defition of the menhir incremental parser (using --table --inspection)
  *
- * Project TouIST, 2015. Easily formalize and solve real-world sized problems
- * using propositional logic and linear theory of reals with a nice language and GUI.
+ * Project TouIST, 2015. Easily formalize and solve real_world sized problems
+ * using propal logic and linear theory of reals with a nice language and GUI.
  *
  * https://github.com/touist/touist
  *
  * Copyright Institut de Recherche en Informatique de Toulouse, France
- * This program and the accompanying materials are made available 
- * under the terms of the GNU Lesser General Public License (LGPL) 
+ * This program and the accompanying materials are made available
+ * under the terms of the GNU Lesser General Public License (LGPL)
  * version 2.1 which accompanies this distribution, and is available at
  * http://www.gnu.org/licenses/lgpl-2.1.html
  *)
@@ -22,7 +22,9 @@
 %token <bool> BOOL
 %token <string> VAR
 %token <string> TERM
-%token ADD SUB MUL DIV MOD SQRT TOINT TOFLOAT
+%token <string> TUPLE
+%token <string> VARTUPLE
+%token ADD SUB MUL DIV MOD SQRT TOINT TOFLOAT ABS
 %token AND OR XOR IMPLIES EQUIV NOT
 %token EQUAL NOTEQUAL LE LT GE GT
 %token IN WHEN
@@ -35,59 +37,70 @@
 %token EXACT ATLEAST ATMOST
 %token TOP BOTTOM
 %token BIGAND BIGOR
-%token BEGIN SETS FORMULA
+%token DATA
+%token LET
 %token EOF
-
-%start <Syntax.prog> prog
-
 
 
 (* The following lines define in which order the tokens should
  * be reduced, e.g. it tells the parser to reduce * before +.
  *
  * Note that the precedence rules apply from bottom to top:
- * the top element will be the less prioritized   
+ * the top element will be the less prioritized
  *
  * %left: e.g: a PLUS b TIMES -> a PLUS b
- *   The precedence rule applies from left to right, 
- *       
- * %right: 
+ *   The precedence rule applies from left to right,
+ *
+ * %right:
  *   The precedence rule applies from right to left
  *
  * %noassoc, e.g. NOT(a)
  *   The precedence rule has no direction; this often
  *   applies for unary oparators *)
 
-%right EQUIV IMPLIES (* Lesser priority on precedence *)
+%nonassoc low_precedence (* Lesser priority on precedence *)
+%right EQUIV IMPLIES
 %left OR
 %left AND
 %left XOR
+(*%left LE GE LT GT EQUAL NOTEQUAL*)
 %left NOT
-%left IN
-%left LE GE LT GT EQUAL NOTEQUAL
-%left SUB
-%left ADD
+(* neg_prec = preced. of 'SUB x' has a lesser preced. than 'x SUB x' *)
+(* sub_prec = predecence of 'x SUB x' *)
+%left ADD SUB sub_prec neg_prec
 %left MUL DIV
-%left MOD
-%nonassoc high_precedence (* Highest priority on precedence *)
+%left MOD (* Highest priority on precedence *)
 
-(* This wierd [high_precedence] is not a TERMINAL, not a 
- * production rule... It is an arbitrary name that allows 
- * to give precedence indications on production rules. 
+(* This wierd [high_precedence] is not a TERMINAL, not a
+ * production rule... It is an arbitrary name that allows
+ * to give precedence indications on production rules.
  * Ex:
- *     clause: SUB clause %prec high_precedence
+ *     formula: SUB formula %prec high_precedence
  * will give this production rule a predecence given by
- * where the 
- *     %nonassoc high_precedence 
+ * where the
+ *     %nonassoc high_precedence
  * is written. Here, we want this production rule to be
  * reduced before any other one because it is the "minus" sign,
  * ex:
  *     -3.905
- * and, like 
+ * and, like
  *     not(a)
  * the minus sign MUST be reduced as fast as possible. *)
 
-%on_error_reduce separated_nonempty_list(COMMA,term_or_exp)
+%on_error_reduce comma_list(any_set)
+%on_error_reduce comma_list(set_int)
+%on_error_reduce comma_list(set_float)
+%on_error_reduce comma_list(set_prop)
+
+%on_error_reduce comma_list(int)
+%on_error_reduce comma_list(float)
+%on_error_reduce comma_list(prop)
+%on_error_reduce comma_list(any_atom)
+
+%on_error_reduce comma_list(indices)
+
+%on_error_reduce comma_list(var)
+
 (* %on_error_reduce is a nice "trick" to display a a more accurate
    context when an error is handled. For example, with this text:
 
@@ -105,150 +118,214 @@
      $0 = end
      $1 = c
      $2 = ,    etc...
-   because we were trying to reduce "b (RPAREN | COMMA)". 
-   There is no way to display the "a" which was the actuall important 
+   because we were trying to reduce "b (RPAREN | COMMA)".
+   There is no way to display the "a" which was the actuall important
    information because we don't actually know on which $i it is.
-   
-   %on_error_reduce will actually tell the parser not to fail immediately 
+
+   %on_error_reduce will actually tell the parser not to fail immediately
    and let the "caller rule" that was calling (1). Here, (1) was called
-   twice recursively. The failing rule will hence be 
+   twice recursively. The failing rule will hence be
 
      TERM LPAREN separated_nonempty_list(COMMA,term_or_exp) . RPAREN (2)
-     
+
    Hence we are sure that $1 will give b,c and $3 will give "a" !
 *)
 
+(* The two entry points of our parser *)
+%start <Syntax.ast> touist_simple, touist_smt
 
 %% (* Everthing below that mark is expected to be a production rule *)
    (* Note that VAR { $0 } is equivalent to v=VAR { v } *)
 
-(* [prog] is the entry point of the parser *)
-prog:
-  | BEGIN SETS affect* END SETS BEGIN FORMULA clause* END FORMULA EOF
-    { Prog (Some $3, $8) }
-  | BEGIN FORMULA clause* END FORMULA EOF
-    { Prog (None, $3) }
+comma_list(T):
+  | x=T { x::[] }
+  | x=T COMMA l=comma_list(T) { x::l }
 
-var_decl:
-  | VAR { ($1, None) }
-  | VAR LPAREN separated_nonempty_list(COMMA, exp) RPAREN { ($1, Some $3) }
-  | VAR LPAREN separated_nonempty_list(COMMA, TERM) RPAREN
-    { ($1, Some (List.map (fun e -> Clause (Term (e,None))) $3)) } 
-
-affect:
-  | var_decl AFFECT exp { Affect ($1, $3) }
-
-exp:
-  (* This parametrized rule allows to "regroup" every "clause OPERATOR clause" 
-    under the same rule. I refactored the explicit rules to that form  to try to
-    have clearer messages in parser.messages *)
-  | LPAREN exp RPAREN { $2 }
-  | INT   { Int   $1 }
-  | FLOAT { Float $1 }
-  | BOOL  { Bool  $1 }
-  | var_decl { Var      $1 }
-  | set_decl { Set_decl $1 }
-  | SUB exp { Neg $2 } %prec high_precedence
-  | exp ADD exp { Add ($1, $3) }
-  | exp SUB exp { Sub ($1, $3) }
-  | exp MUL exp { Mul ($1, $3) }
-  | exp DIV exp { Div ($1, $3) }
-  | exp MOD exp { Mod ($1, $3) }
-  | SQRT    LPAREN exp RPAREN { Sqrt     $3 }
-  | TOINT   LPAREN exp RPAREN { To_int   $3 }
-  | TOFLOAT LPAREN exp RPAREN { To_float $3 }
-  | exp AND     exp { And     ($1, $3) }
-  | exp OR      exp { Or      ($1, $3) }
-  | exp XOR     exp { Xor     ($1, $3) }
-  | exp IMPLIES exp { Implies ($1, $3) }
-  | exp EQUIV   exp { Equiv   ($1, $3) }
-  | NOT exp { Not $2 }
-  | exp EQUAL    exp { Equal            ($1, $3) }
-  | exp NOTEQUAL exp { Not_equal        ($1, $3) }
-  | exp LT       exp { Lesser_than      ($1, $3) }
-  | exp LE       exp { Lesser_or_equal  ($1, $3) }
-  | exp GT       exp { Greater_than     ($1, $3) }
-  | exp GE       exp { Greater_or_equal ($1, $3) }
-  | exp IN exp { In ($1, $3) }
-  | UNION LPAREN exp COMMA exp RPAREN { Union ($3, $5) }
-  | INTER LPAREN exp COMMA exp RPAREN { Inter ($3, $5) }
-  | DIFF  LPAREN exp COMMA exp RPAREN { Diff  ($3, $5) }
-  | CARD  LPAREN exp RPAREN { Card  $3 }
-  | EMPTY LPAREN exp RPAREN { Empty $3 }
-  | SUBSET LPAREN exp COMMA exp RPAREN { Subset ($3, $5) }
-  | LBRACK exp RANGE exp RBRACK { Range ($2, $4) }
-  | IF exp THEN exp ELSE exp END { If ($2, $4, $6) }
+(* [touist_simple] is the entry point of the parser in sat mode *)
+touist_simple:
+  | a=global_affect+ f=formula_simple+ EOF { Touist_code (f,Some a) }
+  | f=formula_simple+ DATA a=global_affect+ EOF { Touist_code (f,Some a) }
+  | f=formula_simple+ EOF { Touist_code (f,None) }
 
 
-clause:
-  (* Conflict between two rules when reading
-   *           "TERM LPAREN exp RPAREN"
-   *  clause ->      LPAREN exp RPAREN  <- mandatory for specifing order of clauses
-   *  clause -> TERM LPAREN exp RPAREN 
-   * are conflicting with each other *)
-  | LPAREN clause RPAREN { $2 }
-  | INT   { CInt   $1 }
-  | FLOAT { CFloat $1 }
+(* [touist_smt] is the entry point of the parser in smt mode *)
+touist_smt:
+  | a=global_affect+ f=formula_smt+ EOF { Touist_code (f, Some a) }
+  | f=formula_smt+ DATA a=global_affect+ EOF { Touist_code (f,Some a) }
+  | f=formula_smt+ EOF { Touist_code (f,None) }
 
-  (* SUB clause makes it really "hard" to solve. Just one example;
-     On the first line, the actual list of tokens. On the two following
-     lines, two reductions conflicting:
-               "clause1 SUB clause2 XOR clause3 ..."
-      clause -> clause1 SUB clause2        => ((clause1 SUB clause2) XOR clause3)
-      clause ->         SUB clause2        => (clause 1)((SUB clause2) XOR clause3)
-   *)
-  | SUB clause { CNeg $2 } %prec high_precedence
-  | clause ADD      clause { CAdd              ($1, $3) }
-  | clause SUB      clause { CSub              ($1, $3) }
-  | clause MUL      clause { CMul              ($1, $3) }
-  | clause DIV      clause { CDiv              ($1, $3) }
-  | clause EQUAL    clause { CEqual            ($1, $3) }
-  | clause NOTEQUAL clause { CNot_equal        ($1, $3) }
-  | clause LT       clause { CLesser_than      ($1, $3) }
-  | clause LE       clause { CLesser_or_equal  ($1, $3) }
-  | clause GT       clause { CGreater_than     ($1, $3) }
-  | clause GE       clause { CGreater_or_equal ($1, $3) }
-  | var_decl { CVar $1 }
-  | TOP    { Top    }
+(* Used in tuple expression; see tuple_variable and tuple_term *)
+indices: i=int | i=float | i=prop { i }
+
+(* a tuple_term is of the form abc(1,d,3): the indices can be *)
+prop:
+  | v=var { v }
+  | t=TERM { Prop t } (* simple_term *)
+  | t=TUPLE (*LPAREN*) l=comma_list(indices) RPAREN (* tuple_term *)
+    { UnexpProp (t, Some l) }
+
+(* For now, we don't check the type of the variables during the parsing.
+   This means that all variables are untyped during parsing.
+   The start and end positions of the current rule are $startpos and $endpos.
+   These two placeholders can only be used in a semantic action, not in the
+   %{ %} header. *)
+var:
+  | v=VAR { let loc = ($startpos,$endpos) in Var (v,None,loc) }
+  | v=VARTUPLE (*LPAREN*) l=comma_list(indices) RPAREN (* tuple_variable *)
+    { let loc = ($startpos,$endpos) in Var (v,Some l,loc) }
+
+(* a global variable is a variable used in the 'data' block
+  for defining sets and constants; it can be of the form of a
+  tuple_variable, i.e. with prefix+indices: '$i(1,a,d)'.
+  The indices can be either expression or term *)
+global_affect:
+  | v=var AFFECT e=global_affect_types { Affect (v,e) }
+
+(* WARNING: any_set and any_atom should only be used in specific places,e.g.,
+       formula_smt: equality(any_atom)
+   because SMT can handle things like '(x + 2) > 3.1', meaning that the
+   types are mixed. *)
+global_affect_types: x=any_set | x=any_atom | x=bool { x }
+
+any_atom: x=prop | x=num { x }
+
+if_statement(T): IF cond=bool THEN v1=T ELSE v2=T END { If (cond,v1,v2) }
+
+in_parenthesis(T): LPAREN x=T RPAREN { x }
+
+num: x=float | x=int {x}
+
+num_operations_standard(T):
+  | x=T    ADD     y=T  { Add (x,y) }
+  | x=T    SUB     y=T  { Sub (x,y) } %prec sub_prec
+  |        SUB     x=T  { Neg x     } %prec neg_prec
+  | x=T    MUL     y=T  { Mul (x,y) }
+  | x=T    DIV     y=T  { Div (x,y) }
+
+num_operations_others(T):
+  | x=T    MOD     y=T  { Mod (x,y) }
+  | ABS (*LPAREN*) x=T RPAREN { Abs x     }
+
+int:
+  | x=INT { Int x }
+  | x=var
+  | x=in_parenthesis(int)
+  | x=num_operations_standard(int)
+  | x=num_operations_others(int)
+  | x=if_statement(int)
+  | TOINT (*LPAREN*) x=num RPAREN { To_int x }
+  | CARD  (*LPAREN*) s=any_set RPAREN { Card s }
+
+float:
+  | x=FLOAT { Float x }
+  | x=var
+  | x=in_parenthesis(float)
+  | x=num_operations_standard(float)
+  | x=num_operations_others(float)
+  | x=if_statement(float) { x }
+  | SQRT    (*LPAREN*) x=float RPAREN { Sqrt x }
+  | TOFLOAT (*LPAREN*) x=num RPAREN { To_float x }
+  
+(* bool is a boolean computed before solving;
+   typically in conditions like 'when' and 'if' *)
+bool:
+  | b=BOOL { Bool b }
+  | b=in_parenthesis(bool)
+  | b=connectors(bool)
+  | b=equality(int) | b=equality(float) | b=equality(prop)
+  | b=order(int) | b=order(float)
+  | b=if_statement(bool)
+  | b=subset_statement
+  | b=in_operator { b }
+  | EMPTY  (*LPAREN*) s=any_set RPAREN { Empty s }
+  | b=var { b }
+
+subset_statement:
+  | SUBSET (*LPAREN*) s1=set_int   COMMA s2=set_int   RPAREN { Subset (s1,s2) }
+  | SUBSET (*LPAREN*) s1=set_float COMMA s2=set_float RPAREN { Subset (s1,s2) }
+  | SUBSET (*LPAREN*) s1=set_prop  COMMA s2=set_prop  RPAREN { Subset (s1,s2) }
+
+in_operator:
+  | x=int   IN s=set_int
+  | x=float IN s=set_float
+  | x=prop  IN s=set_prop  { In (x,s) }
+
+
+equality(T):
+  | x=T  EQUAL    y=T   { Equal (x,y) }
+  | x=T  NOTEQUAL y=T   { Not_equal (x,y) }
+
+order(T):
+  | x=T   LT      y=T   { Lesser_than (x,y) }
+  | x=T   LE      y=T   { Lesser_or_equal (x,y) }
+  | x=T   GT      y=T   { Greater_than (x,y) }
+  | x=T   GE      y=T   { Greater_or_equal (x,y) }
+
+connectors(T):
+  | NOT           x=T   { Not x}
+  | x=T  AND      y=T   { And (x,y) }
+  | x=T  OR       y=T   { Or (x,y) }
+  | x=T  XOR      y=T   { Xor (x,y) }
+  | x=T  IMPLIES  y=T   { Implies (x,y) }
+  | x=T  EQUIV    y=T   { Equiv (x,y) }
+
+set_decl_range(T): LBRACK s1=T RANGE s2=T RBRACK { Range (s1,s2) }
+set_decl_explicit(T): LBRACK l=comma_list(T) RBRACK { Set_decl l }
+set_empty: LBRACK RBRACK { Set_decl [] }
+  
+set_operation(T):
+  | s=if_statement(T) { s }
+  | UNION (*LPAREN*) s1=T COMMA s2=T RPAREN { Union (s1,s2) }
+  | INTER (*LPAREN*) s1=T COMMA s2=T RPAREN { Inter (s1,s2) }
+  | DIFF  (*LPAREN*) s1=T COMMA s2=T RPAREN { Diff (s1,s2) }
+
+set_float:
+  | x=set_decl_range(float)
+  | x=set_decl_explicit(float)
+  | x=set_operation(set_float)
+  | x=var { x }
+
+set_int:
+  | x=set_decl_range(int)
+  | x=set_decl_explicit(int)
+  | x=set_operation(set_int)
+  | x=var { x }
+
+set_prop:
+  | x=set_decl_explicit(prop)
+  | x=set_operation(set_prop)
+  | x=var { x }
+
+any_set:
+  | s=set_float | s=set_int | s=set_prop | s=set_empty { s }
+
+formula(F):
+  | f=in_parenthesis(F)
+  | f=if_statement(F)
+  | f=connectors(F)
+  | f=generalized_connectors(F) (* are only on formulas! No need for parametrization *)
+  | f=let_affect(int,F) | f=let_affect(float,F) | f=let_affect(prop,F)
+  | f=prop { f }
+  | TOP { Top }
   | BOTTOM { Bottom }
-  | TERM   { Term ($1, None) }
-  (* There is a conflict between reducing TERM (the one just above)
-     and shifting before reducing, looking ahead for a LPAREN
-     Ambiguous example:   "a(b)"
-     We don't know if it should be understood as
-        ( a ) ( b )   => two separate clauses
-        a(b)          => a tuple-term with b as the tuple index *)
-  | TERM LPAREN separated_nonempty_list(COMMA, term_or_exp) RPAREN
-      { Term ($1, Some $3) }
-  | NOT clause { CNot $2 }
-  | clause AND     clause { CAnd     ($1, $3) }
-  | clause OR      clause { COr      ($1, $3) }
-  | clause XOR     clause { CXor     ($1, $3) }
-  | clause IMPLIES clause { CImplies ($1, $3) }
-  | clause EQUIV   clause { CEquiv   ($1, $3) }
-  | EXACT   LPAREN exp COMMA exp RPAREN { Exact   ($3, $5) }
-  | ATLEAST LPAREN exp COMMA exp RPAREN { Atleast ($3, $5) }
-  | ATMOST  LPAREN exp COMMA exp RPAREN { Atmost  ($3, $5) }
-  | BIGAND separated_nonempty_list(COMMA,VAR) IN separated_nonempty_list(COMMA,exp) COLON clause END
-  { Bigand ($2, $4, None, $6) }
-  | BIGAND separated_nonempty_list(COMMA,VAR) IN separated_nonempty_list(COMMA,exp) WHEN exp COLON clause END
-  { Bigand ($2, $4, Some $6, $8) }
-  | BIGOR separated_nonempty_list(COMMA,VAR) IN separated_nonempty_list(COMMA,exp) COLON clause END
-  { Bigor ($2, $4, None, $6) }
-  | BIGOR separated_nonempty_list(COMMA,VAR) IN separated_nonempty_list(COMMA,exp) WHEN exp COLON clause END
-  { Bigor ($2, $4, Some $6, $8) }
-  | IF exp THEN clause ELSE clause END { CIf ($2, $4, $6) }
 
-(* Warning: the two rules
-     var_decl -> TERM 
-     exp -> var_decl
-   are doing the same thing as term_or_exp *)
-term_or_exp:
-  | TERM { Clause (Term ($1,None)) }
-  | exp { $1 }
+let_affect(T,F): LET var=var AFFECT content=T COLON form=F { Let (var,content,form) } %prec low_precedence
 
-set_decl:
-  | LBRACK RBRACK { [] } 
-  | LBRACK separated_nonempty_list(COMMA, exp) RBRACK { $2 }
-  | LBRACK separated_nonempty_list(COMMA, TERM) RBRACK
-  { List.map (fun x -> Clause (Term (x,None))) $2 }
+formula_simple:
+  | f=formula(formula_simple) { f }
+
+formula_smt:
+  | f=formula(formula_smt)
+  | f=equality(any_atom) (* can be '1 != prop' for example *)
+  | f=order(any_atom) { f }
+
+generalized_connectors(F):
+  | BIGAND v=comma_list(var) IN s=comma_list(any_set) c=when_cond? COLON f=F END { Bigand (v,s,c,f) }
+  | BIGOR  v=comma_list(var) IN s=comma_list(any_set) c=when_cond? COLON f=F END { Bigor  (v,s,c,f) }
+  | EXACT (*LPAREN*)   x=int COMMA s=set_prop RPAREN { Exact   (x,s) }
+  | ATLEAST (*LPAREN*) x=int COMMA s=set_prop RPAREN { Atleast (x,s) }
+  | ATMOST (*LPAREN*)  x=int COMMA s=set_prop RPAREN { Atmost  (x,s) }
+
+when_cond: WHEN x=bool { x }
+
+
