@@ -27,6 +27,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import javax.swing.JOptionPane;
+import javax.swing.UIManager;
 
 import gui.MainFrame;
 import solution.SolverExecutionException;
@@ -47,6 +48,23 @@ public class TouIST {
 			JOptionPane.showMessageDialog(null, "Your java version is "+version+" but version higher or equal to 1.7 is required");
 			return;
 		}
+		// Better user interface integration with macOS
+		if(System.getProperty("os.name").toLowerCase().contains("mac")) {
+			System.setProperty("apple.laf.useScreenMenuBar", "true");
+			System.setProperty("com.apple.mrj.application.apple.menu.about.name", "Touist");
+			try {
+				UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+			} catch (Exception e) {}
+		}
+		if(args.length==0) {
+			System.out.println("main(): running app from folder '"
+					+ System.getProperty("user.dir")+"'");
+			MainFrame frame = new MainFrame();
+			frame.setVisible(true);
+		}
+		else{
+			String path="";
+			File f;
 
 		System.out.println("main(): running app from folder '"
 				+ System.getProperty("user.dir")+"'");
