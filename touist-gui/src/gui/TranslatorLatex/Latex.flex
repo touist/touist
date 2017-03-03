@@ -83,8 +83,11 @@ Comment     = ";;"[^\n]*
 	"Bot"			{ return symbol(sym.BOT); }
 
 
+	{Var}"("        { return symbol(sym.VARTUPLE,new String(yytext().substring(1).replace("_", "\\_"))); }
    	{Var}			{ return symbol(sym.VAR,new String(yytext().substring(1).replace("_", "\\_"))); }
-
+   	
+   	{Identifier}"("			{ return symbol(sym.TERMTUPLE,new String(yytext().replace("_", "\\_"))); }
+   	{Identifier}			{ return symbol(sym.TERM,new String(yytext().replace("_", "\\_"))); }
 
    	"."				{ return symbol(sym.DOT); }
    	"="				{ return symbol(sym.AFFECT); }
@@ -121,12 +124,10 @@ Comment     = ";;"[^\n]*
    	{Comment}			{ return symbol(sym.COMMENT,new String(yytext())); }
 
 
-	{Identifier}			{ return symbol(sym.IDENTIFIER,new String(yytext().replace("_", "\\_"))); }
-
 
  	<<EOF>>						{ return symbol(sym.EOF); }
 	/* Catch any other (unhandled) characters. */   
 
 	{Alpha}				{ return symbol(sym.ALPHA,new String(yytext())); }
    
-    .					{ return symbol(sym.ERROR_IDENTIFIER,new String(yytext())); }
+    .					{ return symbol(sym.ERROR_TERM,new String(yytext())); }

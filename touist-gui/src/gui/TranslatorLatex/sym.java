@@ -15,18 +15,20 @@ public class sym {
   public static final int SQRT = 20;
   public static final int GREATER_OR_EQUAL = 33;
   public static final int EMPTY = 17;
+  public static final int ERROR_TERM = 68;
   public static final int COMMENT = 50;
   public static final int XOR = 49;
-  public static final int INTEGER = 62;
+  public static final int INTEGER = 63;
   public static final int GREATER = 32;
   public static final int INT = 9;
+  public static final int TERMTUPLE = 66;
   public static final int LESSER_OR_EQUAL = 31;
   public static final int DODOT = 46;
   public static final int WHITESPACE = 22;
-  public static final int ERROR_IDENTIFIER = 66;
   public static final int DATA = 3;
   public static final int NOT = 14;
   public static final int AND = 16;
+  public static final int VARTUPLE = 62;
   public static final int RCRO = 45;
   public static final int RPAR = 39;
   public static final int IN = 13;
@@ -50,7 +52,7 @@ public class sym {
   public static final int ATLEAST = 57;
   public static final int NEWLINE = 56;
   public static final int ADD = 40;
-  public static final int DOUBLENUMBER = 63;
+  public static final int DOUBLENUMBER = 64;
   public static final int MOD = 21;
   public static final int CONSTANT = 7;
   public static final int BOOL_AND = 34;
@@ -58,7 +60,7 @@ public class sym {
   public static final int SUBSET = 18;
   public static final int BOT = 26;
   public static final int UNION = 52;
-  public static final int LATEX = 67;
+  public static final int LATEX = 69;
   public static final int ELSE = 6;
   public static final int LET = 60;
   public static final int EQUIV = 37;
@@ -70,12 +72,12 @@ public class sym {
   public static final int BOOL_OR = 35;
   public static final int DIFF = 54;
   public static final int FALSE = 24;
+  public static final int TERM = 65;
   public static final int INTER = 53;
-  public static final int ALPHA = 65;
+  public static final int ALPHA = 67;
   public static final int VAR = 61;
   public static final int EXACT = 58;
   public static final int SET = 8;
-  public static final int IDENTIFIER = 64;
   public static final String[] terminalNames = new String[] {
   "EOF",
   "error",
@@ -139,11 +141,13 @@ public class sym {
   "ATMOST",
   "LET",
   "VAR",
+  "VARTUPLE",
   "INTEGER",
   "DOUBLENUMBER",
-  "IDENTIFIER",
+  "TERM",
+  "TERMTUPLE",
   "ALPHA",
-  "ERROR_IDENTIFIER",
+  "ERROR_TERM",
   "LATEX"
   };
 }
