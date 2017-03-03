@@ -1,3 +1,8 @@
+v2.1.4
+  - gui:
+    - when clicking on the Solve button, it turns into 'Translating' as long
+      as `touistc` is translating, and then 'Solving' when the SAT solver is
+      running. Also removed the alert message when stopping the solver.
 v2.1.3
   - gui:
     - fixed a bug in the latex viwer that was removing the carriage return
