@@ -56,18 +56,8 @@ public class TouIST {
 				UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 			} catch (Exception e) {}
 		}
-		if(args.length==0) {
-			System.out.println("main(): running app from folder '"
-					+ System.getProperty("user.dir")+"'");
-			MainFrame frame = new MainFrame();
-			frame.setVisible(true);
-		}
-		else{
-			String path="";
-			File f;
 
-		System.out.println("main(): running app from folder '"
-				+ System.getProperty("user.dir")+"'");
+		System.out.println("main(): running app from folder '"+ System.getProperty("user.dir")+"'");
 		MainFrame frame = new MainFrame();
 		frame.setVisible(true);
 	}
