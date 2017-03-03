@@ -323,7 +323,22 @@ and eval_ast (ast:ast) (env:env) =
       | Set (SSet a), Set (SSet b) -> Bool (PropSet.equal a b)
       | x',y' -> raise_type_error2 ast x x' y y' "an int, float, prop or set"
     end
-  | Not_equal (x,y) -> eval_ast (Not (Equal (x,y))) env
+  (* For Not_equal, we could simply return:
+       'eval_ast (Not (Equal (x,y)))'
+     but in case of type error between x and y, the user would be seeing
+       '==' instead of '!='. Because of that, we repeat the previous 'Equal
+     in order to get the right error message with '=='. *)
+  | Not_equal (x,y) ->
+      begin let x',y' = eval_ast x env, eval_ast y env in
+      match process_empty x' y', process_empty y' x' with
+      | Int x, Int y -> Bool (not (x = y))
+      | Float x, Float y -> Bool (not (x = y))
+      | Prop x, Prop y -> Bool (not (x = y))
+      | Set (ISet a), Set (ISet b) -> Bool (not (IntSet.equal a b))
+      | Set (FSet a), Set (FSet b) -> Bool (not FloatSet.equal a b))
+      | Set (SSet a), Set (SSet b) -> Bool (not (PropSet.equal a b))
+      | x',y' -> raise_type_error2 ast x x' y y' "an int, float, prop or set"
+    end
   | Lesser_than (x,y) -> (match eval_ast x env, eval_ast y env with
       | Int x, Int y -> Bool (x < y)
       | Float x, Float y -> Bool (x < y)
