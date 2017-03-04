@@ -176,6 +176,7 @@ public class ParentEditionPanel extends AbstractComponentPanel {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(selectSatOrSmt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(editor, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -474,6 +475,9 @@ public class ParentEditionPanel extends AbstractComponentPanel {
             return State.EDITION;
         }
         
+        // Button "Solve" now displays "Translating...
+        solveButton.setText("Translating");
+
         if (getFrame().getSolverSelection().getSelectedSolver() == SolverSelection.SolverType.SAT) {
            
             try {
@@ -500,11 +504,11 @@ public class ParentEditionPanel extends AbstractComponentPanel {
                 showErrorMessage(ex, errorMessage, getFrame().getLang().getWord(Lang.ERROR_TRADUCTION));
                 return State.EDITION;
             } catch (InterruptedException ex) {
-                ex.printStackTrace();
-                errorMessage = "Translator has been interrupted.";
-                showErrorMessage(ex, errorMessage, getFrame().getLang().getWord(Lang.ERROR_TRADUCTION));
+                System.out.println("touistc has been stopped");
                 return State.EDITION;
             }
+
+            solveButton.setText("Solving");
 
             //Add CurrentPath/dimacsFile
             String translatedFilePath = getFrame().getTranslatorSAT().getDimacsFilePath();
