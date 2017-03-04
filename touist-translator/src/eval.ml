@@ -73,7 +73,7 @@ let raise_type_error2 operator op1 exp1 op2 exp2 (expected_types:string) =
         ""))
   in raise (ErrorWithLoc (
       "incorrect types with '"^(string_of_ast_type operator)^"', which expects "^expected_types ^".\n"^
-      "The content of the variable '"^(string_of_ast var)^"' has type "^(string_of_ast_type content)^":\n"^
+      "The content of the variable '"^(string_of_ast var)^"' has type '"^(string_of_ast_type content)^"':\n"^
       "    "^(string_of_ast content)^"\n"^
       "The other operand is of type '"^(string_of_ast_type other_expanded)^"':\n"^
       "    "^(string_of_ast other_expanded)^"", loc))
@@ -186,22 +186,22 @@ and eval_ast (ast:ast) (env:env) =
   | Add (x,y) -> (match eval_ast x env, eval_ast y env with
       | Int x, Int y -> Int (x + y)
       | Float x, Float y -> Float (x +. y)
-      | x',y' -> raise_type_error2 ast x y x' y' "float or integer")
+      | x',y' -> raise_type_error2 ast x x' y y' "float or integer")
   | Sub (x,y) -> (match eval_ast x env, eval_ast y env with
       | Int x, Int y -> Int (x - y)
       | Float x, Float y -> Float (x -. y)
-      | x',y' -> raise_type_error2 ast x y x' y' "float or integer")
+      | x',y' -> raise_type_error2 ast x x' y y' "float or integer")
   | Mul (x,y) -> (match eval_ast x env, eval_ast y env with
       | Int x, Int y -> Int (x * y)
       | Float x, Float y -> Float (x *. y)
-      | x',y' -> raise_type_error2 ast x y x' y' "a float or integer")
+      | x',y' -> raise_type_error2 ast x x' y y' "a float or integer")
   | Div (x,y) -> (match eval_ast x env, eval_ast y env with
       | Int x, Int y -> Int (x / y)
       | Float x, Float y -> Float (x /. y)
-      | x',y' -> raise_type_error2 ast x y x' y' "a float or integer")
+      | x',y' -> raise_type_error2 ast x x' y y' "a float or integer")
   | Mod (x,y) -> (match eval_ast x env, eval_ast y env with
       | Int x, Int y -> Int (x mod y)
-      | x',y' -> raise_type_error2 ast x y x' y' "a float or integer")
+      | x',y' -> raise_type_error2 ast x x' y y' "a float or integer")
   | Sqrt x -> (match eval_ast x env with
       | Float x -> Float (sqrt x)
       | x' -> raise_type_error ast x x' "a float")
@@ -222,19 +222,19 @@ and eval_ast (ast:ast) (env:env) =
       | x' -> raise_type_error ast x x' "a boolean")
   | And (x,y) -> (match eval_ast x env, eval_ast y env with
       | Bool x,Bool y -> Bool (x && y)
-      | x',y' -> raise_type_error2 ast x y x' y' "a boolean")
+      | x',y' -> raise_type_error2 ast x x' y y' "a boolean")
   | Or (x,y) -> (match eval_ast x env, eval_ast y env with
       | Bool x,Bool y -> Bool (x || y)
-      | x',y' -> raise_type_error2 ast x y x' y' "a boolean")
+      | x',y' -> raise_type_error2 ast x x' y y' "a boolean")
   | Xor (x,y) -> (match eval_ast x env, eval_ast y env with
       | Bool x,Bool y -> Bool ((x || y) && (not (x && y)))
-      | x',y' -> raise_type_error2 ast x y x' y' "a boolean")
+      | x',y' -> raise_type_error2 ast x x' y y' "a boolean")
   | Implies (x,y) -> (match eval_ast x env, eval_ast y env with
       | Bool x,Bool y -> Bool (not x || y)
-      | x',y' -> raise_type_error2 ast x y x' y' "a boolean")
+      | x',y' -> raise_type_error2 ast x x' y y' "a boolean")
   | Equiv (x,y) -> (match eval_ast x env, eval_ast y env with
       | Bool x,Bool y -> Bool ((not x || y) && (not x || y))
-      | x',y' -> raise_type_error2 ast x y x' y' "a boolean")
+      | x',y' -> raise_type_error2 ast x x' y y' "a boolean")
   | If (x,y,z) ->
     let test =
       match eval_ast x env with
@@ -249,7 +249,7 @@ and eval_ast (ast:ast) (env:env) =
       | Set (ISet a), Set (ISet b) -> Set (ISet (IntSet.union a b))
       | Set (FSet a), Set (FSet b) -> Set (FSet (FloatSet.union a b))
       | Set (SSet a), Set (SSet b) -> Set (SSet (PropSet.union a b))
-      | _,_ -> raise_type_error2 ast x y x' y' "a set of float, int or prop"
+      | _,_ -> raise_type_error2 ast x x' y y' "a set of float, int or prop"
     end
   | Inter (x,y) -> begin
       let x',y' = eval_ast x env, eval_ast y env in
@@ -257,7 +257,7 @@ and eval_ast (ast:ast) (env:env) =
       | Set (ISet a), Set (ISet b) -> Set (ISet (IntSet.inter a b))
       | Set (FSet a), Set (FSet b) -> Set (FSet (FloatSet.inter a b))
       | Set (SSet a), Set (SSet b) -> Set (SSet (PropSet.inter a b))
-      | _,_ -> raise_type_error2 ast x y x' y' "a set of float, int or prop"
+      | _,_ -> raise_type_error2 ast x x' y y' "a set of float, int or prop"
     end
   | Diff (x,y) -> begin
       let x',y' = eval_ast x env, eval_ast y env in
@@ -265,7 +265,7 @@ and eval_ast (ast:ast) (env:env) =
       | Set (ISet a), Set (ISet b) -> Set (ISet (IntSet.diff a b))
       | Set (FSet a), Set (FSet b) -> Set (FSet (FloatSet.diff a b))
       | Set (SSet a), Set (SSet b) -> Set (SSet (PropSet.diff a b))
-      | _,_ -> raise_type_error2 ast x y x' y' "a set of float, int or prop"
+      | _,_ -> raise_type_error2 ast x x' y y' "a set of float, int or prop"
     end
   | Range (x,y) ->
     (* Return the list of integers between min and max with an increment of step *)
@@ -279,7 +279,7 @@ and eval_ast (ast:ast) (env:env) =
       match eval_ast x env, eval_ast y env with
       | Int x, Int y     -> Set (ISet (IntSet.of_list (irange x y 1)))
       | Float x, Float y -> Set (FSet (FloatSet.of_list (frange x y 1.)))
-      | x',y' -> raise_type_error2 ast x y x' y' "two integers or two floats"
+      | x',y' -> raise_type_error2 ast x x' y y' "two integers or two floats"
     end
   | Empty x -> begin
       match eval_ast x env with
@@ -303,7 +303,7 @@ and eval_ast (ast:ast) (env:env) =
       | Set (ISet a), Set (ISet b) -> Bool (IntSet.subset a b)
       | Set (FSet a), Set (FSet b) -> Bool (FloatSet.subset a b)
       | Set (SSet a), Set (SSet b) -> Bool (PropSet.subset a b)
-      | _,_ -> raise_type_error2 ast x y x' y' "a set of float, int or prop"
+      | _,_ -> raise_type_error2 ast x x' y y' "a set of float, int or prop"
     end
   | In (x,y) ->
     begin match eval_ast x env, eval_ast y env with
@@ -327,19 +327,19 @@ and eval_ast (ast:ast) (env:env) =
   | Lesser_than (x,y) -> (match eval_ast x env, eval_ast y env with
       | Int x, Int y -> Bool (x < y)
       | Float x, Float y -> Bool (x < y)
-      | x',y' -> raise_type_error2 ast x y x' y' "a float or int")
+      | x',y' -> raise_type_error2 ast x x' y y' "a float or int")
   | Lesser_or_equal (x,y) -> (match eval_ast x env, eval_ast y env with
       | Int x, Int y -> Bool (x <= y)
       | Float x, Float y -> Bool (x <= y)
-      | x',y' -> raise_type_error2 ast x y x' y' "a float or int")
+      | x',y' -> raise_type_error2 ast x x' y y' "a float or int")
   | Greater_than     (x,y) -> (match eval_ast x env, eval_ast y env with
       | Int x, Int y -> Bool (x > y)
       | Float x, Float y -> Bool (x > y)
-      | x',y' -> raise_type_error2 ast x y x' y' "a float or int")
+      | x',y' -> raise_type_error2 ast x x' y y' "a float or int")
   | Greater_or_equal (x,y) -> (match eval_ast x env, eval_ast y env with
       | Int x, Int y -> Bool (x >= y)
       | Float x, Float y -> Bool (x >= y)
-      | x',y' -> raise_type_error2 ast x y x' y' "a float or int")
+      | x',y' -> raise_type_error2 ast x x' y y' "a float or int")
   | UnexpProp (p,i) -> Prop (expand_var_name (p,i) env)
   | Prop x -> Prop x
   | e -> raise (Error ("this expression cannot be expanded: " ^ string_of_ast e))
@@ -521,17 +521,17 @@ and eval_ast_formula (ast:ast) (env:env) : ast =
   | Exact (x,y) -> begin
       match eval_ast x env, eval_ast y env with
       | Int x, Set (SSet s) -> exact_str (PropSet.exact x s)
-      | x',y' -> raise_type_error2 ast x y x' y' "int (left-hand) and a set of prop (right-hand)"
+      | x',y' -> raise_type_error2 ast x x' y y' "int (left-hand) and a set of prop (right-hand)"
     end
   | Atleast (x,y) -> begin
       match eval_ast x env, eval_ast y env with
       | Int x, Set (SSet s) -> atleast_str (PropSet.atleast x s)
-      | x',y' -> raise_type_error2 ast x y x' y' "int (left-hand) and a set of prop (right-hand)"
+      | x',y' -> raise_type_error2 ast x x' y y' "int (left-hand) and a set of prop (right-hand)"
     end
   | Atmost (x,y) ->begin
       match eval_ast x env, eval_ast y env with
       | Int x, Set (SSet s) -> atmost_str (PropSet.atmost x s)
-      | x',y' -> raise_type_error2 ast x y x' y' "int (left-hand) and a set of prop (right-hand)"
+      | x',y' -> raise_type_error2 ast x x' y y' "int (left-hand) and a set of prop (right-hand)"
     end
   (* What is returned by bigand or bigor when they do not
      generate anything? A direct solution would have been to
