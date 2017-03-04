@@ -288,6 +288,11 @@ touist_simple: EXACT XOR
 ## The known suffix of the stack is as follows:
 ## EXACT 
 ##
+
+Ill-formed $1 statement. At this point, an integer is expected.
+Instead, the following statement were read:
+    $0
+
 touist_smt: CARD DIFF XOR 
 ##
 ## Ends in an error in state: 246.
