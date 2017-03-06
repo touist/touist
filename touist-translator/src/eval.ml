@@ -51,16 +51,16 @@ let rm_loc (ast:ast) : ast = match ast with
    'an integer or a float'. *)
 let raise_type_error operator operand expanded (expected_types:string) = 
   match operand with
-    | Var (_,_,loc) -> raise (ErrorWithLoc (
-        "'"^(string_of_ast_type operator)^"' expects "^expected_types^".\n"^
-        "The content of the variable '"^(string_of_ast operand)^"' has type '"^(string_of_ast_type expanded)^"':\n"^
-        "    "^(string_of_ast expanded)^"", loc))
-    | _ -> raise_with_loc operator (
-        "'"^(string_of_ast_type operator)^"' expects "^expected_types^".\n"^
-        "The operand:\n"^
-        "    "^(string_of_ast operand)^"\n"^
-        "has been expanded to something of type '"^(string_of_ast_type expanded)^"':\n"^
-        "    "^(string_of_ast expanded)^"")
+  | Var (_,_,loc) -> raise (ErrorWithLoc (
+      "'"^(string_of_ast_type operator)^"' expects "^expected_types^".\n"^
+      "The content of the variable '"^(string_of_ast operand)^"' has type '"^(string_of_ast_type expanded)^"':\n"^
+      "    "^(string_of_ast expanded)^"", loc))
+  | _ -> raise_with_loc operator (
+      "'"^(string_of_ast_type operator)^"' expects "^expected_types^".\n"^
+      "The operand:\n"^
+      "    "^(string_of_ast operand)^"\n"^
+      "has been expanded to something of type '"^(string_of_ast_type expanded)^"':\n"^
+      "    "^(string_of_ast expanded)^"")
 
 (* Same as above but for functions of two parameters. Example: with And (x,y),
    operator is And (x,y),
@@ -71,14 +71,14 @@ let raise_type_error2 operator op1 exp1 op2 exp2 (expected_types:string) =
     | Var (_,_,loc),_ -> op1,exp1,loc,op2,exp2
     | _,Var (_,_,loc) -> op2,exp2,loc,op1,exp1
     | _,_ -> raise_with_loc operator 
-        ("incorrect types with operator '"^(string_of_ast_type operator)^"', which expects "^expected_types^".\n"^
-        "In statement:\n"^
-        "    "^(string_of_ast operator)^"\n"^
-        "Left-hand operand has type '"^(string_of_ast_type exp1)^"':\n"^
-        "    "^(string_of_ast exp1)^"\n"^
-        "Right-hand operand has type '"^(string_of_ast_type exp2)^"':\n"^
-        "    "^(string_of_ast exp2)^""^
-        "")
+               ("incorrect types with operator '"^(string_of_ast_type operator)^"', which expects "^expected_types^".\n"^
+                "In statement:\n"^
+                "    "^(string_of_ast operator)^"\n"^
+                "Left-hand operand has type '"^(string_of_ast_type exp1)^"':\n"^
+                "    "^(string_of_ast exp1)^"\n"^
+                "Right-hand operand has type '"^(string_of_ast_type exp2)^"':\n"^
+                "    "^(string_of_ast exp2)^""^
+                "")
   in raise (ErrorWithLoc (
       "incorrect types with '"^(string_of_ast_type operator)^"', which expects "^expected_types ^".\n"^
       "The content of the variable '"^(string_of_ast var)^"' has type '"^(string_of_ast_type content)^"':\n"^
@@ -90,24 +90,24 @@ let raise_type_error2 operator op1 exp1 op2 exp2 (expected_types:string) =
    and the set this element is supposed to be added to. *)
 let raise_set_decl ast elmt elmt_expanded set set_expanded (expected_types:string) =
   match elmt with
-    | Var (_,_,loc) -> raise (ErrorWithLoc (
-        "Ill-formed set declaration. It expects "^expected_types^".\n"^
-        "The content of the variable '"^(string_of_ast elmt)^"' has type '"^(string_of_ast_type elmt_expanded)^"':\n"^
-        "    "^(string_of_ast elmt_expanded)^"\n"^
-        "Up to now, the set declaration\n"^
-        "    "^(string_of_ast set)^"\n"^
-        "has been expanded to:\n"^
-        "    "^(string_of_ast set_expanded)^"", loc))
-    | _ -> raise_with_loc ast
-        ("Ill-formed set declaration. It expects "^expected_types^".\n"^
-        "One of the elements is of type '"^(string_of_ast_type elmt_expanded)^"':\n"^
-        "    "^(string_of_ast elmt)^"\n"^
-        "This element has been expanded to\n"^
-        "    "^(string_of_ast elmt_expanded)^"\n"^
-        "Up to now, the set declaration\n"^
-        "    "^(string_of_ast set)^"\n"^
-        "has been expanded to:\n"^
-        "    "^(string_of_ast set_expanded)^"")
+  | Var (_,_,loc) -> raise (ErrorWithLoc (
+      "Ill-formed set declaration. It expects "^expected_types^".\n"^
+      "The content of the variable '"^(string_of_ast elmt)^"' has type '"^(string_of_ast_type elmt_expanded)^"':\n"^
+      "    "^(string_of_ast elmt_expanded)^"\n"^
+      "Up to now, the set declaration\n"^
+      "    "^(string_of_ast set)^"\n"^
+      "has been expanded to:\n"^
+      "    "^(string_of_ast set_expanded)^"", loc))
+  | _ -> raise_with_loc ast
+           ("Ill-formed set declaration. It expects "^expected_types^".\n"^
+            "One of the elements is of type '"^(string_of_ast_type elmt_expanded)^"':\n"^
+            "    "^(string_of_ast elmt)^"\n"^
+            "This element has been expanded to\n"^
+            "    "^(string_of_ast elmt_expanded)^"\n"^
+            "Up to now, the set declaration\n"^
+            "    "^(string_of_ast set)^"\n"^
+            "has been expanded to:\n"^
+            "    "^(string_of_ast set_expanded)^"")
 
 
 let check_nb_vars_and_sets (ast:ast) (vars: ast list) (sets: ast list) : unit =
@@ -119,15 +119,15 @@ let check_nb_vars_and_sets (ast:ast) (vars: ast list) (sets: ast list) : unit =
   match (List.length vars) == (List.length sets) with
   | true -> ()
   | false -> let vars_loc = fist_last_loc_of vars
-    (* We only know the locations of the variables. To help the user, we give
-       him the position of the list of variables. *)
+  (* We only know the locations of the variables. To help the user, we give
+     him the position of the list of variables. *)
     in raise (ErrorWithLoc (
         "Ill-formed '"^(string_of_ast_type ast)^"'. The number of variables and sets must be the same.\n"^
         "You defined "^(string_of_int (List.length vars))^" variables:\n"^
         "    "^(string_of_ast_list "," vars)^"\n"^
         "but you gave "^(string_of_int (List.length sets))^" sets:\n"^
         "    "^(string_of_ast_list "," sets)^"", vars_loc))
-  
+
 
 (* [process_empty] is necessary because of how 'clunky' have been implemented
    the set capabilities (type 'set', EmptySet, ISet, IntSet.empty.....).
@@ -152,7 +152,7 @@ and eval_touist_code ast (env:env) =
     | [x]   -> x
     | x::xs -> And (x, loop xs)
   in
-  match ast with
+  match rm_loc ast with
   | Touist_code (formulas, None) -> eval_ast_formula (loop formulas) env
   | Touist_code (formulas, Some decl) ->
     List.iter (fun x -> eval_affect x env) decl;
@@ -560,14 +560,18 @@ and eval_ast_formula (ast:ast) (env:env) : ast =
     begin check_nb_vars_and_sets ast v s;
       match v,s with
       | [],[] | _,[] | [],_ -> failwith "shouln't happen: non-variable in big construct"
-      | [Var (p,i,loc)],[y] ->
+      | [Var (p,i,loc)],[set] ->
         begin
-          match eval_ast y env with
+          match eval_ast set env with
           | Set (EmptySet)  -> bigand_empty env (p,i,loc) [] test e
           | Set (ISet a) -> bigand_int   env (p,i,loc) (IntSet.elements a)    test e
           | Set (FSet a) -> bigand_float env (p,i,loc) (FloatSet.elements a)  test e
           | Set (SSet a) -> bigand_str   env (p,i,loc) (PropSet.elements a) test e
-          | y' -> raise_type_error ast y y' "a comma-separated list of sets after 'in'"
+          | set' -> raise_with_loc set ("Ill-formed 'bigand': after 'in', only sets are allowed.\n" ^
+            "The faulty element is of type '"^(string_of_ast_type set)^"':\n"^
+            "    "^(string_of_ast set)^"\n"^
+            "This element has been expanded to\n"^
+            "    "^(string_of_ast set')^"")
         end
       | x::xs,y::ys ->
         eval_ast_formula (Bigand ([x],[y],None,(Bigand (xs,ys,t,e)))) env
@@ -581,13 +585,17 @@ and eval_ast_formula (ast:ast) (env:env) : ast =
     begin check_nb_vars_and_sets ast v s;
       match v,s with
       | [],[] | _,[] | [],_ -> failwith "shouln't happen: non-variable in big construct"
-      | [Var (p,i,loc)],[y] -> begin
-          match eval_ast y env with
+      | [Var (p,i,loc)],[set] -> begin
+          match eval_ast set env with
           | Set (EmptySet)  -> bigor_empty env (p,i,loc) [] test e
           | Set (ISet a) -> bigor_int   env (p,i,loc) (IntSet.elements a)    test e
           | Set (FSet a) -> bigor_float env (p,i,loc) (FloatSet.elements a)  test e
           | Set (SSet a) -> bigor_str   env (p,i,loc) (PropSet.elements a) test e
-          | y' -> raise_type_error ast y y' "a comma-separated list of sets after 'in'"
+          | set' -> raise_with_loc set ("Ill-formed 'bigor': after 'in', only sets are allowed.\n" ^
+            "The faulty element is of type '"^(string_of_ast_type set)^"':\n"^
+            "    "^(string_of_ast set)^"\n"^
+            "This element has been expanded to\n"^
+            "    "^(string_of_ast set')^"")
         end
       | x::xs,y::ys ->
         eval_ast_formula (Bigor ([x],[y],None,(Bigor (xs,ys,t,e)))) env

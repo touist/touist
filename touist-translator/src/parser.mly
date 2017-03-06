@@ -137,25 +137,25 @@ comma_list(T):
 
 (* [touist_simple] is the entry point of the parser in sat mode *)
 touist_simple:
-  | a=global_affect+ f=formula_simple+ EOF { Touist_code (f,Some a) }
-  | f=formula_simple+ DATA a=global_affect+ EOF { Touist_code (f,Some a) }
-  | f=formula_simple+ EOF { Touist_code (f,None) }
+  | a=global_affect+ f=formula_simple+ EOF {Loc (Touist_code (f,Some a),($startpos,$endpos))}
+  | f=formula_simple+ DATA a=global_affect+ EOF {Loc (Touist_code (f,Some a),($startpos,$endpos))}
+  | f=formula_simple+ EOF {Loc (Touist_code (f,None),($startpos,$endpos))}
 
 
 (* [touist_smt] is the entry point of the parser in smt mode *)
 touist_smt:
-  | a=global_affect+ f=formula_smt+ EOF { Touist_code (f, Some a) }
-  | f=formula_smt+ DATA a=global_affect+ EOF { Touist_code (f,Some a) }
-  | f=formula_smt+ EOF { Touist_code (f,None) }
+  | a=global_affect+ f=formula_smt+ EOF {Loc (Touist_code (f, Some a),($startpos,$endpos))}
+  | f=formula_smt+ DATA a=global_affect+ EOF {Loc (Touist_code (f,Some a),($startpos,$endpos))}
+  | f=formula_smt+ EOF {Loc (Touist_code (f,None),($startpos,$endpos))}
 
 (* Used in tuple expression; see tuple_variable and tuple_term *)
 indices: i=expr { i }
 
 (* a tuple_term is of the form abc(1,d,3): the indices can be *)
 prop:
-  | t=TERM { Prop t } (* simple_term *)
+  | t=TERM {Loc (Prop t,($startpos,$endpos))} (* simple_term *)
   | t=TUPLE (*LPAREN*) l=comma_list(indices) RPAREN (* tuple_term *)
-    { UnexpProp (t, Some l) }
+    {Loc (UnexpProp (t, Some l),($startpos,$endpos))}
 
 (* For now, we don't check the type of the variables during the parsing.
    This means that all variables are untyped during parsing.
@@ -186,12 +186,12 @@ var:
   | x=T    DIV     y=T  {Loc (Div (x,y),($startpos,$endpos))}
 
 %inline num_operations_others(T):
-  | x=T    MOD     y=T  { Mod (x,y) }
-  | ABS (*LPAREN*) x=T RPAREN { Abs x     }
+  | x=T    MOD     y=T  {Loc (Mod (x,y),($startpos,$endpos))}
+  | ABS (*LPAREN*) x=T RPAREN {Loc (Abs x,($startpos,$endpos))}
 
-%inline int: x=INT { Int x }
-%inline float: x=FLOAT { Float x }
-%inline bool: x=BOOL { Bool x }
+%inline int: x=INT {Loc (Int x,($startpos,$endpos))}
+%inline float: x=FLOAT {Loc (Float x,($startpos,$endpos))}
+%inline bool: x=BOOL {Loc (Bool x,($startpos,$endpos))}
 
 expr:
   | b=var {b}
@@ -238,7 +238,7 @@ expr:
 
 %inline set_decl_range(T): LBRACK s1=T RANGE s2=T RBRACK {Loc (Range (s1,s2),($startpos,$endpos))}
 %inline set_decl_explicit(T): LBRACK l=comma_list(T) RBRACK {Loc (Set_decl l,($startpos,$endpos))}
-%inline set_empty: LBRACK RBRACK { Set_decl [] }
+%inline set_empty: LBRACK RBRACK {Loc (Set_decl [],($startpos,$endpos))}
   
 %inline set_operation(T):
   | UNION (*LPAREN*) s1=T COMMA s2=T RPAREN {Loc (Union (s1,s2),($startpos,$endpos))}
@@ -280,7 +280,7 @@ formula_smt:
   | BIGAND v=comma_list(var) IN s=comma_list(expr) c=when_cond? COLON f=F END 
     {Loc (Bigand (v,s,c,f),($startpos,$endpos))}
   | BIGOR  v=comma_list(var) IN s=comma_list(expr) c=when_cond? COLON f=F END 
-    { Loc (Bigor (v,s,c,f),($startpos,$endpos))}
+    {Loc (Bigor (v,s,c,f),($startpos,$endpos))}
   | EXACT (*LPAREN*)   x=expr COMMA s=expr RPAREN {Loc (Exact (x,s),($startpos,$endpos))}
   | ATLEAST (*LPAREN*) x=expr COMMA s=expr RPAREN {Loc (Atleast (x,s),($startpos,$endpos))}
   | ATMOST (*LPAREN*)  x=expr COMMA s=expr RPAREN {Loc (Atmost (x,s),($startpos,$endpos))}
