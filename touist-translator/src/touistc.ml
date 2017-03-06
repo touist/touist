@@ -1,17 +1,13 @@
 type mode = SMTLIB2 | SAT_DIMACS
 type error =
   | OK
-  | COMPILE_WITH_LINE_NUMBER_ERROR
-  | COMPILE_NO_LINE_NUMBER_ERROR
-  | OTHER
+  | ERROR
 
 (* COMPILE_WITH_LINE_NUMBER_ERROR == `file_name:num_row:num_col:message`*)
 (* COMPILE_NO_LINE_NUMBER_ERROR == `Any other message format` *)
 let get_code (e : error) : int = match e with
   | OK -> 0
-  | COMPILE_WITH_LINE_NUMBER_ERROR -> 1
-  | COMPILE_NO_LINE_NUMBER_ERROR -> 2
-  | OTHER -> 3
+  | ERROR -> 1
 
 (* Here is the list of hard-coded accepted logics. There are many
  * other logics that can be accepted. *)
@@ -104,7 +100,7 @@ let () =
   if (!input_file_path = "") && not !use_stdin (* NOTE: !var is like *var in C *)
   then (
     print_endline (cmd^": you must give an input file (try --help)");
-    exit (get_code OTHER)
+    exit (get_code ERROR)
   );
   if !use_stdin then (input := stdin) else (input := open_in !input_file_path);
 
@@ -120,16 +116,16 @@ let () =
   (* Check that either -smt2 or -sat have been selected *)
   if (!sat_mode && (!smt_logic <> "")) then begin
     print_endline (cmd^": cannot use both SAT and SMT solvers (try --help)");
-    exit (get_code OTHER) end;
+    exit (get_code ERROR) end;
   if (not !sat_mode) && (!smt_logic = "") then begin
     print_endline (cmd^": you must choose a solver to use: -sat or -smt2 (try --help)");
-    exit (get_code OTHER) end;
+    exit (get_code ERROR) end;
 
   (* SMT Mode: check if one of the available QF_? has been given after -smt2 *)
   if (not !sat_mode) && (not (List.exists (fun x->x=(String.uppercase !smt_logic)) smt_logic_avail)) then
     (print_endline (cmd^": you must specify the logic used (-smt2 logic_name) (try --help)");
      print_endline ("Example: -smt2 QF_IDL");
-     exit (get_code OTHER));
+     exit (get_code ERROR));
 
   try
   
@@ -190,4 +186,8 @@ let () =
   close_in !input;
   exit (get_code OK)
 
-  with Translation.Error msg -> Printf.fprintf stderr "%s" msg; exit (get_code OTHER);
+  with
+    | Lexer.Error (msg,loc) -> (Printf.fprintf stderr "%s %s\n" (Parse.string_of_loc ~detailed:!detailed_position loc) msg; exit (get_code ERROR))
+    | Parse.Error (msg,loc) -> (Printf.fprintf stderr "%s %s" (Parse.string_of_loc ~detailed:!detailed_position loc) msg; exit (get_code ERROR))
+    | Eval.Error (msg,loc) -> (Printf.fprintf stderr "%s %s\n" (Parse.string_of_loc ~detailed:!detailed_position loc) msg; exit (get_code ERROR))
+    | Cnf.Error msg -> (Printf.fprintf stderr "%s %s\n" (Parse.string_of_loc ~detailed:!detailed_position (Lexing.dummy_pos,Lexing.dummy_pos)) msg; exit (get_code ERROR))
