@@ -65,6 +65,7 @@
 %left XOR
 (*%left LE GE LT GT EQUAL NOTEQUAL*)
 %left NOT
+%nonassoc EQUAL NOTEQUAL LT LE GT GE IN
 (* neg_prec = preced. of 'SUB x' has a lesser preced. than 'x SUB x' *)
 (* sub_prec = predecence of 'x SUB x' *)
 %left ADD SUB sub_prec neg_prec
@@ -87,15 +88,8 @@
  *     not(a)
  * the minus sign MUST be reduced as fast as possible. *)
 
-%on_error_reduce comma_list(any_set)
-%on_error_reduce comma_list(set_int)
-%on_error_reduce comma_list(set_float)
-%on_error_reduce comma_list(set_prop)
-
-%on_error_reduce comma_list(int)
-%on_error_reduce comma_list(float)
-%on_error_reduce comma_list(prop)
-%on_error_reduce comma_list(any_atom)
+%on_error_reduce comma_list(expr)
+%on_error_reduce comma_list(expr_smt)
 
 %on_error_reduce comma_list(indices)
 
@@ -155,11 +149,10 @@ touist_smt:
   | f=formula_smt+ EOF { Touist_code (f,None) }
 
 (* Used in tuple expression; see tuple_variable and tuple_term *)
-indices: i=int | i=float | i=prop { i }
+indices: i=expr { i }
 
 (* a tuple_term is of the form abc(1,d,3): the indices can be *)
 prop:
-  | v=var { v }
   | t=TERM { Prop t } (* simple_term *)
   | t=TUPLE (*LPAREN*) l=comma_list(indices) RPAREN (* tuple_term *)
     { UnexpProp (t, Some l) }
@@ -170,162 +163,126 @@ prop:
    These two placeholders can only be used in a semantic action, not in the
    %{ %} header. *)
 var:
-  | v=VAR { let loc = ($startpos,$endpos) in Var (v,None,loc) }
+  | v=VAR { let loc=($startpos,$endpos) in Var (v,None,loc) }
   | v=VARTUPLE (*LPAREN*) l=comma_list(indices) RPAREN (* tuple_variable *)
-    { let loc = ($startpos,$endpos) in Var (v,Some l,loc) }
+    { let loc=($startpos,$endpos) in Var (v,Some l,loc) }
 
 (* a global variable is a variable used in the 'data' block
   for defining sets and constants; it can be of the form of a
   tuple_variable, i.e. with prefix+indices: '$i(1,a,d)'.
   The indices can be either expression or term *)
-global_affect:
-  | v=var AFFECT e=global_affect_types { Affect (v,e) }
+%inline global_affect:
+  | v=var AFFECT e=expr {Loc (Affect (v,e),($startpos,$endpos))}
 
-(* WARNING: any_set and any_atom should only be used in specific places,e.g.,
-       formula_smt: equality(any_atom)
-   because SMT can handle things like '(x + 2) > 3.1', meaning that the
-   types are mixed. *)
-global_affect_types: x=any_set | x=any_atom | x=bool { x }
+%inline if_statement(T): IF cond=expr THEN v1=T ELSE v2=T END {Loc (If (cond,v1,v2),($startpos,$endpos))}
 
-any_atom: x=prop | x=num { x }
+%inline in_parenthesis(T): LPAREN x=T RPAREN { x }
 
-if_statement(T): IF cond=bool THEN v1=T ELSE v2=T END { If (cond,v1,v2) }
+%inline num_operations_standard(T):
+  | x=T    ADD     y=T  {Loc (Add (x,y),($startpos,$endpos))}
+  | x=T    SUB     y=T  {Loc (Sub (x,y),($startpos,$endpos))} %prec sub_prec
+  |        SUB     x=T  {Loc (Neg x,($startpos,$endpos))     } %prec neg_prec
+  | x=T    MUL     y=T  {Loc (Mul (x,y),($startpos,$endpos))}
+  | x=T    DIV     y=T  {Loc (Div (x,y),($startpos,$endpos))}
 
-in_parenthesis(T): LPAREN x=T RPAREN { x }
-
-num: x=float | x=int {x}
-
-num_operations_standard(T):
-  | x=T    ADD     y=T  { Add (x,y) }
-  | x=T    SUB     y=T  { Sub (x,y) } %prec sub_prec
-  |        SUB     x=T  { Neg x     } %prec neg_prec
-  | x=T    MUL     y=T  { Mul (x,y) }
-  | x=T    DIV     y=T  { Div (x,y) }
-
-num_operations_others(T):
+%inline num_operations_others(T):
   | x=T    MOD     y=T  { Mod (x,y) }
   | ABS (*LPAREN*) x=T RPAREN { Abs x     }
 
-int:
-  | x=INT { Int x }
-  | x=var
-  | x=in_parenthesis(int)
-  | x=num_operations_standard(int)
-  | x=num_operations_others(int)
-  | x=if_statement(int)
-  | TOINT (*LPAREN*) x=num RPAREN { To_int x }
-  | CARD  (*LPAREN*) s=any_set RPAREN { Card s }
+%inline int: x=INT { Int x }
+%inline float: x=FLOAT { Float x }
+%inline bool: x=BOOL { Bool x }
 
-float:
-  | x=FLOAT { Float x }
-  | x=var
-  | x=in_parenthesis(float)
-  | x=num_operations_standard(float)
-  | x=num_operations_others(float)
-  | x=if_statement(float) { x }
-  | SQRT    (*LPAREN*) x=float RPAREN { Sqrt x }
-  | TOFLOAT (*LPAREN*) x=num RPAREN { To_float x }
+expr:
+  | b=var {b}
+  | x=int {x}
+  | TOINT (*LPAREN*) x=expr RPAREN {Loc (To_int x,($startpos,$endpos))}
+  | CARD  (*LPAREN*) s=expr RPAREN {Loc (Card s,($startpos,$endpos))}
+  | x=float {x}
+  | x=in_parenthesis(expr)
+  | x=num_operations_standard(expr)
+  | x=num_operations_others(expr)
+  | x=if_statement(expr) { x }
+  | SQRT    (*LPAREN*) x=expr RPAREN {Loc (Sqrt x,($startpos,$endpos))}
+  | TOFLOAT (*LPAREN*) x=expr RPAREN {Loc (To_float x,($startpos,$endpos))}
+  | b=bool {b}
+  | b=connectors(expr)
+  | b=equality(expr)
+  | b=order(expr) {b}
+  | EMPTY  (*LPAREN*) s=expr RPAREN {Loc (Empty s,($startpos,$endpos))}
+  | SUBSET (*LPAREN*) s1=expr   COMMA s2=expr   RPAREN {Loc (Subset (s1,s2),($startpos,$endpos))}
+  | p=prop {p}
+  | x=expr   IN s=expr {Loc (In (x,s),($startpos,$endpos))}
+  | x=set_decl_range(expr)
+  | x=set_empty
+  | x=set_decl_explicit(expr)
+  | x=set_operation(expr) {x}
+
+%inline equality(T):
+  | x=T  EQUAL    y=T   {Loc (Equal (x,y),($startpos,$endpos)) }
+  | x=T  NOTEQUAL y=T   {Loc (Not_equal (x,y),($startpos,$endpos)) }
+
+%inline order(T):
+  | x=T   LT      y=T   {Loc (Lesser_than (x,y),($startpos,$endpos)) }
+  | x=T   LE      y=T   {Loc (Lesser_or_equal (x,y),($startpos,$endpos)) }
+  | x=T   GT      y=T   {Loc (Greater_than (x,y),($startpos,$endpos)) }
+  | x=T   GE      y=T   {Loc (Greater_or_equal (x,y),($startpos,$endpos)) }
+
+%inline connectors(T):
+  | NOT           x=T   {Loc (Not x,($startpos,$endpos))}
+  | x=T  AND      y=T   {Loc (And (x,y),($startpos,$endpos)) }
+  | x=T  OR       y=T   {Loc (Or (x,y),($startpos,$endpos)) }
+  | x=T  XOR      y=T   {Loc (Xor (x,y),($startpos,$endpos)) }
+  | x=T  IMPLIES  y=T   {Loc (Implies (x,y),($startpos,$endpos)) }
+  | x=T  EQUIV    y=T   {Loc (Equiv (x,y),($startpos,$endpos)) }
+
+%inline set_decl_range(T): LBRACK s1=T RANGE s2=T RBRACK {Loc (Range (s1,s2),($startpos,$endpos))}
+%inline set_decl_explicit(T): LBRACK l=comma_list(T) RBRACK {Loc (Set_decl l,($startpos,$endpos))}
+%inline set_empty: LBRACK RBRACK { Set_decl [] }
   
-(* bool is a boolean computed before solving;
-   typically in conditions like 'when' and 'if' *)
-bool:
-  | b=BOOL { Bool b }
-  | b=in_parenthesis(bool)
-  | b=connectors(bool)
-  | b=equality(int) | b=equality(float) | b=equality(prop)
-  | b=order(int) | b=order(float)
-  | b=if_statement(bool)
-  | b=subset_statement
-  | b=in_operator { b }
-  | EMPTY  (*LPAREN*) s=any_set RPAREN { Empty s }
-  | b=var { b }
+%inline set_operation(T):
+  | UNION (*LPAREN*) s1=T COMMA s2=T RPAREN {Loc (Union (s1,s2),($startpos,$endpos))}
+  | INTER (*LPAREN*) s1=T COMMA s2=T RPAREN {Loc (Inter (s1,s2),($startpos,$endpos))}
+  | DIFF  (*LPAREN*) s1=T COMMA s2=T RPAREN {Loc (Diff (s1,s2),($startpos,$endpos))}
 
-subset_statement:
-  | SUBSET (*LPAREN*) s1=set_int   COMMA s2=set_int   RPAREN { Subset (s1,s2) }
-  | SUBSET (*LPAREN*) s1=set_float COMMA s2=set_float RPAREN { Subset (s1,s2) }
-  | SUBSET (*LPAREN*) s1=set_prop  COMMA s2=set_prop  RPAREN { Subset (s1,s2) }
-
-in_operator:
-  | x=int   IN s=set_int
-  | x=float IN s=set_float
-  | x=prop  IN s=set_prop  { In (x,s) }
-
-
-equality(T):
-  | x=T  EQUAL    y=T   { Equal (x,y) }
-  | x=T  NOTEQUAL y=T   { Not_equal (x,y) }
-
-order(T):
-  | x=T   LT      y=T   { Lesser_than (x,y) }
-  | x=T   LE      y=T   { Lesser_or_equal (x,y) }
-  | x=T   GT      y=T   { Greater_than (x,y) }
-  | x=T   GE      y=T   { Greater_or_equal (x,y) }
-
-connectors(T):
-  | NOT           x=T   { Not x}
-  | x=T  AND      y=T   { And (x,y) }
-  | x=T  OR       y=T   { Or (x,y) }
-  | x=T  XOR      y=T   { Xor (x,y) }
-  | x=T  IMPLIES  y=T   { Implies (x,y) }
-  | x=T  EQUIV    y=T   { Equiv (x,y) }
-
-set_decl_range(T): LBRACK s1=T RANGE s2=T RBRACK { Range (s1,s2) }
-set_decl_explicit(T): LBRACK l=comma_list(T) RBRACK { Set_decl l }
-set_empty: LBRACK RBRACK { Set_decl [] }
-  
-set_operation(T):
-  | s=if_statement(T) { s }
-  | UNION (*LPAREN*) s1=T COMMA s2=T RPAREN { Union (s1,s2) }
-  | INTER (*LPAREN*) s1=T COMMA s2=T RPAREN { Inter (s1,s2) }
-  | DIFF  (*LPAREN*) s1=T COMMA s2=T RPAREN { Diff (s1,s2) }
-
-set_float:
-  | x=set_decl_range(float)
-  | x=set_decl_explicit(float)
-  | x=set_operation(set_float)
-  | x=var { x }
-
-set_int:
-  | x=set_decl_range(int)
-  | x=set_decl_explicit(int)
-  | x=set_operation(set_int)
-  | x=var { x }
-
-set_prop:
-  | x=set_decl_explicit(prop)
-  | x=set_operation(set_prop)
-  | x=var { x }
-
-any_set:
-  | s=set_float | s=set_int | s=set_prop | s=set_empty { s }
-
-formula(F):
+%inline formula(F):
   | f=in_parenthesis(F)
   | f=if_statement(F)
   | f=connectors(F)
   | f=generalized_connectors(F) (* are only on formulas! No need for parametrization *)
-  | f=let_affect(int,F) | f=let_affect(float,F) | f=let_affect(prop,F)
+  | f=let_affect(expr,F) {f}
+
+%inline let_affect(T,F): LET var=var AFFECT content=T COLON form=F 
+  {Loc (Let (var,content,form),($startpos,$endpos))} %prec low_precedence
+
+formula_simple:
+  | f=formula(formula_simple) { f }
   | f=prop { f }
   | TOP { Top }
   | BOTTOM { Bottom }
 
-let_affect(T,F): LET var=var AFFECT content=T COLON form=F { Let (var,content,form) } %prec low_precedence
-
-formula_simple:
-  | f=formula(formula_simple) { f }
+(* WARNING: SMT can handle things like '(x + 2) > 3.1', meaning that the
+   types are mixed. *)
+expr_smt:
+  | f=prop { f }
+  | TOP { Top }
+  | BOTTOM { Bottom }
+  | x=int 
+  | x=float
+  | x=order(expr_smt)
+  | x=equality(expr_smt) {x}
 
 formula_smt:
   | f=formula(formula_smt)
-  | f=equality(any_atom) (* can be '1 != prop' for example *)
-  | f=order(any_atom) { f }
+  | f=expr_smt { f }
 
-generalized_connectors(F):
-  | BIGAND v=comma_list(var) IN s=comma_list(any_set) c=when_cond? COLON f=F END { Bigand (v,s,c,f) }
-  | BIGOR  v=comma_list(var) IN s=comma_list(any_set) c=when_cond? COLON f=F END { Bigor  (v,s,c,f) }
-  | EXACT (*LPAREN*)   x=int COMMA s=set_prop RPAREN { Exact   (x,s) }
-  | ATLEAST (*LPAREN*) x=int COMMA s=set_prop RPAREN { Atleast (x,s) }
-  | ATMOST (*LPAREN*)  x=int COMMA s=set_prop RPAREN { Atmost  (x,s) }
+%inline generalized_connectors(F):
+  | BIGAND v=comma_list(var) IN s=comma_list(expr) c=when_cond? COLON f=F END 
+    {Loc (Bigand (v,s,c,f),($startpos,$endpos))}
+  | BIGOR  v=comma_list(var) IN s=comma_list(expr) c=when_cond? COLON f=F END 
+    { Loc (Bigor (v,s,c,f),($startpos,$endpos))}
+  | EXACT (*LPAREN*)   x=expr COMMA s=expr RPAREN {Loc (Exact (x,s),($startpos,$endpos))}
+  | ATLEAST (*LPAREN*) x=expr COMMA s=expr RPAREN {Loc (Atleast (x,s),($startpos,$endpos))}
+  | ATMOST (*LPAREN*)  x=expr COMMA s=expr RPAREN {Loc (Atmost (x,s),($startpos,$endpos))}
 
-when_cond: WHEN x=bool { x }
-
-
+%inline when_cond: WHEN x=expr { x }

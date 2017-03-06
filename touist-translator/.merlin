@@ -10,3 +10,4 @@ PKG menhirLib
 PKG str
 PKG fileutils
 PKG minisat
+PKG ounit

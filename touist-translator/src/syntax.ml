@@ -31,6 +31,7 @@ type loc = Lexing.position * Lexing.position
 and var = string * ast list option * loc
 and ast = (* Touist_code is the entry point *)
   | Touist_code      of ast list * ast list option
+  | Loc              of ast * loc
   | Int              of int
   | Float            of float
   | Bool             of bool

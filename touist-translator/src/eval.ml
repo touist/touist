@@ -34,6 +34,14 @@ type env = (string * (ast * loc)) list
    The description is a couple (content, location) *)
 type extenv = (string, (ast * loc)) Hashtbl.t
 
+let raise_with_loc (ast:ast) (message:string) = match ast with
+  | Loc (ast,loc) -> raise (ErrorWithLoc (message,loc))
+  | _ -> raise (Error (message))
+
+let rm_loc (ast:ast) : ast = match ast with
+  | Loc (ast,_) -> ast
+  | ast -> ast
+
 (* [raise_type_error] raises the errors that come from one-parameter functions.
    operator is the non-expanded (expand = eval_ast) operator.
    Example: in 'To_int x', 'operand' is the non-expanded parameter 'x',
@@ -41,65 +49,65 @@ type extenv = (string, (ast * loc)) Hashtbl.t
    Expanded means that eval_ast has been applied to x.
    [expected_types] contain a string that explain what is expected, e.g.,
    'an integer or a float'. *)
-let raise_type_error operator operand expanded (expected_types:string) =
+let raise_type_error operator operand expanded (expected_types:string) = 
   match operand with
-  | Var (_,_,loc) -> raise (ErrorWithLoc (
-      "'"^(string_of_ast_type operator)^"' expects "^expected_types^".\n"^
-      "The content of the variable '"^(string_of_ast operand)^"' has type '"^(string_of_ast_type expanded)^"':\n"^
-      "    "^(string_of_ast expanded)^"", loc))
-  | _ -> raise (Error (
-      "'"^(string_of_ast_type operator)^"' expects "^expected_types^".\n"^
-      "The operand:\n"^
-      "    "^(string_of_ast operand)^"\n"^
-      "has been expanded to something of type '"^(string_of_ast_type expanded)^"':\n"^
-      "    "^(string_of_ast expanded)^""))
+    | Var (_,_,loc) -> raise (ErrorWithLoc (
+        "'"^(string_of_ast_type operator)^"' expects "^expected_types^".\n"^
+        "The content of the variable '"^(string_of_ast operand)^"' has type '"^(string_of_ast_type expanded)^"':\n"^
+        "    "^(string_of_ast expanded)^"", loc))
+    | _ -> raise_with_loc operator (
+        "'"^(string_of_ast_type operator)^"' expects "^expected_types^".\n"^
+        "The operand:\n"^
+        "    "^(string_of_ast operand)^"\n"^
+        "has been expanded to something of type '"^(string_of_ast_type expanded)^"':\n"^
+        "    "^(string_of_ast expanded)^"")
 
 (* Same as above but for functions of two parameters. Example: with And (x,y),
    operator is And (x,y),
    op1 and op2 are the non-expanded parameters x and y,
    exp1 and exp2 are the expanded parameters x and y. *)
 let raise_type_error2 operator op1 exp1 op2 exp2 (expected_types:string) =
-  let var,content,loc,other,other_expanded = match op1,op2 with
+  let var,content,loc_var,other,other_expanded = match op1,op2 with
     | Var (_,_,loc),_ -> op1,exp1,loc,op2,exp2
     | _,Var (_,_,loc) -> op2,exp2,loc,op1,exp1
-    | _,_ -> raise (Error (
-        "incorrect types with operator '"^(string_of_ast_type operator)^"', which expects "^expected_types^".\n"^
+    | _,_ -> raise_with_loc operator 
+        ("incorrect types with operator '"^(string_of_ast_type operator)^"', which expects "^expected_types^".\n"^
         "In statement:\n"^
         "    "^(string_of_ast operator)^"\n"^
-        "Left-hand operand has type '"^(string_of_ast_type op1)^"':\n"^
+        "Left-hand operand has type '"^(string_of_ast_type exp1)^"':\n"^
         "    "^(string_of_ast exp1)^"\n"^
         "Right-hand operand has type '"^(string_of_ast_type exp2)^"':\n"^
         "    "^(string_of_ast exp2)^""^
-        ""))
+        "")
   in raise (ErrorWithLoc (
       "incorrect types with '"^(string_of_ast_type operator)^"', which expects "^expected_types ^".\n"^
       "The content of the variable '"^(string_of_ast var)^"' has type '"^(string_of_ast_type content)^"':\n"^
       "    "^(string_of_ast content)^"\n"^
       "The other operand is of type '"^(string_of_ast_type other_expanded)^"':\n"^
-      "    "^(string_of_ast other_expanded)^"", loc))
+      "    "^(string_of_ast other_expanded)^"", loc_var))
 
 (* [raise_set_decl] is the same as [raise_type_error2] but between one element
    and the set this element is supposed to be added to. *)
 let raise_set_decl ast elmt elmt_expanded set set_expanded (expected_types:string) =
   match elmt with
-  | Var (_,_,loc) -> raise (ErrorWithLoc (
-      "Ill-formed set declaration. It expects "^expected_types^".\n"^
-      "The content of the variable '"^(string_of_ast elmt)^"' has type '"^(string_of_ast_type elmt_expanded)^"':\n"^
-      "    "^(string_of_ast elmt_expanded)^"\n"^
-      "Up to now, the set declaration\n"^
-      "    "^(string_of_ast set)^"\n"^
-      "has been expanded to:\n"^
-      "    "^(string_of_ast set_expanded)^"", loc))
-  | _ -> raise (Error (
-      "Ill-formed set declaration. It expects "^expected_types^".\n"^
-      "One of the elements is of type '"^(string_of_ast_type elmt_expanded)^"':\n"^
-      "    "^(string_of_ast elmt)^"\n"^
-      "This element has been expanded to\n"^
-      "    "^(string_of_ast elmt_expanded)^"\n"^
-      "Up to now, the set declaration\n"^
-      "    "^(string_of_ast set)^"\n"^
-      "has been expanded to:\n"^
-      "    "^(string_of_ast set_expanded)^""))
+    | Var (_,_,loc) -> raise (ErrorWithLoc (
+        "Ill-formed set declaration. It expects "^expected_types^".\n"^
+        "The content of the variable '"^(string_of_ast elmt)^"' has type '"^(string_of_ast_type elmt_expanded)^"':\n"^
+        "    "^(string_of_ast elmt_expanded)^"\n"^
+        "Up to now, the set declaration\n"^
+        "    "^(string_of_ast set)^"\n"^
+        "has been expanded to:\n"^
+        "    "^(string_of_ast set_expanded)^"", loc))
+    | _ -> raise_with_loc ast
+        ("Ill-formed set declaration. It expects "^expected_types^".\n"^
+        "One of the elements is of type '"^(string_of_ast_type elmt_expanded)^"':\n"^
+        "    "^(string_of_ast elmt)^"\n"^
+        "This element has been expanded to\n"^
+        "    "^(string_of_ast elmt_expanded)^"\n"^
+        "Up to now, the set declaration\n"^
+        "    "^(string_of_ast set)^"\n"^
+        "has been expanded to:\n"^
+        "    "^(string_of_ast set_expanded)^"")
 
 
 let check_nb_vars_and_sets (ast:ast) (vars: ast list) (sets: ast list) : unit =
@@ -140,7 +148,7 @@ let rec eval ast =
 
 and eval_touist_code ast (env:env) =
   let rec loop = function
-    | []    -> raise (Error ("no formulas"))
+    | []    -> raise_with_loc ast ("no formulas")
     | [x]   -> x
     | x::xs -> And (x, loop xs)
   in
@@ -149,20 +157,18 @@ and eval_touist_code ast (env:env) =
   | Touist_code (formulas, Some decl) ->
     List.iter (fun x -> eval_affect x env) decl;
     eval_ast_formula (loop formulas) env
-  | e -> raise (Error ("this does not seem to be a touist code structure: " ^ string_of_ast e))
+  | e -> raise_with_loc ast ("this does not seem to be a touist code structure: " ^ string_of_ast e)
 
-
-and eval_affect ast env =
-  match ast with
+and eval_affect (ast:ast) env =
+  match rm_loc ast with
   | Affect (Var (p,i,loc),y) ->
     Hashtbl.replace extenv (expand_var_name (p,i) env) (eval_ast y env, loc)
-  | e -> raise (Error ("this does not seem to be an affectation: " ^ string_of_ast e))
+  | e -> raise_with_loc ast ("this does not seem to be an affectation: " ^ string_of_ast e)
 
 (* [eval_ast] evaluates (= expands) numerical, boolean and set expresions that
    are not directly in formulas. For example, in 'when $a!=a' or 'if 3>4',
    the boolean values must be computed: eval_ast will do exactly that.*)
-and eval_ast (ast:ast) (env:env) =
-  match ast with
+and eval_ast (ast:ast) (env:env) = match rm_loc ast with
   | Int x   -> Int x
   | Float x -> Float x
   | Bool x  -> Bool x
@@ -342,10 +348,11 @@ and eval_ast (ast:ast) (env:env) =
       | x',y' -> raise_type_error2 ast x x' y y' "a float or int")
   | UnexpProp (p,i) -> Prop (expand_var_name (p,i) env)
   | Prop x -> Prop x
-  | e -> raise (Error ("this expression cannot be expanded: " ^ string_of_ast e))
+  | Loc (x,l) -> eval_ast x env
+  | e -> raise_with_loc ast ("this expression cannot be expanded: " ^ string_of_ast e)
 
 and eval_set_decl (set_decl:ast) (env:env) =
-  let sets = (match set_decl with Set_decl sets -> sets | _ -> failwith "shoulnt happen: non-Set_decl in eval_set_decl") in
+  let sets = (match rm_loc set_decl with Set_decl sets -> sets | _ -> failwith "shoulnt happen: non-Set_decl in eval_set_decl") in
   let sets_expanded = List.map (fun x -> eval_ast x env) sets in
   let unwrap_int elmt elmt_expanded = match elmt_expanded with
     | Int x -> x
@@ -373,12 +380,13 @@ and eval_set_decl (set_decl:ast) (env:env) =
   | x::_,x'::_ -> raise_set_decl set_decl x x'
                     (Set_decl sets) (Set_decl sets_expanded)
                     "elements of type int,\nfloat or propositon"
-  | [],x::_ | x::_,[] -> failwith "shouldn't happen: len(sets)!=len(sets_expanded)"
+  | [],x::_ | x::_,[] -> failwith "shouldn't happen: len(sets)!=len(sets_expanded)" 
+
 
 (* [eval_ast_formula] evaluates formulas; nothing in formulas should be
    expanded, except for variables, bigand, bigor, let, exact, atleast,atmost. *)
 and eval_ast_formula (ast:ast) (env:env) : ast =
-  match ast with
+  match rm_loc ast with
   | Int x   -> Int x
   | Float x -> Float x
   | Neg x ->
@@ -590,8 +598,7 @@ and eval_ast_formula (ast:ast) (env:env) : ast =
   | Let (Var (p,i,loc),content,formula) ->
     let name = (expand_var_name (p,i) env) and desc = (eval_ast content env,loc)
     in eval_ast_formula formula ((name,desc)::env)
-  | e -> raise (Error ("this expression is not a formula: " ^ string_of_ast e))
-
+  | e -> raise_with_loc ast ("this expression is not a formula: " ^ string_of_ast e)
 
 and exact_str lst =
   let rec go = function

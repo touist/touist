@@ -1,10 +1,5 @@
 # OCaml
-
-parser.ml
 parser.mli
-
-myocamlbuild.ml
-_tags
 /touistc
 parser_messages.ml
 version.ml

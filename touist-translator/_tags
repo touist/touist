@@ -1,0 +1,49 @@
+# OASIS_START
+# DO NOT EDIT (digest: 1582f6085983ab9e6bd532a546965034)
+# Ignore VCS directories, you can use the same kind of rule outside
+# OASIS_START/STOP if you want to exclude directories that contains
+# useless stuff for the build process
+true: annot, bin_annot
+<**/.svn>: -traverse
+<**/.svn>: not_hygienic
+".bzr": -traverse
+".bzr": not_hygienic
+".hg": -traverse
+".hg": not_hygienic
+".git": -traverse
+".git": not_hygienic
+"_darcs": -traverse
+"_darcs": not_hygienic
+# Library touist
+"src/touist.cmxs": use_touist
+# Executable touistc
+<src/touistc.{native,byte}>: package(fileutils)
+<src/touistc.{native,byte}>: package(menhirLib)
+<src/touistc.{native,byte}>: package(minisat)
+<src/touistc.{native,byte}>: package(str)
+<src/touistc.{native,byte}>: use_touist
+# Executable touistc-debug
+"src/touistc.byte": package(fileutils)
+"src/touistc.byte": package(menhirLib)
+"src/touistc.byte": package(minisat)
+"src/touistc.byte": package(str)
+"src/touistc.byte": use_touist
+<src/*.ml{,i,y}>: package(fileutils)
+<src/*.ml{,i,y}>: package(menhirLib)
+<src/*.ml{,i,y}>: package(minisat)
+<src/*.ml{,i,y}>: package(str)
+<src/*.ml{,i,y}>: use_touist
+# Executable test
+"test/test.byte": package(fileutils)
+"test/test.byte": package(menhirLib)
+"test/test.byte": package(minisat)
+"test/test.byte": package(oUnit)
+"test/test.byte": package(str)
+"test/test.byte": use_touist
+<test/*.ml{,i,y}>: package(fileutils)
+<test/*.ml{,i,y}>: package(menhirLib)
+<test/*.ml{,i,y}>: package(minisat)
+<test/*.ml{,i,y}>: package(oUnit)
+<test/*.ml{,i,y}>: package(str)
+<test/*.ml{,i,y}>: use_touist
+# OASIS_STOP
