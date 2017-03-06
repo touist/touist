@@ -215,7 +215,7 @@ let element checkpoint i : element =
       raise Not_found
   | S.Cons (Element (a, b, p1, p2), _) ->
       match i with
-      | 0 -> let p1',p2' = (positions (match checkpoint with HandlingError env -> env)) in
+      | 0 -> let p1',p2' = (positions (match checkpoint with HandlingError env -> env | _ -> failwith "Shouldnt happen")) in
         Element (a, b, p1', p2')
       | _ -> Element (a, b, p1, p2)
 
