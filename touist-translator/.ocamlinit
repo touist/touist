@@ -16,11 +16,12 @@
 #load "parser_messages.cmo";;
 #load "lexer.cmo";;
 #load "parser.cmo";;
-#load "ErrorReporting.cmo";;
+#load "parser_error_report.cmo";;
+#load "parse.cmo";;
 #load "eval.cmo";;
 #load "version.cmo";;
 #load "cnf.cmo";;
-#load "dimacs.cmo";;
+#load "sat.cmo";;
 #load "smt.cmo";;
 
 (* From 'utop', you can test small pieces of your code. For example,

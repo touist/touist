@@ -31,7 +31,6 @@ type loc = Lexing.position * Lexing.position
 and var = string * ast list option * loc
 and ast = (* Touist_code is the entry point *)
   | Touist_code      of ast list * ast list option
-  | Loc              of ast * loc
   | Int              of int
   | Float            of float
   | Bool             of bool
@@ -89,6 +88,16 @@ and ast = (* Touist_code is the entry point *)
          abcd(1,foo,123,a)     <- an actual string that represents an actual
                                   logical proposition
   *)
+  | Loc              of ast * loc  
+  (* Loc is a clever way of keeping the locations in the text of the ast elements.
+     In parser.mly, each production rule gives its location in the original text;
+     for example, instead of simply returning
+         Inter (x,y)
+     the parser will return
+         Loc (Inter (x,y), ($startpos,$endpos))
+     Loc is used in eval.ml when checking the types; it allows to give precise
+     locations.
+     *)
 and set =
   | EmptySet
   | ISet of IntSet.t

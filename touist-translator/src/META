@@ -1,0 +1,12 @@
+# OASIS_START
+# DO NOT EDIT (digest: 4ef821cf622d8131de8be46fecf6f647)
+version = "0.1"
+description = "This package is a compiler to the DIMACS file format"
+requires = "menhirLib fileutils str minisat"
+archive(byte) = "touist.cma"
+archive(byte, plugin) = "touist.cma"
+archive(native) = "touist.cmxa"
+archive(native, plugin) = "touist.cmxs"
+exists_if = "touist.cma"
+# OASIS_STOP
+

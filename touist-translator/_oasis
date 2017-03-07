@@ -33,10 +33,16 @@ PostCleanCommand: make -f TopMakefile clean
 
 XOCamlbuildExtraArgs: -use-menhir -menhir \"menhir --table --inspection -v -la 2\"
 
+# IMPORTANT: the library name is 'touist', so when calling ocamlc we must add
+#     ocamlfind ocamlc -pkg Touist
+# but inside of the .ml files that use the functions, you just have to do:
+#     open Parse                                  (or Sat, Smt, Eval...)
+# I know that it is confusing for now: we should be able to do '-pkg touist'
+# and 'open Touist'...
 Library touist
   Path:           src
-  Install:        false
-  Modules:        Translation,Dimacs,Smt
+  Install:        true
+  Modules:        Parse,Eval,Sat,Smt
   BuildTools:     ocamlbuild, git, menhir
   BuildDepends:   menhirLib (>= 20150118), fileutils (>= 0.4.0), str, minisat
 

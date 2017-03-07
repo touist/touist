@@ -1,8 +1,8 @@
 open OUnit2;;
 
 let parse_and_eval expr : unit =
-    let _ = Translation.parse_str_simple_to_ast expr 
-            |> Translation.eval_ast in ()
+    let _ = Parse.parse_sat expr
+            |> Eval.eval in ()
 
 
 let test1 _ = parse_and_eval

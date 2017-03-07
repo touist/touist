@@ -1,5 +1,5 @@
 (*
- * ErrorReporting.ml: handles errors produced by the menhir
+ * parser_error_report.ml: handles errors produced by the menhir
  *              incremental parser.
  *              [report] is the main function.
  *

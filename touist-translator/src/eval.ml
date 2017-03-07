@@ -17,8 +17,7 @@
 open Syntax
 open Pprint
 
-exception Error of string
-exception ErrorWithLoc of string * loc
+exception Error of string * loc
 
 (* Variables are stored in two data structures (global and local scopes). *)
 
@@ -34,13 +33,22 @@ type env = (string * (ast * loc)) list
    The description is a couple (content, location) *)
 type extenv = (string, (ast * loc)) Hashtbl.t
 
-let raise_with_loc (ast:ast) (message:string) = match ast with
-  | Loc (ast,loc) -> raise (ErrorWithLoc (message,loc))
-  | _ -> raise (Error (message))
-
-let rm_loc (ast:ast) : ast = match ast with
+(* [ast_whithout_loc] removes the location attached by the parser to the ast
+   node. This location 'Loc (ast,loc)' allows to give the location in error 
+   messages. [ast_whithout_loc] must be called before any 
+        match ast with | Inter (x,y) -> ... *)
+let ast_whithout_loc (ast:ast) : ast = match ast with
   | Loc (ast,_) -> ast
   | ast -> ast
+
+(* [raise_with_loc] takes an ast that may contains a Loc (Loc is added in
+   parser.mly) and raise an exception with the given message.
+   The only purpose of giving 'ast' is to get the Loc thing.
+   [ast_whithout_loc] should not have been previously applied to [ast]
+   because ast_whithout_loc will remove the Loc thing. *)
+let raise_with_loc (ast:ast) (message:string) = match ast with
+  | Loc (ast,loc) -> raise (Error (message,loc))
+  | _ -> raise (Error (message,(Lexing.dummy_pos,Lexing.dummy_pos)))
 
 (* [raise_type_error] raises the errors that come from one-parameter functions.
    operator is the non-expanded (expand = eval_ast) operator.
@@ -51,7 +59,7 @@ let rm_loc (ast:ast) : ast = match ast with
    'an integer or a float'. *)
 let raise_type_error operator operand expanded (expected_types:string) = 
   match operand with
-  | Var (_,_,loc) -> raise (ErrorWithLoc (
+  | Var (_,_,loc) -> raise (Error (
       "'"^(string_of_ast_type operator)^"' expects "^expected_types^".\n"^
       "The content of the variable '"^(string_of_ast operand)^"' has type '"^(string_of_ast_type expanded)^"':\n"^
       "    "^(string_of_ast expanded)^"", loc))
@@ -79,7 +87,7 @@ let raise_type_error2 operator op1 exp1 op2 exp2 (expected_types:string) =
                 "Right-hand operand has type '"^(string_of_ast_type exp2)^"':\n"^
                 "    "^(string_of_ast exp2)^""^
                 "")
-  in raise (ErrorWithLoc (
+  in raise (Error (
       "incorrect types with '"^(string_of_ast_type operator)^"', which expects "^expected_types ^".\n"^
       "The content of the variable '"^(string_of_ast var)^"' has type '"^(string_of_ast_type content)^"':\n"^
       "    "^(string_of_ast content)^"\n"^
@@ -90,7 +98,7 @@ let raise_type_error2 operator op1 exp1 op2 exp2 (expected_types:string) =
    and the set this element is supposed to be added to. *)
 let raise_set_decl ast elmt elmt_expanded set set_expanded (expected_types:string) =
   match elmt with
-  | Var (_,_,loc) -> raise (ErrorWithLoc (
+  | Var (_,_,loc) -> raise (Error (
       "Ill-formed set declaration. It expects "^expected_types^".\n"^
       "The content of the variable '"^(string_of_ast elmt)^"' has type '"^(string_of_ast_type elmt_expanded)^"':\n"^
       "    "^(string_of_ast elmt_expanded)^"\n"^
@@ -121,7 +129,7 @@ let check_nb_vars_and_sets (ast:ast) (vars: ast list) (sets: ast list) : unit =
   | false -> let vars_loc = fist_last_loc_of vars
   (* We only know the locations of the variables. To help the user, we give
      him the position of the list of variables. *)
-    in raise (ErrorWithLoc (
+    in raise (Error (
         "Ill-formed '"^(string_of_ast_type ast)^"'. The number of variables and sets must be the same.\n"^
         "You defined "^(string_of_int (List.length vars))^" variables:\n"^
         "    "^(string_of_ast_list "," vars)^"\n"^
@@ -152,7 +160,7 @@ and eval_touist_code ast (env:env) =
     | [x]   -> x
     | x::xs -> And (x, loop xs)
   in
-  match rm_loc ast with
+  match ast_whithout_loc ast with
   | Touist_code (formulas, None) -> eval_ast_formula (loop formulas) env
   | Touist_code (formulas, Some decl) ->
     List.iter (fun x -> eval_affect x env) decl;
@@ -160,7 +168,7 @@ and eval_touist_code ast (env:env) =
   | e -> raise_with_loc ast ("this does not seem to be a touist code structure: " ^ string_of_ast e)
 
 and eval_affect (ast:ast) env =
-  match rm_loc ast with
+  match ast_whithout_loc ast with
   | Affect (Var (p,i,loc),y) ->
     Hashtbl.replace extenv (expand_var_name (p,i) env) (eval_ast y env, loc)
   | e -> raise_with_loc ast ("this does not seem to be an affectation: " ^ string_of_ast e)
@@ -168,7 +176,7 @@ and eval_affect (ast:ast) env =
 (* [eval_ast] evaluates (= expands) numerical, boolean and set expresions that
    are not directly in formulas. For example, in 'when $a!=a' or 'if 3>4',
    the boolean values must be computed: eval_ast will do exactly that.*)
-and eval_ast (ast:ast) (env:env) = match rm_loc ast with
+and eval_ast (ast:ast) (env:env) = match ast_whithout_loc ast with
   | Int x   -> Int x
   | Float x -> Float x
   | Bool x  -> Bool x
@@ -178,7 +186,7 @@ and eval_ast (ast:ast) (env:env) = match rm_loc ast with
       try let (content,loc) = List.assoc name env in content
       with Not_found ->
       try let (content,_) = Hashtbl.find extenv name in content
-      with Not_found -> raise (ErrorWithLoc (
+      with Not_found -> raise (Error (
           "variable '" ^ name ^"' does not seem to be known. Either you forgot\n"^
           "to declare it globally or it has been previously declared locally\n"^
           "(with bigand, bigor or let) and you are out of its scope.", loc))
@@ -352,7 +360,7 @@ and eval_ast (ast:ast) (env:env) = match rm_loc ast with
   | e -> raise_with_loc ast ("this expression cannot be expanded: " ^ string_of_ast e)
 
 and eval_set_decl (set_decl:ast) (env:env) =
-  let sets = (match rm_loc set_decl with Set_decl sets -> sets | _ -> failwith "shoulnt happen: non-Set_decl in eval_set_decl") in
+  let sets = (match ast_whithout_loc set_decl with Set_decl sets -> sets | _ -> failwith "shoulnt happen: non-Set_decl in eval_set_decl") in
   let sets_expanded = List.map (fun x -> eval_ast x env) sets in
   let unwrap_int elmt elmt_expanded = match elmt_expanded with
     | Int x -> x
@@ -386,7 +394,7 @@ and eval_set_decl (set_decl:ast) (env:env) =
 (* [eval_ast_formula] evaluates formulas; nothing in formulas should be
    expanded, except for variables, bigand, bigor, let, exact, atleast,atmost. *)
 and eval_ast_formula (ast:ast) (env:env) : ast =
-  match rm_loc ast with
+  match ast_whithout_loc ast with
   | Int x   -> Int x
   | Float x -> Float x
   | Neg x ->
@@ -455,7 +463,7 @@ and eval_ast_formula (ast:ast) (env:env) : ast =
         | Int x' -> Int x'
         | Float x' -> Float x'
         | Prop x -> Prop x
-        | _ -> raise (ErrorWithLoc (
+        | _ -> raise (Error (
             "'" ^ name ^ "' has been declared locally (in bigand, bigor or let)\n" ^
             "Locally declared variables must be scalar (float, int or term).\n" ^
             "Instead, the content of the variable has type '"^(string_of_ast_type content)^"':\n"^
@@ -468,7 +476,7 @@ and eval_ast_formula (ast:ast) (env:env) : ast =
         | Int x' -> Int x'
         | Float x' -> Float x'
         | Prop x -> Prop x
-        | _ -> raise (ErrorWithLoc (
+        | _ -> raise (Error (
             "the global variable '" ^ name ^ "' should be a scalar (number or term).\n" ^
             "Instead, the content of the variable has type '"^(string_of_ast_type content)^"':\n"^
             "    "^(string_of_ast content), loc_affect))
@@ -497,7 +505,7 @@ and eval_ast_formula (ast:ast) (env:env) : ast =
             | Int x -> Int x
             | Float x -> Float x
             | Prop x -> Prop x
-            | wrong -> raise (ErrorWithLoc (
+            | wrong -> raise (Error (
                 "'" ^ name ^ "' has not been declared; maybe you wanted '"^prefix^"' to expand\n" ^
                 "in order to produce an expanded version <"^prefix^"-content>("^(string_of_ast_list "," indices)^")." ^
                 "But the content of the variable '"^prefix^"' has type '"^(string_of_ast_type wrong)^"':\n"^
@@ -506,7 +514,7 @@ and eval_ast_formula (ast:ast) (env:env) : ast =
           in eval_ast_formula (UnexpProp ((string_of_ast term), Some indices)) env
       (* Case 5. the variable was of the form '$v(1,2,3)' and was not declared
          and '$v' is not either declared, so we can safely guess that this var has not been declared. *)
-      with Not_found -> raise (ErrorWithLoc ("'" ^ name ^ "' has not been declared", loc))
+      with Not_found -> raise (Error ("'" ^ name ^ "' has not been declared", loc))
     end
   | Not Top    -> Bottom
   | Not Bottom -> Top

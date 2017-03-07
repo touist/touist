@@ -183,6 +183,6 @@ let rec to_cnf depth (stop:stop) (ast:ast) : ast =
     cnf
 
 (* [ast_to_cnf] is the entry point  for [to_cnf] *)
-let ast_to_cnf (ast:ast) debug_mode : ast =
-  debug := debug_mode;
+let ast_to_cnf ?debug:(d=false) (ast:ast) : ast =
+  debug := d;
   to_cnf 0 No ast

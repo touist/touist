@@ -1,7 +1,7 @@
 (*
- * dimacs.ml: processes the CNF-compliant version of the abstract syntaxic tree and
+ * sat.ml: processes the CNF-compliant version of the abstract syntaxic tree and
  *            produces a string in DIMACS format.
- *            [to_dimacs] is the main function.
+ *            [cnf_to_clauses] is the main function.
  *
  * Project TouIST, 2015. Easily formalize and solve real-world sized problems
  * using propositional logic and linear theory of reals with a nice language and GUI.
@@ -216,3 +216,13 @@ let solve_clauses
         models := ModelSet.add model !models; print model i;
         models
   in solve_loop limit 0
+
+(* [print_solve] outputs the result of the solver.
+   'show_hidden' indicates that the hidden literals introduced during
+   CNF conversion should be shown. *)
+let print_solve output (solver:Minisat.t) (table:(string, Minisat.Lit.t) Hashtbl.t) show_hidden =
+  let string_of_value solver (lit:Minisat.Lit.t) = match Minisat.value solver lit with
+    | V_true -> "1" | V_false -> "0" | V_undef -> "?"
+  in let print_value_and_name name lit = if show_hidden || name.[0] != '&'
+       then Printf.fprintf output "%s %s\n" (string_of_value solver lit) name
+  in Hashtbl.iter print_value_and_name table
