@@ -52,19 +52,22 @@ before_install:
 install:
   # Build touistc (touist-translator)  
   - cd touist-translator
-  - ./configure --bindir ../touist-gui/external
+  - ./configure --bindir ../touist-gui/external --enable-tests
   - make && make install
+  - cd ..
 
   # Build touist.jar (touist-gui)
-  - cd ../touist-gui
+  - cd touist-gui
   - chmod ugo+x external/touistc
   - ant -e zip
   - zip=$(ls | grep 'touist.*\.zip' | head -1) # The artifact's name for later use
   - echo $zip
+  - cd ..
 
 # This part is meant for unit tests (among others).
 script:
-  - echo "Build succeded. No tests yet."
+  - cd touist-translator
+  - make test
 
 
 # This is the part where the touist.zip is pushed to the Github

@@ -85,7 +85,7 @@ build_script:
   # Build touistc (touist-translator)
   # IMPORTANT: I had to add the 2>&1 because when something writes to
   # stderr, Powershell thinks there was an error... -_-
-  - '%CYG_BASH% -lc "cd /cygdrive/c/touist/touist-translator && ./configure --bindir ../touist-gui/external 2>&1"'
+  - '%CYG_BASH% -lc "cd /cygdrive/c/touist/touist-translator && ./configure --bindir ../touist-gui/external --enable-tests 2>&1"'
   - '%CYG_BASH% -lc "cd /cygdrive/c/touist/touist-translator && make 2>&1"'
   - '%CYG_BASH% -lc "cd /cygdrive/c/touist/touist-translator && make install 2>&1"'
 
@@ -95,7 +95,8 @@ build_script:
   - ps: $zip=$(Get-ChildItem -name -include touist*.zip) # The artifact's name for later use
   - ps: echo $zip
 
-test: off
+test_script:
+  - '%CYG_BASH% -lc "cd /cygdrive/c/touist/touist-translator && make test 2>&1"'
 
 # Important: to be able to use the artifact: /touist-.*\.zip/
 # in deploy:, it is mandatory to add every .zip or whatever
