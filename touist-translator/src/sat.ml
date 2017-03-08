@@ -1,8 +1,9 @@
-(*
- * sat.ml: processes the CNF-compliant version of the abstract syntaxic tree and
- *            produces a string in DIMACS format.
- *            [cnf_to_clauses] is the main function.
- *
+ (** Processes the CNF-compliant version of the abstract syntaxic tree given by [Cnf.ast_to_cnf]
+     and produces a string in DIMACS format.
+     
+     [cnf_to_clauses] is the main function. *)
+
+(**
  * Project TouIST, 2015. Easily formalize and solve real-world sized problems
  * using propositional logic and linear theory of reals with a nice language and GUI.
  *

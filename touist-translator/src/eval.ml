@@ -1,8 +1,8 @@
-(*
- * eval.ml: semantic analysis of the abstract syntaxic tree produced by the parser.
- *          [eval] is the main function.
- *
- * Project TouIST, 2015. Easily formalize and solve real-world sized problems
+(** Functions for semantic analysis of the abstract syntaxic tree produced by [Parse.parse].
+    
+    [eval] is the main function. *)
+
+(* Project TouIST, 2015. Easily formalize and solve real-world sized problems
  * using propositional logic and linear theory of reals with a nice language and GUI.
  *
  * https://github.com/touist/touist
@@ -11,7 +11,7 @@
  * This program and the accompanying materials are made available
  * under the terms of the GNU Lesser General Public License (LGPL)
  * version 2.1 which accompanies this distribution, and is available at
- * http://www.gnu.org/licenses/lgpl-2.1.html
+ * http://www.gnu.org/licenses/lgpl-2.1.html 
  *)
 
 open Syntax
@@ -151,6 +151,10 @@ let process_empty (set:ast) (set_type:ast) : ast = match set,set_type with
 
 let extenv = Hashtbl.create 10
 
+(** Main function for checking the types and evaluating the touistl expressions
+    (variables, bigand, bigor, let...).
+    @param ast is the AST given by [Parse.parse] 
+    @raise Eval.Error (msg,loc) *)
 let rec eval ast =
   eval_touist_code ast []
 

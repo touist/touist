@@ -1,13 +1,12 @@
-(*
- * parser_error_report.ml: handles errors produced by the menhir
- *              incremental parser.
- *              [report] is the main function.
- *
- *              To understand what is a checkpoint and everything, you can
- *              check the menhir incremental parser API in
- *              IncrementalEngine.ml (google it)
- *
- * Project TouIST, 2015. Easily formalize and solve real-world sized problems
+(** Handles errors in [Parse.parse] produced by the menhir in 
+    incremental parser.
+    [report] is the main function. *)
+ 
+(* To understand what is a checkpoint and everything, you can
+   check the menhir incremental parser API in
+   IncrementalEngine.ml (google it) *)
+
+(* Project TouIST, 2015. Easily formalize and solve real-world sized problems
  * using propositional logic and linear theory of reals with a nice language and GUI.
  *
  * https://github.com/FredMaris/touist
@@ -34,8 +33,7 @@
  * under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 2 of the License, or
  * (at your option) any later version.  This file is also distributed
- * under the terms of the INRIA Non-Commercial License Agreement.
- *)
+ * under the terms of the INRIA Non-Commercial License Agreement. *)
 
 open Lexing
 open Parser.MenhirInterpreter

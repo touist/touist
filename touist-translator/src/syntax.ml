@@ -1,7 +1,6 @@
-(*
- * syntax.ml: defition of the types constituting the abstract syntaxic tree (ast)
- *
- * Project TouIST, 2015. Easily formalize and solve real-world sized problems
+(** Defition of the types constituting the abstract syntaxic tree (ast) *)
+
+(* Project TouIST, 2015. Easily formalize and solve real-world sized problems
  * using propositional logic and linear theory of reals with a nice language and GUI.
  *
  * https://github.com/touist/touist
@@ -10,8 +9,7 @@
  * This program and the accompanying materials are made available
  * under the terms of the GNU Lesser General Public License (LGPL)
  * version 2.1 which accompanies this distribution, and is available at
- * http://www.gnu.org/licenses/lgpl-2.1.html
- *)
+ * http://www.gnu.org/licenses/lgpl-2.1.html *)
 
 module IntSet = Set_ext.Make(
   struct

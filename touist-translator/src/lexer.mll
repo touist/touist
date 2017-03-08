@@ -1,7 +1,6 @@
-(*
- * lexer.mll: definition of the ocamllex lexer.
- *
- * Project TouIST, 2015. Easily formalize and solve real-world sized problems
+(* Definition of the ocamllex lexer. *)
+
+(* Project TouIST, 2015. Easily formalize and solve real-world sized problems
  * using propositional logic and linear theory of reals with a nice language and GUI.
  *
  * https://github.com/touist/touist
@@ -28,8 +27,7 @@
  * under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 2 of the License, or
  * (at your option) any later version.  This file is also distributed
- * under the terms of the INRIA Non-Commercial License Agreement.
- *)
+ * under the terms of the INRIA Non-Commercial License Agreement. *)
 
 {
   open Lexing

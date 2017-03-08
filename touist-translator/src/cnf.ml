@@ -1,9 +1,43 @@
-(*
- * cnf.ml: processes the "semantically correct" abstract syntax tree (ast) given by [eval]
- *         to produce a CNF-compliant version of the abstract syntax tree.
- *         [to_cnf] is the main function.
- *
- * Project TouIST, 2015. Easily formalize and solve real-world sized problems
+(** Processes the "semantically correct" abstract syntax tree (ast) given by [Eval.eval]
+    to produce a CNF-compliant version of the abstract syntax tree.
+    
+    [ast_to_cnf] is the main function. 
+    
+    {2 Vocabulary}
+    
+    {ul{- Literal:
+      a possibly negated proposition; we denote them as a, b... and
+      their type is homogenous to [Prop _] or [Not(Prop _)] or [Top] or [Bottom].
+      Exples:
+         - [   a        ]                        is a literal,
+         - [   not b    ]                        is a literal.
+    
+    }{- Clause:
+      a disjunction (= separated by "or") of possibly negated literals.
+      Example of clause:
+        - [   a or not b or c or d   ]          is a clause
+    
+    }{- Conjunction:
+      literals separated by "and"; example:
+        - [   a and b and not and not d    ]    is a conjunction
+    
+    }{- AST:
+      abstract syntax tree; it is homogenous to Syntax.ast
+      and is a recursive tree representing a formula, using Or, And, Implies...
+      Example: the formula (1) has the abstract syntax tree (2):
+        - [   (a or b) and not c    ]                  (1) natural language
+        - [   And (Or (Prop x, Prop x),Not (Prop x))  ](2) abstract syntax tree
+
+    }{- CNF:
+      a Conjunctive Normal Form is an AST that has a special structure with
+      is a conjunction of disjunctions of literals. For example:
+        - [   (a or not b) and (not c and d)   ]    is a CNF form
+        - [   (a and b) or not (c or d)        ]    is not a CNF form
+    
+    }}
+*)
+
+(* Project TouIST, 2015. Easily formalize and solve real-world sized problems
  * using propositional logic and linear theory of reals with a nice language and GUI.
  *
  * https://github.com/touist/touist
@@ -12,38 +46,11 @@
  * This program and the accompanying materials are made available
  * under the terms of the GNU Lesser General Public License (LGPL)
  * version 2.1 which accompanies this distribution, and is available at
- * http://www.gnu.org/licenses/lgpl-2.1.html
- *)
+ * http://www.gnu.org/licenses/lgpl-2.1.html *)
 
 open Syntax
 open Pprint
 exception Error of string
-
-(*  Vocabulary:
-    - Literal:
-      a possibly negated proposition; we denote them as a, b... and
-      their type is homogenous to Prop _ or Not(Prop _) or Top or Bottom. Exples:
-          a                                         is a literal
-          not b                                     is a literal
-    - Clause:
-      a disjunction (= separated by "or") of possibly negated literals.
-      Example of clause:
-          a or not b or c or d                      is a clause
-    - Conjunction:
-      literals separated by "and"; example:
-          a and b and not and not d                 is a conjunction
-    - AST:
-      abstract syntax tree; it is homogenous to Syntax.ast
-      and is a recursive tree representing a formula, using Or, And, Implies...
-      Example: the formula (1) has the abstract syntax tree (2):
-          (a or b) and not c                          (1) natural language
-          And (Or (Prop x, Prop x),Not (Prop x))   (2) abstract syntax tree
-    - CNF:
-      a Conjunctive Normal Form is an AST that has a special structure with
-      is a conjunction of disjunctions of literals. For example:
-          (a or not b) and (not c and d)            is a CNF form
-          (a and b) or not (c or d)                 is not a CNF form
- *)
 
 (* [is_clause] checks that the given AST is a clause. This function can only
    be called on an AST containing Or, And or Not. No Equiv or Implies! *)
@@ -100,14 +107,19 @@ let print_debug (prefix:string) depth (formulas:ast list) : unit =
    recursions. See (1) below *)
 type stop = No | Yes of int
 
-(* [to_cnf] translates the syntaxic tree made of Or, And, Implies, Equiv...
+(** [ast_to_cnf] translates the syntaxic tree made of Or, And, Implies, Equiv...
  * Or, And and Not; moreover, it can only be in a conjunction of formulas
  * (see a reminder of their definition above).
  * For example (instead of And, Or we use "and" and "or" and "not"):
  *     (a or not b or c) and (not a or b or d) and (d)
  * The matching abstract syntax tree (ast) is
  *     And (Or a,(Cor (Not b),c)), (And (Or (Or (Not a),b),d), d)
- *
+ *)
+let rec ast_to_cnf ?debug:(d=false) (ast:ast) : ast =
+  debug := d;
+  to_cnf 0 No ast
+
+(* Actual logic of [ast_to_cnf] 
  * The `depth` variable tells what is the current level of recursion and
  * helps for debugging the translation to CNF.
  * The `stop` boolean tells to_cnf if it should stop or continue the recursion
@@ -118,9 +130,8 @@ type stop = No | Yes of int
  *     we want to limit the inner `to_cnf` expansion to let the possibily for
  *     the outer to_cnf to "simplify" with the Not as soon as possible.
  *     For inner `to_cnf`, we simply use `to_cnf_once` to prevent the inner
- *     `to_cnf` from recursing more than once.
- * *)
-let rec to_cnf depth (stop:stop) (ast:ast) : ast =
+ *     `to_cnf` from recursing more than once. *)
+and to_cnf depth (stop:stop) (ast:ast) : ast =
   if !debug then print_debug "in:  " depth [ast];
   if (match stop with Yes 0 -> true | _ -> false) then ast else (* See (1) above*)
     let to_cnf_once = to_cnf (depth+1) (match stop with Yes i->Yes (i-1) | No->Yes 1) in
@@ -182,7 +193,4 @@ let rec to_cnf depth (stop:stop) (ast:ast) : ast =
     if !debug then print_debug "out: " depth [cnf];
     cnf
 
-(* [ast_to_cnf] is the entry point  for [to_cnf] *)
-let ast_to_cnf ?debug:(d=false) (ast:ast) : ast =
-  debug := d;
-  to_cnf 0 No ast
+

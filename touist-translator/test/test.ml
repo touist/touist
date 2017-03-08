@@ -3,7 +3,7 @@ open OUnit2;;
 (* The ending _ is necessary because the testing function
    must accept the 'context' thing. *)
 let eval text _ =
-    let _ = Parse.parse_sat text |> Eval.eval in ()
+  let _ = Parse.parse_sat text |> Eval.eval in ()
 
 (* To check that the error has occured curreclty, we only check
    that the place where the error was found is the right one.  *)
@@ -19,7 +19,8 @@ let assert_eval_exception (loc_expected:string) text _ =
       end
   in match exception_is_correct with
   | true -> ()
-  | false -> raise (OUnit2.assert_failure ("should have raised Eval.Error exception with location "^loc_expected))
+  | false -> raise (OUnit2.assert_failure (
+    "this test should have raised Eval.Error exception with location '"^loc_expected^"'"))
 
 
 (*  A standard test in oUnit should first define a function 
@@ -53,7 +54,7 @@ run_test_tt_main (
 ]); 
 run_test_tt_main (
 "samples of code that should raise errors in 'eval'">:::[ (* 'c' is the testing context *)
-  "not empty">::       (assert_eval_exception "2:2:" "\n $a");
+  "not empty">::       (assert_eval_exception "1:4:" "   $a");
   "bigand: too many vars">::(assert_eval_exception "1:8:" "bigand $i,$j in [1]: p end");
   "bigand: too many sets">::(assert_eval_exception "1:8:" "bigand $i in [1],[2]: p end");
   "bigor: too many vars">::(assert_eval_exception "1:7:" "bigor $i,$j in [1]: p end");

@@ -42,7 +42,7 @@ XOCamlbuildExtraArgs: -use-menhir -menhir \"menhir --table --inspection -v -la 2
 Library touist
   Path:           src
   Install:        false
-  Modules:        Parse,Eval,Sat,Smt
+  Modules:        Parse,Eval,Cnf,Sat,Smt
   BuildTools:     ocamlbuild, git, menhir
   BuildDepends:   menhirLib (>= 20150118), fileutils (>= 0.4.0), str, minisat
 
