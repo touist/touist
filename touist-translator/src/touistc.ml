@@ -177,7 +177,7 @@ let () =
         | i when !only_count -> Printf.fprintf !output "%d\n" i; exit 0
         | 0 -> Printf.fprintf stderr "Unsat\n"; exit 1
         | i -> (* case where we already printed models in [solve_clause] *)
-          Printf.fprintf !output "==== Found %d models, limit is %d (--limit N for more models)\n" !limit i; exit 0
+          Printf.fprintf !output "==== Found %d models, limit is %d (--limit N for more models)\n" i !limit; exit 0
     else
       (* B. solve not asked: print the Sat file *)
       let clauses,tbl = Parse.parse_sat ~debug:!debug_syntax (string_of_file !input) 

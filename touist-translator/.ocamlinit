@@ -8,6 +8,7 @@
 #require "minisat";;
 #require "str";;
 #require "fileutils";;
+#require "OUnit";;
 
 (* The order of the loads is important *)
 #load "set_ext.cmo";;

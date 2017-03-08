@@ -59,6 +59,7 @@
  *   applies for unary oparators *)
 
 %nonassoc low_precedence (* Lesser priority on precedence *)
+
 %right EQUIV IMPLIES
 %left OR
 %left AND
@@ -135,21 +136,24 @@ comma_list(T):
   | x=T { x::[] }
   | x=T COMMA l=comma_list(T) { x::l }
 
+(* A touistl code is a blank-separated list of either formulas or 
+   global variable affectations. Global affectations can only occur
+   in this 'top' list ('top' because it is at the top of the ast tree). *)
+%inline affect_or(T):
+  | a=global_affect {a}
+  | f=T option(DATA) {f} (* DATA is now useless but stays for compatibilty *)
+
 (* [touist_simple] is the entry point of the parser in sat mode *)
 touist_simple:
-  | a=global_affect+ f=formula_simple+ EOF {Loc (Touist_code (f,Some a),($startpos,$endpos))}
-  | f=formula_simple+ DATA a=global_affect+ EOF {Loc (Touist_code (f,Some a),($startpos,$endpos))}
-  | f=formula_simple+ EOF {Loc (Touist_code (f,None),($startpos,$endpos))}
+  | f=affect_or(formula_simple)+ EOF {Loc (Touist_code (f),($startpos,$endpos))}
 
 
 (* [touist_smt] is the entry point of the parser in smt mode *)
 touist_smt:
-  | a=global_affect+ f=formula_smt+ EOF {Loc (Touist_code (f, Some a),($startpos,$endpos))}
-  | f=formula_smt+ DATA a=global_affect+ EOF {Loc (Touist_code (f,Some a),($startpos,$endpos))}
-  | f=formula_smt+ EOF {Loc (Touist_code (f,None),($startpos,$endpos))}
+  | f=affect_or(formula_smt)+ EOF {Loc (Touist_code (f),($startpos,$endpos))}
 
 (* Used in tuple expression; see tuple_variable and tuple_term *)
-indices: i=expr { i }
+%inline indices: i=expr { i }
 
 (* a tuple_term is of the form abc(1,d,3): the indices can be *)
 prop:
@@ -163,16 +167,15 @@ prop:
    These two placeholders can only be used in a semantic action, not in the
    %{ %} header. *)
 var:
-  | v=VAR { let loc=($startpos,$endpos) in Var (v,None,loc) }
+  | v=VAR { let loc=($startpos,$endpos) in Var (v,None,loc) } (* avoids shift/reduce conflict in case: '$a=1 $a' *)
   | v=VARTUPLE (*LPAREN*) l=comma_list(indices) RPAREN (* tuple_variable *)
-    { let loc=($startpos,$endpos) in Var (v,Some l,loc) }
+    { let loc=($startpos,$endpos) in Var (v,Some l,loc) } (* avoids shift/reduce conflict in case: '$a=1 $a' *)
 
 (* a global variable is a variable used in the 'data' block
   for defining sets and constants; it can be of the form of a
   tuple_variable, i.e. with prefix+indices: '$i(1,a,d)'.
   The indices can be either expression or term *)
-%inline global_affect:
-  | v=var AFFECT e=expr {Loc (Affect (v,e),($startpos,$endpos))}
+%inline global_affect: v=var AFFECT e=expr {Loc (Affect (v,e),($startpos,$endpos))}
 
 %inline if_statement(T): IF cond=expr THEN v1=T ELSE v2=T END {Loc (If (cond,v1,v2),($startpos,$endpos))}
 
@@ -252,29 +255,31 @@ expr:
   | f=generalized_connectors(F) (* are only on formulas! No need for parametrization *)
   | f=let_affect(expr,F) {f}
 
-%inline let_affect(T,F): LET var=var AFFECT content=T COLON form=F 
+let_affect(T,F): LET var=var AFFECT content=T COLON form=F 
   {Loc (Let (var,content,form),($startpos,$endpos))} %prec low_precedence
 
 formula_simple:
-  | f=formula(formula_simple) { f }
-  | f=prop { f }
+  | f=var {f}
+  | f=formula(formula_simple)
+  | f=prop {f}
   | TOP { Top }
   | BOTTOM { Bottom }
-
-(* WARNING: SMT can handle things like '(x + 2) > 3.1', meaning that the
-   types are mixed. *)
-expr_smt:
-  | f=prop { f }
-  | TOP { Top }
-  | BOTTOM { Bottom }
-  | x=int 
-  | x=float
-  | x=order(expr_smt)
-  | x=equality(expr_smt) {x}
 
 formula_smt:
   | f=formula(formula_smt)
   | f=expr_smt { f }
+
+(* WARNING: SMT can handle things like '(x + 2) > 3.1', meaning that the
+   types are mixed. *)
+expr_smt:
+  | f=prop {f}
+  | TOP { Top }
+  | BOTTOM { Bottom }
+  | x=var {x}
+  | x=int
+  | x=float
+  | x=order(expr_smt)
+  | x=equality(expr_smt) {x}
 
 %inline generalized_connectors(F):
   | BIGAND v=comma_list(var) IN s=comma_list(expr) c=when_cond? COLON f=F END 

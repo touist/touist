@@ -30,7 +30,7 @@ module PropSet = Set_ext.Make(String)
 type loc = Lexing.position * Lexing.position
 and var = string * ast list option * loc
 and ast = (* Touist_code is the entry point *)
-  | Touist_code      of ast list * ast list option
+  | Touist_code      of ast list
   | Int              of int
   | Float            of float
   | Bool             of bool

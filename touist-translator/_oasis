@@ -31,7 +31,7 @@ AlphaFeatures: ocamlbuild_more_args
 PreBuildCommand: make -f TopMakefile
 PostCleanCommand: make -f TopMakefile clean
 
-XOCamlbuildExtraArgs: -use-menhir -menhir \"menhir --table --inspection -v -la 2\"
+XOCamlbuildExtraArgs: -use-menhir -menhir \"menhir --table --inspection -v -la 2 --explain\"
 
 # IMPORTANT: the library name is 'touist', so when calling ocamlc we must add
 #     ocamlfind ocamlc -pkg Touist

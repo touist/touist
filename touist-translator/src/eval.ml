@@ -155,23 +155,22 @@ let rec eval ast =
   eval_touist_code ast []
 
 and eval_touist_code ast (env:env) =
-  let rec loop = function
+  let rec affect_vars = function
+    | [] -> []
+    | Loc (Affect (Var (p,i,loc),y),_)::xs ->
+      Hashtbl.replace extenv (expand_var_name (p,i) env) (eval_ast y env, loc);
+        affect_vars xs
+    | x::xs -> x::(affect_vars xs)
+  in
+  let rec process_formulas = function
     | []    -> raise_with_loc ast ("no formulas")
-    | [x]   -> x
-    | x::xs -> And (x, loop xs)
+    | x::[] -> x
+    | x::xs -> And (x, process_formulas xs)
   in
   match ast_whithout_loc ast with
-  | Touist_code (formulas, None) -> eval_ast_formula (loop formulas) env
-  | Touist_code (formulas, Some decl) ->
-    List.iter (fun x -> eval_affect x env) decl;
-    eval_ast_formula (loop formulas) env
+  | Touist_code (formulas) ->
+    eval_ast_formula (process_formulas (affect_vars formulas)) env
   | e -> raise_with_loc ast ("this does not seem to be a touist code structure: " ^ string_of_ast e)
-
-and eval_affect (ast:ast) env =
-  match ast_whithout_loc ast with
-  | Affect (Var (p,i,loc),y) ->
-    Hashtbl.replace extenv (expand_var_name (p,i) env) (eval_ast y env, loc)
-  | e -> raise_with_loc ast ("this does not seem to be an affectation: " ^ string_of_ast e)
 
 (* [eval_ast] evaluates (= expands) numerical, boolean and set expresions that
    are not directly in formulas. For example, in 'when $a!=a' or 'if 3>4',
@@ -456,29 +455,30 @@ and eval_ast_formula (ast:ast) (env:env) : ast =
        name is '$v(a,b,c)', prefix is '$v' and indices are '(a,b,c)' *)
     let name = expand_var_name (p,i) env in
     begin
-      (* Case 1. Check if this variable name has been affected locally 
-         (recursive-wise) in bigand, bigor or let. *)
+      (* Case 1. Check if this variable name has been affected locally
+         (recursive-wise) in bigand, bigor or let.
+         To be accepted, this variable must contain a proposition. *)
       try let content,loc_affect = List.assoc name env in
         match content with
-        | Int x' -> Int x'
-        | Float x' -> Float x'
         | Prop x -> Prop x
         | _ -> raise (Error (
-            "'" ^ name ^ "' has been declared locally (in bigand, bigor or let)\n" ^
-            "Locally declared variables must be scalar (float, int or term).\n" ^
-            "Instead, the content of the variable has type '"^(string_of_ast_type content)^"':\n"^
-            "    "^(string_of_ast content),loc_affect))
+            "the local variable '" ^ name ^ "' (defined in a bigand, bigor or let) cannot be expanded\n"^
+            "into a proposition because its content is of type '"^(string_of_ast_type content)^"' instead of 'prop'.\n"^
+            "Why? Because this variable is part of a formula, and thus is expected\n"^
+            "to be a proposition. Here is the content of '" ^name^"':\n"^
+            "    "^(string_of_ast content), loc_affect))
       with Not_found ->
       (* Case 2. Check if this variable name has been affected globally, i.e.,
-         in the 'data' section *)
-      try let (content,loc_affect) = Hashtbl.find extenv name in
+         in the 'data' section. To be accepted, this variable must contain
+         a proposition. *)
+      try let content,loc_affect = Hashtbl.find extenv name in
         match content with
-        | Int x' -> Int x'
-        | Float x' -> Float x'
         | Prop x -> Prop x
         | _ -> raise (Error (
-            "the global variable '" ^ name ^ "' should be a scalar (number or term).\n" ^
-            "Instead, the content of the variable has type '"^(string_of_ast_type content)^"':\n"^
+            "the global variable '" ^ name ^ "' cannot be expanded into a proposition because\n"^
+            "its content is of type '"^(string_of_ast_type content)^"' instead of 'prop'.\n"^
+            "Why? Because this variable is part of a formula, and thus is expected\n"^
+            "to be a proposition. Here is the content of '" ^name^"':\n"^
             "    "^(string_of_ast content), loc_affect))
       with Not_found ->
       try
@@ -502,15 +502,13 @@ and eval_ast_formula (ast:ast) (env:env) : ast =
         | prefix, Some indices ->
           let (content,loc_affect) = List.assoc prefix env in
           let term = match content with
-            | Int x -> Int x
-            | Float x -> Float x
             | Prop x -> Prop x
             | wrong -> raise (Error (
-                "'" ^ name ^ "' has not been declared; maybe you wanted '"^prefix^"' to expand\n" ^
-                "in order to produce an expanded version <"^prefix^"-content>("^(string_of_ast_list "," indices)^")." ^
-                "But the content of the variable '"^prefix^"' has type '"^(string_of_ast_type wrong)^"':\n"^
-                "    "^(string_of_ast wrong)^"\n'"^
-                "which is not a term or a number, so it cannot be expanded as explained above.", loc_affect))
+                "the proposition '" ^ name ^ "' cannot be expanded because '"^prefix^"' is of type '"^(string_of_ast_type wrong)^"'.\n" ^
+                "In order to produce an expanded proposition of this kind, '"^prefix^"' must be a proposition.\n"^
+                "Why? Because this variable is part of a formula, and thus is expected\n"^
+                "to be a proposition. Here is the content of '" ^prefix^"':\n"^
+                "    "^(string_of_ast content), loc_affect))
           in eval_ast_formula (UnexpProp ((string_of_ast term), Some indices)) env
       (* Case 5. the variable was of the form '$v(1,2,3)' and was not declared
          and '$v' is not either declared, so we can safely guess that this var has not been declared. *)
