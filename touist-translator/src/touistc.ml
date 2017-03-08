@@ -104,7 +104,7 @@ let () =
   (* Check (file | -) and open input and output *)
   if (!input_file_path = "") && not !use_stdin (* NOTE: !var is like *var in C *)
   then (
-    print_endline (cmd^": you must give an input file (try --help)");
+    Printf.fprintf stderr "%s: you must give an input file (try --help)" cmd;
     exit (get_code ERROR)
   );
   if !use_stdin then (input := stdin) else (input := open_in !input_file_path);
@@ -120,17 +120,17 @@ let () =
 
   (* Check that either -smt2 or -sat have been selected *)
   if (!sat_mode && (!smt_logic <> "")) then begin
-    print_endline (cmd^": cannot use both SAT and SMT solvers (try --help)");
+    Printf.fprintf stderr "%s: cannot use both SAT and SMT solvers (try --help)\n" cmd;
     exit (get_code ERROR) end;
   if (not !sat_mode) && (!smt_logic = "") then begin
-    print_endline (cmd^": you must choose a solver to use: -sat or -smt2 (try --help)");
+    Printf.fprintf stderr "%s: you must choose a solver to use: -sat or -smt2 (try --help)" cmd;
     exit (get_code ERROR) end;
 
   (* SMT Mode: check if one of the available QF_? has been given after -smt2 *)
   if (not !sat_mode) && (not (List.exists (fun x->x=(String.uppercase !smt_logic)) smt_logic_avail)) then
-    (print_endline (cmd^": you must specify the logic used (-smt2 logic_name) (try --help)");
-     print_endline ("Example: -smt2 QF_IDL");
-     exit (get_code ERROR));
+    (Printf.fprintf stderr 
+    "%s: you must specify the logic used (-smt2 logic_name) (try --help)\nExample: -smt2 QF_IDL" cmd;
+    exit (get_code ERROR));
 
   try
   
