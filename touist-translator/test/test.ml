@@ -1,16 +1,11 @@
 open OUnit2;;
 
-(* The ending _ is necessary because the testing function
-   must accept the 'context' thing. *)
-let eval text _ =
-  let _ = Parse.parse_sat text |> Eval.eval in ()
-
 (* To check that the error has occured curreclty, we only check
    that the place where the error was found is the right one.  *)
-let assert_eval_exception (loc_expected:string) text _ =
+let test_raise (parse:(string->unit)) (loc_expected:string) text =
   let print_loc loc = Printf.sprintf "'%s'" loc in
   let exception_is_correct =
-    try let _= Parse.parse_sat text |> Eval.eval in false
+    try let _= parse text in false
     with Eval.Error (_,loc) -> begin
       OUnit2.assert_equal 
         ~msg:"line and column of expected Eval.Error are different"
@@ -22,6 +17,15 @@ let assert_eval_exception (loc_expected:string) text _ =
   | false -> raise (OUnit2.assert_failure (
     "this test should have raised Eval.Error exception with location '"^loc_expected^"'"))
 
+let sat text = let _= Parse.parse_sat text |> Eval.eval |> Cnf.ast_to_cnf |> Sat.cnf_to_clauses in ()
+let smt text = let _= Parse.parse_smt text |> Eval.eval |> Smt.to_smt2 "QF_IDL" in ()
+
+(* The ending _ is necessary because the testing function
+   must accept the 'context' thing. *)
+let test_sat text _ = sat text
+let test_smt text _ = smt text
+let test_sat_raise loc text _ = test_raise sat loc text
+let test_smt_raise loc text _ = test_raise smt loc text
 
 (*  A standard test in oUnit should first define a function 
         let test1 context : unit = OUnit2.assert_bool true
@@ -42,22 +46,42 @@ let loc = (Lexing.dummy_pos,Lexing.dummy_pos)
 (* Name the test cases and group them together *)
 let () = 
 run_test_tt_main (
-"samples of code that should be correct">:::[ (* 'c' is the testing context *)
-  "lower than">::      (eval "let $i=1.0: if $i < 3.0 then a else b end");
-  "bigand and >">::    (eval "bigand $i in [1..5] when $i > 2: p($i) end");
-  "let declaration">:: (eval "let $i = 3: p($i-$i*3-1 mod 2 / 1)");
-  "bigand">::          (eval "bigand $i in [a]: p($i) end");
-  "bigor">::           (eval "bigor $i in [a,b,c] when $i==a and $i!=d: $i(a) end");
-  "affect before">::   (eval "$a = a f($a)");
-  "affect after">::    (eval "f($a) $a = a");
-  "affect between">::  (eval "$a = a f($a,$b) $b = b");
-]); 
+"samples of code that should be correct with -sat and -smt2">:::[ (* 'c' is the testing context *)
+  "lower than">::      (test_sat "let $i=1.0: if $i < 3.0 then a else b end");
+  "bigand and >">::    (test_sat "bigand $i in [1..5] when $i > 2: p($i) end");
+  "let declaration">:: (test_sat "let $i = 3: p($i-$i*3-1 mod 2 / 1)");
+  "bigand">::          (test_sat "bigand $i in [a]: p($i) end");
+  "bigor">::           (test_sat "bigor $i in [a,b,c] when $i==a and $i!=d: $i(a) end");
+  "bigand imply">::    (test_sat "bigand $i,$j in [1..3],[1..3]:
+	                                A($i) and B($i) => not C($j) end");
+  "affect before">::   (test_sat "$a = a f($a)");
+  "affect after">::    (test_sat "f($a) $a = a");
+  "affect between">::  (test_sat "$a = a f($a,$b) $b = b");
+  
+  "var-tuple is prop">::(test_sat "$a=p p($a)");
+]);
+
 run_test_tt_main (
-"samples of code that should raise errors in 'eval'">:::[ (* 'c' is the testing context *)
-  "not empty">::       (assert_eval_exception "1:4:" "   $a");
-  "bigand: too many vars">::(assert_eval_exception "1:8:" "bigand $i,$j in [1]: p end");
-  "bigand: too many sets">::(assert_eval_exception "1:8:" "bigand $i in [1],[2]: p end");
-  "bigor: too many vars">::(assert_eval_exception "1:7:" "bigor $i,$j in [1]: p end");
-  "bigor: too many sets">::(assert_eval_exception "1:7:" "bigor $i in [1],[2]: p end");
-])
+"samples of code that should raise errors in [Eval.eval]">:::[ (* 'c' is the testing context *)
+  "defined vars">::         (test_sat_raise "1:4:" "   $a");
+  "bigand: too many vars">::(test_sat_raise "1:8:" "bigand $i,$j in [1]: p end");
+  "bigand: too many sets">::(test_sat_raise "1:8:" "bigand $i in [1],[2]: p end");
+  "bigor: too many vars">::(test_sat_raise "1:7:" "bigor $i,$j in [1]: p end");
+  "bigor: too many sets">::(test_sat_raise "1:7:" "bigor $i in [1],[2]: p end");
+  "condition is bool">::(test_sat_raise "1:23:" "bigand $i in [1] when a: p end");
+]);
+run_test_tt_main (
+"samples of code that should be correct with -smt2">:::[ (* 'c' is the testing context *)
+  "lower than">::      (test_smt "let $i=1.0: if $i < 3.0 then a else b end");
+  "bigand and >">::    (test_smt "bigand $i in [1..5] when $i > 2: p($i) end");
+  "let declaration">:: (test_smt "let $i = 3: p($i-$i*3-1 mod 2 / 1)");
+  "bigand">::          (test_smt "bigand $i in [a]: p($i) end");
+  "bigor">::           (test_smt "bigor $i in [a,b,c] when $i==a and $i!=d: $i(a) end");
+  "affect before">::   (test_smt "$a = a f($a)");
+  "affect after">::    (test_smt "f($a) $a = a");
+  "affect between">::  (test_smt "$a = a f($a,$b) $b = b");
+  
+  "affect between">::  (test_smt "a");
+  "affect between">::  (test_smt "a > 3");
+]); 
 ;;
