@@ -251,7 +251,8 @@ let to_smt2 logic formula =
     | Xor     (x, y) -> gen_var "Bool" x; gen_var "Bool" y(*; Xor (x, y)*)
     | Implies (x, y) -> gen_var "Bool" x; gen_var "Bool" y(*; Implies (x, y)*)
     | Equiv   (x, y) -> gen_var "Bool" x; gen_var "Bool" y(*; Equiv (x, y)*)
-    | _ -> failwith "parse error"
+    | Prop x -> add_var x "Bool"
+    | x -> failwith ("this cannot be transformed into SMT2: "^(Pprint.string_of_ast x))
   in
 
   let rec write = function
@@ -291,8 +292,6 @@ let to_smt2 logic formula =
     | _ -> failwith "error smt write"
   in
 
-  (*gen_var formula;*)
-  (*gen formula;*)
   parse formula;
   Hashtbl.iter (fun k v -> write_to_buf (decl_var (sanitize_var k) v)) vtbl;
   decl_assert (write formula) |> write_to_buf;
