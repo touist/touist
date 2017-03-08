@@ -1,9 +1,12 @@
 v2.2.0
+  - gui:
+    - the smt mode (QF_IDL...) are now linted (errors are underlined
+      in red)
   - touistc:
     - global variables can now be affected anywhere (as long as it is not
       nested). The 'data' is still supported for compatibility but is not
       required anymore.
-    - fixed '-smt2'; it had been kroken for a long time
+    - fixed '-smt2'; it had been kroken for a long time.
     - type checking has been moved from parse time to eval time. This means
       that less errors will (for now) appear automatically in the editor,
       and you will have to push 'Solve' to see the errors.

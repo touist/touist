@@ -53,7 +53,8 @@ import org.scilab.forge.jlatexmath.TeXIcon;
 public class EditionPanel extends AbstractComponentPanel {
 
     private Editor editorTextArea;
-    private ErrorParser parser;
+
+	private ErrorParser parser;
     private int rightPanelWidth;
     private JLabel latexLabel;
     private int zoom = 0;
@@ -122,6 +123,7 @@ public class EditionPanel extends AbstractComponentPanel {
              editorTextArea = new Editor();
              editorTextArea.getDocument().addDocumentListener(new UpdateLatexListener());
              editorTextArea.addParser(parser = new ErrorParser());
+             editorTextArea.setSyntaxEditingStyle("sat");
         }
         catch (IOException e) {
             System.err.println("Erreur lancement éditeur");
