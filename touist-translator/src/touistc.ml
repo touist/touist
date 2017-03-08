@@ -135,10 +135,16 @@ let () =
   try
   
   (* linter = only show syntax errors *)
-  if !linter then 
-    (let _ = Parse.parse_sat (string_of_file !input) in (); exit (get_code OK));
+  if !linter then
+    if (!sat_mode) then
+      (let _ = Parse.parse_sat (string_of_file !input) in (); exit (get_code OK))
+    else
+      (let _ = Parse.parse_smt (string_of_file !input) in (); exit (get_code OK));
   if !linter_and_expand then (* same but adds the semantic (using [eval_ast]) *)
-    (let _ = Parse.parse_sat ~debug:!debug_syntax (string_of_file !input) |> Eval.eval in (); exit (get_code OK));
+    if (!sat_mode) then
+      (let _ = Parse.parse_sat ~debug:!debug_syntax (string_of_file !input) |> Eval.eval in (); exit (get_code OK))
+    else
+      (let _ = Parse.parse_smt ~debug:!debug_syntax (string_of_file !input) |> Eval.eval in (); exit (get_code OK));
 
   (* Step 3: translation *)
   if (!sat_mode) then
