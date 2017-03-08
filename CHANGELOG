@@ -1,15 +1,21 @@
 v2.2.0
   - touistc:
-    - type checking moved from parse time to eval time. This means that
-      less errors will (for now) appear automatically in the editor,
+    - global variables can now be affected anywhere (as long as it is not
+      nested). The 'data' is still supported for compatibility but is not
+      required anymore.
+    - fixed '-smt2'; it had been kroken for a long time
+    - type checking has been moved from parse time to eval time. This means
+      that less errors will (for now) appear automatically in the editor,
       and you will have to push 'Solve' to see the errors.
     - (internal) the grammar has been re-designed; I have to say, the previous
-      parser was REALLY crappy: $i == 3.0 was always giving an error and
+      parser (in v2.1.0) was broken: $i == 3.0 was always giving an error and
       3.0 == $i was not. I have to be honest: writing a parser is a pain.
-      Along the way, I understood that havin nasty reduce/reduce conflicts
-      is a BAD idea.
-    - finally added small unit tests, but they only check that the parsing
-      goes well.
+      Along the way, I understood that having nasty reduce/reduce conflicts
+      is a BAD idea. In this version, there is no more conflict!
+    - (internal) added unit tests for the touistc compiler (mainly to check
+      that the parser accepts the right language and throws the right errors)
+    - the '--verbose' flag has been temporarily disabled (because of the code
+      refactoring)
 v2.1.4
   - gui:
     - when clicking on the Solve button, it turns into 'Translating' as long

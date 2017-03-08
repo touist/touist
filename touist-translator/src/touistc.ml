@@ -30,7 +30,6 @@ let linter_and_expand = ref false (* same but with semantic errors (during eval)
 let detailed_position = ref false (* display absolute position of error *)
 let debug_syntax = ref false
 let debug_cnf = ref false
-let verbose = ref false
 
 (* [process_arg_alone] is the function called by the command-line argument
    parser when it finds an argument with no preceeding -flag (-f, -x...).
@@ -70,7 +69,6 @@ let () =
     ("--debug-syntax", Arg.Set debug_syntax, "Print information for debugging
     syntax errors given by parser.messages");
     ("--debug-cnf", Arg.Set debug_cnf,"Print step by step CNF transformation");
-    ("--verbose", Arg.Set verbose,"Print info on what is happening step by step");
     ("--solve", Arg.Set solve_sat,"Solve the problem and print the first model if it exists");
     ("--limit", Arg.Set_int limit,"(with --solve) Instead of one model, return N models if they exist.
                                             With 0, return every possible model.");
@@ -195,7 +193,8 @@ let () =
               c 98 p(1,2,3)     -> c means 'comment' in any Sat file   *)
 
   else if (!smt_logic <> "") then begin
-    let smt = Smt.to_smt2 (String.uppercase !smt_logic) (Parse.parse_smt ~debug:!debug_syntax (string_of_file !input)) in
+    let ast = Parse.parse_smt ~debug:!debug_syntax (string_of_file !input) |> Eval.eval in
+    let smt = Smt.to_smt2 (String.uppercase !smt_logic) ast in
     Buffer.output_buffer !output smt;
   end;
 

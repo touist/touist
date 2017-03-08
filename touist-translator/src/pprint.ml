@@ -75,7 +75,7 @@ let rec string_of_ast = function
   | Let (v,x,c) -> (string_of_ast v) ^ "=" ^ (string_of_ast x) ^ ": " ^ (string_of_ast c)
   | Affect (v,c) -> (string_of_ast v) ^ "=" ^ (string_of_ast c)
   | Touist_code (f) -> (string_of_ast_list "\n" f)
-  | Loc (x,_) -> string_of_ast x
+  | Loc (x,_) -> "(loc)" ^ string_of_ast x
 
 and string_of_ast_type = function
   | Int    x               -> "int"

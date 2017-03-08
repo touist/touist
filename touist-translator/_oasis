@@ -41,7 +41,7 @@ XOCamlbuildExtraArgs: -use-menhir -menhir \"menhir --table --inspection -v -la 2
 # and 'open Touist'...
 Library touist
   Path:           src
-  Install:        true
+  Install:        false
   Modules:        Parse,Eval,Sat,Smt
   BuildTools:     ocamlbuild, git, menhir
   BuildDepends:   menhirLib (>= 20150118), fileutils (>= 0.4.0), str, minisat
