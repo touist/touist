@@ -149,20 +149,21 @@ let process_empty (set:ast) (set_type:ast) : ast = match set,set_type with
   | Set EmptySet, Set (EmptySet)  -> Set (ISet IntSet.empty) (* arbitrary *)
   | _,_ -> set
 
-let extenv = Hashtbl.create 10
+let extenv = ref (Hashtbl.create 0)
 
 (** Main function for checking the types and evaluating the touistl expressions
     (variables, bigand, bigor, let...).
     @param ast is the AST given by [Parse.parse] 
     @raise Eval.Error (msg,loc) *)
 let rec eval ast =
+  extenv := Hashtbl.create 50; (* extenv must be re-init between two calls to [eval] *)
   eval_touist_code ast []
 
 and eval_touist_code ast (env:env) =
   let rec affect_vars = function
     | [] -> []
     | Loc (Affect (Var (p,i,loc),y),_)::xs ->
-      Hashtbl.replace extenv (expand_var_name (p,i) env) (eval_ast y env, loc);
+      Hashtbl.replace !extenv (expand_var_name (p,i) env) (eval_ast y env, loc);
         affect_vars xs
     | x::xs -> x::(affect_vars xs)
   in
@@ -188,7 +189,7 @@ and eval_ast (ast:ast) (env:env) = match ast_whithout_loc ast with
     begin
       try let (content,loc) = List.assoc name env in content
       with Not_found ->
-      try let (content,_) = Hashtbl.find extenv name in content
+      try let (content,_) = Hashtbl.find !extenv name in content
       with Not_found -> raise (Error (
           "variable '" ^ name ^"' does not seem to be known. Either you forgot\n"^
           "to declare it globally or it has been previously declared locally\n"^
@@ -475,7 +476,7 @@ and eval_ast_formula (ast:ast) (env:env) : ast =
       (* Case 2. Check if this variable name has been affected globally, i.e.,
          in the 'data' section. To be accepted, this variable must contain
          a proposition. *)
-      try let content,loc_affect = Hashtbl.find extenv name in
+      try let content,loc_affect = Hashtbl.find !extenv name in
         match content with
         | Prop x -> Prop x
         | _ -> raise (Error (
