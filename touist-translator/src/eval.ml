@@ -118,7 +118,7 @@ let raise_set_decl ast elmt elmt_expanded set set_expanded (expected_types:strin
             "    "^(string_of_ast set_expanded)^"")
 
 
-let check_nb_vars_and_sets (ast:ast) (vars: ast list) (sets: ast list) : unit =
+let check_nb_vars_same_as_nb_sets (ast:ast) (vars: ast list) (sets: ast list) : unit =
   let fist_last_loc_of (varlist:ast list) : loc =
     match (List.nth varlist 0), List.nth varlist ((List.length varlist)-1) with
     | Var (_,_,(startpos,_)), Var (_,_,(_,endpos)) -> startpos,endpos
@@ -562,54 +562,46 @@ and eval_ast_formula (ast:ast) (env:env) : ast =
      Maybe we could bypass this problem: return Nothing when
      the bigand is empty; during the evaluation, Nothing will
      act like '... and Top' or '... or Bot'. *)
-  | Bigand (v,s,t,e) ->
-    let test =
-      match t with
-      | Some x -> x
-      | None   -> Bool true
-    in
-    begin check_nb_vars_and_sets ast v s;
-      match v,s with
+  | Bigand (vars,sets,when_optional,body) ->
+    let when_cond = match when_optional with Some x -> x | None -> Bool true in
+    begin check_nb_vars_same_as_nb_sets ast vars sets;
+      match vars,sets with
       | [],[] | _,[] | [],_ -> failwith "shouln't happen: non-variable in big construct"
-      | [Var (p,i,loc)],[set] ->
-        begin
-          match eval_ast set env with
-          | Set (EmptySet)  -> bigand_empty env (p,i,loc) [] test e
-          | Set (ISet a) -> bigand_int   env (p,i,loc) (IntSet.elements a)    test e
-          | Set (FSet a) -> bigand_float env (p,i,loc) (FloatSet.elements a)  test e
-          | Set (SSet a) -> bigand_str   env (p,i,loc) (PropSet.elements a) test e
-          | set' -> raise_with_loc set ("Ill-formed 'bigand': after 'in', only sets are allowed.\n" ^
-            "The faulty element is of type '"^(string_of_ast_type set)^"':\n"^
-            "    "^(string_of_ast set)^"\n"^
-            "This element has been expanded to\n"^
-            "    "^(string_of_ast set')^"")
-        end
+      | [Var (name,_,loc)],[set] -> (* we don't need the indices because bigand's vars are 'simple' *)
+          let rec process_list_set (set_list:ast list) env =
+            match set_list with
+            | []    -> Top (* XXX what if bigand in a or?*)
+            | x::xs ->
+              let env = (name,(x,loc))::env in
+              match ast_to_bool when_cond env with
+              | true when xs != [] -> And (eval_ast_formula body env, process_list_set xs env)
+              | true  -> eval_ast_formula body env
+              | false -> process_list_set xs env
+          in
+            process_list_set (set_to_ast_list (eval_ast set env)) env
       | x::xs,y::ys ->
-        eval_ast_formula (Bigand ([x],[y],None,(Bigand (xs,ys,t,e)))) env
+        eval_ast_formula (Bigand ([x],[y],None,(Bigand (xs,ys,when_optional,body)))) env
     end
-  | Bigor (v,s,t,e) ->
-    let test =
-      match t with
-      | Some x -> x
-      | None   -> Bool true
+  | Bigor (vars,sets,when_optional,body) ->
+    let when_cond = match when_optional with Some x -> x | None -> Bool true
     in
-    begin check_nb_vars_and_sets ast v s;
-      match v,s with
+    begin check_nb_vars_same_as_nb_sets ast vars sets;
+      match vars,sets with
       | [],[] | _,[] | [],_ -> failwith "shouln't happen: non-variable in big construct"
-      | [Var (p,i,loc)],[set] -> begin
-          match eval_ast set env with
-          | Set (EmptySet)  -> bigor_empty env (p,i,loc) [] test e
-          | Set (ISet a) -> bigor_int   env (p,i,loc) (IntSet.elements a)    test e
-          | Set (FSet a) -> bigor_float env (p,i,loc) (FloatSet.elements a)  test e
-          | Set (SSet a) -> bigor_str   env (p,i,loc) (PropSet.elements a) test e
-          | set' -> raise_with_loc set ("Ill-formed 'bigor': after 'in', only sets are allowed.\n" ^
-            "The faulty element is of type '"^(string_of_ast_type set)^"':\n"^
-            "    "^(string_of_ast set)^"\n"^
-            "This element has been expanded to\n"^
-            "    "^(string_of_ast set')^"")
-        end
+      | [Var (name,_,loc)],[set] ->
+          let rec process_list_set (set_list:ast list) env =
+            match set_list with
+            | []    -> Bottom
+            | x::xs ->
+              let env = (name,(x,loc))::env in
+              match ast_to_bool when_cond env with
+              | true when xs != [] -> Or (eval_ast_formula body env, process_list_set xs env)
+              | true  -> eval_ast_formula body env
+              | false -> process_list_set xs env
+          in
+            process_list_set (set_to_ast_list (eval_ast set env)) env
       | x::xs,y::ys ->
-        eval_ast_formula (Bigor ([x],[y],None,(Bigor (xs,ys,t,e)))) env
+        eval_ast_formula (Bigor ([x],[y],None,(Bigor (xs,ys,when_optional,body)))) env
     end
   | If (c,y,z) ->
     let test = match eval_ast c env with Bool c -> c | c' -> raise_type_error ast c c' "boolean"
@@ -644,47 +636,6 @@ and formula_of_string_list =
 and and_of_term_list =
   List.fold_left (fun acc t -> And (acc, t)) Top
 
-and bigand_empty env var values test ast = Top (* XXX what if bigand in a or?*)
-and bigand_int env var values test ast =
-  let ast' = If (test,ast,Top) and name,_,loc = var in 
-  match values with
-  | []    -> Top
-  | [x]   -> eval_ast_formula ast' ((name, (Int x, loc))::env)
-  | x::xs -> And (eval_ast_formula ast' ((name, (Int x,loc))::env) ,bigand_int env var xs test ast)
-and bigand_float env var values test ast =
-  let ast' = If (test,ast,Top) and name,_,loc = var in
-  match values with
-  | []    -> Top
-  | [x]   -> eval_ast_formula ast' ((name, (Float x,loc))::env)
-  | x::xs -> And (eval_ast_formula ast' ((name, (Float x,loc))::env) ,bigand_float env var xs test ast)
-and bigand_str env var values test ast =
-  let ast' = If (test,ast,Top) and name,_,loc = var in
-  match values with
-  | []    -> Top
-  | [x]   -> eval_ast_formula ast' ((name, (Prop x,loc))::env)
-  | x::xs ->
-    And (eval_ast_formula ast' ((name, (Prop x,loc))::env), bigand_str env var xs test ast)
-and bigor_empty env var values test ast = Bottom
-and bigor_int env var values test ast =
-  let ast' = If (test,ast,Bottom) and name,_,loc = var in
-  match values with
-  | []    -> Bottom
-  | [x]   -> eval_ast_formula ast' ((name, (Int x,loc))::env)
-  | x::xs -> Or (eval_ast_formula ast' ((name, (Int x,loc))::env), bigor_int env var xs test ast)
-and bigor_float env (var:string * ast list option * loc) values test ast =
-  let ast' = If (test,ast,Bottom) and name,_,loc = var in
-  match values with
-  | []    -> Bottom
-  | [x]   -> eval_ast_formula ast' ((name, (Float x,loc))::env)
-  | x::xs -> Or (eval_ast_formula ast' ((name, (Float x,loc))::env), bigor_float env var xs test ast)
-and bigor_str env var values test ast =
-  let ast' = If (test,ast,Bottom) and name,_,loc = var in
-  match values with
-  | []    -> Bottom
-  | [x]   -> eval_ast_formula ast' ((name, (Prop x,loc))::env)
-  | x::xs ->
-    Or (eval_ast_formula ast' ((name, (Prop x,loc))::env), bigor_str env var xs test ast)
-
 and expand_var_name (prefix,indices:string * ast list option) (env:env) =
   match (prefix,indices) with
   | (x,None)   -> x
@@ -692,3 +643,32 @@ and expand_var_name (prefix,indices:string * ast list option) (env:env) =
     x ^ "("
     ^ (string_of_ast_list ", " (List.map (fun e -> eval_ast e env) y))
     ^ ")"
+
+(* [set_to_ast_list] trasnforms Set (.) into a list of Int, Float or Prop.
+   This function is used in Bigand and Bigor statements. 
+   WARNING: this function reverses the order of the elements of the set;
+   we could use fold_right in order to keep the original order, but 
+   it would mean that it is not tail recursion anymore (= uses much more heap) *)
+and set_to_ast_list (ast:ast) : ast list =
+  match ast_whithout_loc ast with
+  | Set (EmptySet)-> []
+  | Set (ISet a) -> List.fold_left (fun acc v -> (Int v)::acc) [] (IntSet.elements a)
+  | Set (FSet a) -> List.fold_left (fun acc v -> (Float v)::acc) [] (FloatSet.elements a)
+  | Set (SSet a) -> List.fold_left (fun acc v -> (Prop v)::acc) [] (PropSet.elements a)
+  | ast' -> raise_with_loc ast (
+      "After 'in', only sets are allowed. The faulty element is of type '"^(string_of_ast_type ast')^"':\n"^
+      "    "^(string_of_ast ast')^"\n"^
+      "This element has been expanded to\n"^
+      "    "^(string_of_ast ast')^"")
+
+  (* [ast_to_bool] evaluates the 'when' condition when returns 'true' or 'false'
+     depending on the result. 
+     This function is used in Bigand and Bigor statements. *)
+  and ast_to_bool (ast:ast) env : bool = 
+    match eval_ast ast env with 
+    | Bool b -> b 
+    | ast' -> raise_with_loc ast (
+      "'when' expects a 'bool' but you gave something of type '"^(string_of_ast_type ast')^"':\n"^
+      "    "^(string_of_ast ast')^"\n"^
+      "This element has been expanded to\n"^
+      "    "^(string_of_ast ast')^"")
