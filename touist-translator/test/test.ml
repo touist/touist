@@ -129,8 +129,10 @@ run_test_tt_main (
   "affect between">::  (test_smt "a > 3");
 ];
 "real-size tests">:::[
-  "sodoku">:: (fun ctx -> OUnit2.assert_command
-      ~foutput:(check_solution "real-size-tests/sudoku_solution.txt") ~use_stderr:false ~ctxt:ctx
+  "sodoku">:: (fun ctx -> 
+      OUnit2.skip_if (Sys.os_type = "Win32") "won't work on windows (unix-only??)";
+      OUnit2.assert_command ~use_stderr:false ~ctxt:ctx
+      ~foutput:(check_solution "real-size-tests/sudoku_solution.txt")
       "../touistc.byte" ["--solve";"-sat";"real-size-tests/sudoku.touistl"]);
 ];
 
