@@ -1,12 +1,12 @@
 v2.2.0
   - gui:
-    - the smt mode (QF_IDL...) are now linted (errors are underlined
-      in red)
+    - when using one of the SMT selectors (QF_IDL...), the errors are now
+      correctly linted (underlined in red)
   - touistc:
     - global variables can now be affected anywhere (as long as it is not
       nested). The 'data' is still supported for compatibility but is not
       required anymore.
-    - fixed '-smt2'; it had been kroken for a long time.
+    - fixed '-smt2'; it had been broken for a long time
     - type checking has been moved from parse time to eval time. This means
       that less errors will (for now) appear automatically in the editor,
       and you will have to push 'Solve' to see the errors.
@@ -15,8 +15,8 @@ v2.2.0
       3.0 == $i was not. I have to be honest: writing a parser is a pain.
       Along the way, I understood that having nasty reduce/reduce conflicts
       is a BAD idea. In this version, there is no more conflict!
-    - (internal) added unit tests for the touistc compiler (mainly to check
-      that the parser accepts the right language and throws the right errors)
+    - (internal) added unit tests for the touistc compiler, mainly to check
+      that the parser accepts the right language and throws the right errors
     - the '--verbose' flag has been temporarily disabled (because of the code
       refactoring)
 v2.1.4
