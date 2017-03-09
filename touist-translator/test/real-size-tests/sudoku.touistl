@@ -1,0 +1,59 @@
+;; Sudoku écrit par Maël
+
+;; ------------variables/ensembles -------------
+$taillebloc = 2
+$taillegrille = $taillebloc*$taillebloc
+$valeurs = [1..$taillegrille]
+$lignes = [1..$taillegrille]
+$colonnes = [1..$taillegrille]
+$bloc = [1..$taillebloc]
+
+;; Sudoku lettres :
+;; p(1,1,A) and p(1,2,B) and p(2,2,D) and p(3,3,A) and p(4,3,C) and p(4,4,B)
+;; Carre latin / sudoku :
+p(1,3,1) and p(2,4,2) and p(3,1,4) and p(4,3,3)
+
+
+;; ------------ modèle -------------
+;; Contrainte d'existence d'une valeur au moins par case
+bigand $l,$c in $lignes,$colonnes:
+  bigor $v in $valeurs:
+    p($l,$c,$v)
+  end
+end
+
+;; Contrainte d'une unique valeur par case
+bigand $l,$c,$v in $lignes,$colonnes,$valeurs:
+  p($l,$c,$v) =>
+  bigand $v2 in $valeurs when $v2 != $v:
+    not p($l,$c,$v2)
+  end
+end
+
+;; Contrainte d'une unique valeur par ligne
+bigand $l,$c,$v in $lignes,$colonnes,$valeurs:
+  p($l,$c,$v) =>
+  bigand $l2 in $lignes when $l2 != $l: 
+    not p($l2,$c,$v)
+  end
+end
+
+;; Contrainte d'une unique valeur par colonne
+bigand $l,$c,$v in $lignes,$colonnes,$valeurs:
+  p($l,$c,$v) =>
+  bigand $c2 in $colonnes when $c2 != $c: 
+    not p($l,$c2,$v)
+  end
+end
+
+;; Contrainte d'une unique valeur par bloc
+bigand $l,$c,$v in $lignes,$colonnes,$valeurs:
+  p($l,$c,$v) =>
+  let $lbloc = (int(($l-1)/$taillebloc)*$taillebloc):
+  let $cbloc = (int(($c-1)/$taillebloc)*$taillebloc):
+  ;; On parcourt le bloc dans lequel est la case ($l,$c) en évitant de repasser sur la case ($l,$c).
+  ;; `int($l-1/$taillebloc)+1` donne la ligne de la 'première case' du bloc dans lequel se situe ($l,$c).
+  bigand $l2,$c2 in [($lbloc+1)..($lbloc+$taillebloc)],[($cbloc+1)..($cbloc+$taillebloc)] when ($l2 != $l and $c2 != $c):
+      not p($l2,$c2,$v)
+  end
+end
