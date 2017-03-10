@@ -24,7 +24,7 @@ module FloatSet = Set_ext.Make(
   end)
 
 module PropSet = Set_ext.Make(String)
-type var = string * ast list option * Msg.loc
+type var = string * ast list option
 and ast = (* Touist_code is the entry point *)
   | Touist_code      of ast list
   | Int              of int

@@ -11,7 +11,7 @@ let test_raise (parse:(string->unit)) (during:Msg.during) ?(nth_msg=0) (loc_expe
       match List.nth !Msg.messages nth_msg with
       | (Msg.Error,d,msg,loc) when d==during ->
           OUnit2.assert_equal
-          ~msg:("the 'line:column:' of expected and actual exception Eval.Error are different; actual error was:\n"^msg)
+          ~msg:("the 'line:column' of expected and actual exception Eval.Error are different; actual error was:\n"^msg)
           ~printer:(fun loc -> Printf.sprintf "'%s'" loc)
           loc_expected (Msg.string_of_loc loc)
       | _ -> raise (OUnit2.assert_failure ("this test didn't raise an error at location '"^loc_expected^"' as expected"))
@@ -109,12 +109,12 @@ run_test_tt_main (
 ];
 
 "samples of code that should raise errors in [Eval.eval]">:::[ (* 'c' is the testing context *)
-  "undefined var">::         (test_sat_raise Msg.Eval "1:4:" "   $a");
-  "bigand: too many vars">::(test_sat_raise Msg.Eval "1:8:" "bigand $i,$j in [1]: p end");
-  "bigand: too many sets">::(test_sat_raise Msg.Eval "1:8:" "bigand $i in [1],[2]: p end");
-  "bigor: too many vars">::(test_sat_raise Msg.Eval "1:7:" "bigor $i,$j in [1]: p end");
-  "bigor: too many sets">::(test_sat_raise Msg.Eval "1:7:" "bigor $i in [1],[2]: p end");
-  "condition is bool">::(test_sat_raise Msg.Eval "1:23:" "bigand $i in [1] when a: p end");
+  "undefined var">::         (test_sat_raise Msg.Eval "1:4" "   $a");
+  "bigand: too many vars">::(test_sat_raise Msg.Eval "1:8" "bigand $i,$j in [1]: p end");
+  "bigand: too many sets">::(test_sat_raise Msg.Eval "1:8" "bigand $i in [1],[2]: p end");
+  "bigor: too many vars">::(test_sat_raise Msg.Eval "1:7" "bigor $i,$j in [1]: p end");
+  "bigor: too many sets">::(test_sat_raise Msg.Eval "1:7" "bigor $i in [1],[2]: p end");
+  "condition is bool">::(test_sat_raise Msg.Eval "1:23" "bigand $i in [1] when a: p end");
   (*"bigand var is not tuple">::(test_sat_raise "1:23:" "bigand $i(p) in [1]: p end");*)
 ];
 

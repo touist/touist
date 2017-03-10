@@ -64,83 +64,57 @@ let raise_with_loc (ast:ast) (message:string) = match ast with
    [expected_types] contain a string that explain what is expected, e.g.,
    'an integer or a float'. *)
 let raise_type_error operator operand expanded (expected_types:string) = 
-  match operand with
-  | Var (_,_,loc) -> add_fatal (Error,Eval,
-      "'"^(string_of_ast_type operator)^"' expects "^expected_types^".\n"^
-      "The content of the variable '"^(string_of_ast operand)^"' has type '"^(string_of_ast_type expanded)^"':\n"^
-      "    "^(string_of_ast expanded)^"", loc)
-  | _ -> raise_with_loc operator (
-      "'"^(string_of_ast_type operator)^"' expects "^expected_types^".\n"^
-      "The operand:\n"^
-      "    "^(string_of_ast operand)^"\n"^
-      "has been expanded to something of type '"^(string_of_ast_type expanded)^"':\n"^
-      "    "^(string_of_ast expanded)^"")
+  raise_with_loc operator (
+    "'"^(string_of_ast_type operator)^"' expects "^expected_types^".\n"^
+    "The operand:\n"^
+    "    "^(string_of_ast operand)^"\n"^
+    "has been expanded to something of type '"^(string_of_ast_type expanded)^"':\n"^
+    "    "^(string_of_ast expanded)^"")
 
 (* Same as above but for functions of two parameters. Example: with And (x,y),
    operator is And (x,y),
    op1 and op2 are the non-expanded parameters x and y,
    exp1 and exp2 are the expanded parameters x and y. *)
 let raise_type_error2 operator op1 exp1 op2 exp2 (expected_types:string) =
-  let var,content,loc_var,other,other_expanded = match op1,op2 with
-    | Var (_,_,loc),_ -> op1,exp1,loc,op2,exp2
-    | _,Var (_,_,loc) -> op2,exp2,loc,op1,exp1
-    | _,_ -> raise_with_loc operator 
-               ("incorrect types with '"^(string_of_ast_type operator)^"'; expects "^expected_types^".\n"^
-                "In statement:\n"^
-                "    "^(string_of_ast operator)^"\n"^
-                "Left-hand operand has type '"^(string_of_ast_type exp1)^"':\n"^
-                "    "^(string_of_ast exp1)^"\n"^
-                "Right-hand operand has type '"^(string_of_ast_type exp2)^"':\n"^
-                "    "^(string_of_ast exp2)^""^
-                "")
-  in add_fatal (Error,Eval,
-      "incorrect types with '"^(string_of_ast_type operator)^"', expects "^expected_types ^".\n"^
-      "The content of the variable '"^(string_of_ast var)^"' has type '"^(string_of_ast_type content)^"':\n"^
-      "    "^(string_of_ast content)^"\n"^
-      "The other operand is of type '"^(string_of_ast_type other_expanded)^"':\n"^
-      "    "^(string_of_ast other_expanded)^"", loc_var)
+  raise_with_loc operator
+    ("incorrect types with '"^(string_of_ast_type operator)^"'; expects "^expected_types^".\n"^
+    "In statement:\n"^
+    "    "^(string_of_ast operator)^"\n"^
+    "Left-hand operand has type '"^(string_of_ast_type exp1)^"':\n"^
+    "    "^(string_of_ast exp1)^"\n"^
+    "Right-hand operand has type '"^(string_of_ast_type exp2)^"':\n"^
+    "    "^(string_of_ast exp2)^""^
+    "")
 
 (* [raise_set_decl] is the same as [raise_type_error2] but between one element
    and the set this element is supposed to be added to. *)
 let raise_set_decl ast elmt elmt_expanded set set_expanded (expected_types:string) =
-  match elmt with
-  | Var (_,_,loc) -> add_fatal (Error,Eval,
-      "Ill-formed set declaration. It expects "^expected_types^".\n"^
-      "The content of the variable '"^(string_of_ast elmt)^"' has type '"^(string_of_ast_type elmt_expanded)^"':\n"^
-      "    "^(string_of_ast elmt_expanded)^"\n"^
-      "Up to now, the set declaration\n"^
-      "    "^(string_of_ast set)^"\n"^
-      "has been expanded to:\n"^
-      "    "^(string_of_ast set_expanded)^"", loc)
-  | _ -> raise_with_loc ast
-           ("Ill-formed set declaration. It expects "^expected_types^".\n"^
-            "One of the elements is of type '"^(string_of_ast_type elmt_expanded)^"':\n"^
-            "    "^(string_of_ast elmt)^"\n"^
-            "This element has been expanded to\n"^
-            "    "^(string_of_ast elmt_expanded)^"\n"^
-            "Up to now, the set declaration\n"^
-            "    "^(string_of_ast set)^"\n"^
-            "has been expanded to:\n"^
-            "    "^(string_of_ast set_expanded)^"")
+  raise_with_loc ast
+    ("Ill-formed set declaration. It expects "^expected_types^".\n"^
+    "One of the elements is of type '"^(string_of_ast_type elmt_expanded)^"':\n"^
+    "    "^(string_of_ast elmt)^"\n"^
+    "This element has been expanded to\n"^
+    "    "^(string_of_ast elmt_expanded)^"\n"^
+    "Up to now, the set declaration\n"^
+    "    "^(string_of_ast set)^"\n"^
+    "has been expanded to:\n"^
+    "    "^(string_of_ast set_expanded)^"")
 
 
 let check_nb_vars_same_as_nb_sets (ast:ast) (vars: ast list) (sets: ast list) : unit =
-  let fist_last_loc_of (varlist:ast list) : loc =
-    match (List.nth varlist 0), List.nth varlist ((List.length varlist)-1) with
-    | Var (_,_,(startpos,_)), Var (_,_,(_,endpos)) -> startpos,endpos
-    | _,_ -> failwith "[shouldn't happen] non-variable in big construct"
+  let loc = match (List.nth vars 0), List.nth sets ((List.length sets)-1) with
+    | Loc (_,(startpos,_)), Loc (_,(_,endpos)) -> startpos,endpos 
+    | _-> failwith "[shouldn't happen] missing locations in vars/sets"
   in
   match (List.length vars) == (List.length sets) with
   | true -> ()
-  | false -> let vars_loc = fist_last_loc_of vars
-  (* We only know the locations of the variables. To help the user, we give
-     him the position of the list of variables. *)
-    in add_fatal (Error,Eval,
-        "Ill-formed '"^(string_of_ast_type ast)^"'. The number of variables and sets must be the same.\n"^
-        "You defined "^(string_of_int (List.length vars))^" variables:\n"^
-        "    "^(string_of_ast_list "," vars)^"\n"^
-        "but you gave "^(string_of_int (List.length sets))^" sets:\n"^
-        "    "^(string_of_ast_list "," sets)^"", vars_loc)
+  | false -> add_fatal (Error,Eval,
+    "Ill-formed '"^(string_of_ast_type ast)^"'. The number of variables and sets must be the same.\n"^
+    "You defined "^(string_of_int (List.length vars))^" variables:\n"^
+    "    "^(string_of_ast_list "," vars)^"\n"^
+    "but you gave "^(string_of_int (List.length sets))^" sets:\n"^
+    "    "^(string_of_ast_list "," sets)^""
+    ,loc)
 
 
 (* [process_empty] is necessary because of how 'clunky' have been implemented
@@ -168,8 +142,8 @@ let rec eval ast =
 and eval_touist_code ast (env:env) =
   let rec affect_vars = function
     | [] -> []
-    | Loc (Affect (Var (p,i,loc),y),_)::xs ->
-      Hashtbl.replace !extenv (expand_var_name (p,i) env) (eval_ast y env, loc);
+    | Loc (Affect (Loc (Var (p,i),var_loc),y),affect_loc)::xs ->
+      Hashtbl.replace !extenv (expand_var_name (p,i) env) (eval_ast y env, var_loc);
         affect_vars xs
     | x::xs -> x::(affect_vars xs)
   in
@@ -190,16 +164,16 @@ and eval_ast (ast:ast) (env:env) = match ast_whithout_loc ast with
   | Int x   -> Int x
   | Float x -> Float x
   | Bool x  -> Bool x
-  | Var (p,i,loc) -> (* p,i = prefix, indices *)
+  | Var (p,i) -> (* p,i = prefix, indices *)
     let name = expand_var_name (p,i) env in
     begin
       try let (content,loc) = List.assoc name env in content
       with Not_found ->
       try let (content,_) = Hashtbl.find !extenv name in content
-      with Not_found -> add_fatal (Error,Eval,
-          "variable '" ^ name ^"' does not seem to be known. Either you forgot\n"^
+      with Not_found -> raise_with_loc ast
+          ("variable '" ^ name ^"' does not seem to be known. Either you forgot\n"^
           "to declare it globally or it has been previously declared locally\n"^
-          "(with bigand, bigor or let) and you are out of its scope.", loc)
+          "(with bigand, bigor or let) and you are out of its scope.")
     end
   | Set x -> Set x
   | Set_decl x -> eval_set_decl ast env
@@ -460,7 +434,7 @@ and eval_ast_formula (ast:ast) (env:env) : ast =
   | Bottom -> Bottom
   | UnexpProp (p,i) -> Prop (expand_var_name (p,i) env)
   | Prop x -> Prop x
-  | Var (p,i,loc) -> (* p,i = prefix,indices *)
+  | Var (p,i) -> (* p,i = prefix,indices *)
     (* name = prefix + indices. 
        Example with $v(a,b,c):
        name is '$v(a,b,c)', prefix is '$v' and indices are '(a,b,c)' *)
@@ -523,7 +497,7 @@ and eval_ast_formula (ast:ast) (env:env) : ast =
           in eval_ast_formula (UnexpProp ((string_of_ast term), Some indices)) env
       (* Case 5. the variable was of the form '$v(1,2,3)' and was not declared
          and '$v' is not either declared, so we can safely guess that this var has not been declared. *)
-      with Not_found -> add_fatal (Error,Eval,"'" ^ name ^ "' has not been declared", loc)
+      with Not_found -> raise_with_loc ast ("'" ^ name ^ "' has not been declared")
     end
   | Not Top    -> Bottom
   | Not Bottom -> Top
@@ -573,22 +547,22 @@ and eval_ast_formula (ast:ast) (env:env) : ast =
     begin check_nb_vars_same_as_nb_sets ast vars sets;
       match vars,sets with
       | [],[] | _,[] | [],_ -> failwith "shouln't happen: non-variable in big construct"
-      | [Var (name,_,loc)],[set] -> (* we don't need the indices because bigand's vars are 'simple' *)
-          let rec process_list_set (set_list:ast list) env =
-            match set_list with
-            | []    -> Top (* XXX what if bigand in a or?*)
-            | x::xs ->
-              let env = (name,(x,loc))::env in
-              match ast_to_bool when_cond env with
-              | true when xs != [] -> And (eval_ast_formula body env, process_list_set xs env)
-              | true  -> eval_ast_formula body env
-              | false -> process_list_set xs env
-          in
-          let list_ast_set = set_to_ast_list (eval_ast set env) in
-          if (List.length list_ast_set) == 0 then
-            warning set ("using 'bigand' on an empty set is not recommanded\n"^
-              "as it returns a 'Top' formula which can give unexpected results");
-            process_list_set list_ast_set env
+      | [Loc (Var (name,_),loc)],[set] -> (* we don't need the indices because bigand's vars are 'simple' *)
+        let rec process_list_set (set_list:ast list) env =
+          match set_list with
+          | []    -> Top (* XXX what if bigand in a or?*)
+          | x::xs ->
+            let env = (name,(x,loc))::env in
+            match ast_to_bool when_cond env with
+            | true when xs != [] -> And (eval_ast_formula body env, process_list_set xs env)
+            | true  -> eval_ast_formula body env
+            | false -> process_list_set xs env
+        in
+        let list_ast_set = set_to_ast_list (eval_ast set env) in
+        if (List.length list_ast_set) == 0 then
+          warning set ("using 'bigand' on an empty set is not recommanded\n"^
+            "as it returns a 'Top' formula which can give unexpected results");
+          process_list_set list_ast_set env
       | x::xs,y::ys ->
         eval_ast_formula (Bigand ([x],[y],None,(Bigand (xs,ys,when_optional,body)))) env
     end
@@ -598,7 +572,7 @@ and eval_ast_formula (ast:ast) (env:env) : ast =
     begin check_nb_vars_same_as_nb_sets ast vars sets;
       match vars,sets with
       | [],[] | _,[] | [],_ -> failwith "shouln't happen: non-variable in big construct"
-      | [Var (name,_,loc)],[set] ->
+      | [Loc (Var (name,_),loc)],[set] ->
           let rec process_list_set (set_list:ast list) env =
             match set_list with
             | []    -> Bottom
@@ -620,7 +594,7 @@ and eval_ast_formula (ast:ast) (env:env) : ast =
   | If (c,y,z) ->
     let test = match eval_ast c env with Bool c -> c | c' -> raise_type_error ast c c' "boolean"
     in if test then eval_ast_formula y env else eval_ast_formula z env
-  | Let (Var (p,i,loc),content,formula) ->
+  | Let (Loc (Var (p,i),loc),content,formula) ->
     let name = (expand_var_name (p,i) env) and desc = (eval_ast content env,loc)
     in eval_ast_formula formula ((name,desc)::env)
   | e -> raise_with_loc ast ("this expression is not a formula: " ^ string_of_ast e)

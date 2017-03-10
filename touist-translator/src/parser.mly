@@ -165,9 +165,9 @@ prop:
    These two placeholders can only be used in a semantic action, not in the
    %{ %} header. *)
 var:
-  | v=VAR { let loc=($startpos,$endpos) in Var (v,None,loc) } (* avoids shift/reduce conflict in case: '$a=1 $a' *)
+  | v=VAR {Loc (Var (v,None),($startpos,$endpos))}
   | v=VARTUPLE (*LPAREN*) l=comma_list(indices) RPAREN (* tuple_variable *)
-    { let loc=($startpos,$endpos) in Var (v,Some l,loc) } (* avoids shift/reduce conflict in case: '$a=1 $a' *)
+    {Loc (Var (v,Some l),($startpos,$endpos))}
 
 (* a global variable is a variable used in the 'data' block
   for defining sets and constants; it can be of the form of a

@@ -1,3 +1,9 @@
+v2.2.1
+  - gui:
+    - multiple errors can now be displayed, with a difference between warnings
+      in blue and errors in red
+  - touistc:
+    - a warning is given when using an empty set in bigand or bigor
 v2.2.0
   - gui:
     - when using one of the SMT selectors (QF_IDL...), the errors are now
