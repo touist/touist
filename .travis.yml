@@ -51,25 +51,24 @@ before_install:
   - cp yices-*/bin/yices-smt2 touist-gui/external
 install:
   # Build touistc (touist-translator)  
-  - cd touist-translator
+  - cd $TRAVIS_BUILD_DIR/touist-translator
   - ./configure --bindir ../touist-gui/external --enable-tests
   - make && make install
-  - cd ..
 
   # Build touist.jar (touist-gui)
-  - cd touist-gui
+  - cd $TRAVIS_BUILD_DIR/touist-gui
   - chmod ugo+x external/touistc
   - ant -e zip
   - zip=$(ls | grep 'touist.*\.zip' | head -1) # The artifact's name for later use
-  - echo $zip
-  - cd ..
+  - echo $zip && cd $TRAVIS_BUILD_DIR
 
 # This part is meant for unit tests (among others).
 script:
-  - cd touist-translator
+  - cd $TRAVIS_BUILD_DIR/touist-translator
   - make test
 
-
+before_deploy:
+  - cd $TRAVIS_BUILD_DIR
 # This is the part where the touist.zip is pushed to the Github
 # Releases. It will only do so when we create new tags, like v1.1.2.
 deploy:
@@ -79,7 +78,7 @@ deploy:
     # This is maelvalais's ciphered credentials.
     # It has been ciphered by travis's encryption system.
     secure: PNvSXUUBTgQjfio2QL9qQYtV8JCpT6nWkvRNDGFoAwdskusi719jRLjGYDKHrTHelxiehepKSxiFcPcOCfFD/WkfOLZvEBs463Xb3fldoNxUgRAWwYy/uEWwlD3lbSBREgtqrfuHP3uVKF7tYDlJXhTFpdM/nuwXGIwU5AuUhCw=
-  file: $zip
+  file: touist-gui/$zip
   on:
     branch: master
     tags: true
