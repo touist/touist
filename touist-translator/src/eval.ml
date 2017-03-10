@@ -33,6 +33,12 @@ type env = (string * (ast * loc)) list
    The description is a couple (content, location) *)
 type extenv = (string, (ast * loc)) Hashtbl.t
 
+let warning (ast:ast) (message:string) =
+  let loc = match ast with 
+    | Loc (_,loc) -> loc 
+    | _ -> (Lexing.dummy_pos,Lexing.dummy_pos)
+  in Printf.fprintf stderr "%s %s" (Parse.string_of_loc loc) message
+
 (* [ast_whithout_loc] removes the location attached by the parser to the ast
    node. This location 'Loc (ast,loc)' allows to give the location in error 
    messages. [ast_whithout_loc] must be called before any 
@@ -578,7 +584,11 @@ and eval_ast_formula (ast:ast) (env:env) : ast =
               | true  -> eval_ast_formula body env
               | false -> process_list_set xs env
           in
-            process_list_set (set_to_ast_list (eval_ast set env)) env
+          let list_ast_set = set_to_ast_list (eval_ast set env) in
+          if (List.length list_ast_set) == 0 then
+            warning set ("using 'bigand' on an empty set is not recommanded\n"^
+              "as it returns a 'Top' formula which can give unexpected results");
+            process_list_set list_ast_set env
       | x::xs,y::ys ->
         eval_ast_formula (Bigand ([x],[y],None,(Bigand (xs,ys,when_optional,body)))) env
     end
@@ -599,7 +609,11 @@ and eval_ast_formula (ast:ast) (env:env) : ast =
               | true  -> eval_ast_formula body env
               | false -> process_list_set xs env
           in
-            process_list_set (set_to_ast_list (eval_ast set env)) env
+            let list_ast_set = set_to_ast_list (eval_ast set env) in
+          if (List.length list_ast_set) == 0 then
+            warning set ("using 'bigor' on an empty set is not recommanded\n"^
+              "as it returns a 'Bot' formula which can give unexpected results.");
+            process_list_set list_ast_set env
       | x::xs,y::ys ->
         eval_ast_formula (Bigor ([x],[y],None,(Bigor (xs,ys,when_optional,body)))) env
     end
