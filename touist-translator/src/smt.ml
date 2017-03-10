@@ -1,9 +1,9 @@
-(*
- * smt.ml: processes the "semantically correct" abstract syntaxic tree
- *         given by [eval] and produces a string in SMT-LIB2 format.
- *         [to_smt2] is the main function.
- *
- * Project TouIST, 2015. Easily formalize and solve real-world sized problems
+(** Processes the "semantically correct" abstract syntaxic tree given by
+    [Eval.eval] and produces a string in SMT-LIB2 format. 
+    
+    [to_smt2] is the main function. *)
+
+(* Project TouIST, 2015. Easily formalize and solve real-world sized problems
  * using propositional logic and linear theory of reals with a nice language and GUI.
  *
  * https://github.com/touist/touist
@@ -12,8 +12,7 @@
  * This program and the accompanying materials are made available
  * under the terms of the GNU Lesser General Public License (LGPL)
  * version 2.1 which accompanies this distribution, and is available at
- * http://www.gnu.org/licenses/lgpl-2.1.html
- *)
+ * http://www.gnu.org/licenses/lgpl-2.1.html *)
 
 open Syntax
 
@@ -251,7 +250,8 @@ let to_smt2 logic formula =
     | Xor     (x, y) -> gen_var "Bool" x; gen_var "Bool" y(*; Xor (x, y)*)
     | Implies (x, y) -> gen_var "Bool" x; gen_var "Bool" y(*; Implies (x, y)*)
     | Equiv   (x, y) -> gen_var "Bool" x; gen_var "Bool" y(*; Equiv (x, y)*)
-    | _ -> failwith "parse error"
+    | Prop x -> add_var x "Bool"
+    | x -> failwith ("this cannot be transformed into SMT2: "^(Pprint.string_of_ast x))
   in
 
   let rec write = function
@@ -291,8 +291,6 @@ let to_smt2 logic formula =
     | _ -> failwith "error smt write"
   in
 
-  (*gen_var formula;*)
-  (*gen formula;*)
   parse formula;
   Hashtbl.iter (fun k v -> write_to_buf (decl_var (sanitize_var k) v)) vtbl;
   decl_assert (write formula) |> write_to_buf;

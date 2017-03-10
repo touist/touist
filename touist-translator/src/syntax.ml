@@ -1,7 +1,6 @@
-(*
- * syntax.ml: defition of the types constituting the abstract syntaxic tree (ast)
- *
- * Project TouIST, 2015. Easily formalize and solve real-world sized problems
+(** Defition of the types constituting the abstract syntaxic tree (ast) *)
+
+(* Project TouIST, 2015. Easily formalize and solve real-world sized problems
  * using propositional logic and linear theory of reals with a nice language and GUI.
  *
  * https://github.com/touist/touist
@@ -10,8 +9,7 @@
  * This program and the accompanying materials are made available
  * under the terms of the GNU Lesser General Public License (LGPL)
  * version 2.1 which accompanies this distribution, and is available at
- * http://www.gnu.org/licenses/lgpl-2.1.html
- *)
+ * http://www.gnu.org/licenses/lgpl-2.1.html *)
 
 module IntSet = Set_ext.Make(
   struct
@@ -30,7 +28,7 @@ module PropSet = Set_ext.Make(String)
 type loc = Lexing.position * Lexing.position
 and var = string * ast list option * loc
 and ast = (* Touist_code is the entry point *)
-  | Touist_code      of ast list * ast list option
+  | Touist_code      of ast list
   | Int              of int
   | Float            of float
   | Bool             of bool
@@ -88,6 +86,16 @@ and ast = (* Touist_code is the entry point *)
          abcd(1,foo,123,a)     <- an actual string that represents an actual
                                   logical proposition
   *)
+  | Loc              of ast * loc  
+  (* Loc is a clever way of keeping the locations in the text of the ast elements.
+     In parser.mly, each production rule gives its location in the original text;
+     for example, instead of simply returning
+         Inter (x,y)
+     the parser will return
+         Loc (Inter (x,y), ($startpos,$endpos))
+     Loc is used in eval.ml when checking the types; it allows to give precise
+     locations.
+     *)
 and set =
   | EmptySet
   | ISet of IntSet.t

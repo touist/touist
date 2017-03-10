@@ -24,9 +24,13 @@
 package translation;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.StringReader;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -44,12 +48,26 @@ public class TranslatorSMT {
 	final private String outputTableFilePath = "out.table";
 	private String translatorProgramFilePath;
 	private Map<Integer,String> literalsMap = new HashMap<Integer,String>();
-	private List<TranslationError> errors;
+	private List<TranslationError> errors = new ArrayList<TranslationError>();
 	private String currentPath = System.getProperty("user.dir");
 	private Process p;
+	private List<String> options = new ArrayList<String>();
 
+	
+	public TranslatorSMT(List<String> options) {
+		this.options = options;
+	}
 	public TranslatorSMT() {
-		this.translatorProgramFilePath = translatorProgramFilePath;
+	}
+	
+	public boolean translate(String touistlFilePath, String logic) throws IOException, InterruptedException {
+		BufferedReader reader = new BufferedReader(new FileReader(touistlFilePath));
+		return translate(reader,logic); 
+	}
+
+	public boolean translate(StringReader str, String logic) throws IOException, InterruptedException {
+		BufferedReader reader = new BufferedReader(str);
+		return translate(reader,logic); 
 	}
 
 	/**
@@ -67,68 +85,57 @@ public class TranslatorSMT {
 	 * @throws IOException
 	 * @throws InterruptedException
 	 */
-	public boolean translate(String touistlFilePath, String logic) throws IOException, InterruptedException {
-		/* return_code from the Touistl translator (see touistc.ml):
-  		| OK -> 0
-  		| COMPILE_WITH_LINE_NUMBER_ERROR -> 1
-  		| COMPILE_NO_LINE_NUMBER_ERROR -> 2
-  		| OTHER -> 3
-		 */
-                 System.out.println("le fichier ...."+touistlFilePath);
-		final int OK = 0;
-		final int COMPILE_WITH_LINE_NUMBER_ERROR = 1;
-		final int COMPILE_NO_LINE_NUMBER_ERROR = 2;
-		final int OTHER = 3;
-		/*
-		 * Syntax of errors COMPILE_WITH_LINE_NUMBER_ERROR:
-		 * num_row:num_col: message
-		 */
+	public boolean translate(BufferedReader reader, String logic) throws IOException, InterruptedException {
+		final int OK = 0, ERROR = 1;
+
 		// Check if translatorProgramFilePath is there
 		// This trick is because of linux that sets "user.dir" = $HOME instead of $CWD
 		File touistc = new File(ClassLoader.getSystemClassLoader().getResource(".").getPath());
 		String pathtouistc = touistc.getAbsolutePath() + File.separator + "external" + File.separator + "touistc";
 	
-		String [] cmd = {pathtouistc,"-o", outputFilePath,"-smt2", logic, touistlFilePath};
-		System.out.println("translate(): cmd executed: "+Arrays.toString(cmd));
-		this.p = Runtime.getRuntime().exec(cmd);
-		int return_code = p.waitFor();
-		BufferedReader stdout = new BufferedReader(new InputStreamReader(
-				this.p.getInputStream()));
+		List<String> cmd = new ArrayList<String>();
+		
+		cmd.add(pathtouistc);
+		cmd.add("-"); // touistc will read input from stdin
+		cmd.add("-smt2");
+		cmd.add(logic);
+		cmd.add("-o");
+		cmd.add(outputFilePath);
+		cmd.add("--detailed-position");
+		cmd.addAll(options);		
+		
+        System.out.println("translate(): cmd executed: "+cmd.toString());
+		
+        this.p = Runtime.getRuntime().exec(cmd.toArray(new String[0]));
+
+        BufferedWriter toProcess = new BufferedWriter(new OutputStreamWriter(p.getOutputStream()));
+        String s = "";
+        while ((s = reader.readLine())!=null) {
+        	toProcess.write(s + "\n");
+        }
+        toProcess.flush();
+        toProcess.close();
+		
+        int return_code = p.waitFor();
+        
+		BufferedReader fromProcess = new BufferedReader(new InputStreamReader(p.getInputStream()));
 		List<String> linesStdout = new ArrayList<String>();
-		while (stdout.ready()) {
-			linesStdout.add(stdout.readLine());
-		}
-		BufferedReader stderr = new BufferedReader(new InputStreamReader(
+		while (fromProcess.ready())
+			linesStdout.add(fromProcess.readLine());
+
+		BufferedReader fromProcessErr = new BufferedReader(new InputStreamReader(
 				this.p.getErrorStream()));
-		List<String> linesStdErr = new ArrayList<String>();
-		while (stderr.ready()) {
-			linesStdErr.add(stderr.readLine());
+		String linesStdErr = "";
+		while (fromProcessErr.ready()) {
+			linesStdErr += fromProcessErr.readLine() + "\n";
 		}
-		stderr.close();
-		stdout.close();
-		errors = new ArrayList<TranslationError>();
-		if(return_code == COMPILE_WITH_LINE_NUMBER_ERROR) {
-			System.err.println("translate(): the translator returned errors");
-			int num_line; int num_col;
-			String message_error;
-			for (String errMessage : linesStdErr) {
-				System.err.println("translate(): "+errMessage);
-				StringTokenizer tokenizer = new StringTokenizer(errMessage,":");
-				num_line = Integer.parseInt(tokenizer.nextToken());
-				num_col = Integer.parseInt(tokenizer.nextToken());
-				message_error = tokenizer.nextToken();
-				errors.add(new TranslationError(num_line,num_col,message_error));
-			}
-		}
-		if(return_code == COMPILE_NO_LINE_NUMBER_ERROR) {
-			System.err.println("translate(): the translator returned errors");
-			for (String errMessage : linesStdErr) {
-				System.err.println("translate(): "+errMessage);
-				errors.add(new TranslationError(errMessage));
-			}
+		fromProcessErr.close();
+		fromProcess.close();
+
+		if(return_code != OK) {
+			errors = TranslationError.parse(linesStdErr);
 		}
 		if(return_code == OK) {
-			// Nothing
 		}
 		return return_code == OK;
 	}

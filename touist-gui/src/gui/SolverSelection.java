@@ -5,11 +5,14 @@
  */
 package gui;
 
+import gui.editionView.editor.Editor;
+
 /**
  *
  * @author Skander
  */
 public class SolverSelection {
+	private MainFrame m;
     public enum SolverType {
             SAT, 
             QF_LRA, 
@@ -20,8 +23,8 @@ public class SolverSelection {
     
     private SolverType selectedSolver = SolverType.SAT;
     
-    public SolverSelection() {
-        
+    public SolverSelection(MainFrame m) {
+    	this.m = m;
     }
 
     public SolverType getSelectedSolver() {
@@ -30,6 +33,12 @@ public class SolverSelection {
     
     public void setSelectedSolver(SolverType solverType) {
         this.selectedSolver = solverType;
+        if(selectedSolver == SolverType.SAT) {
+        	m.getEditorPanel1().getEditor().getEditorTextArea().setSyntaxEditingStyle("sat");
+        } else {
+        	m.getEditorPanel1().getEditor().getEditorTextArea().setSyntaxEditingStyle("smt");
+        }
+        m.getEditorPanel1().getEditor().getEditorTextArea().forceReparsing(0);
     }    
     
     public SolverType[] getSupportedSolvers() {

@@ -56,7 +56,7 @@ public class MainFrame extends javax.swing.JFrame {
     private TranslatorSMT translatorSMT = new TranslatorSMT();
     private Solver solver;
     private ModelList models;
-    private SolverSelection solverSelection = new SolverSelection();
+    private SolverSelection solverSelection = new SolverSelection(this);
 
     public State state;
     private String defaultDirectoryPath = ".";

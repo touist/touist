@@ -1,12 +1,9 @@
 package gui.editionView.editor;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.swing.text.BadLocationException;
 
 import org.fife.ui.rsyntaxtextarea.RSyntaxDocument;
 import org.fife.ui.rsyntaxtextarea.parser.AbstractParser;
@@ -15,20 +12,25 @@ import org.fife.ui.rsyntaxtextarea.parser.ParseResult;
 
 import translation.TranslationError;
 import translation.TranslatorSAT;
+import translation.TranslatorSMT;
 
 public class ErrorParser extends AbstractParser {
 	private List<TranslationError> bufferErrors;
 	
 	
-	@Override
+	@Override // lang can be set using editor.setSyntaxEditingStyle
 	public ParseResult parse(RSyntaxDocument code, String lang) {
 		DefaultParseResult result = new DefaultParseResult(this);
-		lang = "sat";
-		if(lang != "sat" || code.getLength()==0)
+		if((lang != "sat" && lang != "smt") || code.getLength()==0)
 			return result;
 		if(bufferErrors == null) {
 			try {
-				bufferErrors = linter(new StringReader(code.getText(0, code.getLength())));
+				if(lang == "sat") {
+					bufferErrors = linterSAT(new StringReader(code.getText(0, code.getLength())));
+				} else if (lang == "smt") {
+					bufferErrors = linterSMT(new StringReader(code.getText(0, code.getLength())));
+				}
+				
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -51,12 +53,18 @@ public class ErrorParser extends AbstractParser {
 		bufferErrors = errors;
 	}
 	
-	public List<TranslationError> linter(StringReader s) throws IOException, InterruptedException {
-		TranslatorSAT translator = null;
+	public List<TranslationError> linterSAT(StringReader s) throws IOException, InterruptedException {
 		List<String> options = new ArrayList<String>();
 		options.add("--linter");
-		translator = new TranslatorSAT(options);
+		TranslatorSAT translator = new TranslatorSAT(options);
 		translator.translate(s);
+		return translator.getErrors();
+	}
+	public List<TranslationError> linterSMT(StringReader s) throws IOException, InterruptedException {
+		List<String> options = new ArrayList<String>();
+		options.add("--linter");
+		TranslatorSMT translator = new TranslatorSMT(options);
+		translator.translate(s, "QF_IDL"); // QF_IDL is an arbitrary SMT2 logic
 		return translator.getErrors();
 	}
 }

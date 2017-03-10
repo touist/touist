@@ -1,8 +1,9 @@
-(*
- * dimacs.ml: processes the CNF-compliant version of the abstract syntaxic tree and
- *            produces a string in DIMACS format.
- *            [to_dimacs] is the main function.
- *
+ (** Processes the CNF-compliant version of the abstract syntaxic tree given by [Cnf.ast_to_cnf]
+     and produces a string in DIMACS format.
+     
+     [cnf_to_clauses] is the main function. *)
+
+(**
  * Project TouIST, 2015. Easily formalize and solve real-world sized problems
  * using propositional logic and linear theory of reals with a nice language and GUI.
  *
@@ -175,10 +176,14 @@ let print_clause (clause:Lit.t list) : unit =
         lits are the negation of the valuation in the model
     (4) go on with (1)
 *)
-(* limit is the limit of number of models you allow to be fetched.
-   When limit = 0, all models will be fetched.
-   [print] can be used to print the models as they appear, because finding a
-   model can be very long. *)
+
+(** [solve_clauses] finds the models for the given clauses. 
+    @param print is a function that will print a model as soon as it is found.
+      It can be useful to print the models as they appear because finding all
+      models (if [limit] is large) can be extremely long.
+      Example: [~print:(Sat.Model.pprint table model)]
+    @param limit is the limit of number of models you allow to be fetched.
+      When limit = 0, all models will be fetched. *)
 let solve_clauses
     ?(print: Model.t -> int -> unit = fun m i ->())
     ?(limit: int = 0)
@@ -216,3 +221,20 @@ let solve_clauses
         models := ModelSet.add model !models; print model i;
         models
   in solve_loop limit 0
+
+(** [print_solve] outputs the result of the solver. But it is much more recommanded
+    to use the parameter '~print_model' of [solve_clauses] in order to output the
+    models as soon as they are found; if looking for a large number of models,
+    [print_solve] will have to wait [solve_clauses] is done.
+
+    @param output is the [out_channel] you want to solutions to be written into.
+    @param show_hidden indicates that the hidden literals introduced during 
+      [ast_to_cnf].
+
+    CNF conversion should be shown. *)
+let print_solve ?(show_hidden=false) output (solver:Minisat.t) (table:(string, Minisat.Lit.t) Hashtbl.t) =
+  let string_of_value solver (lit:Minisat.Lit.t) = match Minisat.value solver lit with
+    | V_true -> "1" | V_false -> "0" | V_undef -> "?"
+  in let print_value_and_name name lit = if show_hidden || name.[0] != '&'
+       then Printf.fprintf output "%s %s\n" (string_of_value solver lit) name
+  in Hashtbl.iter print_value_and_name table

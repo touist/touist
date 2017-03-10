@@ -1,5 +1,10 @@
+(** Helper functions for printing anything contained in the AST
+    produced by the parser. *)
+
 open Syntax
 
+(** [string_of_ast] takes an abstract syntaxic tree.
+    @param ast of type [Syntax.ast] *)
 let rec string_of_ast = function
   | Int    x -> string_of_int x
   | Float  x -> string_of_float x
@@ -74,8 +79,8 @@ let rec string_of_ast = function
   | Atleast (x,y) -> "atleast(" ^ (string_of_ast x) ^ "," ^ (string_of_ast y) ^ ")"
   | Let (v,x,c) -> (string_of_ast v) ^ "=" ^ (string_of_ast x) ^ ": " ^ (string_of_ast c)
   | Affect (v,c) -> (string_of_ast v) ^ "=" ^ (string_of_ast c)
-  | Touist_code (f,None) -> (string_of_ast_list "\n" f)
-  | Touist_code (f,Some a) -> (string_of_ast_list "\n" f) ^ "\n" ^(string_of_ast_list "\n" a)
+  | Touist_code (f) -> (string_of_ast_list "\n" f)
+  | Loc (x,_) -> "" ^ string_of_ast x
 
 and string_of_ast_type = function
   | Int    x               -> "int"
@@ -132,7 +137,8 @@ and string_of_ast_type = function
   | Atleast (x,y)          -> "atleast"
   | Let (v,x,c)            -> "let"
   | Affect (_,_)           -> "="
-  | Touist_code (_,_)      -> "(touist code)"
+  | Touist_code (_)      -> "(touist code)"
+  | Loc (x,_) -> string_of_ast_type x
 
 and string_of_set = function
   | EmptySet  -> "[]"

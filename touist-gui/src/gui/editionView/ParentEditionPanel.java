@@ -57,7 +57,7 @@ import translation.TranslatorSAT;
  */
 public class ParentEditionPanel extends AbstractComponentPanel {
 
-    private static final int ERROR_MESSAGE_MAX_LENGTH = 76;
+	private static final int ERROR_MESSAGE_MAX_LENGTH = 76;
     private String jLabelErrorMessageText;
     private Thread testThread;
 
@@ -490,6 +490,7 @@ public class ParentEditionPanel extends AbstractComponentPanel {
                     
                     this.editor.getParser().linterFromExisting(getFrame().getTranslatorSAT().getErrors());
                     this.editor.getEditorTextArea().forceReparsing(0);
+                    
 
                     System.out.println("Traduction error : " + "\n" + errorMessage + "\n");
                     /*uncomment the following line to have a popup once an error is detected*/
@@ -577,7 +578,7 @@ public class ParentEditionPanel extends AbstractComponentPanel {
                 
                 if(! getFrame().getTranslatorSMT().translate(bigAndFilePath, logic)) {
                     errorMessage = "";
-                    for (TranslationError error : getFrame().getTranslatorSAT().getErrors()) {
+                    for (TranslationError error : getFrame().getTranslatorSMT().getErrors()) {
                     	errorMessage += error + "\n";
                     }
                     setJLabelErrorMessageText(errorMessage);
@@ -663,4 +664,7 @@ public class ParentEditionPanel extends AbstractComponentPanel {
         bottomMessage.setToolTipText(getFrame().getLang().getWord("ParentEditionPanel.jLabelErrorMessage.tooltip"));
         updateUI();
     }
+    public EditionPanel getEditor() {
+		return editor;
+	}
 }

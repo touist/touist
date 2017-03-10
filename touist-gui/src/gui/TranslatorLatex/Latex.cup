@@ -96,7 +96,7 @@ expr ::= IF expr:b THEN expr:e1 ELSE expr:e2  {: RESULT = new String("if\\;"+b+"
 		| expr:b1 EQUIV expr:b2 {: RESULT = new String(b1+" \\Leftrightarrow "+b2);:}
 		| TOP {: RESULT = new String("\\top");:}
 		| BOT {: RESULT = new String("\\bot");:}
-		| TERMTUPLE:i term_option:t RPAR {: RESULT = new String(i+"("+t+")");:}
+		| TERMTUPLE:i term_option:t RPAR {: RESULT = new String(i+""+t+")");:}
 		| TERM:i {: RESULT = new String(i);:}
 		| expr:c1 AND expr:c2 {: RESULT = new String(c1+" \\wedge "+c2);:}
 		| expr:c1 OR expr:c2 {: RESULT = new String(c1+" \\vee "+c2);:}

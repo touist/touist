@@ -1,7 +1,6 @@
-(*
- * lexer.mll: definition of the ocamllex lexer.
- *
- * Project TouIST, 2015. Easily formalize and solve real-world sized problems
+(* Definition of the ocamllex lexer. *)
+
+(* Project TouIST, 2015. Easily formalize and solve real-world sized problems
  * using propositional logic and linear theory of reals with a nice language and GUI.
  *
  * https://github.com/touist/touist
@@ -28,13 +27,14 @@
  * under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 2 of the License, or
  * (at your option) any later version.  This file is also distributed
- * under the terms of the INRIA Non-Commercial License Agreement.
- *)
+ * under the terms of the INRIA Non-Commercial License Agreement. *)
 
 {
   open Lexing
   open Parser
-  exception Error of string * lexbuf
+  open Syntax
+
+  exception Error of string * loc
 
   let next_line lexbuf =
     let pos = lexbuf.lex_curr_p in
@@ -79,7 +79,7 @@
     "true",          BOOL true;
     "false",         BOOL false;
     "let",           LET;
-    "data",          DATA ]
+    "data",          DATA]
 }
 
 let digit      = ['0' - '9']
@@ -150,7 +150,8 @@ rule token = parse (* is a function (Lexing.lexbuf -> Parser.token list) *)
   | double as f    {[ FLOAT      (float_of_string f) ]}
   | newline        { next_line lexbuf; token lexbuf   }
   | ";;"           { comments_parse lexbuf            }
-  | _ as c         { raise (Error ("unexpected char '"^(String.make 1 c)^"'",lexbuf)) }
+  | _ as c         { let loc = (lexbuf.lex_curr_p,lexbuf.lex_curr_p)
+                     in raise (Error ("unexpected char '"^(String.make 1 c)^"'", loc)) }
 
 and comments_parse = parse
   | '\n'           { next_line lexbuf; token lexbuf }
