@@ -6,6 +6,7 @@ import org.fife.ui.rsyntaxtextarea.parser.Parser;
 import org.fife.ui.rsyntaxtextarea.parser.ParserNotice;
 
 import translation.TranslationError;
+import translation.TranslationError.Type;
 
 /**
  * An error notice
@@ -35,7 +36,8 @@ public class ErrorParserNotice implements ParserNotice {
 
 	@Override
 	public Color getColor() {
-		return Color.RED;
+		return (err.getType() == Type.ERROR)
+				? Color.RED : Color.BLUE;
 	}
 
 	@Override
@@ -50,7 +52,8 @@ public class ErrorParserNotice implements ParserNotice {
 
 	@Override
 	public Level getLevel() {
-		return Level.ERROR;
+		return err.getType() == Type.ERROR ?
+				ParserNotice.Level.ERROR : ParserNotice.Level.WARNING;
 	}
 
 	@Override
@@ -81,7 +84,7 @@ public class ErrorParserNotice implements ParserNotice {
 	@Override
 	public String getToolTipText() {
 		if(getKnowsOffsetAndLength()) {
-			return "line "+err.getRowInCode()+", col "+err.getColumnInCode()+": "+getMessage();
+			return "line "+err.getRowInCode()+", col "+err.getColumnInCode()+": "+err.getTypeString()+": "+getMessage();
 		}
 		else {
 			return "unknown line and col: "+getMessage();

@@ -50,7 +50,7 @@
 
 open Syntax
 open Pprint
-exception Error of string
+open Msg
 
 (* [is_clause] checks that the given AST is a clause. This function can only
    be called on an AST containing Or, And or Not. No Equiv or Implies! *)
@@ -77,7 +77,8 @@ let rec push_lit (lit:ast) (cnf:ast) : ast = match cnf with
   | Not (Prop x)     -> Or (lit, Not (Prop x))
   | And (x,y)        -> And (push_lit lit x, push_lit lit y)
   | Or (x,y)         -> Or (lit, Or (x,y))
-  | x -> raise (Error ("this doesn't seem to be a formula: '" ^ (string_of_ast x) ^ "'"))
+  | ast -> add_fatal (Error,Cnf,"this doesn't seem to be a formula: '" ^ (string_of_ast ast) ^ "'",null_loc)
+
 
 
 (* [genterm] generates a (Prop &i) with i being a self-incrementing index.
@@ -188,7 +189,7 @@ and to_cnf depth (stop:stop) (ast:ast) : ast =
     | Implies (x,y) -> to_cnf (Or (Not x, y))
     | Equiv (x,y) -> to_cnf (And (Implies (x,y), Implies (y,x)))
     | Xor (x,y) -> to_cnf (And (Or (x,y), Or (Not x, Not y)))
-    | _ -> raise (Error ("this doesn't seem to be a formula: '" ^ (string_of_ast ast) ^ "'"))
+    | _ -> add_fatal (Error,Cnf,"this doesn't seem to be a formula: '" ^ (string_of_ast ast) ^ "'",null_loc)
     end in
     if !debug then print_debug "out: " depth [cnf];
     cnf

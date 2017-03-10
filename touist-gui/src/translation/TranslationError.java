@@ -1,8 +1,9 @@
 package translation;
 
 import java.util.ArrayList;
-import java.util.NoSuchElementException;
-import java.util.StringTokenizer;
+import java.util.Scanner;
+import java.util.regex.MatchResult;
+import java.util.regex.Pattern;
 
 
 /**
@@ -11,14 +12,17 @@ import java.util.StringTokenizer;
  * @author maelv
  */
 public class TranslationError {
+	public enum Type { ERROR, WARNING };
+	
 	private int rowInCode;
 	private int columnInCode;
 	private boolean rowAndColumnKnown,posStartEndKnown;
 	private int posStart,posEnd; // absolute positions in token flow
 	private String errorMessage;
+	private Type type;
 
 	public TranslationError(int rowInCode, int columnInCode, 
-			int posStart, int posEnd, String errorMessage) {
+			int posStart, int posEnd, Type type, String errorMessage) {
 		this.rowInCode = rowInCode;
 		this.columnInCode = columnInCode;
 		this.errorMessage = errorMessage;
@@ -26,27 +30,31 @@ public class TranslationError {
 		this.posEnd = posEnd;
 		rowAndColumnKnown = true;
 		posStartEndKnown = true;
+		this.type = type;
 	}
 	
-	public TranslationError(int rowInCode, int columnInCode, String errorMessage) {
+	public TranslationError(int rowInCode, int columnInCode, Type type, String errorMessage) {
 		this.rowInCode = rowInCode;
 		this.columnInCode = columnInCode;
 		this.errorMessage = errorMessage;
 		rowAndColumnKnown = true;
 		posStartEndKnown = false;
+		this.type = type;
 	}
 	
 	public TranslationError(String errorMessage) {
 		this.errorMessage = errorMessage;
 		rowAndColumnKnown = false;
 		posStartEndKnown = false;
+		this.type = Type.ERROR;
 	}
 
 	@Override
 	public String toString() {
-		return (hasRowAndColumn())
-				?"line "+rowInCode+", col "+columnInCode+": "+errorMessage
-				:errorMessage;
+		return ((hasRowAndColumn()) ?
+				"line "+rowInCode+", col "+columnInCode+": "+(type==Type.ERROR?"error":"warning")+": "
+				:"")
+			+ errorMessage;
 	}
 
 	public boolean hasRowAndColumn() {
@@ -83,6 +91,60 @@ public class TranslationError {
 		return errorMessage;
 	}
 	
+	public Type getType() {
+		return type;
+	}
+
+	public String getTypeString() {
+		switch (type) {
+		case ERROR:   return "error";
+		case WARNING: return "warning";
+		}
+		return "";
+	}
+	
+	
+	/**
+	 * 
+	 */
+	private static boolean isBeginOfMessage(String oneline) {
+		return Pattern.matches("^[0-9]+:[0-9]+:.*", oneline);
+	}
+	
+	private static TranslationError parseNewError(String line) {
+		TranslationError t = new TranslationError(line); // default case
+		Pattern p1 = 
+			Pattern.compile("^([0-9]+):([0-9]+):([0-9]+):([0-9]+): ([a-z]+): (.*)$");
+		// group description:  line      col     start     end       type     msg
+	    // group number:  i=     1        2        3        4          5       6
+		Scanner scan = new Scanner(line);
+		if(p1.matcher(line).find()) {
+			scan.findInLine(p1);
+			MatchResult r = scan.match();
+			t = new TranslationError(
+				Integer.parseInt(r.group(1)),
+				Integer.parseInt(r.group(2)),
+				Integer.parseInt(r.group(3)),
+				Integer.parseInt(r.group(4)),
+				r.group(5).equals("error") ? Type.ERROR : Type.WARNING,
+				r.group(6));
+		}
+		Pattern p2 = 
+			Pattern.compile("^([0-9]+):([0-9]+): ([a-z]+): (.*)$");
+		// group description:  line      col      type     msg
+	    // group number:  i=     1        2        3        4
+		if(p2.matcher(line).find()) {
+			scan.findInLine(p2);
+			MatchResult r = scan.match();
+			t = new TranslationError(
+				Integer.parseInt(r.group(1)),
+				Integer.parseInt(r.group(2)),
+				r.group(3).equals("error") ? Type.ERROR : Type.WARNING,
+				r.group(4));
+		}
+		scan.close();
+		return t;
+	}
 	/**
 	 * Takes what is outputed by touistc and translates into error messages
 	 * TODO: for now, only ONE error is parsed!
@@ -91,29 +153,24 @@ public class TranslationError {
 	 */
 	public static ArrayList<TranslationError> parse(String errorOutput) {
 		ArrayList<TranslationError> errors = new ArrayList<TranslationError>();
-		StringTokenizer tokenizer = new StringTokenizer(errorOutput,":");
-		ArrayList<Integer> pos = new ArrayList<Integer>();
-		String cur = "";
-		Boolean ok = true;
-		for (int i = 0; i < 5 && ok; i++) {
-			try {
-				cur = tokenizer.nextToken();
-				pos.add(Integer.parseInt(cur));
-			} catch (Exception e) {
-				ok = false;
+		
+		String[] lines = errorOutput.split("\\n");
+		
+		TranslationError errorBeingRead = null;
+		for(String line : lines) {
+			if(isBeginOfMessage(line)) {
+				if(errorBeingRead==null) { // no previous messages
+				} else { // previous message is finished, save it
+					errors.add(errorBeingRead);
+				}
+				errorBeingRead = parseNewError(line);
+			}
+			else if(errorBeingRead != null) { // a message is being read
+				errorBeingRead.errorMessage = errorBeingRead.errorMessage + "\n" + line;
 			}
 		}
-		while(tokenizer.hasMoreTokens()) { cur += ":"+tokenizer.nextToken(); }
-		if(pos.size()==2) { // meaning that only 23:10: has been returned
-			errors.add(new TranslationError(pos.get(0),pos.get(1),cur));
-		} 
-		else if(pos.size()==4) { // meaning that 23:10:465:470: has been returned
-			// format: 'num_line:num_col:token_start:token_end:' 
-			errors.add(new TranslationError(pos.get(0),pos.get(1),pos.get(2),pos.get(3),cur));
-		}
-		else {
-			errors.add(new TranslationError(cur));
-		}
+		if(errorBeingRead != null) // we do not forget to save the last message
+			errors.add(errorBeingRead);
 		return errors;
 	}
 }

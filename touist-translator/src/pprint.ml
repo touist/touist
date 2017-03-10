@@ -13,8 +13,8 @@ let rec string_of_ast = function
   | Bottom -> "bot"
   | Prop x | UnexpProp (x, None)-> x
   | UnexpProp (x,Some y) -> x ^ "(" ^ (string_of_ast_list ", " y) ^ ")"
-  | Var (x,None,_)   -> x
-  | Var (x,Some y,_) -> x ^ "(" ^ (string_of_ast_list ", " y) ^ ")"
+  | Var (x,None)   -> x
+  | Var (x,Some y) -> x ^ "(" ^ (string_of_ast_list ", " y) ^ ")"
   | Set    x -> string_of_set x
   | Set_decl x -> "[" ^ (string_of_ast_list "," x) ^ "]"
   | Neg x     -> "(- " ^ (string_of_ast x) ^ ")"
@@ -90,8 +90,8 @@ and string_of_ast_type = function
   | Bottom                 -> "bot"
   | UnexpProp (_,_)        -> "unexpanded proposition"
   | Prop x                 -> "proposition"
-  | Var (x,None,_)         -> "variable"
-  | Var (x,Some y,_)       -> "tuple-variable"
+  | Var (x,None)         -> "variable"
+  | Var (x,Some y)       -> "tuple-variable"
   | Set (EmptySet)     -> "empty set"
   | Set (FSet _)    -> "float-set"
   | Set (ISet _)    -> "int-set"
