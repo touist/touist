@@ -207,10 +207,11 @@ let () =
   close_out !output;
   close_out !output_table;
   close_in !input;
+  
+  (* In case we have had non-fatal messages, like warning, display them *)
+  Msg.print_msgs ~detailed:!detailed_position ();
+  
   exit (get_code OK)
 
   with
-    | Lexer.Error (msg,loc) -> (Printf.fprintf stderr "%s %s\n" (Parse.string_of_loc ~detailed:!detailed_position loc) msg; exit (get_code ERROR))
-    | Parse.Error (msg,loc) -> (Printf.fprintf stderr "%s %s" (Parse.string_of_loc ~detailed:!detailed_position loc) msg; exit (get_code ERROR))
-    | Eval.Error (msg,loc) -> (Printf.fprintf stderr "%s %s\n" (Parse.string_of_loc ~detailed:!detailed_position loc) msg; exit (get_code ERROR))
-    | Cnf.Error msg -> (Printf.fprintf stderr "%s %s\n" (Parse.string_of_loc ~detailed:!detailed_position (Lexing.dummy_pos,Lexing.dummy_pos)) msg; exit (get_code ERROR))
+    | Msg.Fatal -> (Msg.print_msgs ~detailed:!detailed_position (); exit (get_code ERROR))

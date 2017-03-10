@@ -17,28 +17,7 @@
 open Parser
 open Syntax
 open Lexing
-
-exception Error of string * loc
-
-(** [string_of_loc] will print the position of the error; the two positions
-    correspond to where the error starts and where it ends. 
-    Example of call with dummy positions:
-        string_of_loc (Lexing.dummy_pos,Lexing.dummy_pos)
-    When you have only one Lexing.pos available, repeat it twice:
-        string_of_loc (pos,pos)
-    Optional 'detailed' will give two extra numbers which are the absolute
-    positions in terms of characters from the beginning of the file:
-        string_of_loc ~detailed:true loc
-    'loc' is the location (with start and end) of a faulty piece of code we
-    want to write an error about. 
-*)
-let string_of_loc ?detailed:(d=false) (loc:loc) : string =
-  let s,e = loc in (* start, end *)
-  let relative = Printf.sprintf "%d:%d:" s.pos_lnum (s.pos_cnum - s.pos_bol+1) in
-  let absolute = Printf.sprintf "%d:%d:" s.pos_cnum e.pos_cnum in
-  match d with
-  | false -> relative              (* num_line:num_col: *)
-  | true  -> relative ^":"^ absolute (* num_line:num_col:token_start:token_end: *)
+open Msg
 
 (** [lexer] is used [parse] in order to get the next token of the input
     stream. It is an intermediate to the [Lexer.token] function (in lexer.mll);
@@ -89,7 +68,7 @@ let parse (parser) ?debug:(debug=false) (text:string) : Syntax.ast =
   and fail checkpoint =
     let msg = (Parser_error_report.report text !buffer checkpoint debug)
     and loc = Parser_error_report.area_pos !buffer (* area_pos returns (start_pos,end_pos) *)
-    in raise (Error (msg,loc))
+    in add_fatal (Error,Parse,msg,loc)
   in
     Parser.MenhirInterpreter.loop_handle succeed fail supplier checkpoint
 

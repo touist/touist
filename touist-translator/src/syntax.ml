@@ -24,9 +24,7 @@ module FloatSet = Set_ext.Make(
   end)
 
 module PropSet = Set_ext.Make(String)
-
-type loc = Lexing.position * Lexing.position
-and var = string * ast list option * loc
+type var = string * ast list option * Msg.loc
 and ast = (* Touist_code is the entry point *)
   | Touist_code      of ast list
   | Int              of int
@@ -86,7 +84,7 @@ and ast = (* Touist_code is the entry point *)
          abcd(1,foo,123,a)     <- an actual string that represents an actual
                                   logical proposition
   *)
-  | Loc              of ast * loc  
+  | Loc              of ast * Msg.loc  
   (* Loc is a clever way of keeping the locations in the text of the ast elements.
      In parser.mly, each production rule gives its location in the original text;
      for example, instead of simply returning
