@@ -341,6 +341,7 @@ and eval_ast (ast:ast) (env:env) = match ast_whithout_loc ast with
   | UnexpProp (p,i) -> Prop (expand_var_name (p,i) env)
   | Prop x -> Prop x
   | Loc (x,l) -> eval_ast x env
+  | Paren x -> eval_ast x env
   | e -> raise_with_loc ast ("this expression cannot be expanded: " ^ string_of_ast e)
 
 and eval_set_decl (set_decl:ast) (env:env) =
@@ -597,6 +598,7 @@ and eval_ast_formula (ast:ast) (env:env) : ast =
   | Let (Loc (Var (p,i),loc),content,formula) ->
     let name = (expand_var_name (p,i) env) and desc = (eval_ast content env,loc)
     in eval_ast_formula formula ((name,desc)::env)
+  | Paren x -> eval_ast_formula x env
   | e -> raise_with_loc ast ("this expression is not a formula: " ^ string_of_ast e)
 
 and exact_str lst =

@@ -94,6 +94,8 @@ and ast = (* Touist_code is the entry point *)
      Loc is used in eval.ml when checking the types; it allows to give precise
      locations.
      *)
+  | Paren of ast
+  (* [Paren] keeps track of the parenthesis in the AST in order to print latex *)
 and set =
   | EmptySet
   | ISet of IntSet.t

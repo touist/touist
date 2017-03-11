@@ -30,6 +30,7 @@ let linter_and_expand = ref false (* same but with semantic errors (during eval)
 let detailed_position = ref false (* display absolute position of error *)
 let debug_syntax = ref false
 let debug_cnf = ref false
+let latex = ref false
 
 (* [process_arg_alone] is the function called by the command-line argument
    parser when it finds an argument with no preceeding -flag (-f, -x...).
@@ -73,6 +74,7 @@ let () =
     ("--limit", Arg.Set_int limit,"(with --solve) Instead of one model, return N models if they exist.
                                             With 0, return every possible model.");
     ("--count", Arg.Set only_count,"(with --solve) Instead of displaying models, return the number of models");
+    ("--latex", Arg.Set latex,"Transform the touistl laguage into latex");
     ("--show-hidden", Arg.Set show_hidden_lits,"(with --solve) Show the hidden '&a' literals used when translating to CNF");
     ("--equiv", Arg.Set_string equiv_file_path,"INPUT2 (with --solve) Check that INPUT2 has the same models as INPUT (equivalency)");
     ("--debug-formula-expansion", Arg.Set debug_formula_expansion,"Print how the formula is expanded (bigand...)");
@@ -134,6 +136,13 @@ let () =
 
   try
   
+  (* latex = parse and transform with latex_of_ast *)
+  if !latex then
+    (let latex_str =
+      if !sat_mode
+      then Parse.parse_sat (string_of_file !input) |> Latex.latex_of_ast
+      else Parse.parse_smt (string_of_file !input) |> Latex.latex_of_ast
+    in (Printf.fprintf !output "%s\n" latex_str; exit (get_code OK)));
   (* linter = only show syntax errors *)
   if !linter then
     if (!sat_mode) then
