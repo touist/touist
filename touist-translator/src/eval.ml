@@ -131,11 +131,21 @@ let process_empty (set:ast) (set_type:ast) : ast = match set,set_type with
 
 let extenv = ref (Hashtbl.create 0)
 
+(* [check_only] allows to only 'check the types'. It prevents the bigand,
+    bigor, exact, atmost, atleast and range to expand completely(as it
+    may take a lot of time to do so). *)
+let check_only = ref false
+
 (** Main function for checking the types and evaluating the touistl expressions
     (variables, bigand, bigor, let...).
+
     @param ast is the AST given by [Parse.parse] 
+    @param onlychecktypes will limit the evaluation to its minimum in
+           order to get type errors as fast as possible.
+
     @raise Eval.Error (msg,loc) *)
-let rec eval ast =
+let rec eval ?(onlychecktypes=false) ast =
+  check_only := onlychecktypes;
   extenv := Hashtbl.create 50; (* extenv must be re-init between two calls to [eval] *)
   eval_touist_code ast []
 
@@ -265,8 +275,8 @@ and eval_ast (ast:ast) (env:env) = match ast_whithout_loc ast with
       | Set (SSet a), Set (SSet b) -> Set (SSet (PropSet.diff a b))
       | _,_ -> raise_type_error2 ast x x' y y' "a 'float-set', 'int-set' or 'prop-set'"
     end
-  | Range (x,y) ->
-    (* Return the list of integers between min and max with an increment of step *)
+  | Range (x,y) -> (* !check_only will simplify [min..max] to [min..min] *)
+    (* [irange] generates a list of int between min and max with an increment of step. *)
     let irange min max step =
       let rec loop acc = function i when i=max+1 -> acc | i -> loop (i::acc) (i+step)
       in loop [] min |> List.rev
@@ -275,8 +285,8 @@ and eval_ast (ast:ast) (env:env) = match ast_whithout_loc ast with
       in loop [] min |> List.rev
     in begin
       match eval_ast x env, eval_ast y env with
-      | Int x, Int y     -> Set (ISet (IntSet.of_list (irange x y 1)))
-      | Float x, Float y -> Set (FSet (FloatSet.of_list (frange x y 1.)))
+      | Int x, Int y     -> Set (ISet (IntSet.of_list (irange x (if !check_only then x else y)  1)))
+      | Float x, Float y -> Set (FSet (FloatSet.of_list (frange x (if !check_only then x else y) 1.)))
       | x',y' -> raise_type_error2 ast x x' y y' "two integers or two floats"
     end
   | Empty x -> begin
@@ -518,19 +528,19 @@ and eval_ast_formula (ast:ast) (env:env) : ast =
   | Implies (Top,x) -> eval_ast_formula x env
   | Implies (x,y) -> Implies (eval_ast_formula x env, eval_ast_formula y env)
   | Equiv   (x,y) -> Equiv (eval_ast_formula x env, eval_ast_formula y env)
-  | Exact (x,y) -> begin
+  | Exact (x,y) -> begin (* !check_only simplifies by returning a dummy proposition *)
       match eval_ast x env, eval_ast y env with
-      | Int x, Set (SSet s) -> exact_str (PropSet.exact x s)
+      | Int x, Set (SSet s) -> if !check_only then Prop "dummy" else exact_str (PropSet.exact x s)
       | x',y' -> raise_type_error2 ast x x' y y' "'int' (left-hand)\nand a 'prop-set' (right-hand)"
     end
   | Atleast (x,y) -> begin
       match eval_ast x env, eval_ast y env with
-      | Int x, Set (SSet s) -> atleast_str (PropSet.atleast x s)
+      | Int x, Set (SSet s) -> if !check_only then Prop "dummy" else atleast_str (PropSet.atleast x s)
       | x',y' -> raise_type_error2 ast x x' y y' "'int' (left-hand)\nand a 'prop-set' (right-hand)"
     end
   | Atmost (x,y) ->begin
       match eval_ast x env, eval_ast y env with
-      | Int x, Set (SSet s) -> atmost_str (PropSet.atmost x s)
+      | Int x, Set (SSet s) -> if !check_only then Prop "dummy" else atmost_str (PropSet.atmost x s)
       | x',y' -> raise_type_error2 ast x x' y y' "'int' (left-hand)\nand a 'prop-set' (right-hand)"
     end
   (* What is returned by bigand or bigor when they do not
@@ -551,7 +561,7 @@ and eval_ast_formula (ast:ast) (env:env) : ast =
       | [Loc (Var (name,_),loc)],[set] -> (* we don't need the indices because bigand's vars are 'simple' *)
         let rec process_list_set (set_list:ast list) env =
           match set_list with
-          | []    -> Top (* XXX what if bigand in a or?*)
+          | []   -> Top (*  what if bigand in a or? We give a warning (see below) *)
           | x::xs ->
             let env = (name,(x,loc))::env in
             match ast_to_bool when_cond env with
@@ -636,20 +646,27 @@ and expand_var_name (prefix,indices:string * ast list option) (env:env) =
 
 (* [set_to_ast_list] trasnforms Set (.) into a list of Int, Float or Prop.
    This function is used in Bigand and Bigor statements. 
+   
    WARNING: this function reverses the order of the elements of the set;
    we could use fold_right in order to keep the original order, but 
-   it would mean that it is not tail recursion anymore (= uses much more heap) *)
+   it would mean that it is not tail recursion anymore (= uses much more heap) 
+   
+   If [!check_only] is true, then the lists *)
 and set_to_ast_list (ast:ast) : ast list =
-  match ast_whithout_loc ast with
+  let lst = match ast_whithout_loc ast with
   | Set (EmptySet)-> []
-  | Set (ISet a) -> List.fold_left (fun acc v -> (Int v)::acc) [] (IntSet.elements a)
+  | Set (ISet a) -> List.fold_left (fun acc v -> (Int v)::acc)   [] (IntSet.elements a)
   | Set (FSet a) -> List.fold_left (fun acc v -> (Float v)::acc) [] (FloatSet.elements a)
-  | Set (SSet a) -> List.fold_left (fun acc v -> (Prop v)::acc) [] (PropSet.elements a)
+  | Set (SSet a) -> List.fold_left (fun acc v -> (Prop v)::acc)  [] (PropSet.elements a)
   | ast' -> raise_with_loc ast (
       "after 'in', only sets are allowed, but got '"^(string_of_ast_type ast')^"':\n"^
       "    "^(string_of_ast ast')^"\n"^
       "This element has been expanded to\n"^
       "    "^(string_of_ast ast')^"")
+  in match !check_only, lst with (* useful when you only want to check types *)
+          | false,      _      -> lst
+          | true,       []     -> []
+          | true,        x::xs -> [x]
 
   (* [ast_to_bool] evaluates the 'when' condition when returns 'true' or 'false'
      depending on the result. 

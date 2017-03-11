@@ -158,9 +158,9 @@ let () =
       (let _ = Parse.parse_smt (string_of_file !input) in (); show_msgs_and_exit OK);
   if !linter_and_expand then (* same but adds the semantic (using [eval_ast]) *)
     if (!sat_mode) then
-      (let _ = Parse.parse_sat ~debug:!debug_syntax (string_of_file !input) |> Eval.eval in (); show_msgs_and_exit OK)
+      (let _ = Parse.parse_sat ~debug:!debug_syntax (string_of_file !input) |> Eval.eval ~onlychecktypes:true in (); show_msgs_and_exit OK)
     else
-      (let _ = Parse.parse_smt ~debug:!debug_syntax (string_of_file !input) |> Eval.eval in (); show_msgs_and_exit OK);
+      (let _ = Parse.parse_smt ~debug:!debug_syntax (string_of_file !input) |> Eval.eval ~onlychecktypes:true in (); show_msgs_and_exit OK);
 
   (* Step 3: translation *)
   if (!sat_mode) then

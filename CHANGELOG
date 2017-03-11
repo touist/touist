@@ -1,3 +1,9 @@
+v2.2.3
+  - touistc:
+    - the option --linter-expand will now be way less expensive: the costly
+      evaluations of bigand, bigor, exact, atleast, atmost are 'bypassed'
+      in order to keep a fast linting. Note that all type and eval errors
+      are reported anyway.
 v2.2.2
   - touist:
     - added --latex option for transforming any touistl document into latex
