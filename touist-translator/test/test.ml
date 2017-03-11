@@ -136,7 +136,7 @@ run_test_tt_main (
       OUnit2.skip_if (Sys.os_type = "Win32") "won't work on windows (unix-only??)";
       OUnit2.assert_command ~use_stderr:false ~ctxt:ctx
       ~foutput:(check_solution "real-size-tests/sudoku_solution.txt")
-      "../touistc.byte" ["--solve";"-sat";"real-size-tests/sudoku.touistl"]);
+      "../touistc.native" ["--solve";"-sat";"real-size-tests/sudoku.touistl"]);
 ];
 
 ])
