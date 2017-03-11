@@ -130,6 +130,7 @@ let process_empty (set:ast) (set_type:ast) : ast = match set,set_type with
   | _,_ -> set
 
 let extenv = ref (Hashtbl.create 0)
+let check_only = ref false
 
 (* [check_only] allows to only 'check the types'. It prevents the bigand,
     bigor, exact, atmost, atleast and range to expand completely(as it
@@ -348,7 +349,7 @@ and eval_ast (ast:ast) (env:env) = match ast_whithout_loc ast with
       | Int x, Int y -> Bool (x >= y)
       | Float x, Float y -> Bool (x >= y)
       | x',y' -> raise_type_error2 ast x x' y y' "a 'float' or 'int'")
-  | UnexpProp (p,i) -> Prop (expand_var_name (p,i) env)
+  | UnexpProp (p,i) -> expand_prop_with_set p i env
   | Prop x -> Prop x
   | Loc (x,l) -> eval_ast x env
   | Paren x -> eval_ast x env
@@ -637,6 +638,40 @@ and formula_of_string_list =
 and and_of_term_list =
   List.fold_left (fun acc t -> And (acc, t)) Top
 
+(* [expand_prop] will expand a proposition containing a set as index, e.g.,
+   time([1,2],[a,b]) will become [time(1,a),time(1,b)...time(b,2)]. This is useful when 
+   generating sets. *)
+and expand_prop_with_set name ind env =
+  let rec has_set ind = match ind with
+    | []         -> false
+    | (Set x)::_ -> true
+    | _::next    -> has_set next
+  in
+  let ind = match ind with
+    | None -> [UnexpProp (name,None)]
+    | Some ind -> expand_prop_with_set' [UnexpProp (name,None)] ind env
+  in
+  let eval_unexpprop acc cur = match cur with 
+    | UnexpProp (p,i) -> (expand_var_name (p,i) env)::acc | _->failwith "shouldnt happen"
+  in let props_evaluated = List.fold_left eval_unexpprop [] ind in
+  if has_set ind then Prop (List.nth props_evaluated 0)
+  else Set (SSet (PropSet.of_list props_evaluated))
+
+and expand_prop_with_set' proplist ind env = 
+  match ind with
+  | [] -> proplist
+  | i::next -> 
+    match eval_ast i env with
+    | Set s -> let new_proplist = (expand_proplist proplist (set_to_ast_list (Set s) env)) in
+        expand_prop_with_set' new_proplist next env
+    | x -> expand_prop_with_set' (expand_proplist proplist [x]) next env
+and expand_proplist proplist ind = match proplist with
+  | [] -> []
+  | x::xs -> (expand_prop x ind) @ (expand_proplist xs ind)
+and expand_prop prop ind = match prop with
+  | UnexpProp (name, None) -> List.fold_left (fun acc i -> (UnexpProp (name,Some ([i])))::acc) [] ind
+  | UnexpProp (name, Some cur) -> List.fold_left (fun acc i -> (UnexpProp (name,Some (cur @ [i])))::acc) [] ind
+  | x -> failwith ("[shouldnt happen] proplist contains smth that is not UnexpProp: "^string_of_ast_type x)
 and expand_var_name (prefix,indices:string * ast list option) (env:env) =
   match (prefix,indices) with
   | (x,None)   -> x
