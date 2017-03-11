@@ -15,6 +15,7 @@
 #load "syntax.cmo";;
 #load "pprint.cmo";;
 #load "parser_messages.cmo";;
+#load "msg.cmo";;
 #load "lexer.cmo";;
 #load "parser.cmo";;
 #load "parser_error_report.cmo";;

@@ -11,6 +11,8 @@
  * version 2.1 which accompanies this distribution, and is available at
  * http://www.gnu.org/licenses/lgpl-2.1.html *)
 
+open Msg
+
 module IntSet = Set_ext.Make(
   struct
     type t = int
