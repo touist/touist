@@ -1,6 +1,7 @@
 v2.2.2
   - touist:
     - added --latex option for transforming any touistl document into latex
+    - when using --linter-expand, warnings are now displayed correctly
 v2.2.1
   - gui:
     - multiple errors can now be displayed, with a difference between warnings
