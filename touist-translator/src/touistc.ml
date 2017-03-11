@@ -47,6 +47,12 @@ let rec string_of_file (input:in_channel) : string =
     done; ""
   with End_of_file -> !text
 
+(* In case we have had non-fatal messages (= warnings) during any of the touistc commands,
+   display them before exiting. *)
+let show_msgs_and_exit (exit_code:error) = 
+  Msg.print_msgs ~detailed:!detailed_position ();
+  exit (get_code exit_code)
+
 (* The main program *)
 let () =
   let cmd = (FilePath.basename Sys.argv.(0)) in (* ./touistl exec. name *)
@@ -98,7 +104,7 @@ let () =
    * It doesn't mean "not version_asked" *)
   if !version_asked then (
     print_endline (Version.version);
-    exit (get_code OK)
+    show_msgs_and_exit OK
   );
 
   (* Step 2: we see if we got every parameter we need *)
@@ -107,7 +113,7 @@ let () =
   if (!input_file_path = "") && not !use_stdin (* NOTE: !var is like *var in C *)
   then (
     Printf.fprintf stderr "%s: you must give an input file (try --help)" cmd;
-    exit (get_code ERROR)
+    show_msgs_and_exit ERROR
   );
   if !use_stdin then (input := stdin) else (input := open_in !input_file_path);
 
@@ -123,16 +129,16 @@ let () =
   (* Check that either -smt2 or -sat have been selected *)
   if (!sat_mode && (!smt_logic <> "")) then begin
     Printf.fprintf stderr "%s: cannot use both SAT and SMT solvers (try --help)\n" cmd;
-    exit (get_code ERROR) end;
+    show_msgs_and_exit ERROR end;
   if (not !sat_mode) && (!smt_logic = "") then begin
     Printf.fprintf stderr "%s: you must choose a solver to use: -sat or -smt2 (try --help)" cmd;
-    exit (get_code ERROR) end;
+    show_msgs_and_exit ERROR end;
 
   (* SMT Mode: check if one of the available QF_? has been given after -smt2 *)
   if (not !sat_mode) && (not (List.exists (fun x->x=(String.uppercase !smt_logic)) smt_logic_avail)) then
     (Printf.fprintf stderr 
     "%s: you must specify the logic used (-smt2 logic_name) (try --help)\nExample: -smt2 QF_IDL" cmd;
-    exit (get_code ERROR));
+    show_msgs_and_exit ERROR);
 
   try
   
@@ -142,18 +148,19 @@ let () =
       if !sat_mode
       then Parse.parse_sat (string_of_file !input) |> Latex.latex_of_ast
       else Parse.parse_smt (string_of_file !input) |> Latex.latex_of_ast
-    in (Printf.fprintf !output "%s\n" latex_str; exit (get_code OK)));
+    in (Printf.fprintf !output "%s\n" latex_str; show_msgs_and_exit OK));
+  
   (* linter = only show syntax errors *)
   if !linter then
     if (!sat_mode) then
-      (let _ = Parse.parse_sat (string_of_file !input) in (); exit (get_code OK))
+      (let _ = Parse.parse_sat (string_of_file !input) in (); show_msgs_and_exit OK)
     else
-      (let _ = Parse.parse_smt (string_of_file !input) in (); exit (get_code OK));
+      (let _ = Parse.parse_smt (string_of_file !input) in (); show_msgs_and_exit OK);
   if !linter_and_expand then (* same but adds the semantic (using [eval_ast]) *)
     if (!sat_mode) then
-      (let _ = Parse.parse_sat ~debug:!debug_syntax (string_of_file !input) |> Eval.eval in (); exit (get_code OK))
+      (let _ = Parse.parse_sat ~debug:!debug_syntax (string_of_file !input) |> Eval.eval in (); show_msgs_and_exit OK)
     else
-      (let _ = Parse.parse_smt ~debug:!debug_syntax (string_of_file !input) |> Eval.eval in (); exit (get_code OK));
+      (let _ = Parse.parse_smt ~debug:!debug_syntax (string_of_file !input) |> Eval.eval in (); show_msgs_and_exit OK);
 
   (* Step 3: translation *)
   if (!sat_mode) then
@@ -217,10 +224,7 @@ let () =
   close_out !output_table;
   close_in !input;
   
-  (* In case we have had non-fatal messages, like warning, display them *)
-  Msg.print_msgs ~detailed:!detailed_position ();
-  
-  exit (get_code OK)
+  show_msgs_and_exit OK
 
   with
-    | Msg.Fatal -> (Msg.print_msgs ~detailed:!detailed_position (); exit (get_code ERROR))
+    | Msg.Fatal -> (show_msgs_and_exit ERROR)
