@@ -1,8 +1,10 @@
 # OASIS_START
-# DO NOT EDIT (digest: a9bb50df4260574b6fef3705611059ef)
+# DO NOT EDIT (digest: df68fa0670678bb9c3acdae19cfd2983)
 Parse
 Eval
 Cnf
 Sat
 Smt
+Pprint
+Latex
 # OASIS_STOP

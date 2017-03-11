@@ -25,7 +25,7 @@ let rec string_of_ast = function
   | Mod (x,y) -> "(" ^ (string_of_ast x) ^ " mod " ^ (string_of_ast y) ^ ")"
   | Sqrt     x -> "sqrt("  ^ (string_of_ast x) ^ ")"
   | To_int   x -> "int("   ^ (string_of_ast x) ^ ")"
-  | Abs   x -> "int("   ^ (string_of_ast x) ^ ")"
+  | Abs   x -> "abs("   ^ (string_of_ast x) ^ ")"
   | To_float x -> "float(" ^ (string_of_ast x) ^ ")"
   | Not     x     -> "not " ^ string_of_ast x
   | And     (x,y) -> (string_of_ast x) ^ " and " ^ (string_of_ast y)
@@ -80,7 +80,8 @@ let rec string_of_ast = function
   | Let (v,x,c) -> (string_of_ast v) ^ "=" ^ (string_of_ast x) ^ ": " ^ (string_of_ast c)
   | Affect (v,c) -> (string_of_ast v) ^ "=" ^ (string_of_ast c)
   | Touist_code (f) -> (string_of_ast_list "\n" f)
-  | Loc (x,_) -> "" ^ string_of_ast x
+  | Loc (x,_) -> string_of_ast x
+  | Paren x -> string_of_ast x
 
 and string_of_ast_type = function
   | Int    x               -> "int"
@@ -139,6 +140,7 @@ and string_of_ast_type = function
   | Affect (_,_)           -> "="
   | Touist_code (_)      -> "(touist code)"
   | Loc (x,_) -> string_of_ast_type x
+  | Paren x -> string_of_ast_type x
 
 and string_of_set = function
   | EmptySet  -> "[]"
