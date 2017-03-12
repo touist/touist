@@ -659,10 +659,11 @@ and expand_prop_with_set name indices_optional env =
     | [] -> []
     | x::xs -> (eval_ast x env)::(eval_indices xs env)
   in
-  let rec has_set = function
+  let rec has_nonempty_set = function
     | []         -> false
+    | (Set (EmptySet))::_ -> false
     | (Set _)::_ -> true
-    | _::next    -> has_set next
+    | _::next    -> has_nonempty_set next
   in
   let indices, generated_props = match indices_optional with
     | None   -> [], [UnexpProp (name,None)]
@@ -672,14 +673,15 @@ and expand_prop_with_set name indices_optional env =
   let eval_unexpprop acc cur = match cur with 
     | UnexpProp (p,i) -> (expand_var_name (p,i) env)::acc | _->failwith "shouldnt happen"
   in let props_evaluated = List.fold_left eval_unexpprop [] generated_props in
-  if (let x = has_set indices in x) then Set (SSet (PropSet.of_list props_evaluated))
-  else Prop (List.nth props_evaluated 0)
+  if (let x = has_nonempty_set indices in x) then Set (SSet (PropSet.of_list props_evaluated))
+  else Prop (let a = List.nth props_evaluated 0 in a)
 
-and expand_prop_with_set' proplist indices env = 
-  match indices with
+and expand_prop_with_set' proplist indices env =
+  match indices with (* at this point, indice is either a Prop or a Set *)
   | [] -> proplist
   | i::next -> 
     match i with
+    | Set (EmptySet) -> expand_prop_with_set' proplist next env
     | Set s -> let new_proplist = (expand_proplist proplist (set_to_ast_list (Set s) env)) in
         expand_prop_with_set' new_proplist next env
     | x -> expand_prop_with_set' (expand_proplist proplist [x]) next env
