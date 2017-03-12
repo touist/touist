@@ -457,12 +457,13 @@ and eval_ast_formula (ast:ast) (env:env) : ast =
       try let content,loc_affect = List.assoc name env in
         match content with
         | Prop x -> Prop x
-        | _ -> add_fatal (Error,Eval,
-            "the local variable '" ^ name ^ "' (defined in a bigand, bigor or let) cannot be expanded\n"^
-            "into a proposition because its content is of type '"^(string_of_ast_type content)^"' instead of 'prop'.\n"^
+        | _ -> raise_with_loc ast
+            ("local variable '" ^ name ^ "' (defined in bigand, bigor or let)\n"^
+            "cannot be expanded into a 'prop' because its content\n"^
+            "is of type '"^(string_of_ast_type content)^"' instead of 'prop'.\n"^
             "Why? Because this variable is part of a formula, and thus is expected\n"^
             "to be a proposition. Here is the content of '" ^name^"':\n"^
-            "    "^(string_of_ast content), loc_affect)
+            "    "^(string_of_ast content))
       with Not_found ->
       (* Case 2. Check if this variable name has been affected globally, i.e.,
          in the 'data' section. To be accepted, this variable must contain
@@ -470,12 +471,12 @@ and eval_ast_formula (ast:ast) (env:env) : ast =
       try let content,loc_affect = Hashtbl.find !extenv name in
         match content with
         | Prop x -> Prop x
-        | _ -> add_fatal (Error,Eval,
-            "the global variable '" ^ name ^ "' cannot be expanded into a proposition because\n"^
-            "its content is of type '"^(string_of_ast_type content)^"' instead of 'prop'.\n"^
+        | _ -> raise_with_loc ast
+            ("global variable '" ^ name ^ "' cannot be expanded into a 'prop'\n"^
+            "because its content is of type '"^(string_of_ast_type content)^"' instead of 'prop'.\n"^
             "Why? Because this variable is part of a formula, and thus is expected\n"^
             "to be a proposition. Here is the content of '" ^name^"':\n"^
-            "    "^(string_of_ast content), loc_affect)
+            "    "^(string_of_ast content))
       with Not_found ->
       try
         match (p,i) with
