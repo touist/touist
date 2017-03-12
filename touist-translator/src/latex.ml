@@ -31,11 +31,11 @@ let rec latex_of_ast = function
   | Int    x -> string_of_int x
   | Float  x -> string_of_float x
   | Bool   x -> string_of_bool x
-  | Top    -> "\\top"
-  | Bottom -> "\\bot"
-  | Prop x | UnexpProp (x, None)-> x
+  | Top    -> "\\top "
+  | Bottom -> "\\bot "
+  | Prop x | UnexpProp (x, None)-> escape_underscore x
   | UnexpProp (x,Some y) -> x ^ "_{" ^ (latex_of_commalist "," y) ^ "}"
-  | Var (name,ind)   -> "\\mathbf{" ^ rm_dollar name ^ "}" ^
+  | Var (name,ind)   -> "\\mathbf{" ^ escape_underscore (rm_dollar name) ^ "}" ^
     (match ind with Some ind -> ("("^ (latex_of_commalist "," ind) ^")") | None->"")
   | Set    x -> string_of_set x
   | Set_decl x -> "[" ^ (latex_of_commalist "," x) ^ "]"
@@ -62,11 +62,11 @@ let rec latex_of_ast = function
   | Greater_than     (x,y) -> (latex_of_ast x) ^ " > "  ^ (latex_of_ast y)
   | Greater_or_equal (x,y) -> (latex_of_ast x) ^ " \\geq " ^ (latex_of_ast y)
   | Union  (x,y) -> (latex_of_ast x) ^ "\\cup" ^ (latex_of_ast y)
-  | Inter  (x,y) -> (latex_of_ast x) ^ "\\cap" ^ (latex_of_ast y)
-  | Diff   (x,y) -> (latex_of_ast x) ^ "\\setminus" ^ (latex_of_ast y)
+  | Inter  (x,y) -> (latex_of_ast x) ^ "\\cap " ^ (latex_of_ast y)
+  | Diff   (x,y) -> (latex_of_ast x) ^ "\\setminus " ^ (latex_of_ast y)
   | Range  (x,y) -> "["       ^ (latex_of_ast x) ^ ".." ^ (latex_of_ast y) ^ "]"
-  | Subset (x,y) -> (latex_of_ast x) ^ "\\subset" ^ (latex_of_ast y)
-  | In     (x,y) -> (latex_of_ast x) ^ " in " ^ (latex_of_ast y)
+  | Subset (x,y) -> (latex_of_ast x) ^ "\\subset " ^ (latex_of_ast y)
+  | In     (x,y) -> (latex_of_ast x) ^ " \\in " ^ (latex_of_ast y)
   | Empty x -> "\\textrm{empty}(" ^ (latex_of_ast x) ^ ")"
   | Card  x -> "\\textrm{card}("  ^ (latex_of_ast x) ^ ")"
   | If (x,y,z) ->
@@ -75,20 +75,22 @@ let rec latex_of_ast = function
       ^ "\\;\\textrm{else}\\;" ^ (latex_of_ast z)
   | Bigand (x,y,b,z) ->
        "\\bigwedge\\limits_{\\substack{" ^ (latex_of_commalist "," x) ^
-       "\\in" ^ (latex_of_commalist "," y) ^
+       "\\in " ^ (latex_of_commalist "," y) ^
        (match b with None -> "" | Some b -> "\\\\" ^ (latex_of_ast b)) ^ "}}" ^
        (latex_of_ast z)
   | Bigor (x,y,b,z) ->
       "\\bigvee\\limits_{\\substack{" ^ (latex_of_commalist "," x) ^
-       "\\in" ^ (latex_of_commalist "," y) ^
+       "\\in " ^ (latex_of_commalist "," y) ^
        (match b with None -> "" | Some b -> "\\\\" ^ (latex_of_ast b)) ^ "}}" ^
        (latex_of_ast z)
   | Exact (x,y) -> "\\textrm{exact}(" ^ (latex_of_ast x) ^ "," ^ (latex_of_ast y) ^ ")"
   | Atmost (x,y) -> "\\textrm{atmost}(" ^ (latex_of_ast x) ^ "," ^ (latex_of_ast y) ^ ")"
   | Atleast (x,y) -> "\\{atleast}(" ^ (latex_of_ast x) ^ "," ^ (latex_of_ast y) ^ ")"
-  | Let (v,x,c) -> (latex_of_ast v) ^ "\\leftarrow" ^ (latex_of_ast x) ^ "\\\\" ^ (latex_of_ast c)
-  | Affect (v,c) -> (latex_of_ast v) ^ "\\leftarrow" ^ (latex_of_ast c)
+  | Let (v,x,c) -> (latex_of_ast v) ^ " \\leftarrow " ^ (latex_of_ast x) ^ "\\\\" ^ (latex_of_ast c)
+  | Affect (v,c) -> (latex_of_ast v) ^ " \\leftarrow " ^ (latex_of_ast c)
   | Loc (x,_) -> latex_of_ast x
   | Paren x -> "(" ^ latex_of_ast x ^ ")"
 
   and latex_of_commalist sep el = String.concat sep (List.map latex_of_ast el)
+  and escape_underscore txt =
+    Str.global_replace (Str.regexp "_") "\\_" txt
