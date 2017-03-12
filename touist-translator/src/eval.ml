@@ -136,16 +136,23 @@ let extenv = ref (Hashtbl.create 0)
     may take a lot of time to do so). *)
 let check_only = ref false
 
+(* By default, we are in 'SAT' mode. When [smt] is true,
+   some type checking (variable expansion mostly) is different
+   (formulas can be 'int' or 'float' for example). *)
+let smt = ref false
+
 (** Main function for checking the types and evaluating the touistl expressions
     (variables, bigand, bigor, let...).
 
     @param ast is the AST given by [Parse.parse] 
     @param onlychecktypes will limit the evaluation to its minimum in
            order to get type errors as fast as possible.
+    @param smt enables the SMT mode. By default, the SAT mode is used.
 
     @raise Eval.Error (msg,loc) *)
-let rec eval ?(onlychecktypes=false) ast =
+let rec eval ?smt:(smt_mode=false) ?(onlychecktypes=false) ast =
   check_only := onlychecktypes;
+  smt := smt_mode;
   extenv := Hashtbl.create 50; (* extenv must be re-init between two calls to [eval] *)
   eval_touist_code ast []
 
@@ -457,10 +464,13 @@ and eval_ast_formula (ast:ast) (env:env) : ast =
       try let content,loc_affect = List.assoc name env in
         match content with
         | Prop x -> Prop x
+        | Int x when !smt -> Int x
+        | Float x when !smt -> Float x
         | _ -> raise_with_loc ast
             ("local variable '" ^ name ^ "' (defined in bigand, bigor or let)\n"^
             "cannot be expanded into a 'prop' because its content\n"^
-            "is of type '"^(string_of_ast_type content)^"' instead of 'prop'.\n"^
+            "is of type '"^(string_of_ast_type content)^"' instead of "^
+              (if !smt then "'prop', 'int' or 'float'" else "'prop'") ^ ".\n"^
             "Why? Because this variable is part of a formula, and thus is expected\n"^
             "to be a proposition. Here is the content of '" ^name^"':\n"^
             "    "^(string_of_ast content))
@@ -471,9 +481,12 @@ and eval_ast_formula (ast:ast) (env:env) : ast =
       try let content,loc_affect = Hashtbl.find !extenv name in
         match content with
         | Prop x -> Prop x
+        | Int x when !smt -> Int x
+        | Float x when !smt -> Float x
         | _ -> raise_with_loc ast
             ("global variable '" ^ name ^ "' cannot be expanded into a 'prop'\n"^
-            "because its content is of type '"^(string_of_ast_type content)^"' instead of 'prop'.\n"^
+            "because its content is of type '"^(string_of_ast_type content)^"' instead of "^
+               (if !smt then "'prop', 'int' or 'float'" else "'prop'") ^ ".\n"^
             "Why? Because this variable is part of a formula, and thus is expected\n"^
             "to be a proposition. Here is the content of '" ^name^"':\n"^
             "    "^(string_of_ast content))
