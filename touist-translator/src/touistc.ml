@@ -25,8 +25,7 @@ let show_hidden_lits = ref false
 let debug_formula_expansion = ref false
 let equiv_file_path = ref ""
 let input_equiv = ref stdin
-let linter = ref false (* for displaying syntax errors (during parse only) *)
-let linter_and_expand = ref false (* same but with semantic errors (during eval)*)
+let linter = ref false (* for displaying syntax errors (during parse and eval) *)
 let detailed_position = ref false (* display absolute position of error *)
 let debug_syntax = ref false
 let debug_cnf = ref false
@@ -84,8 +83,7 @@ let () =
     ("--show-hidden", Arg.Set show_hidden_lits,"(with --solve) Show the hidden '&a' literals used when translating to CNF");
     ("--equiv", Arg.Set_string equiv_file_path,"INPUT2 (with --solve) Check that INPUT2 has the same models as INPUT (equivalency)");
     ("--debug-formula-expansion", Arg.Set debug_formula_expansion,"Print how the formula is expanded (bigand...)");
-    ("--linter", Arg.Set linter,"Display parse errors and exit");
-    ("--linter-expand", Arg.Set linter_and_expand,"Same as --linter but with semantic errors");
+    ("--linter", Arg.Set linter,"Display syntax and semantic errors and exit");
     ("--detailed-position", Arg.Set detailed_position,"Detailed position with 'num_line:num_col:token_start:token_end: '");
   ]
   in
@@ -150,17 +148,14 @@ let () =
       else Parse.parse_smt (string_of_file !input) |> Latex.latex_of_ast
     in (Printf.fprintf !output "%s\n" latex_str; show_msgs_and_exit OK));
   
-  (* linter = only show syntax errors *)
+  (* linter = only show syntax and semantic errors *)
   if !linter then
     if (!sat_mode) then
-      (let _ = Parse.parse_sat (string_of_file !input) in (); show_msgs_and_exit OK)
+      (let _ = Parse.parse_sat ~debug:!debug_syntax (string_of_file !input) 
+        |> Eval.eval ~onlychecktypes:true in (); show_msgs_and_exit OK)
     else
-      (let _ = Parse.parse_smt (string_of_file !input) in (); show_msgs_and_exit OK);
-  if !linter_and_expand then (* same but adds the semantic (using [eval_ast]) *)
-    if (!sat_mode) then
-      (let _ = Parse.parse_sat ~debug:!debug_syntax (string_of_file !input) |> Eval.eval ~onlychecktypes:true in (); show_msgs_and_exit OK)
-    else
-      (let _ = Parse.parse_smt ~debug:!debug_syntax (string_of_file !input) |> Eval.eval ~onlychecktypes:true in (); show_msgs_and_exit OK);
+      (let _ = Parse.parse_smt ~debug:!debug_syntax (string_of_file !input) 
+        |> Eval.eval ~onlychecktypes:true in (); show_msgs_and_exit OK);
 
   (* Step 3: translation *)
   if (!sat_mode) then
