@@ -12,9 +12,9 @@ let rec string_of_ast = function
   | Top    -> "top"
   | Bottom -> "bot"
   | Prop x | UnexpProp (x, None)-> x
-  | UnexpProp (x,Some y) -> x ^ "(" ^ (string_of_ast_list ", " y) ^ ")"
+  | UnexpProp (x,Some y) -> x ^ "(" ^ (string_of_ast_list "," y) ^ ")"
   | Var (x,None)   -> x
-  | Var (x,Some y) -> x ^ "(" ^ (string_of_ast_list ", " y) ^ ")"
+  | Var (x,Some y) -> x ^ "(" ^ (string_of_ast_list "," y) ^ ")"
   | Set    x -> string_of_set x
   | Set_decl x -> "[" ^ (string_of_ast_list "," x) ^ "]"
   | Neg x     -> "(- " ^ (string_of_ast x) ^ ")"
@@ -39,11 +39,11 @@ let rec string_of_ast = function
   | Lesser_or_equal  (x,y) -> (string_of_ast x) ^ " <= " ^ (string_of_ast y)
   | Greater_than     (x,y) -> (string_of_ast x) ^ " > "  ^ (string_of_ast y)
   | Greater_or_equal (x,y) -> (string_of_ast x) ^ " >= " ^ (string_of_ast y)
-  | Union  (x,y) -> "union("  ^ (string_of_ast x) ^ ", " ^ (string_of_ast y)
-  | Inter  (x,y) -> "inter("  ^ (string_of_ast x) ^ ", " ^ (string_of_ast y)
-  | Diff   (x,y) -> "diff("   ^ (string_of_ast x) ^ ", " ^ (string_of_ast y)
+  | Union  (x,y) -> "union("  ^ (string_of_ast x) ^ "," ^ (string_of_ast y)
+  | Inter  (x,y) -> "inter("  ^ (string_of_ast x) ^ "," ^ (string_of_ast y)
+  | Diff   (x,y) -> "diff("   ^ (string_of_ast x) ^ "," ^ (string_of_ast y)
   | Range  (x,y) -> "["       ^ (string_of_ast x) ^ ".." ^ (string_of_ast y) ^ "]"
-  | Subset (x,y) -> "subset(" ^ (string_of_ast x) ^ ", " ^ (string_of_ast y)
+  | Subset (x,y) -> "subset(" ^ (string_of_ast x) ^ "," ^ (string_of_ast y)
   | In     (x,y) -> (string_of_ast x) ^ " in " ^ (string_of_ast y)
   | Empty x -> "empty(" ^ (string_of_ast x) ^ ")"
   | Card  x -> "card("  ^ (string_of_ast x) ^ ")"
@@ -154,13 +154,13 @@ and string_of_set = function
 and string_of_ast_list sep el = String.concat sep (List.map string_of_ast el)
 
 and string_of_a_list to_string il =
-  "[" ^ (String.concat ", " (List.map to_string il)) ^ "]"
+  "[" ^ (String.concat "," (List.map to_string il)) ^ "]"
 
 and string_of_intset s =
-  "[" ^ (String.concat ", " (List.map string_of_int (IntSet.elements s))) ^ "]"
+  "[" ^ (String.concat "," (List.map string_of_int (IntSet.elements s))) ^ "]"
 
 and string_of_floatset s =
-  "[" ^ (String.concat ", " (List.map string_of_float (FloatSet.elements s))) ^ "]"
+  "[" ^ (String.concat "," (List.map string_of_float (FloatSet.elements s))) ^ "]"
 
 and string_of_strset s =
-  "[" ^ (String.concat ", " (PropSet.elements s)) ^ "]"
+  "[" ^ (String.concat "," (PropSet.elements s)) ^ "]"
