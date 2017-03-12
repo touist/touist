@@ -277,6 +277,7 @@ expr_smt:
   | x=int
   | x=float
   | x=order(expr_smt)
+  | x=num_operations_standard(expr_smt)
   | x=equality(expr_smt) {x}
 
 %inline generalized_connectors(F):
