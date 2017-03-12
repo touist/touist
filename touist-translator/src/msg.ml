@@ -50,18 +50,25 @@ match detailed with
 | false -> relative              (* num_line:num_col *)
 | true  -> relative ^":"^ absolute (* num_line:num_col:token_start:token_end *)
 
-let rec print_msgs' ?(detailed=false) (messages:msg list) = match messages with
+let rec print_msgs' ?(color=false) ?(detailed=false) (messages:msg list) = match messages with
   | [] -> ()
-  | (Warning,_,msg,loc)::next -> 
-      Printf.fprintf stderr "%s: warning: %s\n" (string_of_loc ~detailed:detailed loc) msg;
-      print_msgs' ~detailed:detailed next
-  | (Error,_,msg,loc)::next -> 
-      Printf.fprintf stderr "%s: error: %s\n" (string_of_loc ~detailed:detailed loc) msg;
-      print_msgs' ~detailed:detailed next
-
-
+  | (typ,_,msg,loc)::next ->
+      let colstart,colend = match color,typ with 
+        | false,_ -> "",""
+        | _,Warning -> "\x1b[33m\x1b[1m" (* yellow bold *), "\x1b[0m" (* reset *)
+        | _,Error   -> "\x1b[31m\x1b[1m" (* red bold    *), "\x1b[0m" (* reset *)
+      and txt_type = match typ with
+        | Warning -> "warning"
+        | Error -> "error"
+      in
+      begin
+        Printf.fprintf stderr "%s: " (string_of_loc ~detailed:detailed loc);
+        Printf.fprintf stderr "%s%s%s: " colstart txt_type colend;
+        Printf.fprintf stderr "%s\n" msg;
+        print_msgs' ~color:color ~detailed:detailed next
+      end
 (** [print_msgs] will display the messages that have been produced by parse, eval, sat,
     cnf or smt. 
     @param detailed enables the 'detailed location' mode (adds the absolute positions)  *)
-let rec print_msgs ?(detailed=false) () =
-  print_msgs' ~detailed:detailed !messages
+let rec print_msgs ?(color=false) ?(detailed=false) () =
+  print_msgs' ~color:color ~detailed:detailed !messages

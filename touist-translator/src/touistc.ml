@@ -50,7 +50,7 @@ let rec string_of_file (input:in_channel) : string =
 (* In case we have had non-fatal messages (= warnings) during any of the touistc commands,
    display them before exiting. *)
 let show_msgs_and_exit (exit_code:error) = 
-  Msg.print_msgs ~detailed:!detailed_position ();
+  Msg.print_msgs ~color:(Unix.isatty Unix.stderr) ~detailed:!detailed_position ();
   exit (get_code exit_code)
 
 (* The main program *)

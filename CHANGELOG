@@ -1,3 +1,6 @@
+v2.2.3
+  - touistc:
+    - enabled error coloring when touistc is used in a terminal
 v2.2.2
   - touist:
     - added --latex option for transforming any touistl document into latex
