@@ -4,28 +4,40 @@ open OUnit2;;
    that the place where the error was found is the right one.  *)
 let test_raise (parse:(string->unit)) (during:Msg.during) ?(nth_msg=0) (loc_expected:string) text =
   try let _= parse text in
-    (Printf.fprintf stdout "%s" "OKç";
-    raise (OUnit2.assert_failure (
-      "this test should have raised Eval.Error exception with location '"^loc_expected^"'")))
-  with Msg.Fatal ->
-      match List.nth !Msg.messages nth_msg with
+    (OUnit2.assert_failure (
+      "this test should have raised Eval.Error exception with location '"^loc_expected^"'"))
+  with Msg.Fatal messages ->
+      match List.nth messages nth_msg with
       | (Msg.Error,d,msg,loc) when d==during ->
           OUnit2.assert_equal
           ~msg:("the 'line:column' of expected and actual exception Eval.Error are different; actual error was:\n"^msg)
           ~printer:(fun loc -> Printf.sprintf "'%s'" loc)
           loc_expected (Msg.string_of_loc loc)
-      | _ -> raise (OUnit2.assert_failure ("this test didn't raise an error at location '"^loc_expected^"' as expected"))
+      | _ -> OUnit2.assert_failure ("this test didn't raise an error at location '"^loc_expected^"' as expected")
 
 
 let sat text = let _= Parse.parse_sat text |> Eval.eval |> Cnf.ast_to_cnf |> Sat.cnf_to_clauses in ()
-let smt text = let _= Parse.parse_smt text |> Eval.eval |> Smt.to_smt2 "QF_IDL" in ()
+let smt logic text = let _= Parse.parse_smt text |> Eval.eval ~smt:true |> Smt.to_smt2 logic in ()
 
 (* The ending _ is necessary because the testing function
    must accept the 'context' thing. *)
-let test_sat text _ = sat text
-let test_smt text _ = smt text
+let test_sat text _ = try sat text;
+  if Msg.has_error then OUnit2.assert_failure
+    ("this test didn't raise any exceptions but errors had been outputed:\n"^
+      Msg.string_of_msgs !Msg.messages)
+  with Msg.Fatal msg -> OUnit2.assert_failure 
+    ("this test shouldn't have raised a Fatal exception. Here is the exception:\n"^
+      Msg.string_of_msgs msg)
+let test_smt ?(logic="QF_IDL") text _ = try (smt logic) text;
+  if Msg.has_error then OUnit2.assert_failure
+      ("this test didn't raise any exceptions but errors had been outputed:\n"^
+        Msg.string_of_msgs !Msg.messages)
+    with Msg.Fatal msg -> OUnit2.assert_failure 
+      ("this test shouldn't have raised a Fatal exception. Here is the exception:\n"^
+        Msg.string_of_msgs msg)
+
 let test_sat_raise during loc text _ = test_raise sat during loc text
-let test_smt_raise during loc text _ = test_raise smt during loc text
+let test_smt_raise during loc ?(logic="QF_IDL") text _ = test_raise (smt logic) during loc text
 
 (*  A standard test in oUnit should first define a function 
         let test1 context : unit = OUnit2.assert_bool true
@@ -42,7 +54,7 @@ let test_smt_raise during loc text _ = test_raise smt during loc text
       (fun _ -> eval "let $i=1: if $i < 3.0 then a else b end"));
 *)
 
-let read_file (filename:string) : string list =
+and read_file (filename:string) : string list =
   let lines = ref [] in
   let chan = open_in filename in
   try
@@ -130,13 +142,14 @@ run_test_tt_main (
   
   "affect between">::  (test_smt "a");
   "affect between">::  (test_smt "a > 3");
+  "takuzu4x4.touistl">:: (test_smt (Parse.string_of_file "test/real-size-tests/smt/takuzu4x4.touistl"))
 ];
 "real-size tests">:::[
   "sodoku">:: (fun ctx -> 
       OUnit2.skip_if (Sys.os_type = "Win32") "won't work on windows (unix-only??)";
       OUnit2.assert_command ~use_stderr:false ~ctxt:ctx
-      ~foutput:(check_solution "real-size-tests/sudoku_solution.txt")
-      "../touistc.native" ["--solve";"-sat";"real-size-tests/sudoku.touistl"]);
+      ~foutput:(check_solution "test/real-size-tests/sat/sudoku_solution.txt")
+      "./touistc.native" ["--solve";"-sat";"test/real-size-tests/sat/sudoku.touistl"]);
 ];
 
 ])

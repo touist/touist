@@ -59,6 +59,7 @@ let lexer buffer : (Lexing.lexbuf -> Parser.token) =
     indicated to the user: useless because we only handle a single touistl file 
 *)
 let parse (parser) ?debug:(debug=false) (text:string) : Syntax.ast =
+  Msg.clear_messages;
   let buffer = ref Parser_error_report.Zero in
   let lexbuf = Lexing.from_string text in
   lexbuf.lex_curr_p <- {lexbuf.lex_curr_p with pos_fname = "foo.touistl"; pos_lnum = 1};
@@ -77,3 +78,17 @@ let parse_sat ?debug:(d=false) text = parse Parser.Incremental.touist_simple ~de
 
 (** Same for [Parser.Incremental.touist_simple] *)
 let parse_smt ?debug:(d=false) text = parse Parser.Incremental.touist_smt ~debug:d text
+
+
+(** [string_of_channel] takes an opened file and returns a string of its content. *)
+let string_of_chan (input:in_channel) : string =
+  let text = ref "" in
+  try 
+    while true do
+      text := !text ^ (input_line input) ^ "\n"
+    done; ""
+  with End_of_file -> !text
+
+(** [string_of_file] opens the given file and returns a string of its content. *)
+let string_of_file (name:string) : string =
+  string_of_chan (open_in name)

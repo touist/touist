@@ -13,7 +13,7 @@ type during = Parse | Lex | Eval | Sat | Cnf
 type msg_type = Error | Warning
 type loc = Lexing.position * Lexing.position
 type msg = msg_type * during * string * loc
-exception Fatal
+exception Fatal of msg list
 
 let messages = ref []
 
@@ -27,7 +27,7 @@ let has_error : bool =
 
 let add_msg msg = messages := msg::!messages
 let add_fatal msg =
-    add_msg msg; raise (Fatal)
+    add_msg msg; raise (Fatal !messages)
 let null_loc = (Lexing.dummy_pos,Lexing.dummy_pos)
 
 (** [string_of_loc] will print the position of the error; the two positions
@@ -50,8 +50,8 @@ match detailed with
 | false -> relative              (* num_line:num_col *)
 | true  -> relative ^":"^ absolute (* num_line:num_col:token_start:token_end *)
 
-let rec print_msgs' ?(color=false) ?(detailed=false) (messages:msg list) = match messages with
-  | [] -> ()
+let rec string_of_msgs ?(color=false) ?(detailed=false) (messages:msg list) = match messages with
+  | [] -> ""
   | (typ,_,msg,loc)::next ->
       let colstart,colend = match color,typ with 
         | false,_ -> "",""
@@ -62,13 +62,11 @@ let rec print_msgs' ?(color=false) ?(detailed=false) (messages:msg list) = match
         | Error -> "error"
       in
       begin
-        Printf.fprintf stderr "%s: " (string_of_loc ~detailed:detailed loc);
-        Printf.fprintf stderr "%s%s%s: " colstart txt_type colend;
-        Printf.fprintf stderr "%s\n" msg;
-        print_msgs' ~color:color ~detailed:detailed next
+        (Printf.sprintf "%s: %s%s%s: %s\n" (string_of_loc ~detailed:detailed loc) colstart txt_type colend msg)
+        ^ (string_of_msgs ~color:color ~detailed:detailed next)
       end
 (** [print_msgs] will display the messages that have been produced by parse, eval, sat,
     cnf or smt. 
     @param detailed enables the 'detailed location' mode (adds the absolute positions)  *)
 let rec print_msgs ?(color=false) ?(detailed=false) () =
-  print_msgs' ~color:color ~detailed:detailed !messages
+  Printf.fprintf stderr "%s" (string_of_msgs ~color:color ~detailed:detailed !messages)
