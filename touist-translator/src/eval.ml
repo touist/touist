@@ -690,7 +690,7 @@ and expand_var_name (prefix,indices:string * ast list option) (env:env) =
   | (x,None)   -> x
   | (x,Some y) ->
     x ^ "("
-    ^ (string_of_ast_list ", " (List.map (fun e -> eval_ast e env) y))
+    ^ (string_of_ast_list "," (List.map (fun e -> eval_ast e env) y))
     ^ ")"
 
 (* [set_to_ast_list] evaluates one element  of the list of things after
