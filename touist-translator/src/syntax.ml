@@ -75,9 +75,9 @@ and ast = (* Touist_code is the entry point *)
   | Bigor            of ast list * ast list * ast option * ast
   | Let              of ast * ast * ast
   | Affect           of ast * ast
-  | UnexpProp        of string * ast list option
+  | UnexpProp        of string * ast list option (* Unexp = unexpanded *)
   | Prop             of string
-  (* UnexpProp is a proposition that contains unexpandable variables; we cannot
+  (* UnexpProp is a proposition that contains unexpanded variables; we cannot
      tranform UnexpProp into Prop before knowing what is the content of the
      variables. Examples:
          abcd(1,$d,$i,a)       <- not a full-string yet

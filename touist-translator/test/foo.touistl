@@ -1,2 +1,0 @@
-bigand $i,$j in [1..3],[1..3]:
-	A($i) and B($i) => not C($j)

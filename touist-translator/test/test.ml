@@ -4,28 +4,40 @@ open OUnit2;;
    that the place where the error was found is the right one.  *)
 let test_raise (parse:(string->unit)) (during:Msg.during) ?(nth_msg=0) (loc_expected:string) text =
   try let _= parse text in
-    (Printf.fprintf stdout "%s" "OKç";
-    raise (OUnit2.assert_failure (
-      "this test should have raised Eval.Error exception with location '"^loc_expected^"'")))
-  with Msg.Fatal ->
-      match List.nth !Msg.messages nth_msg with
+    (OUnit2.assert_failure (
+      "this test should have raised an exception with location '"^loc_expected^"'"))
+  with Msg.Fatal messages ->
+      match List.nth messages nth_msg with
       | (Msg.Error,d,msg,loc) when d==during ->
           OUnit2.assert_equal
-          ~msg:("the 'line:column' of expected and actual exception Eval.Error are different; actual error was:\n"^msg)
+          ~msg:("the 'line:column' of expected and actual exception are different; actual error was:\n"^msg)
           ~printer:(fun loc -> Printf.sprintf "'%s'" loc)
           loc_expected (Msg.string_of_loc loc)
-      | _ -> raise (OUnit2.assert_failure ("this test didn't raise an error at location '"^loc_expected^"' as expected"))
+      | _ -> OUnit2.assert_failure ("this test didn't raise an error at location '"^loc_expected^"' as expected")
 
 
 let sat text = let _= Parse.parse_sat text |> Eval.eval |> Cnf.ast_to_cnf |> Sat.cnf_to_clauses in ()
-let smt text = let _= Parse.parse_smt text |> Eval.eval |> Smt.to_smt2 "QF_IDL" in ()
+let smt logic text = let _= Parse.parse_smt text |> Eval.eval ~smt:true |> Smt.to_smt2 logic in ()
 
 (* The ending _ is necessary because the testing function
    must accept the 'context' thing. *)
-let test_sat text _ = sat text
-let test_smt text _ = smt text
+let test_sat text _ = try sat text;
+  if Msg.has_error then OUnit2.assert_failure
+    ("this test didn't raise any exceptions but errors had been outputed:\n"^
+      Msg.string_of_msgs !Msg.messages)
+  with Msg.Fatal msg -> OUnit2.assert_failure 
+    ("this test shouldn't have raised a Fatal exception. Here is the exception:\n"^
+      Msg.string_of_msgs msg)
+let test_smt ?(logic="QF_IDL") text _ = try (smt logic) text;
+  if Msg.has_error then OUnit2.assert_failure
+      ("this test didn't raise any exceptions but errors had been outputed:\n"^
+        Msg.string_of_msgs !Msg.messages)
+    with Msg.Fatal msg -> OUnit2.assert_failure 
+      ("this test shouldn't have raised a Fatal exception. Here is the exception:\n"^
+        Msg.string_of_msgs msg)
+
 let test_sat_raise during loc text _ = test_raise sat during loc text
-let test_smt_raise during loc text _ = test_raise smt during loc text
+let test_smt_raise during loc ?(logic="QF_IDL") text _ = test_raise (smt logic) during loc text
 
 (*  A standard test in oUnit should first define a function 
         let test1 context : unit = OUnit2.assert_bool true
@@ -42,7 +54,7 @@ let test_smt_raise during loc text _ = test_raise smt during loc text
       (fun _ -> eval "let $i=1: if $i < 3.0 then a else b end"));
 *)
 
-let read_file (filename:string) : string list =
+and read_file (filename:string) : string list =
   let lines = ref [] in
   let chan = open_in filename in
   try
@@ -104,7 +116,6 @@ run_test_tt_main (
   "affect before">::   (test_sat "$a = a f($a)");
   "affect after">::    (test_sat "f($a) $a = a");
   "affect between">::  (test_sat "$a = a f($a,$b) $b = b");
-  
   "var-tuple is prop">::(test_sat "$a=p p($a)");
 ];
 
@@ -116,6 +127,22 @@ run_test_tt_main (
   "bigor: too many sets">::(test_sat_raise Msg.Eval "1:7" "bigor $i in [1],[2]: p end");
   "condition is bool">::(test_sat_raise Msg.Eval "1:23" "bigand $i in [1] when a: p end");
   (*"bigand var is not tuple">::(test_sat_raise "1:23:" "bigand $i(p) in [1]: p end");*)
+];
+
+"test of the p([a,b,c]) construct">:::[ (* 'c' is the testing context *)
+(* We can generate a set with p([a,b]). Check that p(a) does generate a set. *)
+"p([a,b]) should expand to a set">::(test_sat "bigand $i in p([a,b]): $i end");
+"p(a) shouldn't expand to a set">::(test_sat_raise Msg.Eval "1:14" "bigand $i in p(a): $i end");
+"p([]) should return p">::(test_sat "$NOK=0 if p([])==p then OK else $NOK end");
+"p([],a) should return p(a)">::(test_sat "$NOK=0 if p([],a)==p(a) then OK else $NOK end");
+"p(a,[]) should return p(a)">::(test_sat "$NOK=0 if p(a,[])==p(a) then OK else $NOK end");
+"p(1,[a]) should return [p(1,a)]">::(test_sat "$NOK=0 if p(1,[a])==[p(1,a)] then OK else $NOK end");
+"the p([a,b,c]) syntax">:: (fun ctx ->
+      OUnit2.skip_if (Sys.os_type = "Win32") "won't work on windows (unix-only??)";
+      OUnit2.assert_command ~use_stderr:false ~ctxt:ctx
+      ~foutput:(check_solution "test/sat/unittest_setgen_solution.txt")
+      "./touistc.native" ["--solve";"-sat";"test/sat/unittest_setgen.touistl"]);
+
 ];
 
 "samples of code that should be correct with -smt2">:::[ (* 'c' is the testing context *)
@@ -130,13 +157,14 @@ run_test_tt_main (
   
   "affect between">::  (test_smt "a");
   "affect between">::  (test_smt "a > 3");
+  "takuzu4x4.touistl">:: (test_smt (Parse.string_of_file "test/smt/takuzu4x4.touistl"))
 ];
 "real-size tests">:::[
   "sodoku">:: (fun ctx -> 
       OUnit2.skip_if (Sys.os_type = "Win32") "won't work on windows (unix-only??)";
       OUnit2.assert_command ~use_stderr:false ~ctxt:ctx
-      ~foutput:(check_solution "real-size-tests/sudoku_solution.txt")
-      "../touistc.native" ["--solve";"-sat";"real-size-tests/sudoku.touistl"]);
+      ~foutput:(check_solution "test/sat/sudoku_solution.txt")
+      "./touistc.native" ["--solve";"-sat";"test/sat/sudoku.touistl"]);
 ];
 
 ])

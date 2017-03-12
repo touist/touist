@@ -73,8 +73,8 @@ Executable test
   BuildDepends:   touist, oUnit
 
 Test test
-  Command:        $test
-  WorkingDirectory: test
+  Command:          $test
+  WorkingDirectory: .
   TestTools: test
 
 Document touist

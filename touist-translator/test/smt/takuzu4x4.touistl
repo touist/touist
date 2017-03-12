@@ -1,0 +1,48 @@
+;; SMT2 logic used: QF_LIA
+
+$n=4
+$N=[1..$n]
+$N_2=[1..$n-2]
+
+;; Define the initial grid here
+
+$x(1,1)=[ ]	$x(1,2)=[1]	$x(1,3)=[ ]	$x(1,4)=[0]
+$x(2,1)=[ ]	$x(2,2)=[ ]	$x(2,3)=[0]	$x(2,4)=[ ]
+$x(3,1)=[ ]	$x(3,2)=[0]	$x(3,3)=[ ]	$x(3,4)=[ ] $x(4,1)=[1]	$x(4,2)=[1]	$x(4,3)=[ ]	$x(4,4)=[0]
+;;
+
+
+;; Initialize values with defined sets
+bigand $i,$j,$value in [1..4],[1..4],$x($i,$j):
+  x($i,$j)==$value
+end
+
+;; Each cell contains either 0 or 1
+bigand $i,$j in $N,$N:
+  (x($i,$j)==0) or (x($i,$j)==1)
+end
+
+;; There is an equal number of 1s and 0s in each row and column
+bigand $i in $N:
+  (x($i,1)+x($i,2)+x($i,3)+x($i,4)==2)
+  and (x(1,$i)+x(2,$i)+x(3,$i)+x(4,$i)==2)
+end
+
+;; There is no more than two of either number adjacent to each other
+bigand $i,$j in $N_2,$N:
+      (not ((x($i,$j)==0) and (x($i+1,$j)==0) and (x($i+2,$j)==0)))
+  and (not ((x($i,$j)==1) and (x($i+1,$j)==1) and (x($i+2,$j)==1)))
+  and (not ((x($j,$i)==0) and (x($j,$i+1)==0) and (x($j,$i+2)==0)))
+  and (not ((x($j,$i)==1) and (x($j,$i+1)==1) and (x($j,$i+2)==1)))
+end
+
+;; There can be no identical rows or columns
+bigand $i,$j in $N,$N when $i!=$j:
+    bigor $k in $N:
+      (x($i,$k)!=x($j,$k))
+    end
+  and
+    bigor $k in $N:
+      (x($k,$i)!=x($k,$j))
+    end
+end

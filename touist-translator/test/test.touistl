@@ -1,6 +1,0 @@
-bigand $i in $a:
-	A($i) and B($i)
-end
-
-data
-$a = [a,b,c]

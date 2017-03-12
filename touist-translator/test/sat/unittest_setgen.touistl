@@ -1,0 +1,6 @@
+;; We can generate sets using the syntax
+;;     p([a,b,c],[1,2])
+;; and it will produce the set
+;;     [p(a,1),p(a,2),p(b,1),...,p(c,2)]
+
+bigand $i in p([a,b,c,d],[1,2,3],ahah,[0]): $i end

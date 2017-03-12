@@ -36,16 +36,6 @@ let latex = ref false
    In our case, an argument not preceeded by a flag is the touistl input file. *)
 let process_arg_alone (file_path:string) : unit = input_file_path := file_path
 
-
-(* [string_of_file] takes an opened file and returns a string of its content. *)
-let rec string_of_file (input:in_channel) : string =
-  let text = ref "" in
-  try
-    while true do
-      text := !text ^ (input_line input) ^ "\n"
-    done; ""
-  with End_of_file -> !text
-
 (* In case we have had non-fatal messages (= warnings) during any of the touistc commands,
    display them before exiting. *)
 let show_msgs_and_exit (exit_code:error) = 
@@ -144,17 +134,17 @@ let () =
   if !latex then
     (let latex_str =
       if !sat_mode
-      then Parse.parse_sat (string_of_file !input) |> Latex.latex_of_ast
-      else Parse.parse_smt (string_of_file !input) |> Latex.latex_of_ast
+      then Parse.parse_sat (string_of_chan !input) |> Latex.latex_of_ast
+      else Parse.parse_smt (string_of_chan !input) |> Latex.latex_of_ast
     in (Printf.fprintf !output "%s\n" latex_str; show_msgs_and_exit OK));
   
   (* linter = only show syntax and semantic errors *)
   if !linter then
     if (!sat_mode) then
-      (let _ = Parse.parse_sat ~debug:!debug_syntax (string_of_file !input) 
+      (let _ = Parse.parse_sat ~debug:!debug_syntax (string_of_chan !input) 
         |> Eval.eval ~smt:(not !sat_mode) ~onlychecktypes:true in (); show_msgs_and_exit OK)
     else
-      (let _ = Parse.parse_smt ~debug:!debug_syntax (string_of_file !input) 
+      (let _ = Parse.parse_smt ~debug:!debug_syntax (string_of_chan !input) 
         |> Eval.eval ~smt:(not !sat_mode) ~onlychecktypes:true in (); show_msgs_and_exit OK);
 
   (* Step 3: translation *)
@@ -162,12 +152,12 @@ let () =
     (* A. solve has been asked *)
     if !solve_sat then
       if !equiv_file_path <> "" then begin
-        let models = Parse.parse_sat ~debug:!debug_syntax (string_of_file !input) 
+        let models = Parse.parse_sat ~debug:!debug_syntax (string_of_chan !input) 
                       |> Eval.eval
                       |> Cnf.ast_to_cnf ~debug:!debug_cnf
                       |> Sat.cnf_to_clauses 
                       |> Sat.solve_clauses
-        and models2 = Parse.parse_sat ~debug:!debug_syntax (string_of_file !input_equiv)
+        and models2 = Parse.parse_sat ~debug:!debug_syntax (string_of_chan !input_equiv)
                       |> Eval.eval 
                       |> Cnf.ast_to_cnf ~debug:!debug_cnf
                       |> Sat.cnf_to_clauses 
@@ -177,7 +167,7 @@ let () =
         | false -> Printf.fprintf !output "Not equivalent\n"; exit 1
       end
       else
-        let clauses,table = Parse.parse_sat ~debug:!debug_syntax (string_of_file !input)
+        let clauses,table = Parse.parse_sat ~debug:!debug_syntax (string_of_chan !input)
                             |> Eval.eval 
                             |> Cnf.ast_to_cnf ~debug:!debug_cnf
                             |> Sat.cnf_to_clauses
@@ -195,7 +185,7 @@ let () =
           Printf.fprintf !output "==== Found %d models, limit is %d (--limit N for more models)\n" i !limit; exit 0
     else
       (* B. solve not asked: print the Sat file *)
-      let clauses,tbl = Parse.parse_sat ~debug:!debug_syntax (string_of_file !input) 
+      let clauses,tbl = Parse.parse_sat ~debug:!debug_syntax (string_of_chan !input) 
                         |> Eval.eval
                         |> Cnf.ast_to_cnf ~debug:!debug_cnf
                         |> Sat.cnf_to_clauses
@@ -210,7 +200,7 @@ let () =
               c 98 p(1,2,3)     -> c means 'comment' in any Sat file   *)
 
   else if (!smt_logic <> "") then begin
-    let ast = Parse.parse_smt ~debug:!debug_syntax (string_of_file !input) 
+    let ast = Parse.parse_smt ~debug:!debug_syntax (string_of_chan !input)
         |> Eval.eval ~smt:(!smt_logic <> "") in
     let smt = Smt.to_smt2 (String.uppercase !smt_logic) ast in
     Buffer.output_buffer !output smt;
@@ -223,4 +213,4 @@ let () =
   show_msgs_and_exit OK
 
   with
-    | Msg.Fatal -> (show_msgs_and_exit ERROR)
+    | Msg.Fatal _ -> (show_msgs_and_exit ERROR)
