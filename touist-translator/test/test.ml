@@ -5,12 +5,12 @@ open OUnit2;;
 let test_raise (parse:(string->unit)) (during:Msg.during) ?(nth_msg=0) (loc_expected:string) text =
   try let _= parse text in
     (OUnit2.assert_failure (
-      "this test should have raised Eval.Error exception with location '"^loc_expected^"'"))
+      "this test should have raised an exception with location '"^loc_expected^"'"))
   with Msg.Fatal messages ->
       match List.nth messages nth_msg with
       | (Msg.Error,d,msg,loc) when d==during ->
           OUnit2.assert_equal
-          ~msg:("the 'line:column' of expected and actual exception Eval.Error are different; actual error was:\n"^msg)
+          ~msg:("the 'line:column' of expected and actual exception are different; actual error was:\n"^msg)
           ~printer:(fun loc -> Printf.sprintf "'%s'" loc)
           loc_expected (Msg.string_of_loc loc)
       | _ -> OUnit2.assert_failure ("this test didn't raise an error at location '"^loc_expected^"' as expected")
@@ -116,7 +116,6 @@ run_test_tt_main (
   "affect before">::   (test_sat "$a = a f($a)");
   "affect after">::    (test_sat "f($a) $a = a");
   "affect between">::  (test_sat "$a = a f($a,$b) $b = b");
-  
   "var-tuple is prop">::(test_sat "$a=p p($a)");
 ];
 
@@ -128,6 +127,22 @@ run_test_tt_main (
   "bigor: too many sets">::(test_sat_raise Msg.Eval "1:7" "bigor $i in [1],[2]: p end");
   "condition is bool">::(test_sat_raise Msg.Eval "1:23" "bigand $i in [1] when a: p end");
   (*"bigand var is not tuple">::(test_sat_raise "1:23:" "bigand $i(p) in [1]: p end");*)
+];
+
+"test of the p([a,b,c]) construct">:::[ (* 'c' is the testing context *)
+(* We can generate a set with p([a,b]). Check that p(a) does generate a set. *)
+"p([a,b]) should expand to a set">::(test_sat "bigand $i in p([a,b]): $i end");
+"p(a) shouldn't expand to a set">::(test_sat_raise Msg.Eval "1:14" "bigand $i in p(a): $i end");
+"p([]) should return p">::(test_sat "$NOK=0 if p([])==p then OK else $NOK end");
+"p([],a) should return p(a)">::(test_sat "$NOK=0 if p([],a)==p(a) then OK else $NOK end");
+"p(a,[]) should return p(a)">::(test_sat "$NOK=0 if p(a,[])==p(a) then OK else $NOK end");
+"p(1,[a]) should return [p(1,a)]">::(test_sat "$NOK=0 if p(1,[a])==[p(1,a)] then OK else $NOK end");
+"the p([a,b,c]) syntax">:: (fun ctx ->
+      OUnit2.skip_if (Sys.os_type = "Win32") "won't work on windows (unix-only??)";
+      OUnit2.assert_command ~use_stderr:false ~ctxt:ctx
+      ~foutput:(check_solution "test/sat/unittest_setgen_solution.txt")
+      "./touistc.native" ["--solve";"-sat";"test/sat/unittest_setgen.touistl"]);
+
 ];
 
 "samples of code that should be correct with -smt2">:::[ (* 'c' is the testing context *)
@@ -142,14 +157,14 @@ run_test_tt_main (
   
   "affect between">::  (test_smt "a");
   "affect between">::  (test_smt "a > 3");
-  "takuzu4x4.touistl">:: (test_smt (Parse.string_of_file "test/real-size-tests/smt/takuzu4x4.touistl"))
+  "takuzu4x4.touistl">:: (test_smt (Parse.string_of_file "test/smt/takuzu4x4.touistl"))
 ];
 "real-size tests">:::[
   "sodoku">:: (fun ctx -> 
       OUnit2.skip_if (Sys.os_type = "Win32") "won't work on windows (unix-only??)";
       OUnit2.assert_command ~use_stderr:false ~ctxt:ctx
-      ~foutput:(check_solution "test/real-size-tests/sat/sudoku_solution.txt")
-      "./touistc.native" ["--solve";"-sat";"test/real-size-tests/sat/sudoku.touistl"]);
+      ~foutput:(check_solution "test/sat/sudoku_solution.txt")
+      "./touistc.native" ["--solve";"-sat";"test/sat/sudoku.touistl"]);
 ];
 
 ])

@@ -37,7 +37,7 @@ bigand $i,$j in $N_2,$N:
 end
 
 ;; There can be no identical rows or columns
-bigand $i,$j in $N,a when $i!=$j:
+bigand $i,$j in $N,$N when $i!=$j:
     bigor $k in $N:
       (x($i,$k)!=x($j,$k))
     end
