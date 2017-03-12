@@ -569,7 +569,7 @@ and eval_ast_formula (ast:ast) (env:env) : ast =
             | true  -> eval_ast_formula body env
             | false -> process_list_set xs env
         in
-        let list_ast_set = set_to_ast_list (eval_ast set env) in
+        let list_ast_set = set_to_ast_list set env in
         if (List.length list_ast_set) == 0 then
           warning set ("using 'bigand' on an empty set is not recommanded\n"^
             "as it returns a 'Top' formula which can give unexpected results");
@@ -594,7 +594,7 @@ and eval_ast_formula (ast:ast) (env:env) : ast =
               | true  -> eval_ast_formula body env
               | false -> process_list_set xs env
           in
-            let list_ast_set = set_to_ast_list (eval_ast set env) in
+            let list_ast_set = set_to_ast_list set env in
           if (List.length list_ast_set) == 0 then
             warning set ("using 'bigor' on an empty set is not recommanded\n"^
               "as it returns a 'Bot' formula which can give unexpected results.");
@@ -644,16 +644,18 @@ and expand_var_name (prefix,indices:string * ast list option) (env:env) =
     ^ (string_of_ast_list ", " (List.map (fun e -> eval_ast e env) y))
     ^ ")"
 
-(* [set_to_ast_list] trasnforms Set (.) into a list of Int, Float or Prop.
-   This function is used in Bigand and Bigor statements. 
+(* [set_to_ast_list] evaluates one element  of the list of things after
+   the 'in' of bigand/bigor. 
+   If this element is a set, it turns this Set (.) into a list of Int,
+   Float or Prop.
    
    WARNING: this function reverses the order of the elements of the set;
    we could use fold_right in order to keep the original order, but 
    it would mean that it is not tail recursion anymore (= uses much more heap) 
    
    If [!check_only] is true, then the lists *)
-and set_to_ast_list (ast:ast) : ast list =
-  let lst = match ast_whithout_loc ast with
+and set_to_ast_list (ast:ast) env : ast list =
+  let lst = match ast_whithout_loc (eval_ast ast env) with
   | Set (EmptySet)-> []
   | Set (ISet a) -> List.fold_left (fun acc v -> (Int v)::acc)   [] (IntSet.elements a)
   | Set (FSet a) -> List.fold_left (fun acc v -> (Float v)::acc) [] (FloatSet.elements a)
