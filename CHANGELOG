@@ -10,6 +10,13 @@ v2.2.3
       very expensive (because of the evaluations of bigand, bigor, exact,
       atleast, atmost and range sets). To make the 'expand' faster, I just
       'bypassed' these. As it is now duplicate, --linter-expand is removed.
+v2.2.3
+  - touistc:
+    - it is now possible to generate sets using the following syntax:
+      p(a,[1..2],[c]) will generate the set [p(a,1,c) p(a,2,c)]. It
+      basically generates the cartesian product of the given sets.
+      It can be really useful for creating time-related propositions
+      indexed by numbers (time(1), time(2), time(3)...)
 v2.2.2
   - touist:
     - added --latex option for transforming any touistl document into latex
