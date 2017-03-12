@@ -1,27 +1,21 @@
-v2.2.3
-  - touistc:
-    - tuple-propositions of the form p(a,b,c) are now printed with no
-      additional whitespaces. No more p(a, b, c).
-v2.2.3
-  - touistc:
-    - fixed -smt2 so that it can handle +,-,/,* in formulas
-    - fixed -smt2 so that variables in formulas can contain int and float
-    - fixed --latex when propositions or variables contain '_'
-v2.2.3
-  - touistc:
-    - enabled error coloring when touistc is used in a terminal
-    - the option --linter now does what --linter-expand is doing. The
-      separation of both in the first place was due to the 'expand' being
-      very expensive (because of the evaluations of bigand, bigor, exact,
-      atleast, atmost and range sets). To make the 'expand' faster, I just
-      'bypassed' these. As it is now duplicate, --linter-expand is removed.
-v2.2.3
+v2.3.0
   - touistc:
     - it is now possible to generate sets using the following syntax:
       p(a,[1..2],[c]) will generate the set [p(a,1,c) p(a,2,c)]. It
       basically generates the cartesian product of the given sets.
       It can be really useful for creating time-related propositions
       indexed by numbers (time(1), time(2), time(3)...)
+    - tuple-propositions of the form p(a,b,c) are now printed with no
+      additional whitespaces. No more p(a, b, c).
+    - fixed -smt2 so that it can handle +,-,/,* in formulas
+    - fixed -smt2 so that variables in formulas can contain int and float
+    - fixed --latex when propositions or variables contain '_'
+    - enabled error coloring when touistc is used in a terminal
+    - the option --linter now does what --linter-expand is doing. The
+      separation of both in the first place was due to the 'expand' being
+      very expensive (because of the evaluations of bigand, bigor, exact,
+      atleast, atmost and range sets). To make the 'expand' faster, I just
+      'bypassed' these. As it is now duplicate, --linter-expand is removed.
 v2.2.2
   - touist:
     - added --latex option for transforming any touistl document into latex
