@@ -49,7 +49,7 @@ let rec string_of_file (input:in_channel) : string =
 (* In case we have had non-fatal messages (= warnings) during any of the touistc commands,
    display them before exiting. *)
 let show_msgs_and_exit (exit_code:error) = 
-  Msg.print_msgs ~detailed:!detailed_position ();
+  Msg.print_msgs ~color:(Unix.isatty Unix.stderr) ~detailed:!detailed_position ();
   exit (get_code exit_code)
 
 (* The main program *)
@@ -152,10 +152,10 @@ let () =
   if !linter then
     if (!sat_mode) then
       (let _ = Parse.parse_sat ~debug:!debug_syntax (string_of_file !input) 
-        |> Eval.eval ~onlychecktypes:true in (); show_msgs_and_exit OK)
+        |> Eval.eval ~smt:(not !sat_mode) ~onlychecktypes:true in (); show_msgs_and_exit OK)
     else
       (let _ = Parse.parse_smt ~debug:!debug_syntax (string_of_file !input) 
-        |> Eval.eval ~onlychecktypes:true in (); show_msgs_and_exit OK);
+        |> Eval.eval ~smt:(not !sat_mode) ~onlychecktypes:true in (); show_msgs_and_exit OK);
 
   (* Step 3: translation *)
   if (!sat_mode) then
@@ -210,7 +210,8 @@ let () =
               c 98 p(1,2,3)     -> c means 'comment' in any Sat file   *)
 
   else if (!smt_logic <> "") then begin
-    let ast = Parse.parse_smt ~debug:!debug_syntax (string_of_file !input) |> Eval.eval in
+    let ast = Parse.parse_smt ~debug:!debug_syntax (string_of_file !input) 
+        |> Eval.eval ~smt:(!smt_logic <> "") in
     let smt = Smt.to_smt2 (String.uppercase !smt_logic) ast in
     Buffer.output_buffer !output smt;
   end;

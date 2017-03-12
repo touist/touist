@@ -1,5 +1,10 @@
 v2.2.3
   - touistc:
+    - fixed -smt2 so that it can handle +,-,/,* in formulas
+    - fixed -smt2 so that variables in formulas can contain int and float
+v2.2.3
+  - touistc:
+    - enabled error coloring when touistc is used in a terminal
     - the option --linter now does what --linter-expand is doing. The
       separation of both in the first place was due to the 'expand' being
       very expensive (because of the evaluations of bigand, bigor, exact,
