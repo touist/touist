@@ -50,7 +50,7 @@
 
 open Syntax
 open Pprint
-open Msg
+open Msgs
 
 (* [is_clause] checks that the given AST is a clause. This function can only
    be called on an AST containing Or, And or Not. No Equiv or Implies! *)
@@ -70,14 +70,16 @@ let rec is_clause (ast: ast) : bool = match ast with
     form) is not a CNF form and must be modified. Conversely, the form
           `d  and  ((a or not b) and (not c))`
     doesn't need to be modified because it is already in CNF.  *)
-let rec push_lit (lit:ast) (cnf:ast) : ast = match cnf with
+let rec push_lit (lit:ast) (cnf:ast) : ast =
+  let push_lit = push_lit in
+  match cnf with
   | Top              -> Top
   | Bottom           -> lit
   | Prop x           -> Or (lit, Prop x) (* p,i = prefix, indices *)
   | Not (Prop x)     -> Or (lit, Not (Prop x))
   | And (x,y)        -> And (push_lit lit x, push_lit lit y)
   | Or (x,y)         -> Or (lit, Or (x,y))
-  | ast -> add_fatal (Error,Cnf,"this doesn't seem to be a formula: '" ^ (string_of_ast ast) ^ "'",null_loc)
+  | ast -> failwith ("[shouldnt happen] this doesn't seem to be a formula: '" ^ (string_of_ast ast) ^ "'")
 
 
 
@@ -189,7 +191,7 @@ and to_cnf depth (stop:stop) (ast:ast) : ast =
     | Implies (x,y) -> to_cnf (Or (Not x, y))
     | Equiv (x,y) -> to_cnf (And (Implies (x,y), Implies (y,x)))
     | Xor (x,y) -> to_cnf (And (Or (x,y), Or (Not x, Not y)))
-    | _ -> add_fatal (Error,Cnf,"this doesn't seem to be a formula: '" ^ (string_of_ast ast) ^ "'",null_loc)
+    | _ -> failwith ("[shouldnt happen] this doesn't seem to be a formula: '" ^ (string_of_ast ast) ^ "'")
     end in
     if !debug then print_debug "out: " depth [cnf];
     cnf

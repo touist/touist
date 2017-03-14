@@ -80,7 +80,7 @@ let rec string_of_ast ?(parenthesis=false) ?(debug=false) ast = match ast with
   | Let (v,x,c) -> (string_of_ast v) ^ "=" ^ (string_of_ast x) ^ ": " ^ (string_of_ast c)
   | Affect (v,c) -> (string_of_ast v) ^ "=" ^ (string_of_ast c)
   | Touist_code (f) -> (string_of_ast_list "\n" f)
-  | Loc (x,l) -> (if debug then "("^(Msg.string_of_loc l)^")" else "") ^ string_of_ast x
+  | Loc (x,l) -> (if debug then "("^(Msgs.string_of_loc l)^")" else "") ^ string_of_ast x
   | Paren x -> string_of_ast x
 
 and string_of_ast_type = function

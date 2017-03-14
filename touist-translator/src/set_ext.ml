@@ -22,6 +22,7 @@ module Make (Ord : Set.OrderedType) = struct
       | k,x::xs -> List.map (fun y -> x::y) (comb (pred k) xs) @ comb k xs
     in comb k (elements set)
 
+  (** [exact] returns a list of  *)
   let exact k set =
     let rec go k l =
       match k,l with
