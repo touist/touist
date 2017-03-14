@@ -5,7 +5,7 @@ open Syntax
 
 (** [string_of_ast] takes an abstract syntaxic tree.
     @param ast of type [Syntax.ast] *)
-let rec string_of_ast = function
+let rec string_of_ast ?(parenthesis=false) ?(debug=false) ast = match ast with
   | Int    x -> string_of_int x
   | Float  x -> string_of_float x
   | Bool   x -> string_of_bool x
@@ -28,11 +28,11 @@ let rec string_of_ast = function
   | Abs   x -> "abs("   ^ (string_of_ast x) ^ ")"
   | To_float x -> "float(" ^ (string_of_ast x) ^ ")"
   | Not     x     -> "not " ^ string_of_ast x
-  | And     (x,y) -> (string_of_ast x) ^ " and " ^ (string_of_ast y)
-  | Or      (x,y) -> (string_of_ast x) ^ " or "  ^ (string_of_ast y)
-  | Xor     (x,y) -> (string_of_ast x) ^ " xor " ^ (string_of_ast y)
-  | Implies (x,y) -> (string_of_ast x) ^ " => "  ^ (string_of_ast y)
-  | Equiv   (x,y) -> (string_of_ast x) ^ " <=> " ^ (string_of_ast y)
+  | And     (x,y) -> "(" ^ (string_of_ast x) ^ " and " ^ (string_of_ast y) ^ ")"
+  | Or      (x,y) -> "(" ^ (string_of_ast x) ^ " or "  ^ (string_of_ast y) ^ ")"
+  | Xor     (x,y) -> "(" ^ (string_of_ast x) ^ " xor " ^ (string_of_ast y) ^ ")"
+  | Implies (x,y) -> "(" ^ (string_of_ast x) ^ " => "  ^ (string_of_ast y) ^ ")"
+  | Equiv   (x,y) -> "(" ^ (string_of_ast x) ^ " <=> " ^ (string_of_ast y) ^ ")"
   | Equal            (x,y) -> (string_of_ast x) ^ " == " ^ (string_of_ast y)
   | Not_equal        (x,y) -> (string_of_ast x) ^ " != " ^ (string_of_ast y)
   | Lesser_than      (x,y) -> (string_of_ast x) ^ " < "  ^ (string_of_ast y)
@@ -80,7 +80,7 @@ let rec string_of_ast = function
   | Let (v,x,c) -> (string_of_ast v) ^ "=" ^ (string_of_ast x) ^ ": " ^ (string_of_ast c)
   | Affect (v,c) -> (string_of_ast v) ^ "=" ^ (string_of_ast c)
   | Touist_code (f) -> (string_of_ast_list "\n" f)
-  | Loc (x,_) -> string_of_ast x
+  | Loc (x,l) -> (if debug then "("^(Msg.string_of_loc l)^")" else "") ^ string_of_ast x
   | Paren x -> string_of_ast x
 
 and string_of_ast_type = function
