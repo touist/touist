@@ -176,8 +176,8 @@ let () =
                       |> Sat.cnf_to_clauses 
                       |> Sat.solve_clauses
         in match Sat.ModelSet.equal !models !models2 with
-        | true -> Printf.fprintf !output "Equivalent\n"; exit 0
-        | false -> Printf.fprintf !output "Not equivalent\n"; exit 1
+        | true -> Printf.fprintf !output "Equivalent\n"; show_msgs_and_exit OK
+        | false -> Printf.fprintf !output "Not equivalent\n"; show_msgs_and_exit ERROR
       end
       else
         let clauses,table = Parse.parse_sat ~debug:!debug_syntax (string_of_chan !input)
@@ -192,10 +192,10 @@ let () =
               in Sat.solve_clauses ~limit:!limit ~print:print_model (clauses,table))
         in
         match Sat.ModelSet.cardinal !models with
-        | i when !only_count -> Printf.fprintf !output "%d\n" i; exit 0
-        | 0 -> Printf.fprintf stderr "Unsat\n"; exit 1
+        | i when !only_count -> Printf.fprintf !output "%d\n" i; show_msgs_and_exit OK
+        | 0 -> Printf.fprintf stderr "Unsat\n"; show_msgs_and_exit ERROR
         | i -> (* case where we already printed models in [solve_clause] *)
-          Printf.fprintf !output "==== Found %d models, limit is %d (--limit N for more models)\n" i !limit; exit 0
+          Printf.fprintf !output "==== Found %d models, limit is %d (--limit N for more models)\n" i !limit; show_msgs_and_exit OK
     else
       (* B. solve not asked: print the Sat file *)
       let clauses,tbl = Parse.parse_sat ~debug:!debug_syntax (string_of_chan !input) 
