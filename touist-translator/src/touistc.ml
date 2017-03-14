@@ -30,6 +30,7 @@ let detailed_position = ref false (* display absolute position of error *)
 let debug_syntax = ref false
 let debug_cnf = ref false
 let latex = ref false
+let show = ref false
 
 (* [process_arg_alone] is the function called by the command-line argument
    parser when it finds an argument with no preceeding -flag (-f, -x...).
@@ -65,6 +66,7 @@ let () =
     ("--debug-syntax", Arg.Set debug_syntax, "Print information for debugging
     syntax errors given by parser.messages");
     ("--debug-cnf", Arg.Set debug_cnf,"Print step by step CNF transformation");
+    ("--show", Arg.Set show,"Show the expanded AST after evaluation (= expansion)");
     ("--solve", Arg.Set solve_sat,"Solve the problem and print the first model if it exists");
     ("--limit", Arg.Set_int limit,"(with --solve) Instead of one model, return N models if they exist.
                                             With 0, return every possible model.");
@@ -142,10 +144,21 @@ let () =
   if !linter then
     if (!sat_mode) then
       (let _ = Parse.parse_sat ~debug:!debug_syntax (string_of_chan !input) 
-        |> Eval.eval ~smt:(not !sat_mode) ~onlychecktypes:true in (); show_msgs_and_exit OK)
+        |> Eval.eval ~smt:(not !sat_mode) ~onlychecktypes:true in show_msgs_and_exit OK)
     else
       (let _ = Parse.parse_smt ~debug:!debug_syntax (string_of_chan !input) 
-        |> Eval.eval ~smt:(not !sat_mode) ~onlychecktypes:true in (); show_msgs_and_exit OK);
+        |> Eval.eval ~smt:(not !sat_mode) ~onlychecktypes:true in show_msgs_and_exit OK);
+  if !show then
+    if (!sat_mode) then
+      (let ast = Parse.parse_sat ~debug:!debug_syntax (string_of_chan !input) 
+        |> Eval.eval ~smt:(not !sat_mode) in
+        if !show then Printf.fprintf !output "%s\n" (Pprint.string_of_ast ast); 
+        show_msgs_and_exit OK)
+    else
+      (let ast = Parse.parse_smt ~debug:!debug_syntax (string_of_chan !input) 
+        |> Eval.eval ~smt:(not !sat_mode) in
+        if !show then Printf.fprintf !output "%s\n" (Pprint.string_of_ast ast);
+        show_msgs_and_exit OK);
 
   (* Step 3: translation *)
   if (!sat_mode) then
