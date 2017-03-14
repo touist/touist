@@ -545,16 +545,22 @@ and eval_ast_formula (ast:ast) (env:env) : ast =
   | Equiv   (x,y) -> Equiv (eval_ast_formula x env, eval_ast_formula y env)
   | Exact (x,y) -> begin (* !check_only simplifies by returning a dummy proposition *)
       match eval_ast x env, eval_ast y env with
+      | Int v, _ when v<=0 -> raise_with_loc x "in 'exact', the first parameter must be an int > 0"
+      | _, Set (EmptySet) -> raise_with_loc y "in 'exact', the second parameter cannot be an empty set"
       | Int x, Set (SSet s) -> if !check_only then Prop "dummy" else exact_str (PropSet.exact x s)
       | x',y' -> raise_type_error2 ast x x' y y' "'int' (left-hand)\nand a 'prop-set' (right-hand)"
     end
   | Atleast (x,y) -> begin
       match eval_ast x env, eval_ast y env with
+      | Int v, _ when v<=0 -> raise_with_loc x "in 'atleast', the first parameter must be an int > 0"
+      | _, Set (EmptySet) -> raise_with_loc y "in 'atleast', the second parameter cannot be an empty set"
       | Int x, Set (SSet s) -> if !check_only then Prop "dummy" else atleast_str (PropSet.atleast x s)
       | x',y' -> raise_type_error2 ast x x' y y' "'int' (left-hand)\nand a 'prop-set' (right-hand)"
     end
   | Atmost (x,y) ->begin
       match eval_ast x env, eval_ast y env with
+      | Int v, _ when v<=0 -> raise_with_loc x "in 'atmost', the first parameter must be an int > 0"
+      | _, Set (EmptySet) -> raise_with_loc y "in 'atmost', the second parameter cannot be an empty set"
       | Int x, Set (SSet s) -> if !check_only then Prop "dummy" else atmost_str (PropSet.atmost x s)
       | x',y' -> raise_type_error2 ast x x' y y' "'int' (left-hand)\nand a 'prop-set' (right-hand)"
     end
