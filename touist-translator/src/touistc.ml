@@ -188,7 +188,7 @@ let () =
         let models =
           (if !only_count then Sat.solve_clauses (clauses,table)
            else 
-             let print_model model i = Printf.fprintf !output "==== model %d\n%s" i (Sat.Model.pprint table model)
+             let print_model model i = Printf.fprintf !output "==== model %d\n%s\n" i (Sat.Model.pprint ~sep:"\n" table model)
               in Sat.solve_clauses ~limit:!limit ~print:print_model (clauses,table))
         in
         match Sat.ModelSet.cardinal !models with

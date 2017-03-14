@@ -115,14 +115,17 @@ struct
   (* [pprint] gives a string under the form
      1 prop(1,2,9)
      O prop(1,4,2)... *)
-  let pprint table model = List.fold_left (fun acc (n,v) -> ((string_of_value v) ^" "^ (Hashtbl.find table n) ^ "\n" ^ acc)) "" model
+  let pprint ?(sep="\n") table model = List.fold_left 
+    (fun acc (n,v) -> let str = (string_of_value v)^" "^(Hashtbl.find table n)
+      in match acc with "" -> str | _ -> str ^ sep ^ acc)
+     "" model
 end
 
 (* A set that contains all the models already found. *)
 module ModelSet = struct
   include Set.Make(Model)
-  let dump models = print_endline (fold (fun m acc -> (Model.dump m) ^ "\n" ^ acc) models "")
-  let pprint table models = print_endline (fold (fun m acc -> (Model.pprint table m) ^ "=====\n" ^ acc) models "")
+  let dump models = fold (fun m acc -> (Model.dump m) ^ "\n" ^ acc) models ""
+  let pprint table models = fold (fun m acc -> (Model.pprint table m) ^ "=====\n" ^ acc) models ""
 end
 
 (* [get_model] retrieves the valuations from the current state of the solver
@@ -179,6 +182,7 @@ let print_clause (clause:Lit.t list) : unit =
 
 (** [solve_clauses] finds the models for the given clauses. 
     @param print is a function that will print a model as soon as it is found.
+      [i] is the number of the model.
       It can be useful to print the models as they appear because finding all
       models (if [limit] is large) can be extremely long.
       Example: [~print:(Sat.Model.pprint table model)]
