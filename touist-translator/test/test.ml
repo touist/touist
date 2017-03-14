@@ -2,33 +2,43 @@ open OUnit2;;
 
 (* To check that the error has occured curreclty, we only check
    that the place where the error was found is the right one.  *)
-let test_raise (parse:(string->unit)) (during:Msg.during) ?(nth_msg=0) (loc_expected:string) text =
-  try let _= parse text in
-    (OUnit2.assert_failure (
-      "this test should have raised an exception with location '"^loc_expected^"'"))
-  with Msg.Fatal messages ->
-      match List.nth messages nth_msg with
+let test_raise (parse:(string->'a)) (during:Msg.during) typ nth_msg (loc_expected:string) text =
+  match typ with
+  | Msg.Error ->
+    (try let _= parse text in
+      (OUnit2.assert_failure (
+        "this test should have raised an exception with location '"^loc_expected^"'"))
+    with Msg.Fatal messages ->
+        match List.nth messages nth_msg with
+        | (Msg.Error,d,msg,loc) when d==during ->
+            OUnit2.assert_equal
+            ~msg:("the 'line:column' of expected and actual exception are different; actual error was:\n"^msg)
+            ~printer:(fun loc -> Printf.sprintf "'%s'" loc)
+            loc_expected (Msg.string_of_loc loc)
+        | _ -> OUnit2.assert_failure ("this test didn't raise an error at location '"^loc_expected^"' as expected"))
+   | Msg.Warning -> (parse text;
+      match List.nth !Msg.messages nth_msg with
       | (Msg.Error,d,msg,loc) when d==during ->
           OUnit2.assert_equal
           ~msg:("the 'line:column' of expected and actual exception are different; actual error was:\n"^msg)
           ~printer:(fun loc -> Printf.sprintf "'%s'" loc)
           loc_expected (Msg.string_of_loc loc)
-      | _ -> OUnit2.assert_failure ("this test didn't raise an error at location '"^loc_expected^"' as expected")
+      | _ -> OUnit2.assert_failure ("this test didn't raise an error at location '"^loc_expected^"' as expected"))
 
 
-let sat text = let _= Parse.parse_sat text |> Eval.eval |> Cnf.ast_to_cnf |> Sat.cnf_to_clauses in ()
-let smt logic text = let _= Parse.parse_smt text |> Eval.eval ~smt:true |> Smt.to_smt2 logic in ()
+let sat text = Parse.parse_sat text |> Eval.eval |> Cnf.ast_to_cnf |> Sat.cnf_to_clauses
+let smt logic text = Parse.parse_smt text |> Eval.eval ~smt:true |> Smt.to_smt2 logic
 
 (* The ending _ is necessary because the testing function
    must accept the 'context' thing. *)
-let test_sat text _ = try sat text;
+let test_sat text _ = try let _ = sat text in ();
   if Msg.has_error then OUnit2.assert_failure
     ("this test didn't raise any exceptions but errors had been outputed:\n"^
       Msg.string_of_msgs !Msg.messages)
   with Msg.Fatal msg -> OUnit2.assert_failure 
     ("this test shouldn't have raised a Fatal exception. Here is the exception:\n"^
       Msg.string_of_msgs msg)
-let test_smt ?(logic="QF_IDL") text _ = try (smt logic) text;
+let test_smt ?(logic="QF_IDL") text _ = try let _ = (smt logic) text in ();
   if Msg.has_error then OUnit2.assert_failure
       ("this test didn't raise any exceptions but errors had been outputed:\n"^
         Msg.string_of_msgs !Msg.messages)
@@ -36,9 +46,23 @@ let test_smt ?(logic="QF_IDL") text _ = try (smt logic) text;
       ("this test shouldn't have raised a Fatal exception. Here is the exception:\n"^
         Msg.string_of_msgs msg)
 
-let test_sat_raise during loc text _ = test_raise sat during loc text
-let test_smt_raise during loc ?(logic="QF_IDL") text _ = test_raise (smt logic) during loc text
+let test_sat_raise during ?(typ=Msg.Error) ?(nth=0) loc text _ = test_raise sat during typ nth loc text
+let test_smt_raise during ?(typ=Msg.Error) ?(nth=0) ?(logic="QF_IDL") loc text _ = test_raise (smt logic) during typ nth loc text
 
+let sat_models_are text expected _ =
+  OUnit2.assert_equal ~printer:(fun s -> s)
+    expected
+    (let cl,tbl = Parse.parse_sat text |> Eval.eval |> Cnf.ast_to_cnf |> Sat.cnf_to_clauses in
+      let models_str = ref [] in
+        let _ = Sat.solve_clauses ~print:(fun m _ -> models_str := (Sat.Model.pprint ~sep:" " tbl m)::!models_str) (cl,tbl)
+          in List.fold_left (fun acc s -> match acc with "" -> s | _ -> s^" | "^acc) "" !models_str)
+
+(* Tests if the given [text] is translated into the [expected] expanded
+   text. *)
+let sat_expands_to text expected _ =
+  OUnit2.assert_equal ~printer:(fun s -> s)
+    expected (Pprint.string_of_ast (Parse.parse_sat text |> Eval.eval))
+                       
 (*  A standard test in oUnit should first define a function 
         let test1 context : unit = OUnit2.assert_bool true
     and then you add it to the suite:
@@ -105,8 +129,27 @@ let () =
 run_test_tt_main (
 "touist">:::[
 
-"samples of code that should be correct with -sat and -smt2">:::[ (* 'c' is the testing context *)
-  "lower than">::      (test_sat "let $i=1.0: if $i < 3.0 then a else b end");
+"numerical expressions">:::[ (* 'c' is the testing context *)
+  "1 > 10 should be false">::(sat_expands_to "t(1 > 10)" "t(false)");
+  "1 < 10 should be true">::(sat_expands_to "t(1 < 10)" "t(true)");
+  "1.0 > 10.0 should be false">::(sat_expands_to "t(1.0 > 10.0)" "t(false)");
+  "1.0 < 10.0 should be true">::(sat_expands_to "t(1.0 < 10.0)" "t(true)");
+  "1 == 1.0 should raise error">::(test_sat_raise Msg.Eval "1:3" "t(1==1.0)");
+  "1.0 == 1 should raise error">::(test_sat_raise Msg.Eval "1:3" "t(1.0==1)");
+  "1 == 1 should be true">::(sat_expands_to "t(1==1)" "t(true)");
+];
+"exact, atleast and atmost">:::[
+  "exact(0,[a,b]) should not work">::(test_sat_raise Msg.Eval "1:7" "exact(0,[a,b])");
+  "exact(1,[]) should not work">::(test_sat_raise Msg.Eval "1:9" "exact(1,[])");
+  "exact(1,[a,b,c]) should give 3 models">::(sat_models_are "exact(1,[a,b,c])" "0 a 0 b 1 c | 1 a 0 b 0 c | 0 a 1 b 0 c");
+  "exact(3,[a,b,c]) should give 1 model">::(sat_models_are "exact(3,[a,b,c])" "1 c 1 b 1 a");
+  "'atmost(2,[a,b,c]) a' should give 3 models">::(sat_models_are "atmost(2,[a,b,c]) a" "1 a 0 c 0 b | 1 a 0 c 1 b | 1 a 1 c 0 b");
+  "'atmost(2,[a,b,c]) a b' should give 1 model">::(sat_models_are "atmost(2,[a,b,c]) a b" "1 b 1 a 0 c");
+  "'atleast(2,[a,b,c])' should give 4 model">::(sat_models_are "atleast(2,[a,b,c])" "1 c 1 b 0 a | 0 c 1 b 1 a | 1 c 0 b 1 a | 1 c 1 b 1 a");
+  "'atleast(2,[a,b,c]) a' should give 3 model">::(sat_models_are "atleast(2,[a,b,c]) a" "1 a 1 b 1 c | 1 a 1 b 0 c | 1 a 0 b 1 c");
+  "'atleast(2,[a,b,c]) a b' should give 2 model">::(sat_models_are "atleast(2,[a,b,c]) a b" "1 b 1 c 1 a | 1 b 0 c 1 a");
+];
+"bigand and bigor">:::[
   "bigand and >">::    (test_sat "bigand $i in [1..5] when $i > 2: p($i) end");
   "let declaration">:: (test_sat "let $i = 3: p($i-$i*3-1 mod 2 / 1)");
   "bigand">::          (test_sat "bigand $i in [a]: p($i) end");
@@ -131,12 +174,13 @@ run_test_tt_main (
 
 "test of the p([a,b,c]) construct">:::[ (* 'c' is the testing context *)
 (* We can generate a set with p([a,b]). Check that p(a) does generate a set. *)
-"p([a,b]) should expand to a set">::(test_sat "bigand $i in p([a,b]): $i end");
-"p(a) shouldn't expand to a set">::(test_sat_raise Msg.Eval "1:14" "bigand $i in p(a): $i end");
-"p([]) should return p">::(test_sat "$NOK=0 if p([])==p then OK else $NOK end");
-"p([],a) should return p(a)">::(test_sat "$NOK=0 if p([],a)==p(a) then OK else $NOK end");
-"p(a,[]) should return p(a)">::(test_sat "$NOK=0 if p(a,[])==p(a) then OK else $NOK end");
-"p(1,[a]) should return [p(1,a)]">::(test_sat "$NOK=0 if p(1,[a])==[p(1,a)] then OK else $NOK end");
+"p([a,b]) in a formula should stay p([a,b])">::(sat_expands_to "p([a,b])" "p([a,b])");
+"p([a,b]) in an expr should expand to [p(a),p(b)]">::(sat_expands_to "t(p([a,b]))" "t([p(a),p(b)])");
+"p(a) in an expr shouldn't expand to a set">::(sat_expands_to "t(p(a))" "t(p(a))");
+"p([]) in an expr should return p">::(sat_expands_to "t(p([]))" "t(p)");
+"p([],a) in an expr should return p(a)">::(sat_expands_to "t(p([],a))" "t(p(a))");
+"p(a,[]) in an expr should return p(a)">::(sat_expands_to "t(p(a,[]))" "t(p(a))");
+"p(1,[a]) in an expr should return [p(1,a)]">::(sat_expands_to "t(p(1,[a]))" "t([p(1,a)])");
 "the p([a,b,c]) syntax">:: (fun ctx ->
       OUnit2.skip_if (Sys.os_type = "Win32") "won't work on windows (unix-only??)";
       OUnit2.assert_command ~use_stderr:false ~ctxt:ctx
