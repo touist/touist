@@ -201,7 +201,8 @@ let () =
       (* tbl contains the literal-to-name correspondance table. 
          The number of literals is (Hashtbl.length tbl) *)
       Sat.print_clauses_to_dimacs !output (Hashtbl.length tbl) clauses;
-      Sat.print_table !output_table ~prefix:(if !output == !output_table then "c " else "") tbl
+      Sat.print_table !output_table ~prefix:(if !output == !output_table then "c " else "") tbl;
+      show_msgs_and_exit !msgs OK
         (* table_prefix allows to add the 'c' before each line of the table
            display, when and only when everything is outputed in a single
            file. Example:
