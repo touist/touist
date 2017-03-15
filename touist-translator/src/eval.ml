@@ -547,7 +547,7 @@ and eval_ast_formula (msgs:Msgs.t ref) (env:env) (ast:ast) : ast =
   | Or (Bottom,x)
   | Or (x,Bottom) -> eval_ast_formula x
   | Or      (x,y) -> Or  (eval_ast_formula x, eval_ast_formula y)
-  | Xor (ToRemove,x) | Xor (x,ToRemove) -> x
+  | Xor (ToRemove,x) | Xor (x,ToRemove) -> ToRemove
   | Xor     (x,y) -> Xor (eval_ast_formula x, eval_ast_formula y)
   | Implies (ToRemove,x) | Implies (x,ToRemove) -> ToRemove
   | Implies (_,Top)
