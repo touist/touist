@@ -159,7 +159,6 @@ let rec eval ?smt:(smt_mode=false) ?(onlychecktypes=false) (ast,msgs) : ast * Ms
   eval_touist_code msgs [] ast, msgs
 
 and eval_touist_code msgs (env:env) ast : ast =
-  
   let rec affect_vars = function
     | [] -> []
     | Loc (Affect (Loc (Var (p,i),var_loc),y),affect_loc)::xs ->
@@ -173,8 +172,10 @@ and eval_touist_code msgs (env:env) ast : ast =
     | x::xs -> And (x, process_formulas xs)
   in
   match ast_whithout_loc ast with
-  | Touist_code (formulas) ->
-    eval_ast_formula msgs env (process_formulas (affect_vars formulas))
+  | Touist_code (formulas) -> 
+    (match cleantoremove (eval_ast_formula msgs env (process_formulas (affect_vars formulas))) with
+    | ToRemove -> raise_with_loc msgs ast ("your formulas have expanded to nothing")
+    | evaluated -> evaluated)
   | e -> raise_with_loc msgs ast ("this does not seem to be a touist code structure: " ^ string_of_ast e)
 
 (* [eval_ast] evaluates (= expands) numerical, boolean and set expresions that
@@ -404,7 +405,7 @@ and eval_set_decl (msgs:Msgs.t ref) (env:env) (set_decl:ast) =
 and eval_ast_formula (msgs:Msgs.t ref) (env:env) (ast:ast) : ast =
   let eval_ast_formula = eval_ast_formula msgs env
   and eval_ast_formula_env = eval_ast_formula msgs
-  and eval_ast = eval_ast msgs env in
+  and eval_ast = eval_ast msgs env
   let expanded = match ast_whithout_loc ast with
   | Int x   -> Int x
   | Float x -> Float x
@@ -533,42 +534,48 @@ and eval_ast_formula (msgs:Msgs.t ref) (env:env) (ast:ast) : ast =
          and '$v' is not either declared, so we can safely guess that this var has not been declared. *)
       with Not_found -> raise_with_loc msgs ast ("'" ^ name ^ "' has not been declared")
     end
+  | Not ToRemove -> ToRemove
   | Not Top    -> Bottom
   | Not Bottom -> Top
   | Not x      -> Not (eval_ast_formula x)
+  | And (ToRemove,x) | And (x,ToRemove) -> x
   | And (Bottom, _) | And (_, Bottom) -> Bottom
   | And (Top,x)
   | And (x,Top) -> eval_ast_formula x
   | And     (x,y) -> And (eval_ast_formula x, eval_ast_formula y)
+  | Or (ToRemove,x) | Or (x,ToRemove) -> x
   | Or (Top, _) | Or (_, Top) -> Top
   | Or (Bottom,x)
   | Or (x,Bottom) -> eval_ast_formula x
   | Or      (x,y) -> Or  (eval_ast_formula x, eval_ast_formula y)
+  | Xor (ToRemove,x) | Xor (x,ToRemove) -> x
   | Xor     (x,y) -> Xor (eval_ast_formula x, eval_ast_formula y)
+  | Implies (ToRemove,x) | Implies (x,ToRemove) -> ToRemove
   | Implies (_,Top)
   | Implies (Bottom,_) -> Top
   | Implies (x,Bottom) -> eval_ast_formula (Not x)
   | Implies (Top,x) -> eval_ast_formula x
   | Implies (x,y) -> Implies (eval_ast_formula x, eval_ast_formula y)
+  | Equiv (x,ToRemove) | Equiv (ToRemove,x) -> ToRemove 
   | Equiv   (x,y) -> Equiv (eval_ast_formula x, eval_ast_formula y)
   | Exact (x,y) -> begin (* !check_only simplifies by returning a dummy proposition *)
       match eval_ast x, eval_ast y with
-      | Int v, _ when v<=0 -> raise_with_loc msgs x "in 'exact', the first parameter must be an int > 0"
-      | _, Set (EmptySet) -> raise_with_loc msgs y "in 'exact', the second parameter cannot be an empty set"
+      | Int v, _ when v<=0 -> ToRemove 
+      | _, Set (EmptySet) -> ToRemove
       | Int x, Set (SSet s) -> if !check_only then Prop "dummy" else exact_str (PropSet.exact x s)
       | x',y' -> raise_type_error2 msgs ast x x' y y' "'int' (left-hand)\nand a 'prop-set' (right-hand)"
     end
   | Atleast (x,y) -> begin
       match eval_ast x, eval_ast y with
-      | Int v, _ when v<=0 -> raise_with_loc msgs x "in 'atleast', the first parameter must be an int > 0"
-      | _, Set (EmptySet) -> raise_with_loc msgs y "in 'atleast', the second parameter cannot be an empty set"
+      | Int v, _ when v<=0 -> ToRemove 
+      | _, Set (EmptySet) -> ToRemove
       | Int x, Set (SSet s) -> if !check_only then Prop "dummy" else atleast_str (PropSet.atleast x s)
       | x',y' -> raise_type_error2 msgs ast x x' y y' "'int' (left-hand)\nand a 'prop-set' (right-hand)"
     end
   | Atmost (x,y) ->begin
       match eval_ast x, eval_ast y with
-      | Int v, _ when v<=0 -> raise_with_loc msgs x "in 'atmost', the first parameter must be an int > 0"
-      | _, Set (EmptySet) -> raise_with_loc msgs y "in 'atmost', the second parameter cannot be an empty set"
+      | Int v, _ when v<=0 -> ToRemove 
+      | _, Set (EmptySet) -> ToRemove
       | Int x, Set (SSet s) -> if !check_only then Prop "dummy" else atmost_str (PropSet.atmost x s)
       | x',y' -> raise_type_error2 msgs ast x x' y y' "'int' (left-hand)\nand a 'prop-set' (right-hand)"
     end
@@ -588,26 +595,27 @@ and eval_ast_formula (msgs:Msgs.t ref) (env:env) (ast:ast) : ast =
       match vars,sets with
       | [],[] | _,[] | [],_ -> failwith "shouln't happen: non-variable in big construct"
       | [Loc (Var (name,_),loc)],[set] -> (* we don't need the indices because bigand's vars are 'simple' *)
-        let rec process_list_set env (set_list:ast list) =
+        (* If [when_cond] has never been satisfied, [process_list_set] will return
+             (_,false). In the opposite case, it will return (ast,true). *)
+        let rec process_list_set env (set_list:ast list) : ast * bool =
           match set_list with
-          | []   -> Top (*  what if bigand in a or? We give a warning (see below) *)
+          | []   -> ToRemove,false (* what if bigand in a or? We give a warning (see below) *)
           | x::xs ->
             let env = (name,(x,loc))::env in
             match ast_to_bool msgs env when_cond with
-            | true when xs != [] -> And (eval_ast_formula_env env body, process_list_set env xs)
-            | true  -> eval_ast_formula_env env body
+            | true when xs != [] -> let next,b = process_list_set env xs in And (eval_ast_formula_env env body, next),true
+            | true  -> eval_ast_formula_env env body,true
             | false -> process_list_set env xs
         in
         let list_ast_set = set_to_ast_list msgs env set in
-        if (List.length list_ast_set) == 0 then
-          warning msgs set ("using 'bigand' on an empty set is not recommanded\n"^
-            "as it returns a 'Top' formula which can give unexpected results");
-        let evaluated_ast = process_list_set env list_ast_set in
-        if evaluated_ast == Top then
-          warning msgs when_cond ("the 'when' condition of 'bigand' is never true. This should\n"^
-            "be avoided as it returns a 'Top' formula which can give unexpected results");
-        evaluated_ast
+        if (List.length list_ast_set) == 0 then ToRemove
+        else
+          let evaluated_ast,when_satisfied = process_list_set env list_ast_set in
+          if not when_satisfied then ToRemove
+          else cleantoremove evaluated_ast
       | x::xs,y::ys ->
+        (* only the last couple of var-set in the var-set list is going to
+           have the [when_optional] evaluated. *)
         eval_ast_formula (Bigand ([x],[y],None,(Bigand (xs,ys,when_optional,body))))
     end
   | Bigor (vars,sets,when_optional,body) ->
@@ -617,25 +625,24 @@ and eval_ast_formula (msgs:Msgs.t ref) (env:env) (ast:ast) : ast =
       match vars,sets with
       | [],[] | _,[] | [],_ -> failwith "shouln't happen: non-variable in big construct"
       | [Loc (Var (name,_),loc)],[set] ->
-          let rec process_list_set env (set_list:ast list) =
+          (* If [when_cond] has never been satisfied, [process_list_set] will return
+             (_,false). In the opposite case, it will return (ast,true). *)
+          let rec process_list_set env (set_list:ast list) : ast * bool =
             match set_list with
-            | []    -> Bottom
+            | []    -> ToRemove, false
             | x::xs ->
               let env = (name,(x,loc))::env in
               match ast_to_bool msgs env when_cond with
-              | true when xs != [] -> Or (eval_ast_formula_env env body, process_list_set env xs)
-              | true  -> eval_ast_formula_env env body
+              | true when xs != [] -> let next,b = process_list_set env xs in Or (eval_ast_formula_env env body, next),true
+              | true  -> eval_ast_formula_env env body,true
               | false -> process_list_set env xs
           in
-            let list_ast_set = set_to_ast_list msgs env set in
-          if (List.length list_ast_set) == 0 then
-            warning msgs set ("using 'bigor' on an empty set is not recommanded\n"^
-              "as it returns a 'Bot' formula which can give unexpected results.");
-          let evaluated_ast = process_list_set env list_ast_set in
-          if evaluated_ast == Bottom then
-            warning msgs when_cond ("the 'when' condition of 'bigor' is never true. This should\n"^
-              "be avoided as it returns a 'Bot' formula which can give unexpected results");
-            evaluated_ast
+          let list_ast_set = set_to_ast_list msgs env set in
+          if (List.length list_ast_set) == 0 then ToRemove
+          else
+            let evaluated_ast,when_satisfied = process_list_set env list_ast_set in
+            if not when_satisfied then ToRemove
+            else cleantoremove evaluated_ast
       | x::xs,y::ys ->
         eval_ast_formula (Bigor ([x],[y],None,(Bigor (xs,ys,when_optional,body))))
     end
@@ -646,33 +653,34 @@ and eval_ast_formula (msgs:Msgs.t ref) (env:env) (ast:ast) : ast =
     let name = (expand_var_name msgs env (p,i)) and desc = (eval_ast content,loc)
     in eval_ast_formula_env ((name,desc)::env) formula
   | Paren x -> eval_ast_formula x
+  | ToRemove -> ToRemove
   | e -> raise_with_loc msgs ast ("this expression is not a formula: " ^ string_of_ast e)
   in expanded
 
 and exact_str lst =
   let rec go = function
-    | [],[]       -> Top
-    | t::ts,[]    -> And (And (Prop t, Top), go (ts,[]))
-    | [],f::fs    -> And (And (Top, Not (Prop f)), go ([],fs))
+    | [],[]       -> ToRemove
+    | t::ts,[]    -> And (And (Prop t, ToRemove), go (ts,[]))
+    | [],f::fs    -> And (And (ToRemove, Not (Prop f)), go ([],fs))
     | t::ts,f::fs -> And (And (Prop t, Not (Prop f)), go (ts,fs))
   in
   match lst with
-  | []    -> Bottom
-  | x::xs -> Or (go x, exact_str xs)
+  | []    -> ToRemove
+  | x::xs -> cleantoremove (Or (go x, exact_str xs))
 
 and atleast_str lst =
-  List.fold_left (fun acc str -> Or (acc, formula_of_string_list str)) Bottom lst
+  List.fold_left (fun acc str -> Or (acc, formula_of_string_list str)) ToRemove lst
 
 and atmost_str lst =
   List.fold_left (fun acc str ->
       Or (acc, List.fold_left (fun acc' str' ->
-          And (acc', Not (Prop str'))) Top str)) Bottom lst
+          And (acc', Not (Prop str'))) ToRemove str)) ToRemove lst
 
 and formula_of_string_list =
-  List.fold_left (fun acc str -> And (acc, Prop str)) Top
+  List.fold_left (fun acc str -> And (acc, Prop str)) ToRemove
 
 and and_of_term_list =
-  List.fold_left (fun acc t -> And (acc, t)) Top
+  List.fold_left (fun acc t -> And (acc, t)) ToRemove
 
 (* [expand_prop] will expand a proposition containing a set as index, e.g.,
    time([1,2],[a,b]) will become [time(1,a),time(1,b)...time(b,2)]. This is useful when 
@@ -702,7 +710,7 @@ and expand_prop_with_set msgs env name indices_optional =
 and expand_prop_with_set' msgs proplist indices env =
   match indices with (* at this point, indice is either a Prop or a Set *)
   | [] -> proplist
-  | i::next -> 
+  | i::next ->
     match i with
     | Set (EmptySet) -> expand_prop_with_set' msgs proplist next env
     | Set s -> let new_proplist = (expand_proplist proplist (set_to_ast_list msgs env (Set s))) in
@@ -760,3 +768,34 @@ and set_to_ast_list (msgs:Msgs.t ref) (env:env) (ast:ast) : ast list =
       "    "^(string_of_ast ast')^"\n"^
       "This element has been expanded to\n"^
       "    "^(string_of_ast ast')^"")
+  (* To_int, To_float, Var, Int... all these cannot contain ToRemove because
+     ToRemove can only be generated by exact, atleast, atmost, bigand and bigor.
+     I only need to match the items that can potentially be produced by the 
+     above mentionned. And because "produced" means that everything has already
+     been evaluated, all If, Var... have already disapeared. *)
+  and hastoremove = function
+    | ToRemove -> true
+    | Not x                  -> hastoremove x
+    | And     (x,y)          -> hastoremove x || hastoremove y
+    | Or      (x,y)          -> hastoremove x || hastoremove y
+    | Xor     (x,y)          -> hastoremove x || hastoremove y
+    | Implies (x,y)          -> hastoremove x || hastoremove y
+    | Equiv   (x,y)          -> hastoremove x || hastoremove y
+     (* the following items are just here because of SMT that
+        allows ==, <, >, +, -, *... in formulas. *)
+    | Neg x                  -> hastoremove x
+    | Add (x,y)              -> hastoremove x || hastoremove y
+    | Sub (x,y)              -> hastoremove x || hastoremove y
+    | Mul (x,y)              -> hastoremove x || hastoremove y
+    | Div (x,y)              -> hastoremove x || hastoremove y
+    | Equal            (x,y) -> hastoremove x || hastoremove y
+    | Not_equal        (x,y) -> hastoremove x || hastoremove y
+    | Lesser_than      (x,y) -> hastoremove x || hastoremove y
+    | Lesser_or_equal  (x,y) -> hastoremove x || hastoremove y
+    | Greater_than     (x,y) -> hastoremove x || hastoremove y
+    | Greater_or_equal (x,y) -> hastoremove x || hastoremove y
+    | _ -> false
+  and cleantoremove ast =
+    if ast != ToRemove && hastoremove ast
+    then cleantoremove (eval_ast_formula (ref Msgs.empty) [] ast)
+    else ast

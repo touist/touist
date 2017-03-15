@@ -5,16 +5,18 @@ open Syntax
 
 (** [string_of_ast] takes an abstract syntaxic tree.
     @param ast of type [Syntax.ast] *)
-let rec string_of_ast ?(parenthesis=false) ?(debug=false) ast = match ast with
+let rec string_of_ast ?(show_var=(fun ast -> "")) ?(parenthesis=false) ?(debug=false) ast =
+  let string_of_ast = string_of_ast ~show_var:show_var ~parenthesis:parenthesis ~debug:debug in
+  match ast with
   | Int    x -> string_of_int x
   | Float  x -> string_of_float x
   | Bool   x -> string_of_bool x
-  | Top    -> "top"
-  | Bottom -> "bot"
+  | Top    -> "Top"
+  | Bottom -> "Bot"
   | Prop x | UnexpProp (x, None)-> x
   | UnexpProp (x,Some y) -> x ^ "(" ^ (string_of_ast_list "," y) ^ ")"
-  | Var (x,None)   -> x
-  | Var (x,Some y) -> x ^ "(" ^ (string_of_ast_list "," y) ^ ")"
+  | Var (x,None)   -> x ^ (show_var ast)
+  | Var (x,Some y) -> x ^ "(" ^ (string_of_ast_list "," y) ^ ")" ^ show_var ast
   | Set    x -> string_of_set x
   | Set_decl x -> "[" ^ (string_of_ast_list "," x) ^ "]"
   | Neg x     -> "(- " ^ (string_of_ast x) ^ ")"
@@ -82,13 +84,14 @@ let rec string_of_ast ?(parenthesis=false) ?(debug=false) ast = match ast with
   | Touist_code (f) -> (string_of_ast_list "\n" f)
   | Loc (x,l) -> (if debug then "("^(Msgs.string_of_loc l)^")" else "") ^ string_of_ast x
   | Paren x -> string_of_ast x
+  | ToRemove -> "(nil)"
 
 and string_of_ast_type = function
   | Int    x               -> "int"
   | Float  x               -> "float"
   | Bool      x            -> "bool"
-  | Top                    -> "top"
-  | Bottom                 -> "bot"
+  | Top                    -> "Top"
+  | Bottom                 -> "Bot"
   | UnexpProp (_,_)        -> "unexpanded proposition"
   | Prop x                 -> "proposition"
   | Var (x,None)         -> "variable"
@@ -141,6 +144,7 @@ and string_of_ast_type = function
   | Touist_code (_)      -> "(touist code)"
   | Loc (x,_) -> string_of_ast_type x
   | Paren x -> string_of_ast_type x
+  | ToRemove -> "(nil)"
 
 and string_of_set = function
   | EmptySet  -> "[]"

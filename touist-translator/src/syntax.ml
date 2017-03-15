@@ -98,6 +98,7 @@ and ast = (* Touist_code is the entry point *)
      *)
   | Paren of ast
   (* [Paren] keeps track of the parenthesis in the AST in order to print latex *)
+  | ToRemove
 and set =
   | EmptySet
   | ISet of IntSet.t
