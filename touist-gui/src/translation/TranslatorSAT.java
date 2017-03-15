@@ -150,9 +150,8 @@ public class TranslatorSAT {
 		fromProcessErr.close();
 		fromProcess.close();
 
-		if(return_code != OK) {
-			errors = TranslationError.parse(linesStdErr);
-		}
+		errors = TranslationError.parse(linesStdErr);
+		
 		if(return_code == OK) {
 			parseLiteralsMapFile(currentPath+File.separatorChar+outputTableFilePath);
 		}

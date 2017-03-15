@@ -481,20 +481,19 @@ public class ParentEditionPanel extends AbstractComponentPanel {
         if (getFrame().getSolverSelection().getSelectedSolver() == SolverSelection.SolverType.SAT) {
            
             try {
-                if(! getFrame().getTranslatorSAT().translate(bigAndFilePath)) {
-                    errorMessage = "";
-                    for (TranslationError error : getFrame().getTranslatorSAT().getErrors()) {
-                            errorMessage += error + "\n";
-                    }
-                    setJLabelErrorMessageText(errorMessage);
-                    
-                    this.editor.getParser().linterFromExisting(getFrame().getTranslatorSAT().getErrors());
-                    this.editor.getEditorTextArea().forceReparsing(0);
-                    
-
-                    System.out.println("Traduction error : " + "\n" + errorMessage + "\n");
-                    /*uncomment the following line to have a popup once an error is detected*/
-                    //showErrorMessage(errorMessage, getFrame().getLang().getWord(Lang.ERROR_TRADUCTION));
+            	boolean ok = getFrame().getTranslatorSAT().translate(bigAndFilePath);
+            	errorMessage = "";
+                for (TranslationError error : getFrame().getTranslatorSAT().getErrors()) {
+                        errorMessage += error + "\n";
+                }
+                setJLabelErrorMessageText(errorMessage);
+                
+                this.editor.getParser().linterFromExisting(getFrame().getTranslatorSAT().getErrors());
+                this.editor.getEditorTextArea().forceReparsing(0);
+                if(errorMessage != "") {
+                    System.out.println("touistc returned errors:\n"+ errorMessage + "\n");
+                }   
+                if(!ok) {
                     return State.EDITION;
                 }
                 File f = new File(bigAndFilePath);
@@ -575,17 +574,17 @@ public class ParentEditionPanel extends AbstractComponentPanel {
                         break;
                     default :
                 }
-                
-                if(! getFrame().getTranslatorSMT().translate(bigAndFilePath, logic)) {
-                    errorMessage = "";
-                    for (TranslationError error : getFrame().getTranslatorSMT().getErrors()) {
-                    	errorMessage += error + "\n";
-                    }
-                    setJLabelErrorMessageText(errorMessage);
-
-                    System.out.println("Traduction error : " + "\n" + errorMessage + "\n");
-                    /*uncomment the following line to have a popup once an error is detected*/
-                    //showErrorMessage(errorMessage, getFrame().getLang().getWord(Lang.ERROR_TRADUCTION));
+                boolean ok = getFrame().getTranslatorSMT().translate(bigAndFilePath, logic); 
+                errorMessage = "";
+                for (TranslationError error : getFrame().getTranslatorSMT().getErrors()) {
+                	errorMessage += error + "\n";
+                }
+                setJLabelErrorMessageText(errorMessage);
+                if(errorMessage != "") {
+                    System.out.println("touistc returned errors:\n"+ errorMessage + "\n");
+                }
+                if(!ok) {
+   
                     return State.EDITION;
                 }
                 File f = new File(bigAndFilePath);
