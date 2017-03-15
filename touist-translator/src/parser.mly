@@ -180,7 +180,7 @@ var:
 
 %inline if_statement(T): IF cond=expr THEN v1=T ELSE v2=T END {Loc (If (cond,v1,v2),($startpos,$endpos))}
 
-%inline in_parenthesis(T): LPAREN x=T RPAREN {Paren x}
+%inline in_parenthesis(T): LPAREN x=T RPAREN {Loc (Paren x,($startpos,$endpos))}
 
 %inline num_operations_standard(T):
   | x=T    ADD     y=T  {Loc (Add (x,y),($startpos,$endpos))}
