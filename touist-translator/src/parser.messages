@@ -2103,7 +2103,7 @@ touist_smt: SUB VAR WHEN
 ##
 
 Ill-formed SMT formula. At this point, either begin a new formula
-or continue the existing one with and,or,xor,=>,<=>,+,-,>,<...
+or continue the existing one with an operator (and,or,xor,=>,<=>,!=,==,>,<,+,-,...)
 Instead, the following statement were read:
     $0
 
@@ -2234,7 +2234,7 @@ touist_simple: LET VAR AFFECT VAR WHEN
 
 Ill-formed local variable block. At this point, either
 finish the expression by starting a new one or continue it
-with a operator (==,!=,<,>,and,or...).
+with a operator (and,or,xor,=>,<=>,!=,==,>,<,+,-,...).
 Instead, the following statement were read:
     $0
 
