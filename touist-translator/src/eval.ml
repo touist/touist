@@ -183,7 +183,7 @@ and eval_touist_code msgs (env:env) ast : ast =
    the boolean values must be computed: eval_ast will do exactly that.*)
 and eval_ast (msgs:Msgs.t ref) (env:env) (ast:ast) : ast =
   let eval_ast = eval_ast msgs env in
-  let expanded = match ast_whithout_loc ast with
+  match ast_whithout_loc ast with
   | Int x   -> Int x
   | Float x -> Float x
   | Bool x  -> Bool x
@@ -366,7 +366,6 @@ and eval_ast (msgs:Msgs.t ref) (env:env) (ast:ast) : ast =
   | Loc (x,l) -> eval_ast x
   | Paren x -> eval_ast x
   | e -> raise_with_loc msgs ast ("this expression cannot be expanded: " ^ string_of_ast e)
-  in expanded
 
 and eval_set_decl (msgs:Msgs.t ref) (env:env) (set_decl:ast) =
   let sets = (match ast_whithout_loc set_decl with Set_decl sets -> sets | _ -> failwith "shoulnt happen: non-Set_decl in eval_set_decl") in
@@ -405,8 +404,8 @@ and eval_set_decl (msgs:Msgs.t ref) (env:env) (set_decl:ast) =
 and eval_ast_formula (msgs:Msgs.t ref) (env:env) (ast:ast) : ast =
   let eval_ast_formula = eval_ast_formula msgs env
   and eval_ast_formula_env = eval_ast_formula msgs
-  and eval_ast = eval_ast msgs env
-  let expanded = match ast_whithout_loc ast with
+  and eval_ast = eval_ast msgs env in
+  match ast_whithout_loc ast with
   | Int x   -> Int x
   | Float x -> Float x
   | Neg x ->
@@ -655,7 +654,6 @@ and eval_ast_formula (msgs:Msgs.t ref) (env:env) (ast:ast) : ast =
   | Paren x -> eval_ast_formula x
   | ToRemove -> ToRemove
   | e -> raise_with_loc msgs ast ("this expression is not a formula: " ^ string_of_ast e)
-  in expanded
 
 and exact_str lst =
   let rec go = function
