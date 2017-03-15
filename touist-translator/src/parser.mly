@@ -56,8 +56,8 @@
  *   The precedence rule has no direction; this often
  *   applies for unary oparators *)
 
+%nonassoc affect_before_exprsmt
 %nonassoc low_precedence (* Lesser priority on precedence *)
-
 %right EQUIV IMPLIES
 %left OR
 %left AND
@@ -125,13 +125,10 @@
 *)
 
 (* The two entry points of our parser *)
-%start <Syntax.ast> touist_simple, touist_smt, set_decl
+%start <Syntax.ast> touist_simple, touist_smt
 
 %% (* Everthing below that mark is expected to be a production rule *)
    (* Note that VAR { $0 } is equivalent to v=VAR { v } *)
-
-set_decl:
-  | s=set_decl_explicit(expr) | s=set_decl_range(expr) | s=set_empty {s}
 
 comma_list(T):
   | x=T { x::[] }
@@ -140,8 +137,8 @@ comma_list(T):
 (* A touistl code is a blank-separated list of either formulas or 
    global variable affectations. Global affectations can only occur
    in this 'top' list ('top' because it is at the top of the ast tree). *)
-%inline affect_or(T):
-  | a=global_affect {a}
+affect_or(T):
+  | a=global_affect {a}  %prec affect_before_exprsmt
   | f=T option(DATA) {f} (* DATA is now useless but stays for compatibilty *)
 
 (* [touist_simple] is the entry point of the parser in sat mode *)
@@ -282,6 +279,7 @@ expr_smt:
   | x=order(expr_smt)
   | x=num_operations_standard(expr_smt)
   | x=equality(expr_smt) {x}
+  | x=in_parenthesis(expr_smt) {x}
 
 %inline generalized_connectors(F):
   | BIGAND v=comma_list(var) IN s=comma_list(expr) c=when_cond? COLON f=F END 
