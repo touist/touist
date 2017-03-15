@@ -408,55 +408,6 @@ and eval_ast_formula (msgs:Msgs.t ref) (env:env) (ast:ast) : ast =
   match ast_whithout_loc ast with
   | Int x   -> Int x
   | Float x -> Float x
-  | Neg x ->
-    begin
-      match eval_ast_formula x with
-      | Int   x' -> Int   (- x')
-      | Float x' -> Float (-. x')
-      | x' -> Neg x'
-      (*| _ -> raise (Error (string_of_ast ast))*)
-    end
-  | Add (x,y) ->
-    begin
-      match eval_ast_formula x, eval_ast_formula y with
-      | Int x', Int y'     -> Int   (x' +  y')
-      | Float x', Float y' -> Float (x' +. y')
-      | Int _, Prop _
-      | Prop _, Int _ -> Add (x,y)
-      | x', y' -> Add (x', y')
-      (*| _,_ -> raise (Error (string_of_ast ast))*)
-    end
-  | Sub (x,y) ->
-    begin
-      match eval_ast_formula x, eval_ast_formula y with
-      | Int x', Int y'     -> Int   (x' -  y')
-      | Float x', Float y' -> Float (x' -. y')
-      (*| Prop x', Prop x' -> Sub (Prop x', Prop x')*)
-      | x', y' -> Sub (x', y')
-      (*| _,_ -> raise (Error (string_of_ast ast))*)
-    end
-  | Mul (x,y) ->
-    begin
-      match eval_ast_formula x, eval_ast_formula y with
-      | Int x', Int y'     -> Int   (x' *  y')
-      | Float x', Float y' -> Float (x' *. y')
-      | x', y' -> Mul (x', y')
-      (*| _,_ -> raise (Error (string_of_ast ast))*)
-    end
-  | Div (x,y) ->
-    begin
-      match eval_ast_formula x, eval_ast_formula y with
-      | Int x', Int y'     -> Int   (x' /  y')
-      | Float x', Float y' -> Float (x' /. y')
-      | x', y' -> Div (x', y')
-      (*| _,_ -> raise (Error (string_of_ast ast))*)
-    end
-  | Equal            (x,y) -> Equal            (eval_ast_formula x, eval_ast_formula y)
-  | Not_equal        (x,y) -> Not_equal        (eval_ast_formula x, eval_ast_formula y)
-  | Lesser_than      (x,y) -> Lesser_than      (eval_ast_formula x, eval_ast_formula y)
-  | Lesser_or_equal  (x,y) -> Lesser_or_equal  (eval_ast_formula x, eval_ast_formula y)
-  | Greater_than     (x,y) -> Greater_than     (eval_ast_formula x, eval_ast_formula y)
-  | Greater_or_equal (x,y) -> Greater_or_equal (eval_ast_formula x, eval_ast_formula y)
   | Top    -> Top
   | Bottom -> Bottom
   | UnexpProp (p,i) -> Prop (expand_var_name msgs env (p,i))
@@ -653,7 +604,62 @@ and eval_ast_formula (msgs:Msgs.t ref) (env:env) (ast:ast) : ast =
     in eval_ast_formula_env ((name,desc)::env) formula
   | Paren x -> eval_ast_formula x
   | ToRemove -> ToRemove
-  | e -> raise_with_loc msgs ast ("this expression is not a formula: " ^ string_of_ast e)
+  | e when !smt -> eval_ast_formula_smt msgs env ast
+  | e -> raise_with_loc msgs ast ("this expression is not a standard formula: " ^ string_of_ast e)
+
+and eval_ast_formula_smt msgs env ast =
+  let eval_ast_formula = eval_ast_formula msgs env in
+  match ast_whithout_loc ast with
+  | Neg x ->
+    begin
+      match eval_ast_formula x with
+      | Int   x' -> Int   (- x')
+      | Float x' -> Float (-. x')
+      | x' -> Neg x'
+      (*| _ -> raise (Error (string_of_ast ast))*)
+    end
+  | Add (x,y) ->
+    begin
+      match eval_ast_formula x, eval_ast_formula y with
+      | Int x', Int y'     -> Int   (x' +  y')
+      | Float x', Float y' -> Float (x' +. y')
+      | Int _, Prop _
+      | Prop _, Int _ -> Add (x,y)
+      | x', y' -> Add (x', y')
+      (*| _,_ -> raise (Error (string_of_ast ast))*)
+    end
+  | Sub (x,y) ->
+    begin
+      match eval_ast_formula x, eval_ast_formula y with
+      | Int x', Int y'     -> Int   (x' -  y')
+      | Float x', Float y' -> Float (x' -. y')
+      (*| Prop x', Prop x' -> Sub (Prop x', Prop x')*)
+      | x', y' -> Sub (x', y')
+      (*| _,_ -> raise (Error (string_of_ast ast))*)
+    end
+  | Mul (x,y) ->
+    begin
+      match eval_ast_formula x, eval_ast_formula y with
+      | Int x', Int y'     -> Int   (x' *  y')
+      | Float x', Float y' -> Float (x' *. y')
+      | x', y' -> Mul (x', y')
+      (*| _,_ -> raise (Error (string_of_ast ast))*)
+    end
+  | Div (x,y) ->
+    begin
+      match eval_ast_formula x, eval_ast_formula y with
+      | Int x', Int y'     -> Int   (x' /  y')
+      | Float x', Float y' -> Float (x' /. y')
+      | x', y' -> Div (x', y')
+      (*| _,_ -> raise (Error (string_of_ast ast))*)
+    end
+  | Equal            (x,y) -> Equal            (eval_ast_formula x, eval_ast_formula y)
+  | Not_equal        (x,y) -> Not_equal        (eval_ast_formula x, eval_ast_formula y)
+  | Lesser_than      (x,y) -> Lesser_than      (eval_ast_formula x, eval_ast_formula y)
+  | Lesser_or_equal  (x,y) -> Lesser_or_equal  (eval_ast_formula x, eval_ast_formula y)
+  | Greater_than     (x,y) -> Greater_than     (eval_ast_formula x, eval_ast_formula y)
+  | Greater_or_equal (x,y) -> Greater_or_equal (eval_ast_formula x, eval_ast_formula y)
+  | e -> raise_with_loc msgs ast ("this expression is not a SMT formula: " ^ string_of_ast ~debug:true e)
 
 and exact_str lst =
   let rec go = function
