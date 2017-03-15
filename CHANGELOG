@@ -1,3 +1,12 @@
+v2.4.0
+  - touistc:
+    - sets can now contain sets: [[a,b],[c,d]] is now correct
+    - added the function 'powerset([a,b])' which computes a set of all
+      subsets (including empty set) of [a,b].
+    - added option --show that shows the formula after it has been
+      evaluated (no more variables or bigands, only propositions, 'and',
+      'or', '=>'...). Handy for debugging how your touistl has been
+      translated.
 v2.3.0
   - touistc:
     - it is now possible to generate sets using the following syntax:
