@@ -163,8 +163,21 @@ run_test_tt_main (
   "empty cases">:::[
   "single bigand + empty set = error 'nothing produced'">::(test_sat_raise ~typ:Msgs.Error "1:1" "bigand $i in []: p($i) end");
   "single bigand + 'when' always false = error 'nothing produced'">::(test_sat_raise ~typ:Msgs.Error "1:1" "bigand $i in [1] when false: p($i) end");
-  "single bigand + 'when' always false = error 'nothing produced'">::(test_sat_raise ~typ:Msgs.Error "1:1" "bigand $i in [1] when false: p($i) end");
-  "bigand with a 'when' always false in a formula should only produce the formula">::(test_sat_raise ~typ:Msgs.Error "1:1" "bigand $i in [1] when false: p($i) end");
+  "empty bigand inside 'and' or 'or' formula = only the other formula stays">:::[
+    "">::(sat_expands_to "T and bigand $i in [1] when false: p($i) end" "T");
+    "">::(sat_expands_to "bigand $i in [1] when false: p($i) end and T" "T");
+    "">::(sat_expands_to "T or bigand $i in [1] when false: p($i) end" "T");
+    "">::(sat_expands_to "bigand $i in [1] when false: p($i) end or T" "T");
+  ];
+  "empty bigand inside => or <=> formula should make the <=> and => removed">:::[
+    "">::(sat_expands_to "T and (A => bigand $i in [1] when false: p($i) end)" "T");
+    "">::(sat_expands_to "T and (A <=> bigand $i in [1] when false: p($i) end)" "T");
+    "">::(sat_expands_to "T and (bigand $i in [1] when false: p($i) end => A)" "T");
+    "">::(sat_expands_to "T and (bigand $i in [1] when false: p($i) end <=> A)" "T");
+  ];
+  "empty bigand inside 'xor' should make the 'xor' removed">:::[
+    "">::(sat_expands_to "T and (A xor bigand $i in [1] when false: p($i) end)" "T");
+  ];
   "bigand and >">::    (test_sat "bigand $i in [1..5] when $i > 2: p($i) end");
   "let declaration">:: (test_sat "let $i = 3: p($i-$i*3-1 mod 2 / 1)");
   "bigand">::          (test_sat "bigand $i in [a]: p($i) end");
@@ -189,34 +202,26 @@ run_test_tt_main (
 ];
 
 "test of the p([a,b,c]) construct">:::[ (* 'c' is the testing context *)
-(* We can generate a set with p([a,b]). Check that p(a) does generate a set. *)
-"p([a,b]) in a formula should stay p([a,b])">::(sat_expands_to "p([a,b])" "p([a,b])");
-"p([a,b]) in an expr should expand to [p(a),p(b)]">::(sat_expands_to "t(p([a,b]))" "t([p(a),p(b)])");
-"p(a) in an expr shouldn't expand to a set">::(sat_expands_to "t(p(a))" "t(p(a))");
-"p([]) in an expr should return p">::(sat_expands_to "t(p([]))" "t(p)");
-"p([],a) in an expr should return p(a)">::(sat_expands_to "t(p([],a))" "t(p(a))");
-"p(a,[]) in an expr should return p(a)">::(sat_expands_to "t(p(a,[]))" "t(p(a))");
-"p(1,[a]) in an expr should return [p(1,a)]">::(sat_expands_to "t(p(1,[a]))" "t([p(1,a)])");
-"the p([a,b,c]) syntax">:: (fun ctx ->
-      OUnit2.skip_if (Sys.os_type = "Win32") "won't work on windows (unix-only??)";
-      OUnit2.assert_command ~use_stderr:false ~ctxt:ctx
-      ~foutput:(check_solution "test/sat/unittest_setgen_solution.txt")
-      "./touistc.native" ["--solve";"-sat";"test/sat/unittest_setgen.touistl"]);
-
+  "p([a,b]) in a formula should stay p([a,b])">::(sat_expands_to "p([a,b])" "p([a,b])");
+  "p([a,b]) in an expr should expand to [p(a),p(b)]">::(sat_expands_to "t(p([a,b]))" "t([p(a),p(b)])");
+  "p(a) in an expr shouldn't expand to a set">::(sat_expands_to "t(p(a))" "t(p(a))");
+  "p([]) in an expr should return p">::(sat_expands_to "t(p([]))" "t(p)");
+  "p([],a) in an expr should return p(a)">::(sat_expands_to "t(p([],a))" "t(p(a))");
+  "p(a,[]) in an expr should return p(a)">::(sat_expands_to "t(p(a,[]))" "t(p(a))");
+  "p(1,[a]) in an expr should return [p(1,a)]">::(sat_expands_to "t(p(1,[a]))" "t([p(1,a)])");
+  "the p([a,b,c]) syntax">:: (fun ctx ->
+        OUnit2.skip_if (Sys.os_type = "Win32") "won't work on windows (unix-only??)";
+        OUnit2.assert_command ~use_stderr:false ~ctxt:ctx
+        ~foutput:(check_solution "test/sat/unittest_setgen_solution.txt")
+        "./touistc.native" ["--solve";"-sat";"test/sat/unittest_setgen.touistl"]);
 ];
 
 "samples of code that should be correct with -smt2">:::[ (* 'c' is the testing context *)
-  "lower than">::      (test_smt "let $i=1.0: if $i < 3.0 then a else b end");
-  "bigand and >">::    (test_smt "bigand $i in [1..5] when $i > 2: p($i) end");
-  "let declaration">:: (test_smt "let $i = 3: p($i-$i*3-1 mod 2 / 1)");
-  "bigand">::          (test_smt "bigand $i in [a]: p($i) end");
-  "bigor">::           (test_smt "bigor $i in [a,b,c] when $i==a and $i!=d: $i(a) end");
-  "affect before">::   (test_smt "$a = a f($a)");
-  "affect after">::    (test_smt "f($a) $a = a");
-  "affect between">::  (test_smt "$a = a f($a,$b) $b = b");
-  
-  "affect between">::  (test_smt "a");
-  "affect between">::  (test_smt "a > 3");
+  "">::(test_smt "a > 1"); 
+  "">::(test_smt "a < 1");
+  "">::(test_smt "a == 3");
+  "">::(test_smt "a != 3");
+  "for now, one of the two terms must be a float or int">::(test_smt "(a+1) > 3");
   "takuzu4x4.touistl">:: (test_smt (Parse.string_of_file "test/smt/takuzu4x4.touistl"))
 ];
 "real-size tests">:::[
