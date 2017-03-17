@@ -602,7 +602,11 @@ and eval_ast_formula (msgs:Msgs.t ref) (env:env) (ast:ast) : ast =
         if (List.length list_ast_set) == 0 then
           warning msgs set ("using 'bigand' on an empty set is not recommanded\n"^
             "as it returns a 'Top' formula which can give unexpected results");
-          process_list_set env list_ast_set
+        let evaluated_ast = process_list_set env list_ast_set in
+        if evaluated_ast == Top then
+          warning msgs when_cond ("the 'when' condition of 'bigand' is never true. This should\n"^
+            "be avoided as it returns a 'Top' formula which can give unexpected results");
+        evaluated_ast
       | x::xs,y::ys ->
         eval_ast_formula (Bigand ([x],[y],None,(Bigand (xs,ys,when_optional,body))))
     end
@@ -627,7 +631,11 @@ and eval_ast_formula (msgs:Msgs.t ref) (env:env) (ast:ast) : ast =
           if (List.length list_ast_set) == 0 then
             warning msgs set ("using 'bigor' on an empty set is not recommanded\n"^
               "as it returns a 'Bot' formula which can give unexpected results.");
-            process_list_set env list_ast_set
+          let evaluated_ast = process_list_set env list_ast_set in
+          if evaluated_ast == Bottom then
+            warning msgs when_cond ("the 'when' condition of 'bigor' is never true. This should\n"^
+              "be avoided as it returns a 'Bot' formula which can give unexpected results");
+            evaluated_ast
       | x::xs,y::ys ->
         eval_ast_formula (Bigor ([x],[y],None,(Bigor (xs,ys,when_optional,body))))
     end
