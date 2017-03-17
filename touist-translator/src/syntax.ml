@@ -11,7 +11,7 @@
  * version 2.1 which accompanies this distribution, and is available at
  * http://www.gnu.org/licenses/lgpl-2.1.html *)
 
-open Msg
+open Msgs
 
 module IntSet = Set_ext.Make(
   struct
@@ -86,7 +86,7 @@ and ast = (* Touist_code is the entry point *)
          abcd(1,foo,123,a)     <- an actual string that represents an actual
                                   logical proposition
   *)
-  | Loc              of ast * Msg.loc  
+  | Loc              of ast * loc
   (* Loc is a clever way of keeping the locations in the text of the ast elements.
      In parser.mly, each production rule gives its location in the original text;
      for example, instead of simply returning

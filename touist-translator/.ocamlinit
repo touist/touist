@@ -12,7 +12,7 @@
 
 (* The order of the loads is important *)
 #load "set_ext.cmo";;
-#load "msg.cmo";;
+#load "msgs.cmo";;
 #load "syntax.cmo";;
 #load "pprint.cmo";;
 #load "parser_messages.cmo";;

@@ -17,7 +17,7 @@
 open Parser
 open Syntax
 open Lexing
-open Msg
+open Msgs
 
 (** [lexer] is used [parse] in order to get the next token of the input
     stream. It is an intermediate to the [Lexer.token] function (in lexer.mll);
@@ -58,8 +58,8 @@ let lexer buffer : (Lexing.lexbuf -> Parser.token) =
     "foo.touistl"... For now, the name of the input file name is not
     indicated to the user: useless because we only handle a single touistl file 
 *)
-let parse (parser) ?debug:(debug=false) (text:string) : Syntax.ast =
-  Msg.clear_messages;
+let parse (parser) ?debug:(debug=false) (text:string) : Syntax.ast * Msgs.t ref =
+  let msgs = ref Msgs.empty in
   let buffer = ref Parser_error_report.Zero in
   let lexbuf = Lexing.from_string text in
   lexbuf.lex_curr_p <- {lexbuf.lex_curr_p with pos_fname = "foo.touistl"; pos_lnum = 1};
@@ -69,9 +69,12 @@ let parse (parser) ?debug:(debug=false) (text:string) : Syntax.ast =
   and fail checkpoint =
     let msg = (Parser_error_report.report text !buffer checkpoint debug)
     and loc = Parser_error_report.area_pos !buffer (* area_pos returns (start_pos,end_pos) *)
-    in add_fatal (Error,Parse,msg,loc)
+    in add_fatal msgs (Error,Parse,msg,loc)
   in
-    Parser.MenhirInterpreter.loop_handle succeed fail supplier checkpoint
+    let ast =
+      try Parser.MenhirInterpreter.loop_handle succeed fail supplier checkpoint
+      with Lexer.Error (msg,loc) -> Msgs.add_fatal msgs (Error,Lex,msg,loc)
+    in ast,msgs
 
 (** Directly calls [parser] with [Parser.Incremental.touist_simple] *)
 let parse_sat ?debug:(d=false) text = parse Parser.Incremental.touist_simple ~debug:d text

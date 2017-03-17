@@ -37,10 +37,12 @@ let show = ref false
    In our case, an argument not preceeded by a flag is the touistl input file. *)
 let process_arg_alone (file_path:string) : unit = input_file_path := file_path
 
+let exit_with (exit_code:error) = exit (get_code exit_code)
+
 (* In case we have had non-fatal messages (= warnings) during any of the touistc commands,
    display them before exiting. *)
-let show_msgs_and_exit (exit_code:error) = 
-  Msg.print_msgs ~color:(Unix.isatty Unix.stderr) ~detailed:!detailed_position ();
+let show_msgs_and_exit msgs (exit_code:error) = 
+  Msgs.print_msgs ~color:(Unix.isatty Unix.stderr) ~detailed:!detailed_position msgs;
   exit (get_code exit_code)
 
 (* The main program *)
@@ -94,7 +96,7 @@ let () =
    * It doesn't mean "not version_asked" *)
   if !version_asked then (
     print_endline (Version.version);
-    show_msgs_and_exit OK
+    exit_with OK
   );
 
   (* Step 2: we see if we got every parameter we need *)
@@ -103,7 +105,7 @@ let () =
   if (!input_file_path = "") && not !use_stdin (* NOTE: !var is like *var in C *)
   then (
     Printf.fprintf stderr "%s: you must give an input file (try --help)" cmd;
-    show_msgs_and_exit ERROR
+    exit_with ERROR
   );
   if !use_stdin then (input := stdin) else (input := open_in !input_file_path);
 
@@ -119,71 +121,66 @@ let () =
   (* Check that either -smt2 or -sat have been selected *)
   if (!sat_mode && (!smt_logic <> "")) then begin
     Printf.fprintf stderr "%s: cannot use both SAT and SMT solvers (try --help)\n" cmd;
-    show_msgs_and_exit ERROR end;
+    exit_with ERROR end;
   if (not !sat_mode) && (!smt_logic = "") then begin
     Printf.fprintf stderr "%s: you must choose a solver to use: -sat or -smt2 (try --help)" cmd;
-    show_msgs_and_exit ERROR end;
+    exit_with ERROR end;
 
   (* SMT Mode: check if one of the available QF_? has been given after -smt2 *)
   if (not !sat_mode) && (not (List.exists (fun x->x=(String.uppercase !smt_logic)) smt_logic_avail)) then
-    (Printf.fprintf stderr 
+    (Printf.fprintf stderr
     "%s: you must specify the logic used (-smt2 logic_name) (try --help)\nExample: -smt2 QF_IDL" cmd;
-    show_msgs_and_exit ERROR);
+    exit_with ERROR);
 
   try
-  
+
   (* latex = parse and transform with latex_of_ast *)
   if !latex then
-    (let latex_str =
+    (let ast,msgs =
       if !sat_mode
-      then Parse.parse_sat (string_of_chan !input) |> Latex.latex_of_ast
-      else Parse.parse_smt (string_of_chan !input) |> Latex.latex_of_ast
-    in (Printf.fprintf !output "%s\n" latex_str; show_msgs_and_exit OK));
+      then Parse.parse_sat (string_of_chan !input)
+      else Parse.parse_smt (string_of_chan !input)
+    in (Printf.fprintf !output "%s\n" (Latex.latex_of_ast ast); show_msgs_and_exit !msgs OK));
   
   (* linter = only show syntax and semantic errors *)
   if !linter then
     if (!sat_mode) then
-      (let _ = Parse.parse_sat ~debug:!debug_syntax (string_of_chan !input) 
-        |> Eval.eval ~smt:(not !sat_mode) ~onlychecktypes:true in show_msgs_and_exit OK)
+      (let _,msgs = Parse.parse_sat ~debug:!debug_syntax (string_of_chan !input) 
+        |> Eval.eval ~smt:(not !sat_mode) ~onlychecktypes:true in show_msgs_and_exit !msgs OK)
     else
-      (let _ = Parse.parse_smt ~debug:!debug_syntax (string_of_chan !input) 
-        |> Eval.eval ~smt:(not !sat_mode) ~onlychecktypes:true in show_msgs_and_exit OK);
+      (let _,msgs = Parse.parse_smt ~debug:!debug_syntax (string_of_chan !input) 
+        |> Eval.eval ~smt:(not !sat_mode) ~onlychecktypes:true in show_msgs_and_exit !msgs OK);
   if !show then
     if (!sat_mode) then
-      (let ast = Parse.parse_sat ~debug:!debug_syntax (string_of_chan !input) 
+      (let ast,msgs = Parse.parse_sat ~debug:!debug_syntax (string_of_chan !input) 
         |> Eval.eval ~smt:(not !sat_mode) in
         if !show then Printf.fprintf !output "%s\n" (Pprint.string_of_ast ast); 
-        show_msgs_and_exit OK)
+        show_msgs_and_exit !msgs OK)
     else
-      (let ast = Parse.parse_smt ~debug:!debug_syntax (string_of_chan !input) 
+      (let ast,msgs = Parse.parse_smt ~debug:!debug_syntax (string_of_chan !input) 
         |> Eval.eval ~smt:(not !sat_mode) in
         if !show then Printf.fprintf !output "%s\n" (Pprint.string_of_ast ast);
-        show_msgs_and_exit OK);
+        show_msgs_and_exit !msgs OK);
 
   (* Step 3: translation *)
   if (!sat_mode) then
     (* A. solve has been asked *)
     if !solve_sat then
       if !equiv_file_path <> "" then begin
-        let models = Parse.parse_sat ~debug:!debug_syntax (string_of_chan !input) 
-                      |> Eval.eval
-                      |> Cnf.ast_to_cnf ~debug:!debug_cnf
-                      |> Sat.cnf_to_clauses 
-                      |> Sat.solve_clauses
-        and models2 = Parse.parse_sat ~debug:!debug_syntax (string_of_chan !input_equiv)
-                      |> Eval.eval 
-                      |> Cnf.ast_to_cnf ~debug:!debug_cnf
-                      |> Sat.cnf_to_clauses 
-                      |> Sat.solve_clauses
+        let solve input = 
+          let ast,msgs = Parse.parse_sat ~debug:!debug_syntax (string_of_chan input) |> Eval.eval
+          in let models = Cnf.ast_to_cnf ~debug:!debug_cnf ast |> Sat.cnf_to_clauses |> Sat.solve_clauses
+          in models,msgs
+        in
+        let models,msgs = solve !input
+        and models2,msgs2 = solve !input_equiv
         in match Sat.ModelSet.equal !models !models2 with
-        | true -> Printf.fprintf !output "Equivalent\n"; show_msgs_and_exit OK
-        | false -> Printf.fprintf !output "Not equivalent\n"; show_msgs_and_exit ERROR
+        | true -> Printf.fprintf !output "Equivalent\n"; show_msgs_and_exit !msgs OK
+        | false -> Printf.fprintf !output "Not equivalent\n"; show_msgs_and_exit !msgs ERROR
       end
       else
-        let clauses,table = Parse.parse_sat ~debug:!debug_syntax (string_of_chan !input)
-                            |> Eval.eval 
-                            |> Cnf.ast_to_cnf ~debug:!debug_cnf
-                            |> Sat.cnf_to_clauses
+        let ast,msgs = Parse.parse_sat ~debug:!debug_syntax (string_of_chan !input) |> Eval.eval in
+        let clauses,table = Cnf.ast_to_cnf ~debug:!debug_cnf ast |> Sat.cnf_to_clauses
         in
         let models =
           (if !only_count then Sat.solve_clauses (clauses,table)
@@ -192,16 +189,14 @@ let () =
               in Sat.solve_clauses ~limit:!limit ~print:print_model (clauses,table))
         in
         match Sat.ModelSet.cardinal !models with
-        | i when !only_count -> Printf.fprintf !output "%d\n" i; show_msgs_and_exit OK
-        | 0 -> Printf.fprintf stderr "Unsat\n"; show_msgs_and_exit ERROR
+        | i when !only_count -> Printf.fprintf !output "%d\n" i; show_msgs_and_exit !msgs OK
+        | 0 -> Printf.fprintf stderr "Unsat\n"; show_msgs_and_exit !msgs ERROR
         | i -> (* case where we already printed models in [solve_clause] *)
-          Printf.fprintf !output "==== Found %d models, limit is %d (--limit N for more models)\n" i !limit; show_msgs_and_exit OK
+          Printf.fprintf !output "==== Found %d models, limit is %d (--limit N for more models)\n" i !limit; show_msgs_and_exit !msgs OK
     else
       (* B. solve not asked: print the Sat file *)
-      let clauses,tbl = Parse.parse_sat ~debug:!debug_syntax (string_of_chan !input) 
-                        |> Eval.eval
-                        |> Cnf.ast_to_cnf ~debug:!debug_cnf
-                        |> Sat.cnf_to_clauses
+      let ast,msgs = Parse.parse_sat ~debug:!debug_syntax (string_of_chan !input) |> Eval.eval in
+      let clauses,tbl = Cnf.ast_to_cnf ~debug:!debug_cnf ast |> Sat.cnf_to_clauses
       in
       (* tbl contains the literal-to-name correspondance table. 
          The number of literals is (Hashtbl.length tbl) *)
@@ -213,17 +208,18 @@ let () =
               c 98 p(1,2,3)     -> c means 'comment' in any Sat file   *)
 
   else if (!smt_logic <> "") then begin
-    let ast = Parse.parse_smt ~debug:!debug_syntax (string_of_chan !input)
+    let ast,msgs = Parse.parse_smt ~debug:!debug_syntax (string_of_chan !input)
         |> Eval.eval ~smt:(!smt_logic <> "") in
     let smt = Smt.to_smt2 (String.uppercase !smt_logic) ast in
     Buffer.output_buffer !output smt;
+    show_msgs_and_exit !msgs OK
   end;
 
   close_out !output;
   close_out !output_table;
   close_in !input;
   
-  show_msgs_and_exit OK
+  exit_with OK
 
   with
-    | Msg.Fatal _ -> (show_msgs_and_exit ERROR)
+    | Msgs.Fatal msgs -> (show_msgs_and_exit msgs ERROR)
