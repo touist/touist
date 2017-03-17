@@ -5,7 +5,7 @@ open Syntax
 
 (** [string_of_ast] takes an abstract syntaxic tree.
     @param ast of type [Syntax.ast] *)
-let rec string_of_ast ?(show_var=(fun ast -> "")) ?(parenthesis=false) ?(debug=false) ast =
+let rec string_of_ast ?(show_var=(fun ast -> "")) ?(debug=false) ?(parenthesis=debug) ast =
   let string_of_ast = string_of_ast ~show_var:show_var ~parenthesis:parenthesis ~debug:debug in
   match ast with
   | Int    x -> string_of_int x
