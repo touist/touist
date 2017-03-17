@@ -588,22 +588,24 @@ and eval_ast_formula (msgs:Msgs.t ref) (env:env) (ast:ast) : ast =
       match vars,sets with
       | [],[] | _,[] | [],_ -> failwith "shouln't happen: non-variable in big construct"
       | [Loc (Var (name,_),loc)],[set] -> (* we don't need the indices because bigand's vars are 'simple' *)
-        let rec process_list_set env (set_list:ast list) =
+        (* If [when_cond] has never been satisfied, [process_list_set] will return
+             (_,false). In the opposite case, it will return (ast,true). *)
+        let rec process_list_set env (set_list:ast list) : ast * bool =
           match set_list with
-          | []   -> Top (*  what if bigand in a or? We give a warning (see below) *)
+          | []   -> Top,false (*  what if bigand in a or? We give a warning (see below) *)
           | x::xs ->
             let env = (name,(x,loc))::env in
             match ast_to_bool msgs env when_cond with
-            | true when xs != [] -> And (eval_ast_formula_env env body, process_list_set env xs)
-            | true  -> eval_ast_formula_env env body
+            | true when xs != [] -> let next,b = process_list_set env xs in And (eval_ast_formula_env env body, next),true
+            | true  -> eval_ast_formula_env env body,true
             | false -> process_list_set env xs
         in
         let list_ast_set = set_to_ast_list msgs env set in
         if (List.length list_ast_set) == 0 then
           warning msgs set ("using 'bigand' on an empty set is not recommanded\n"^
             "as it returns a 'Top' formula which can give unexpected results");
-        let evaluated_ast = process_list_set env list_ast_set in
-        if evaluated_ast == Top then
+        let evaluated_ast,when_satisfied = process_list_set env list_ast_set in
+        if not when_satisfied then
           warning msgs when_cond ("the 'when' condition of 'bigand' is never true. This should\n"^
             "be avoided as it returns a 'Top' formula which can give unexpected results");
         evaluated_ast
