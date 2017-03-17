@@ -1,5 +1,5 @@
 # OASIS_START
-# DO NOT EDIT (digest: f0bf5520719289d21e0c6884cf687c76)
+# DO NOT EDIT (digest: df744b99361d5df789cea6078c03ad4a)
 Parse
 Eval
 Cnf
@@ -7,7 +7,7 @@ Sat
 Smt
 Pprint
 Latex
-Msg
+Msgs
 Lexer
 Parser
 Syntax

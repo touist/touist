@@ -125,10 +125,13 @@
 *)
 
 (* The two entry points of our parser *)
-%start <Syntax.ast> touist_simple, touist_smt
+%start <Syntax.ast> touist_simple, touist_smt, set_decl
 
 %% (* Everthing below that mark is expected to be a production rule *)
    (* Note that VAR { $0 } is equivalent to v=VAR { v } *)
+
+set_decl:
+  | s=set_decl_explicit(expr) | s=set_decl_range(expr) | s=set_empty {s}
 
 comma_list(T):
   | x=T { x::[] }
