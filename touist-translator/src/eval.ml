@@ -572,16 +572,10 @@ and eval_ast_formula (msgs:Msgs.t ref) (env:env) (ast:ast) : ast =
       | Int x, Set (SSet s) -> if !check_only then Prop "dummy" else atmost_str (PropSet.atmost x s)
       | x',y' -> raise_type_error2 msgs ast x x' y y' "'int' (left-hand)\nand a 'prop-set' (right-hand)"
     end
-  (* What is returned by bigand or bigor when they do not
-     generate anything? A direct solution would have been to
-     return the 'neutral' element of the containing type, e.g.,
-         ... and (bigand $i in []: p($i) end)
-     would have to transform into
-         ... and Top
-     And we would have to know in what is the 'bigor/bigand'.
-     Maybe we could bypass this problem: return Nothing when
-     the bigand is empty; during the evaluation, Nothing will
-     act like '... and Top' or '... or Bot'. *)
+  (* We consider 'bigand' as the universal quantification; it could be translated as
+         for all elements i of E, p(i) is true
+     As such, whenever 'bigand' returns nothing (when condition always false or empty
+     sets), we return Top. This means that an empty bigand satisfies all the p($i) *)
   | Bigand (vars,sets,when_optional,body) ->
     let when_cond = match when_optional with Some x -> x | None -> Bool true in
     begin check_nb_vars_same_as_nb_sets msgs ast vars sets;
@@ -590,28 +584,27 @@ and eval_ast_formula (msgs:Msgs.t ref) (env:env) (ast:ast) : ast =
       | [Loc (Var (name,_),loc)],[set] -> (* we don't need the indices because bigand's vars are 'simple' *)
         (* If [when_cond] has never been satisfied, [process_list_set] will return
              (_,false). In the opposite case, it will return (ast,true). *)
-        let rec process_list_set env (set_list:ast list) : ast * bool =
+        let rec process_list_set env (set_list:ast list) =
           match set_list with
-          | []   -> Top,false (*  what if bigand in a or? We give a warning (see below) *)
+          | []   -> Top (*  what if bigand in a or? We give a warning (see below) *)
           | x::xs ->
             let env = (name,(x,loc))::env in
             match ast_to_bool msgs env when_cond with
-            | true when xs != [] -> let next,b = process_list_set env xs in And (eval_ast_formula_env env body, next),true
-            | true  -> eval_ast_formula_env env body,true
+            | true when xs != [] -> And (eval_ast_formula_env env body, process_list_set env xs)
+            | true  -> eval_ast_formula_env env body
             | false -> process_list_set env xs
         in
         let list_ast_set = set_to_ast_list msgs env set in
-        if (List.length list_ast_set) == 0 then
-          warning msgs set ("using 'bigand' on an empty set is not recommanded\n"^
-            "as it returns a 'Top' formula which can give unexpected results");
-        let evaluated_ast,when_satisfied = process_list_set env list_ast_set in
-        if not when_satisfied then
-          warning msgs when_cond ("the 'when' condition of 'bigand' is never true. This should\n"^
-            "be avoided as it returns a 'Top' formula which can give unexpected results");
+        let evaluated_ast = process_list_set env list_ast_set in
         rm_top_bot evaluated_ast
       | x::xs,y::ys ->
         eval_ast_formula (Bigand ([x],[y],None,(Bigand (xs,ys,when_optional,body))))
     end
+  (* bigor returns 'Bot' when it returns nothing. It can be interpreted as the
+     existential quantificator
+         there exists some i of E so that p(i) is true
+     When it is applied an empty E, it means that there exists no elements that
+     satisfy p(i), so we return Bot. *)
   | Bigor (vars,sets,when_optional,body) ->
     let when_cond = match when_optional with Some x -> x | None -> Bool true
     in
@@ -619,25 +612,19 @@ and eval_ast_formula (msgs:Msgs.t ref) (env:env) (ast:ast) : ast =
       match vars,sets with
       | [],[] | _,[] | [],_ -> failwith "shouln't happen: non-variable in big construct"
       | [Loc (Var (name,_),loc)],[set] ->
-          let rec process_list_set env (set_list:ast list) =
-            match set_list with
-            | []    -> Bottom
-            | x::xs ->
-              let env = (name,(x,loc))::env in
-              match ast_to_bool msgs env when_cond with
-              | true when xs != [] -> Or (eval_ast_formula_env env body, process_list_set env xs)
-              | true  -> eval_ast_formula_env env body
-              | false -> process_list_set env xs
-          in
-            let list_ast_set = set_to_ast_list msgs env set in
-          if (List.length list_ast_set) == 0 then
-            warning msgs set ("using 'bigor' on an empty set is not recommanded\n"^
-              "as it returns a 'Bot' formula which can give unexpected results.");
-          let evaluated_ast = process_list_set env list_ast_set in
-          if evaluated_ast == Bottom then
-            warning msgs when_cond ("the 'when' condition of 'bigor' is never true. This should\n"^
-              "be avoided as it returns a 'Bot' formula which can give unexpected results");
-            rm_top_bot evaluated_ast
+        let rec process_list_set env (set_list:ast list) =
+          match set_list with
+          | []    -> Bottom
+          | x::xs ->
+            let env = (name,(x,loc))::env in
+            match ast_to_bool msgs env when_cond with
+            | true when xs != [] -> Or (eval_ast_formula_env env body, process_list_set env xs)
+            | true  -> eval_ast_formula_env env body
+            | false -> process_list_set env xs
+        in
+        let list_ast_set = set_to_ast_list msgs env set in
+        let evaluated_ast = process_list_set env list_ast_set in
+        rm_top_bot evaluated_ast
       | x::xs,y::ys ->
         eval_ast_formula (Bigor ([x],[y],None,(Bigor (xs,ys,when_optional,body))))
     end
