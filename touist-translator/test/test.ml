@@ -138,17 +138,8 @@ run_test_tt_main (
   "1 == 1 should be true">::(sat_expands_to "t(1==1)" "t(true)");
 ];
 "exact, atleast and atmost">:::[
-  "cases that should raise 'nothing has been produced'">:::[
-  "exact(0,[a,b])">::(test_sat_raise "1:1" "exact(0,[a,b])");
-  "exact(1,[])">::(test_sat_raise "1:1" "exact(1,[])");
-  "exact(1,[])">::(test_sat_raise "1:1" "exact(1,[])");
-  ];
-  "cases where exact/atleast/atmost should disapear">:::[
-  "">::(sat_expands_to "exact(0,[a,b]) or T" "T");
-  "">::(sat_expands_to "exact(0,[a,b]) and T" "T");
-  "">::(sat_expands_to "T or exact(0,[a,b])" "T");
-  "">::(sat_expands_to "T and exact(0,[a,b])" "T");
-  ];
+  "exact(1,[])">::(sat_expands_to "exact(1,[])" "Top");
+  (*"exact(0,[a,b]) should return not a and not b">::(sat_expands_to "exact(0,[a,b])" "(not a and not b)");*)
   "normal cases">:::[
   "exact(1,[a,b,c]) should give 3 models">::(sat_models_are "exact(1,[a,b,c])" "0 a 0 b 1 c | 1 a 0 b 0 c | 0 a 1 b 0 c");
   "exact(3,[a,b,c]) should give 1 model">::(sat_models_are "exact(3,[a,b,c])" "1 c 1 b 1 a");
@@ -158,25 +149,12 @@ run_test_tt_main (
   "'atleast(2,[a,b,c]) a' should give 3 model">::(sat_models_are "atleast(2,[a,b,c]) a" "1 a 1 b 1 c | 1 a 1 b 0 c | 1 a 0 b 1 c");
   "'atleast(2,[a,b,c]) a b' should give 2 model">::(sat_models_are "atleast(2,[a,b,c]) a b" "1 b 1 c 1 a | 1 b 0 c 1 a");
   ];
-];
 "bigand and bigor">:::[
   "empty cases">:::[
-  "single bigand + empty set = error 'nothing produced'">::(test_sat_raise ~typ:Msgs.Error "1:1" "bigand $i in []: p($i) end");
-  "single bigand + 'when' always false = error 'nothing produced'">::(test_sat_raise ~typ:Msgs.Error "1:1" "bigand $i in [1] when false: p($i) end");
-  "empty bigand inside 'and' or 'or' formula = only the other formula stays">:::[
-    "">::(sat_expands_to "T and bigand $i in [1] when false: p($i) end" "T");
-    "">::(sat_expands_to "bigand $i in [1] when false: p($i) end and T" "T");
-    "">::(sat_expands_to "T or bigand $i in [1] when false: p($i) end" "T");
-    "">::(sat_expands_to "bigand $i in [1] when false: p($i) end or T" "T");
-  ];
-  "empty bigand inside => or <=> formula should make the <=> and => removed">:::[
-    "">::(sat_expands_to "T and (A => bigand $i in [1] when false: p($i) end)" "T");
-    "">::(sat_expands_to "T and (A <=> bigand $i in [1] when false: p($i) end)" "T");
-    "">::(sat_expands_to "T and (bigand $i in [1] when false: p($i) end => A)" "T");
-    "">::(sat_expands_to "T and (bigand $i in [1] when false: p($i) end <=> A)" "T");
-  ];
-  "empty bigand inside 'xor' should make the 'xor' removed">:::[
-    "">::(sat_expands_to "T and (A xor bigand $i in [1] when false: p($i) end)" "T");
+  "bigand with empty sets should return Top">::(sat_expands_to "bigand $i in []: p($i) end" "Top");
+  "bigand with always false 'when' should return Top">::(sat_expands_to "bigand $i in [1] when false: p($i) end" "Top");
+  "bigor with empty sets should return Bot">::(sat_expands_to "bigor $i in []: p($i) end" "Bot");
+  "bigor with always false 'when' should return Bot">::(sat_expands_to "bigor $i in [1] when false: p($i) end" "Bot");
   ];
   "bigand and >">::    (test_sat "bigand $i in [1..5] when $i > 2: p($i) end");
   "let declaration">:: (test_sat "let $i = 3: p($i-$i*3-1 mod 2 / 1)");

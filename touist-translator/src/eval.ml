@@ -553,22 +553,22 @@ and eval_ast_formula (msgs:Msgs.t ref) (env:env) (ast:ast) : ast =
   | Equiv   (x,y) -> Equiv (eval_ast_formula x, eval_ast_formula y)
   | Exact (x,y) -> rm_top_bot begin (* !check_only simplifies by returning a dummy proposition *)
       match eval_ast x, eval_ast y with
-      | Int v, _ when v<=0 -> raise_with_loc msgs x "in 'exact', the first parameter must be an int > 0"
-      | _, Set (EmptySet) -> raise_with_loc msgs y "in 'exact', the second parameter cannot be an empty set"
+      | Int 0, Set (EmptySet) -> Top
+      | Int v, Set (EmptySet) -> Top
       | Int x, Set (SSet s) -> if !check_only then Prop "dummy" else exact_str (PropSet.exact x s)
       | x',y' -> raise_type_error2 msgs ast x x' y y' "'int' (left-hand)\nand a 'prop-set' (right-hand)"
     end
   | Atleast (x,y) -> rm_top_bot begin
       match eval_ast x, eval_ast y with
-      | Int v, _ when v<=0 -> raise_with_loc msgs x "in 'atleast', the first parameter must be an int > 0"
-      | _, Set (EmptySet) -> raise_with_loc msgs y "in 'atleast', the second parameter cannot be an empty set"
+      | Int 0, Set (EmptySet) -> Top
+      | Int v, Set (EmptySet) -> Top
       | Int x, Set (SSet s) -> if !check_only then Prop "dummy" else atleast_str (PropSet.atleast x s)
       | x',y' -> raise_type_error2 msgs ast x x' y y' "'int' (left-hand)\nand a 'prop-set' (right-hand)"
     end
   | Atmost (x,y) -> rm_top_bot begin
       match eval_ast x, eval_ast y with
-      | Int v, _ when v<=0 -> raise_with_loc msgs x "in 'atmost', the first parameter must be an int > 0"
-      | _, Set (EmptySet) -> raise_with_loc msgs y "in 'atmost', the second parameter cannot be an empty set"
+      | Int 0, Set (EmptySet) -> Top
+      | Int v, Set (EmptySet) -> Top
       | Int x, Set (SSet s) -> if !check_only then Prop "dummy" else atmost_str (PropSet.atmost x s)
       | x',y' -> raise_type_error2 msgs ast x x' y y' "'int' (left-hand)\nand a 'prop-set' (right-hand)"
     end
@@ -775,6 +775,8 @@ and set_to_ast_list (msgs:Msgs.t ref) (env:env) (ast:ast) : ast list =
     | Greater_than     (x,y) -> has_top_or_bot x || has_top_or_bot y
     | Greater_or_equal (x,y) -> has_top_or_bot x || has_top_or_bot y
     | _ -> false
+  (* Simplify an AST by removing Bot and Top that can be absorbed
+     by And or Or. *)
   and rm_top_bot ast =
     if ast != Top && ast != Bottom && has_top_or_bot ast
     then rm_top_bot (eval_ast_formula (ref Msgs.empty) [] ast)
