@@ -16,7 +16,7 @@
 
 open Syntax
 open Pprint
-open Msg
+open Msgs
 
 
 (* Variables are stored in two data structures (global and local scopes). *)
@@ -33,11 +33,12 @@ type env = (string * (ast * loc)) list
    The description is a couple (content, location) *)
 type extenv = (string, (ast * loc)) Hashtbl.t
 
-let warning (ast:ast) (message:string) =
-  let loc = match ast with 
+let get_loc (ast:ast) : loc = match ast with 
     | Loc (_,loc) -> loc 
     | _ -> (Lexing.dummy_pos,Lexing.dummy_pos)
-  in add_msg (Warning,Eval,message,loc)
+
+let warning msgs (ast:ast) (message:string) =
+  add_msg msgs (Warning,Eval,message,get_loc ast)
 
 (* [ast_whithout_loc] removes the location attached by the parser to the ast
    node. This location 'Loc (ast,loc)' allows to give the location in error 
@@ -52,9 +53,9 @@ let ast_whithout_loc (ast:ast) : ast = match ast with
    The only purpose of giving 'ast' is to get the Loc thing.
    [ast_whithout_loc] should not have been previously applied to [ast]
    because ast_whithout_loc will remove the Loc thing. *)
-let raise_with_loc (ast:ast) (message:string) = match ast with
-  | Loc (ast,loc) -> add_fatal (Error,Eval,message,loc)
-  | _ -> add_fatal (Error,Eval,message,(Lexing.dummy_pos,Lexing.dummy_pos))
+let raise_with_loc msgs (ast:ast) (message:string) = match ast with
+  | Loc (ast,loc) -> add_fatal msgs (Error,Eval,message,loc)
+  | _ -> add_fatal msgs (Error,Eval,message,(Lexing.dummy_pos,Lexing.dummy_pos))
 
 (* [raise_type_error] raises the errors that come from one-parameter functions.
    operator is the non-expanded (expand = eval_ast) operator.
@@ -63,8 +64,8 @@ let raise_with_loc (ast:ast) (message:string) = match ast with
    Expanded means that eval_ast has been applied to x.
    [expected_types] contain a string that explain what is expected, e.g.,
    'an integer or a float'. *)
-let raise_type_error operator operand expanded (expected_types:string) = 
-  raise_with_loc operator (
+let raise_type_error msgs operator operand expanded (expected_types:string) = 
+  raise_with_loc msgs operator (
     "'"^(string_of_ast_type operator)^"' expects "^expected_types^".\n"^
     "The operand:\n"^
     "    "^(string_of_ast operand)^"\n"^
@@ -75,8 +76,8 @@ let raise_type_error operator operand expanded (expected_types:string) =
    operator is And (x,y),
    op1 and op2 are the non-expanded parameters x and y,
    exp1 and exp2 are the expanded parameters x and y. *)
-let raise_type_error2 operator op1 exp1 op2 exp2 (expected_types:string) =
-  raise_with_loc operator
+let raise_type_error2 msgs operator op1 exp1 op2 exp2 (expected_types:string) =
+  raise_with_loc msgs operator
     ("incorrect types with '"^(string_of_ast_type operator)^"'; expects "^expected_types^".\n"^
     "In statement:\n"^
     "    "^(string_of_ast operator)^"\n"^
@@ -88,8 +89,8 @@ let raise_type_error2 operator op1 exp1 op2 exp2 (expected_types:string) =
 
 (* [raise_set_decl] is the same as [raise_type_error2] but between one element
    and the set this element is supposed to be added to. *)
-let raise_set_decl ast elmt elmt_expanded set set_expanded (expected_types:string) =
-  raise_with_loc ast
+let raise_set_decl msgs ast elmt elmt_expanded set set_expanded (expected_types:string) =
+  raise_with_loc msgs ast
     ("Ill-formed set declaration. It expects "^expected_types^".\n"^
     "One of the elements is of type '"^(string_of_ast_type elmt_expanded)^"':\n"^
     "    "^(string_of_ast elmt)^"\n"^
@@ -101,14 +102,14 @@ let raise_set_decl ast elmt elmt_expanded set set_expanded (expected_types:strin
     "    "^(string_of_ast set_expanded)^"")
 
 
-let check_nb_vars_same_as_nb_sets (ast:ast) (vars: ast list) (sets: ast list) : unit =
+let check_nb_vars_same_as_nb_sets msgs (ast:ast) (vars: ast list) (sets: ast list) : unit =
   let loc = match (List.nth vars 0), List.nth sets ((List.length sets)-1) with
     | Loc (_,(startpos,_)), Loc (_,(_,endpos)) -> startpos,endpos 
     | _-> failwith "[shouldn't happen] missing locations in vars/sets"
   in
   match (List.length vars) == (List.length sets) with
   | true -> ()
-  | false -> add_fatal (Error,Eval,
+  | false -> add_fatal msgs (Error,Eval,
     "Ill-formed '"^(string_of_ast_type ast)^"'. The number of variables and sets must be the same.\n"^
     "You defined "^(string_of_int (List.length vars))^" variables:\n"^
     "    "^(string_of_ast_list "," vars)^"\n"^
@@ -151,137 +152,141 @@ let smt = ref false
     @param smt enables the SMT mode. By default, the SAT mode is used.
 
     @raise Eval.Error (msg,loc) *)
-let rec eval ?smt:(smt_mode=false) ?(onlychecktypes=false) ast =
+let rec eval ?smt:(smt_mode=false) ?(onlychecktypes=false) (ast,msgs) : ast * Msgs.t ref =
   check_only := onlychecktypes;
   smt := smt_mode;
   extenv := Hashtbl.create 50; (* extenv must be re-init between two calls to [eval] *)
-  eval_touist_code ast []
+  eval_touist_code msgs [] ast, msgs
 
-and eval_touist_code ast (env:env) =
+and eval_touist_code msgs (env:env) ast : ast =
   let rec affect_vars = function
     | [] -> []
     | Loc (Affect (Loc (Var (p,i),var_loc),y),affect_loc)::xs ->
-      Hashtbl.replace !extenv (expand_var_name (p,i) env) (eval_ast y env, var_loc);
+      Hashtbl.replace !extenv (expand_var_name msgs env (p,i)) (eval_ast msgs env y, var_loc);
         affect_vars xs
     | x::xs -> x::(affect_vars xs)
   in
   let rec process_formulas = function
-    | []    -> raise_with_loc ast ("no formulas")
+    | []    -> raise_with_loc msgs ast ("no formulas")
     | x::[] -> x
     | x::xs -> And (x, process_formulas xs)
   in
   match ast_whithout_loc ast with
-  | Touist_code (formulas) ->
-    eval_ast_formula (process_formulas (affect_vars formulas)) env
-  | e -> raise_with_loc ast ("this does not seem to be a touist code structure: " ^ string_of_ast e)
+  | Touist_code (formulas) -> 
+    (match cleantoremove (eval_ast_formula msgs env (process_formulas (affect_vars formulas))) with
+    | ToRemove -> raise_with_loc msgs ast ("your formulas have expanded to nothing")
+    | evaluated -> evaluated)
+  | e -> raise_with_loc msgs ast ("this does not seem to be a touist code structure: " ^ string_of_ast e)
 
 (* [eval_ast] evaluates (= expands) numerical, boolean and set expresions that
    are not directly in formulas. For example, in 'when $a!=a' or 'if 3>4',
    the boolean values must be computed: eval_ast will do exactly that.*)
-and eval_ast (ast:ast) (env:env) = match ast_whithout_loc ast with
+and eval_ast (msgs:Msgs.t ref) (env:env) (ast:ast) : ast =
+  let eval_ast = eval_ast msgs env in
+  match ast_whithout_loc ast with
   | Int x   -> Int x
   | Float x -> Float x
   | Bool x  -> Bool x
   | Var (p,i) -> (* p,i = prefix, indices *)
-    let name = expand_var_name (p,i) env in
+    let name = expand_var_name msgs env (p,i) in
     begin
       try let (content,loc) = List.assoc name env in content
       with Not_found ->
       try let (content,_) = Hashtbl.find !extenv name in content
-      with Not_found -> raise_with_loc ast
+      with Not_found -> raise_with_loc msgs ast
           ("variable '" ^ name ^"' does not seem to be known. Either you forgot\n"^
           "to declare it globally or it has been previously declared locally\n"^
           "(with bigand, bigor or let) and you are out of its scope.")
     end
   | Set x -> Set x
-  | Set_decl x -> eval_set_decl ast env
-  | Neg x -> (match eval_ast x env with
+  | Set_decl x -> eval_set_decl msgs env ast
+  | Neg x -> (match eval_ast x with
       | Int x'   -> Int   (- x')
       | Float x' -> Float (-. x')
-      | x' -> raise_type_error ast x x' "'float' or 'int'")
-  | Add (x,y) -> (match eval_ast x env, eval_ast y env with
+      | x' -> raise_type_error msgs ast x x' "'float' or 'int'")
+  | Add (x,y) -> (match eval_ast x, eval_ast y with
       | Int x, Int y -> Int (x + y)
       | Float x, Float y -> Float (x +. y)
-      | x',y' -> raise_type_error2 ast x x' y y' "'float' or 'int'")
-  | Sub (x,y) -> (match eval_ast x env, eval_ast y env with
+      | x',y' -> raise_type_error2 msgs ast x x' y y' "'float' or 'int'")
+  | Sub (x,y) -> (match eval_ast x, eval_ast y with
       | Int x, Int y -> Int (x - y)
       | Float x, Float y -> Float (x -. y)
-      | x',y' -> raise_type_error2 ast x x' y y' "'float' or 'int'")
-  | Mul (x,y) -> (match eval_ast x env, eval_ast y env with
+      | x',y' -> raise_type_error2 msgs ast x x' y y' "'float' or 'int'")
+  | Mul (x,y) -> (match eval_ast x, eval_ast y with
       | Int x, Int y -> Int (x * y)
       | Float x, Float y -> Float (x *. y)
-      | x',y' -> raise_type_error2 ast x x' y y' "a 'float' or 'int'")
-  | Div (x,y) -> (match eval_ast x env, eval_ast y env with
+      | x',y' -> raise_type_error2 msgs ast x x' y y' "a 'float' or 'int'")
+  | Div (x,y) -> (match eval_ast x, eval_ast y with
       | Int x, Int y -> Int (x / y)
       | Float x, Float y -> Float (x /. y)
-      | x',y' -> raise_type_error2 ast x x' y y' "a 'float' or 'int'")
-  | Mod (x,y) -> (match eval_ast x env, eval_ast y env with
+      | x',y' -> raise_type_error2 msgs ast x x' y y' "a 'float' or 'int'")
+  | Mod (x,y) -> (match eval_ast x, eval_ast y with
       | Int x, Int y -> Int (x mod y)
-      | x',y' -> raise_type_error2 ast x x' y y' "a 'float' or 'int'")
-  | Sqrt x -> (match eval_ast x env with
+      | x',y' -> raise_type_error2 msgs ast x x' y y' "a 'float' or 'int'")
+  | Sqrt x -> (match eval_ast x with
       | Float x -> Float (sqrt x)
-      | x' -> raise_type_error ast x x' "a float")
-  | To_int x -> (match eval_ast x env with
+      | x' -> raise_type_error msgs ast x x' "a float")
+  | To_int x -> (match eval_ast x with
       | Float x -> Int (int_of_float x)
       | Int x   -> Int x
-      | x' -> raise_type_error ast x x' "a 'float' or 'int'")
-  | To_float x -> (match eval_ast x env with
+      | x' -> raise_type_error msgs ast x x' "a 'float' or 'int'")
+  | To_float x -> (match eval_ast x with
       | Int x   -> Float (float_of_int x)
       | Float x -> Float x
-      | x' -> raise_type_error ast x x' "a 'float' or 'int'")
-  | Abs x -> (match eval_ast x env with
+      | x' -> raise_type_error msgs ast x x' "a 'float' or 'int'")
+  | Abs x -> (match eval_ast x with
       | Int x   -> Int (abs x)
       | Float x -> Float (abs_float x)
-      | x' -> raise_type_error ast x x' "a 'float' or 'int'")
-  | Not x -> (match eval_ast x env with
+      | x' -> raise_type_error msgs ast x x' "a 'float' or 'int'")
+  | Not x -> (match eval_ast x with
       | Bool x -> Bool (not x)
-      | x' -> raise_type_error ast x x' "a 'bool'")
-  | And (x,y) -> (match eval_ast x env, eval_ast y env with
+      | x' -> raise_type_error msgs ast x x' "a 'bool'")
+  | And (x,y) -> (match eval_ast x, eval_ast y with
       | Bool x,Bool y -> Bool (x && y)
-      | x',y' -> raise_type_error2 ast x x' y y' "a 'bool'")
-  | Or (x,y) -> (match eval_ast x env, eval_ast y env with
+      | x',y' -> raise_type_error2 msgs ast x x' y y' "a 'bool'")
+  | Or (x,y) -> (match eval_ast x, eval_ast y with
       | Bool x,Bool y -> Bool (x || y)
-      | x',y' -> raise_type_error2 ast x x' y y' "a 'bool'")
-  | Xor (x,y) -> (match eval_ast x env, eval_ast y env with
+      | x',y' -> raise_type_error2 msgs ast x x' y y' "a 'bool'")
+  | Xor (x,y) -> (match eval_ast x, eval_ast y with
       | Bool x,Bool y -> Bool ((x || y) && (not (x && y)))
-      | x',y' -> raise_type_error2 ast x x' y y' "a 'bool'")
-  | Implies (x,y) -> (match eval_ast x env, eval_ast y env with
+      | x',y' -> raise_type_error2 msgs ast x x' y y' "a 'bool'")
+  | Implies (x,y) -> (match eval_ast x, eval_ast y with
       | Bool x,Bool y -> Bool (not x || y)
-      | x',y' -> raise_type_error2 ast x x' y y' "a 'bool'")
-  | Equiv (x,y) -> (match eval_ast x env, eval_ast y env with
+      | x',y' -> raise_type_error2 msgs ast x x' y y' "a 'bool'")
+  | Equiv (x,y) -> (match eval_ast x, eval_ast y with
       | Bool x,Bool y -> Bool ((not x || y) && (not x || y))
-      | x',y' -> raise_type_error2 ast x x' y y' "a 'bool'")
+      | x',y' -> raise_type_error2 msgs ast x x' y y' "a 'bool'")
   | If (x,y,z) ->
     let test =
-      match eval_ast x env with
+      match eval_ast x with
       | Bool true  -> true
       | Bool false -> false
-      | x' -> raise_type_error ast x x' "a 'bool'"
+      | x' -> raise_type_error msgs ast x x' "a 'bool'"
     in
-    if test then eval_ast y env else eval_ast z env
+    if test then eval_ast y else eval_ast z
   | Union (x,y) -> begin
-      let x',y' = eval_ast x env, eval_ast y env in
+      let x',y' = eval_ast x, eval_ast y in
       match process_empty x' y', process_empty y' x' with
       | Set (ISet a), Set (ISet b) -> Set (ISet (IntSet.union a b))
       | Set (FSet a), Set (FSet b) -> Set (FSet (FloatSet.union a b))
       | Set (SSet a), Set (SSet b) -> Set (SSet (PropSet.union a b))
-      | _,_ -> raise_type_error2 ast x x' y y' "a 'float-set', 'int-set' or 'prop-set'"
+      | _,_ -> raise_type_error2 msgs ast x x' y y' "a 'float-set', 'int-set' or 'prop-set'"
     end
   | Inter (x,y) -> begin
-      let x',y' = eval_ast x env, eval_ast y env in
+      let x',y' = eval_ast x, eval_ast y in
       match process_empty x' y', process_empty y' x' with
       | Set (ISet a), Set (ISet b) -> Set (ISet (IntSet.inter a b))
       | Set (FSet a), Set (FSet b) -> Set (FSet (FloatSet.inter a b))
       | Set (SSet a), Set (SSet b) -> Set (SSet (PropSet.inter a b))
-      | _,_ -> raise_type_error2 ast x x' y y' "a 'float-set', 'int-set' or 'prop-set'"
+      | _,_ -> raise_type_error2 msgs ast x x' y y' "a 'float-set', 'int-set' or 'prop-set'"
     end
   | Diff (x,y) -> begin
-      let x',y' = eval_ast x env, eval_ast y env in
+      let x',y' = eval_ast x, eval_ast y in
       match process_empty x' y', process_empty y' x' with
       | Set (ISet a), Set (ISet b) -> Set (ISet (IntSet.diff a b))
       | Set (FSet a), Set (FSet b) -> Set (FSet (FloatSet.diff a b))
       | Set (SSet a), Set (SSet b) -> Set (SSet (PropSet.diff a b))
-      | _,_ -> raise_type_error2 ast x x' y y' "a 'float-set', 'int-set' or 'prop-set'"
+      | _,_ -> raise_type_error2 msgs ast x x' y y' "a 'float-set', 'int-set' or 'prop-set'"
     end
   | Range (x,y) -> (* !check_only will simplify [min..max] to [min..min] *)
     (* [irange] generates a list of int between min and max with an increment of step. *)
@@ -292,44 +297,44 @@ and eval_ast (ast:ast) (env:env) = match ast_whithout_loc ast with
       let rec loop acc = function i when i=max+.1. -> acc | i -> loop (i::acc) (i+.step)
       in loop [] min |> List.rev
     in begin
-      match eval_ast x env, eval_ast y env with
+      match eval_ast x, eval_ast y with
       | Int x, Int y     -> Set (ISet (IntSet.of_list (irange x (if !check_only then x else y)  1)))
       | Float x, Float y -> Set (FSet (FloatSet.of_list (frange x (if !check_only then x else y) 1.)))
-      | x',y' -> raise_type_error2 ast x x' y y' "two integers or two floats"
+      | x',y' -> raise_type_error2 msgs ast x x' y y' "two integers or two floats"
     end
   | Empty x -> begin
-      match eval_ast x env with
+      match eval_ast x with
       | Set (EmptySet)    -> Bool true
       | Set (ISet x) -> Bool (IntSet.is_empty x)
       | Set (FSet x) -> Bool (FloatSet.is_empty x)
       | Set (SSet x) -> Bool (PropSet.is_empty x)
-      | x' -> raise_type_error ast x x' "a 'float-set', 'int-set' or 'prop-set'"
+      | x' -> raise_type_error msgs ast x x' "a 'float-set', 'int-set' or 'prop-set'"
     end
   | Card x -> begin
-      match eval_ast x env with
+      match eval_ast x with
       | Set (EmptySet)    -> Int 0
       | Set (ISet x) -> Int (IntSet.cardinal x)
       | Set (FSet x) -> Int (FloatSet.cardinal x)
       | Set (SSet x) -> Int (PropSet.cardinal x)
-      | x' -> raise_type_error ast x x' "a 'float-set', 'int-set' or 'prop-set'"
+      | x' -> raise_type_error msgs ast x x' "a 'float-set', 'int-set' or 'prop-set'"
     end
   | Subset (x,y) -> begin
-      let x',y' = eval_ast x env, eval_ast y env in
+      let x',y' = eval_ast x, eval_ast y in
       match process_empty x' y', process_empty y' x' with
       | Set (ISet a), Set (ISet b) -> Bool (IntSet.subset a b)
       | Set (FSet a), Set (FSet b) -> Bool (FloatSet.subset a b)
       | Set (SSet a), Set (SSet b) -> Bool (PropSet.subset a b)
-      | _,_ -> raise_type_error2 ast x x' y y' "a 'float-set', int or prop"
+      | _,_ -> raise_type_error2 msgs ast x x' y y' "a 'float-set', int or prop"
     end
   | In (x,y) ->
-    begin match eval_ast x env, eval_ast y env with
+    begin match eval_ast x, eval_ast y with
       | _, Set (EmptySet) -> Bool false (* nothing can be in an empty set!*)
       | Int x, Set (ISet y) -> Bool (IntSet.mem x y)
       | Float x', Set (FSet y') -> Bool (FloatSet.mem x' y')
       | Prop x', Set (SSet y') -> Bool (PropSet.mem x' y')
-      | x',y' -> raise_type_error2 ast x x' y y' "\nan 'int', 'float' or 'prop' on the left-hand and a 'set' on the right-hand"
+      | x',y' -> raise_type_error2 msgs ast x x' y y' "\nan 'int', 'float' or 'prop' on the left-hand and a 'set' on the right-hand"
     end
-  | Equal (x,y) -> begin let x',y' = eval_ast x env, eval_ast y env in
+  | Equal (x,y) -> begin let x',y' = eval_ast x, eval_ast y in
       match process_empty x' y', process_empty y' x' with
       | Int x, Int y -> Bool (x = y)
       | Float x, Float y -> Bool (x = y)
@@ -337,47 +342,47 @@ and eval_ast (ast:ast) (env:env) = match ast_whithout_loc ast with
       | Set (ISet a), Set (ISet b) -> Bool (IntSet.equal a b)
       | Set (FSet a), Set (FSet b) -> Bool (FloatSet.equal a b)
       | Set (SSet a), Set (SSet b) -> Bool (PropSet.equal a b)
-      | x',y' -> raise_type_error2 ast x x' y y' "an int, float, prop or set"
+      | x',y' -> raise_type_error2 msgs ast x x' y y' "an int, float, prop or set"
     end
-  | Not_equal (x,y) -> eval_ast (Not (Equal (x,y))) env
-  | Lesser_than (x,y) -> (match eval_ast x env, eval_ast y env with
+  | Not_equal (x,y) -> eval_ast (Not (Equal (x,y)))
+  | Lesser_than (x,y) -> (match eval_ast x, eval_ast y with
       | Int x, Int y -> Bool (x < y)
       | Float x, Float y -> Bool (x < y)
-      | x',y' -> raise_type_error2 ast x x' y y' "a 'float' or 'int'")
-  | Lesser_or_equal (x,y) -> (match eval_ast x env, eval_ast y env with
+      | x',y' -> raise_type_error2 msgs ast x x' y y' "a 'float' or 'int'")
+  | Lesser_or_equal (x,y) -> (match eval_ast x, eval_ast y with
       | Int x, Int y -> Bool (x <= y)
       | Float x, Float y -> Bool (x <= y)
-      | x',y' -> raise_type_error2 ast x x' y y' "a 'float' or 'int'")
-  | Greater_than     (x,y) -> (match eval_ast x env, eval_ast y env with
+      | x',y' -> raise_type_error2 msgs ast x x' y y' "a 'float' or 'int'")
+  | Greater_than     (x,y) -> (match eval_ast x, eval_ast y with
       | Int x, Int y -> Bool (x > y)
       | Float x, Float y -> Bool (x > y)
-      | x',y' -> raise_type_error2 ast x x' y y' "a 'float' or 'int'")
-  | Greater_or_equal (x,y) -> (match eval_ast x env, eval_ast y env with
+      | x',y' -> raise_type_error2 msgs ast x x' y y' "a 'float' or 'int'")
+  | Greater_or_equal (x,y) -> (match eval_ast x, eval_ast y with
       | Int x, Int y -> Bool (x >= y)
       | Float x, Float y -> Bool (x >= y)
-      | x',y' -> raise_type_error2 ast x x' y y' "a 'float' or 'int'")
-  | UnexpProp (p,i) -> expand_prop_with_set p i env
+      | x',y' -> raise_type_error2 msgs ast x x' y y' "a 'float' or 'int'")
+  | UnexpProp (p,i) -> expand_prop_with_set msgs env  p i
   | Prop x -> Prop x
-  | Loc (x,l) -> eval_ast x env
-  | Paren x -> eval_ast x env
-  | e -> raise_with_loc ast ("this expression cannot be expanded: " ^ string_of_ast e)
+  | Loc (x,l) -> eval_ast x
+  | Paren x -> eval_ast x
+  | e -> raise_with_loc msgs ast ("this expression cannot be expanded: " ^ string_of_ast e)
 
-and eval_set_decl (set_decl:ast) (env:env) =
+and eval_set_decl (msgs:Msgs.t ref) (env:env) (set_decl:ast) =
   let sets = (match ast_whithout_loc set_decl with Set_decl sets -> sets | _ -> failwith "shoulnt happen: non-Set_decl in eval_set_decl") in
-  let sets_expanded = List.map (fun x -> eval_ast x env) sets in
+  let sets_expanded = List.map (fun x -> eval_ast msgs env x) sets in
   let unwrap_int elmt elmt_expanded = match elmt_expanded with
     | Int x -> x
-    | _ -> raise_set_decl set_decl elmt elmt_expanded
+    | _ -> raise_set_decl msgs set_decl elmt elmt_expanded
              (Set_decl sets) (Set_decl sets_expanded)
              "at this point a\ncomma-separated list of integers, because previous elements\nof the list had this type"
   and unwrap_float elmt elmt_expanded = match elmt_expanded with
     | Float x -> x
-    | _ -> raise_set_decl set_decl elmt elmt_expanded
+    | _ -> raise_set_decl msgs set_decl elmt elmt_expanded
              (Set_decl sets) (Set_decl sets_expanded)
              "at this point a\ncomma-separated list of floats, because previous elements\nof the list had this type"
   and unwrap_str elmt elmt_expanded = match elmt_expanded with
     | Prop x -> x
-    | _ -> raise_set_decl set_decl elmt elmt_expanded
+    | _ -> raise_set_decl msgs set_decl elmt elmt_expanded
              (Set_decl sets) (Set_decl sets_expanded)
              "at this point a\ncomma-separated list of propositions, because previous elements\nof the list had this type"
 
@@ -388,7 +393,7 @@ and eval_set_decl (set_decl:ast) (env:env) =
   | _,(Int _)::_ -> Set (ISet (IntSet.of_list (List.map2 unwrap_int sets sets_expanded)))
   | _,(Float _)::_ -> Set (FSet (FloatSet.of_list (List.map2 unwrap_float sets sets_expanded)))
   | _,(Prop _)::_ -> Set (SSet (PropSet.of_list (List.map2 unwrap_str sets sets_expanded)))
-  | x::_,x'::_ -> raise_set_decl set_decl x x'
+  | x::_,x'::_ -> raise_set_decl msgs set_decl x x'
                     (Set_decl sets) (Set_decl sets_expanded)
                     "elements of type int,\nfloat or propositon"
   | [],x::_ | x::_,[] -> failwith "shouldn't happen: len(sets)!=len(sets_expanded)" 
@@ -396,68 +401,22 @@ and eval_set_decl (set_decl:ast) (env:env) =
 
 (* [eval_ast_formula] evaluates formulas; nothing in formulas should be
    expanded, except for variables, bigand, bigor, let, exact, atleast,atmost. *)
-and eval_ast_formula (ast:ast) (env:env) : ast =
+and eval_ast_formula (msgs:Msgs.t ref) (env:env) (ast:ast) : ast =
+  let eval_ast_formula = eval_ast_formula msgs env
+  and eval_ast_formula_env = eval_ast_formula msgs
+  and eval_ast = eval_ast msgs env in
   match ast_whithout_loc ast with
   | Int x   -> Int x
   | Float x -> Float x
-  | Neg x ->
-    begin
-      match eval_ast_formula x env with
-      | Int   x' -> Int   (- x')
-      | Float x' -> Float (-. x')
-      | x' -> Neg x'
-      (*| _ -> raise (Error (string_of_ast ast))*)
-    end
-  | Add (x,y) ->
-    begin
-      match eval_ast_formula x env, eval_ast_formula y env with
-      | Int x', Int y'     -> Int   (x' +  y')
-      | Float x', Float y' -> Float (x' +. y')
-      | Int _, Prop _
-      | Prop _, Int _ -> Add (x,y)
-      | x', y' -> Add (x', y')
-      (*| _,_ -> raise (Error (string_of_ast ast))*)
-    end
-  | Sub (x,y) ->
-    begin
-      match eval_ast_formula x env, eval_ast_formula y env with
-      | Int x', Int y'     -> Int   (x' -  y')
-      | Float x', Float y' -> Float (x' -. y')
-      (*| Prop x', Prop x' -> Sub (Prop x', Prop x')*)
-      | x', y' -> Sub (x', y')
-      (*| _,_ -> raise (Error (string_of_ast ast))*)
-    end
-  | Mul (x,y) ->
-    begin
-      match eval_ast_formula x env, eval_ast_formula y env with
-      | Int x', Int y'     -> Int   (x' *  y')
-      | Float x', Float y' -> Float (x' *. y')
-      | x', y' -> Mul (x', y')
-      (*| _,_ -> raise (Error (string_of_ast ast))*)
-    end
-  | Div (x,y) ->
-    begin
-      match eval_ast_formula x env, eval_ast_formula y env with
-      | Int x', Int y'     -> Int   (x' /  y')
-      | Float x', Float y' -> Float (x' /. y')
-      | x', y' -> Div (x', y')
-      (*| _,_ -> raise (Error (string_of_ast ast))*)
-    end
-  | Equal            (x,y) -> Equal            (eval_ast_formula x env, eval_ast_formula y env)
-  | Not_equal        (x,y) -> Not_equal        (eval_ast_formula x env, eval_ast_formula y env)
-  | Lesser_than      (x,y) -> Lesser_than      (eval_ast_formula x env, eval_ast_formula y env)
-  | Lesser_or_equal  (x,y) -> Lesser_or_equal  (eval_ast_formula x env, eval_ast_formula y env)
-  | Greater_than     (x,y) -> Greater_than     (eval_ast_formula x env, eval_ast_formula y env)
-  | Greater_or_equal (x,y) -> Greater_or_equal (eval_ast_formula x env, eval_ast_formula y env)
   | Top    -> Top
   | Bottom -> Bottom
-  | UnexpProp (p,i) -> Prop (expand_var_name (p,i) env)
+  | UnexpProp (p,i) -> Prop (expand_var_name msgs env (p,i))
   | Prop x -> Prop x
   | Var (p,i) -> (* p,i = prefix,indices *)
     (* name = prefix + indices. 
        Example with $v(a,b,c):
        name is '$v(a,b,c)', prefix is '$v' and indices are '(a,b,c)' *)
-    let name = expand_var_name (p,i) env in
+    let name = expand_var_name msgs env (p,i) in
     begin
       (* Case 1. Check if this variable name has been affected locally
          (recursive-wise) in bigand, bigor or let.
@@ -467,7 +426,7 @@ and eval_ast_formula (ast:ast) (env:env) : ast =
         | Prop x -> Prop x
         | Int x when !smt -> Int x
         | Float x when !smt -> Float x
-        | _ -> raise_with_loc ast
+        | _ -> raise_with_loc msgs ast
             ("local variable '" ^ name ^ "' (defined in bigand, bigor or let)\n"^
             "cannot be expanded into a 'prop' because its content\n"^
             "is of type '"^(string_of_ast_type content)^"' instead of "^
@@ -484,7 +443,7 @@ and eval_ast_formula (ast:ast) (env:env) : ast =
         | Prop x -> Prop x
         | Int x when !smt -> Int x
         | Float x when !smt -> Float x
-        | _ -> raise_with_loc ast
+        | _ -> raise_with_loc msgs ast
             ("global variable '" ^ name ^ "' cannot be expanded into a 'prop'\n"^
             "because its content is of type '"^(string_of_ast_type content)^"' instead of "^
                (if !smt then "'prop', 'int' or 'float'" else "'prop'") ^ ".\n"^
@@ -514,49 +473,61 @@ and eval_ast_formula (ast:ast) (env:env) : ast =
           let (content,loc_affect) = List.assoc prefix env in
           let term = match content with
             | Prop x -> Prop x
-            | wrong -> add_fatal (Error,Eval,
+            | wrong -> add_fatal msgs (Error,Eval,
                 "the proposition '" ^ name ^ "' cannot be expanded because '"^prefix^"' is of type '"^(string_of_ast_type wrong)^"'.\n" ^
                 "In order to produce an expanded proposition of this kind, '"^prefix^"' must be a proposition.\n"^
                 "Why? Because this variable is part of a formula, and thus is expected\n"^
                 "to be a proposition. Here is the content of '" ^prefix^"':\n"^
                 "    "^(string_of_ast content), loc_affect)
-          in eval_ast_formula (UnexpProp ((string_of_ast term), Some indices)) env
+          in eval_ast_formula (UnexpProp ((string_of_ast term), Some indices))
       (* Case 5. the variable was of the form '$v(1,2,3)' and was not declared
          and '$v' is not either declared, so we can safely guess that this var has not been declared. *)
-      with Not_found -> raise_with_loc ast ("'" ^ name ^ "' has not been declared")
+      with Not_found -> raise_with_loc msgs ast ("'" ^ name ^ "' has not been declared")
     end
+  | Not ToRemove -> ToRemove
   | Not Top    -> Bottom
   | Not Bottom -> Top
-  | Not x      -> Not (eval_ast_formula x env)
+  | Not x      -> Not (eval_ast_formula x)
+  | And (ToRemove,x) | And (x,ToRemove) -> x
   | And (Bottom, _) | And (_, Bottom) -> Bottom
   | And (Top,x)
-  | And (x,Top) -> eval_ast_formula x env
-  | And     (x,y) -> And (eval_ast_formula x env, eval_ast_formula y env)
+  | And (x,Top) -> eval_ast_formula x
+  | And     (x,y) -> And (eval_ast_formula x, eval_ast_formula y)
+  | Or (ToRemove,x) | Or (x,ToRemove) -> x
   | Or (Top, _) | Or (_, Top) -> Top
   | Or (Bottom,x)
-  | Or (x,Bottom) -> eval_ast_formula x env
-  | Or      (x,y) -> Or  (eval_ast_formula x env, eval_ast_formula y env)
-  | Xor     (x,y) -> Xor (eval_ast_formula x env, eval_ast_formula y env)
+  | Or (x,Bottom) -> eval_ast_formula x
+  | Or      (x,y) -> Or  (eval_ast_formula x, eval_ast_formula y)
+  | Xor (ToRemove,x) | Xor (x,ToRemove) -> ToRemove
+  | Xor     (x,y) -> Xor (eval_ast_formula x, eval_ast_formula y)
+  | Implies (ToRemove,x) | Implies (x,ToRemove) -> ToRemove
   | Implies (_,Top)
   | Implies (Bottom,_) -> Top
-  | Implies (x,Bottom) -> eval_ast_formula (Not x) env
-  | Implies (Top,x) -> eval_ast_formula x env
-  | Implies (x,y) -> Implies (eval_ast_formula x env, eval_ast_formula y env)
-  | Equiv   (x,y) -> Equiv (eval_ast_formula x env, eval_ast_formula y env)
+  | Implies (x,Bottom) -> eval_ast_formula (Not x)
+  | Implies (Top,x) -> eval_ast_formula x
+  | Implies (x,y) -> Implies (eval_ast_formula x, eval_ast_formula y)
+  | Equiv (x,ToRemove) | Equiv (ToRemove,x) -> ToRemove 
+  | Equiv   (x,y) -> Equiv (eval_ast_formula x, eval_ast_formula y)
   | Exact (x,y) -> begin (* !check_only simplifies by returning a dummy proposition *)
-      match eval_ast x env, eval_ast y env with
+      match eval_ast x, eval_ast y with
+      | Int v, _ when v<=0 -> ToRemove 
+      | _, Set (EmptySet) -> ToRemove
       | Int x, Set (SSet s) -> if !check_only then Prop "dummy" else exact_str (PropSet.exact x s)
-      | x',y' -> raise_type_error2 ast x x' y y' "'int' (left-hand)\nand a 'prop-set' (right-hand)"
+      | x',y' -> raise_type_error2 msgs ast x x' y y' "'int' (left-hand)\nand a 'prop-set' (right-hand)"
     end
   | Atleast (x,y) -> begin
-      match eval_ast x env, eval_ast y env with
+      match eval_ast x, eval_ast y with
+      | Int v, _ when v<=0 -> ToRemove 
+      | _, Set (EmptySet) -> ToRemove
       | Int x, Set (SSet s) -> if !check_only then Prop "dummy" else atleast_str (PropSet.atleast x s)
-      | x',y' -> raise_type_error2 ast x x' y y' "'int' (left-hand)\nand a 'prop-set' (right-hand)"
+      | x',y' -> raise_type_error2 msgs ast x x' y y' "'int' (left-hand)\nand a 'prop-set' (right-hand)"
     end
   | Atmost (x,y) ->begin
-      match eval_ast x env, eval_ast y env with
+      match eval_ast x, eval_ast y with
+      | Int v, _ when v<=0 -> ToRemove 
+      | _, Set (EmptySet) -> ToRemove
       | Int x, Set (SSet s) -> if !check_only then Prop "dummy" else atmost_str (PropSet.atmost x s)
-      | x',y' -> raise_type_error2 ast x x' y y' "'int' (left-hand)\nand a 'prop-set' (right-hand)"
+      | x',y' -> raise_type_error2 msgs ast x x' y y' "'int' (left-hand)\nand a 'prop-set' (right-hand)"
     end
   (* What is returned by bigand or bigor when they do not
      generate anything? A direct solution would have been to
@@ -570,94 +541,158 @@ and eval_ast_formula (ast:ast) (env:env) : ast =
      act like '... and Top' or '... or Bot'. *)
   | Bigand (vars,sets,when_optional,body) ->
     let when_cond = match when_optional with Some x -> x | None -> Bool true in
-    begin check_nb_vars_same_as_nb_sets ast vars sets;
+    begin check_nb_vars_same_as_nb_sets msgs ast vars sets;
       match vars,sets with
       | [],[] | _,[] | [],_ -> failwith "shouln't happen: non-variable in big construct"
       | [Loc (Var (name,_),loc)],[set] -> (* we don't need the indices because bigand's vars are 'simple' *)
-        let rec process_list_set (set_list:ast list) env =
+        (* If [when_cond] has never been satisfied, [process_list_set] will return
+             (_,false). In the opposite case, it will return (ast,true). *)
+        let rec process_list_set env (set_list:ast list) : ast * bool =
           match set_list with
-          | []   -> Top (*  what if bigand in a or? We give a warning (see below) *)
+          | []   -> ToRemove,false (* what if bigand in a or? We give a warning (see below) *)
           | x::xs ->
             let env = (name,(x,loc))::env in
-            match ast_to_bool when_cond env with
-            | true when xs != [] -> And (eval_ast_formula body env, process_list_set xs env)
-            | true  -> eval_ast_formula body env
-            | false -> process_list_set xs env
+            match ast_to_bool msgs env when_cond with
+            | true when xs != [] -> let next,b = process_list_set env xs in And (eval_ast_formula_env env body, next),true
+            | true  -> eval_ast_formula_env env body,true
+            | false -> process_list_set env xs
         in
-        let list_ast_set = set_to_ast_list set env in
-        if (List.length list_ast_set) == 0 then
-          warning set ("using 'bigand' on an empty set is not recommanded\n"^
-            "as it returns a 'Top' formula which can give unexpected results");
-          process_list_set list_ast_set env
+        let list_ast_set = set_to_ast_list msgs env set in
+        if (List.length list_ast_set) == 0 then ToRemove
+        else
+          let evaluated_ast,when_satisfied = process_list_set env list_ast_set in
+          if not when_satisfied then ToRemove
+          else cleantoremove evaluated_ast
       | x::xs,y::ys ->
-        eval_ast_formula (Bigand ([x],[y],None,(Bigand (xs,ys,when_optional,body)))) env
+        (* only the last couple of var-set in the var-set list is going to
+           have the [when_optional] evaluated. *)
+        eval_ast_formula (Bigand ([x],[y],None,(Bigand (xs,ys,when_optional,body))))
     end
   | Bigor (vars,sets,when_optional,body) ->
     let when_cond = match when_optional with Some x -> x | None -> Bool true
     in
-    begin check_nb_vars_same_as_nb_sets ast vars sets;
+    begin check_nb_vars_same_as_nb_sets msgs ast vars sets;
       match vars,sets with
       | [],[] | _,[] | [],_ -> failwith "shouln't happen: non-variable in big construct"
       | [Loc (Var (name,_),loc)],[set] ->
-          let rec process_list_set (set_list:ast list) env =
+          (* If [when_cond] has never been satisfied, [process_list_set] will return
+             (_,false). In the opposite case, it will return (ast,true). *)
+          let rec process_list_set env (set_list:ast list) : ast * bool =
             match set_list with
-            | []    -> Bottom
+            | []    -> ToRemove, false
             | x::xs ->
               let env = (name,(x,loc))::env in
-              match ast_to_bool when_cond env with
-              | true when xs != [] -> Or (eval_ast_formula body env, process_list_set xs env)
-              | true  -> eval_ast_formula body env
-              | false -> process_list_set xs env
+              match ast_to_bool msgs env when_cond with
+              | true when xs != [] -> let next,b = process_list_set env xs in Or (eval_ast_formula_env env body, next),true
+              | true  -> eval_ast_formula_env env body,true
+              | false -> process_list_set env xs
           in
-            let list_ast_set = set_to_ast_list set env in
-          if (List.length list_ast_set) == 0 then
-            warning set ("using 'bigor' on an empty set is not recommanded\n"^
-              "as it returns a 'Bot' formula which can give unexpected results.");
-            process_list_set list_ast_set env
+          let list_ast_set = set_to_ast_list msgs env set in
+          if (List.length list_ast_set) == 0 then ToRemove
+          else
+            let evaluated_ast,when_satisfied = process_list_set env list_ast_set in
+            if not when_satisfied then ToRemove
+            else cleantoremove evaluated_ast
       | x::xs,y::ys ->
-        eval_ast_formula (Bigor ([x],[y],None,(Bigor (xs,ys,when_optional,body)))) env
+        eval_ast_formula (Bigor ([x],[y],None,(Bigor (xs,ys,when_optional,body))))
     end
   | If (c,y,z) ->
-    let test = match eval_ast c env with Bool c -> c | c' -> raise_type_error ast c c' "boolean"
-    in if test then eval_ast_formula y env else eval_ast_formula z env
+    let test = match eval_ast c with Bool c -> c | c' -> raise_type_error msgs ast c c' "boolean"
+    in if test then eval_ast_formula y else eval_ast_formula z
   | Let (Loc (Var (p,i),loc),content,formula) ->
-    let name = (expand_var_name (p,i) env) and desc = (eval_ast content env,loc)
-    in eval_ast_formula formula ((name,desc)::env)
-  | Paren x -> eval_ast_formula x env
-  | e -> raise_with_loc ast ("this expression is not a formula: " ^ string_of_ast e)
+    let name = (expand_var_name msgs env (p,i)) and desc = (eval_ast content,loc)
+    in eval_ast_formula_env ((name,desc)::env) formula
+  | Paren x -> eval_ast_formula x
+  | ToRemove -> ToRemove
+  | e when !smt -> eval_ast_formula_smt msgs env ast
+  | e -> raise_with_loc msgs ast ("this expression is not a standard formula: " ^ string_of_ast e)
+
+and eval_ast_formula_smt msgs env ast =
+  let eval_ast_formula = eval_ast_formula msgs env in
+  match ast_whithout_loc ast with
+  | Neg x ->
+    begin
+      match eval_ast_formula x with
+      | Int   x' -> Int   (- x')
+      | Float x' -> Float (-. x')
+      | x' -> Neg x'
+      (*| _ -> raise (Error (string_of_ast ast))*)
+    end
+  | Add (x,y) ->
+    begin
+      match eval_ast_formula x, eval_ast_formula y with
+      | Int x', Int y'     -> Int   (x' +  y')
+      | Float x', Float y' -> Float (x' +. y')
+      | Int _, Prop _
+      | Prop _, Int _ -> Add (x,y)
+      | x', y' -> Add (x', y')
+      (*| _,_ -> raise (Error (string_of_ast ast))*)
+    end
+  | Sub (x,y) ->
+    begin
+      match eval_ast_formula x, eval_ast_formula y with
+      | Int x', Int y'     -> Int   (x' -  y')
+      | Float x', Float y' -> Float (x' -. y')
+      (*| Prop x', Prop x' -> Sub (Prop x', Prop x')*)
+      | x', y' -> Sub (x', y')
+      (*| _,_ -> raise (Error (string_of_ast ast))*)
+    end
+  | Mul (x,y) ->
+    begin
+      match eval_ast_formula x, eval_ast_formula y with
+      | Int x', Int y'     -> Int   (x' *  y')
+      | Float x', Float y' -> Float (x' *. y')
+      | x', y' -> Mul (x', y')
+      (*| _,_ -> raise (Error (string_of_ast ast))*)
+    end
+  | Div (x,y) ->
+    begin
+      match eval_ast_formula x, eval_ast_formula y with
+      | Int x', Int y'     -> Int   (x' /  y')
+      | Float x', Float y' -> Float (x' /. y')
+      | x', y' -> Div (x', y')
+      (*| _,_ -> raise (Error (string_of_ast ast))*)
+    end
+  | Equal            (x,y) -> Equal            (eval_ast_formula x, eval_ast_formula y)
+  | Not_equal        (x,y) -> Not_equal        (eval_ast_formula x, eval_ast_formula y)
+  | Lesser_than      (x,y) -> Lesser_than      (eval_ast_formula x, eval_ast_formula y)
+  | Lesser_or_equal  (x,y) -> Lesser_or_equal  (eval_ast_formula x, eval_ast_formula y)
+  | Greater_than     (x,y) -> Greater_than     (eval_ast_formula x, eval_ast_formula y)
+  | Greater_or_equal (x,y) -> Greater_or_equal (eval_ast_formula x, eval_ast_formula y)
+  | e -> raise_with_loc msgs ast ("this expression is not a SMT formula: " ^ string_of_ast ~debug:true e)
 
 and exact_str lst =
   let rec go = function
-    | [],[]       -> Top
-    | t::ts,[]    -> And (And (Prop t, Top), go (ts,[]))
-    | [],f::fs    -> And (And (Top, Not (Prop f)), go ([],fs))
+    | [],[]       -> ToRemove
+    | t::ts,[]    -> And (And (Prop t, ToRemove), go (ts,[]))
+    | [],f::fs    -> And (And (ToRemove, Not (Prop f)), go ([],fs))
     | t::ts,f::fs -> And (And (Prop t, Not (Prop f)), go (ts,fs))
   in
   match lst with
-  | []    -> Bottom
-  | x::xs -> Or (go x, exact_str xs)
+  | []    -> ToRemove
+  | x::xs -> cleantoremove (Or (go x, exact_str xs))
 
 and atleast_str lst =
-  List.fold_left (fun acc str -> Or (acc, formula_of_string_list str)) Bottom lst
+  List.fold_left (fun acc str -> Or (acc, formula_of_string_list str)) ToRemove lst
 
 and atmost_str lst =
   List.fold_left (fun acc str ->
       Or (acc, List.fold_left (fun acc' str' ->
-          And (acc', Not (Prop str'))) Top str)) Bottom lst
+          And (acc', Not (Prop str'))) ToRemove str)) ToRemove lst
 
 and formula_of_string_list =
-  List.fold_left (fun acc str -> And (acc, Prop str)) Top
+  List.fold_left (fun acc str -> And (acc, Prop str)) ToRemove
 
 and and_of_term_list =
-  List.fold_left (fun acc t -> And (acc, t)) Top
+  List.fold_left (fun acc t -> And (acc, t)) ToRemove
 
 (* [expand_prop] will expand a proposition containing a set as index, e.g.,
    time([1,2],[a,b]) will become [time(1,a),time(1,b)...time(b,2)]. This is useful when 
    generating sets. *)
-and expand_prop_with_set name indices_optional env =
-  let rec eval_indices (l:ast list) env : ast list = match l with
+and expand_prop_with_set msgs env name indices_optional =
+  let rec eval_indices env (l:ast list) : ast list = match l with
     | [] -> []
-    | x::xs -> (eval_ast x env)::(eval_indices xs env)
+    | x::xs -> (eval_ast msgs env x)::(eval_indices env xs)
   in
   let rec has_nonempty_set = function
     | []         -> false
@@ -667,24 +702,24 @@ and expand_prop_with_set name indices_optional env =
   in
   let indices, generated_props = match indices_optional with
     | None   -> [], [UnexpProp (name,None)]
-    | Some x -> let indices = eval_indices x env in
-            indices, expand_prop_with_set' [UnexpProp (name,None)] indices env
+    | Some x -> let indices = eval_indices env x in
+            indices, expand_prop_with_set' msgs [UnexpProp (name,None)] indices env
   in
   let eval_unexpprop acc cur = match cur with 
-    | UnexpProp (p,i) -> (expand_var_name (p,i) env)::acc | _->failwith "shouldnt happen"
+    | UnexpProp (p,i) -> (expand_var_name msgs env (p,i))::acc | _->failwith "shouldnt happen"
   in let props_evaluated = List.fold_left eval_unexpprop [] generated_props in
   if (let x = has_nonempty_set indices in x) then Set (SSet (PropSet.of_list props_evaluated))
   else Prop (let a = List.nth props_evaluated 0 in a)
 
-and expand_prop_with_set' proplist indices env =
+and expand_prop_with_set' msgs proplist indices env =
   match indices with (* at this point, indice is either a Prop or a Set *)
   | [] -> proplist
-  | i::next -> 
+  | i::next ->
     match i with
-    | Set (EmptySet) -> expand_prop_with_set' proplist next env
-    | Set s -> let new_proplist = (expand_proplist proplist (set_to_ast_list (Set s) env)) in
-        expand_prop_with_set' new_proplist next env
-    | x -> expand_prop_with_set' (expand_proplist proplist [x]) next env
+    | Set (EmptySet) -> expand_prop_with_set' msgs proplist next env
+    | Set s -> let new_proplist = (expand_proplist proplist (set_to_ast_list msgs env (Set s))) in
+        expand_prop_with_set' msgs new_proplist next env
+    | x -> expand_prop_with_set' msgs (expand_proplist proplist [x]) next env
 and expand_proplist proplist ind = match proplist with
   | [] -> []
   | x::xs -> (expand_prop x ind) @ (expand_proplist xs ind)
@@ -692,12 +727,12 @@ and expand_prop prop ind = match prop with
   | UnexpProp (name, None) -> List.fold_left (fun acc i -> (UnexpProp (name,Some ([i])))::acc) [] ind
   | UnexpProp (name, Some cur) -> List.fold_left (fun acc i -> (UnexpProp (name,Some (cur @ [i])))::acc) [] ind
   | x -> failwith ("[shouldnt happen] proplist contains smth that is not UnexpProp: "^string_of_ast_type x)
-and expand_var_name (prefix,indices:string * ast list option) (env:env) =
+and expand_var_name (msgs:Msgs.t ref) (env:env) (prefix,indices:string * ast list option) =
   match (prefix,indices) with
   | (x,None)   -> x
   | (x,Some y) ->
     x ^ "("
-    ^ (string_of_ast_list "," (List.map (fun e -> eval_ast e env) y))
+    ^ (string_of_ast_list "," (List.map (fun e -> eval_ast msgs env e) y))
     ^ ")"
 
 (* [set_to_ast_list] evaluates one element  of the list of things after
@@ -710,13 +745,13 @@ and expand_var_name (prefix,indices:string * ast list option) (env:env) =
    it would mean that it is not tail recursion anymore (= uses much more heap) 
    
    If [!check_only] is true, then the lists *)
-and set_to_ast_list (ast:ast) env : ast list =
-  let lst = match ast_whithout_loc (eval_ast ast env) with
+and set_to_ast_list (msgs:Msgs.t ref) (env:env) (ast:ast) : ast list =
+  let lst = match ast_whithout_loc (eval_ast msgs env ast) with
   | Set (EmptySet)-> []
   | Set (ISet a) -> List.fold_left (fun acc v -> (Int v)::acc)   [] (IntSet.elements a)
   | Set (FSet a) -> List.fold_left (fun acc v -> (Float v)::acc) [] (FloatSet.elements a)
   | Set (SSet a) -> List.fold_left (fun acc v -> (Prop v)::acc)  [] (PropSet.elements a)
-  | ast' -> raise_with_loc ast (
+  | ast' -> raise_with_loc msgs ast (
       "after 'in', only sets are allowed, but got '"^(string_of_ast_type ast')^"':\n"^
       "    "^(string_of_ast ast')^"\n"^
       "This element has been expanded to\n"^
@@ -729,11 +764,42 @@ and set_to_ast_list (ast:ast) env : ast list =
   (* [ast_to_bool] evaluates the 'when' condition when returns 'true' or 'false'
      depending on the result. 
      This function is used in Bigand and Bigor statements. *)
-  and ast_to_bool (ast:ast) env : bool = 
-    match eval_ast ast env with 
+  and ast_to_bool msgs env (ast:ast) : bool =
+    match eval_ast msgs env ast with 
     | Bool b -> b 
-    | ast' -> raise_with_loc ast (
+    | ast' -> raise_with_loc msgs ast (
       "'when' expects a 'bool' but got '"^(string_of_ast_type ast')^"':\n"^
       "    "^(string_of_ast ast')^"\n"^
       "This element has been expanded to\n"^
       "    "^(string_of_ast ast')^"")
+  (* To_int, To_float, Var, Int... all these cannot contain ToRemove because
+     ToRemove can only be generated by exact, atleast, atmost, bigand and bigor.
+     I only need to match the items that can potentially be produced by the 
+     above mentionned. And because "produced" means that everything has already
+     been evaluated, all If, Var... have already disapeared. *)
+  and hastoremove = function
+    | ToRemove -> true
+    | Not x                  -> hastoremove x
+    | And     (x,y)          -> hastoremove x || hastoremove y
+    | Or      (x,y)          -> hastoremove x || hastoremove y
+    | Xor     (x,y)          -> hastoremove x || hastoremove y
+    | Implies (x,y)          -> hastoremove x || hastoremove y
+    | Equiv   (x,y)          -> hastoremove x || hastoremove y
+     (* the following items are just here because of SMT that
+        allows ==, <, >, +, -, *... in formulas. *)
+    | Neg x                  -> hastoremove x
+    | Add (x,y)              -> hastoremove x || hastoremove y
+    | Sub (x,y)              -> hastoremove x || hastoremove y
+    | Mul (x,y)              -> hastoremove x || hastoremove y
+    | Div (x,y)              -> hastoremove x || hastoremove y
+    | Equal            (x,y) -> hastoremove x || hastoremove y
+    | Not_equal        (x,y) -> hastoremove x || hastoremove y
+    | Lesser_than      (x,y) -> hastoremove x || hastoremove y
+    | Lesser_or_equal  (x,y) -> hastoremove x || hastoremove y
+    | Greater_than     (x,y) -> hastoremove x || hastoremove y
+    | Greater_or_equal (x,y) -> hastoremove x || hastoremove y
+    | _ -> false
+  and cleantoremove ast =
+    if ast != ToRemove && hastoremove ast
+    then cleantoremove (eval_ast_formula (ref Msgs.empty) [] ast)
+    else ast

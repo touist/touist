@@ -1,3 +1,21 @@
+v2.3.1
+  - touistc:
+    - new way of handling empty bigand and bigor (when set is empty) and
+      exact, atmost and atleast (when the set is empty or the int is 0).
+      We denote this 'empty' statement by 'ø'; this special item will
+      allow the proper removal of the empty stamtent. It will remove
+      any statement before a 'and' or 'or' is met. Imagine we have
+      an empty bigand that is evaluated to Top. If this bigand is inside
+      an 'or', there will be a big side-effect: 
+        a or (bigand $i in []: p end)  -> a or Top  -> Top
+      Instead of removing the bigand, this Top alters our formula. Now,
+      with the new approach:
+        a or (bigand $i in []: p end)  -> a or ø    -> a
+      where our empty formula has been gracefully removed.
+    - added option --show that shows the formula after it has been
+      evaluated (no more variables or bigands, only propositions, 'and',
+      'or', '=>'...). Handy for debugging how your touistl has been
+      translated.
 v2.3.0
   - touistc:
     - it is now possible to generate sets using the following syntax:

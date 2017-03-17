@@ -32,7 +32,9 @@
 {
   open Lexing
   open Parser
-  open Msg
+  open Msgs
+
+  exception Error of string * loc
 
   let next_line lexbuf =
     let pos = lexbuf.lex_curr_p in
@@ -149,7 +151,7 @@ rule token = parse (* is a function (Lexing.lexbuf -> Parser.token list) *)
   | newline        { next_line lexbuf; token lexbuf   }
   | ";;"           { comments_parse lexbuf            }
   | _ as c         { let loc = (lexbuf.lex_curr_p,lexbuf.lex_curr_p)
-                     in Msg.add_fatal (Error, Lex, "unexpected char '"^(String.make 1 c)^"'", loc) }
+                     in raise (Error ("unexpected char '"^(String.make 1 c)^"'", loc)) }
 
 and comments_parse = parse
   | '\n'           { next_line lexbuf; token lexbuf }
