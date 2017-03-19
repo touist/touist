@@ -138,8 +138,12 @@ run_test_tt_main (
   "1 == 1 should be true">::(sat_expands_to "t(1==1)" "t(true)");
 ];
 "exact, atleast and atmost">:::[
-  "exact(1,[]) should be always false">::(sat_expands_to "exact(1,[])" "Bot");
-  "exact(0,[]) should be always true">::(sat_expands_to "exact(0,[])" "Top");
+  "exact(5,[]) should be false">::(sat_expands_to "exact(5,[])" "Bot");
+  "exact(0,[]) should be true">::(sat_expands_to "exact(0,[])" "Top");
+  "atmost(0,[]) should be true">::(sat_expands_to "atmost(0,[])" "Top");
+  "atmost(5,[]) should be true">::(sat_expands_to "atmost(5,[])" "Top");
+  "atleast(0,[]) should be true">::(sat_expands_to "atleast(0,[])" "Top");
+  "atleast(5,[]) should be false">::(sat_expands_to "atleast(5,[])" "Bot");
   "normal cases">:::[
   "exact(0,[a,b]) should return 'not a and not b'">::(sat_expands_to "exact(0,[a,b])" "(not a and not b)");
   "exact(1,[a,b,c]) should give 3 models">::(sat_models_are "exact(1,[a,b,c])" "0 a 0 b 1 c | 1 a 0 b 0 c | 0 a 1 b 0 c");

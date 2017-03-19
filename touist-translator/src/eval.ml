@@ -517,18 +517,22 @@ and eval_ast_formula (msgs:Msgs.t ref) (env:env) (ast:ast) : ast =
   | Equiv   (x,y) -> Equiv (eval_ast_formula x, eval_ast_formula y)
   | Exact (x,y) -> rm_top_bot begin (* !check_only simplifies by returning a dummy proposition *)
       match eval_ast x, eval_ast y with
-      | Int 0, Set s -> Top
-      | Int x, Set s ->
-        if !check_only then Prop "dummy" else exact_str (Set.exact x s)
+      | Int 0, Set s when Set.is_empty s -> Top
+      | Int k, Set s when Set.is_empty s -> Bottom
+      | Int x, Set s -> if !check_only then Prop "dummy" else exact_str (Set.exact x s)
       | x',y' -> raise_type_error2 msgs ast x x' y y' "'int' (left-hand)\nand a 'prop-set' (right-hand)"
     end
   | Atleast (x,y) -> rm_top_bot begin
       match eval_ast x, eval_ast y with
+      | Int 0, Set s when Set.is_empty s -> Top
+      | Int k, Set s when k > 0 && Set.is_empty s -> Bottom
       | Int x, Set s -> if !check_only then Prop "dummy" else atleast_str (Set.atleast x s)
       | x',y' -> raise_type_error2 msgs ast x x' y y' "'int' (left-hand)\nand a 'prop-set' (right-hand)"
     end
   | Atmost (x,y) -> rm_top_bot begin
       match eval_ast x, eval_ast y with
+      | Int _, Set s when Set.is_empty s -> Top
+      | Int 0, Set _ -> Bottom
       | Int x, Set s -> if !check_only then Prop "dummy" else atmost_str (Set.atmost x s)
       | x',y' -> raise_type_error2 msgs ast x x' y y' "'int' (left-hand)\nand a 'prop-set' (right-hand)"
     end
