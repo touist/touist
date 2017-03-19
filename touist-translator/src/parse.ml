@@ -2,7 +2,7 @@
 
     [parse] is the main function.
 
-    After this step, the AST (its type is [Syntax.ast]) can go through different functions:
+    After this step, the AST (its type is [Types.Ast.ast]) can go through different functions:
     - (1) [Eval.eval] for type-checking and evaluation of the expressions
         (bigor, bigand, variables...)
     - (2) [Cnf.ast_to_cnf] and then [Sat.cnf_to_clauses] to transform the AST
@@ -15,7 +15,7 @@
 *)
 
 open Parser
-open Syntax
+open Types.Ast
 open Lexing
 open Msgs
 
@@ -48,7 +48,7 @@ let lexer buffer : (Lexing.lexbuf -> Parser.token) =
     API of menhirLib, which allows us to do our own error handling.
 
     @param parser is the 'entry point' of the parser that is defined in parser.mly,e.g.,
-        %start <Syntax.ast> touist_simple, touist_smt
+        %start <Types.Ast.ast> touist_simple, touist_smt
     @param detailed_err allows to display absolute positions of the faulty text.
     
     Example:   parse Parser.Incremental.touist_simple "let î = 1: p($i)" 
@@ -58,7 +58,7 @@ let lexer buffer : (Lexing.lexbuf -> Parser.token) =
     "foo.touistl"... For now, the name of the input file name is not
     indicated to the user: useless because we only handle a single touistl file 
 *)
-let parse (parser) ?debug:(debug=false) (text:string) : Syntax.ast * Msgs.t ref =
+let parse (parser) ?debug:(debug=false) (text:string) : ast * Msgs.t ref =
   let msgs = ref Msgs.empty in
   let buffer = ref Parser_error_report.Zero in
   let lexbuf = Lexing.from_string text in

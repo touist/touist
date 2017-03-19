@@ -16,7 +16,7 @@
  * http://www.gnu.org/licenses/lgpl-2.1.html
  *)
 
-open Syntax
+open Types.Ast
 open Pprint
 open Minisat
 

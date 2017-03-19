@@ -14,7 +14,7 @@
  * version 2.1 which accompanies this distribution, and is available at
  * http://www.gnu.org/licenses/lgpl-2.1.html *)
 
-open Syntax
+open Types.Ast
 
 let to_smt2 logic formula =
   let vtbl = Hashtbl.create 10 in

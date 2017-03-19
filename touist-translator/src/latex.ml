@@ -21,7 +21,8 @@
       with most tools: MathJax (javascript), jlatexmath (java).
 *)
 
-open Syntax
+open Types.Ast
+open Types
 open Pprint
 
 let rm_dollar x = String.sub x 1 (String.length x - 1)
@@ -37,7 +38,7 @@ let rec latex_of_ast = function
   | UnexpProp (x,Some y) -> x ^ "_{" ^ (latex_of_commalist "," y) ^ "}"
   | Var (name,ind)   -> "\\mathbf{" ^ escape_underscore (rm_dollar name) ^ "}" ^
     (match ind with Some ind -> ("("^ (latex_of_commalist "," ind) ^")") | None->"")
-  | Set    x -> string_of_set x
+  | Set    x -> "["^latex_of_commalist "," (Set.elements x) ^ "]"
   | Set_decl x -> "[" ^ (latex_of_commalist "," x) ^ "]"
   | Neg x     -> "-" ^ (latex_of_ast x)
   | Add (x,y) -> (latex_of_ast x) ^ " + "   ^ (latex_of_ast y)
