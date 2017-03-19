@@ -24,7 +24,7 @@
 # =========================================================================
 touist_smt: ATLEAST VAR COMMA VAR WHEN 
 ##
-## Ends in an error in state: 249.
+## Ends in an error in state: 261.
 ##
 ## expr -> expr . ADD expr [ XOR SUB RPAREN OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
 ## expr -> expr . SUB expr [ XOR SUB RPAREN OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
@@ -50,7 +50,7 @@ touist_smt: ATLEAST VAR COMMA VAR WHEN
 ##
 touist_smt: ATMOST VAR COMMA VAR WHEN 
 ##
-## Ends in an error in state: 244.
+## Ends in an error in state: 256.
 ##
 ## expr -> expr . ADD expr [ XOR SUB RPAREN OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
 ## expr -> expr . SUB expr [ XOR SUB RPAREN OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
@@ -76,7 +76,7 @@ touist_smt: ATMOST VAR COMMA VAR WHEN
 ##
 touist_smt: EXACT VAR COMMA VAR WHEN 
 ##
-## Ends in an error in state: 226.
+## Ends in an error in state: 239.
 ##
 ## expr -> expr . ADD expr [ XOR SUB RPAREN OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
 ## expr -> expr . SUB expr [ XOR SUB RPAREN OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
@@ -291,7 +291,7 @@ Instead, the following statement were read:
 
 touist_smt: ATLEAST VAR COMMA XOR 
 ##
-## Ends in an error in state: 248.
+## Ends in an error in state: 260.
 ##
 ## formula_smt -> ATLEAST expr COMMA . expr RPAREN [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOT LPAREN LET INT IMPLIES IF FLOAT EXACT EQUIV EOF END ELSE DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ]
 ##
@@ -300,7 +300,7 @@ touist_smt: ATLEAST VAR COMMA XOR
 ##
 touist_smt: ATMOST VAR COMMA XOR 
 ##
-## Ends in an error in state: 243.
+## Ends in an error in state: 255.
 ##
 ## formula_smt -> ATMOST expr COMMA . expr RPAREN [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOT LPAREN LET INT IMPLIES IF FLOAT EXACT EQUIV EOF END ELSE DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ]
 ##
@@ -309,7 +309,7 @@ touist_smt: ATMOST VAR COMMA XOR
 ##
 touist_smt: EXACT VAR COMMA XOR 
 ##
-## Ends in an error in state: 225.
+## Ends in an error in state: 238.
 ##
 ## formula_smt -> EXACT expr COMMA . expr RPAREN [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOT LPAREN LET INT IMPLIES IF FLOAT EXACT EQUIV EOF END ELSE DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ]
 ##
@@ -391,7 +391,7 @@ Instead, the following statement were read:
 
 touist_smt: ATLEAST XOR 
 ##
-## Ends in an error in state: 246.
+## Ends in an error in state: 258.
 ##
 ## formula_smt -> ATLEAST . expr COMMA expr RPAREN [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOT LPAREN LET INT IMPLIES IF FLOAT EXACT EQUIV EOF END ELSE DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ]
 ##
@@ -400,7 +400,7 @@ touist_smt: ATLEAST XOR
 ##
 touist_smt: ATMOST XOR 
 ##
-## Ends in an error in state: 241.
+## Ends in an error in state: 253.
 ##
 ## formula_smt -> ATMOST . expr COMMA expr RPAREN [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOT LPAREN LET INT IMPLIES IF FLOAT EXACT EQUIV EOF END ELSE DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ]
 ##
@@ -409,7 +409,7 @@ touist_smt: ATMOST XOR
 ##
 touist_smt: EXACT XOR 
 ##
-## Ends in an error in state: 223.
+## Ends in an error in state: 236.
 ##
 ## formula_smt -> EXACT . expr COMMA expr RPAREN [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOT LPAREN LET INT IMPLIES IF FLOAT EXACT EQUIV EOF END ELSE DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ]
 ##
@@ -450,7 +450,7 @@ Instead, the following statement were read:
 
 touist_smt: IF XOR 
 ##
-## Ends in an error in state: 220.
+## Ends in an error in state: 233.
 ##
 ## formula_smt -> IF . expr THEN formula_smt ELSE formula_smt END [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOT LPAREN LET INT IMPLIES IF FLOAT EXACT EQUIV EOF END ELSE DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ]
 ##
@@ -717,7 +717,7 @@ Instead, the following statement were read:
 
 touist_smt: BIGAND XOR 
 ##
-## Ends in an error in state: 235.
+## Ends in an error in state: 247.
 ##
 ## formula_smt -> BIGAND . comma_list(var) IN comma_list(expr) option(when_cond) COLON formula_smt END [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOT LPAREN LET INT IMPLIES IF FLOAT EXACT EQUIV EOF END ELSE DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ]
 ##
@@ -726,7 +726,7 @@ touist_smt: BIGAND XOR
 ##
 touist_smt: BIGOR XOR 
 ##
-## Ends in an error in state: 229.
+## Ends in an error in state: 241.
 ##
 ## formula_smt -> BIGOR . comma_list(var) IN comma_list(expr) option(when_cond) COLON formula_smt END [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOT LPAREN LET INT IMPLIES IF FLOAT EXACT EQUIV EOF END ELSE DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ]
 ##
@@ -759,7 +759,7 @@ Instead, the following statement were read:
 
 touist_smt: LET XOR 
 ##
-## Ends in an error in state: 215.
+## Ends in an error in state: 228.
 ##
 ## let_affect(expr,formula_smt) -> LET . var AFFECT expr COLON formula_smt [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOT LPAREN LET INT IMPLIES IF FLOAT EXACT EQUIV EOF END ELSE DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ]
 ##
@@ -783,9 +783,9 @@ Instead, the following statement were read:
 
 touist_smt: LPAREN XOR 
 ##
-## Ends in an error in state: 214.
+## Ends in an error in state: 227.
 ##
-## expr_smt -> LPAREN . expr_smt RPAREN [ SUB RPAREN NOTEQUAL MUL LT LE GT GE EQUAL DIV ADD ]
+## expr_smt -> LPAREN . expr_smt RPAREN [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ## formula_smt -> LPAREN . formula_smt RPAREN [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOT LPAREN LET INT IMPLIES IF FLOAT EXACT EQUIV EOF END ELSE DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ]
 ##
 ## The known suffix of the stack is as follows:
@@ -802,7 +802,7 @@ touist_simple: LPAREN XOR
 ##
 touist_smt: NOT XOR 
 ##
-## Ends in an error in state: 213.
+## Ends in an error in state: 226.
 ##
 ## formula_smt -> NOT . formula_smt [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOT LPAREN LET INT IMPLIES IF FLOAT EXACT EQUIV EOF END ELSE DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ]
 ##
@@ -850,11 +850,10 @@ touist_simple: VAR WHEN
 ##
 touist_smt: VAR WHEN 
 ##
-## Ends in an error in state: 290.
+## Ends in an error in state: 288.
 ##
 ## affect_or(formula_smt) -> var . AFFECT expr [ VARTUPLE VAR TUPLE TOP TERM SUB NOT LPAREN LET INT IF FLOAT EXACT EOF BOTTOM BIGOR BIGAND ATMOST ATLEAST ]
-## expr_smt -> var . [ SUB NOTEQUAL MUL LT LE GT GE EQUAL DIV ADD ]
-## formula_smt -> var . [ XOR VARTUPLE VAR TUPLE TOP TERM SUB OR NOT LPAREN LET INT IMPLIES IF FLOAT EXACT EQUIV EOF DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ]
+## expr_smt -> var . [ XOR VARTUPLE VAR TUPLE TOP TERM SUB OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF DIV DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ##
 ## The known suffix of the stack is as follows:
 ## var 
@@ -877,7 +876,7 @@ touist_simple: VAR AFFECT XOR
 ##
 touist_smt: VAR AFFECT XOR 
 ##
-## Ends in an error in state: 291.
+## Ends in an error in state: 289.
 ##
 ## affect_or(formula_smt) -> var AFFECT . expr [ VARTUPLE VAR TUPLE TOP TERM SUB NOT LPAREN LET INT IF FLOAT EXACT EOF BOTTOM BIGOR BIGAND ATMOST ATLEAST ]
 ##
@@ -917,7 +916,7 @@ touist_simple: VAR AFFECT VAR WHEN
 ##
 touist_smt: VAR AFFECT VAR WHEN 
 ##
-## Ends in an error in state: 292.
+## Ends in an error in state: 290.
 ##
 ## affect_or(formula_smt) -> var AFFECT expr . [ VARTUPLE VAR TUPLE TOP TERM SUB NOT LPAREN LET INT IF FLOAT EXACT EOF BOTTOM BIGOR BIGAND ATMOST ATLEAST ]
 ## expr -> expr . ADD expr [ XOR VARTUPLE VAR TUPLE TOP TERM SUB OR NOTEQUAL NOT MUL MOD LT LPAREN LET LE INT IN IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF DIV BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
@@ -963,7 +962,7 @@ Instead, the following statement were read:
 
 touist_smt: BIGAND VAR IN VAR COLON TOP TUPLE 
 ##
-## Ends in an error in state: 254.
+## Ends in an error in state: 264.
 ##
 ## formula_smt -> formula_smt . AND formula_smt [ XOR OR IMPLIES EQUIV END AND ]
 ## formula_smt -> formula_smt . OR formula_smt [ XOR OR IMPLIES EQUIV END AND ]
@@ -975,9 +974,15 @@ touist_smt: BIGAND VAR IN VAR COLON TOP TUPLE
 ## The known suffix of the stack is as follows:
 ## BIGAND comma_list(var) IN comma_list(expr) option(when_cond) COLON formula_smt 
 ##
+## WARNING: This example involves spurious reductions.
+## This implies that, although the LR(1) items shown above provide an
+## accurate view of the past (what has been recognized so far), they
+## may provide an INCOMPLETE view of the future (what was expected next).
+## In state 267, spurious reduction of production formula_smt -> expr_smt 
+##
 touist_smt: BIGOR VAR IN VAR COLON TOP TUPLE 
 ##
-## Ends in an error in state: 279.
+## Ends in an error in state: 277.
 ##
 ## formula_smt -> formula_smt . AND formula_smt [ XOR OR IMPLIES EQUIV END AND ]
 ## formula_smt -> formula_smt . OR formula_smt [ XOR OR IMPLIES EQUIV END AND ]
@@ -988,6 +993,12 @@ touist_smt: BIGOR VAR IN VAR COLON TOP TUPLE
 ##
 ## The known suffix of the stack is as follows:
 ## BIGOR comma_list(var) IN comma_list(expr) option(when_cond) COLON formula_smt 
+##
+## WARNING: This example involves spurious reductions.
+## This implies that, although the LR(1) items shown above provide an
+## accurate view of the past (what has been recognized so far), they
+## may provide an INCOMPLETE view of the future (what was expected next).
+## In state 267, spurious reduction of production formula_smt -> expr_smt 
 ##
 touist_simple: BIGAND VAR IN VAR COLON TOP WHEN 
 ##
@@ -1025,7 +1036,7 @@ Instead, the following statement were read:
 
 touist_smt: BIGAND VAR IN VAR COLON XOR 
 ##
-## Ends in an error in state: 240.
+## Ends in an error in state: 252.
 ##
 ## formula_smt -> BIGAND comma_list(var) IN comma_list(expr) option(when_cond) COLON . formula_smt END [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOT LPAREN LET INT IMPLIES IF FLOAT EXACT EQUIV EOF END ELSE DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ]
 ##
@@ -1034,7 +1045,7 @@ touist_smt: BIGAND VAR IN VAR COLON XOR
 ##
 touist_smt: BIGOR VAR IN VAR COLON XOR 
 ##
-## Ends in an error in state: 234.
+## Ends in an error in state: 246.
 ##
 ## formula_smt -> BIGOR comma_list(var) IN comma_list(expr) option(when_cond) COLON . formula_smt END [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOT LPAREN LET INT IMPLIES IF FLOAT EXACT EQUIV EOF END ELSE DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ]
 ##
@@ -1066,7 +1077,7 @@ Instead, the following statement were read:
 
 touist_smt: BIGAND VAR IN VAR VARTUPLE 
 ##
-## Ends in an error in state: 238.
+## Ends in an error in state: 250.
 ##
 ## formula_smt -> BIGAND comma_list(var) IN comma_list(expr) . option(when_cond) COLON formula_smt END [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOT LPAREN LET INT IMPLIES IF FLOAT EXACT EQUIV EOF END ELSE DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ]
 ##
@@ -1081,7 +1092,7 @@ touist_smt: BIGAND VAR IN VAR VARTUPLE
 ##
 touist_smt: BIGOR VAR IN VAR VARTUPLE 
 ##
-## Ends in an error in state: 232.
+## Ends in an error in state: 244.
 ##
 ## formula_smt -> BIGOR comma_list(var) IN comma_list(expr) . option(when_cond) COLON formula_smt END [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOT LPAREN LET INT IMPLIES IF FLOAT EXACT EQUIV EOF END ELSE DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ]
 ##
@@ -1132,7 +1143,7 @@ Instead, the following statement were read:
 
 touist_smt: BIGAND VAR IN XOR 
 ##
-## Ends in an error in state: 237.
+## Ends in an error in state: 249.
 ##
 ## formula_smt -> BIGAND comma_list(var) IN . comma_list(expr) option(when_cond) COLON formula_smt END [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOT LPAREN LET INT IMPLIES IF FLOAT EXACT EQUIV EOF END ELSE DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ]
 ##
@@ -1141,7 +1152,7 @@ touist_smt: BIGAND VAR IN XOR
 ##
 touist_smt: BIGOR VAR IN XOR 
 ##
-## Ends in an error in state: 231.
+## Ends in an error in state: 243.
 ##
 ## formula_smt -> BIGOR comma_list(var) IN . comma_list(expr) option(when_cond) COLON formula_smt END [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOT LPAREN LET INT IMPLIES IF FLOAT EXACT EQUIV EOF END ELSE DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ]
 ##
@@ -1174,7 +1185,7 @@ Instead, the following statement were read:
 
 touist_smt: BIGAND VAR XOR 
 ##
-## Ends in an error in state: 236.
+## Ends in an error in state: 248.
 ##
 ## formula_smt -> BIGAND comma_list(var) . IN comma_list(expr) option(when_cond) COLON formula_smt END [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOT LPAREN LET INT IMPLIES IF FLOAT EXACT EQUIV EOF END ELSE DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ]
 ##
@@ -1189,7 +1200,7 @@ touist_smt: BIGAND VAR XOR
 ##
 touist_smt: BIGOR VAR XOR 
 ##
-## Ends in an error in state: 230.
+## Ends in an error in state: 242.
 ##
 ## formula_smt -> BIGOR comma_list(var) . IN comma_list(expr) option(when_cond) COLON formula_smt END [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOT LPAREN LET INT IMPLIES IF FLOAT EXACT EQUIV EOF END ELSE DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ]
 ##
@@ -1240,7 +1251,7 @@ Instead, the following statement were read:
 
 touist_smt: IF VAR THEN TOP ELSE TOP TUPLE 
 ##
-## Ends in an error in state: 283.
+## Ends in an error in state: 281.
 ##
 ## formula_smt -> IF expr THEN formula_smt ELSE formula_smt . END [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOT LPAREN LET INT IMPLIES IF FLOAT EXACT EQUIV EOF END ELSE DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ]
 ## formula_smt -> formula_smt . AND formula_smt [ XOR OR IMPLIES EQUIV END AND ]
@@ -1251,6 +1262,12 @@ touist_smt: IF VAR THEN TOP ELSE TOP TUPLE
 ##
 ## The known suffix of the stack is as follows:
 ## IF expr THEN formula_smt ELSE formula_smt 
+##
+## WARNING: This example involves spurious reductions.
+## This implies that, although the LR(1) items shown above provide an
+## accurate view of the past (what has been recognized so far), they
+## may provide an INCOMPLETE view of the future (what was expected next).
+## In state 267, spurious reduction of production formula_smt -> expr_smt 
 ##
 touist_simple: IF VAR THEN TOP ELSE TOP WHEN 
 ##
@@ -1274,7 +1291,7 @@ Instead, the following statement were read:
 
 touist_smt: IF VAR THEN TOP ELSE XOR 
 ##
-## Ends in an error in state: 282.
+## Ends in an error in state: 280.
 ##
 ## formula_smt -> IF expr THEN formula_smt ELSE . formula_smt END [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOT LPAREN LET INT IMPLIES IF FLOAT EXACT EQUIV EOF END ELSE DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ]
 ##
@@ -1297,7 +1314,7 @@ Instead, the following statement were read:
 
 touist_smt: IF VAR THEN TOP TUPLE 
 ##
-## Ends in an error in state: 281.
+## Ends in an error in state: 279.
 ##
 ## formula_smt -> IF expr THEN formula_smt . ELSE formula_smt END [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOT LPAREN LET INT IMPLIES IF FLOAT EXACT EQUIV EOF END ELSE DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ]
 ## formula_smt -> formula_smt . AND formula_smt [ XOR OR IMPLIES EQUIV ELSE AND ]
@@ -1308,6 +1325,12 @@ touist_smt: IF VAR THEN TOP TUPLE
 ##
 ## The known suffix of the stack is as follows:
 ## IF expr THEN formula_smt 
+##
+## WARNING: This example involves spurious reductions.
+## This implies that, although the LR(1) items shown above provide an
+## accurate view of the past (what has been recognized so far), they
+## may provide an INCOMPLETE view of the future (what was expected next).
+## In state 267, spurious reduction of production formula_smt -> expr_smt 
 ##
 touist_simple: IF VAR THEN TOP WHEN 
 ##
@@ -1409,7 +1432,7 @@ Instead, the following statement were read:
 
 touist_smt: IF VAR THEN XOR 
 ##
-## Ends in an error in state: 222.
+## Ends in an error in state: 235.
 ##
 ## formula_smt -> IF expr THEN . formula_smt ELSE formula_smt END [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOT LPAREN LET INT IMPLIES IF FLOAT EXACT EQUIV EOF END ELSE DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ]
 ##
@@ -1505,17 +1528,22 @@ Instead, the following statement were read:
 
 touist_smt: LET VAR AFFECT VAR COLON LPAREN BOTTOM RPAREN WHEN 
 ##
-## Ends in an error in state: 285.
+## Ends in an error in state: 267.
 ##
-## formula_smt -> formula_smt . AND formula_smt [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOT LPAREN LET INT IMPLIES IF FLOAT EXACT EQUIV EOF END ELSE DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ]
-## formula_smt -> formula_smt . OR formula_smt [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOT LPAREN LET INT IMPLIES IF FLOAT EXACT EQUIV EOF END ELSE DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ]
-## formula_smt -> formula_smt . XOR formula_smt [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOT LPAREN LET INT IMPLIES IF FLOAT EXACT EQUIV EOF END ELSE DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ]
-## formula_smt -> formula_smt . IMPLIES formula_smt [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOT LPAREN LET INT IMPLIES IF FLOAT EXACT EQUIV EOF END ELSE DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ]
-## formula_smt -> formula_smt . EQUIV formula_smt [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOT LPAREN LET INT IMPLIES IF FLOAT EXACT EQUIV EOF END ELSE DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ]
-## let_affect(expr,formula_smt) -> LET var AFFECT expr COLON formula_smt . [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOT LPAREN LET INT IMPLIES IF FLOAT EXACT EQUIV EOF END ELSE DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ]
+## expr_smt -> expr_smt . LT expr_smt [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
+## expr_smt -> expr_smt . LE expr_smt [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
+## expr_smt -> expr_smt . GT expr_smt [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
+## expr_smt -> expr_smt . GE expr_smt [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
+## expr_smt -> expr_smt . ADD expr_smt [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
+## expr_smt -> expr_smt . SUB expr_smt [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
+## expr_smt -> expr_smt . MUL expr_smt [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
+## expr_smt -> expr_smt . DIV expr_smt [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
+## expr_smt -> expr_smt . EQUAL expr_smt [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
+## expr_smt -> expr_smt . NOTEQUAL expr_smt [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
+## formula_smt -> expr_smt . [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOT LPAREN LET INT IMPLIES IF FLOAT EXACT EQUIV EOF END ELSE DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ]
 ##
 ## The known suffix of the stack is as follows:
-## LET var AFFECT expr COLON formula_smt 
+## expr_smt 
 ##
 
 At this point, either finish the formula with a new formula
@@ -1525,7 +1553,7 @@ Instead, the following statement were read:
 
 touist_smt: LET VAR AFFECT VAR COLON XOR 
 ##
-## Ends in an error in state: 219.
+## Ends in an error in state: 232.
 ##
 ## let_affect(expr,formula_smt) -> LET var AFFECT expr COLON . formula_smt [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOT LPAREN LET INT IMPLIES IF FLOAT EXACT EQUIV EOF END ELSE DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ]
 ##
@@ -1539,7 +1567,7 @@ Instead, the following statement were read:
 
 touist_smt: LET VAR AFFECT VAR WHEN 
 ##
-## Ends in an error in state: 218.
+## Ends in an error in state: 231.
 ##
 ## expr -> expr . ADD expr [ XOR SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COLON AND ADD ]
 ## expr -> expr . SUB expr [ XOR SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COLON AND ADD ]
@@ -1571,7 +1599,7 @@ Instead, the following statement were read:
 
 touist_smt: LET VAR AFFECT XOR 
 ##
-## Ends in an error in state: 217.
+## Ends in an error in state: 230.
 ##
 ## let_affect(expr,formula_smt) -> LET var AFFECT . expr COLON formula_smt [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOT LPAREN LET INT IMPLIES IF FLOAT EXACT EQUIV EOF END ELSE DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ]
 ##
@@ -1586,7 +1614,7 @@ Instead, the following statement were read:
 
 touist_smt: LET VAR XOR 
 ##
-## Ends in an error in state: 216.
+## Ends in an error in state: 229.
 ##
 ## let_affect(expr,formula_smt) -> LET var . AFFECT expr COLON formula_smt [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOT LPAREN LET INT IMPLIES IF FLOAT EXACT EQUIV EOF END ELSE DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ]
 ##
@@ -1602,15 +1630,21 @@ touist_smt: LPAREN TOP TUPLE
 ##
 ## Ends in an error in state: 286.
 ##
-## formula_smt -> LPAREN formula_smt . RPAREN [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOT LPAREN LET INT IMPLIES IF FLOAT EXACT EQUIV EOF END ELSE DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ]
-## formula_smt -> formula_smt . AND formula_smt [ XOR RPAREN OR IMPLIES EQUIV AND ]
-## formula_smt -> formula_smt . OR formula_smt [ XOR RPAREN OR IMPLIES EQUIV AND ]
-## formula_smt -> formula_smt . XOR formula_smt [ XOR RPAREN OR IMPLIES EQUIV AND ]
-## formula_smt -> formula_smt . IMPLIES formula_smt [ XOR RPAREN OR IMPLIES EQUIV AND ]
-## formula_smt -> formula_smt . EQUIV formula_smt [ XOR RPAREN OR IMPLIES EQUIV AND ]
+## expr_smt -> expr_smt . LT expr_smt [ XOR SUB RPAREN OR NOTEQUAL MUL LT LE IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
+## expr_smt -> expr_smt . LE expr_smt [ XOR SUB RPAREN OR NOTEQUAL MUL LT LE IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
+## expr_smt -> expr_smt . GT expr_smt [ XOR SUB RPAREN OR NOTEQUAL MUL LT LE IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
+## expr_smt -> expr_smt . GE expr_smt [ XOR SUB RPAREN OR NOTEQUAL MUL LT LE IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
+## expr_smt -> expr_smt . ADD expr_smt [ XOR SUB RPAREN OR NOTEQUAL MUL LT LE IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
+## expr_smt -> expr_smt . SUB expr_smt [ XOR SUB RPAREN OR NOTEQUAL MUL LT LE IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
+## expr_smt -> expr_smt . MUL expr_smt [ XOR SUB RPAREN OR NOTEQUAL MUL LT LE IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
+## expr_smt -> expr_smt . DIV expr_smt [ XOR SUB RPAREN OR NOTEQUAL MUL LT LE IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
+## expr_smt -> expr_smt . EQUAL expr_smt [ XOR SUB RPAREN OR NOTEQUAL MUL LT LE IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
+## expr_smt -> expr_smt . NOTEQUAL expr_smt [ XOR SUB RPAREN OR NOTEQUAL MUL LT LE IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
+## expr_smt -> LPAREN expr_smt . RPAREN [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
+## formula_smt -> expr_smt . [ XOR RPAREN OR IMPLIES EQUIV AND ]
 ##
 ## The known suffix of the stack is as follows:
-## LPAREN formula_smt 
+## LPAREN expr_smt 
 ##
 
 Ill-formed formula. At this point, finish the formula with ')' or
@@ -1620,7 +1654,7 @@ Instead, the following statement were read:
 
 touist_smt: TOP AND XOR 
 ##
-## Ends in an error in state: 272.
+## Ends in an error in state: 270.
 ##
 ## formula_smt -> formula_smt AND . formula_smt [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOT LPAREN LET INT IMPLIES IF FLOAT EXACT EQUIV EOF END ELSE DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ]
 ##
@@ -1629,7 +1663,7 @@ touist_smt: TOP AND XOR
 ##
 touist_smt: TOP EQUIV XOR 
 ##
-## Ends in an error in state: 276.
+## Ends in an error in state: 274.
 ##
 ## formula_smt -> formula_smt EQUIV . formula_smt [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOT LPAREN LET INT IMPLIES IF FLOAT EXACT EQUIV EOF END ELSE DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ]
 ##
@@ -1638,7 +1672,7 @@ touist_smt: TOP EQUIV XOR
 ##
 touist_smt: TOP IMPLIES XOR 
 ##
-## Ends in an error in state: 274.
+## Ends in an error in state: 272.
 ##
 ## formula_smt -> formula_smt IMPLIES . formula_smt [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOT LPAREN LET INT IMPLIES IF FLOAT EXACT EQUIV EOF END ELSE DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ]
 ##
@@ -1647,7 +1681,7 @@ touist_smt: TOP IMPLIES XOR
 ##
 touist_smt: TOP OR XOR 
 ##
-## Ends in an error in state: 270.
+## Ends in an error in state: 268.
 ##
 ## formula_smt -> formula_smt OR . formula_smt [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOT LPAREN LET INT IMPLIES IF FLOAT EXACT EQUIV EOF END ELSE DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ]
 ##
@@ -1656,7 +1690,7 @@ touist_smt: TOP OR XOR
 ##
 touist_smt: TOP XOR XOR 
 ##
-## Ends in an error in state: 255.
+## Ends in an error in state: 265.
 ##
 ## formula_smt -> formula_smt XOR . formula_smt [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOT LPAREN LET INT IMPLIES IF FLOAT EXACT EQUIV EOF END ELSE DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ]
 ##
@@ -1741,7 +1775,7 @@ touist_smt: SUB XOR
 ##
 touist_smt: VAR MUL XOR 
 ##
-## Ends in an error in state: 205.
+## Ends in an error in state: 206.
 ##
 ## expr_smt -> expr_smt MUL . expr_smt [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ##
@@ -1750,7 +1784,7 @@ touist_smt: VAR MUL XOR
 ##
 touist_smt: VAR DIV XOR 
 ##
-## Ends in an error in state: 207.
+## Ends in an error in state: 208.
 ##
 ## expr_smt -> expr_smt DIV . expr_smt [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ##
@@ -1759,7 +1793,7 @@ touist_smt: VAR DIV XOR
 ##
 touist_smt: VAR ADD XOR 
 ##
-## Ends in an error in state: 210.
+## Ends in an error in state: 213.
 ##
 ## expr_smt -> expr_smt ADD . expr_smt [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ##
@@ -1782,26 +1816,38 @@ Instead, the following statement were read:
 
 touist_smt: VAR SUB VAR WHEN 
 ##
-## Ends in an error in state: 212.
+## Ends in an error in state: 205.
 ##
+## expr_smt -> expr_smt . LT expr_smt [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
+## expr_smt -> expr_smt . LE expr_smt [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
+## expr_smt -> expr_smt . GT expr_smt [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
+## expr_smt -> expr_smt . GE expr_smt [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ## expr_smt -> expr_smt . ADD expr_smt [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ## expr_smt -> expr_smt . SUB expr_smt [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
-## expr_smt -> SUB expr_smt . [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
+## expr_smt -> expr_smt SUB expr_smt . [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ## expr_smt -> expr_smt . MUL expr_smt [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ## expr_smt -> expr_smt . DIV expr_smt [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
+## expr_smt -> expr_smt . EQUAL expr_smt [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
+## expr_smt -> expr_smt . NOTEQUAL expr_smt [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ##
 ## The known suffix of the stack is as follows:
-## SUB expr_smt 
+## expr_smt SUB expr_smt 
 ##
 touist_smt: VAR ADD VAR WHEN 
 ##
-## Ends in an error in state: 211.
+## Ends in an error in state: 214.
 ##
+## expr_smt -> expr_smt . LT expr_smt [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
+## expr_smt -> expr_smt . LE expr_smt [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
+## expr_smt -> expr_smt . GT expr_smt [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
+## expr_smt -> expr_smt . GE expr_smt [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ## expr_smt -> expr_smt . ADD expr_smt [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ## expr_smt -> expr_smt ADD expr_smt . [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ## expr_smt -> expr_smt . SUB expr_smt [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ## expr_smt -> expr_smt . MUL expr_smt [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ## expr_smt -> expr_smt . DIV expr_smt [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
+## expr_smt -> expr_smt . EQUAL expr_smt [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
+## expr_smt -> expr_smt . NOTEQUAL expr_smt [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOTEQUAL NOT MUL LT LPAREN LET LE INT IMPLIES IF GT GE FLOAT EXACT EQUIV EQUAL EOF END ELSE DIV DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
 ##
 ## The known suffix of the stack is as follows:
 ## expr_smt ADD expr_smt 
@@ -2364,7 +2410,7 @@ touist_simple: VAR DATA AND
 ##
 touist_smt: VAR DATA AND 
 ##
-## Ends in an error in state: 298.
+## Ends in an error in state: 296.
 ##
 ## nonempty_list(affect_or(formula_smt)) -> affect_or(formula_smt) . [ EOF ]
 ## nonempty_list(affect_or(formula_smt)) -> affect_or(formula_smt) . nonempty_list(affect_or(formula_smt)) [ EOF ]
@@ -2524,7 +2570,7 @@ touist_simple: VARTUPLE UNION VAR WHEN
 ##
 touist_smt: ATLEAST VAR WHEN 
 ##
-## Ends in an error in state: 247.
+## Ends in an error in state: 259.
 ##
 ## expr -> expr . ADD expr [ XOR SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COMMA AND ADD ]
 ## expr -> expr . SUB expr [ XOR SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COMMA AND ADD ]
@@ -2550,7 +2596,7 @@ touist_smt: ATLEAST VAR WHEN
 ##
 touist_smt: ATMOST VAR WHEN 
 ##
-## Ends in an error in state: 242.
+## Ends in an error in state: 254.
 ##
 ## expr -> expr . ADD expr [ XOR SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COMMA AND ADD ]
 ## expr -> expr . SUB expr [ XOR SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COMMA AND ADD ]
@@ -2576,7 +2622,7 @@ touist_smt: ATMOST VAR WHEN
 ##
 touist_smt: EXACT VAR WHEN 
 ##
-## Ends in an error in state: 224.
+## Ends in an error in state: 237.
 ##
 ## expr -> expr . ADD expr [ XOR SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COMMA AND ADD ]
 ## expr -> expr . SUB expr [ XOR SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COMMA AND ADD ]
@@ -2602,7 +2648,7 @@ touist_smt: EXACT VAR WHEN
 ##
 touist_smt: IF VAR WHEN 
 ##
-## Ends in an error in state: 221.
+## Ends in an error in state: 234.
 ##
 ## expr -> expr . ADD expr [ XOR THEN SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
 ## expr -> expr . SUB expr [ XOR THEN SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
