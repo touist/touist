@@ -295,6 +295,18 @@ and eval_ast (msgs:Msgs.t ref) (env:env) (ast:ast) :ast =
       | Set a, Set b -> Bool (Set.subset a b)
       | x',y' -> raise_type_error2 msgs ast x x' y y' "a 'float-set', int or prop"
     end
+  | Powerset x -> begin
+      let combination_to_set k set =
+        List.fold_left (fun acc x -> Set.add (Set (Set.of_list x)) acc) Set.empty (Set.combinations k set)
+      in
+      let rec all_combinations_to_set k set = match k with
+        | 0 -> Set.empty
+        | _ -> Set.union (combination_to_set k set) (all_combinations_to_set (pred k) set)
+      in
+      match eval_ast x with
+      | Set s -> Set (all_combinations_to_set (Set.cardinal s) s)
+      | x' -> raise_type_error msgs ast x x' "a 'set'"
+    end
   | In (x,y) ->
     begin match eval_ast x, eval_ast y with
       | x', Set y' -> Bool (Set.mem x' y')

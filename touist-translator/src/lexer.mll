@@ -79,7 +79,8 @@
     "true",          BOOL true;
     "false",         BOOL false;
     "let",           LET;
-    "data",          DATA]
+    "data",          DATA;
+    "powerset(",     POWERSET]
 }
 
 let digit      = ['0' - '9']
