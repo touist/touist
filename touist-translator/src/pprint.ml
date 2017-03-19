@@ -47,6 +47,7 @@ let rec string_of_ast ?(show_var=(fun ast -> "")) ?(debug=false) ?(parenthesis=d
   | Diff   (x,y) -> "diff("   ^ (string_of_ast x) ^ "," ^ (string_of_ast y)
   | Range  (x,y) -> "["       ^ (string_of_ast x) ^ ".." ^ (string_of_ast y) ^ "]"
   | Subset (x,y) -> "subset(" ^ (string_of_ast x) ^ "," ^ (string_of_ast y)
+  | Powerset x   -> "powerset(" ^ string_of_ast x ^ ")"
   | In     (x,y) -> (string_of_ast x) ^ " in " ^ (string_of_ast y)
   | Empty x -> "empty(" ^ (string_of_ast x) ^ ")"
   | Card  x -> "card("  ^ (string_of_ast x) ^ ")"
@@ -96,7 +97,7 @@ and string_of_ast_type = function
   | Prop x                 -> "proposition"
   | Var (x,None)         -> "variable"
   | Var (x,Some y)       -> "tuple-variable"
-  | Set s                  -> "term-set"
+  | Set s                  -> "set"
   | Set_decl x             -> "[ ] (set definition)"
   | Neg x                  -> "-"
   | Add (x,y)              -> "+"
@@ -125,6 +126,7 @@ and string_of_ast_type = function
   | Diff   (x,y)           -> "diff"
   | Range  (x,y)           -> ".."
   | Subset (x,y)           -> "subset()"
+  | Powerset x             -> "powerset()"
   | In     (x,y)           -> "in"
   | Empty x                -> "empty()"
   | Card  x                -> "card()"

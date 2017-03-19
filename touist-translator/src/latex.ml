@@ -67,6 +67,7 @@ let rec latex_of_ast = function
   | Diff   (x,y) -> (latex_of_ast x) ^ "\\setminus " ^ (latex_of_ast y)
   | Range  (x,y) -> "["       ^ (latex_of_ast x) ^ ".." ^ (latex_of_ast y) ^ "]"
   | Subset (x,y) -> (latex_of_ast x) ^ "\\subset " ^ (latex_of_ast y)
+  | Powerset x   -> "\\textrm{powerset}(" ^ string_of_ast x ^ ")"
   | In     (x,y) -> (latex_of_ast x) ^ " \\in " ^ (latex_of_ast y)
   | Empty x -> "\\textrm{empty}(" ^ (latex_of_ast x) ^ ")"
   | Card  x -> "\\textrm{card}("  ^ (latex_of_ast x) ^ ")"

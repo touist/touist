@@ -26,7 +26,7 @@
 %token AND OR XOR IMPLIES EQUIV NOT
 %token EQUAL NOTEQUAL LE LT GE GT
 %token IN WHEN
-%token UNION INTER DIFF SUBSET RANGE
+%token UNION INTER DIFF SUBSET RANGE POWERSET
 %token EMPTY CARD
 %token LBRACK RBRACK
 %token LPAREN RPAREN
@@ -245,6 +245,7 @@ expr:
   | UNION (*LPAREN*) s1=T COMMA s2=T RPAREN {Loc (Union (s1,s2),($startpos,$endpos))}
   | INTER (*LPAREN*) s1=T COMMA s2=T RPAREN {Loc (Inter (s1,s2),($startpos,$endpos))}
   | DIFF  (*LPAREN*) s1=T COMMA s2=T RPAREN {Loc (Diff (s1,s2),($startpos,$endpos))}
+  | POWERSET (*LPAREN*) s=T RPAREN {Loc (Powerset s,($startpos,$endpos))}
 
 %inline formula(F):
   | f=in_parenthesis(F)
