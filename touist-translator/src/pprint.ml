@@ -1,10 +1,11 @@
 (** Helper functions for printing anything contained in the AST
     produced by the parser. *)
 
-open Syntax
+open Types
+open Types.Ast
 
 (** [string_of_ast] takes an abstract syntaxic tree.
-    @param ast of type [Syntax.ast] *)
+    @param ast of type [Types.Ast.ast] *)
 let rec string_of_ast ?(show_var=(fun ast -> "")) ?(debug=false) ?(parenthesis=debug) ast =
   let string_of_ast = string_of_ast ~show_var:show_var ~parenthesis:parenthesis ~debug:debug in
   match ast with
@@ -17,7 +18,7 @@ let rec string_of_ast ?(show_var=(fun ast -> "")) ?(debug=false) ?(parenthesis=d
   | UnexpProp (x,Some y) -> x ^ "(" ^ (string_of_ast_list "," y) ^ ")"
   | Var (x,None)   -> x ^ (show_var ast)
   | Var (x,Some y) -> x ^ "(" ^ (string_of_ast_list "," y) ^ ")" ^ show_var ast
-  | Set    x -> string_of_set x
+  | Set    x -> "[" ^ string_of_ast_list "," (Set.elements x) ^ "]"
   | Set_decl x -> "[" ^ (string_of_ast_list "," x) ^ "]"
   | Neg x     -> "(- " ^ (string_of_ast x) ^ ")"
   | Add (x,y) -> "(" ^ (string_of_ast x) ^ " + "   ^ (string_of_ast y) ^ ")"
@@ -95,10 +96,7 @@ and string_of_ast_type = function
   | Prop x                 -> "proposition"
   | Var (x,None)         -> "variable"
   | Var (x,Some y)       -> "tuple-variable"
-  | Set (EmptySet)     -> "empty set"
-  | Set (FSet _)    -> "float-set"
-  | Set (ISet _)    -> "int-set"
-  | Set (SSet _)    -> "term-set"
+  | Set s                  -> "term-set"
   | Set_decl x             -> "[ ] (set definition)"
   | Neg x                  -> "-"
   | Add (x,y)              -> "+"
@@ -144,25 +142,4 @@ and string_of_ast_type = function
   | Loc (x,_) -> string_of_ast_type x
   | Paren x -> string_of_ast_type x
 
-and string_of_set = function
-  | EmptySet  -> "[]"
-  | ISet s -> (*string_of_a_list string_of_int (IntSet.elements s)*)
-      string_of_intset s
-  | FSet s -> (*string_of_a_list string_of_float (FloatSet.elements s)*)
-      string_of_floatset s
-  | SSet s -> (*string_of_a_list (fun x -> x) (PropSet.elements s)*)
-      string_of_strset s
-
 and string_of_ast_list sep el = String.concat sep (List.map string_of_ast el)
-
-and string_of_a_list to_string il =
-  "[" ^ (String.concat "," (List.map to_string il)) ^ "]"
-
-and string_of_intset s =
-  "[" ^ (String.concat "," (List.map string_of_int (IntSet.elements s))) ^ "]"
-
-and string_of_floatset s =
-  "[" ^ (String.concat "," (List.map string_of_float (FloatSet.elements s))) ^ "]"
-
-and string_of_strset s =
-  "[" ^ (String.concat "," (PropSet.elements s)) ^ "]"

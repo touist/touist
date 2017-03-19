@@ -14,7 +14,8 @@
  * http://www.gnu.org/licenses/lgpl-2.1.html 
  *)
 
-open Syntax
+open Types.Ast
+open Types
 open Pprint
 open Msgs
 
@@ -34,7 +35,7 @@ type env = (string * (ast * loc)) list
 type extenv = (string, (ast * loc)) Hashtbl.t
 
 let get_loc (ast:ast) : loc = match ast with 
-    | Loc (_,loc) -> loc 
+    | Loc (_,loc) -> loc
     | _ -> (Lexing.dummy_pos,Lexing.dummy_pos)
 
 let warning msgs (ast:ast) (message:string) =
@@ -102,7 +103,7 @@ let raise_set_decl msgs ast elmt elmt_expanded set set_expanded (expected_types:
     "    "^(string_of_ast set_expanded)^"")
 
 
-let check_nb_vars_same_as_nb_sets msgs (ast:ast) (vars: ast list) (sets: ast list) : unit =
+let check_nb_vars_same_as_nb_sets msgs (ast:ast) (vars:ast list) (sets:ast list) : unit =
   let loc = match (List.nth vars 0), List.nth sets ((List.length sets)-1) with
     | Loc (_,(startpos,_)), Loc (_,(_,endpos)) -> startpos,endpos 
     | _-> failwith "[shouldn't happen] missing locations in vars/sets"
@@ -116,19 +117,6 @@ let check_nb_vars_same_as_nb_sets msgs (ast:ast) (vars: ast list) (sets: ast lis
     "but you gave "^(string_of_int (List.length sets))^" sets:\n"^
     "    "^(string_of_ast_list "," sets)^""
     ,loc)
-
-
-(* [process_empty] is necessary because of how 'clunky' have been implemented
-   the set capabilities (type 'set', EmptySet, ISet, IntSet.empty.....).
-   If 'set' is EmptySet, transform it into a typed IntSet.empty,
-   FloatSet.empty or PropSet.empty, depending on the type of 'set_type'.
-   If 'set' isn't an empty set, then return 'set'.*)
-let process_empty (set:ast) (set_type:ast) : ast = match set,set_type with
-  | Set EmptySet, Set (ISet _) -> Set (ISet IntSet.empty)
-  | Set EmptySet, Set (FSet _) -> Set (FSet FloatSet.empty)
-  | Set EmptySet, Set (SSet _) -> Set (SSet PropSet.empty)
-  | Set EmptySet, Set (EmptySet)  -> Set (ISet IntSet.empty) (* arbitrary *)
-  | _,_ -> set
 
 let extenv = ref (Hashtbl.create 0)
 let check_only = ref false
@@ -152,13 +140,13 @@ let smt = ref false
     @param smt enables the SMT mode. By default, the SAT mode is used.
 
     @raise Eval.Error (msg,loc) *)
-let rec eval ?smt:(smt_mode=false) ?(onlychecktypes=false) (ast,msgs) : ast * Msgs.t ref =
+let rec eval ?smt:(smt_mode=false) ?(onlychecktypes=false) (ast,msgs) :ast * Msgs.t ref =
   check_only := onlychecktypes;
   smt := smt_mode;
   extenv := Hashtbl.create 50; (* extenv must be re-init between two calls to [eval] *)
   eval_touist_code msgs [] ast, msgs
 
-and eval_touist_code msgs (env:env) ast : ast =
+and eval_touist_code msgs (env:env) ast :ast =
   
   let rec affect_vars = function
     | [] -> []
@@ -180,7 +168,7 @@ and eval_touist_code msgs (env:env) ast : ast =
 (* [eval_ast] evaluates (= expands) numerical, boolean and set expresions that
    are not directly in formulas. For example, in 'when $a!=a' or 'if 3>4',
    the boolean values must be computed: eval_ast will do exactly that.*)
-and eval_ast (msgs:Msgs.t ref) (env:env) (ast:ast) : ast =
+and eval_ast (msgs:Msgs.t ref) (env:env) (ast:ast) :ast =
   let eval_ast = eval_ast msgs env in
   let expanded = match ast_whithout_loc ast with
   | Int x   -> Int x
@@ -264,83 +252,59 @@ and eval_ast (msgs:Msgs.t ref) (env:env) (ast:ast) : ast =
     in
     if test then eval_ast y else eval_ast z
   | Union (x,y) -> begin
-      let x',y' = eval_ast x, eval_ast y in
-      match process_empty x' y', process_empty y' x' with
-      | Set (ISet a), Set (ISet b) -> Set (ISet (IntSet.union a b))
-      | Set (FSet a), Set (FSet b) -> Set (FSet (FloatSet.union a b))
-      | Set (SSet a), Set (SSet b) -> Set (SSet (PropSet.union a b))
-      | _,_ -> raise_type_error2 msgs ast x x' y y' "a 'float-set', 'int-set' or 'prop-set'"
+      match eval_ast x, eval_ast y with
+      | Set a, Set b -> Set (Set.union a b)
+      | x',y' -> raise_type_error2 msgs ast x x' y y' "a 'float-set', 'int-set' or 'prop-set'"
     end
   | Inter (x,y) -> begin
-      let x',y' = eval_ast x, eval_ast y in
-      match process_empty x' y', process_empty y' x' with
-      | Set (ISet a), Set (ISet b) -> Set (ISet (IntSet.inter a b))
-      | Set (FSet a), Set (FSet b) -> Set (FSet (FloatSet.inter a b))
-      | Set (SSet a), Set (SSet b) -> Set (SSet (PropSet.inter a b))
-      | _,_ -> raise_type_error2 msgs ast x x' y y' "a 'float-set', 'int-set' or 'prop-set'"
+      match eval_ast x, eval_ast y with
+      | Set a, Set b -> Set (Set.inter a b)
+      | x',y' -> raise_type_error2 msgs ast x x' y y' "a 'float-set', 'int-set' or 'prop-set'"
     end
   | Diff (x,y) -> begin
-      let x',y' = eval_ast x, eval_ast y in
-      match process_empty x' y', process_empty y' x' with
-      | Set (ISet a), Set (ISet b) -> Set (ISet (IntSet.diff a b))
-      | Set (FSet a), Set (FSet b) -> Set (FSet (FloatSet.diff a b))
-      | Set (SSet a), Set (SSet b) -> Set (SSet (PropSet.diff a b))
-      | _,_ -> raise_type_error2 msgs ast x x' y y' "a 'float-set', 'int-set' or 'prop-set'"
+      match eval_ast x, eval_ast y with
+      | Set a, Set b -> Set (Set.diff a b)
+      | x',y' -> raise_type_error2 msgs ast x x' y y' "a 'float-set', 'int-set' or 'prop-set'"
     end
   | Range (x,y) -> (* !check_only will simplify [min..max] to [min..min] *)
     (* [irange] generates a list of int between min and max with an increment of step. *)
     let irange min max step =
-      let rec loop acc = function i when i=max+1 -> acc | i -> loop (i::acc) (i+step)
+      let rec loop acc = function i when i=max+1 -> acc | i -> loop ((Int i)::acc) (i+step)
       in loop [] min |> List.rev
     and frange min max step =
-      let rec loop acc = function i when i=max+.1. -> acc | i -> loop (i::acc) (i+.step)
+      let rec loop acc = function i when i=max+.1. -> acc | i -> loop ((Float i)::acc) (i+.step)
       in loop [] min |> List.rev
     in begin
       match eval_ast x, eval_ast y with
-      | Int x, Int y     -> Set (ISet (IntSet.of_list (irange x (if !check_only then x else y)  1)))
-      | Float x, Float y -> Set (FSet (FloatSet.of_list (frange x (if !check_only then x else y) 1.)))
+      | Int x, Int y     -> Set (Set.of_list (irange x (if !check_only then x else y) 1))
+      | Float x, Float y -> Set (Set.of_list (frange x (if !check_only then x else y) 1.))
       | x',y' -> raise_type_error2 msgs ast x x' y y' "two integers or two floats"
     end
   | Empty x -> begin
       match eval_ast x with
-      | Set (EmptySet)    -> Bool true
-      | Set (ISet x) -> Bool (IntSet.is_empty x)
-      | Set (FSet x) -> Bool (FloatSet.is_empty x)
-      | Set (SSet x) -> Bool (PropSet.is_empty x)
+      | Set x -> Bool (Types.Set.is_empty x)
       | x' -> raise_type_error msgs ast x x' "a 'float-set', 'int-set' or 'prop-set'"
     end
   | Card x -> begin
       match eval_ast x with
-      | Set (EmptySet)    -> Int 0
-      | Set (ISet x) -> Int (IntSet.cardinal x)
-      | Set (FSet x) -> Int (FloatSet.cardinal x)
-      | Set (SSet x) -> Int (PropSet.cardinal x)
+      | Set x -> Int (Set.cardinal x)
       | x' -> raise_type_error msgs ast x x' "a 'float-set', 'int-set' or 'prop-set'"
     end
   | Subset (x,y) -> begin
-      let x',y' = eval_ast x, eval_ast y in
-      match process_empty x' y', process_empty y' x' with
-      | Set (ISet a), Set (ISet b) -> Bool (IntSet.subset a b)
-      | Set (FSet a), Set (FSet b) -> Bool (FloatSet.subset a b)
-      | Set (SSet a), Set (SSet b) -> Bool (PropSet.subset a b)
-      | _,_ -> raise_type_error2 msgs ast x x' y y' "a 'float-set', int or prop"
+      match eval_ast x, eval_ast y with
+      | Set a, Set b -> Bool (Set.subset a b)
+      | x',y' -> raise_type_error2 msgs ast x x' y y' "a 'float-set', int or prop"
     end
   | In (x,y) ->
     begin match eval_ast x, eval_ast y with
-      | _, Set (EmptySet) -> Bool false (* nothing can be in an empty set!*)
-      | Int x, Set (ISet y) -> Bool (IntSet.mem x y)
-      | Float x', Set (FSet y') -> Bool (FloatSet.mem x' y')
-      | Prop x', Set (SSet y') -> Bool (PropSet.mem x' y')
+      | x', Set y' -> Bool (Set.mem x' y')
       | x',y' -> raise_type_error2 msgs ast x x' y y' "\nan 'int', 'float' or 'prop' on the left-hand and a 'set' on the right-hand"
     end
-  | Equal (x,y) -> begin let x',y' = eval_ast x, eval_ast y in
-      match process_empty x' y', process_empty y' x' with
+  | Equal (x,y) -> begin match eval_ast x, eval_ast y with
       | Int x, Int y -> Bool (x = y)
       | Float x, Float y -> Bool (x = y)
       | Prop x, Prop y -> Bool (x = y)
-      | Set (ISet a), Set (ISet b) -> Bool (IntSet.equal a b)
-      | Set (FSet a), Set (FSet b) -> Bool (FloatSet.equal a b)
-      | Set (SSet a), Set (SSet b) -> Bool (PropSet.equal a b)
+      | Set a, Set b -> Bool (Set.equal a b)
       | x',y' -> raise_type_error2 msgs ast x x' y y' "an int, float, prop or set"
     end
   | Not_equal (x,y) -> eval_ast (Not (Equal (x,y)))
@@ -371,17 +335,17 @@ and eval_set_decl (msgs:Msgs.t ref) (env:env) (set_decl:ast) =
   let sets = (match ast_whithout_loc set_decl with Set_decl sets -> sets | _ -> failwith "shoulnt happen: non-Set_decl in eval_set_decl") in
   let sets_expanded = List.map (fun x -> eval_ast msgs env x) sets in
   let unwrap_int elmt elmt_expanded = match elmt_expanded with
-    | Int x -> x
+    | Int x -> Int x
     | _ -> raise_set_decl msgs set_decl elmt elmt_expanded
              (Set_decl sets) (Set_decl sets_expanded)
              "at this point a\ncomma-separated list of integers, because previous elements\nof the list had this type"
   and unwrap_float elmt elmt_expanded = match elmt_expanded with
-    | Float x -> x
+    | Float x -> Float x
     | _ -> raise_set_decl msgs set_decl elmt elmt_expanded
              (Set_decl sets) (Set_decl sets_expanded)
              "at this point a\ncomma-separated list of floats, because previous elements\nof the list had this type"
   and unwrap_str elmt elmt_expanded = match elmt_expanded with
-    | Prop x -> x
+    | Prop x -> Prop x
     | _ -> raise_set_decl msgs set_decl elmt elmt_expanded
              (Set_decl sets) (Set_decl sets_expanded)
              "at this point a\ncomma-separated list of propositions, because previous elements\nof the list had this type"
@@ -389,10 +353,10 @@ and eval_set_decl (msgs:Msgs.t ref) (env:env) (set_decl:ast) =
   in (* this match-with uses the first element of the list to set the set type
         (ISet, FSet, SSet...)*)
   match sets, sets_expanded with
-  | [],[] -> Set (EmptySet) (*   (fun -> function Int x->x   *)
-  | _,(Int _)::_ -> Set (ISet (IntSet.of_list (List.map2 unwrap_int sets sets_expanded)))
-  | _,(Float _)::_ -> Set (FSet (FloatSet.of_list (List.map2 unwrap_float sets sets_expanded)))
-  | _,(Prop _)::_ -> Set (SSet (PropSet.of_list (List.map2 unwrap_str sets sets_expanded)))
+  | [],[] -> Set Set.empty (*   (fun -> function Int x->x   *)
+  | _,(Int _)::_ -> Set (Set.of_list (List.map2 unwrap_int sets sets_expanded))
+  | _,(Float _)::_ -> Set (Set.of_list (List.map2 unwrap_float sets sets_expanded))
+  | _,(Prop _)::_ -> Set (Set.of_list (List.map2 unwrap_str sets sets_expanded))
   | x::_,x'::_ -> raise_set_decl msgs set_decl x x'
                     (Set_decl sets) (Set_decl sets_expanded)
                     "elements of type int,\nfloat or propositon"
@@ -553,23 +517,19 @@ and eval_ast_formula (msgs:Msgs.t ref) (env:env) (ast:ast) : ast =
   | Equiv   (x,y) -> Equiv (eval_ast_formula x, eval_ast_formula y)
   | Exact (x,y) -> rm_top_bot begin (* !check_only simplifies by returning a dummy proposition *)
       match eval_ast x, eval_ast y with
-      | Int 0, Set (EmptySet) -> Top
-      | Int v, Set (EmptySet) -> Top
-      | Int x, Set (SSet s) -> if !check_only then Prop "dummy" else exact_str (PropSet.exact x s)
+      | Int 0, Set s -> Top
+      | Int x, Set s ->
+        if !check_only then Prop "dummy" else exact_str (Set.exact x s)
       | x',y' -> raise_type_error2 msgs ast x x' y y' "'int' (left-hand)\nand a 'prop-set' (right-hand)"
     end
   | Atleast (x,y) -> rm_top_bot begin
       match eval_ast x, eval_ast y with
-      | Int 0, Set (EmptySet) -> Top
-      | Int v, Set (EmptySet) -> Top
-      | Int x, Set (SSet s) -> if !check_only then Prop "dummy" else atleast_str (PropSet.atleast x s)
+      | Int x, Set s -> if !check_only then Prop "dummy" else atleast_str (Set.atleast x s)
       | x',y' -> raise_type_error2 msgs ast x x' y y' "'int' (left-hand)\nand a 'prop-set' (right-hand)"
     end
   | Atmost (x,y) -> rm_top_bot begin
       match eval_ast x, eval_ast y with
-      | Int 0, Set (EmptySet) -> Top
-      | Int v, Set (EmptySet) -> Top
-      | Int x, Set (SSet s) -> if !check_only then Prop "dummy" else atmost_str (PropSet.atmost x s)
+      | Int x, Set s -> if !check_only then Prop "dummy" else atmost_str (Set.atmost x s)
       | x',y' -> raise_type_error2 msgs ast x x' y y' "'int' (left-hand)\nand a 'prop-set' (right-hand)"
     end
   (* We consider 'bigand' as the universal quantification; it could be translated as
@@ -640,9 +600,9 @@ and eval_ast_formula (msgs:Msgs.t ref) (env:env) (ast:ast) : ast =
 and exact_str lst =
   let rec go = function
     | [],[]       -> Top
-    | t::ts,[]    -> And (And (Prop t, Top), go (ts,[]))
-    | [],f::fs    -> And (And (Top, Not (Prop f)), go ([],fs))
-    | t::ts,f::fs -> And (And (Prop t, Not (Prop f)), go (ts,fs))
+    | t::ts,[]    -> And (     t,         go (ts,[]))
+    | [],f::fs    -> And (        Not f,  go ([],fs))
+    | t::ts,f::fs -> And (And (t, Not f), go (ts,fs))
   in
   match lst with
   | []    -> Bottom
@@ -654,10 +614,10 @@ and atleast_str lst =
 and atmost_str lst =
   List.fold_left (fun acc str ->
       Or (acc, List.fold_left (fun acc' str' ->
-          And (acc', Not (Prop str'))) Top str)) Bottom lst
+          And (acc', Not str')) Top str)) Bottom lst
 
 and formula_of_string_list =
-  List.fold_left (fun acc str -> And (acc, Prop str)) Top
+  List.fold_left (fun acc str -> And (acc, str)) Top
 
 and and_of_term_list =
   List.fold_left (fun acc t -> And (acc, t)) Top
@@ -666,13 +626,13 @@ and and_of_term_list =
    time([1,2],[a,b]) will become [time(1,a),time(1,b)...time(b,2)]. This is useful when 
    generating sets. *)
 and expand_prop_with_set msgs env name indices_optional =
-  let rec eval_indices env (l:ast list) : ast list = match l with
+  let rec eval_indices env (l:ast list) :ast list = match l with
     | [] -> []
     | x::xs -> (eval_ast msgs env x)::(eval_indices env xs)
   in
   let rec has_nonempty_set = function
     | []         -> false
-    | (Set (EmptySet))::_ -> false
+    | (Set s)::_ when Set.is_empty s -> false
     | (Set _)::_ -> true
     | _::next    -> has_nonempty_set next
   in
@@ -682,17 +642,17 @@ and expand_prop_with_set msgs env name indices_optional =
             indices, expand_prop_with_set' msgs [UnexpProp (name,None)] indices env
   in
   let eval_unexpprop acc cur = match cur with 
-    | UnexpProp (p,i) -> (expand_var_name msgs env (p,i))::acc | _->failwith "shouldnt happen"
+    | UnexpProp (p,i) -> (Prop (expand_var_name msgs env (p,i)))::acc | _->failwith "shouldnt happen"
   in let props_evaluated = List.fold_left eval_unexpprop [] generated_props in
-  if (let x = has_nonempty_set indices in x) then Set (SSet (PropSet.of_list props_evaluated))
-  else Prop (let a = List.nth props_evaluated 0 in a)
+  if (let x = has_nonempty_set indices in x) then Set (Set.of_list props_evaluated)
+  else List.nth props_evaluated 0
 
 and expand_prop_with_set' msgs proplist indices env =
   match indices with (* at this point, indice is either a Prop or a Set *)
   | [] -> proplist
   | i::next -> 
     match i with
-    | Set (EmptySet) -> expand_prop_with_set' msgs proplist next env
+    | Set s when Set.is_empty s -> expand_prop_with_set' msgs proplist next env
     | Set s -> let new_proplist = (expand_proplist proplist (set_to_ast_list msgs env (Set s))) in
         expand_prop_with_set' msgs new_proplist next env
     | x -> expand_prop_with_set' msgs (expand_proplist proplist [x]) next env
@@ -721,12 +681,9 @@ and expand_var_name (msgs:Msgs.t ref) (env:env) (prefix,indices:string * ast lis
    it would mean that it is not tail recursion anymore (= uses much more heap) 
    
    If [!check_only] is true, then the lists *)
-and set_to_ast_list (msgs:Msgs.t ref) (env:env) (ast:ast) : ast list =
+and set_to_ast_list (msgs:Msgs.t ref) (env:env) (ast:ast) :ast list =
   let lst = match ast_whithout_loc (eval_ast msgs env ast) with
-  | Set (EmptySet)-> []
-  | Set (ISet a) -> List.fold_left (fun acc v -> (Int v)::acc)   [] (IntSet.elements a)
-  | Set (FSet a) -> List.fold_left (fun acc v -> (Float v)::acc) [] (FloatSet.elements a)
-  | Set (SSet a) -> List.fold_left (fun acc v -> (Prop v)::acc)  [] (PropSet.elements a)
+  | Set s -> Set.elements s
   | ast' -> raise_with_loc msgs ast (
       "after 'in', only sets are allowed, but got '"^(string_of_ast_type ast')^"':\n"^
       "    "^(string_of_ast ast')^"\n"^

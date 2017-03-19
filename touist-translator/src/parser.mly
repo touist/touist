@@ -12,7 +12,7 @@
  * http://www.gnu.org/licenses/lgpl-2.1.html *)
 
 %{
-  open Syntax
+  open Types.Ast
 %}
 
 %token <int> INT
@@ -125,7 +125,7 @@
 *)
 
 (* The two entry points of our parser *)
-%start <Syntax.ast> touist_simple, touist_smt
+%start <Types.Ast.ast> touist_simple, touist_smt
 
 %% (* Everthing below that mark is expected to be a production rule *)
    (* Note that VAR { $0 } is equivalent to v=VAR { v } *)

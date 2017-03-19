@@ -22,7 +22,7 @@
         - [   a and b and not and not d    ]    is a conjunction
     
     }{- AST:
-      abstract syntax tree; it is homogenous to Syntax.ast
+      abstract syntax tree; it is homogenous to Types.Ast.ast
       and is a recursive tree representing a formula, using Or, And, Implies...
       Example: the formula (1) has the abstract syntax tree (2):
         - [   (a or b) and not c    ]                  (1) natural language
@@ -48,7 +48,7 @@
  * version 2.1 which accompanies this distribution, and is available at
  * http://www.gnu.org/licenses/lgpl-2.1.html *)
 
-open Syntax
+open Types.Ast
 open Pprint
 open Msgs
 
