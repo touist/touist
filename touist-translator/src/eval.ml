@@ -347,32 +347,24 @@ and eval_ast (msgs:Msgs.t ref) (env:env) (ast:ast) :ast =
 and eval_set_decl (msgs:Msgs.t ref) (env:env) (set_decl:ast) =
   let sets = (match ast_whithout_loc set_decl with Set_decl sets -> sets | _ -> failwith "shoulnt happen: non-Set_decl in eval_set_decl") in
   let sets_expanded = List.map (fun x -> eval_ast msgs env x) sets in
-  let unwrap_int elmt elmt_expanded = match elmt_expanded with
-    | Int x -> Int x
+  let unwrap_set first_elmt elmt elmt_expanded = match first_elmt, elmt_expanded with
+    | Int _  , Int x   -> Int x
+    | Float _, Float x -> Float x
+    | Prop _ , Prop x  -> Prop x
+    | Set _  , Set x   -> Set x
     | _ -> raise_set_decl msgs set_decl elmt elmt_expanded
              (Set_decl sets) (Set_decl sets_expanded)
-             "at this point a\ncomma-separated list of integers, because previous elements\nof the list had this type"
-  and unwrap_float elmt elmt_expanded = match elmt_expanded with
-    | Float x -> Float x
-    | _ -> raise_set_decl msgs set_decl elmt elmt_expanded
-             (Set_decl sets) (Set_decl sets_expanded)
-             "at this point a\ncomma-separated list of floats, because previous elements\nof the list had this type"
-  and unwrap_str elmt elmt_expanded = match elmt_expanded with
-    | Prop x -> Prop x
-    | _ -> raise_set_decl msgs set_decl elmt elmt_expanded
-             (Set_decl sets) (Set_decl sets_expanded)
-             "at this point a\ncomma-separated list of propositions, because previous elements\nof the list had this type"
-
-  in (* this match-with uses the first element of the list to set the set type
-        (ISet, FSet, SAstSet...)*)
+             ("at this point a\ncomma-separated list of '"^string_of_ast_type first_elmt^"', because previous elements\nof the list had this type")
+  in
   match sets, sets_expanded with
-  | [],[] -> Set AstSet.empty (*   (fun -> function Int x->x   *)
-  | _,(Int _)::_ -> Set (AstSet.of_list (List.map2 unwrap_int sets sets_expanded))
-  | _,(Float _)::_ -> Set (AstSet.of_list (List.map2 unwrap_float sets sets_expanded))
-  | _,(Prop _)::_ -> Set (AstSet.of_list (List.map2 unwrap_str sets sets_expanded))
-  | x::_,x'::_ -> raise_set_decl msgs set_decl x x'
+  | [],[] -> Set AstSet.empty
+  | x::_,first::_ -> begin
+      match first with 
+      | Int _ | Float _ | Prop _ | Set _ -> Set (AstSet.of_list (List.map2 (unwrap_set first) sets sets_expanded))
+      | _ -> raise_set_decl msgs set_decl x first
                     (Set_decl sets) (Set_decl sets_expanded)
-                    "elements of type int,\nfloat or propositon"
+                    "elements of type 'int',\n'float', 'prop' or 'set'"
+    end
   | [],x::_ | x::_,[] -> failwith "shouldn't happen: len(sets)!=len(sets_expanded)" 
 
 
