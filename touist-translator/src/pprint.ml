@@ -18,7 +18,7 @@ let rec string_of_ast ?(show_var=(fun ast -> "")) ?(debug=false) ?(parenthesis=d
   | UnexpProp (x,Some y) -> x ^ "(" ^ (string_of_ast_list "," y) ^ ")"
   | Var (x,None)   -> x ^ (show_var ast)
   | Var (x,Some y) -> x ^ "(" ^ (string_of_ast_list "," y) ^ ")" ^ show_var ast
-  | Set    x -> "[" ^ string_of_ast_list "," (Set.elements x) ^ "]"
+  | Set    x -> "[" ^ string_of_ast_list "," (AstSet.elements x) ^ "]"
   | Set_decl x -> "[" ^ (string_of_ast_list "," x) ^ "]"
   | Neg x     -> "(- " ^ (string_of_ast x) ^ ")"
   | Add (x,y) -> "(" ^ (string_of_ast x) ^ " + "   ^ (string_of_ast y) ^ ")"
