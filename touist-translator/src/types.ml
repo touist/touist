@@ -1,4 +1,4 @@
-(** Defition of asthe types constituting the abstract syntaxic tree (t) *)
+(** Definition of types [Ast.ast] and [AstSet] constituting the abstract syntaxic tree *)
 
 (* Project TouIST, 2015. Easily formalize and solve real-world sized problems
  * using propositional logic and linear theory of reals with a nice language and GUI.
@@ -14,32 +14,18 @@
 open Msgs
 
 (* Do you think this file is wierd, with this 'module rec' thing?
-   This is because we want the type 't' to be used in 'Set' and
-   also we want 'Set' to be inside an 't', I had to come up with
+   This is because we want the type 'ast' to be used in 'Set' and
+   also we want 'Set' to be inside an 'ast', I had to come up with
    this recursive (and quite confusing) module thing. I got
    the idea from http://stackoverflow.com/questions/8552589
    Notes:
-   (1) I don't know why but Set.elt wouldn't be Ast.ast... So
-       I tried this and now it works...
-   (2) This is a trick that allows me to avoid repeating the type
+   (1) This is a trick that allows me to avoid repeating the type
        definitions in sig .. end and in struct .. end (explained
        in above link)
+   (2) I don't know why but Set.elt wouldn't be Ast.ast... So
+       I tried this and now it works...
 *)
-module rec Set : Set_ext.S
-  with type elt = Ast.ast = (*1*)
-  Set_ext.Make(
-struct
-  include Ast
-  type t = ast
-  let compare ast ast2 = match ast,ast2 with
-    | Int x, Int y -> Pervasives.compare x y
-    | Float x, Float y -> Pervasives.compare x y
-    | Prop x, Prop y -> Pervasives.compare x y
-    | Set x, Set y -> Pervasives.compare x y
-    | _ -> failwith "cannot compare"
-end)
-
-and Ast : sig
+module rec Ast : sig
   type var = string * ast list option
   and ast = (* Touist_code is the entry point *)
     | Touist_code      of ast list
@@ -47,7 +33,7 @@ and Ast : sig
     | Float            of float
     | Bool             of bool
     | Var              of var
-    | Set              of Set.t
+    | Set              of AstSet.t
     | Set_decl         of ast list
     | Neg              of ast
     | Add              of ast * ast
@@ -113,5 +99,67 @@ and Ast : sig
       *)
     | Paren of ast
     (* [Paren] keeps track of asthe parenthesis in the AST in order to print latex *)
-  val compare : ast -> ast -> int
-end = Ast (*2*)
+end = Ast (* see (1) *)
+
+(* From the type [Ast], we create an ordered type [AstOrdered] in order to be able
+   to create a set. *)
+and AstOrdered : Set.OrderedType = struct
+  include Ast
+  type t = Ast.ast
+  let compare ast ast2 = match ast,ast2 with
+      | Int x, Int y -> Pervasives.compare x y
+      | Float x, Float y -> Pervasives.compare x y
+      | Prop x, Prop y -> Pervasives.compare x y
+      | Set x, Set y -> Pervasives.compare x y
+      | _ -> failwith "cannot compare"
+      let of_list =
+      List.fold_left (fun acc x -> add x acc) empty
+end
+
+
+and AstSet : sig
+  include Set.S
+  (** Return the different ways to choose k elements among a set of n
+      elements *)
+  val combinations : int -> t -> elt list list
+  (** Return a list of tuples. The first member is a combination of k
+     elements in the set and the second member is the list of every other
+     set elements not in the combination *)
+  val exact: int -> t -> (elt list * elt list) list
+  (** Actually an alias for the combinations function:
+      combinations k set *)
+  val atleast: int -> t -> elt list list
+  (** Equivalent to:
+      combinations (n-k) set, where n = card(set)  *)
+  val atmost: int -> t -> elt list list
+  end with type elt = Ast.ast (* see (2) *)
+= 
+struct 
+  include Set.Make(AstOrdered)
+
+  (* Inefficient implementation - Found on Rosetta Code ^_^ *)
+  let combinations k set =
+    let rec comb k lst =
+      match k,lst with
+      | 0,_     -> [[]]
+      | _,[]    -> []
+      | k,x::xs -> List.map (fun y -> x::y) (comb (pred k) xs) @ comb k xs
+    in comb k (elements set)
+
+  let exact k set =
+    let rec go k l =
+      match k,l with
+      | 0,_     -> [([],l)] (* exact 0 -> all terms in the list must be 'not' *)
+      | _,[]    -> []       (* exact on empty set -> no couple at all *)
+      | k,x::xs ->
+          List.map (fun (comb,rest) ->
+            (x::comb, elements (diff set (of_list (x::comb)))))
+          (go (pred k) xs) @ go k xs
+    in go k (elements set)
+
+  let atleast = combinations
+
+  let atmost k set =
+    let n = cardinal set in
+    combinations (n-k) set
+end
