@@ -108,7 +108,7 @@ let check_nb_vars_same_as_nb_sets msgs (ast:ast) (vars:ast list) (sets:ast list)
     | Loc (_,(startpos,_)), Loc (_,(_,endpos)) -> startpos,endpos 
     | _-> failwith "[shouldn't happen] missing locations in vars/sets"
   in
-  match (List.length vars) == (List.length sets) with
+  match (List.length vars) = (List.length sets) with
   | true -> ()
   | false -> add_fatal msgs (Error,Eval,
     "Ill-formed '"^(string_of_ast_type ast)^"'. The number of variables and sets must be the same.\n"^
