@@ -140,7 +140,7 @@ let get_model solver (table:(Lit.t,string) Hashtbl.t) (discard:string->bool): Mo
 (* [is_dummy] filters the 'dummy' literals that were introduced during
    cnf conversion; these literals are identified by their prefix '&'.
    Returns true if the given name corresponds to is a dummy literal *)
-let is_dummy (name:string) : bool = name.[0] == '&'
+let is_dummy (name:string) : bool = name.[0] = '&'
 
 (* [print_clause] dumps the clause in its literal-number form:
    e.g., 1 -5 3 9 -2 -7 *)
