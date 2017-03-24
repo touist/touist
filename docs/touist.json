@@ -1,0 +1,77 @@
+{
+ "displayName":    "Touist",
+ "name":           "touist",
+ "mimeTypes":      ["text/x-touist"],
+ "fileExtensions": ["touist","touistl"],
+ 
+ "lineComment": ";;",
+
+ "keywords": [
+  "end",
+  "in",
+  "subset",
+  "empty",
+  "union",
+  "inter",
+  "diff",
+  "exact",
+  "atmost",
+  "atleast",
+  "bigand",
+  "bigor",
+  "when",
+  "card",
+  "mod",
+  "sqrt",
+  "int",
+  "float",
+  "abs",
+  "if",
+  "then",
+  "else",
+  "mod",
+  "let",
+  "data",
+  "powerset",
+  ":"],
+ 
+ "extraKeywords": [ "Top","Bot","true","false"],
+
+ "builtins": [
+   "and", "or", "xor", "=>", "<=>","not"
+ ],
+ "operators": [
+   "=", ">", "<",
+   "==", "<=", ">=", "!=", "&&", "||",
+   "+", "-", "*", "/"
+ ],
+ "symbols":  "[=><!~?:&|+\\-*\\/\\^%]+",
+ "escapes": "\\\\(?:[abfnrtv\\\\\"']|x[0-9A-Fa-f]{1,4}|u[0-9A-Fa-f]{4}|U[0-9A-Fa-f]{8})",
+ 
+ "tokenizer": {
+   "root": [
+     
+     ["[a-zA-Z_][\\w]*", { "cases": { "@builtins": "predefined.identifier",
+                                  "@keywords": "keyword",
+                                  "@extraKeywords" : "keyword.extra",
+                                  "@default": "identifier" } }],
+     
+     { "include": "@whitespace" },
+     
+     ["[{}()\\[\\]]", "@brackets"],
+     ["[,.]", "delimiter"],
+
+     ["@symbols", { "cases": { "@operators": "predefined.operator",
+                               "@default"  : "" } } ],
+
+     ["[$][a-zA-Z_][\\w]*", "constructor.identifier"],
+     ["\\d*\\.\\d+([eE][\\-+]?\\d+)?[fFdD]?", "number.float"],
+     ["\\d+[lL]?", "number"]
+   ],
+
+   "whitespace": [
+     ["[ \\t\\r\\n]+", "white"],
+     [";;.*$", "comment"]
+   ]
+ }
+}

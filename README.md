@@ -7,6 +7,8 @@ TouIST, the IDE for propositional logic
 ## I want to try
 [Get the latest release here](https://github.com/touist/touist/releases). Touist works on **macOS** (x86_64 only), **Linux** x86\_64 and **Windows** (x86 or x64\_86). Just download, unzip and double-click on `touist.jar` (you can also use the command-line `touistc` in `./external/`)
 
+You can also look at the [Touist language reference](http://touist.github.io/reference-manual.html) ([pdf version](http://touist.github.io/reference-manual.pdf)).
+
 ## Description
 
 TouIST is a user-friendly tool for solving propositionnal logic problems using a high-level logic language (known as the _bigand_ format or syntax or language). This language allows complex expressions like _big and_, _sets_...

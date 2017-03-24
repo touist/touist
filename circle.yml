@@ -1,0 +1,59 @@
+# CircleCI only handles the compilation of the documentation
+# using the `.mdk` (madoko) format. It compiles to pdf and htmL.
+# I chose to try the mdk format instead of plain latex because
+# I wanted something that could produce HTML and also beautiful
+# PDFs. NOTE: I could also have chosen Pandoc or smth like that.
+
+general:
+  branches:
+    only:
+      - master
+
+machine:
+  pre:
+  - sudo add-apt-repository -y ppa:jonathonf/texlive-2016
+  - sudo apt-get -q -y update
+  # The following Texlive packages are the minimum required for
+  # Madoko to run.
+  - sudo apt-get -q -y --no-install-recommends install texlive texlive-xetex texlive-extra-utils texlive-latex-extra texlive-generic-extra texlive-math-extra lmodern
+
+checkout:
+  post:
+    - git fetch --unshallow
+
+dependencies:
+  override:
+    - npm install -g madoko
+      
+test:
+  override:
+    # We must use the pdflatex through the options 
+    #    -mmath-latex:pdflatex -mmath-latex-full:pdflatex
+    # because of a texlive-2016 bug between xelatex and dvisvgm. The bug
+    # is called "DVI format 7 not supported" and occurs because xetex uses
+    # a new format (the 7th) but dvisvgm does support the 7th format in the
+    # Texlive-2016 version (dvisgvm v1.15.1). Here are the bug discussions:
+    # - dvisgvm forum: https://github.com/mgieseki/dvisvgm/issues/59
+    # - madoko forum:  http://madoko.codeplex.com/workitem/162
+    #
+    # "-mversion:`git describe`" allows me to use "&version;" in the .mdk
+    # file and it will be replaced by the git last tag.
+    #
+    # "-mmath-mode:static" is because I use "Math Mode: mathjax" when editing
+    # the .mdk. I want to produce SVG math images instead of using mathjax 
+    # for the final HTML.
+    - cd docs && madoko -vvvv -mversion:`git describe --tags` -mmath-mode:static -mmath-latex:pdflatex -mmath-latex-full:pdflatex reference-manual.mdk
+    - cd docs && madoko -vvvv -mversion:`git describe --tags` -mmath-mode:static -mmath-latex:pdflatex -mmath-latex-full:pdflatex --pdf reference-manual.mdk
+    - cp docs/out/reference-manual.pdf docs/out/reference-manual.html "$CIRCLE_ARTIFACTS"
+    # I had to add a ssh pair of keys to circle-ci and github. The
+    # full explaination is here:
+    # https://circleci.com/docs/1.0/adding-read-write-deployment-key/
+    - git clone git@github.com:touist/touist.github.io.git
+    - cp docs/out/reference-manual.pdf docs/out/reference-manual.html touist.github.io
+    - |
+       cd touist.github.io
+       git config user.name "CircleCI"
+       git config user.email "robot@circleci.com"
+       git add reference-manual.pdf reference-manual.html
+       git commit -m "Generated mdk (modako) documentation"
+       git push
