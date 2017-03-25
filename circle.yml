@@ -19,7 +19,7 @@ machine:
 
 checkout:
   post:
-    - git fetch --unshallow
+    - git fetch --unshallow || git fetch
 
 dependencies:
   override:
