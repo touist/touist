@@ -55,5 +55,5 @@ test:
        git config user.name "CircleCI"
        git config user.email "robot@circleci.com"
        git add reference-manual.pdf reference-manual.html
-       git commit -m "Generated mdk (modako) documentation"
+       git commit -m "Generated mdk (modako) documentation for `cd .. && git describe --tags`"
        git push

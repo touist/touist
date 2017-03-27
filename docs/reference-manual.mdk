@@ -1,6 +1,8 @@
 Title: Touist reference manual
-Author: Olivier Gasquet, Frédéric Maris, Maël Valais
-Title Note: Draft, &date; (touist &version;)
+Author: Olivier Gasquet
+Author: Frédéric Maris
+Author: Maël Valais
+Title Note: &date; (touist &version;)
 Bib: bibliography.bib
 Colorizer: touist
 Colorizer: grammar
@@ -231,7 +233,7 @@ Integer and float expressions cannot be mixed. It is necessary to cast explicite
     | "sqrt(" <float> ")"
 ```
 
-### Booleans
+## Booleans
 
 The constants are ``true`` and ``false``. The boolean connectors are $>$,$<$,$\ge$ (`>=`),$\le$ (`<=`),$=$ (`==`) and $\neq$ (`!=`). The operators that return a boolean are ``subset(,)``, ``empty()`` and ``in``.
 
@@ -260,7 +262,7 @@ The constants are ``true`` and ``false``. The boolean connectors are $>$,$<$,$\g
 Booleans cannot be mixed with formulas. In a formula, the evaluation (choosing true or false) is not done during the translation from touist to the "solver-friendly" language. Conversely, a boolean expression must be evaluable during the translation.
 ~
 
-### Sets
+## Sets
 
 Sets can contain anything (propositions, integers, floats, booleans or even other sets) as long as all elements have the same type.
 
