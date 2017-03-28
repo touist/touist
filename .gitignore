@@ -6,7 +6,7 @@
 # OCaml
 
 parser.mli
-/touist
+**/touist
 parser_messages.ml
 version.ml
 *.annot
