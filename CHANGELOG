@@ -1,5 +1,12 @@
 v2.4.0
   - touist:
+    - the 'touistc' command-line binary is now named 'touist' as it is
+      not solely a compiler anymore (also plays the role of the solver)
+    - command-line options have been normalized:
+      1. -sat renamed to --sat and is enabled by default (if --smt is
+         not given);
+      2. -smt2 renamed to --smt
+      3. -table is now --table
     - sets can now contain sets: [[a,b],[c,d]] is now correct
     - added the function 'powerset([a,b])' which computes a set of all
       subsets (including empty set) of [a,b].
