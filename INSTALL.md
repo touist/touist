@@ -1,31 +1,70 @@
-## Building 
+Touist is composed of:
+- `touistc` is a command-line compiler from `.touistl` to `dimacs`;
+- `touist.jar`, (in `support/gui/`) is a graphical interface for `touistc`.
 
-The Touist project is made of two different sub-projects:
-- the _touist-translator_, which is a command-line compiler from `.touistl` to `dimacs`,
-- the _touist-gui_, which is the main graphical interface.
+Building the `touistc` binary
+=============================
+
+## Prerequisites
+Before you go, make sure you have the following installed:
+- `ocaml` **>= 4.02.3**
+- `menhir` **>= 20150118** (an equivalent of ocamlyacc)
+- `fileutils` (for reading/writing POSIX files)
+- `minisat` (for solving SAT problems)
+
+**Note**: the binary `touistc` produced must be moved into
+`./support/gui/external`. After moving it, you go into `./support/gui`
+and run `ant`.
+
+### Build it on linux
+```shell
+apt-get install opam
+opam install menhir fileutils
+opam pin add -y minisat "https://github.com/maelvalais/ocaml-minisat.git#v0.0.2"
+make
+```
+### Build it on Mac OS X
+```shell
+ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+brew install opam
+opam install menhir fileutils minisat
+opam pin add -y minisat "https://github.com/maelvalais/ocaml-minisat.git#v0.0.2"
+make
+```
+### Build it on windows
+Just follow the instructions for installing [Opam and Ocaml on windows](http://fdopen.github.io/opam-repository-mingw/installation/) (link working on 2016-10-26). Thanks to fdopen on github, we have opam on windows!
+
+## What is `oasis`?
+
+As you probably noticed, there is a file named `_oasis`. This file contains the instructions to create the build system (`./configure`, `setup.ml` and `Makefile`) for the project. It works similarly to the `configure.ac` when you use `autoconf`. If you need to change the build behaviour (e.g. add a pre-build script, move some file after building...) you must install `oasis`:
+
+    opam install oasis
+
+## Notes on version numbers
+
+To be able to have a version number synchronized with the `git` version,
+the makefile `TopMakefile` (run it with `make -f TopMakefile` will try to run
+the command:
+
+	git describe --tags
+
+and put the result into `src/version.ml`. If `git` is not found, the version
+number will be `n/a`.
+
+
+----------
+
+
+Building the Java GUI
+=====================
 
 Steps:
 
-1. go to `./touist-translator` and build `touistc.native`
-   (see `touist-translator/INSTALL.md` for more details)
-2. rename to `touistc` and move it to `./touist-gui/external`
-3. go to `./touist-gui` and build it 
-   (see `touist-gui/INSTALL.md` for more details)
+1. first, build `touistc` (see above)
+2. copy `_build/src/touistc.native` to `support/gui/external/touistc`
+3. go to `support/gui` and run `ant` for building the GUI
+   (see `support/gui/INSTALL.md` for more details)
+4. to run it, you can do `java -jar touist.jar` or `ant run`
 
-Same steps with the Makefile structure:
-
-    touist-gui/external/touistc:
-    	cd touist-translator; make; \
-    	cp _build/src/touistc.native ../touist-gui/external/touistc
-    	chmod ugo+x touist-gui/external/touistc
-
-    all: touist-gui/external/touistc \
-         touist-gui/external/yices-smt2 \
-         touist-gui/external/minisat.jar
-    	cd touist-gui;\
-    	ant zip
-
-## Running
-
-See `touist-gui/INSTALL.md`
+For more information, see `support/gui/INSTALL.md`
 
