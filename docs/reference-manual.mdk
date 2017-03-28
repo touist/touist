@@ -49,12 +49,12 @@ false\}$. To check the models of this formula using `touist`, you can do
 | Graphical Java interface            | Command-line interface[^stdin]            |
 |-------------------------------------|-------------------------------------------|
 | 1. Type ``p and q``                 | 1. Create a file ``p and q``              |
-| 2. Press "Solve"                    | 2. Type `./touist -sat --solve yourfile` |
+| 2. Press "Solve"                    | 2. Type `./touist ---sat --solve yourfile` |
 | 3. Press "Next" to see other models | 3. The first model is displayed           |
 ~
 
 [^stdin]: You can also use `touist` with `stdin`: `echo 'p and q' | ./touist
-- -sat --solve`
+- --sat --solve`
 
 ## Simple inference checking
 

@@ -97,7 +97,7 @@ public class TranslatorSMT {
 		
 		cmd.add(pathtouist);
 		cmd.add("-"); // touist will read input from stdin
-		cmd.add("-smt2");
+		cmd.add("--smt");
 		cmd.add(logic);
 		cmd.add("-o");
 		cmd.add(outputFilePath);

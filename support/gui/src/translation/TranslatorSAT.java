@@ -113,9 +113,9 @@ public class TranslatorSAT {
 		List<String> cmd = new ArrayList<String>();
 		
 		cmd.add(pathtouist);
-		cmd.add("-sat");
+		cmd.add("--sat");
 		cmd.add("-");
-		cmd.add("-table");
+		cmd.add("--table");
 		cmd.add(outputTableFilePath);
 		cmd.add("-o");
 		cmd.add(outputFilePath);

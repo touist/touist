@@ -196,10 +196,10 @@ run_test_tt_main (
         OUnit2.skip_if (Sys.os_type = "Win32") "won't work on windows (unix-only??)";
         OUnit2.assert_command ~use_stderr:false ~ctxt:ctx
         ~foutput:(check_solution "test/sat/unittest_setgen_solution.txt")
-        "./touist.native" ["--solve";"-sat";"test/sat/unittest_setgen.touistl"]);
+        "./touist.native" ["--solve";"--sat";"test/sat/unittest_setgen.touistl"]);
 ];
 
-"samples of code that should be correct with -smt2">:::[ (* 'c' is the testing context *)
+"samples of code that should be correct with --smt">:::[ (* 'c' is the testing context *)
   "">::(test_smt "a > 1"); 
   "">::(test_smt "a < 1");
   "">::(test_smt "a == 3");
@@ -212,7 +212,7 @@ run_test_tt_main (
       OUnit2.skip_if (Sys.os_type = "Win32") "won't work on windows (unix-only??)";
       OUnit2.assert_command ~use_stderr:false ~ctxt:ctx
       ~foutput:(check_solution "test/sat/sudoku_solution.txt")
-      "./touist.native" ["--solve";"-sat";"test/sat/sudoku.touistl"]);
+      "./touist.native" ["--solve";"--sat";"test/sat/sudoku.touistl"]);
 ];
 
 ])

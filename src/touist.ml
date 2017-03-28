@@ -51,12 +51,14 @@ let () =
   let argspecs = [ (* This list enumerates the different flags (-x,-f...)*)
     (* "-flag", Arg.toSomething (ref var), "Usage for this flag"*)
     ("-o", Arg.Set_string (output_file_path), "OUTPUT is the translated file");
-    ("-table", Arg.Set_string (output_table_file_path),
-     "TABLE (-sat only) The output file that contains the literals table.
+    ("--table", Arg.Set_string (output_table_file_path),
+     "TABLE (--sat only) The output file that contains the literals table.
       By default, prints to stdout.");
-    ("-sat", Arg.Set sat_mode, "Select the SAT solver");
-    ("-smt2", Arg.Set_string (smt_logic), (
-        "LOGIC Select the SMT solver with the specified LOGIC:
+    ("--sat", Arg.Set sat_mode,
+        "Select the SAT solver (enabled by default when --smt not selected)");
+    ("--smt", Arg.Set_string (smt_logic), (
+        "LOGIC Select the SMT solver with the specified LOGIC from the
+        SMT2-LIB specification:
         QF_IDL allows to deal with boolean and integer, E.g, x - y < b
         QF_RDL is the same as QF_IDL but with reals
         QF_LIA (not documented)
@@ -83,9 +85,9 @@ let () =
   in
   let usage =
     "TouistL compiles files from the TouIST Language to SAT-Sat/SMT-LIB2.\n"^
-    "Usage: " ^ cmd ^ " -sat [-o OUTPUT] [-table TABLE] (INPUT | -)\n"^
-    "Usage: " ^ cmd ^ " -smt2 (QF_IDL|QF_RDL|QF_LIA|QF_LRA) [-o OUTPUT] (INPUT | -)\n"^
-    "Note: in -sat mode, if TABLE and OUTPUT aren't given, both output will be mixed in stdout."
+    "Usage: " ^ cmd ^ " --sat [-o OUTPUT] [--table TABLE] (INPUT | -)\n"^
+    "Usage: " ^ cmd ^ " --smt (QF_IDL|QF_RDL|QF_LIA|QF_LRA) [-o OUTPUT] (INPUT | -)\n"^
+    "Note: in --sat mode, if TABLE and OUTPUT aren't given, both output will be mixed in stdout."
   in
   (* Step 1: we parse the args. If an arg. is "alone", we suppose
    * it is the touistl input file (this is handled by [process_arg_alone]) *)
@@ -118,18 +120,17 @@ let () =
   if !equiv_file_path <> ""
   then input_equiv := open_in !equiv_file_path;
 
-  (* Check that either -smt2 or -sat have been selected *)
+  (* Check that either --smt or --sat have been selected *)
   if (!sat_mode && (!smt_logic <> "")) then begin
-    Printf.fprintf stderr "%s: cannot use both SAT and SMT solvers (try --help)\n" cmd;
+    Printf.fprintf stderr "%s: cannot use both --sat and --smt solvers (try --help)\n" cmd;
     exit_with ERROR end;
-  if (not !sat_mode) && (!smt_logic = "") then begin
-    Printf.fprintf stderr "%s: you must choose a solver to use: -sat or -smt2 (try --help)" cmd;
-    exit_with ERROR end;
+  (* When neither --smt nor --sat has been given, we default to --sat mode *)
+  if (not !sat_mode) && (!smt_logic = "") then sat_mode := true;
 
-  (* SMT Mode: check if one of the available QF_? has been given after -smt2 *)
+  (* SMT Mode: check if one of the available QF_? has been given after --smt *)
   if (not !sat_mode) && (not (List.exists (fun x->x=(String.uppercase !smt_logic)) smt_logic_avail)) then
     (Printf.fprintf stderr
-    "%s: you must specify the logic used (-smt2 logic_name) (try --help)\nExample: -smt2 QF_IDL" cmd;
+    "%s: you must specify the logic used (--smt logic_name) (try --help)\nExample: --smt QF_IDL" cmd;
     exit_with ERROR);
 
   try
