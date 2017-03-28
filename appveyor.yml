@@ -58,7 +58,7 @@ cache:
 install:
     # This step is a workaround based on a snapshot of wodi (ocaml+cygwin). Because installing ocaml+opam
     # seems (for now) impossible, I chose to upload this wodi32.zip on my dropbox ; it contains everything
-    # needed for touist-translator.
+    # needed for touistc.
   - appveyor.yml javac -version
   - ps: 'Invoke-WebRequest http://cygwin.com/$env:CYG_SETUP -OutFile "$env:CYG_SETUP"'
   - '%CYG_SETUP% --quiet-mode --no-shortcuts --only-site --root "%CYG_ROOT%" --site "%CYG_MIRROR%" --local-package-dir "%CYG_CACHE%" --packages rsync,patch,diffutils,curl,make,unzip,git,m4,perl,mingw64-i686-gcc-core --upgrade-also'
