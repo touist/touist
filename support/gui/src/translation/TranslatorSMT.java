@@ -90,13 +90,13 @@ public class TranslatorSMT {
 
 		// Check if translatorProgramFilePath is there
 		// This trick is because of linux that sets "user.dir" = $HOME instead of $CWD
-		File touistc = new File(ClassLoader.getSystemClassLoader().getResource(".").getPath());
-		String pathtouistc = touistc.getAbsolutePath() + File.separator + "external" + File.separator + "touistc";
+		File touist = new File(ClassLoader.getSystemClassLoader().getResource(".").getPath());
+		String pathtouist = touist.getAbsolutePath() + File.separator + "external" + File.separator + "touist";
 	
 		List<String> cmd = new ArrayList<String>();
 		
-		cmd.add(pathtouistc);
-		cmd.add("-"); // touistc will read input from stdin
+		cmd.add(pathtouist);
+		cmd.add("-"); // touist will read input from stdin
 		cmd.add("-smt2");
 		cmd.add(logic);
 		cmd.add("-o");

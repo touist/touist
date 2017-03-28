@@ -10,7 +10,7 @@
     - (2') [Smt.to_smt2] to transform the AST into a SMT2 expression
     - (3) [Sat.clauses_to_solver] and [Sat.solve_clauses] to solve the SAT problem
 
-    The SMT solver has not (yet) been brought to the [touistc] library; you
+    The SMT solver has not (yet) been brought to the [touist] library; you
     must use touist.jar for now.
 *)
 

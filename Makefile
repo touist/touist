@@ -1,6 +1,6 @@
 #
 # These targets are generated when using `oasis setup` and aim to build
-# the touist compiler (touistc)
+# the touist compiler (touist)
 #
 # OASIS_START
 # DO NOT EDIT (digest: a3c674b4239234cbbe53afe090018954)
@@ -96,12 +96,12 @@ missing:
 
 .PHONY: build-gui clean-gui run-gui smt
 
-# This target builds 'touistc'
-support/gui/external/touistc: check-opam-packages build
-	cp _build/src/touistc.native support/gui/external/touistc
+# This target builds 'touist'
+support/gui/external/touist: check-opam-packages build
+	cp _build/src/touist.native support/gui/external/touist
 
 
-build-gui: check-requirements support/gui/external/touistc support/gui/external/minisat.jar
+build-gui: check-requirements support/gui/external/touist support/gui/external/minisat.jar
 	cd support/gui/ &&\
 	ant -e jar
 	@echo "Done! Now you can run touist with 'make run-gui'"

@@ -9,7 +9,7 @@
 # to the repo. Basically, it
 # - tells the author of a commit if his commit has broken the build,
 # - deploys two .zip containing the linux and osx apps, with the
-#   touistc compiled in it
+#   touist compiled in it
 #
 # To allow Travis-ci to know that something has been pushed to the repo
 # the owner of the project (Olivier Lezaud back then) had had to link
@@ -49,14 +49,14 @@ before_install:
   - tar xzf yices.tar.gz
   - cp yices-*/bin/yices-smt2 support/gui/external
 install:
-  # Build touistc
+  # Build touist
   - cd $TRAVIS_BUILD_DIR
   - ./configure --bindir support/gui/external --enable-tests
   - make && make install
 
   # Build the Java GUI touist.jar (in support/gui)
   - cd $TRAVIS_BUILD_DIR/support/gui
-  - chmod ugo+x external/touistc
+  - chmod ugo+x external/touist
   - ant -e zip
   - zip=$(ls | grep 'touist.*\.zip' | head -1) # The artifact's name for later use
   - echo $zip && cd $TRAVIS_BUILD_DIR

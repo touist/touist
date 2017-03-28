@@ -37,7 +37,7 @@
 			- the .class from `./touist-gui/build`
 			- a file `manifest` containing the classpath (among others)
 
-		This target will not take care of the external binaries, e.g. touistc.
+		This target will not take care of the external binaries, e.g. touist.
 
 		The `external/` directory and `touist.jar` must be in the same directory
 		for the program to work.

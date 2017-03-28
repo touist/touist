@@ -491,7 +491,7 @@ public class ParentEditionPanel extends AbstractComponentPanel {
                 this.editor.getParser().linterFromExisting(getFrame().getTranslatorSAT().getErrors());
                 this.editor.getEditorTextArea().forceReparsing(0);
                 if(errorMessage != "") {
-                    System.out.println("touistc returned errors:\n"+ errorMessage + "\n");
+                    System.out.println("touist returned errors:\n"+ errorMessage + "\n");
                 }   
                 if(!ok) {
                     return State.EDITION;
@@ -500,11 +500,11 @@ public class ParentEditionPanel extends AbstractComponentPanel {
                 f.deleteOnExit();
             } catch (IOException ex) {
                 ex.printStackTrace();
-                errorMessage = "The translator returned an IOException: \n"+ex.getMessage()+"\nCheck that touistc is in external/ and that it has the right permissions.";
+                errorMessage = "The translator returned an IOException: \n"+ex.getMessage()+"\nCheck that touist is in external/ and that it has the right permissions.";
                 showErrorMessage(ex, errorMessage, getFrame().getLang().getWord(Lang.ERROR_TRADUCTION));
                 return State.EDITION;
             } catch (InterruptedException ex) {
-                System.out.println("touistc has been stopped");
+                System.out.println("touist has been stopped");
                 return State.EDITION;
             }
 
@@ -581,7 +581,7 @@ public class ParentEditionPanel extends AbstractComponentPanel {
                 }
                 setJLabelErrorMessageText(errorMessage);
                 if(errorMessage != "") {
-                    System.out.println("touistc returned errors:\n"+ errorMessage + "\n");
+                    System.out.println("touist returned errors:\n"+ errorMessage + "\n");
                 }
                 if(!ok) {
    

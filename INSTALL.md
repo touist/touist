@@ -1,8 +1,8 @@
 Touist is composed of:
-- `touistc` is a command-line compiler from `.touistl` to `dimacs`;
-- `touist.jar`, (in `support/gui/`) is a graphical interface for `touistc`.
+- `touist` is a command-line compiler from `.touistl` to `dimacs`;
+- `touist.jar`, (in `support/gui/`) is a graphical interface for `touist`.
 
-Building the `touistc` binary
+Building the `touist` binary
 =============================
 
 ## Prerequisites
@@ -12,7 +12,7 @@ Before you go, make sure you have the following installed:
 - `fileutils` (for reading/writing POSIX files)
 - `minisat` (for solving SAT problems)
 
-**Note**: the binary `touistc` produced must be moved into
+**Note**: the binary `touist` produced must be moved into
 `./support/gui/external`. After moving it, you go into `./support/gui`
 and run `ant`.
 
@@ -60,8 +60,8 @@ Building the Java GUI
 
 Steps:
 
-1. first, build `touistc` (see above)
-2. copy `_build/src/touistc.native` to `support/gui/external/touistc`
+1. first, build `touist` (see above)
+2. copy `_build/src/touist.native` to `support/gui/external/touist`
 3. go to `support/gui` and run `ant` for building the GUI
    (see `support/gui/INSTALL.md` for more details)
 4. to run it, you can do `java -jar touist.jar` or `ant run`
