@@ -6,7 +6,7 @@ is an online editor (madoko.net/editor.html).
 
 If you want to edit the .mdk file, you have multiple choices:
 
-- (online madoko GUI and Github account)
+- (1. online madoko GUI and Github account)
   You first have to fork the touist project: https://github.com/touist/touist/fork
   Then, go to https://www.madoko.net/editor.html and log into your github account.
   Select the project freshly forked with 
@@ -17,13 +17,42 @@ If you want to edit the .mdk file, you have multiple choices:
   Finally, go to your github fork https://github.com/yourgithubname/touist and
   open a new pull request against the https://github.com/touist/touist repo.
 
-- (madoko GUI locally) Install madoko-local with `npm install -g madoko-local`
-  and you run the madoko webserver with `madoko-local --port 8080 --run -l .` from
-  the `docs` directory and you Open... Local Disk... and you select the .mdk file.
+- (2. madoko GUI locally) 
+  Install madoko-local with `npm install -g madoko-local` and you run the madoko
+  webserver with `madoko-local --port 8080 --run -l .` from the `docs` directory
+  and you Open... Local Disk... and you select the .mdk file.
   To get your changes reviewed and accepted, fork the project, commit your changes
   and submit a pull request.
   
+- (3. no GUI)
+  Install madoko (not madoko-local): `npm install -g madoko`.
+  Edit the `.mdk` file; you can then render the HTML or PDF with:
+  * HTML: madoko reference-manual.mdk
+  * PDF: madoko reference-manual.mdk --pdf
+  You can then submit a pull request with your changes.
+
 Thanks a lot for your help!!
+
+
+About latex rendering and issues
+================================
+
+If you want to use madoko locally, you will need the full Texlive 2016 distrib;
+if you use Texlive-basic (like me) and install tex packages with
+`tlmgr install <package>`, you will need to install plenty of packages
+error after error. In `circleci.yml` (at the root of the repository), you will
+have an overview of all necessary ubuntu packages you can install using apt-get.
+
+But a lot of errors can occur (I struggled a lot with latex errors). So what I
+do to develop locally is that I use the "mathjax" mode when rendering the html,
+which I can enable with the following metadata (at the top of the .mdk file):
+
+    Math mode: mathjax
+
+This means that you won't need latex for using madoko or madoko-local, and the
+math figures will be rendered using javascript. CircleCI will take care of
+turning on the statically-generated math pieces with the latex mode when
+generating the final document (when the changes are pulled to the master branch).
 
 
 NOTE: Do not put the HTML or PDF into github. The HTML and PDF files are
