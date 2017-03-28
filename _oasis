@@ -98,4 +98,3 @@ SourceRepository master
   Type:           git
   Location:       https://github.com/touist/touist.git
   Browser:        https://github.com/touist/touist
-  Subdir:         touist-translator
