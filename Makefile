@@ -98,7 +98,7 @@ missing:
 
 # This target builds 'touistc'
 support/gui/external/touistc: check-opam-packages build
-	cp _build/src/touistc.native support/gui/touistc
+	cp _build/src/touistc.native support/gui/external/touistc
 
 
 build-gui: check-requirements support/gui/external/touistc support/gui/external/minisat.jar
