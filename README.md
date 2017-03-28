@@ -31,7 +31,7 @@ We have some issues with compiling the ocaml translator for Windows. Some of the
 
 
 ## What is Touist made of?
-Touist uses Java (>= jre7) and embeds an architecture-specific binary, [touistc](https://github.com/touist/touist/tree/master/touist-translator) (we coded it in ocaml), which translates touistl language to dimacs. The dimacs files are then given to another binary, the SAT (or SMT) solver, and then displayed to the user (cf. [DIMACS](http://www.satcompetition.org/2009/format-benchmarks2009.html) and [SMT2](http://smtlib.github.io/jSMTLIB/SMTLIBTutorial.pdf)).
+Touist uses Java (>= jre7) and embeds an architecture-specific binary, [touistc](https://github.com/touist/touist/tree/master) (we coded it in ocaml), which translates touistl language to dimacs. The dimacs files are then given to another binary, the SAT (or SMT) solver, and then displayed to the user (cf. [DIMACS](http://www.satcompetition.org/2009/format-benchmarks2009.html) and [SMT2](http://smtlib.github.io/jSMTLIB/SMTLIBTutorial.pdf)).
 
 _touistc_ can also be used in command-line.
 
