@@ -90,10 +90,10 @@ build_script:
   - ps: cd c:\touist\support\gui
   - ps: ant -e zip
   - ps: $zip=$(Get-ChildItem -name -include touist*.zip) # The artifact's name for later use
-  - ps: mv $zip c:\
+  - ps: mv $zip c:\touist
   # Because ocaml setup.ml test will say that it is not 'sane' to keep a dll
   # somewhere, I have to remove it explicitely...
-  - ps: rm external\libyices.dll 
+  - ps: get-childitem c:\touist\support\gui -include *.dll -recurse | foreach ($_) {remove-item $_.fullname}
 
 test_script:
   - '%CYG_BASH% -lc "cd /cygdrive/c/touist && make test 2>&1"'
@@ -106,7 +106,7 @@ test_script:
 # you want to upload have not been given in "path:", the
 # deploy: artifact: thing will do nothing.
 artifacts:
-  - path: c:\touist-*.zip
+  - path: touist-*.zip
 
 skip_tags: false
 
