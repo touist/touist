@@ -134,3 +134,19 @@ I use the following parameter:
 
 But because `Math mode: mathjax` has precedence over the command-line parameter,
 I cannot do that.
+
+
+## Multiline tables
+
+It would be great to be able to do multiline tables... For example with the ":"
+syntax that continues the line (note that the new line with two trailing spaces
+would not work...):
+
+|-----------|------------------|
+| Heading 1 | Centered 2       |
++-----------|:----------------:+
+| Cell 1    | Cell 2           |
+| Cell 1    | This cell        |
+:           : continues on the :
+:           : same line.       :
+|-----------|------------------|
