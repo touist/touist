@@ -23,7 +23,7 @@ to the place you indicated in --bindir.
 After having make & make install using `./configure --bindir .`, you should be
 able to run `./touist`:
 
-    echo '$a' | ./touist - -sat
+    echo '$a' | ./touist - --sat
 
 
 ## Edit how the build is made ##
@@ -51,7 +51,7 @@ Here is the full command (you must be in `src/`):
 Now with the debugger. Note that I installed `rlwrap` to be able to use the
 arrows to go through the command history.
 
-    rlwrap ocamldebug touist.byte -sat test/atleast.touistl
+    rlwrap ocamldebug touist.byte --sat test/atleast.touistl
 
 The commands I used:
 - `r` to run, `f` to finish and be able to re-run
@@ -129,7 +129,7 @@ is not parsed as expected. For example (WARNING: this is the old syntax with
 begin formula end formula):
 
 ```
-./touist.byte -sat /dev/stdin -o /dev/stdout -table /dev/stdout << eof
+./touist.byte --sat /dev/stdin -o /dev/stdout --table /dev/stdout << eof
 begin
 eof
 
