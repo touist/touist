@@ -39,7 +39,7 @@ let process_arg_alone (file_path:string) : unit = input_file_path := file_path
 
 let exit_with (exit_code:error) = exit (get_code exit_code)
 
-(* In case we have had non-fatal messages (= warnings) during any of the touistc commands,
+(* In case we have had non-fatal messages (= warnings) during any of the touist commands,
    display them before exiting. *)
 let show_msgs_and_exit msgs (exit_code:error) = 
   Msgs.print_msgs ~color:(Unix.isatty Unix.stderr) ~detailed:!detailed_position msgs;

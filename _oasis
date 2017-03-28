@@ -53,21 +53,21 @@ Library touist
   BuildTools:     ocamlbuild, menhir
   BuildDepends:   menhirLib (>= 20150118), fileutils (>= 0.4.0), str, minisat
 
-Executable touistc
+Executable touist-exec
   CompiledObject: best
   Path:           src
   BuildTools:     ocamlbuild, menhir
-  MainIs:         touistc.ml
+  MainIs:         touist.ml
   BuildDepends:   touist
 
-# This produces touistc.byte, useful for ocamldebug.
+# This produces touist.byte, useful for ocamldebug.
 # To enable it, ./configure --enable-debug
-Executable touistc-debug
+Executable touist-exec-debug
   Build$: flag(debug)
   CompiledObject: byte
   Path:           src
   BuildTools:     ocamlbuild, menhir
-  MainIs:         touistc.ml
+  MainIs:         touist.ml
   BuildDepends:   touist
 
 # This produces the test.byte executable; to enable it,
@@ -75,7 +75,7 @@ Executable touistc-debug
 Executable test
   Path:           test
   MainIs:         test.ml
-  BuildTools:     ocamlbuild, menhir, touistc
+  BuildTools:     ocamlbuild, menhir, touist-exec
   BuildDepends:   touist, oUnit
 
 Test test

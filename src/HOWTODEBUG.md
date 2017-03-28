@@ -9,7 +9,7 @@ There are two ways of building: with with pre-generated setup.ml (and
 ./configure and Makefile) or directly with the more "low-level" ocamlbuild.
 
 1. Using setup.ml. You basically have to make and make install. The
-`make install` step is not mandatory as it will only move the compiled touistc
+`make install` step is not mandatory as it will only move the compiled touist
 to the place you indicated in --bindir.
 
         ./configure --enable-debug --bindir . --override is_native false
@@ -19,11 +19,11 @@ to the place you indicated in --bindir.
 2. Using ocamlbuild (which is used by the 1). See section [Run the debugger](#run-the-debugger).
 
 
-## Running touistc ##
+## Running touist ##
 After having make & make install using `./configure --bindir .`, you should be
-able to run `./touistc`:
+able to run `./touist`:
 
-    echo '$a' | ./touistc - -sat
+    echo '$a' | ./touist - -sat
 
 
 ## Edit how the build is made ##
@@ -37,7 +37,7 @@ Whenever you want to regenerate the build scripts:
 
 ## Run the debugger ##
 
-If you want to run ocamldebug, you must build touistc as a .byte instead of
+If you want to run ocamldebug, you must build touist as a .byte instead of
 .native. So I propose to use directly ocamlbuild instead of what oasis
 has generated (`make`). You also need to add to the ocamlbuild command:
 - the option `-tag debug` -> will generate the debug symbols for ocamldebug
@@ -46,12 +46,12 @@ has generated (`make`). You also need to add to the ocamlbuild command:
 Here is the full command (you must be in `src/`):
 
     ocamlbuild -use-ocamlfind -use-menhir -menhir "menhir --trace --table --inspection \
-    -v -la 2" -package fileutils,str,menhirLib touistc.byte -tag debug
+    -v -la 2" -package fileutils,str,menhirLib touist.byte -tag debug
 
 Now with the debugger. Note that I installed `rlwrap` to be able to use the
 arrows to go through the command history.
 
-    rlwrap ocamldebug touistc.byte -sat test/atleast.touistl
+    rlwrap ocamldebug touist.byte -sat test/atleast.touistl
 
 The commands I used:
 - `r` to run, `f` to finish and be able to re-run
@@ -64,7 +64,7 @@ The commands I used:
 
 The syntax errors in parser.messages
 ====================================
-One of the new features of the touistc compiler is to be able to give real
+One of the new features of the touist compiler is to be able to give real
 and understandable syntax errors (when you forget to close a parenthesis...).
 To do so, we use a feature of menhir that allows to pick a message among a
 list of hand-written error messages. The thing is that there are more than
@@ -98,9 +98,9 @@ messages in `parser.messages`:
 
         menhir --compile-errors parser.messages parser.mly > parser_messages.ml
 
-4. And to recompile parser_messages.ml and then touistc:
+4. And to recompile parser_messages.ml and then touist:
 
-        menhir --compile-errors parser.messages parser.mly > parser_messages.ml && ocamlbuild -use-ocamlfind -use-menhir -menhir "menhir --trace --table --inspection -v -la 2" -package menhirLib -package fileutils,str touistc.byte -tag debug -r
+        menhir --compile-errors parser.messages parser.mly > parser_messages.ml && ocamlbuild -use-ocamlfind -use-menhir -menhir "menhir --trace --table --inspection -v -la 2" -package menhirLib -package fileutils,str touist.byte -tag debug -r
 
 ## Missing error cases in parser.messages
 When updating parser.mly, you might sometimes create new error states
@@ -122,14 +122,14 @@ menhir --compare-errors parser.messages_updated --compare-errors src/parser.mess
 
 ## Testing your hand-written messages ##
 There are two ways to test if the messages actually work. The first one
-is simply to launch `./touistc` with a wrong syntax touistl file. If you built
+is simply to launch `./touist` with a wrong syntax touistl file. If you built
 using ocamlbuild and the option --trace in -menhir "" block, it will show you
 the steps of the automaton. It is REALLY helpful to understand why an expression
 is not parsed as expected. For example (WARNING: this is the old syntax with
 begin formula end formula):
 
 ```
-./touistc.byte -sat /dev/stdin -o /dev/stdout -table /dev/stdout << eof
+./touist.byte -sat /dev/stdin -o /dev/stdout -table /dev/stdout << eof
 begin
 eof
 

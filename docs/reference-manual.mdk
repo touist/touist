@@ -18,7 +18,7 @@ Math Mode: mathjax
 Touist is a language that allows to express propositional logic
 [@Ben_Slimane_IAF_2015;@SlimaneCGHLMV15]. You are provided with two programs: a
 graphical interface, refered as `touist.jar` (as it is written in Java) and
-`touistc`, the command-line compiler and solver (written in Ocaml).
+`touist`, the command-line compiler and solver (written in Ocaml).
 
 The touist language aims at making the writing of propositional logic as
 approchable as possible. Propositions and connectors syntaxes are close to what
@@ -49,11 +49,11 @@ false\}$. To check the models of this formula using `touist`, you can do
 | Graphical Java interface            | Command-line interface[^stdin]            |
 |-------------------------------------|-------------------------------------------|
 | 1. Type ``p and q``                 | 1. Create a file ``p and q``              |
-| 2. Press "Solve"                    | 2. Type `./touistc -sat --solve yourfile` |
+| 2. Press "Solve"                    | 2. Type `./touist -sat --solve yourfile` |
 | 3. Press "Next" to see other models | 3. The first model is displayed           |
 ~
 
-[^stdin]: You can also use `touistc` with `stdin`: `echo 'p and q' | ./touistc
+[^stdin]: You can also use `touist` with `stdin`: `echo 'p and q' | ./touist
 - -sat --solve`
 
 ## Simple inference checking

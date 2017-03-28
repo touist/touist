@@ -3,7 +3,7 @@ TouIST main program
 
 This folder contains the source code for the main program of the TouIST 
 project. It is named GUI because of it's main feature: be the user 
-interface for the SAT/SMT solver and `touistc` translator. The whole GUI is written in Java/SWING.
+interface for the SAT/SMT solver and `touist` translator. The whole GUI is written in Java/SWING.
 
 
 ## Java Architecture

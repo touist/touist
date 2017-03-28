@@ -30,7 +30,7 @@
 	<property name="touist.resources.dir" value="${touist.dir}/resources"/>
 	<property name="touist.external.dir" value="${touist.dir}/external"/>
 	<!-- ${touist.external.dir} is the the project folder in which 
-		 external bins are (touistc, solver) -->	
+		 external bins are (touist, solver) -->	
 
 
 	<!-- 
@@ -122,7 +122,7 @@
 			- the .class from `./touist-gui/build`
 			- a file `manifest` containing the classpath (among others)
 
-		This target will not take care of the external binaries, e.g. touistc.
+		This target will not take care of the external binaries, e.g. touist.
 
 		The `external/` directory and `touist.jar` must be in the same directory
 		for the program to work.
@@ -158,7 +158,7 @@
 
 		After calling the target `build` and `build-jar`, this target
 		creates a directory called `dist` with the full program: 
-		touist.jar and external binaries, including `touistc`.
+		touist.jar and external binaries, including `touist`.
 
 		The goal of this target is to create a clean "distribution" 
 		of your software for end-users.

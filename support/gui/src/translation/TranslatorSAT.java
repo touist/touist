@@ -92,7 +92,7 @@ public class TranslatorSAT {
 	 * @throws InterruptedException
 	 */
 	public boolean translate(BufferedReader reader) throws IOException, InterruptedException {
-		/* return_code from the Touistl translator (see touistc.ml):
+		/* return_code from the Touistl translator (see touist.ml):
   		| OK -> 0
   		| COMPILE_WITH_LINE_NUMBER_ERROR -> 1
   		| COMPILE_NO_LINE_NUMBER_ERROR -> 2
@@ -108,11 +108,11 @@ public class TranslatorSAT {
 		 */
 		// Check if translatorProgramFilePath is there
 		
-		String pathtouistc = getTouistDir() + File.separator + "external" + File.separator + "touistc";
+		String pathtouist = getTouistDir() + File.separator + "external" + File.separator + "touist";
 
 		List<String> cmd = new ArrayList<String>();
 		
-		cmd.add(pathtouistc);
+		cmd.add(pathtouist);
 		cmd.add("-sat");
 		cmd.add("-");
 		cmd.add("-table");

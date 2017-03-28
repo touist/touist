@@ -10,10 +10,10 @@ To install the tools:
 
 Then, you must check/add the external binaries in `external`:
 
-- `external/touistc` (see `INSTALL.md`) must be compiled 
+- `external/touist` (see `INSTALL.md`) must be compiled 
    and moved to `external`. We keep a version [in our Google Drive](
    https://drive.google.com/folderview?id=0B5mz8k-t6PT0cW5FSTBxNmgxUjQ&usp=sharing);
-   just rename to `touistc`.
+   just rename to `touist`.
 - `external/yices-smt2` must be unziped from SMT.zip (located in `libs`)
 - `external/minisat.jar` is the SAT solver; we build the .jar from the 
    `./temporary-solver/src` sources and then move `minisat.jar` to
@@ -80,7 +80,7 @@ it will contain:
     dist 
       |--touist.jar
       |--external
-           |--touistc
+           |--touist
            |--minisat.jar
            |--yices-smt2
 

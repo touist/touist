@@ -5,7 +5,7 @@ TouIST, the IDE for propositional logic
 [![Appveyor (Windows)](https://ci.appveyor.com/api/projects/status/rayupfflmut8xbe0?svg=true)](https://ci.appveyor.com/project/maelvalais/touist-kila4)
 
 ## I want to try
-[Get the latest release here](https://github.com/touist/touist/releases). Touist works on **macOS** (x86_64 only), **Linux** x86\_64 and **Windows** (x86 or x64\_86). Just download, unzip and double-click on `touist.jar` (you can also use the command-line `touistc` in `./external/`)
+[Get the latest release here](https://github.com/touist/touist/releases). Touist works on **macOS** (x86_64 only), **Linux** x86\_64 and **Windows** (x86 or x64\_86). Just download, unzip and double-click on `touist.jar` (you can also use the command-line `touist` in `./external/`)
 
 You can also look at the [Touist language reference](http://touist.github.io/reference-manual.html) ([pdf version](http://touist.github.io/reference-manual.pdf)).
 
@@ -31,9 +31,9 @@ We have some issues with compiling the ocaml translator for Windows. Some of the
 
 
 ## What is Touist made of?
-Touist uses Java (>= jre7) and embeds an architecture-specific binary, [touistc](https://github.com/touist/touist/tree/master) (we coded it in ocaml), which translates touistl language to dimacs. The dimacs files are then given to another binary, the SAT (or SMT) solver, and then displayed to the user (cf. [DIMACS](http://www.satcompetition.org/2009/format-benchmarks2009.html) and [SMT2](http://smtlib.github.io/jSMTLIB/SMTLIBTutorial.pdf)).
+Touist uses Java (>= jre7) and embeds an architecture-specific binary, [touist](https://github.com/touist/touist/tree/master) (we coded it in ocaml), which translates touistl language to dimacs. The dimacs files are then given to another binary, the SAT (or SMT) solver, and then displayed to the user (cf. [DIMACS](http://www.satcompetition.org/2009/format-benchmarks2009.html) and [SMT2](http://smtlib.github.io/jSMTLIB/SMTLIBTutorial.pdf)).
 
-_touistc_ can also be used in command-line.
+_touist_ can also be used in command-line.
 
 
 ## Rebuilding-it

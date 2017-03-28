@@ -146,7 +146,7 @@ public class TranslationError {
 		return t;
 	}
 	/**
-	 * Takes what is outputed by touistc and translates into error messages
+	 * Takes what is outputed by touist and translates into error messages
 	 * TODO: for now, only ONE error is parsed!
 	 * @param error
 	 * @return
