@@ -1,3 +1,4 @@
+<support/gui/**/*>: not_hygienic
 # OASIS_START
 # DO NOT EDIT (digest: 21074f1f8a0324c20ebc1bbbb4bfb5c5)
 # Ignore VCS directories, you can use the same kind of rule outside
