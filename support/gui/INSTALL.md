@@ -10,7 +10,7 @@ To install the tools:
 
 Then, you must check/add the external binaries in `external`:
 
-- `external/touistc` (see `touist-translator/INSTALL.md`) must be compiled 
+- `external/touistc` (see `INSTALL.md`) must be compiled 
    and moved to `external`. We keep a version [in our Google Drive](
    https://drive.google.com/folderview?id=0B5mz8k-t6PT0cW5FSTBxNmgxUjQ&usp=sharing);
    just rename to `touistc`.

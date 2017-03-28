@@ -5,6 +5,10 @@
 
 # OCaml
 
+parser.mli
+/touistc
+parser_messages.ml
+version.ml
 *.annot
 *.cmo
 *.cma
@@ -25,9 +29,6 @@ _build/
 # oasis generated files
 setup.data
 setup.log
-META
-*.mllib
-*.mldylib
 
 # menhir conflicts file
 *.conflicts
@@ -52,26 +53,25 @@ hs_err_pid*
 **/dist/
 **/build/
 nbproject/**
-build.xml
 *.mf
 *.cnf
 *.table
 
-/touist-gui/nbproject/**
-/touist-gui/nbbuild.xml
+/support/gui/nbproject/**
+/support/gui/nbbuild.xml
 *.prefs
 
-touist-gui/external/*
+support/gui/external/*
 
-touist-gui/*.touistl
-touist-gui/*.table
-touist-gui/*.txt
-touist-gui/*.smt
-touist-gui/touist-*
+support/gui/*.touistl
+support/gui/*.table
+support/gui/*.txt
+support/gui/*.smt
+support/gui/touist-*
 
 
-touist-gui/resources/version.properties
+support/gui/resources/version.properties
 
-touist-translator/src/version.ml
+src/version.ml
 
-touist-gui/dist.zip
+support/gui/dist.zip

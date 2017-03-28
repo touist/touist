@@ -74,29 +74,30 @@ install:
   - ps: If(-Not(Test-Path c:\ant)){ 7z x c:\ant.zip -oc:\ | Out-Null; rm c:\ant.zip; mv c:\apache-ant* c:\ant }
   - ps: $env:Path = $env:Path + ";C:\ant\bin"
 
-# Now we must put the SMT solver into touist-gui/external/
 before_build:
-  - ps: If(-Not(Test-Path c:\yices)){ Invoke-WebRequest "http://yices.csl.sri.com/cgi-bin/yices2-newnewdownload.cgi?file=yices-2.4.2-i686-pc-mingw32-static-gmp.zip&accept=I+Agree" -OutFile c:\yices.zip }
-  - ps: If(-Not(Test-Path c:\yices)){ 7z x c:\yices.zip -oc:\ | Out-Null; rm c:\yices.zip; mv c:\yices* c:\yices }
-  - ps: cp c:\yices\bin\yices-smt2.exe c:\touist\touist-gui\external
-  - ps: cp c:\yices\bin\libyices.dll c:\touist\touist-gui\external
+
 
 build_script:
-  # Build touistc (touist-translator)
+  # Build touistc
   # IMPORTANT: I had to add the 2>&1 because when something writes to
   # stderr, Powershell thinks there was an error... -_-
-  - '%CYG_BASH% -lc "cd /cygdrive/c/touist/touist-translator && ./configure --bindir ../touist-gui/external --enable-tests 2>&1"'
-  - '%CYG_BASH% -lc "cd /cygdrive/c/touist/touist-translator && make 2>&1"'
-  - '%CYG_BASH% -lc "cd /cygdrive/c/touist/touist-translator && make install 2>&1"'
+  - '%CYG_BASH% -lc "cd /cygdrive/c/touist && ./configure --bindir support/gui/external --enable-tests 2>&1"'
+  - '%CYG_BASH% -lc "cd /cygdrive/c/touist && make 2>&1"'
+  - '%CYG_BASH% -lc "cd /cygdrive/c/touist && make install 2>&1"'
 
-  # Build touist.jar (touist-gui)
-  - ps: cd c:\touist\touist-gui
+  # Build the Java GUI touist.jar (in support/gui)
+  # First, put the SMT solver into support/gui/external/
+  - ps: If(-Not(Test-Path c:\yices)){ Invoke-WebRequest "http://yices.csl.sri.com/cgi-bin/yices2-newnewdownload.cgi?file=yices-2.4.2-i686-pc-mingw32-static-gmp.zip&accept=I+Agree" -OutFile c:\yices.zip }
+  - ps: If(-Not(Test-Path c:\yices)){ 7z x c:\yices.zip -oc:\ | Out-Null; rm c:\yices.zip; mv c:\yices* c:\yices }
+  - ps: cp c:\yices\bin\yices-smt2.exe c:\touist\support\gui\external
+  - ps: cp c:\yices\bin\libyices.dll c:\touist\support\gui\external
+  - ps: cd c:\touist\support\gui
   - ps: ant -e zip
   - ps: $zip=$(Get-ChildItem -name -include touist*.zip) # The artifact's name for later use
   - ps: echo $zip
 
 test_script:
-  - '%CYG_BASH% -lc "cd /cygdrive/c/touist/touist-translator && make test 2>&1"'
+  - '%CYG_BASH% -lc "cd /cygdrive/c/touist && make test 2>&1"'
 
 # Important: to be able to use the artifact: /touist-.*\.zip/
 # in deploy:, it is mandatory to add every .zip or whatever
@@ -106,7 +107,7 @@ test_script:
 # you want to upload have not been given in "path:", the
 # deploy: artifact: thing will do nothing.
 artifacts:
-  - path: touist-gui\touist-*.zip
+  - path: support\gui\touist-*.zip
 
 skip_tags: false
 
