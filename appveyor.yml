@@ -74,9 +74,6 @@ install:
   - ps: If(-Not(Test-Path c:\ant)){ 7z x c:\ant.zip -oc:\ | Out-Null; rm c:\ant.zip; mv c:\apache-ant* c:\ant }
   - ps: $env:Path = $env:Path + ";C:\ant\bin"
 
-before_build:
-
-
 build_script:
   # Build touistc
   # IMPORTANT: I had to add the 2>&1 because when something writes to
@@ -94,7 +91,10 @@ build_script:
   - ps: cd c:\touist\support\gui
   - ps: ant -e zip
   - ps: $zip=$(Get-ChildItem -name -include touist*.zip) # The artifact's name for later use
-  - ps: echo $zip
+  - ps: mv $zip c:\
+  # Because ocaml setup.ml test will say that it is not 'sane' to keep a dll
+  # somewhere, I have to remove it explicitely...
+  - ps: rm external\libyices.dll 
 
 test_script:
   - '%CYG_BASH% -lc "cd /cygdrive/c/touist && make test 2>&1"'
@@ -107,7 +107,7 @@ test_script:
 # you want to upload have not been given in "path:", the
 # deploy: artifact: thing will do nothing.
 artifacts:
-  - path: support\gui\touist-*.zip
+  - path: c:\touist-*.zip
 
 skip_tags: false
 
