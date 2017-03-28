@@ -8,9 +8,7 @@
 # To install oasis:
 #     opam install oasis
 # To install menhir, fileutils:
-#     opam install menhir fileutils
-# To install minisat:
-#     opam pin add -y minisat "https://github.com/maelvalais/ocaml-minisat.git#0.0.2"
+#     opam install menhir fileutils minisat
 ###############
 # To force using 'bytecode' over 'native' binary for debugging with
 # ocamldebug or utop, launch:
@@ -19,11 +17,19 @@
 
 OASISFormat:  0.4
 OcamlVersion: >= 4.01.0
-Name:         TouiST Compiler
-Version:      0.1
-Synopsis:     This package is a compiler to the DIMACS file format
-Authors:      Olivier Lezaud
-License:      LGPL
+Name:         touist
+Version:      2.4.0
+Synopsis:     The solver for the Touist language
+Description:  The Touist language is a friendly language for writing
+  propositional logic and logic on real and integers (SMT). This language
+  aims to formalize real-life problems (e.g., the sudoku can be solved in a
+  few lines). Touist embeds the minisat solver (for propositional logic) and
+  (coming soon) the SMT2 solver. It can also generate the DIMACS, SMT2 and
+  latex formats from you touist file.
+Maintainers:  Maël Valais <mael.valais@gmail.com>
+Authors:      Maël Valais <mael.valais@gmail.com>, Olivier Lezaud
+Homepage:     http://touist.github.io
+License:      MIT
 Plugins:      META (0.4), DevFiles (0.4)
 BuildType: ocamlbuild (0.4)
 AlphaFeatures: ocamlbuild_more_args
