@@ -1,8 +1,9 @@
-v2.4.0
+v3.0.0
   - touist:
-    - the 'touistc' command-line binary is now named 'touist' as it is
-      not solely a compiler anymore (also plays the role of the solver)
-    - command-line options have been normalized:
+    - (breaking change) the 'touistc' command-line binary is now named
+      'touist' as it is not solely a compiler anymore (also plays the
+      role of the solver)
+    - (breaking change) command-line options have been normalized:
       1. -sat renamed to --sat and is enabled by default (if --smt is
          not given);
       2. -smt2 renamed to --smt
