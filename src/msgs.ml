@@ -52,7 +52,8 @@ let rec string_of_msgs ?(color=false) ?(detailed=false) (messages:t) =
       and txt_type = match typ with
         | Warning -> "warning"
         | Error -> "error"
-      in (Printf.sprintf "%s: %s%s%s: %s\n" (string_of_loc ~detailed:detailed loc) colstart txt_type colend msg) ^ acc)
+      (* NOTE: all msg should be finished by a trailing newline (\n) *)
+      in (Printf.sprintf "%s: %s%s%s: %s" (string_of_loc ~detailed:detailed loc) colstart txt_type colend msg) ^ acc)
       messages ""
 (** [print_msgs] will display the messages that have been produced by parse, eval, sat,
     cnf or smt. 

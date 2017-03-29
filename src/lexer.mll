@@ -152,7 +152,7 @@ rule token = parse (* is a function (Lexing.lexbuf -> Parser.token list) *)
   | newline        { next_line lexbuf; token lexbuf   }
   | ";;"           { comments_parse lexbuf            }
   | _ as c         { let loc = (lexbuf.lex_curr_p,lexbuf.lex_curr_p)
-                     in raise (Error ("unexpected char '"^(String.make 1 c)^"'", loc)) }
+                     in raise (Error ("unexpected char '"^(String.make 1 c)^"'\n", loc)) }
 
 and comments_parse = parse
   | '\n'           { next_line lexbuf; token lexbuf }

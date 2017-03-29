@@ -341,7 +341,7 @@ and eval_ast (msgs:Msgs.t ref) (env:env) (ast:ast) :ast =
   | Prop x -> Prop x
   | Loc (x,l) -> eval_ast x
   | Paren x -> eval_ast x
-  | e -> raise_with_loc msgs ast ("this expression cannot be expanded: " ^ string_of_ast e)
+  | e -> raise_with_loc msgs ast ("[shouldnt happen] this expression cannot be expanded: " ^ string_of_ast e)
   in expanded
 
 and eval_set_decl (msgs:Msgs.t ref) (env:env) (set_decl:ast) =
@@ -467,7 +467,7 @@ and eval_ast_formula (msgs:Msgs.t ref) (env:env) (ast:ast) : ast =
                (if !smt then "'prop', 'int' or 'float'" else "'prop'") ^ ".\n"^
             "Why? Because this variable is part of a formula, and thus is expected\n"^
             "to be a proposition. Here is the content of '" ^name^"':\n"^
-            "    "^(string_of_ast content))
+            "    "^(string_of_ast content)^"\n")
       with Not_found ->
       try
         match (p,i) with
@@ -496,11 +496,11 @@ and eval_ast_formula (msgs:Msgs.t ref) (env:env) (ast:ast) : ast =
                 "In order to produce an expanded proposition of this kind, '"^prefix^"' must be a proposition.\n"^
                 "Why? Because this variable is part of a formula, and thus is expected\n"^
                 "to be a proposition. Here is the content of '" ^prefix^"':\n"^
-                "    "^(string_of_ast content), loc_affect)
+                "    "^(string_of_ast content)^"\n", loc_affect)
           in eval_ast_formula (UnexpProp ((string_of_ast term), Some indices))
       (* Case 5. the variable was of the form '$v(1,2,3)' and was not declared
          and '$v' is not either declared, so we can safely guess that this var has not been declared. *)
-      with Not_found -> raise_with_loc msgs ast ("'" ^ name ^ "' has not been declared")
+      with Not_found -> raise_with_loc msgs ast ("'" ^ name ^ "' has not been declared\n")
     end
   | Not Top    -> Bottom
   | Not Bottom -> Top

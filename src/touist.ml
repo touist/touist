@@ -85,7 +85,7 @@ let () =
   in
   let usage =
     "TouistL compiles files from the TouIST Language to SAT-Sat/SMT-LIB2.\n"^
-    "Usage: " ^ cmd ^ " --sat [-o OUTPUT] [--table TABLE] (INPUT | -)\n"^
+    "Usage: " ^ cmd ^ " [--sat] [-o OUTPUT] [--table TABLE] (INPUT | -)\n"^
     "Usage: " ^ cmd ^ " --smt (QF_IDL|QF_RDL|QF_LIA|QF_LRA) [-o OUTPUT] (INPUT | -)\n"^
     "Note: in --sat mode, if TABLE and OUTPUT aren't given, both output will be mixed in stdout."
   in
@@ -106,10 +106,24 @@ let () =
   (* Check (file | -) and open input and output *)
   if (!input_file_path = "") && not !use_stdin (* NOTE: !var is like *var in C *)
   then (
-    Printf.fprintf stderr "%s: you must give an input file (try --help)" cmd;
+    Printf.fprintf stderr "%s: you must give an input file.\nTo read from stdin, add - to the arguments. For more info, try --help.\n" cmd;
     exit_with ERROR
   );
   if !use_stdin then (input := stdin) else (input := open_in !input_file_path);
+
+  (* Check that --smt and --sat have not been both selected *)
+  if (!sat_mode && (!smt_logic <> "")) then begin
+    Printf.fprintf stderr "%s: cannot use both --sat and --smt solvers (try --help)\n" cmd;
+    exit_with ERROR end;
+
+  (* When neither --smt nor --sat has been given, we default to --sat mode *)
+  if (not !sat_mode) && (!smt_logic = "") then sat_mode := true;
+
+  (* SMT Mode: check if one of the available QF_? has been given after --smt *)
+  if (not !sat_mode) && (not (List.exists (fun x->x=(String.uppercase !smt_logic)) smt_logic_avail)) then
+    (Printf.fprintf stderr
+    "%s: you must specify the logic used (--smt logic_name) (try --help)\nExample: --smt QF_IDL\n" cmd;
+    exit_with ERROR);
 
   if !output_file_path <> "" && (!sat_mode || (!smt_logic <> ""))
   then output := open_out !output_file_path;
@@ -119,19 +133,6 @@ let () =
 
   if !equiv_file_path <> ""
   then input_equiv := open_in !equiv_file_path;
-
-  (* Check that either --smt or --sat have been selected *)
-  if (!sat_mode && (!smt_logic <> "")) then begin
-    Printf.fprintf stderr "%s: cannot use both --sat and --smt solvers (try --help)\n" cmd;
-    exit_with ERROR end;
-  (* When neither --smt nor --sat has been given, we default to --sat mode *)
-  if (not !sat_mode) && (!smt_logic = "") then sat_mode := true;
-
-  (* SMT Mode: check if one of the available QF_? has been given after --smt *)
-  if (not !sat_mode) && (not (List.exists (fun x->x=(String.uppercase !smt_logic)) smt_logic_avail)) then
-    (Printf.fprintf stderr
-    "%s: you must specify the logic used (--smt logic_name) (try --help)\nExample: --smt QF_IDL" cmd;
-    exit_with ERROR);
 
   try
 

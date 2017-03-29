@@ -11,9 +11,8 @@
 #require "OUnit";;
 
 (* The order of the loads is important *)
-#load "set_ext.cmo";;
 #load "msgs.cmo";;
-#load "syntax.cmo";;
+#load "types.cmo";;
 #load "pprint.cmo";;
 #load "parser_messages.cmo";;
 #load "lexer.cmo";;
