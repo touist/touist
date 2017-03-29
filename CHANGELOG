@@ -1,3 +1,6 @@
+v3.0.1
+  - touist:
+    - fixed powerset([a,b]) that now correclty returns the empty set
 v3.0.0
   - touist:
     - (breaking change) the 'touistc' command-line binary is now named
