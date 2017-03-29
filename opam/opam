@@ -28,6 +28,6 @@ depends: [
   "minisat" {build}
   "ocamlbuild" {build}
   "ocamlfind" {build}
-  "ounit" {build}
+  "ounit" {test}
 ]
 available: [ ocaml-version >= "4.01.0" ]

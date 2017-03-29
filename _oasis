@@ -14,6 +14,18 @@
 # ocamldebug or utop, launch:
 #     ./configure --override is_native false
 #
+###############
+# To distribute to OPAM,
+# - modify the 'Version:' field; this field will be used for creating
+#   the version.ml instead of using 'git describe --tags' because git
+#   information is not available in archive tar.gz from github.
+# - run `oasis setup`
+#       `oasis2opam --local`
+#       `git add setup.ml _oasis opam/opam`
+#   and then commit and push
+# - create the tag, for example `git tag -s v2.4.0`
+# - run `oasis2opam https://github.com/touist/touist/archive/v2.4.0.tar.gz`
+# - run `opam-publish submit touist.2.4.0`
 
 OASISFormat:  0.4
 OcamlVersion: >= 4.01.0
