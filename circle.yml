@@ -52,6 +52,7 @@ test:
     - cp docs/out/reference-manual.pdf docs/out/reference-manual.html touist.github.io
     - |
        cd touist.github.io
+       git pull
        git config user.name "CircleCI"
        git config user.email "robot@circleci.com"
        git add reference-manual.pdf reference-manual.html
