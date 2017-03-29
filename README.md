@@ -5,7 +5,15 @@ TouIST, the IDE for propositional logic
 [![Appveyor (Windows)](https://ci.appveyor.com/api/projects/status/rayupfflmut8xbe0?svg=true)](https://ci.appveyor.com/project/maelvalais/touist-kila4)
 
 ## I want to try
-[Get the latest release here](https://github.com/touist/touist/releases). Touist works on **macOS** (x86_64 only), **Linux** x86\_64 and **Windows** (x86 or x64\_86). Just download, unzip and double-click on `touist.jar` (you can also use the command-line `touist` in `./external/`)
+Touist can be either used as a command-line tool or through a graphical interface
+that wraps the command-line tool:
+
+* The graphical interface can be [downloaded here](https://github.com/touist/touist/releases).
+It embeds the command-line tool. The graphical interface works on **macOS**
+(x86_64 only), **Linux** x86\_64 and **Windows** (x86 or x64\_86). Just download
+it, unzip and double-click on `touist.jar` (the command-line tool `touist` is
+in `./external/`)
+* The command-line tool can be installed using `opam install touist`. To use it, type for example `echo a and b | touist - --solve`
 
 You can also look at the [Touist language reference](http://touist.github.io/reference-manual.html) ([pdf version](http://touist.github.io/reference-manual.pdf)).
 
