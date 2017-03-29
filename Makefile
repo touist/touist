@@ -74,10 +74,15 @@ pre-build: $(targets)
 	menhir --compile-errors $^ > $@
 
 # Produced by git
-%version.ml: FORCE
-	@echo "let version=\"`if which git 1>&2 2>/dev/null; then git describe --tags; else echo "n/a"; fi`\"" > $@
-# A dummy target to force version.ml to rebuild each time
+%version.ml: | .git/HEAD _oasis
+	@if which git 2>&1 >/dev/null;\
+		then echo "let version=\"`git describe --tags` (git)\"" > $@;\
+		else echo "let version=\"v`grep 'Version:  *[0-9][0-9\.]*' _oasis |\
+			tr -d ' ' | cut -d: -f2` (opam)\"" > $@;\
+	fi
+
 FORCE:
+.git/HEAD: # This rule is here when no git info is available
 
 clean-pre-build:
 	cd $(SRC) && rm -f parser_messages.ml version.ml
