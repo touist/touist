@@ -22,7 +22,6 @@ let solve_sat = ref false
 let limit = ref 1
 let only_count = ref false
 let show_hidden_lits = ref false
-let debug_formula_expansion = ref false
 let equiv_file_path = ref ""
 let input_equiv = ref stdin
 let linter = ref false (* for displaying syntax errors (during parse and eval) *)
@@ -78,13 +77,13 @@ let () =
     ("--latex", Arg.Set latex,"Transform the touistl laguage into latex");
     ("--show-hidden", Arg.Set show_hidden_lits,"(with --solve) Show the hidden '&a' literals used when translating to CNF");
     ("--equiv", Arg.Set_string equiv_file_path,"INPUT2 (with --solve) Check that INPUT2 has the same models as INPUT (equivalency)");
-    ("--debug-formula-expansion", Arg.Set debug_formula_expansion,"Print how the formula is expanded (bigand...)");
     ("--linter", Arg.Set linter,"Display syntax and semantic errors and exit");
     ("--detailed-position", Arg.Set detailed_position,"Detailed position with 'num_line:num_col:token_start:token_end: '");
   ]
   in
   let usage =
-    "TouistL compiles files from the TouIST Language to SAT-Sat/SMT-LIB2.\n"^
+    "TouIST solves propositional logic problems written in TouIST language\n
+     and supports conversion to SAT-DIMACS and SMT-LIB2 solver formats.\n"^
     "Usage: " ^ cmd ^ " [--sat] [-o OUTPUT] [--table TABLE] (INPUT | -)\n"^
     "Usage: " ^ cmd ^ " --smt (QF_IDL|QF_RDL|QF_LIA|QF_LRA) [-o OUTPUT] (INPUT | -)\n"^
     "Note: in --sat mode, if TABLE and OUTPUT aren't given, both output will be mixed in stdout."
