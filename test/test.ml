@@ -173,6 +173,10 @@ run_test_tt_main (
   "var-tuple is prop">::(test_sat "$a=p p($a)");
   ];
 ];
+"powerset">:::[
+  "powerset should always return a set containing the empty set">::(sat_expands_to "f(powerset([1]))" "f([[],[1]])");
+  "powerset simple test">::(sat_expands_to "f(powerset([a,b]))" "f([[],[a],[a,b],[b]])")
+];
 
 "samples of code that should raise errors in [Eval.eval]">:::[ (* 'c' is the testing context *)
   "undefined var">::         (test_sat_raise "1:4" "   $a");

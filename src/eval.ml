@@ -300,10 +300,14 @@ and eval_ast (msgs:Msgs.t ref) (env:env) (ast:ast) :ast =
         List.fold_left (fun acc x -> AstSet.add (Set (AstSet.of_list x)) acc) AstSet.empty (AstSet.combinations k set)
       in
       let rec all_combinations_to_set k set = match k with
-        | 0 -> AstSet.empty
+        (* 0 -> because AstSet.combinations does not produce the empty set
+                in the set of combinations, we must add the empty set here. *)
+        | 0 -> AstSet.of_list [Set (AstSet.empty)]
         | _ -> AstSet.union (combination_to_set k set) (all_combinations_to_set (pred k) set)
       in
       match eval_ast x with
+      (* !check_only is here to skip the full expansion of powerset(). This
+         is useful for linting (=checking types). *)
       | Set s -> if !check_only then Set (AstSet.of_list [AstSet.choose s])
                  else Set (all_combinations_to_set (AstSet.cardinal s) s)
       | x' -> raise_type_error msgs ast x x' "a 'set'"
