@@ -19,13 +19,15 @@
 # - modify the 'Version:' field; this field will be used for creating
 #   the version.ml instead of using 'git describe --tags' because git
 #   information is not available in archive tar.gz from github.
-# - run `oasis setup`
+# - 1. `oasis setup`
 #       `oasis2opam --local`
 #       `git add setup.ml _oasis opam/opam`
-#   and then commit and push
-# - create the tag, for example `git tag -s v2.4.0`
-# - run `oasis2opam https://github.com/touist/touist/archive/v2.4.0.tar.gz`
-# - run `opam-publish submit touist.2.4.0`
+#       `git commit -m "Bump to v2.4.0"`
+#    NOTE: these three steps can be done with 'make version VERSION=2.4.0'
+# 2. create the tag, for example `git tag -s v2.4.0`
+# 3. push all that: `git push --tags`
+# 4. run `oasis2opam https://github.com/touist/touist/archive/v2.4.0.tar.gz`
+# 5. run `opam-publish submit touist.2.4.0`
 
 OASISFormat:  0.4
 OcamlVersion: >= 4.01.0
