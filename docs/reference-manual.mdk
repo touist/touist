@@ -124,31 +124,17 @@ A whitespace is a space, tab or newline.
 
 Comments begin with the "``;;``" sequence.
 
-## Affectations {#affect}
-Affectations have the following syntax:
-
-``` Grammar
-<affect> ::= <var> "=" (<int>|<float>|<bool>|<prop>|<set>)
-```
-
-This kind of affectation is global and applies for the whole code, even if the
-affectation happens after the formulas when the variable appears. These
-affectations are evaluated before any formula.
-
-The only place where the order of affectation has importance is when you want
-to use a variable in an affectation expression. For example:
-``` Touist
-$N = 10
-$set = [1..$N]    ;; $N must be defined before $set
-```
-
 ## Variables
 
+First, we describe what a variable is. Then, we detail how to affect variables
+(with global or local affectations).
+
+### Syntax of a variable
+
 ``` Grammar
-TERM = [_0-9]*[a-zA-Z][a-zA-Z_0-9]*
-<var> ::=
-  | "$" TERM                            (* simple-var *)
-  | "$" TERM "(" <comma-list(<float>|<int>|<prop>)> ")" (* tuple-var *)
+<expr> ::= <int>|<float>|<prop>|<bool>|<set>
+<var> ::= "$" TERM                           <- simple-var
+    | "$" TERM "(" <comma-list(<expr>)> ")"   <- tuple-var
 ```
 
 * Simple variable ("simple-var")
@@ -178,14 +164,73 @@ Here are some examples of variables:
 |``$is_over`` |                     |
 |-------------|---------------------|
 
+### Global affectation {#global-var}
+
+We call "global variables" any variable that is affected in the top-level
+formula (meaning that global variables cannot be nested in other formulas)
+using the following affectation syntax:
+``` Grammar
+<affect> ::= <var> "=" (<expr>)      <-- global affectation
+<expr> ::= <int>|<float>|<prop>|<bool>|<set>
+```
+
+Global variables apply for the whole code, even if the affectation is located
+before it is first used. This is because all global affectations are evaluated
+before any formula.
+
+The only case where the order of affectation is important is when you want
+to use a variable in a global affectation expression. Global affectations are
+sequentially evaluated, so the order of affectation matters. For example:
+``` Touist
+$N = 10
+$set = [1..$N]    ;; $N must be defined before $set
+```
+
+### Local affectation (``let`` construct)
+
+Sometimes, you want to use the same result in multiple places and you cannot
+use a global variable (presented in [#global-var]) because of nested formulas.
+The ``let`` construct lets you create temporary variables inside formulas:
+``` Grammar
+<let-affect<T>> ::=
+    | "let" <var> "=" <expr> ":" <formula<T>>  <-- local affectation
+<expr> ::= <int>|<float>|<prop>|<bool>|<set>
+```
+The ``let`` affectation can only be used in formulas (detailed in [#sec-formulas])
+and cannot be used in expressions (`<expr>`, i.e., integer, floating-point,
+boolean or set expressions).
+
+Example: 
+``` Touist
+;; This piece of code has no actual meaning
+$letters = [a,b,c,d,e]
+bigand $letter,$number in $letters,[1..card($letters)]:
+  has($letter,$number) =>
+  let $without_letter = diff($letters,$letter): ;; keep temorary result
+  bigand $l1 in $without_letter:
+      p($letter) 
+  end
+end
+```
+~ Note
+The scope of a variable affected using ``let`` is limited to the formula that
+follows the colon (`:`). If this formula is followed by a whitespace and an other
+formula, the second formula will not be in the variable scope. Example:
+``` Touist
+  let $v=10: prop($v)
+  prop($v)    ;; error: $v is not in scope anymore  
+``` 
+~
+
 ## Propositions
 
 ``` Grammar
 TERM = [_0-9]*[a-zA-Z][a-zA-Z_0-9]*
+<expr> ::= <int>|<float>|<prop>|<bool>|<set>
 <prop> ::=
     | <var>
     | TERM
-    | TERM "(" <comma-list(<float> | <int> | <prop>)> ")"
+    | TERM "(" <comma-list(<expr>)> ")"
 ```
 
 A simple proposition is a simple word that can contain numbers and the
@@ -526,30 +571,6 @@ Touist can also be given Satisfiability Modulo Theory (SMT) formulas and output
 the SMT2-LIB-compliant file.
 (TODO)
 
-### Local variables
-Sometimes, you want to use the same result in multiple places. You might not be
-able to use a global affectation (presented in [#affect]) because you are in a
-nested formula. The ``let`` construct lets you create temporary variables
-inside formulas:
-``` Grammar
-<let-affect<T>> ::=
-    | "let" <var> "=" <int>|<float>|<bool>|<prop>|<set> ":" <formula<T>>
-```
-
-Example: 
-``` Touist
-;; This piece of code has no actual meaning
-$letters = [a,b,c,d,e]
-bigand $letter,$number in $letters,[1..card($letters)]:
-  has($letter,$number) =>
-  let $without_letter = diff($letters,$letter): ;; keep temorary result
-  bigand $l1 in $without_letter:
-      p($letter) 
-  end
-end
-```
-
-
 ## Formal grammar
 
 This section presents the grammar formatted in a BNF-like way. Some rules (a
@@ -558,13 +579,13 @@ are "factorized" (the idea of parametrized rules come from the Menhir parser
 generator used for generating the touist parser).
 
 ~ Note
-This grammar specification is not LL(1) and could not be implemented as such
+This grammar specification is not LR(1) and could not be implemented as such
 using Menhir; most of the type checking is made after the abstract syntactic
 tree is produced. The only purpose of the present specification is to give a
 clear view of what is possible and not possible with this language.
 ~
 
-``` Grammar { .pretty }
+``` Grammar
 INT       = [0-9]+
 FLOAT     = [0-9]+\.[0-9]+
 TERM      = [_0-9]*[a-zA-Z][a-zA-Z_0-9]*
@@ -575,18 +596,19 @@ TERM      = [_0-9]*[a-zA-Z][a-zA-Z_0-9]*
                  | <formula> <touist-file>
                  | EOF
 
+<expr> ::= <int>|<float>|<prop>|<bool>|<set>
 <var> ::= "$" TERM
-    | "$" TERM "(" <comma-list(<float> | <int> | <prop>)> ")"
+    | "$" TERM "(" <comma-list(<expr>)> ")"
 
 <prop> ::=
     | <var>
     | TERM
-    | TERM "(" <comma-list(<float> | <int> | <prop>)> ")"
+    | TERM "(" <comma-list(<expr>)> ")"
 
-<affect> ::= <var> "=" (<int>|<float>|<bool>|<prop>|<set>)
+<affect> ::= <var> "=" (<expr>)
 
 <let-affect<T>> ::=
-    | "let" <var> "=" <int>|<float>|<bool>|<prop>|<set> ":" <formula<T>>
+    | "let" <var> "=" <expr> ":" <formula<T>>
 
 <equality(<T>)> ::=
     | <T> "!=" <T>
@@ -602,7 +624,7 @@ TERM      = [_0-9]*[a-zA-Z][a-zA-Z_0-9]*
     | <var>
     | "true"
     | "false"
-    | (<int>|<float>|<prop>|<bool>) "in" <set>
+    | (<expr>) "in" <set>
     | "subset(" <set> "," <set> ")"
     | "empty(" <set> ")"
     | <equality(<int>|<float>|<prop>)>
@@ -642,7 +664,7 @@ TERM      = [_0-9]*[a-zA-Z][a-zA-Z_0-9]*
 
 <set> ::= "(" <set> ")"
     | <var>
-    | "[" <comma-list(<int>|<float>|<prop>|<bool>)> "]"
+    | "[" <comma-list(<expr>)> "]"
     | "[ <int> ".." <int> "]"      <- step is 1
     | "[ <float> ".." <float> "]"  <- step is 1.0
     | "union(" <set> "," <set> ")" 
