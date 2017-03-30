@@ -1,10 +1,19 @@
-TouIST, the IDE for propositional logic
-=======================================
+TouIST, the language for propositional logic
+===========================================
 
-[![Travis (Linux/Mac) build state](https://travis-ci.org/touist/touist.svg?branch=master)](https://travis-ci.org/touist/touist)
-[![Appveyor (Windows)](https://ci.appveyor.com/api/projects/status/rayupfflmut8xbe0?svg=true)](https://ci.appveyor.com/project/maelvalais/touist-kila4)
 
-## I want to try
+|      Mac, Linux      |         Windows         |    Documentation     |
+| :------------------: | :---------------------: | :------------------: |
+| [![trv-img]][travis] | [![apvy-img]][appveyor] | [![cir-img]][circle] |
+
+[circle]: https://circleci.com/gh/touist/touist/tree/master
+[cir-img]: https://circleci.com/gh/touist/touist/tree/master.svg?style=svg
+[travis]: https://travis-ci.org/touist/touist
+[trv-img]: https://travis-ci.org/touist/touist.svg?branch=master
+[appveyor]: https://ci.appveyor.com/project/maelvalais/touist-kila4/branch/master
+[apvy-img]: https://ci.appveyor.com/api/projects/status/rayupfflmut8xbe0/branch/master?svg=true
+
+## Try it
 Touist can be either used as a command-line tool or through a graphical interface
 that wraps the command-line tool:
 
