@@ -7,7 +7,8 @@
      [ "<[a-zA-Z<>()-]+>", "constructor" ],
      [ "[|]", "operator" ],
      [ "::=", "operator" ],
-     [ "\\(\\*.*\\*\\)","comment"]
+     [ "\\(\\*.*\\*\\)","comment"],
+     ["<-.*$", "comment"]
    ]
  }
 }

@@ -158,13 +158,13 @@ TERM = [_0-9]*[a-zA-Z][a-zA-Z_0-9]*
     or a set.
 * Tuple variable (can be seen as a _predicate_)
   : A tuple variable is a simple variable followed by a comma-separated list of
-    indices in braces, e.g., ``$var($i,a,4)``. The leading variable (``$var``)
-    must always contain a proposition. The nested indices (e.g., ``$i``) can be
+    indexes in braces, e.g., ``$var($i,a,4)``. The leading variable (``$var``)
+    must always contain a proposition. The nested indexes (e.g., ``$i``) can be
     integers, floats, propositions or booleans.
   : A tuple variable will always be expanded to a proposition. For example, if
     ``$var=p`` and ``$i=q``, then it will expand to ``p(q,a,4)``
   : Tuple variables are not (yet) compatible with the set-builder construct (in
-    [#set-builder]). If one of the indices is a set, the set will stay
+    [#set-builder]). If one of the indexes is a set, the set will stay
     as-is.
 
 Here are some examples of variables:
@@ -190,14 +190,14 @@ TERM = [_0-9]*[a-zA-Z][a-zA-Z_0-9]*
 
 A simple proposition is a simple word that can contain numbers and the
 underscore symbol ("`_`"). A tuple proposition (we can it as a _predicate_),
-of the form ``prop(1,$i,abc)``, must have indices of type integer, float,
+of the form ``prop(1,$i,abc)``, must have indexes of type integer, float,
 boolean or set.
 
 ### Tuple proposition containing a set {#tuple-prop-set}
 
 A tuple proposition that is in an expression and that contains at least one
-set in its indices will be expanded to a set of the cartesian product of the
-set indices. This feature is called **set-building** and is described in
+set in its indexes will be expanded to a set of the cartesian product of the
+set indexes. This feature is called **set-building** and is described in
 [#set-builder] and only works in expressions (not in formulas).
 
 In the following table, the two right-columns show how the propositions
@@ -338,11 +338,11 @@ be produced with both integer and float limits. For both integer and float
 limits, the step is 1 (it is not possible to change the step for now);
 
 ### Set-builder notation {#set-builder}
-$\{p(x_1,...,x_n)~|~(x_1,...,x_n) \in S_1 \times ... \times S_n \}$ is the set
-of tuple propositions based on the cartesian product of the sets $S_1,...,S_n$.
-This can be written using sets instead of atoms in a proposition:
-``p([a,b,c])`` will produce ``[p(a),p(b),p(c)]``.
-You can mix sets, integers, floats, propositions and booleans in indices:
+$\{p(x_1,...,x_n)~|~(x_1,...,x_n) \in S_1 \times ... \times S_n \}$, which the set
+of tuple propositions based on the cartesian product of the sets $S_1,...,S_n$,
+can be written ``p($S1,$S2,$S3)``. The example ``p([a,b,c])`` will produce
+``[p(a),p(b),p(c)]``.
+You can mix sets, integers, floats, propositions and booleans in indexes:
 ~Center
 |-------------------------|------------------------------|
 | Proposition             | produces the set             |
@@ -362,7 +362,7 @@ This notation is inspired from the concept of extension of a predicate (cf.
 
 ### Operators using sets
 
-Four operators have been mentionned in previous sections; refer to these
+Four operators have been mentioned in previous sections; refer to these
 sections to get description of each:
 
 * ``card(x)`` (cf. [#sec-integers]), 
@@ -396,7 +396,8 @@ Here is the complete rule for sets:
 <set> ::= "(" <set> ")"
     | <var>
     | "[" <comma-list(<int>|<float>|<prop>|<bool>)> "]"
-    | "[ <int> ".." <int> "]"
+    | "[ <int> ".." <int> "]"      <- step is 1
+    | "[ <float> ".." <float> "]"  <- step is 1.0
     | "union(" <set> "," <set> ")"
     | "inter(" <set> "," <set> ")"
     | "diff(" <set> "," <set> ")"
@@ -439,19 +440,19 @@ is the rule for these:
 
 When multiple variables and sets are given, the ``bigand`` and ``bigor``
 operators will produce the ``and``/``or`` sequence for each possible couple of
-value of each set (the set of couples is the cartesian product of the given
+value of each set (the set of couples is the Cartesian product of the given
 sets). For example,
 
 ~ Center
-|------------------------------------------------------------------|--------------------------------------------------------|
-| The formula                                                      | expands to...                                          |
-|------------------------------------------------------------------+--------------------------------------------------------|
-| $\bigwedge\limits_{\substack{i\in [1..2]\\j \in [a,b]}} p_{i,j}$ | $p_{1,a} \wedge p_{1,b} \wedge p_{2,a} \wedge p_{2,b}$ |
-|------------------------------------------------------------------|--------------------------------------------------------|
-| ``bigand $i,$j in [1..2],[a,b]:``                                | ``p(1,a) and p(1,b) ``                                 |
-| ``p(i,j)``                                                       | ``and p(2,a) and p(2,b)``                              |
-| ``end``                                                          |                                                        |
-|------------------------------------------------------------------|--------------------------------------------------------|
+|--------------------------------------------------------------------------|--------------------------------------------------------|
+| The formula                                                              | expands to...                                          |
+|--------------------------------------------------------------------------+--------------------------------------------------------|
+| $\bigwedge\limits_{\substack{i\in \{1,...,2\}\\j \in \{a,b\}}} p_{i,j}$ | $p_{1,a} \wedge p_{1,b} \wedge p_{2,a} \wedge p_{2,b}$ |
+|--------------------------------------------------------------------------|--------------------------------------------------------|
+| ``bigand $i,$j in [1..2],[a,b]:``                                        | ``p(1,a) and p(1,b) ``                                 |
+| ``p($i,$j)``                                                             | ``and p(2,a) and p(2,b)``                              |
+| ``end``                                                                  |                                                        |
+|--------------------------------------------------------------------------|--------------------------------------------------------|
 ~
 
 The ``when`` is optional and allows to apply a condition to each couple of
@@ -490,7 +491,7 @@ end
 #### Exact, atmost and atleast
 
 The operator ``exact(3,[a,b,c,d,e])`` will produce the formula that ensures
-that, for any valuation, exactly 3 propositions can be ``true`` simultanously.
+that, for any valuation, exactly 3 propositions can be ``true`` simultaneously.
 The operator ``atleast`` ensures that at least N propositions are ``true``
 simultanously, and ``atmost`` does the opposite.
 
@@ -558,7 +559,7 @@ generator used for generating the touist parser).
 
 ~ Note
 This grammar specification is not LL(1) and could not be implemented as such
-using Menhir; most of the type checking is made after the abstract syntaxic
+using Menhir; most of the type checking is made after the abstract syntactic
 tree is produced. The only purpose of the present specification is to give a
 clear view of what is possible and not possible with this language.
 ~
@@ -569,7 +570,7 @@ FLOAT     = [0-9]+\.[0-9]+
 TERM      = [_0-9]*[a-zA-Z][a-zA-Z_0-9]*
 ```
 
-``` Grammar { }
+``` Grammar
 <touist-file> ::= <affect> <touist-file>
                  | <formula> <touist-file>
                  | EOF
@@ -642,8 +643,9 @@ TERM      = [_0-9]*[a-zA-Z][a-zA-Z_0-9]*
 <set> ::= "(" <set> ")"
     | <var>
     | "[" <comma-list(<int>|<float>|<prop>|<bool>)> "]"
-    | "[ <int> ".." <int> "]"
-    | "union(" <set> "," <set> ")"
+    | "[ <int> ".." <int> "]"      <- step is 1
+    | "[ <float> ".." <float> "]"  <- step is 1.0
+    | "union(" <set> "," <set> ")" 
     | "inter(" <set> "," <set> ")"
     | "diff(" <set> "," <set> ")"
     | "powerset(" <set> ")"
@@ -700,7 +702,7 @@ TERM      = [_0-9]*[a-zA-Z][a-zA-Z_0-9]*
 
 # Command-line tool (`touist`)
 
-## Instalation
+## Installation
 The main tool that parses and solves the touist programs is written in Ocaml.
 It is easily installable (as long as you have installed `ocaml` and `opam`)
 with the command
@@ -717,13 +719,13 @@ format which can then be fed to a SMT solver.
 
 ## Usage {#cli}
 
-Any touist command is of the form: 
+Any touist command is of the form:
 ```
   touist [-o OUTPUT] (INPUT | -) [options...]
 ```
-The flags can be given in any order. You can use stdin
-instead of using an input file by setting the `-` argument.
-With no `-o` flag, touist will output to stdout.
+The flags can be given in any order. You can use the standard input
+(`stdin`) instead of using an input file by setting the `-` argument.
+With no `-o` flag, touist will output to the standard output (`stdout`).
 
 ### Usage for propositional logic (SAT mode)
 
@@ -732,9 +734,12 @@ The language accepted for propositional logic is described in
 default, but can be optionally expressed using the `--sat` flag.
 
 With no other argument, touist will simply translate the touist
-code to the DIMACS format.
+code to the [DIMACS][dimacs] format and then output the mapping table
+(that maps each proposition to an integer > 0) in DIMACS comments.
+You can redirect this mapping table using the `--table <filename>` flag. 
+[dimacs]: <http://www.satcompetition.org/2009/format-benchmarks2009.html>
 
-Options:
+#### Options:
 
 **`--solve`**. Ask touist to solve the SAT problem. By default, the first
 model is displayed; you can ask for more models using the `--limit N`
@@ -769,7 +774,7 @@ models explodes when the number of propositions is big.
 ### Other options
 **`--latex`**. Translates the given touist code to &logolatex;. The resulting
 latex code only require the `mathtools` package and is compatible with
-Mathjax (javascript tool for displaying math in HTML). This command does
+Mathjax (JavaScript tool for displaying math in HTML). This command does
 not print `\begin{document}`{language:latex} nor any latex headers
 (`\usepackage{}`{language:latex}...). 
 
