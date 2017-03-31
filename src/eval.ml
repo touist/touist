@@ -555,8 +555,6 @@ and eval_ast_formula (msgs:Msgs.t ref) (env:env) (ast:ast) : ast =
       match vars,sets with
       | [],[] | _,[] | [],_ -> failwith "shouln't happen: non-variable in big construct"
       | [Loc (Var (name,_),loc)],[set] -> (* we don't need the indices because bigand's vars are 'simple' *)
-        (* If [when_cond] has never been satisfied, [process_list_set] will return
-             (_,false). In the opposite case, it will return (ast,true). *)
         let rec process_list_set env (set_list:ast list) =
           match set_list with
           | []   -> Top (*  what if bigand in a or? We give a warning (see below) *)
