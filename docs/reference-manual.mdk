@@ -9,6 +9,7 @@ Colorizer: grammar
 Math Mode: mathjax
 .code2 { language: Touist } <!-- ``bigand`` will be touist-colored -->
 .code3 { language: Grammar }
+Package:[top=2.5cm,bottom=2.5cm,inner=2.5cm,outer=2.5cm]geometry
 
 [TITLE]
 
@@ -23,8 +24,7 @@ graphical interface, refered as `touist.jar` (as it is written in Java) and
 
 The touist language aims at making the writing of propositional logic as
 approchable as possible. Propositions and connectors syntaxes are close to what
-would be written on paper. Propositions are words that can contain numbers, the
-character "`_`". Here are some examples of formulas:
+would be written on paper. Here are some examples of formulas:
 
 ~ Center
 |-----------------------|-------------------|
@@ -55,10 +55,9 @@ false\}$. To check the models of this formula using `touist`, you can do
 ~
 
 
-## Simple inference checking
+## Check logical consequence
 
-Checking the truth of a given reasoning (or _inference_) may be handy. From a
-wikipedia example:
+From a wikipedia example:
 
 +-------------:|:---------------------------------+
 |*Premise 1:*  | If it's raining then it's cloudy |
@@ -72,9 +71,9 @@ This inference can be written
 \{ raining \rightarrow cloudy, raining\} \models cloudy
 ~
 
-The _infer_ symbol ($\models$) does not belong to the `touist` language (we
-call it "meta-language"). This means that we have to transform this notation to
-an actual propositional formula.
+The _infer_ (or _entails_) symbol ($\models$) does not belong to the `touist`
+language (we call it "metalanguage"). This means that we have to transform
+this notation to an actual propositional formula.
 
 ~ Theorem
 Let $H$ be a set of formulas (called _hypotheses_ or _premises_) and $C$ a
@@ -465,6 +464,7 @@ $\rightarrow$ (``=>``) or $\leftrightarrow$ (``<=>``).
     | <T> "=>" <T>
     | <T> "<=>" <T>
 ```
+
 ### Generalized connectors
 Generalized connectors ``bigand``, ``bigor``, ``exact``, ``atmost`` and
 ``atleast`` are also available for generalizing the formulas using sets. Here
@@ -487,17 +487,20 @@ When multiple variables and sets are given, the ``bigand`` and ``bigor``
 operators will produce the ``and``/``or`` sequence for each possible couple of
 value of each set (the set of couples is the Cartesian product of the given
 sets). For example,
-
 ~ Center
-|--------------------------------------------------------------------------|--------------------------------------------------------|
-| The formula                                                              | expands to...                                          |
-|--------------------------------------------------------------------------+--------------------------------------------------------|
-| $\bigwedge\limits_{\substack{i\in \{1,...,2\}\\j \in \{a,b\}}} p_{i,j}$ | $p_{1,a} \wedge p_{1,b} \wedge p_{2,a} \wedge p_{2,b}$ |
-|--------------------------------------------------------------------------|--------------------------------------------------------|
-| ``bigand $i,$j in [1..2],[a,b]:``                                        | ``p(1,a) and p(1,b) ``                                 |
-| ``p($i,$j)``                                                             | ``and p(2,a) and p(2,b)``                              |
-| ``end``                                                                  |                                                        |
-|--------------------------------------------------------------------------|--------------------------------------------------------|
+|---------------------------------|--------------------------|
+| The formula                     | expands to...            |
+|:--------------------------------+--------------------------|
+| &bigand_example;                | &bigand_expanded;        |
+|---------------------------------|--------------------------|
+|``bigand $i,$j in [1..2],[a,b]:``|``p(1,a) and p(1,b) ``    |
+|``p($i,$j)``                     |``and p(2,a) and p(2,b)`` |
+|``end``                          |                          |
+|---------------------------------|--------------------------|
+<!--meta
+bigand_example: $\bigwedge\limits_{\substack{i\in \{1,...,2\}\\j \in \{a,b\}}} p_{i,j}$
+bigand_expanded: $p_{1,a} \wedge p_{1,b} \wedge p_{2,a} \wedge p_{2,b}$ 
+-->
 ~
 
 The ``when`` is optional and allows to apply a condition to each couple of
@@ -507,7 +510,7 @@ On the following two examples, the math expression is given on the left
 and the matching touist code is given on the right:
 
 ~ Begin Columns
-~~ Column { width:40% }
+~~ Column { width:30% }
 $\bigwedge\limits_{\substack{i\in [1..n]\\j \in [a,b,c]}} p_{i,j}$
 ~~
 ~~ Column
@@ -519,7 +522,7 @@ end
 ~~
 ~ End Columns
 ~ Begin Columns
-~~ Column { width:40% }
+~~ Column { width:30% }
 $\bigvee\limits_{\substack{v\in [A,B,C]\\x \in [1..9]\\y\in[3..4]\\x \ne y \\ x \ne A\\}} v_{x,y}$
 ~~
 ~~ Column
@@ -533,16 +536,92 @@ end
 ~~
 ~ End Columns
 
+##### Special cases for quantifier elimination
+
+Here is the list of "limit" cases where ``bigand`` and ``bigor`` will produce
+special results:
+
+* In ``bigand``, if a set is empty then ``Top`` is produced
+* In ``bigand``, if the ``when`` condition is always false then ``Top`` is produced
+* In ``bigor``, if a set is empty then ``Bot`` is produced
+* In ``bigor``, if the ``when`` condition is always false then ``Bot`` is produced
+
+These behaviors come from the idea of quantification behind the ``bigand``
+and ``bigor`` operators:
+
+~ Center
+|:~~~~~~~~~~~~~~~~~~~~~~~~~|:~~~{width:25%}~~~~~~~:|:~~~~~~~~~~~~~~~~~~~~~~~~~~~~~|
+|Universal quantification  |$\forall x \in S, p(x)$|``bigand $x in $S: p($x) end``|
+|--------------------------|-----------------------|------------------------------|
+|Existential quantification|$\exists x \in S, p(x)$|``bigor $x in $S: p($x) end`` |
+~
+
+The following properties on quantifiers hold:
+~ Math
+\forall x \in \emptyset, p(x) \quad \equiv \quad \top\\
+\exists x \in \emptyset, p(x) \quad \equiv \quad \bot
+~
+which helps understand why ``Top`` and ``Bot`` are produced.
+~Todo
+Clarify this explanation.
+~
+
 #### Exact, atmost and atleast
 
-The operator ``exact(3,[a,b,c,d,e])`` will produce the formula that ensures
-that, for any valuation, exactly 3 propositions can be ``true`` simultaneously.
-The operator ``atleast`` ensures that at least N propositions are ``true``
-simultanously, and ``atmost`` does the opposite.
+Touist provides some specialized operators, namely ``exact``, ``atmost`` and ``atleast``.
+In some cases, these operators can drastically lower the size of some formulas. The
+syntax of these constructs is:
+~Center
+|-------------------------|------------------|
+| Math notation           | Touist syntax    |
+|:-----------------------:|------------------|
+|$\leqslant_{x\in P}^k x$ |``atmost($k,$P)`` |
+|$\geqslant_{x\in P}^k x$ |``atleast($k,$P)``|
+|${<>}_{x\in P}^k x$      |``exact($k,$P)``  |
+|-------------------------|------------------|
+~ 
 
-~ Note
-(TODO) explain the cases N=0 or empty set
+Let $P$ be a set of propositions, $x$ a proposition and $k$ a positive integer. Then:
+
+* $\leqslant_{x\in P}^k x$ represents "at any time, at most $k$ propositions $x \in P$ must be true"
+* $\geqslant_{x\in P}^k x$ represents "at any time, at least $k$ propositions $x \in P$ must be true"
+* ${<>}_{x\in P}^k x$ represents "at any time, exactly $k$ propositions $x \in P$ must be true"
+
+These operators are extremely expensive in the sense that they produce formulas
+with an exponential size. For example, ``exact(5,p([1..20])``
+will produce a disjunction of $\binom{20}{5} = 15 504$ conjunctions. 
+
+~Note
+The notation ``p([1..20])`` is called "set-builder" and is defined in [#set-builder].
+Using this syntax, the formula ``exact(5,p([1..20])`` is equivalent to 
+~~ Math
+{<>}_{x\in P}^k p(x)
+~~
 ~
+
+##### Special cases for quantifier elimination
+
+The following table sums up the various "limit" cases that may not be obvious.
+In this table, $k$ is a positive integer and $P$ is a set of propositions.
+~Center
+|------------------|------|----------------|-------------------------------|
+|                  |``$k``|``$P``          | Gives                         |
+|------------------+:----:+:--------------:+-------------------------------|
+|``exact($k,$P)``  |$k=0$ |$P=\emptyset$   |``Top``                        |
+|                  |$k=0$ |$P\neq\emptyset$|``bigand $p in $P: not $p end``|
+|                  |$k>0$ |$\vert P\vert=k$|``bigand $p in $P: $p end``    |
+|``atleast($k,$P)``|$k=0$ | any            |``Top``                        |
+|                  |$k=1$ | any            |``bigor $p in $P: $p end``     |
+|                  |$k>0$ |$\emptyset$     |``Bot`` (subcase of next row)  |
+|                  |$k>0$ |$\vert P\vert<k$|``Bot``                        |
+|                  |$k>0$ |$\vert P\vert=k$|``bigand $p in $P: $p end``    |
+|``atmost($k,$P)`` |$k=0$ |$\emptyset$     |``Top`` (subcase of next row)  |
+|                  |$k=0$ | any            |``Top``                        |
+|------------------|------|----------------|-------------------------------|
+~
+How to read the table: for example, the row where $k>0$ and $\vert P\vert<k$
+should be read "when using ``atleast``, all couples 
+$(k,P) \in \{(k,P)|k>0,\vert P\vert<k\}$ will produce the special case ``Top``".
 
 ### Propositional logic formulas
 
@@ -569,7 +648,9 @@ The constants $\top$ (``Top``) and $\bot$ (``Bot``) allows to express the
 
 Touist can also be given Satisfiability Modulo Theory (SMT) formulas and output
 the SMT2-LIB-compliant file.
-(TODO)
+~ Todo
+Describe the SMT language
+~
 
 ## Formal grammar
 
@@ -827,8 +908,10 @@ prints the successive recursive transformations that produce the CNF formula.
 ### Usage for Satisfiability Modulo Theory (SMT mode)
 
 The language accepted by this mode is described in [#sec-smt-formulas].
-The flag `--smt` enables the SMT mode.
+The flag `--smt LOGIC` enables the SMT mode.
 
-(TODO)
+~ Todo
+Explain which `LOGIC` can be given and how to use `--smt`
+~
 
 [BIB]
