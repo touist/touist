@@ -11,14 +11,24 @@ open Lexing (* for Lexing.position *)
 
 type msg_type = Error | Warning
 type loc = Lexing.position * Lexing.position
-type during = Parse | Lex | Eval | Sat | Cnf
+type during = Parse | Lex | Eval
 type msg = msg_type * during * string * loc
 
 module Msg =
 struct
   type t = msg
   let compare l1 l2 = Pervasives.compare l1 l2
+  let get_type (m,d,s,l) = m
 end
+
+let string_of_type = function
+  | Warning -> "warning"
+  | Error -> "error"
+
+let string_of_during = function
+  | Parse -> "parsing"
+  | Lex -> "lexing"
+  | Eval -> "evaluation"
 
 include Set.Make(Msg)
 
@@ -33,7 +43,6 @@ let add_fatal (msgs:t ref) msg =
 
 let null_loc = (Lexing.dummy_pos,Lexing.dummy_pos)
 
-
 let string_of_loc ?(detailed=false) (loc:loc) : string =
   let s,e = loc in (* start, end *)
   let relative = Printf.sprintf "%d:%d" s.pos_lnum (s.pos_cnum - s.pos_bol+1) in
@@ -42,6 +51,13 @@ let string_of_loc ?(detailed=false) (loc:loc) : string =
   | false -> relative              (* num_line:num_col *)
   | true  -> relative ^":"^ absolute (* num_line:num_col:token_start:token_end *)
 
+
+(** [get_loc] translates a 'loc' to an understandable tuple that contains
+    (num_line, num_col, token_start, token_end). *)
+let get_loc loc : int * int * int * int =
+  let s,e = loc in (s.pos_lnum, (s.pos_cnum - s.pos_bol+1), s.pos_cnum, e.pos_cnum)
+  
+
 let rec string_of_msgs ?(color=false) ?(detailed=false) (messages:t) = 
   fold 
     (fun (typ,_,msg,loc) acc ->
@@ -49,11 +65,8 @@ let rec string_of_msgs ?(color=false) ?(detailed=false) (messages:t) =
         | false,_ -> "",""
         | _,Warning -> "\x1b[33m\x1b[1m" (* yellow bold *), "\x1b[0m" (* reset *)
         | _,Error   -> "\x1b[31m\x1b[1m" (* red bold    *), "\x1b[0m" (* reset *)
-      and txt_type = match typ with
-        | Warning -> "warning"
-        | Error -> "error"
       (* NOTE: all msg should be finished by a trailing newline (\n) *)
-      in (Printf.sprintf "%s: %s%s%s: %s" (string_of_loc ~detailed:detailed loc) colstart txt_type colend msg) ^ acc)
+      in (Printf.sprintf "%s: %s%s%s: %s" (string_of_loc ~detailed:detailed loc) colstart (string_of_type typ) colend msg) ^ acc)
       messages ""
 (** [print_msgs] will display the messages that have been produced by parse, eval, sat,
     cnf or smt. 

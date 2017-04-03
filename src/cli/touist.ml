@@ -1,4 +1,3 @@
-open Parse
 
 type error = OK | ERROR
 let get_code (e : error) : int = match e with OK -> 0 | ERROR -> 1
@@ -139,26 +138,26 @@ let () =
   if !latex then
     (let ast,msgs =
       if !sat_mode
-      then Parse.parse_sat (string_of_chan !input)
-      else Parse.parse_smt (string_of_chan !input)
+      then Parse.parse_sat (Parse.string_of_chan !input)
+      else Parse.parse_smt (Parse.string_of_chan !input)
     in (Printf.fprintf !output "%s\n" (Latex.latex_of_ast ast); show_msgs_and_exit !msgs OK));
   
   (* linter = only show syntax and semantic errors *)
   if !linter then
     if (!sat_mode) then
-      (let _,msgs = Parse.parse_sat ~debug:!debug_syntax (string_of_chan !input) 
+      (let _,msgs = Parse.parse_sat ~debug:!debug_syntax (Parse.string_of_chan !input) 
         |> Eval.eval ~smt:(not !sat_mode) ~onlychecktypes:true in show_msgs_and_exit !msgs OK)
     else
-      (let _,msgs = Parse.parse_smt ~debug:!debug_syntax (string_of_chan !input) 
+      (let _,msgs = Parse.parse_smt ~debug:!debug_syntax (Parse.string_of_chan !input) 
         |> Eval.eval ~smt:(not !sat_mode) ~onlychecktypes:true in show_msgs_and_exit !msgs OK);
   if !show then
     if (!sat_mode) then
-      (let ast,msgs = Parse.parse_sat ~debug:!debug_syntax (string_of_chan !input) 
+      (let ast,msgs = Parse.parse_sat ~debug:!debug_syntax (Parse.string_of_chan !input) 
         |> Eval.eval ~smt:(not !sat_mode) in
         if !show then Printf.fprintf !output "%s\n" (Pprint.string_of_ast ast); 
         show_msgs_and_exit !msgs OK)
     else
-      (let ast,msgs = Parse.parse_smt ~debug:!debug_syntax (string_of_chan !input) 
+      (let ast,msgs = Parse.parse_smt ~debug:!debug_syntax (Parse.string_of_chan !input) 
         |> Eval.eval ~smt:(not !sat_mode) in
         if !show then Printf.fprintf !output "%s\n" (Pprint.string_of_ast ast);
         show_msgs_and_exit !msgs OK);
@@ -169,7 +168,7 @@ let () =
     if !solve_sat then
       if !equiv_file_path <> "" then begin
         let solve input = 
-          let ast,msgs = Parse.parse_sat ~debug:!debug_syntax (string_of_chan input) |> Eval.eval
+          let ast,msgs = Parse.parse_sat ~debug:!debug_syntax (Parse.string_of_chan input) |> Eval.eval
           in let models = Cnf.ast_to_cnf ~debug:!debug_cnf ast |> Sat.cnf_to_clauses |> Sat.solve_clauses
           in models,msgs
         in
@@ -180,7 +179,7 @@ let () =
         | false -> Printf.fprintf !output "Not equivalent\n"; show_msgs_and_exit !msgs ERROR
       end
       else
-        let ast,msgs = Parse.parse_sat ~debug:!debug_syntax (string_of_chan !input) |> Eval.eval in
+        let ast,msgs = Parse.parse_sat ~debug:!debug_syntax (Parse.string_of_chan !input) |> Eval.eval in
         let clauses,table = Cnf.ast_to_cnf ~debug:!debug_cnf ast |> Sat.cnf_to_clauses
         in
         let models =
@@ -196,7 +195,7 @@ let () =
           Printf.fprintf !output "==== Found %d models, limit is %d (--limit N for more models)\n" i !limit; show_msgs_and_exit !msgs OK
     else
       (* B. solve not asked: print the Sat file *)
-      let ast,msgs = Parse.parse_sat ~debug:!debug_syntax (string_of_chan !input) |> Eval.eval in
+      let ast,msgs = Parse.parse_sat ~debug:!debug_syntax (Parse.string_of_chan !input) |> Eval.eval in
       let clauses,tbl = Cnf.ast_to_cnf ~debug:!debug_cnf ast |> Sat.cnf_to_clauses
       in
       (* tbl contains the literal-to-name correspondance table. 
@@ -210,7 +209,7 @@ let () =
               c 98 p(1,2,3)     -> c means 'comment' in any Sat file   *)
 
   else if (!smt_logic <> "") then begin
-    let ast,msgs = Parse.parse_smt ~debug:!debug_syntax (string_of_chan !input)
+    let ast,msgs = Parse.parse_smt ~debug:!debug_syntax (Parse.string_of_chan !input)
         |> Eval.eval ~smt:(!smt_logic <> "") in
     let smt = Smt.to_smt2 (String.uppercase !smt_logic) ast in
     Buffer.output_buffer !output smt;

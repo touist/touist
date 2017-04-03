@@ -59,30 +59,30 @@ XOCamlbuildExtraArgs: -use-menhir -menhir \"menhir --table --inspection -v -la 2
 #     open Parse                                  (or Sat, Smt, Eval...)
 # I know that it is confusing for now: we should be able to do '-pkg touist'
 # and 'open Touist'...
-Library touist
-  Path:           src
+Library touistLib
+  Path:           src/lib
   Install:        false
   Modules:        Parse,Eval,Cnf,Sat,Smt,Pprint,Latex,Msgs
   InternalModules: Lexer,Parser,Parser_error_report,Types
   BuildTools:     ocamlbuild, menhir
-  BuildDepends:   menhirLib (>= 20150118), fileutils (>= 0.4.0), str, minisat
+  BuildDepends:   menhirLib (>= 20150118), fileutils (>= 0.4.0), re.str, minisat
 
 Executable touist
   CompiledObject: best
-  Path:           src
+  Path:           src/cli
   BuildTools:     ocamlbuild, menhir
   MainIs:         touist.ml
-  BuildDepends:   touist
+  BuildDepends:   touistLib
 
 # This produces touist.byte, useful for ocamldebug.
 # To enable it, ./configure --enable-debug
 Executable touist-debug
   Build$:         flag(debug)
   CompiledObject: byte
-  Path:           src
+  Path:           src/cli
   BuildTools:     ocamlbuild, menhir
   MainIs:         touist.ml
-  BuildDepends:   touist
+  BuildDepends:   touistLib
 
 # This produces the test.byte executable; to enable it,
 # ./configure --enable-tests
@@ -92,7 +92,7 @@ Executable test
   Path:           test
   MainIs:         test.ml
   BuildTools:     ocamlbuild, menhir, touist
-  BuildDepends:   touist, oUnit
+  BuildDepends:   touistLib, oUnit
 
 Test test
   Run$: flag(tests)
@@ -100,14 +100,14 @@ Test test
   WorkingDirectory: .
   TestTools: test
 
-Document touist
+Document touistLib
   Title: API reference for the Touist compiler
   Type: ocamlbuild (0.4)
   Install: false
   InstallDir: $htmldir/api
   BuildTools+: ocamldoc,ocamlbuild
-  XOCamlbuildPath: src
-  XOCamlbuildLibraries: touist
+  XOCamlbuildPath: src/lib
+  XOCamlbuildLibraries: touistLib
   XOCamlbuildExtraArgs: -docflags \"-colorize-code -short-functors -charset utf-8\"
   XOCamlbuildExtraArgs+:-use-menhir -menhir \"menhir --table --inspection -v -la 2\"
 

@@ -29,5 +29,6 @@ depends: [
   "ocamlbuild" {build}
   "ocamlfind" {build}
   "ounit" {test}
+  "re" {build}
 ]
 available: [ ocaml-version >= "4.01.0" ]
