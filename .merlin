@@ -11,3 +11,5 @@ PKG re
 PKG fileutils
 PKG minisat
 PKG ounit
+PKG js_of_ocaml js_of_ocaml.ppx
+EXT js

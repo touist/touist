@@ -94,6 +94,15 @@ Executable test
   BuildTools:     ocamlbuild, menhir, touist
   BuildDepends:   touistLib, oUnit
 
+Executable touistjs
+  Build: true
+  Install: false
+  CompiledObject: byte
+  Path: src/js
+  MainIs: touistjs.ml
+  BuildTools: ocamlbuild, js_of_ocaml
+  BuildDepends: js_of_ocaml, js_of_ocaml.ppx, touistLib
+
 Test test
   Run$: flag(tests)
   Command:          $test
