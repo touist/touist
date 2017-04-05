@@ -24,12 +24,20 @@ build-test: [
 build-doc: [ "ocaml" "setup.ml" "-doc" ]
 depends: [
   "fileutils" {build & >= "0.4.0"}
-  "js_of_ocaml" {build}
   "menhir" {build & >= "20150118"}
   "minisat" {build}
   "ocamlbuild" {build}
   "ocamlfind" {build}
   "ounit" {test}
   "re" {build}
+]
+depopts: [
+  "js_of_ocaml"
+  "ppx_deriving_yojson"
+  "yojson"
+]
+conflicts: [
+  "ppx_deriving_yojson" {> "2.0"}
+  "ppx_deriving_yojson" {< "2.0"}
 ]
 available: [ ocaml-version >= "4.01.0" ]

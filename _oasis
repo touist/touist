@@ -48,6 +48,10 @@ Plugins:      META (0.4), DevFiles (0.4)
 BuildType: ocamlbuild (0.4)
 AlphaFeatures: ocamlbuild_more_args
 
+Flag js
+  Description: build a .js file that contains linter() and latex()
+  Default: false
+
 PreBuildCommand: make pre-build
 PostCleanCommand: make clean-pre-build
 
@@ -95,13 +99,13 @@ Executable test
   BuildDepends:   touistLib, oUnit
 
 Executable touistjs
-  Build: true
-  Install: false
+  Build$: flag(js)
+  Install$: flag(js)
   CompiledObject: byte
   Path: src/js
   MainIs: touistjs.ml
   BuildTools: ocamlbuild, js_of_ocaml
-  BuildDepends: js_of_ocaml, js_of_ocaml.ppx, touistLib
+  BuildDepends: touistLib, js_of_ocaml, js_of_ocaml.ppx, yojson, ppx_deriving_yojson
 
 Test test
   Run$: flag(tests)

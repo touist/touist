@@ -1,6 +1,6 @@
 <support/gui/**/*>: not_hygienic
 # OASIS_START
-# DO NOT EDIT (digest: eed495f9bbb23d196cd95fedf532eebd)
+# DO NOT EDIT (digest: 4abbcc84589356b751b814b8b6374fd9)
 # Ignore VCS directories, you can use the same kind of rule outside
 # OASIS_START/STOP if you want to exclude directories that contains
 # useless stuff for the build process
@@ -57,13 +57,17 @@ true: annot, bin_annot
 "src/js/touistjs.byte": package(js_of_ocaml.ppx)
 "src/js/touistjs.byte": package(menhirLib)
 "src/js/touistjs.byte": package(minisat)
+"src/js/touistjs.byte": package(ppx_deriving_yojson)
 "src/js/touistjs.byte": package(re.str)
+"src/js/touistjs.byte": package(yojson)
 "src/js/touistjs.byte": use_touistLib
 <src/js/*.ml{,i,y}>: package(fileutils)
 <src/js/*.ml{,i,y}>: package(js_of_ocaml)
 <src/js/*.ml{,i,y}>: package(js_of_ocaml.ppx)
 <src/js/*.ml{,i,y}>: package(menhirLib)
 <src/js/*.ml{,i,y}>: package(minisat)
+<src/js/*.ml{,i,y}>: package(ppx_deriving_yojson)
 <src/js/*.ml{,i,y}>: package(re.str)
+<src/js/*.ml{,i,y}>: package(yojson)
 <src/js/*.ml{,i,y}>: use_touistLib
 # OASIS_STOP
