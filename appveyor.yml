@@ -22,6 +22,12 @@
 # To allow AppVeyor knowing when things are pushed to the github repo,
 # the owner of the repo had to link the repo in the AppVeyor website.
 #
+# Debugging an appveyor build
+# ===========================
+# You can use Windows Remote Desktop (also available on mac os x) to debug
+# a build (instead of commit-trying a hundred times); everything is explained
+# in https://www.appveyor.com/docs/how-to/rdp-to-build-worker/
+#
 # vim:set et sw=2 ts=2:
 
 # Operating system (build VM template)
@@ -29,7 +35,10 @@
 os: Windows Server 2012
 
 # Scripts that are called at very beginning, before repo cloning
-init: git config --global core.autocrlf input
+init:
+  - git config --global core.autocrlf input
+#  - ps: iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
+
 
 # Clone directory
 clone_folder: c:\touist
@@ -56,45 +65,14 @@ cache:
 
 # Scripts that run after cloning repository. "ps:" means windows PowerShell
 install:
-    # This step is a workaround based on a snapshot of wodi (ocaml+cygwin). Because installing ocaml+opam
-    # seems (for now) impossible, I chose to upload this wodi32.zip on my dropbox ; it contains everything
-    # needed for touist.
-  - appveyor.yml javac -version
+  # Opam on Windows: http://fdopen.github.io/opam-repository-mingw
+  - javac -version
   - ps: 'Invoke-WebRequest http://cygwin.com/$env:CYG_SETUP -OutFile "$env:CYG_SETUP"'
-  - '%CYG_SETUP% --quiet-mode --no-shortcuts --only-site --root "%CYG_ROOT%" --site "%CYG_MIRROR%" --local-package-dir "%CYG_CACHE%" --packages rsync,patch,diffutils,curl,make,unzip,git,m4,perl,mingw64-i686-gcc-core --upgrade-also'
-  - '%CYG_BASH% -lc "curl -O https://dl.dropboxusercontent.com/s/eo4igttab8ipyle/opam32.tar.xz"'
-  - '%CYG_BASH% -lc "tar -xf opam32.tar.xz"'
-  - '%CYG_BASH% -lc "bash opam32/install.sh"'
-  - '%CYG_BASH% -lc "opam init -y -a mingw https://github.com/fdopen/opam-repository-mingw.git --comp 4.02.3+mingw32c --switch 4.02.3+mingw32c"'
-  - '%CYG_BASH% -lc "opam install -y fileutils menhir minisat"'
-  - '%CYG_BASH% -lc "opam pin add -y yices2 https://github.com/maelvalais/ocamlyices2.git#v0.0.2'
-    # I download apache-ant directly from the web because `choco install ant` was re-installing
-    # the jdk8 on each build, making them last much more time.
-  - ps: If(-Not(Test-Path c:\ant)){Invoke-WebRequest "http://www.us.apache.org/dist/ant/binaries/apache-ant-1.9.9-bin.zip" -OutFile c:\ant.zip}
-  - ps: If(-Not(Test-Path c:\ant)){ 7z x c:\ant.zip -oc:\ | Out-Null; rm c:\ant.zip; mv c:\apache-ant* c:\ant }
+  - '%CYG_SETUP% --quiet-mode --no-shortcuts --only-site --root "%CYG_ROOT%" --site "%CYG_MIRROR%" --local-package-dir "%CYG_CACHE%" --packages rsync,patch,diffutils,curl,make,unzip,git,m4,perl,mingw64-i686-gcc-core,mingw64-i686-gmp --upgrade-also'
   - ps: $env:Path = $env:Path + ";C:\ant\bin"
 
 build_script:
-  # Build touist
-  # IMPORTANT: I had to add the 2>&1 because when something writes to
-  # stderr, Powershell thinks there was an error... -_-
-  - '%CYG_BASH% -lc "cd /cygdrive/c/touist && ./configure --bindir support/gui/external --enable-tests 2>&1"'
-  - '%CYG_BASH% -lc "cd /cygdrive/c/touist && make 2>&1"'
-  - '%CYG_BASH% -lc "cd /cygdrive/c/touist && make install 2>&1"'
-
-  # Build the Java GUI touist.jar (in support/gui)
-  # First, put the SMT solver into support/gui/external/
-  - ps: If(-Not(Test-Path c:\yices)){ Invoke-WebRequest "http://yices.csl.sri.com/cgi-bin/yices2-newnewdownload.cgi?file=yices-2.4.2-i686-pc-mingw32-static-gmp.zip&accept=I+Agree" -OutFile c:\yices.zip }
-  - ps: If(-Not(Test-Path c:\yices)){ 7z x c:\yices.zip -oc:\ | Out-Null; rm c:\yices.zip; mv c:\yices* c:\yices }
-  - ps: cp c:\yices\bin\yices-smt2.exe c:\touist\support\gui\external
-  - ps: cp c:\yices\bin\libyices.dll c:\touist\support\gui\external
-  - ps: cd c:\touist\support\gui
-  - ps: ant -e zip
-  - ps: $zip=$(Get-ChildItem -name -include touist*.zip) # The artifact's name for later use
-  - ps: mv $zip c:\touist
-  # Because ocaml setup.ml test will say that it is not 'sane' to keep a dll
-  # somewhere, I have to remove it explicitely...
-  - ps: get-childitem c:\touist\support\gui -include *.dll -recurse | foreach ($_) {remove-item $_.fullname}
+  - '%CYG_BASH% -lc "cd /cygdrive/c/touist && ./ci/appveyor-script.sh"'
 
 test_script:
   - '%CYG_BASH% -lc "cd /cygdrive/c/touist && make test 2>&1"'
@@ -107,7 +85,7 @@ test_script:
 # you want to upload have not been given in "path:", the
 # deploy: artifact: thing will do nothing.
 artifacts:
-  - path: touist-*.zip
+  - path: support/gui/touist-*.zip
 
 skip_tags: false
 
@@ -132,3 +110,6 @@ deploy:
 # - If the commit fails, then send an email to the committer only.
 # - If the commit previously failing now passes, do not send an email.
 # - Do not send an email to anyone else
+
+#on_finish:
+#  - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))

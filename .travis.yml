@@ -29,6 +29,7 @@ addons:
     - avsm
     packages:
     - opam
+    - libgmp-dev
 
 cache:
   apt: true
@@ -41,8 +42,7 @@ before_install:
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update && brew install opam ant; fi
   - opam init --auto-setup
   - eval `opam config env`
-  - opam install --yes ocamlfind menhir fileutils minisat
-  - opam pin add -y yices2 "https://github.com/maelvalais/ocamlyices2.git#v0.0.2"
+  - opam install -y ocamlfind menhir fileutils minisat cppo yices2
   # Put the dependency yices-smt2 to external/
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then file=yices-2.4.2-x86_64-apple-darwin15.2.0-static-gmp.tar.gz; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then file=yices-2.4.2-x86_64-unknown-linux-gnu-static-gmp.tar.gz; fi
@@ -53,8 +53,9 @@ before_install:
 install:
   # Build touist
   - cd $TRAVIS_BUILD_DIR
-  - ./configure --bindir support/gui/external --enable-tests
-  - make && make install
+  - ./configure --bindir support/gui/external --enable-tests --enable-yices2
+  - make
+  - make install # Only install binary 'touist' as long as --enable-lib is not given
 
   # Build the Java GUI touist.jar (in support/gui)
   - cd $TRAVIS_BUILD_DIR/support/gui
