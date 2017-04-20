@@ -389,17 +389,17 @@ can be written ``p($S1,$S2,$S3)``. The example ``p([a,b,c])`` will produce
 ``[p(a),p(b),p(c)]``.
 You can mix sets, integers, floats, propositions and booleans in indexes:
 ~Center
-|-------------------------|------------------------------|
-| Proposition             | produces the set             |
-|-------------------------|:----------------------------:|
-|``f(1,[a,b],[1.0..2.0])``|``[f(1,a,1.0),f(1,a,2.0),``   |
-|                         | \ ``f(1,b,1.0),f(1,b,2.0)]`` |
-|-------------------------|------------------------------|
+|----------------------|--------------------------|
+| Proposition          | produces the set         |
+|----------------------|:------------------------:|
+|``f(1,[a,b],[7..8])`` |``[f(1,a,7),f(1,a,8),``   |
+|                      | \ ``f(1,b,7),f(1,b,8)]`` |
+|----------------------|--------------------------|
 ~
-**Important:** the set-builder feature only works in expressions and does not
-work in formulas. In formulas, the proposition ``f([a,b])`` will simply produce
-``f([a,b])``. This also means that you can debug your sets by simply putting
-your set in a tuple proposition.
+**Important:** the set-builder feature only works in expressions and does
+not work in formulas. In formulas, the proposition ``f([a,b])`` will
+simply produce ``f([a,b])``. This also means that you can debug your sets
+by simply putting your set in a tuple proposition.
 
 This notation is inspired from the concept of extension of a predicate (cf.
 [wikipedia][predicate-ext]).
@@ -557,9 +557,11 @@ and ``bigor`` operators:
 ~
 
 The following properties on quantifiers hold:
-~ Math
-\forall x \in \emptyset, p(x) \quad \equiv \quad \top\\
+~ Equation
+\begin{aligned}
+\forall x \in \emptyset, p(x) \quad \equiv \quad \top \\
 \exists x \in \emptyset, p(x) \quad \equiv \quad \bot
+\end{aligned}
 ~
 which helps understand why ``Top`` and ``Bot`` are produced.
 ~Todo
