@@ -380,7 +380,7 @@ The empty set $\emptyset$ is denoted by ``[]``.
 ### Sets defined by a range
 $\{i~|~i=1,\dots,10\}$ can be written ``[1..10]``. Ranges can
 be produced with both integer and float limits. For both integer and float
-limits, the step is 1 (it is not possible to change the step for now);
+limits, the step is 1 (respectively 1.0). It is not possible to change the step for now.
 
 ### Set-builder notation {#set-builder}
 $\{p(x_1,...,x_n)~|~(x_1,...,x_n) \in S_1 \times ... \times S_n \}$, which the set
