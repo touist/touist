@@ -173,6 +173,10 @@ run_test_tt_main (
   "var-tuple is prop">::(test_sat "$a=p p($a)");
   ];
 ];
+"set of sets">:::[
+  "simple set of set">::(sat_expands_to "f([[1,2],[3,4]])" "f([[1,2],[3,4]])");
+  "should not mix types">::(fun _ -> OUnit2.skip_if true "should not mix types"; sat_expands_to "f([[1,2],[a,b]])" "" ());
+];
 "powerset">:::[
   "powerset should always return a set containing the empty set">::(sat_expands_to "f(powerset([1]))" "f([[],[1]])");
   "powerset simple test">::(sat_expands_to "f(powerset([a,b]))" "f([[],[a],[a,b],[b]])")
