@@ -57,11 +57,7 @@ configure:
 
 .PHONY: missing FORCE pre-build clean-pre-build
 
-SRC=src
-# If git is present, then ROOT_GIT will be set with the project root path
-# elsewise, ROOT_GIT will not be defined at all
-
-targets = $(SRC)/parser_messages.ml $(SRC)/version.ml
+targets = src/parser_messages.ml src/version.ml
 pre-build: $(targets)
 
 # Produced by menhir
@@ -71,9 +67,10 @@ pre-build: $(targets)
 
 # Produced by menhir
 %parser_messages.ml: %parser.messages %parser.mly
+	@mkdir -p $(dir $@)
 	menhir --compile-errors $^ > $@
 
-# Generate src/version.ml that contains the version number;
+# Generate _build/src/version.ml that contains the version number;
 # If we are in a git repo, use `git describe --tags`
 # If we aren't, use `Version:` in _oasis
 ifeq ($(shell test -d .git && echo yes),yes)
@@ -81,16 +78,14 @@ ifeq ($(shell test -d .git && echo yes),yes)
 # .git/ changes, we want to run the rule %version.ml.
 git_prerequisite=.git/HEAD .git/refs/heads
 endif
-%version.ml: _oasis $(git_prerequisite)
-	@V="";\
-	if test -d .git && which git 2>&1 >/dev/null; then\
-		V="`git describe --tags` (git)";\
-	else\
-		V="v`grep 'Version:  *[0-9][0-9\.]*' _oasis |\
-		tr -d ' ' | cut -d: -f2` (opam)";\
-	fi;\
-	echo "let version=\"$$V\"" > $@;\
-	echo "Updated $@ to $$V"
+%version.ml: %version.cppo.ml $(git_prerequisite)
+	@mkdir -p $(dir $@)
+	@[ $(HAS_YICES2) ] || (echo "Please set the HAS_YICES2 var, e.g., 'make $@ HAS_YICES2=true'" && exit 1)
+	@[ $(VERSION) ] || (echo "Please set the VERSION var, e.g., 'make $@ VERSION=0.0.2'" && exit 1)
+	@HAS_GIT_TAG=$$(test -d .git && which git 2>&1 >/dev/null && echo true || echo false);\
+	[ "$$HAS_GIT_TAG" = true ] && GIT_TAG=$$(git describe --tags);\
+	cppo $< -o $@ -D "HAS_YICES2 $(HAS_YICES2)" -D "VERSION \"$(VERSION)\"" -D "GIT_TAG \"$$GIT_TAG\"" -D "HAS_GIT_TAG $$HAS_GIT_TAG";\
+	echo "Updated $@ to $(VERSION) (git: $$GIT_TAG)"
 # NOTE: when using the $V variable, I must escape
 # it with $$V. If I don't, 'make' will replace it
 # before the shell is able to expand it.
@@ -168,7 +163,7 @@ check-opam-packages:
 # So I wrote this target to ease the process of 'Bumping' the version
 # number.
 .PHONY: version
-version: awk opam-publish oasis2opam oasis
+version: awk opam-publish oasis
 	@[ $(VERSION) ] || (echo "Please set the VERSION var, e.g., 'make $@ VERSION=3.0.2'" && exit 1)
 	@echo $(VERSION) | grep "[0-9]\.[0-9]\.[0-9]" >/dev/null || (echo "VERSION must be of the form 3.0.2" && exit 1)
 	@echo "\033[92mChanging the 'Version:' field in '_oasis' from $$(oasis query version) to $(VERSION)\033[0m"
