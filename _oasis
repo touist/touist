@@ -74,7 +74,7 @@ Library touist
   Modules:        Parse,Eval,Cnf,Sat,Smt,Pprint,Latex,Msgs,Types
   InternalModules: Lexer,Parser,Parser_error_report
   BuildTools+:    menhir, cppo
-  BuildDepends:   menhirLib (>= 20150118), fileutils (>= 0.4.0), str,
+  BuildDepends:   menhirLib (>= 20151023), fileutils (>= 0.4.0), str,
                   minisat
 # Note: the yices2 dependency is only enabled when --enable-yices2 is given.
 # When enabled, the preprocessor macro -D yices2 is passed (see myocamlbuild.ml).
