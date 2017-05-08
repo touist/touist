@@ -67,6 +67,7 @@ install:
   - '%CYG_BASH% -lc "bash opam32/install.sh"'
   - '%CYG_BASH% -lc "opam init -y -a mingw https://github.com/fdopen/opam-repository-mingw.git --comp 4.02.3+mingw32c --switch 4.02.3+mingw32c"'
   - '%CYG_BASH% -lc "opam install -y fileutils menhir minisat"'
+  - '%CYG_BASH% -lc "opam pin add -y yices2 https://github.com/maelvalais/ocamlyices2.git#v0.0.2'
     # I download apache-ant directly from the web because `choco install ant` was re-installing
     # the jdk8 on each build, making them last much more time.
   - ps: If(-Not(Test-Path c:\ant)){Invoke-WebRequest "http://www.us.apache.org/dist/ant/binaries/apache-ant-1.9.9-bin.zip" -OutFile c:\ant.zip}

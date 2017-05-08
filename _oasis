@@ -9,6 +9,8 @@
 #     opam install oasis
 # To install menhir, fileutils:
 #     opam install menhir fileutils minisat
+# To install yices2 (which is not yet available using 'opam install yices2'):
+#     opam pin add -y yices2 https://github.com/maelvalais/ocamlyices2.git#v0.0.2
 ###############
 # To force using 'bytecode' over 'native' binary for debugging with
 # ocamldebug or utop, launch:
@@ -20,7 +22,7 @@
 #   the version.ml instead of using 'git describe --tags' because git
 #   information is not available in archive tar.gz from github.
 # - 1. `oasis setup`
-#       `oasis2opam --local`
+#       `oasis2opam --local -y`
 #       `git add setup.ml _oasis opam/opam`
 #       `git commit -m "Bump to v2.4.0"`
 #    NOTE: these three steps can be done with 'make version VERSION=2.4.0'
@@ -40,49 +42,59 @@ Description:  The Touist language is a friendly language for writing
   few lines). Touist embeds the minisat solver (for propositional logic) and
   (coming soon) the SMT2 solver. It can also generate the DIMACS, SMT2 and
   latex formats from you touist file.
+  NOTE. yices2 cannot be installed using 'opam install yices2', it is 'pin'
+  only. Install it with
+  opam pin add -y yices2 https://github.com/maelvalais/ocamlyices2.git#v0.0.2
 Maintainers:  Maël Valais <mael.valais@gmail.com>
 Authors:      Maël Valais <mael.valais@gmail.com>, Olivier Lezaud
 Homepage:     http://touist.github.io
 License:      MIT
 Plugins:      META (0.4), DevFiles (0.4)
-BuildType: ocamlbuild (0.4)
+BuildType:    ocamlbuild (0.4)
+BuildTools:   ocamlbuild
 AlphaFeatures: ocamlbuild_more_args
+BetaFeatures: section_object
+XOCamlbuildPluginTags: package(cppo_ocamlbuild)
 
-PreBuildCommand: make pre-build
+Flag yices2
+  Default: false
+  Description: enable support for the embeded SMT solver (using yices2)
+
+PreBuildCommand: make pre-build HAS_YICES2=$yices2 VERSION=$pkg_version
 PostCleanCommand: make clean-pre-build
 
-XOCamlbuildExtraArgs: -use-menhir -menhir \"menhir --table --inspection -v -la 2 --explain\"
+XOCamlbuildExtraArgs: -menhir \"menhir --table --inspection -v -la 2 --explain\"
 
 # IMPORTANT: the library name is 'touist', so when calling ocamlc we must add
-#     ocamlfind ocamlc -pkg Touist
+#     ocamlfind ocamlc -package touist
 # but inside of the .ml files that use the functions, you just have to do:
-#     open Parse                                  (or Sat, Smt, Eval...)
-# I know that it is confusing for now: we should be able to do '-pkg touist'
-# and 'open Touist'...
+#     open Parse (or Sat, Smt, Eval...)
 Library touist
   Path:           src
-  Install:        false
-  Modules:        Parse,Eval,Cnf,Sat,Smt,Pprint,Latex,Msgs
-  InternalModules: Lexer,Parser,Parser_error_report,Types
-  BuildTools:     ocamlbuild, menhir
-  BuildDepends:   menhirLib (>= 20150118), fileutils (>= 0.4.0), str, minisat
+  Modules:        Parse,Eval,Cnf,Sat,Smt,Pprint,Latex,Msgs,Types
+  InternalModules: Lexer,Parser,Parser_error_report
+  BuildTools+:    menhir, cppo
+  BuildDepends:   menhirLib (>= 20150118), fileutils (>= 0.4.0), str,
+                  minisat
+# Note: the yices2 dependency is only enabled when --enable-yices2 is given.
+# When enabled, the preprocessor macro -D yices2 is passed (see myocamlbuild.ml).
 
+Library touist_yices2
+  Build$:        flag(yices2)
+  Path:           src
+  Modules:        Solvesmt
+  BuildDepends:   yices2 (>= 0.0.2)
+  FindlibParent:  touist
+  FindlibName:    yices2
+
+# Note that the whole process where 'touist_yices' is added as dependency
+# when the flag 'yices2' is enabled has been written in myocamlbuild.ml. The
+# inspiration comes from the github project Drup/LILiS (see their myocamlbuild.ml)
 Executable touist
   CompiledObject: best
   Path:           src
-  BuildTools:     ocamlbuild, menhir
   MainIs:         touist.ml
-  BuildDepends:   touist
-
-# This produces touist.byte, useful for ocamldebug.
-# To enable it, ./configure --enable-debug
-Executable touist-debug
-  Build$:         flag(debug)
-  CompiledObject: byte
-  Path:           src
-  BuildTools:     ocamlbuild, menhir
-  MainIs:         touist.ml
-  BuildDepends:   touist
+  BuildDepends:   touist #, touist.yices2
 
 # This produces the test.byte executable; to enable it,
 # ./configure --enable-tests
@@ -91,8 +103,8 @@ Executable test
   Install:        false
   Path:           test
   MainIs:         test.ml
-  BuildTools:     ocamlbuild, menhir, touist
-  BuildDepends:   touist, oUnit
+  BuildTools+:    touist
+  BuildDepends:   touist, oUnit #, touist.yices2
 
 Test test
   Run$: flag(tests)
@@ -105,7 +117,7 @@ Document touist
   Type: ocamlbuild (0.4)
   Install: false
   InstallDir: $htmldir/api
-  BuildTools+: ocamldoc,ocamlbuild
+  BuildTools+: ocamldoc
   XOCamlbuildPath: src
   XOCamlbuildLibraries: touist
   XOCamlbuildExtraArgs: -docflags \"-colorize-code -short-functors -charset utf-8\"

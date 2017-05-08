@@ -9,7 +9,8 @@ homepage: "http://touist.github.io"
 dev-repo: "https://github.com/touist/touist.git"
 bug-reports: "https://github.com/touist/touist/issues"
 build: [
-  ["ocaml" "setup.ml" "-configure" "--prefix" prefix]
+  ["ocaml" "setup.ml" "-configure" "--prefix" prefix
+    "--%{yices2:enable}%-yices2"]
   ["ocaml" "setup.ml" "-build"]
 ]
 install: ["ocaml" "setup.ml" "-install"]
@@ -17,17 +18,37 @@ remove: [
   ["ocaml" "%{etc}%/touist/setup.ml" "-C" "%{etc}%/touist" "-uninstall"]
 ]
 build-test: [
-  ["ocaml" "setup.ml" "-configure" "--enable-tests"]
+  ["ocaml" "setup.ml" "-configure" "--enable-tests"
+    "--%{yices2:enable}%-yices2"]
   ["ocaml" "setup.ml" "-build"]
   ["ocaml" "setup.ml" "-test"]
 ]
 build-doc: [ "ocaml" "setup.ml" "-doc" ]
 depends: [
-  "fileutils" {build & >= "0.4.0"}
-  "menhir" {build & >= "20150118"}
-  "minisat" {build}
+  "cppo" {build}
+  "fileutils" {>= "0.4.0"}
+  "menhir" {>= "20150118"}
+  "minisat"
   "ocamlbuild" {build}
   "ocamlfind" {build}
   "ounit" {test}
 ]
+depopts: [
+  "yices2"
+]
+conflicts: [
+  "yices2" {< "0.0.2"}
+]
 available: [ ocaml-version >= "4.01.0" ]
+post-messages: [
+"Touist built without yices2 support.
+To enable the SMT solver (yices2), please install yices2. For now, it is
+pin-only, i.e., you have to install it with:
+
+    opam pin add yices2 https://github.com/maelvalais/ocamlyices2.git#v0.0.2"
+{success & !yices2:installed}
+
+"Touist built with yices2 support.
+**Yices2 is free [only] for non-commercial use**
+License terms: http://yices.csl.sri.com/yices-newnewlicense.html" {success & yices2:installed}
+]
