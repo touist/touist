@@ -1,3 +1,10 @@
+v3.1.0
+  - touist:
+    - (experimental) an SMT solver is now available directly from the touist
+      binary instead of a separate binary. This step took a LOT a work because
+      the libyices library wasn't adapted to Windows building. I also had
+      to publish ocamlyices2 to opam. To enable the SMT solver, you just
+      have to do 'opam install yices2' followed by 'opam reinstall touist'.
 v3.0.1
   - touist:
     - fixed powerset([a,b]) that now correclty returns the empty set
