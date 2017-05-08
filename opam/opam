@@ -26,9 +26,9 @@ build-test: [
 build-doc: [ "ocaml" "setup.ml" "-doc" ]
 depends: [
   "cppo" {build}
-  "fileutils" {>= "0.4.0"}
-  "menhir" {>= "20151023"}
-  "minisat"
+  "fileutils" {build & >= "0.4.0"}
+  "menhir" {build & >= "20151023"}
+  "minisat" {build}
   "ocamlbuild" {build}
   "ocamlfind" {build}
   "ounit" {test}

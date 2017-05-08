@@ -63,6 +63,9 @@ BetaFeatures: section_object
 Flag yices2
   Default: false
   Description: enable support for the embeded SMT solver (using yices2)
+Flag lib
+  Default: false
+  Description: enable installation of the touist library
 
 PreBuildCommand: make pre-build HAS_YICES2=$yices2 VERSION=$pkg_version
 PostCleanCommand: make clean-pre-build
@@ -74,6 +77,7 @@ XOCamlbuildExtraArgs: -menhir \"menhir --table --inspection -v -la 2 --explain\"
 # but inside of the .ml files that use the functions, you just have to do:
 #     open Parse (or Sat, Smt, Eval...)
 Library touist
+  Install$:       flag(lib)
   Path:           src
   Modules:        Parse,Eval,Cnf,Sat,Smt,Pprint,Latex,Msgs,Types
   InternalModules: Lexer,Parser,Parser_error_report
@@ -84,7 +88,8 @@ Library touist
 # When enabled, the preprocessor macro -D yices2 is passed (see myocamlbuild.ml).
 
 Library touist_yices2
-  Build$:        flag(yices2)
+  Build$:         flag(yices2)
+  Install$:       flag(yices2) && flag(lib)
   Path:           src
   Modules:        Solvesmt
   BuildDepends:   yices2 (>= 0.0.2)
