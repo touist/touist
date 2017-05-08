@@ -1,6 +1,6 @@
 <support/gui/**/*>: not_hygienic
 # OASIS_START
-# DO NOT EDIT (digest: 21074f1f8a0324c20ebc1bbbb4bfb5c5)
+# DO NOT EDIT (digest: 4abbcc84589356b751b814b8b6374fd9)
 # Ignore VCS directories, you can use the same kind of rule outside
 # OASIS_START/STOP if you want to exclude directories that contains
 # useless stuff for the build process
@@ -15,36 +15,59 @@ true: annot, bin_annot
 ".git": not_hygienic
 "_darcs": -traverse
 "_darcs": not_hygienic
-# Library touist
-"src/touist.cmxs": use_touist
+# Library touistLib
+"src/lib/touistLib.cmxs": use_touistLib
+<src/lib/*.ml{,i,y}>: package(fileutils)
+<src/lib/*.ml{,i,y}>: package(menhirLib)
+<src/lib/*.ml{,i,y}>: package(minisat)
+<src/lib/*.ml{,i,y}>: package(re.str)
 # Executable touist
-<src/touist.{native,byte}>: package(fileutils)
-<src/touist.{native,byte}>: package(menhirLib)
-<src/touist.{native,byte}>: package(minisat)
-<src/touist.{native,byte}>: package(str)
-<src/touist.{native,byte}>: use_touist
+<src/cli/touist.{native,byte}>: package(fileutils)
+<src/cli/touist.{native,byte}>: package(menhirLib)
+<src/cli/touist.{native,byte}>: package(minisat)
+<src/cli/touist.{native,byte}>: package(re.str)
+<src/cli/touist.{native,byte}>: use_touistLib
 # Executable touist-debug
-"src/touist.byte": package(fileutils)
-"src/touist.byte": package(menhirLib)
-"src/touist.byte": package(minisat)
-"src/touist.byte": package(str)
-"src/touist.byte": use_touist
-<src/*.ml{,i,y}>: package(fileutils)
-<src/*.ml{,i,y}>: package(menhirLib)
-<src/*.ml{,i,y}>: package(minisat)
-<src/*.ml{,i,y}>: package(str)
-<src/*.ml{,i,y}>: use_touist
+"src/cli/touist.byte": package(fileutils)
+"src/cli/touist.byte": package(menhirLib)
+"src/cli/touist.byte": package(minisat)
+"src/cli/touist.byte": package(re.str)
+"src/cli/touist.byte": use_touistLib
+<src/cli/*.ml{,i,y}>: package(fileutils)
+<src/cli/*.ml{,i,y}>: package(menhirLib)
+<src/cli/*.ml{,i,y}>: package(minisat)
+<src/cli/*.ml{,i,y}>: package(re.str)
+<src/cli/*.ml{,i,y}>: use_touistLib
 # Executable test
 "test/test.byte": package(fileutils)
 "test/test.byte": package(menhirLib)
 "test/test.byte": package(minisat)
 "test/test.byte": package(oUnit)
-"test/test.byte": package(str)
-"test/test.byte": use_touist
+"test/test.byte": package(re.str)
+"test/test.byte": use_touistLib
 <test/*.ml{,i,y}>: package(fileutils)
 <test/*.ml{,i,y}>: package(menhirLib)
 <test/*.ml{,i,y}>: package(minisat)
 <test/*.ml{,i,y}>: package(oUnit)
-<test/*.ml{,i,y}>: package(str)
-<test/*.ml{,i,y}>: use_touist
+<test/*.ml{,i,y}>: package(re.str)
+<test/*.ml{,i,y}>: use_touistLib
+# Executable touistjs
+"src/js/touistjs.byte": package(fileutils)
+"src/js/touistjs.byte": package(js_of_ocaml)
+"src/js/touistjs.byte": package(js_of_ocaml.ppx)
+"src/js/touistjs.byte": package(menhirLib)
+"src/js/touistjs.byte": package(minisat)
+"src/js/touistjs.byte": package(ppx_deriving_yojson)
+"src/js/touistjs.byte": package(re.str)
+"src/js/touistjs.byte": package(yojson)
+"src/js/touistjs.byte": use_touistLib
+<src/js/*.ml{,i,y}>: package(fileutils)
+<src/js/*.ml{,i,y}>: package(js_of_ocaml)
+<src/js/*.ml{,i,y}>: package(js_of_ocaml.ppx)
+<src/js/*.ml{,i,y}>: package(menhirLib)
+<src/js/*.ml{,i,y}>: package(minisat)
+<src/js/*.ml{,i,y}>: package(ppx_deriving_yojson)
+<src/js/*.ml{,i,y}>: package(re.str)
+<src/js/*.ml{,i,y}>: package(yojson)
+<src/js/*.ml{,i,y}>: use_touistLib
 # OASIS_STOP

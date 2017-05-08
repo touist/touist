@@ -57,11 +57,7 @@ configure:
 
 .PHONY: missing FORCE pre-build clean-pre-build
 
-SRC=src
-# If git is present, then ROOT_GIT will be set with the project root path
-# elsewise, ROOT_GIT will not be defined at all
-
-targets = $(SRC)/parser_messages.ml $(SRC)/version.ml
+targets = src/lib/parser_messages.ml src/cli/version.ml
 pre-build: $(targets)
 
 # Produced by menhir
@@ -96,7 +92,7 @@ endif
 # before the shell is able to expand it.
 
 clean-pre-build:
-	cd $(SRC) && rm -f parser_messages.ml version.ml
+	rm -f $(targets)
 
 # For finding the errors that should be in parser.messages but are not
 # because parser.mly has been updated and some new errors appeared.

@@ -4,10 +4,14 @@
 #
 # 2016, Mael Valais
 #
-S src
-B _build/src
+S src/lib
+S src/js
+B _build/src/lib
+B _build/src/js
 PKG menhirLib
-PKG str
+PKG re
 PKG fileutils
 PKG minisat
 PKG ounit
+PKG ppx_deriving_yojson js_of_ocaml js_of_ocaml.ppx
+EXT js

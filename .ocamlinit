@@ -2,11 +2,12 @@
  * bytecode over native code, use the following:
  *     ./configure --override is_native false
  *)
-#directory "_build/src";;
+#directory "_build/src/lib";;
 
+
+#require "re.str";;
 #require "menhirLib";;
 #require "minisat";;
-#require "str";;
 #require "fileutils";;
 #require "OUnit";;
 

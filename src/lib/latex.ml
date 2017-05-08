@@ -95,4 +95,4 @@ let rec latex_of_ast = function
 
   and latex_of_commalist sep el = String.concat sep (List.map latex_of_ast el)
   and escape_underscore txt =
-    Str.global_replace (Str.regexp "_") "\\_" txt
+    Re_str.global_replace (Re_str.regexp "_") "\\_" txt

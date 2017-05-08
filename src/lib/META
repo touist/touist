@@ -1,0 +1,12 @@
+# OASIS_START
+# DO NOT EDIT (digest: 6f77abc8f9da6d983b5df00fa51c94c3)
+version = "3.0.1"
+description = "The solver for the Touist language"
+requires = "menhirLib fileutils re.str minisat"
+archive(byte) = "touistLib.cma"
+archive(byte, plugin) = "touistLib.cma"
+archive(native) = "touistLib.cmxa"
+archive(native, plugin) = "touistLib.cmxs"
+exists_if = "touistLib.cma"
+# OASIS_STOP
+

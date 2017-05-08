@@ -110,7 +110,7 @@ let check_solution (sorted_solution:string) (stream:char Stream.t) =
   in
   let rec rm_unwanted_lines (l:string list) : string list = match l with
     | [] -> []
-    | x::xs -> if Str.string_match (Str.regexp "^=") x 0
+    | x::xs -> if Re_str.string_match (Re_str.regexp "^=") x 0
                then rm_unwanted_lines xs
                else x::(rm_unwanted_lines xs)
   in
