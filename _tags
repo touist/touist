@@ -1,6 +1,11 @@
 <support/gui/**/*>: not_hygienic
+
+# This is needed to tell ocamlbuild that we are using menhir instead of the
+# venerable ocamlyacc.
+true: use_menhir
+
 # OASIS_START
-# DO NOT EDIT (digest: 21074f1f8a0324c20ebc1bbbb4bfb5c5)
+# DO NOT EDIT (digest: 7e56264f82d2c74ddb02b3adaae63a47)
 # Ignore VCS directories, you can use the same kind of rule outside
 # OASIS_START/STOP if you want to exclude directories that contains
 # useless stuff for the build process
@@ -17,18 +22,15 @@ true: annot, bin_annot
 "_darcs": not_hygienic
 # Library touist
 "src/touist.cmxs": use_touist
+# Library touist_yices2
+"src/touist_yices2.cmxs": use_touist_yices2
+<src/*.ml{,i,y}>: package(yices2)
 # Executable touist
 <src/touist.{native,byte}>: package(fileutils)
 <src/touist.{native,byte}>: package(menhirLib)
 <src/touist.{native,byte}>: package(minisat)
 <src/touist.{native,byte}>: package(str)
 <src/touist.{native,byte}>: use_touist
-# Executable touist-debug
-"src/touist.byte": package(fileutils)
-"src/touist.byte": package(menhirLib)
-"src/touist.byte": package(minisat)
-"src/touist.byte": package(str)
-"src/touist.byte": use_touist
 <src/*.ml{,i,y}>: package(fileutils)
 <src/*.ml{,i,y}>: package(menhirLib)
 <src/*.ml{,i,y}>: package(minisat)

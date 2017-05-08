@@ -11,3 +11,4 @@ PKG str
 PKG fileutils
 PKG minisat
 PKG ounit
+PKG yices2

@@ -3,10 +3,6 @@ open Parse
 type error = OK | ERROR
 let get_code (e : error) : int = match e with OK -> 0 | ERROR -> 1
 
-(* Here is the list of hard-coded accepted logics. There are many
- * other logics that can be accepted. *)
-let smt_logic_avail = ["QF_IDL";"QF_LIA";"QF_LRA";"QF_RDL"]
-
 let sat_mode = ref false
 let version_asked = ref false
 let smt_logic = ref ""
@@ -82,8 +78,8 @@ let () =
   ]
   in
   let usage =
-    "TouIST solves propositional logic problems written in TouIST language\n
-     and supports conversion to SAT-DIMACS and SMT-LIB2 solver formats.\n"^
+    "TouIST solves propositional logic problems written in TouIST language\n"^
+    "and supports conversion to SAT-DIMACS and SMT-LIB2 solver formats.\n"^
     "Usage: " ^ cmd ^ " [--sat] [-o OUTPUT] [--table TABLE] (INPUT | -)\n"^
     "Usage: " ^ cmd ^ " --smt (QF_IDL|QF_RDL|QF_LIA|QF_LRA) [-o OUTPUT] (INPUT | -)\n"^
     "Note: in --sat mode, if TABLE and OUTPUT aren't given, both output will be mixed in stdout."
@@ -96,7 +92,10 @@ let () =
    * NOTE: !version_asked means like in C, *version_asked.
    * It doesn't mean "not version_asked" *)
   if !version_asked then (
-    print_endline (Version.version);
+    print_endline ("Version: " ^ Version.version);
+    if Version.has_git_tag then print_endline ("Git: "^Version.git_tag);
+    let built_list = ["minisat"] @ if Version.has_yices2 then ["yices2"] else [] in
+    print_endline ("Built with: " ^ List.fold_left (fun acc e -> match acc with "" -> e | _ -> acc^","^e) "" built_list);
     exit_with OK
   );
 
@@ -118,11 +117,13 @@ let () =
   (* When neither --smt nor --sat has been given, we default to --sat mode *)
   if (not !sat_mode) && (!smt_logic = "") then sat_mode := true;
 
+#ifdef yices2
   (* SMT Mode: check if one of the available QF_? has been given after --smt *)
-  if (not !sat_mode) && (not (List.exists (fun x->x=(String.uppercase !smt_logic)) smt_logic_avail)) then
+  if (not !sat_mode) && not (Solvesmt.logic_supported !smt_logic) then
     (Printf.fprintf stderr
-    "%s: you must specify the logic used (--smt logic_name) (try --help)\nExample: --smt QF_IDL\n" cmd;
+    "%s: you must give a correct SMT-LIB logic after --smt (try --help)\nExample: --smt QF_IDL\n" cmd;
     exit_with ERROR);
+#endif
 
   if !output_file_path <> "" && (!sat_mode || (!smt_logic <> ""))
   then output := open_out !output_file_path;
@@ -142,7 +143,7 @@ let () =
       then Parse.parse_sat (string_of_chan !input)
       else Parse.parse_smt (string_of_chan !input)
     in (Printf.fprintf !output "%s\n" (Latex.latex_of_ast ast); show_msgs_and_exit !msgs OK));
-  
+
   (* linter = only show syntax and semantic errors *)
   if !linter then
     if (!sat_mode) then
@@ -209,12 +210,27 @@ let () =
            file. Example:
               c 98 p(1,2,3)     -> c means 'comment' in any Sat file   *)
 
-  else if (!smt_logic <> "") then begin
+  else if (!smt_logic <> "") && not !solve_sat then begin
     let ast,msgs = Parse.parse_smt ~debug:!debug_syntax (string_of_chan !input)
         |> Eval.eval ~smt:(!smt_logic <> "") in
     let smt = Smt.to_smt2 (String.uppercase !smt_logic) ast in
     Buffer.output_buffer !output smt;
     show_msgs_and_exit !msgs OK
+  end
+  else if (!smt_logic <> "") && !solve_sat then begin
+    #ifdef yices2
+      let ast,msgs = Parse.parse_smt ~debug:!debug_syntax (string_of_chan !input)
+          |> Eval.eval ~smt:(!smt_logic <> "") in
+      let str = Solvesmt.ast_to_yices ast |> Solvesmt.model (String.uppercase !smt_logic) in
+      if str = ""
+      then (Printf.fprintf stderr "Unsat\n"; show_msgs_and_exit !msgs ERROR)
+      else Printf.fprintf !output "%s\n" str;
+      show_msgs_and_exit !msgs OK
+  #else
+      Printf.fprintf stderr
+        ("This touist binary has not been compiled with yices2 support, cannot solve with --smt. You can still solve with --sat.");
+      exit_with ERROR
+  #endif
   end;
 
   close_out !output;

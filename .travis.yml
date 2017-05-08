@@ -42,6 +42,7 @@ before_install:
   - opam init --auto-setup
   - eval `opam config env`
   - opam install --yes ocamlfind menhir fileutils minisat
+  - opam pin add -y yices2 "https://github.com/maelvalais/ocamlyices2.git#v0.0.2"
   # Put the dependency yices-smt2 to external/
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then file=yices-2.4.2-x86_64-apple-darwin15.2.0-static-gmp.tar.gz; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then file=yices-2.4.2-x86_64-unknown-linux-gnu-static-gmp.tar.gz; fi

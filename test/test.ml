@@ -212,11 +212,21 @@ run_test_tt_main (
   "takuzu4x4.touistl">:: (test_smt (Parse.string_of_file "test/smt/takuzu4x4.touistl"))
 ];
 "real-size tests">:::[
-  "sodoku">:: (fun ctx -> 
+  "sat/sodoku.touistl (SAT solver)">:: (fun ctx -> 
       OUnit2.skip_if (Sys.os_type = "Win32") "won't work on windows (unix-only??)";
       OUnit2.assert_command ~use_stderr:false ~ctxt:ctx
       ~foutput:(check_solution "test/sat/sudoku_solution.txt")
       "./touist.native" ["--solve";"--sat";"test/sat/sudoku.touistl"]);
+  "sat/sodoku.touistl (using SMT QF_BV solver)">:: (fun ctx ->
+        OUnit2.skip_if (Sys.os_type = "Win32") "won't work on windows (unix-only??)";
+        OUnit2.assert_command ~use_stderr:false ~ctxt:ctx
+        ~foutput:(check_solution "test/sat/sudoku_solution.txt")
+        "./touist.native" ["--solve";"--smt";"QF_BV";"test/sat/sudoku.touistl"]);
+  "smt/takuzu4x4.touistl">:: (fun ctx ->
+      OUnit2.skip_if (Sys.os_type = "Win32") "won't work on windows (unix-only??)";
+      OUnit2.assert_command ~use_stderr:false ~ctxt:ctx
+      ~foutput:(check_solution "test/smt/takuzu4x4_solution.txt")
+      "./touist.native" ["--solve";"--smt";"QF_IDL";"test/smt/takuzu4x4.touistl"]);
 ];
 
 ])

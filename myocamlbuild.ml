@@ -1,5 +1,5 @@
 (* OASIS_START *)
-(* DO NOT EDIT (digest: 093b60e832943d9127fdbf00f981a71c) *)
+(* DO NOT EDIT (digest: a4e1813f29a5caaf4e623f754c84bff6) *)
 module OASISGettext = struct
 (* # 22 "src/oasis/OASISGettext.ml" *)
 
@@ -885,7 +885,8 @@ end
 open Ocamlbuild_plugin;;
 let package_default =
   {
-     MyOCamlbuildBase.lib_ocaml = [("touist", ["src"], [])];
+     MyOCamlbuildBase.lib_ocaml =
+       [("touist", ["src"], []); ("touist_yices2", ["src"], [])];
      lib_c = [];
      flags = [];
      includes = [("test", ["src"])]
@@ -896,6 +897,26 @@ let conf = {MyOCamlbuildFindlib.no_automatic_syntax = false}
 
 let dispatch_default = MyOCamlbuildBase.dispatch_default conf package_default;;
 
-# 900 "myocamlbuild.ml"
+# 901 "myocamlbuild.ml"
 (* OASIS_STOP *)
-Ocamlbuild_plugin.dispatch dispatch_default;;
+
+(** If the yices2 flag is set, compile touist.ml with [-D yices2] and link
+    any binary against touist_yices2 as well as yices2. *)
+let yices_cond env =
+  let flag_is_true =
+    try BaseEnvLight.var_get "yices2" env = "true"
+    with Not_found -> failwith "Flag 'yices2' not found in _oasis (I wrote this message, see in myocamlbuild.ml)"
+  in
+  if flag_is_true then begin
+    tag_file ("src/touist.ml") [ "use_touist_yices2" ; "package(yices2)"; "cppo_D(yices2)" ];
+    let binaries = ["src/touist.native";"src/touist.byte";"test/test.native";"test/test.byte"] in
+      List.iter (fun bin -> tag_file bin ["use_touist_yices2";"package(yices2)"]) binaries;
+  end
+
+let () =
+  Ocamlbuild_plugin.dispatch
+    (fun hook ->
+      dispatch_default hook;
+      Ocamlbuild_cppo.dispatcher hook;
+      let env = BaseEnvLight.load ~allow_empty:true () in yices_cond env;
+    )
