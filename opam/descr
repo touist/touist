@@ -4,8 +4,8 @@ The Touist language is a friendly language for writing propositional
 logic and logic on real and integers (SMT). This language aims to
 formalize real-life problems (e.g., the sudoku can be solved in a few
 lines). Touist embeds the minisat solver (for propositional logic) and
-(coming soon) the SMT2 solver. It can also generate the DIMACS, SMT2
-and latex formats from you touist file. NOTE. yices2 cannot be
-installed using 'opam install yices2', it is 'pin' only. Install it
-with opam pin add -y yices2
-https://github.com/maelvalais/ocamlyices2.git
+the yices2 solver (optional, for SMT logic). It can also generate the
+DIMACS, SMT2 and latex formats from you touist file. To use the SMT
+solver, install yices2 with
+
+   opam install yices2

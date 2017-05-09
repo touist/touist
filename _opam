@@ -1,10 +1,7 @@
 post-messages: [
 "Touist built without yices2 support.
-To enable the SMT solver (yices2), please install yices2. For now, it is
-pin-only, i.e., you have to install it with:
-
-    opam pin add yices2 https://github.com/maelvalais/ocamlyices2.git#v0.0.2"
-{success & !yices2:installed}
+To enable the SMT solver (yices2), please install yices2 with the command:
+    opam install yices2" {success & !yices2:installed}
 
 "Touist built with yices2 support.
 **Yices2 is free [only] for non-commercial use**
