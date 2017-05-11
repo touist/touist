@@ -57,7 +57,7 @@ configure:
 
 .PHONY: missing FORCE pre-build clean-pre-build
 
-targets = src/parser_messages.ml src/version.ml
+targets = src/lib/parser_messages.ml src/lib/version.ml
 pre-build: $(targets)
 
 # Produced by menhir
@@ -91,13 +91,13 @@ endif
 # before the shell is able to expand it.
 
 clean-pre-build:
-	cd $(SRC) && rm -f parser_messages.ml version.ml
+	rm -Rf $(targets)
 
 # For finding the errors that should be in parser.messages but are not
 # because parser.mly has been updated and some new errors appeared.
 missing:
-	menhir --list-errors src/parser.mly > parser.messages_updated
-	menhir --compare-errors parser.messages_updated --compare-errors src/parser.messages --list-errors src/parser.mly
+	menhir --list-errors src/lib/parser.mly > parser.messages_updated
+	menhir --compare-errors parser.messages_updated --compare-errors src/lib/parser.messages --list-errors src/lib/parser.mly
 
 #
 # These targets aim to build the java GUI in support/gui/

@@ -1,5 +1,5 @@
 # OASIS_START
-# DO NOT EDIT (digest: 29b9f507ac99c369236881002bccd323)
+# DO NOT EDIT (digest: eff21b149de9f63f6aae0cdd31a955b7)
 version = "3.1.0"
 description = "The solver for the Touist language"
 requires = "menhirLib fileutils str minisat"
@@ -11,7 +11,7 @@ exists_if = "touist.cma"
 package "yices2" (
  version = "3.1.0"
  description = "The solver for the Touist language"
- requires = "yices2"
+ requires = "touist yices2"
  archive(byte) = "touist_yices2.cma"
  archive(byte, plugin) = "touist_yices2.cma"
  archive(native) = "touist_yices2.cmxa"

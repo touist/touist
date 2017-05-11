@@ -1,5 +1,5 @@
 (* OASIS_START *)
-(* DO NOT EDIT (digest: 1f51a0491f336a9b56ac3fc9ff67ed15) *)
+(* DO NOT EDIT (digest: 57c1e469a68751cfe5d3ec191b5f2b98) *)
 module OASISGettext = struct
 (* # 22 "src/oasis/OASISGettext.ml" *)
 
@@ -880,10 +880,18 @@ open Ocamlbuild_plugin;;
 let package_default =
   {
      MyOCamlbuildBase.lib_ocaml =
-       [("touist", ["src"], []); ("touist_yices2", ["src"], [])];
+       [
+          ("touist", ["src/lib"], []);
+          ("touist_yices2", ["src/lib/yices2"], [])
+       ];
      lib_c = [];
      flags = [];
-     includes = [("test", ["src"])]
+     includes =
+       [
+          ("test", ["src/lib"]);
+          ("src/lib/yices2", ["src/lib"]);
+          ("src", ["src/lib"])
+       ]
   }
   ;;
 
@@ -891,26 +899,68 @@ let conf = {MyOCamlbuildFindlib.no_automatic_syntax = false}
 
 let dispatch_default = MyOCamlbuildBase.dispatch_default conf package_default;;
 
-# 895 "myocamlbuild.ml"
+# 903 "myocamlbuild.ml"
 (* OASIS_STOP *)
 
-(** If the yices2 flag is set, compile touist.ml with [-D yices2] and link
-    any binary against touist_yices2 as well as yices2. *)
-let yices_cond env =
-  let flag_is_true =
-    try BaseEnvLight.var_get "yices2" env = "true"
-    with Not_found -> failwith "Flag 'yices2' not found in _oasis (I wrote this message, see in myocamlbuild.ml)"
-  in
-  if flag_is_true then begin
-    tag_file ("src/touist.ml") [ "use_touist_yices2" ; "package(yices2)"; "cppo_D(yices2)" ];
-    let binaries = ["src/touist.native";"src/touist.byte";"test/test.native";"test/test.byte"] in
-      List.iter (fun bin -> tag_file bin ["use_touist_yices2";"package(yices2)"]) binaries;
+(* [add_include_mapping_to] returns an new package_default with updated
+   includes so that the new includes mapping contain the map
+      (path, ...; path_included)
+   Rationale:
+   I couldn't find a way to tweak _oasis to be able to add 'touist_yices2'
+   to the BuildDepends: field only when the flag 'yices2' is enabled. So
+   I hack the myocamlbuild.ml that is resulting.
+   I just need to add to the includes mapping (in package_default) the mapping
+   between the folders of touist.ml and test.ml and the folder touist_yices2.
+   Example: if the includes are
+        ("src", ["src/lib"])
+   and that yices2 is compiled in src/lib/yices2, I want the includes to become
+        ("src", ["src/lib";"src/lib/yices2"])
+   if 'yices2' has been enabled.
+    *)
+let add_include path include_path package_default =
+  let open MyOCamlbuildBase in
+  let includes = package_default.includes |> List.map (function
+    | (p,l) when p = path -> (path,include_path::l)
+    | (p,l) -> (p,l))
+  in {package_default with includes=includes}
+
+(* let print_info f =
+  Ocamlbuild_pack.Log.dprintf 1
+    "@[<hv 2>Tags I added at the end of myocamlbuild.ml for file %s:@ %a@]@." f
+    Tags.print (tags_of_pathname f) *)
+
+let flag_enabled flag =
+  let env = BaseEnvLight.load ~allow_empty:true () in
+  try BaseEnvLight.var_get flag env = "true"
+  with Not_found -> failwith
+    ("Flag "^flag^" not found in _oasis (I wrote this message, see end of myocamlbuild.ml)")
+
+(** If the flag given is set to 'true', compile touist.ml with [-D flag] and
+    link any binary against touist_flag as well as flag. Also includes the
+    given 'include_path' to folders that contain executables.
+    Example with flag 'yices2'. If this flag is enabled:
+      - make sure touist.ml is compiled with '-D yices2' using cppo's _tags
+      - link any binary against 'touist_yices2' and 'yices2'
+      - add the includes 'src/lib/yices2' for places where executables are:
+        src and test. *)
+let flag_cond flag include_path package_default =
+  if flag_enabled flag then begin
+    (* Add the tags for the '-D yices2' and linking tags *)
+    tag_file ("src/touist.ml") [ "use_touist_"^flag ; "package("^flag^")"; "cppo_D("^flag^")" ];
+    ["src/touist.native";"src/touist.byte";"test/test.native";"test/test.byte"]
+      |> List.iter (fun bin -> tag_file bin ["use_touist_"^flag; "package("^flag^")"]);
+    (* Add the needed includes to package_default *)
+    package_default
+      |> add_include "src" include_path
+      |> add_include "test" include_path
   end
+  else package_default
 
 let () =
-  Ocamlbuild_plugin.dispatch
-    (fun hook ->
-      dispatch_default hook;
-      Ocamlbuild_cppo.dispatcher hook;
-      let env = BaseEnvLight.load ~allow_empty:true () in yices_cond env;
-    )
+  Ocamlbuild_plugin.dispatch (fun hook ->
+    let package_default = package_default
+      |> flag_cond "yices2" "src/lib/yices2"
+    in
+    MyOCamlbuildBase.dispatch_default conf package_default hook;
+    Ocamlbuild_cppo.dispatcher hook;
+  )

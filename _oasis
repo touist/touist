@@ -50,18 +50,19 @@ BuildType:    ocamlbuild (0.4)
 BuildTools:   ocamlbuild
 AlphaFeatures: ocamlbuild_more_args
 BetaFeatures: section_object
-#XOCamlbuildPluginTags: package(cppo_ocamlbuild)
-# I had to comment this field and put the -plugin-tags it in 'ExtraArgs' instead
-# because oasis would add single-quotes around package(cppo_ocamlbuild);
+#XOCamlbuildPluginTags: package(cppo_ocamlbuild)           <- see (1)
+
+# (1) I had to comment this field and put the -plugin-tags it in 'ExtraArgs'
+# instead because oasis would add single-quotes around package(cppo_ocamlbuild);
 # single-quotes aren't interpreted by 'cmd' on windows, and thus they are left
 # as is, triggering an error. Instead, I use double-quotes.
 
 Flag yices2
   Default: false
-  Description: enable support for the embeded SMT solver (using yices2)
+  Description: enable yices2 solver (SMT)
 Flag lib
   Default: false
-  Description: enable installation of the touist library
+  Description: enable library install
 
 PreBuildCommand: make pre-build HAS_YICES2=$yices2 VERSION=$pkg_version
 PostCleanCommand: make clean-pre-build
@@ -74,32 +75,38 @@ XOCamlbuildExtraArgs: -menhir \"menhir --table --inspection -v -la 2 --explain\"
 #     open Parse (or Sat, Smt, Eval...)
 Library touist
   Install$:       flag(lib)
-  Path:           src
+  Path:           src/lib
   Modules:        Parse,Eval,Cnf,Sat,Smt,Pprint,Latex,Msgs,Types
   InternalModules: Lexer,Parser,Parser_error_report
   BuildTools+:    menhir, cppo
   BuildDepends:   menhirLib (>= 20151023), fileutils (>= 0.4.0), str,
                   minisat
-# Note: the yices2 dependency is only enabled when --enable-yices2 is given.
-# When enabled, the preprocessor macro -D yices2 is passed (see myocamlbuild.ml).
 
 Library touist_yices2
   Build$:         flag(yices2)
   Install$:       flag(yices2) && flag(lib)
-  Path:           src
+  Path:           src/lib/yices2
   Modules:        Solvesmt
-  BuildDepends:   yices2 (>= 0.0.2)
+  BuildDepends:   touist, yices2 (>= 0.0.2)
   FindlibParent:  touist
   FindlibName:    yices2
 
-# Note that the whole process where 'touist_yices' is added as dependency
-# when the flag 'yices2' is enabled has been written in myocamlbuild.ml. The
-# inspiration comes from the github project Drup/LILiS (see their myocamlbuild.ml)
 Executable touist
   CompiledObject: best
   Path:           src
   MainIs:         touist.ml
-  BuildDepends:   touist #, touist.yices2
+  BuildDepends:   touist
+# if flag(yices2)                       <- not possible on oasis 0.4.8. See (2)
+#   BuildDepends+:touist.yices2
+
+# (2) the whole logic for adding 'touist_yices' in 'BuildDepends:' when flag
+# 'yices2' is enabled (using --enable-yices2) is handled in a custom way at the
+# end of myocamlbuild.ml. Inspiration comes from the github project Drup/LILiS.
+# When flag yices2 is enabled:
+# - we define the preprocessor macro '-D yices2' (using cppo),
+# - 'touist' and 'test' executables are linked against touist_yices2 and yices2
+#   using the tags 'use_touist_yices' and 'package(yices2)'.
+# - 'touist' and 'test' executables are built with '-I src/lib/yices2' include.
 
 # This produces the test.byte executable; to enable it,
 # ./configure --enable-tests
@@ -123,7 +130,7 @@ Document touist
   Install: false
   InstallDir: $htmldir/api
   BuildTools+: ocamldoc
-  XOCamlbuildPath: src
+  XOCamlbuildPath: src/lib
   XOCamlbuildLibraries: touist
   XOCamlbuildExtraArgs: -docflags \"-colorize-code -short-functors -charset utf-8\"
   XOCamlbuildExtraArgs+:-use-menhir -menhir \"menhir --table --inspection -v -la 2\"
