@@ -157,35 +157,3 @@ check-opam-packages:
 		'  opam pin add -y minisat'\
 	    ''\''https://github.com/maelvalais/ocaml-minisat.git#v0.0.2'\''\n'\
 	&& exit 6)
-
-#
-# This target will do the necessary to update the version number.
-# At first, the version number was only stored using the git tag.
-# But because of opam, the version number must be set in _oasis
-# before I do `git describe --tags`...
-# So I wrote this target to ease the process of 'Bumping' the version
-# number.
-.PHONY: version
-version: awk opam-publish oasis
-	@[ $(VERSION) ] || (echo "Please set the VERSION var, e.g., 'make $@ VERSION=3.0.2'" && exit 1)
-	@echo $(VERSION) | grep "[0-9]\.[0-9]\.[0-9]" >/dev/null || (echo "VERSION must be of the form 3.0.2" && exit 1)
-	@echo "\033[92mChanging the 'Version:' field in '_oasis' from $$(oasis query version) to $(VERSION)\033[0m"
-	@sed "s/^\(Version: *\)[0-9][0-9\.]*$$/\1$(VERSION)/" _oasis > a && mv a _oasis
-	@echo "\033[92mRunning 'oasis setup' to update setup.ml, src/META\033[0m"
-	@oasis setup
-	@echo "\033[92mRunning 'oasis2opam --local -y' to update opam/opam\033[0m"
-	@oasis2opam --local -y
-	@echo "\033[92mRunning 'git add setup.ml _oasis src/META opam/*'\033[0m"
-	git add setup.ml _oasis src/META opam/*
-	@echo "\033[92mCommiting with message 'Bump to v$(VERSION)'\033[0m"
-	git commit -m "Bump to v$(VERSION)"
-	@echo "================="
-	@echo "\033[91mNow, you can do:\033[0m"
-	@echo "    git tag -s v$(VERSION)"
-	@echo "    git push --tags"
-	@echo "    oasis2opam https://github.com/touist/touist/archive/v$(VERSION).tar.gz"
-	@echo "    opam-publish submit touist.$(VERSION)"
-	@echo "\033[91mor cancel the commit that has been done with:\033[0m"
-	@echo "    git reset HEAD^"
-
-
