@@ -218,6 +218,8 @@ Comment     = ";;"[^\n]*
 	"atleast" |
 	"exact" |
 	"atmost" |
+	"forall" |
+	"exists" |
 	"diff" { addToken(Token.FUNCTION); }   
    
    
