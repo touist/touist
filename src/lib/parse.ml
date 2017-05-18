@@ -82,6 +82,9 @@ let parse_sat ?debug:(d=false) ?(filename="foo.touistl") text = parse Parser.Inc
 (** Same for [Parser.Incremental.touist_simple] *)
 let parse_smt ?debug:(d=false) ?(filename="foo.touistl") text = parse Parser.Incremental.touist_smt ~debug:d filename text
 
+(** Same for [Parser.Incremental.touist_qbf] *)
+let parse_qbf ?debug:(d=false) text = parse Parser.Incremental.touist_qbf ~debug:d text
+
 
 (** [string_of_channel] takes an opened file and returns a string of its content. *)
 let string_of_chan (input:in_channel) : string =

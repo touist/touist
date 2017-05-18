@@ -38,6 +38,7 @@
 %token DATA
 %token LET
 %token EOF
+%token FORALL EXISTS
 
 
 (* The following lines define in which order the tokens should
@@ -125,7 +126,7 @@
 *)
 
 (* The two entry points of our parser *)
-%start <Types.Ast.ast> touist_simple, touist_smt
+%start <Types.Ast.ast> touist_simple, touist_smt, touist_qbf
 
 %% (* Everthing below that mark is expected to be a production rule *)
    (* Note that VAR { $0 } is equivalent to v=VAR { v } *)
@@ -149,6 +150,8 @@ touist_simple:
 (* [touist_smt] is the entry point of the parser in smt mode *)
 touist_smt:
   | f=affect_or(formula_smt)+ EOF {Loc (Touist_code (f),($startpos,$endpos))}
+
+touist_qbf: f=affect_or(formula_qbf)+ EOF {Loc (Touist_code (f),($startpos,$endpos))}
 
 (* Used in tuple expression; see tuple_variable and tuple_term *)
 %inline indices: i=expr { i }
@@ -264,6 +267,15 @@ formula_simple:
   | TOP { Top }
   | BOTTOM { Bottom }
 
+formula_qbf:
+  | f=var {f}
+  | f=formula(formula_qbf)
+  | f=prop {f}
+  | TOP { Top }
+  | BOTTOM { Bottom }
+  | f=exists(formula_qbf)
+  | f=forall(formula_qbf) {f}
+
 formula_smt:
   | f=formula(formula_smt)
   | f=expr_smt { f }
@@ -292,3 +304,8 @@ expr_smt:
   | ATMOST (*LPAREN*)  x=expr COMMA s=expr RPAREN {Loc (Atmost (x,s),($startpos,$endpos))}
 
 %inline when_cond: WHEN x=expr { x }
+
+%inline prop_or_var: p=prop | p=var {p}
+
+%inline exists(F): EXISTS v=comma_list(prop_or_var) COLON form=F { List.fold_right (fun v acc -> Loc (Exists (v,acc),($startpos,$endpos))) v form }
+%inline forall(F): FORALL v=comma_list(prop_or_var) COLON form=F { List.fold_right (fun v acc -> Loc (Forall (v,acc),($startpos,$endpos))) v form }

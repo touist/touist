@@ -86,6 +86,8 @@ let rec string_of_ast ?(show_var=(fun ast -> "")) ?(debug=false) ?(parenthesis=d
   | Touist_code (f) -> (string_of_ast_list "\n" f)
   | Loc (x,l) -> (if debug then "("^(Msgs.string_of_loc l)^")" else "") ^ string_of_ast x
   | Paren x -> string_of_ast x
+  | Exists (v,f) -> "exact "^(string_of_ast v) ^": "^ (string_of_ast f)
+  | Forall (v,f) -> "forall "^(string_of_ast v) ^": "^ (string_of_ast f)
 
 and string_of_ast_type = function
   | Int    x               -> "int"
@@ -143,5 +145,7 @@ and string_of_ast_type = function
   | Touist_code (_)      -> "(touist code)"
   | Loc (x,_) -> string_of_ast_type x
   | Paren x -> string_of_ast_type x
+  | Exists (v,f)           -> "exact"
+  | Forall (v,f)           -> "forall"
 
 and string_of_ast_list sep el = String.concat sep (List.map string_of_ast el)
