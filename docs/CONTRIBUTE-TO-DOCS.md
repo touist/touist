@@ -150,3 +150,20 @@ would not work...):
 :           : continues on the :
 :           : same line.       :
 |-----------|------------------|
+
+# Open a document with its dependencies with `?#url=http://...`
+
+It is already possible to open a document that is hosted on the web, but the
+files surrounding it don't seem to be loaded. What I propose is to enable
+the loading of these files. Example: if I have the file
+    https://github.com/touist/touist/tree/master/docs/reference-manual.mdk
+and it uses the external colorizer `Colorizer: touist`, then madoko-local would
+load the file
+    https://github.com/touist/touist/tree/master/docs/touist.json
+
+A simpler way would be for madoko-local to copy all the files that have the prefix
+    https://github.com/touist/touist/tree/master/docs/
+into the browser cache. But I have no idea how that would be possible to list
+these files (easy if the document is hosted on a simple web server that has
+direcoty listing enable (`Options +Indexes`), or if the document is on github
+we can use the github API)
