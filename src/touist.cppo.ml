@@ -21,7 +21,7 @@ let show_hidden_lits = ref false
 let equiv_file_path = ref ""
 let input_equiv = ref stdin
 let linter = ref false (* for displaying syntax errors (during parse and eval) *)
-let detailed_position = ref false (* display absolute position of error *)
+let error_format = ref "%l:%c: %t: %m\n" (* display absolute position of error *)
 let debug_syntax = ref false
 let debug_cnf = ref false
 let latex = ref false
@@ -37,7 +37,7 @@ let exit_with (exit_code:error) = exit (get_code exit_code)
 (* In case we have had non-fatal messages (= warnings) during any of the touist commands,
    display them before exiting. *)
 let show_msgs_and_exit msgs (exit_code:error) = 
-  Msgs.print_msgs ~color:(Unix.isatty Unix.stderr) ~detailed:!detailed_position msgs;
+  Msgs.print_msgs ~color:(Unix.isatty Unix.stderr) ~fmt:!error_format msgs;
   exit (get_code exit_code)
 
 (* The main program *)
@@ -74,7 +74,7 @@ let () =
     ("--show-hidden", Arg.Set show_hidden_lits,"(with --solve) Show the hidden '&a' literals used when translating to CNF");
     ("--equiv", Arg.Set_string equiv_file_path,"INPUT2 (with --solve) Check that INPUT2 has the same models as INPUT (equivalency)");
     ("--linter", Arg.Set linter,"Display syntax and semantic errors and exit");
-    ("--detailed-position", Arg.Set detailed_position,"Detailed position with 'num_line:num_col:token_start:token_end: '");
+    ("--error-format", Arg.Set_string error_format,"Customize the formatting of error messages");
   ]
   in
   let usage =
