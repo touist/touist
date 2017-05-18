@@ -92,6 +92,8 @@ let rec latex_of_ast = function
   | Affect (v,c) -> (latex_of_ast v) ^ " \\leftarrow " ^ (latex_of_ast c)
   | Loc (x,_) -> latex_of_ast x
   | Paren x -> "(" ^ latex_of_ast x ^ ")"
+  | Exists (v,f) -> "\\exists "^(string_of_ast v) ^". "^ (string_of_ast f)
+  | Forall (v,f) -> "\\forall "^(string_of_ast v) ^". "^ (string_of_ast f)
 
   and latex_of_commalist sep el = String.concat sep (List.map latex_of_ast el)
   and escape_underscore txt =
