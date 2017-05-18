@@ -99,6 +99,8 @@ module rec Ast : sig
       *)
     | Paren of ast
     (* [Paren] keeps track of asthe parenthesis in the AST in order to print latex *)
+    | Exists           of ast * ast
+    | Forall           of ast * ast
 end = Ast (* see (1) *)
 
 (* From the type [Ast], we create an ordered type [AstOrdered] in order to be able

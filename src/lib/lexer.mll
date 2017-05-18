@@ -80,7 +80,10 @@
     "false",         BOOL false;
     "let",           LET;
     "data",          DATA;
-    "powerset(",     POWERSET]
+    "powerset(",     POWERSET;
+    "exists",        EXISTS;
+    "forall",        FORALL;
+    ]
 }
 
 let digit      = ['0' - '9']
