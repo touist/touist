@@ -58,11 +58,11 @@ let lexer buffer : (Lexing.lexbuf -> Parser.token) =
     "foo.touistl"... For now, the name of the input file name is not
     indicated to the user: useless because we only handle a single touistl file 
 *)
-let parse (parser) ?debug:(debug=false) (text:string) : ast * Msgs.t ref =
+let parse (parser) ?debug:(debug=false) filename (text:string) : ast * Msgs.t ref =
   let msgs = ref Msgs.empty in
   let buffer = ref Parser_error_report.Zero in
   let lexbuf = Lexing.from_string text in
-  lexbuf.lex_curr_p <- {lexbuf.lex_curr_p with pos_fname = "foo.touistl"; pos_lnum = 1};
+  lexbuf.lex_curr_p <- {lexbuf.lex_curr_p with pos_fname = filename; pos_lnum = 1};
   let checkpoint = parser lexbuf.lex_curr_p
   and supplier = Parser.MenhirInterpreter.lexer_lexbuf_to_supplier (lexer buffer) lexbuf
   and succeed ast = ast
@@ -77,10 +77,10 @@ let parse (parser) ?debug:(debug=false) (text:string) : ast * Msgs.t ref =
     in ast,msgs
 
 (** Directly calls [parser] with [Parser.Incremental.touist_simple] *)
-let parse_sat ?debug:(d=false) text = parse Parser.Incremental.touist_simple ~debug:d text
+let parse_sat ?debug:(d=false) ?(filename="foo.touistl") text = parse Parser.Incremental.touist_simple ~debug:d filename text
 
 (** Same for [Parser.Incremental.touist_simple] *)
-let parse_smt ?debug:(d=false) text = parse Parser.Incremental.touist_smt ~debug:d text
+let parse_smt ?debug:(d=false) ?(filename="foo.touistl") text = parse Parser.Incremental.touist_smt ~debug:d filename text
 
 
 (** [string_of_channel] takes an opened file and returns a string of its content. *)
