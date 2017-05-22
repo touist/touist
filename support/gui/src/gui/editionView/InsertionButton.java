@@ -91,7 +91,7 @@ public class InsertionButton extends JButton {
         });
         
         try {
-            TranslationLatex toLatex = new TranslationLatex(codeToInsert);
+            TranslationLatex toLatex = new TranslationLatex(codeToInsert,editorTextArea.getSyntaxEditingStyle());
             TeXFormula formula = new TeXFormula(toLatex.getFormula());
             TeXIcon ti = formula.createTeXIcon(TeXConstants.ALIGN_TOP, 15);
             this.setIcon(ti);
