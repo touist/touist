@@ -18,7 +18,8 @@ public class SolverSelection {
             QF_LRA, 
             QF_LIA, 
             QF_RDL, 
-            QF_IDL
+            QF_IDL,
+            QBF
     };
     
     private SolverType selectedSolver = SolverType.SAT;
@@ -35,9 +36,10 @@ public class SolverSelection {
         this.selectedSolver = solverType;
         if(selectedSolver == SolverType.SAT) {
         	m.getEditorPanel1().getEditor().getEditorTextArea().setSyntaxEditingStyle("sat");
-        } else {
+        } else if(selectedSolver == SolverType.QBF) {
+        	m.getEditorPanel1().getEditor().getEditorTextArea().setSyntaxEditingStyle("qbf");
+        } else
         	m.getEditorPanel1().getEditor().getEditorTextArea().setSyntaxEditingStyle("smt");
-        }
         m.getEditorPanel1().getEditor().getEditorTextArea().forceReparsing(0);
     }    
     
