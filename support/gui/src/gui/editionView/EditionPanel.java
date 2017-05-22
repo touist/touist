@@ -66,7 +66,7 @@ public class EditionPanel extends AbstractComponentPanel {
     public void UpdateLatexLabel()
     {
             try {
-                TranslationLatex T = new TranslationLatex(editorTextArea.getText());
+                TranslationLatex T = new TranslationLatex(editorTextArea.getText(),editorTextArea.getSyntaxEditingStyle());
                 TeXFormula formula = new TeXFormula(T.getFormula());
                 TeXIcon ti = formula.createTeXIcon(TeXConstants.ALIGN_TOP, 20+zoom);
                 latexLabel.setIcon(ti);
