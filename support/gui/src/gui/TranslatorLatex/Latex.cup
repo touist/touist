@@ -32,7 +32,7 @@ non terminal String atom;
 non terminal String term_option;
 non terminal String big_body;
 non terminal String var_list;
-non terminal String set_list;
+non terminal String expr_list;
 non terminal String program;
 non terminal String var;
 
@@ -124,8 +124,8 @@ expr ::= IF expr:b THEN expr:e1 ELSE expr:e2  {: RESULT = new String("if\\;"+b+"
 		| EXACT LPAR expr:s1 COMMA expr:s2 COMMA expr:s3 COMMA expr:s4 RPAR  {: RESULT = new String("(=_{"+s2+" \\in "+s3+"}^{"+s1+"}"+s4+")");:}
 		| ATMOST LPAR expr:s1 COMMA expr:s2 COMMA expr:s3 COMMA expr:s4 RPAR  {: RESULT = new String("(\\leqslant_{"+s2+" \\in "+s3+"}^{"+s1+"}"+s4+")");:}
 		| LET expr:s1 AFFECT expr:s2 TWODOT expr:s3  {: RESULT = new String(s1+"="+s2+"\\\\"+s3);:}
-		| EXISTS var_list:v TWODOT expr:f {: RESULT = new String("\\exists "+v+"."+f);:}
-		| FORALL var_list:v TWODOT expr:f {: RESULT = new String("\\forall "+v+"."+f);:}
+		| EXISTS expr_list:v TWODOT expr:f {: RESULT = new String("\\exists "+v+"."+f);:}
+		| FORALL expr_list:v TWODOT expr:f {: RESULT = new String("\\forall "+v+"."+f);:}
 ;
 
 
@@ -149,9 +149,9 @@ term_option ::= TERM:i {: RESULT = new String(i);:}
 				| expr:e COMMA term_option:t {: RESULT = new String(e+","+t);:}
 ;
 
-big_body ::= var_list:v IN set_list:s WHEN expr:b TWODOT expr:e END 
+big_body ::= var_list:v IN expr_list:s WHEN expr:b TWODOT expr:e END 
 					{: RESULT = new String("\\limits_{\\substack{"+v+"\\in"+s+"\\\\"+ b+"}}"+e);:}
-			| var_list:v IN set_list:s TWODOT expr:e END
+			| var_list:v IN expr_list:s TWODOT expr:e END
 					{: RESULT = new String("\\limits_{"+v+"\\in"+s+"}"+e);:}
 ;
 
@@ -168,6 +168,6 @@ var_list ::= var:v {: RESULT = new String(v);:}
 			| var:v COMMA var_list:vl {: RESULT = new String(v+","+vl);:}
 ;
 
-set_list ::= expr:s {: RESULT = new String(s);:}
-			| expr:s COMMA set_list:sl {:RESULT = new String(s+","+sl);:}
+expr_list ::= expr:s {: RESULT = new String(s);:}
+			| expr:s COMMA expr_list:sl {:RESULT = new String(s+","+sl);:}
 ;

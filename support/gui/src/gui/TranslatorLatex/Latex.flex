@@ -69,6 +69,8 @@ Comment     = ";;"[^\n]*
 	"atleast"		{ return symbol(sym.ATLEAST); }
 	"atmost"		{ return symbol(sym.ATMOST); }
 	"let"			{ return symbol(sym.LET); }
+	"exists"		{ return symbol(sym.EXISTS); }
+	"forall"		{ return symbol(sym.FORALL); }
 
 	
 
