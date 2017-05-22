@@ -30,6 +30,8 @@ public class ErrorParser extends AbstractParser {
 					bufferErrors = linterSAT(new StringReader(code.getText(0, code.getLength())));
 				} else if (lang == "smt") {
 					bufferErrors = linterSMT(new StringReader(code.getText(0, code.getLength())));
+				} else if (lang == "qbf") {
+					//bufferErrors = linterQBF(new StringReader(code.getText(0, code.getLength())));
 				}
 				
 			} catch (Exception e) {
