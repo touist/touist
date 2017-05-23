@@ -101,8 +101,8 @@ let rec indent = function 0 -> "" | i -> (indent (i-1))^"\t"
 let print_debug (prefix:string) depth (formulas:ast list) : unit =
   let rec string_of_asts = function
     | [] -> ""
-    | cur::[] -> string_of_ast cur
-    | cur::next -> (string_of_ast cur)^", "^(string_of_asts next)
+    | cur::[] -> string_of_ast ~utf8:true cur
+    | cur::next -> (string_of_ast ~utf8:true cur)^", "^(string_of_asts next)
   in print_endline ((indent depth) ^ (string_of_int depth) ^ " " ^ prefix
                     ^ (string_of_asts formulas))
 
