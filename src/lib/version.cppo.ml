@@ -4,3 +4,4 @@ let version = VERSION
 let has_git_tag = HAS_GIT_TAG
 let git_tag = GIT_TAG
 let has_yices2 = HAS_YICES2
+let has_qbf = HAS_QBF

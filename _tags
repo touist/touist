@@ -5,7 +5,7 @@
 true: use_menhir
 
 # OASIS_START
-# DO NOT EDIT (digest: 6e115d0d5e123c60969028f4ce3d17fa)
+# DO NOT EDIT (digest: 4903f1de041bddf74a6ddfbeb79f6b91)
 # Ignore VCS directories, you can use the same kind of rule outside
 # OASIS_START/STOP if you want to exclude directories that contains
 # useless stuff for the build process
@@ -34,6 +34,9 @@ true: annot, bin_annot
 <src/lib/yices2/*.ml{,i,y}>: package(str)
 <src/lib/yices2/*.ml{,i,y}>: package(yices2)
 <src/lib/yices2/*.ml{,i,y}>: use_touist
+# Library touist_qbf
+"src/touist_qbf.cmxs": use_touist_qbf
+<src/*.ml{,i,y}>: package(qbf)
 # Executable touist
 <src/touist.{native,byte}>: package(fileutils)
 <src/touist.{native,byte}>: package(menhirLib)
