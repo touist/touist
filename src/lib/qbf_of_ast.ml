@@ -13,27 +13,36 @@ let add_suffix name =
     'quantified' is the list of previously quantified propositions. We need this
     to rename any overlapping quantor scope when transforming to prenex form. *)
 let rec to_prenex quant_prop_l ast : ast =
-  let to_prenex' = to_prenex quant_prop_l in
+  (* [to_prenex_rn] will recursively launch a prenex where all propositions that
+     have the same name as 'prop' will be renamed by adding a suffix
+     (x1,x2...). *)
+  let to_prenex_rn prop ast = match prop with
+    | Prop name -> to_prenex (name::quant_prop_l) ast
+    | e -> failwith ("[shouldnt happen] a quantor must be a proposition, not a '"^Pprint.string_of_ast_type e^"' in " ^ Pprint.string_of_ast e)
+  in
+  (* [to_prenex]  *)
+  let to_prenex ast = to_prenex quant_prop_l ast
+  in
   match ast with
-  | Forall (Prop x,f) -> Forall (to_prenex' (Prop x), to_prenex (x::quant_prop_l) f)
-  | Exists (Prop x,f) -> Exists (to_prenex' (Prop x), to_prenex (x::quant_prop_l) f)
-  | Not Forall (x,f) -> Forall (to_prenex' x,Not f) (* 1 *)
-  | And (f,Forall (x,g)) | And (Forall (x,g),f)  -> Forall (to_prenex' x,And (f,g)) (* 2,5 *)
-  | Or (f,Forall (x,g)) | Or (Forall (x,g),f)  -> Forall (to_prenex' x,And (f,g)) (* 3,6 *)
-  | Implies (Forall (x,f),g) -> Exists (to_prenex' x,Implies (f,g)) (* 4 *)
-  | Implies (f,Forall (x,g)) -> Forall (to_prenex' x,Implies (f,g)) (* 7 *)
-  | Not Exists (x,f) -> Forall (to_prenex' x,Not f) (* 8 *)
-  | And (f,Exists (x,g)) | And (Exists (x,g),f)  -> Exists (to_prenex' x,And (f,g)) (* 9,12 *)
-  | Or (f,Exists (x,g)) | Or (Exists (x,g),f)  -> Exists (to_prenex' x,Or (f,g)) (* 10,13 *)
-  | Implies (Exists (x,f),g) -> Forall (to_prenex' x,Implies (f,g)) (* 11 *)
-  | Implies (f,Exists (x,g)) -> Exists (to_prenex' x,Implies (f,g)) (* 14 *)
+  | Forall (x,f) -> Forall (to_prenex x, to_prenex f)
+  | Exists (x,f) -> Exists (to_prenex x, to_prenex f)
+  | Not Forall (x,f) -> Forall (to_prenex x,Not f) (* 1 *)
+  | And (f,Forall (x,g)) | And (Forall (x,g),f)  -> Forall (to_prenex x,And (to_prenex_rn x f,to_prenex g)) (* 2,5 *)
+  | Or (f,Forall (x,g)) | Or (Forall (x,g),f)  -> Forall (to_prenex x,And (to_prenex_rn x f,to_prenex g)) (* 3,6 *)
+  | Implies (Forall (x,f),g) -> Exists (to_prenex x,Implies (to_prenex f,to_prenex_rn x g)) (* 4 *)
+  | Implies (f,Forall (x,g)) -> Forall (to_prenex x,Implies (to_prenex_rn x f,to_prenex g)) (* 7 *)
+  | Not Exists (x,f) -> Forall (to_prenex x,Not f) (* 8 *)
+  | And (f,Exists (x,g)) | And (Exists (x,g),f)  -> Exists (to_prenex x,And (to_prenex_rn x f,to_prenex g)) (* 9,12 *)
+  | Or (f,Exists (x,g)) | Or (Exists (x,g),f)  -> Exists (to_prenex x,Or (to_prenex_rn x f,to_prenex g)) (* 10,13 *)
+  | Implies (Exists (x,f),g) -> Forall (to_prenex x,Implies (to_prenex f,to_prenex_rn x g)) (* 11 *)
+  | Implies (f,Exists (x,g)) -> Exists (to_prenex x,Implies (to_prenex_rn x f,to_prenex g)) (* 14 *)
   | Top -> Top
   | Bottom -> Bottom
-  | Not x -> Not (to_prenex' x)
-  | And (x,y) -> And (to_prenex' x, to_prenex' y)
-  | Or (x,y) -> Or (to_prenex' x, to_prenex' y)
+  | Not x -> Not (to_prenex x)
+  | And (x,y) -> And (to_prenex x, to_prenex y)
+  | Or (x,y) -> Or (to_prenex x, to_prenex y)
   | Xor (x,y) -> failwith "TODO: xor has not been implemented yet for use with qbf"
-  | Implies (x,y) -> Implies (to_prenex' x, to_prenex' y)
+  | Implies (x,y) -> Implies (to_prenex x, to_prenex y)
   | Equiv (x,y) -> failwith "TODO: xor has not been implemented yet for use with qbf"
   | Prop x -> if List.exists (fun y -> y=x) quant_prop_l then Prop (add_suffix x) else Prop x
   | e -> failwith ("[shouldnt happen] a qbf formula shouldn't contain '"^Pprint.string_of_ast_type e^"' in " ^ Pprint.string_of_ast e)
