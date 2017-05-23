@@ -258,9 +258,15 @@ let () =
     #endif
   end;
 
+  (* I had to comment these close_out and close_in because it would
+  raise 'bad descriptor file' for some reason. Because the program is always
+  going to shut at this point, we can rely on the operating system for closing
+  opened files.
+
   close_out !output;
   close_out !output_table;
   close_in !input;
+  *)
 
   exit_with OK
 
