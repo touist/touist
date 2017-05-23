@@ -117,7 +117,7 @@ let () =
     Printf.fprintf stderr "%s: you must give an input file.\nTo read from stdin, add - to the arguments. For more info, try --help.\n" cmd;
     exit_with ERROR
   );
-  if !use_stdin then (input := stdin) else (input := open_in !input_file_path);
+  if !use_stdin then input := stdin else (input := open_in !input_file_path);
 
   let count = List.fold_left (fun acc v -> if v then acc+1 else acc) 0
   in
@@ -153,9 +153,10 @@ let () =
   (* latex = parse and transform with latex_of_ast *)
   if !latex then
     (let ast,msgs =
-      if !mode = Sat
-      then Parse.parse_sat ~filename:!input_file_path (string_of_chan !input)
-      else Parse.parse_smt ~filename:!input_file_path (string_of_chan !input)
+      match !mode with
+      | Sat -> Parse.parse_sat ~filename:!input_file_path (string_of_chan !input)
+      | Smt -> Parse.parse_smt ~filename:!input_file_path (string_of_chan !input)
+      | Qbf -> Parse.parse_qbf ~filename:!input_file_path (string_of_chan !input)
     in (Printf.fprintf !output "%s\n" (Latex.latex_of_ast ast); show_msgs_and_exit !msgs OK));
 
   (* linter = only show syntax and semantic errors *)
