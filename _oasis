@@ -97,9 +97,9 @@ Library touist_yices2
 Library touist_qbf
   Build$:         flag(qbf)
   Install$:       flag(qbf) && flag(lib)
-  Path:           src
+  Path:           src/lib/qbf
   Modules:        Solveqbf
-  BuildDepends:   qbf (>= 0.1)
+  BuildDepends:   qbf (>= 0.1), qbf.quantor, touist
   FindlibParent:  touist
   FindlibName:    qbf
 
@@ -113,7 +113,7 @@ Executable touist
 # if flag(qbf)
 #   BuildDepends+:touist.qbf
 
-# (2) the whole logic for adding 'touist_yices' (respectively 'touist_qbf') in
+# (2) the whole magic for adding 'touist_yices' (respectively 'touist_qbf') in
 # 'BuildDepends:' when flag 'yices2' is enabled (using --enable-yices2) is
 # handled in a custom way at the end of myocamlbuild.ml. Inspiration comes from
 # the github project Drup/LILiS. When flag yices2 is enabled:
