@@ -2,11 +2,12 @@ open Parse
 
 type error = OK | ERROR
 let get_code (e : error) : int = match e with OK -> 0 | ERROR -> 1
-
-let sat_mode = ref false
-let qbf_mode = ref false
+type language = Sat | Smt | Qbf
+let sat_flag = ref false
+let qbf_flag = ref false
+let smt_flag = ref ""
+let mode = ref Sat
 let version_asked = ref false
-let smt_logic = ref ""
 let input_file_path = ref "/dev/stdin"
 let output_file_path = ref ""
 let output_table_file_path = ref ""
@@ -15,7 +16,7 @@ let use_stdin = ref false
 let output = ref stdout
 let output_table = ref stdout
 let input = ref stdin
-let solve_sat = ref false
+let solve_flag = ref false
 let limit = ref 1
 let only_count = ref false
 let show_hidden_lits = ref false
@@ -54,11 +55,11 @@ let () =
     ("--table", Arg.Set_string (output_table_file_path),
      "TABLE (--sat only) The output file that contains the literals table.
       By default, prints to stdout.");
-    ("--sat", Arg.Set sat_mode,
+    ("--sat", Arg.Set sat_flag,
         "Select the SAT solver (enabled by default when --smt or --qbf not selected)");
-    ("--qbf", Arg.Set qbf_mode,
+    ("--qbf", Arg.Set qbf_flag,
         "Select the QBF solver");
-    ("--smt", Arg.Set_string (smt_logic), (
+    ("--smt", Arg.Set_string (smt_flag), (
         "LOGIC Select the SMT solver with the specified LOGIC from the
         SMT2-LIB specification:
         QF_IDL allows to deal with boolean and integer, E.g, x - y < b
@@ -73,7 +74,7 @@ let () =
     syntax errors given by parser.messages");
     ("--debug-cnf", Arg.Set debug_cnf,"Print step by step CNF transformation");
     ("--show", Arg.Set show,"Show the expanded AST after evaluation (= expansion)");
-    ("--solve", Arg.Set solve_sat,"Solve the problem and print the first model if it exists");
+    ("--solve", Arg.Set solve_flag,"Solve the problem and print the first model if it exists");
     ("--limit", Arg.Set_int limit,"(with --solve) Instead of one model, return N models if they exist.
                                             With 0, return every possible model.");
     ("--count", Arg.Set only_count,"(with --solve) Instead of displaying models, return the number of models");
@@ -118,26 +119,30 @@ let () =
   );
   if !use_stdin then (input := stdin) else (input := open_in !input_file_path);
 
-  (* Check that --smt and --sat have not been both selected *)
-  if (!sat_mode && (!smt_logic <> "")) then begin
-    Printf.fprintf stderr "%s: cannot use both --sat and --smt solvers (try --help)\n" cmd;
-    exit_with ERROR end;
+  let count = List.fold_left (fun acc v -> if v then acc+1 else acc) 0
+  in
+  if (count [!sat_flag; !smt_flag<>""; !qbf_flag]) > 1 then
+    (Printf.fprintf stderr "%s: only one of --sat, --smt or --qbf must be given.\n" cmd; exit_with ERROR);
 
-  (* When neither --smt nor --sat has been given, we default to --sat mode *)
-  if (not !sat_mode) && (!smt_logic = "") then sat_mode := true;
+  (* Set the mode *)
+  if      !sat_flag     then mode := Sat
+  else if !smt_flag<>"" then mode := Smt
+  else if !qbf_flag     then mode := Qbf
+  else mode := Sat;
+
 
 #ifdef yices2
   (* SMT Mode: check if one of the available QF_? has been given after --smt *)
-  if (not !sat_mode) && not (Solvesmt.logic_supported !smt_logic) then
+  if (!mode = Smt) && not (Solvesmt.logic_supported !smt_flag) then
     (Printf.fprintf stderr
     "%s: you must give a correct SMT-LIB logic after --smt (try --help)\nExample: --smt QF_IDL\n" cmd;
     exit_with ERROR);
 #endif
 
-  if !output_file_path <> "" && (!sat_mode || (!smt_logic <> ""))
+  if !output_file_path <> ""
   then output := open_out !output_file_path;
 
-  if !output_table_file_path <> "" && !sat_mode
+  if !output_table_file_path <> "" && !mode = Sat
   then output_table := open_out !output_table_file_path;
 
   if !equiv_file_path <> ""
@@ -148,35 +153,35 @@ let () =
   (* latex = parse and transform with latex_of_ast *)
   if !latex then
     (let ast,msgs =
-      if !sat_mode
+      if !mode = Sat
       then Parse.parse_sat ~filename:!input_file_path (string_of_chan !input)
       else Parse.parse_smt ~filename:!input_file_path (string_of_chan !input)
     in (Printf.fprintf !output "%s\n" (Latex.latex_of_ast ast); show_msgs_and_exit !msgs OK));
 
   (* linter = only show syntax and semantic errors *)
   if !linter then
-    if (!sat_mode) then
+    if !mode = Sat then
       (let _,msgs = Parse.parse_sat ~debug:!debug_syntax ~filename:!input_file_path (string_of_chan !input) 
-        |> Eval.eval ~smt:(not !sat_mode) ~onlychecktypes:true in show_msgs_and_exit !msgs OK)
+        |> Eval.eval ~smt:(!mode = Smt) ~onlychecktypes:true in show_msgs_and_exit !msgs OK)
     else
       (let _,msgs = Parse.parse_smt ~debug:!debug_syntax ~filename:!input_file_path (string_of_chan !input) 
-        |> Eval.eval ~smt:(not !sat_mode) ~onlychecktypes:true in show_msgs_and_exit !msgs OK);
+        |> Eval.eval ~smt:(!mode = Smt) ~onlychecktypes:true in show_msgs_and_exit !msgs OK);
   if !show then
-    if (!sat_mode) then
+    if !mode = Sat then
       (let ast,msgs = Parse.parse_sat ~debug:!debug_syntax ~filename:!input_file_path (string_of_chan !input) 
-        |> Eval.eval ~smt:(not !sat_mode) in
+        |> Eval.eval ~smt:(!mode = Smt) in
         if !show then Printf.fprintf !output "%s\n" (Pprint.string_of_ast ast); 
         show_msgs_and_exit !msgs OK)
     else
       (let ast,msgs = Parse.parse_smt ~debug:!debug_syntax ~filename:!input_file_path (string_of_chan !input) 
-        |> Eval.eval ~smt:(not !sat_mode) in
+        |> Eval.eval ~smt:(!mode = Smt) in
         if !show then Printf.fprintf !output "%s\n" (Pprint.string_of_ast ast);
         show_msgs_and_exit !msgs OK);
 
   (* Step 3: translation *)
-  if (!sat_mode) then
+  if !mode = Sat then
     (* A. solve has been asked *)
-    if !solve_sat then
+    if !solve_flag then
       if !equiv_file_path <> "" then begin
         let solve input = 
           let ast,msgs = Parse.parse_sat ~debug:!debug_syntax ~filename:!input_file_path (string_of_chan input) |> Eval.eval
@@ -219,18 +224,18 @@ let () =
            file. Example:
               c 98 p(1,2,3)     -> c means 'comment' in any Sat file   *)
 
-  else if (!smt_logic <> "") && not !solve_sat then begin
+  else if !mode = Smt && not !solve_flag then begin
     let ast,msgs = Parse.parse_smt ~debug:!debug_syntax ~filename:!input_file_path (string_of_chan !input)
-        |> Eval.eval ~smt:(!smt_logic <> "") in
-    let smt = Smt.to_smt2 (String.uppercase !smt_logic) ast in
+        |> Eval.eval ~smt:(!mode = Smt) in
+    let smt = Smt.to_smt2 (String.uppercase !smt_flag) ast in
     Buffer.output_buffer !output smt;
     show_msgs_and_exit !msgs OK
   end
-  else if (!smt_logic <> "") && !solve_sat then begin
+  else if !mode = Smt && !solve_flag then begin
     #ifdef yices2
       let ast,msgs = Parse.parse_smt ~debug:!debug_syntax ~filename:!input_file_path (string_of_chan !input)
-          |> Eval.eval ~smt:(!smt_logic <> "") in
-      let str = Solvesmt.ast_to_yices ast |> Solvesmt.model (String.uppercase !smt_logic) in
+          |> Eval.eval ~smt:(!mode = Smt) in
+      let str = Solvesmt.ast_to_yices ast |> Solvesmt.model (String.uppercase !smt_flag) in
       if str = ""
       then (Printf.fprintf stderr "Unsat\n"; show_msgs_and_exit !msgs ERROR)
       else Printf.fprintf !output "%s\n" str;
@@ -241,9 +246,10 @@ let () =
       exit_with ERROR
     #endif
   end
-  else if !qbf_mode then begin
+  else if !qbf_flag then begin
     #ifdef qbf
-      print_endline "QBF"
+      let ast,msgs = Parse.parse_qbf ~debug:!debug_syntax (string_of_chan !input) in
+      Printf.fprintf !output "%s\n" (Pprint.string_of_ast ast)
     #else
       Printf.fprintf stderr
         ("This touist binary has not been compiled with qbf support.");
