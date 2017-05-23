@@ -81,10 +81,13 @@ endif
 %version.ml: %version.cppo.ml $(git_prerequisite)
 	@mkdir -p $(dir $@)
 	@[ $(HAS_YICES2) ] || (echo "Please set the HAS_YICES2 var, e.g., 'make $@ HAS_YICES2=true'" && exit 1)
+	@[ $(HAS_QBF) ] || (echo "Please set the HAS_QBF var, e.g., 'make $@ HAS_QBF=true'" && exit 1)
 	@[ $(VERSION) ] || (echo "Please set the VERSION var, e.g., 'make $@ VERSION=0.0.2'" && exit 1)
 	@HAS_GIT_TAG=$$(test -d .git && which git 2>&1 >/dev/null && echo true || echo false);\
 	[ "$$HAS_GIT_TAG" = true ] && GIT_TAG=$$(git describe --tags);\
-	cppo $< -o $@ -D "HAS_YICES2 $(HAS_YICES2)" -D "VERSION \"$(VERSION)\"" -D "GIT_TAG \"$$GIT_TAG\"" -D "HAS_GIT_TAG $$HAS_GIT_TAG";\
+	cppo $< -o $@ -D "HAS_YICES2 $(HAS_YICES2)" -D "HAS_QBF $(HAS_QBF)" \
+				  -D "VERSION \"$(VERSION)\"" \
+	              -D "GIT_TAG \"$$GIT_TAG\"" -D "HAS_GIT_TAG $$HAS_GIT_TAG" ;\
 	echo "Updated $@ to $(VERSION) (git: $$GIT_TAG)"
 # NOTE: when using the $V variable, I must escape
 # it with $$V. If I don't, 'make' will replace it

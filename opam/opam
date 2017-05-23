@@ -10,7 +10,8 @@ dev-repo: "https://github.com/touist/touist.git"
 bug-reports: "https://github.com/touist/touist/issues"
 build: [
   ["ocaml" "setup.ml" "-configure" "--prefix" prefix
-    "--%{yices2:enable}%-yices2"]
+    "--%{yices2:enable}%-yices2"
+    "--%{qbf:enable}%-qbf"]
   ["ocaml" "setup.ml" "-build"]
 ]
 install: ["ocaml" "setup.ml" "-install"]
@@ -19,7 +20,8 @@ remove: [
 ]
 build-test: [
   ["ocaml" "setup.ml" "-configure" "--enable-tests"
-    "--%{yices2:enable}%-yices2"]
+    "--%{yices2:enable}%-yices2"
+    "--%{qbf:enable}%-qbf"]
   ["ocaml" "setup.ml" "-build"]
   ["ocaml" "setup.ml" "-test"]
 ]
@@ -34,9 +36,11 @@ depends: [
   "ounit" {test}
 ]
 depopts: [
+  "qbf"
   "yices2"
 ]
 conflicts: [
+  "qbf" {< "0.1"}
   "yices2" {< "0.0.2"}
 ]
 available: [ ocaml-version >= "4.01.0" ]

@@ -4,6 +4,7 @@ type error = OK | ERROR
 let get_code (e : error) : int = match e with OK -> 0 | ERROR -> 1
 
 let sat_mode = ref false
+let qbf_mode = ref false
 let version_asked = ref false
 let smt_logic = ref ""
 let input_file_path = ref "/dev/stdin"
@@ -54,7 +55,9 @@ let () =
      "TABLE (--sat only) The output file that contains the literals table.
       By default, prints to stdout.");
     ("--sat", Arg.Set sat_mode,
-        "Select the SAT solver (enabled by default when --smt not selected)");
+        "Select the SAT solver (enabled by default when --smt or --qbf not selected)");
+    ("--qbf", Arg.Set qbf_mode,
+        "Select the QBF solver");
     ("--smt", Arg.Set_string (smt_logic), (
         "LOGIC Select the SMT solver with the specified LOGIC from the
         SMT2-LIB specification:
@@ -99,8 +102,9 @@ let () =
   if !version_asked then (
     print_endline ("Version: " ^ Version.version);
     if Version.has_git_tag then print_endline ("Git: "^Version.git_tag);
-    let built_list = ["minisat"] @ if Version.has_yices2 then ["yices2"] else [] in
-    print_endline ("Built with: " ^ List.fold_left (fun acc e -> match acc with "" -> e | _ -> acc^","^e) "" built_list);
+    let built_list = ["minisat"] @ (if Version.has_yices2 then ["yices2"] else [])
+                                 @ (if Version.has_qbf then ["qbf"] else []) in
+    print_endline ("Built with: " ^ List.fold_left (fun acc e -> match acc with "" -> e | _ -> acc^", "^e) "" built_list);
     exit_with OK
   );
 
@@ -231,17 +235,26 @@ let () =
       then (Printf.fprintf stderr "Unsat\n"; show_msgs_and_exit !msgs ERROR)
       else Printf.fprintf !output "%s\n" str;
       show_msgs_and_exit !msgs OK
-  #else
+    #else
       Printf.fprintf stderr
-        ("This touist binary has not been compiled with yices2 support, cannot solve with --smt. You can still solve with --sat.");
+        ("This touist binary has not been compiled with yices2 support.");
       exit_with ERROR
-  #endif
+    #endif
+  end
+  else if !qbf_mode then begin
+    #ifdef qbf
+      print_endline "QBF"
+    #else
+      Printf.fprintf stderr
+        ("This touist binary has not been compiled with qbf support.");
+      exit_with ERROR
+    #endif
   end;
 
   close_out !output;
   close_out !output_table;
   close_in !input;
-  
+
   exit_with OK
 
   with
