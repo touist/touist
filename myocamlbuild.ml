@@ -1,5 +1,5 @@
 (* OASIS_START *)
-(* DO NOT EDIT (digest: 57c1e469a68751cfe5d3ec191b5f2b98) *)
+(* DO NOT EDIT (digest: 4c7b48d96daf0f68e2cef6df249da19a) *)
 module OASISGettext = struct
 (* # 22 "src/oasis/OASISGettext.ml" *)
 
@@ -882,7 +882,8 @@ let package_default =
      MyOCamlbuildBase.lib_ocaml =
        [
           ("touist", ["src/lib"], []);
-          ("touist_yices2", ["src/lib/yices2"], [])
+          ("touist_yices2", ["src/lib/yices2"], []);
+          ("touist_qbf", ["src"], [])
        ];
      lib_c = [];
      flags = [];
@@ -899,7 +900,7 @@ let conf = {MyOCamlbuildFindlib.no_automatic_syntax = false}
 
 let dispatch_default = MyOCamlbuildBase.dispatch_default conf package_default;;
 
-# 903 "myocamlbuild.ml"
+# 904 "myocamlbuild.ml"
 (* OASIS_STOP *)
 
 (* [add_include_mapping_to] returns an new package_default with updated
@@ -960,6 +961,7 @@ let () =
   Ocamlbuild_plugin.dispatch (fun hook ->
     let package_default = package_default
       |> flag_cond "yices2" "src/lib/yices2"
+      |> flag_cond "qbf" "src/lib/qbf"
     in
     MyOCamlbuildBase.dispatch_default conf package_default hook;
     Ocamlbuild_cppo.dispatcher hook;
