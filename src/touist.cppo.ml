@@ -207,9 +207,9 @@ let () =
         in
         match Sat.ModelSet.cardinal !models with
         | i when !only_count -> Printf.fprintf !output "%d\n" i; show_msgs_and_exit !msgs OK
-        | 0 -> Printf.fprintf stderr "Unsat\n"; show_msgs_and_exit !msgs ERROR
+        | 0 -> Printf.fprintf stderr "unsat\n"; show_msgs_and_exit !msgs ERROR
         | i -> (* case where we already printed models in [solve_clause] *)
-          Printf.fprintf !output "==== Found %d models, limit is %d (--limit N for more models)\n" i !limit; show_msgs_and_exit !msgs OK
+          Printf.fprintf !output "==== found %d models, limit is %d (--limit N for more models)\n" i !limit; show_msgs_and_exit !msgs OK
     else
       (* B. solve not asked: print the Sat file *)
       let ast,msgs = Parse.parse_sat ~debug:!debug_syntax ~filename:!input_file_path (string_of_chan !input) |> Eval.eval in
