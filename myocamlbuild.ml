@@ -1,5 +1,5 @@
 (* OASIS_START *)
-(* DO NOT EDIT (digest: 4c7b48d96daf0f68e2cef6df249da19a) *)
+(* DO NOT EDIT (digest: 03f504f68aaddd37343d2df26bda1ece) *)
 module OASISGettext = struct
 (* # 22 "src/oasis/OASISGettext.ml" *)
 
@@ -883,7 +883,7 @@ let package_default =
        [
           ("touist", ["src/lib"], []);
           ("touist_yices2", ["src/lib/yices2"], []);
-          ("touist_qbf", ["src"], [])
+          ("touist_qbf", ["src/lib/qbf"], [])
        ];
      lib_c = [];
      flags = [];
@@ -891,6 +891,7 @@ let package_default =
        [
           ("test", ["src/lib"]);
           ("src/lib/yices2", ["src/lib"]);
+          ("src/lib/qbf", ["src/lib"]);
           ("src", ["src/lib"])
        ]
   }
@@ -900,7 +901,7 @@ let conf = {MyOCamlbuildFindlib.no_automatic_syntax = false}
 
 let dispatch_default = MyOCamlbuildBase.dispatch_default conf package_default;;
 
-# 904 "myocamlbuild.ml"
+# 905 "myocamlbuild.ml"
 (* OASIS_STOP *)
 
 (* [add_include_mapping_to] returns an new package_default with updated
@@ -944,12 +945,15 @@ let flag_enabled flag =
       - link any binary against 'touist_yices2' and 'yices2'
       - add the includes 'src/lib/yices2' for places where executables are:
         src and test. *)
-let flag_cond flag include_path package_default =
+let flag_cond (flag:string) (include_path:string) ?(pkgs=[flag]) package_default =
+  let cartesian l l' = List.concat (List.map (fun e -> List.map (fun e' -> (e,e')) l') l) in
+  let bin = ["src/touist.native";"src/touist.byte";"test/test.native";"test/test.byte"] in
   if flag_enabled flag then begin
     (* Add the tags for the '-D yices2' and linking tags *)
-    tag_file ("src/touist.ml") [ "use_touist_"^flag ; "package("^flag^")"; "cppo_D("^flag^")" ];
-    ["src/touist.native";"src/touist.byte";"test/test.native";"test/test.byte"]
-      |> List.iter (fun bin -> tag_file bin ["use_touist_"^flag; "package("^flag^")"]);
+    tag_file "src/touist.ml" [ "use_touist_"^flag ; "cppo_D("^flag^")" ];
+    pkgs |> List.iter (fun pkg -> tag_file "src/touist.ml" ["package("^pkg^")"]);
+    bin |> List.iter (fun bin -> tag_file bin ["use_touist_"^flag]);
+    cartesian bin pkgs |> List.iter (fun (bin,pkg) -> tag_file bin ["package("^pkg^")"]);
     (* Add the needed includes to package_default *)
     package_default
       |> add_include "src" include_path
@@ -960,8 +964,8 @@ let flag_cond flag include_path package_default =
 let () =
   Ocamlbuild_plugin.dispatch (fun hook ->
     let package_default = package_default
-      |> flag_cond "yices2" "src/lib/yices2"
-      |> flag_cond "qbf" "src/lib/qbf"
+      |> flag_cond "yices2" "src/lib/yices2" ~pkgs:["yices2"]
+      |> flag_cond "qbf" "src/lib/qbf" ~pkgs:["qbf";"qbf.quantor"]
     in
     MyOCamlbuildBase.dispatch_default conf package_default hook;
     Ocamlbuild_cppo.dispatcher hook;
