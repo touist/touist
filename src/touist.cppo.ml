@@ -160,24 +160,27 @@ let () =
     in (Printf.fprintf !output "%s\n" (Latex.latex_of_ast ast); show_msgs_and_exit !msgs OK));
 
   (* linter = only show syntax and semantic errors *)
-  if !linter then
-    if !mode = Sat then
-      (let _,msgs = Parse.parse_sat ~debug:!debug_syntax ~filename:!input_file_path (string_of_chan !input) 
-        |> Eval.eval ~smt:(!mode = Smt) ~onlychecktypes:true in show_msgs_and_exit !msgs OK)
-    else
-      (let _,msgs = Parse.parse_smt ~debug:!debug_syntax ~filename:!input_file_path (string_of_chan !input) 
-        |> Eval.eval ~smt:(!mode = Smt) ~onlychecktypes:true in show_msgs_and_exit !msgs OK);
-  if !show then
-    if !mode = Sat then
-      (let ast,msgs = Parse.parse_sat ~debug:!debug_syntax ~filename:!input_file_path (string_of_chan !input) 
-        |> Eval.eval ~smt:(!mode = Smt) in
-        if !show then Printf.fprintf !output "%s\n" (Pprint.string_of_ast ast); 
-        show_msgs_and_exit !msgs OK)
-    else
-      (let ast,msgs = Parse.parse_smt ~debug:!debug_syntax ~filename:!input_file_path (string_of_chan !input) 
-        |> Eval.eval ~smt:(!mode = Smt) in
-        if !show then Printf.fprintf !output "%s\n" (Pprint.string_of_ast ast);
-        show_msgs_and_exit !msgs OK);
+  if !linter then begin
+    let _,msgs = match !mode with
+    | Sat -> Parse.parse_sat ~debug:!debug_syntax ~filename:!input_file_path (string_of_chan !input)
+      |> Eval.eval ~smt:(!mode = Smt) ~onlychecktypes:true
+    | Smt -> Parse.parse_smt ~debug:!debug_syntax ~filename:!input_file_path (string_of_chan !input)
+      |> Eval.eval ~smt:(!mode = Smt) ~onlychecktypes:true
+    | Qbf -> Parse.parse_qbf ~debug:!debug_syntax ~filename:!input_file_path (string_of_chan !input)
+      |> Eval.eval ~smt:(!mode = Smt) ~onlychecktypes:true
+    in show_msgs_and_exit !msgs OK
+  end;
+  if !show then begin
+    let ast,msgs = match !mode with
+    | Sat -> Parse.parse_sat ~debug:!debug_syntax ~filename:!input_file_path (string_of_chan !input)
+        |> Eval.eval ~smt:(!mode = Smt)
+    | Smt -> Parse.parse_smt ~debug:!debug_syntax ~filename:!input_file_path (string_of_chan !input)
+        |> Eval.eval ~smt:(!mode = Smt)
+    | Qbf -> Parse.parse_qbf ~debug:!debug_syntax ~filename:!input_file_path (string_of_chan !input)
+        |> Eval.eval ~smt:(!mode = Smt)
+    in (Printf.fprintf !output "%s\n" (Pprint.string_of_ast ~utf8:true ast);
+       show_msgs_and_exit !msgs OK)
+    end;
 
   (* Step 3: translation *)
   if !mode = Sat then
@@ -252,10 +255,18 @@ let () =
       let ast,msgs = Parse.parse_qbf ~debug:!debug_syntax (string_of_chan !input)
                   |> Eval.eval ~smt:(!mode = Smt) in
       let prenex = Qbf_of_ast.prenex ast in
-      Printf.fprintf !output "formul: %s\n" (Pprint.string_of_ast ~utf8:true ast);
-      Printf.fprintf !output "prenex: %s\n" (Pprint.string_of_ast ~utf8:true prenex);
       let formula,table = Solveqbf.ocamlqbf_of_ast prenex in
-      Solveqbf.solve (formula,table)
+      let qcnf = Qbf.QFormula.cnf formula in
+      if !debug_cnf then begin
+        Printf.fprintf stderr "formula: %s\n" (Pprint.string_of_ast ~utf8:true ast);
+        Printf.fprintf stderr " prenex: %s\n" (Pprint.string_of_ast ~utf8:true prenex);
+        Printf.fprintf stderr "    cnf: cannot print it for now\n"
+      end;
+      match Solveqbf.solve (qcnf,table) with
+      | true -> ()
+      | false ->
+        (Printf.fprintf stderr ("unsat\n");
+        exit_with ERROR)
     #else
       Printf.fprintf stderr
         ("This touist binary has not been compiled with qbf support.");
@@ -277,3 +288,4 @@ let () =
 
   with
     | Msgs.Fatal msgs -> (show_msgs_and_exit msgs ERROR)
+    | x -> raise x
