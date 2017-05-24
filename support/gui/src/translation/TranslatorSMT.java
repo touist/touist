@@ -89,9 +89,7 @@ public class TranslatorSMT {
 		final int OK = 0, ERROR = 1;
 
 		// Check if translatorProgramFilePath is there
-		// This trick is because of linux that sets "user.dir" = $HOME instead of $CWD
-		File touist = new File(ClassLoader.getSystemClassLoader().getResource(".").getPath());
-		String pathtouist = touist.getAbsolutePath() + File.separator + "external" + File.separator + "touist";
+		String pathtouist = touist.TouIST.getTouistDir() + File.separator + "external" + File.separator + "touist";
 	
 		List<String> cmd = new ArrayList<String>();
 		
