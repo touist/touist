@@ -12,6 +12,7 @@ bash opam32/install.sh
 opam init -y -a mingw https://github.com/fdopen/opam-repository-mingw.git --comp 4.03.0+mingw32c --switch 4.03.0+mingw32c
 eval `opam config env`
 opam install -y fileutils menhir minisat cppo zarith depext-cygwinports
+opam pin add -y qbf https://github.com/maelvalais/ocaml-qbf.git
 
 if ! ocamlfind query yices2; then
     # We want a static libgmp.a. The mingw64-i686-gmp version only contains a
@@ -38,7 +39,7 @@ cd $TOUIST_BUILD_DIR
 # So I abandoned. More info in the issue:
 # https://forge.ocamlcore.org/tracker/?func=detail&group_id=54&aid=758&atid=291
 ocamlfind remove touist
-./configure --bindir support/gui/external --enable-tests --enable-yices2
+./configure --bindir support/gui/external --enable-tests --enable-yices2 --enable-qbf
 make
 make install # Only install binary 'touist' as long as --enable-lib is not given
 
