@@ -1,7 +1,31 @@
 open Parse
 
-type error = OK | ERROR
-let get_code (e : error) : int = match e with OK -> 0 | ERROR -> 1
+type error =
+  | OK
+  | UNKNOWN
+  | CMD_USAGE
+  | CMD_UNSUPPORTED
+  | TOUIST_UNKNOWN
+  | TOUIST_TIMEOUT
+  | TOUIST_SYNTAX
+  | SOLVER_UNKNOWN
+  | SOLVER_UNSAT
+  | SOLVER_TIMEOUT
+  | SOLVER_MEMORY
+
+let get_code (e : error) : int = match e with
+  | OK               -> 0
+  | UNKNOWN          -> 1
+  | CMD_USAGE        -> 2
+  | CMD_UNSUPPORTED  -> 3
+  | TOUIST_UNKNOWN   -> 7
+  | TOUIST_TIMEOUT   -> 5
+  | TOUIST_SYNTAX    -> 4
+  | SOLVER_UNKNOWN   -> 6
+  | SOLVER_UNSAT     -> 7
+  | SOLVER_TIMEOUT   -> 8
+  | SOLVER_MEMORY    -> 9
+
 type language = Sat | Smt | Qbf
 let sat_flag = ref false
 let qbf_flag = ref false
@@ -115,14 +139,14 @@ let () =
   if (!input_file_path = "/dev/stdin") && not !use_stdin (* NOTE: !var is like *var in C *)
   then (
     Printf.fprintf stderr "%s: you must give an input file.\nTo read from stdin, add - to the arguments. For more info, try --help.\n" cmd;
-    exit_with ERROR
+    exit_with CMD_USAGE
   );
   if !use_stdin then input := stdin else (input := open_in !input_file_path);
 
   let count = List.fold_left (fun acc v -> if v then acc+1 else acc) 0
   in
   if (count [!sat_flag; !smt_flag<>""; !qbf_flag]) > 1 then
-    (Printf.fprintf stderr "%s: only one of --sat, --smt or --qbf must be given.\n" cmd; exit_with ERROR);
+    (Printf.fprintf stderr "%s: only one of --sat, --smt or --qbf must be given.\n" cmd; exit_with CMD_USAGE);
 
   (* Set the mode *)
   if      !sat_flag     then mode := Sat
@@ -136,7 +160,7 @@ let () =
   if (!mode = Smt) && not (Solvesmt.logic_supported !smt_flag) then
     (Printf.fprintf stderr
     "%s: you must give a correct SMT-LIB logic after --smt (try --help)\nExample: --smt QF_IDL\n" cmd;
-    exit_with ERROR);
+    exit_with CMD_USAGE);
 #endif
 
   if !output_file_path <> ""
@@ -187,7 +211,7 @@ let () =
     (* A. solve has been asked *)
     if !solve_flag then
       if !equiv_file_path <> "" then begin
-        let solve input = 
+        let solve input =
           let ast,msgs = Parse.parse_sat ~debug:!debug_syntax ~filename:!input_file_path (string_of_chan input) |> Eval.eval
           in let models = Cnf.ast_to_cnf ~debug:!debug_cnf ast |> Sat.cnf_to_clauses |> Sat.solve_clauses
           in models,msgs
@@ -196,7 +220,7 @@ let () =
         and models2,msgs2 = solve !input_equiv
         in match Sat.ModelSet.equal !models !models2 with
         | true -> Printf.fprintf !output "Equivalent\n"; show_msgs_and_exit !msgs OK
-        | false -> Printf.fprintf !output "Not equivalent\n"; show_msgs_and_exit !msgs ERROR
+        | false -> Printf.fprintf !output "Not equivalent\n"; show_msgs_and_exit !msgs SOLVER_UNSAT
       end
       else
         let ast,msgs = Parse.parse_sat ~debug:!debug_syntax ~filename:!input_file_path (string_of_chan !input) |> Eval.eval in
@@ -204,13 +228,13 @@ let () =
         in
         let models =
           (if !only_count then Sat.solve_clauses (clauses,table)
-           else 
+           else
              let print_model model i = Printf.fprintf !output "==== model %d\n%s\n" i (Sat.Model.pprint ~sep:"\n" table model)
               in Sat.solve_clauses ~limit:!limit ~print:print_model (clauses,table))
         in
         match Sat.ModelSet.cardinal !models with
         | i when !only_count -> Printf.fprintf !output "%d\n" i; show_msgs_and_exit !msgs OK
-        | 0 -> Printf.fprintf stderr "unsat\n"; show_msgs_and_exit !msgs ERROR
+        | 0 -> Printf.fprintf stderr "unsat\n"; show_msgs_and_exit !msgs SOLVER_UNSAT
         | i -> (* case where we already printed models in [solve_clause] *)
           Printf.fprintf !output "==== found %d models, limit is %d (--limit N for more models)\n" i !limit; show_msgs_and_exit !msgs OK
     else
@@ -218,7 +242,7 @@ let () =
       let ast,msgs = Parse.parse_sat ~debug:!debug_syntax ~filename:!input_file_path (string_of_chan !input) |> Eval.eval in
       let clauses,tbl = Cnf.ast_to_cnf ~debug:!debug_cnf ast |> Sat.cnf_to_clauses
       in
-      (* tbl contains the literal-to-name correspondance table. 
+      (* tbl contains the literal-to-name correspondance table.
          The number of literals is (Hashtbl.length tbl) *)
       Sat.print_clauses_to_dimacs !output (Hashtbl.length tbl) clauses;
       Sat.print_table !output_table ~prefix:(if !output = !output_table then "c " else "") tbl;
@@ -241,13 +265,13 @@ let () =
           |> Eval.eval ~smt:(!mode = Smt) in
       let str = Solvesmt.ast_to_yices ast |> Solvesmt.model (String.uppercase !smt_flag) in
       if str = ""
-      then (Printf.fprintf stderr "Unsat\n"; show_msgs_and_exit !msgs ERROR)
+      then (Printf.fprintf stderr "unsat\n"; show_msgs_and_exit !msgs SOLVER_UNSAT)
       else Printf.fprintf !output "%s\n" str;
       show_msgs_and_exit !msgs OK
     #else
       Printf.fprintf stderr
         ("This touist binary has not been compiled with yices2 support.");
-      exit_with ERROR
+      exit_with CMD_UNSUPPORTED
     #endif
   end
   else if !qbf_flag then begin
@@ -266,11 +290,11 @@ let () =
       | true -> ()
       | false ->
         (Printf.fprintf stderr ("unsat\n");
-        exit_with ERROR)
+        exit_with SOLVER_UNSAT)
     #else
       Printf.fprintf stderr
         ("This touist binary has not been compiled with qbf support.");
-      exit_with ERROR
+      exit_with CMD_UNSUPPORTED
     #endif
   end;
 
@@ -287,5 +311,5 @@ let () =
   exit_with OK
 
   with
-    | Msgs.Fatal msgs -> (show_msgs_and_exit msgs ERROR)
+    | Msgs.Fatal msgs -> (show_msgs_and_exit msgs TOUIST_SYNTAX)
     | x -> raise x
