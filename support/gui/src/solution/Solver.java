@@ -23,6 +23,7 @@
 
 package solution;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 
 import entity.Model;
@@ -38,6 +39,9 @@ import entity.Model;
  */
 public abstract class Solver {
 
+	public Solver(BufferedReader reader) {
+		super();
+	}
 	public Solver() {
 		super();
 	}
@@ -49,7 +53,7 @@ public abstract class Solver {
 	 * @return the iterable Models instance.
 	 * @throws IOException
 	 */
-	public abstract void launch() throws IOException;
+	public abstract void launch() throws IOException,InterruptedException;
 
 	/**
 	 * Close the solver program process.
