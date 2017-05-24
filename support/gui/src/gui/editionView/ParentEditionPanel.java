@@ -642,11 +642,19 @@ public class ParentEditionPanel extends AbstractComponentPanel {
                 
                 ListIterator<Model> iter = getFrame().getSolver().getModelList().iterator();
                 if(!iter.hasNext()) {
-                    System.out.println("This problem is unsatisfiable");
-                    errorMessage = "There is no solution";
-                    showErrorMessage(errorMessage, "Solver error");
+                	if(s.getReturnCode() == SolverQBF.SOLVER_UNSAT) {
+	                    System.out.println("This problem is unsatisfiable");
+	                    errorMessage = "There is no solution";
+	                    showErrorMessage(errorMessage, "Solver error");
+                	} else if(s.getReturnCode() != SolverQBF.OK) {
+                		errorMessage = "";
+                		for (TranslationError error : s.getErrors())
+                			errorMessage += error + "\n";
+                		setJLabelErrorMessageText(errorMessage);
+                		System.err.println("touist error: "+errorMessage);
+                	}
                     return State.EDITION;
-                }    
+                }
                 getFrame().updateResultsPanelIterator(iter);
                 /**
                  * Si il y a plus d'un model, alors passer à l'état FIRST_RESULT
@@ -676,7 +684,9 @@ public class ParentEditionPanel extends AbstractComponentPanel {
                 return State.EDITION;
             } catch (SolverExecutionException e) {
             	errorMessage = "The solver returned an error: \n"+e.getMessage();
-            	showErrorMessage(e, errorMessage, getFrame().getLang().getWord(Lang.ERROR_TRADUCTION));
+            	for (TranslationError error : ((SolverQBF)getFrame().getSolver()).getErrors())
+                	errorMessage += error + "\n";
+                setJLabelErrorMessageText(errorMessage);
             	return State.EDITION;
 			}
         }
