@@ -836,6 +836,24 @@ The flags can be given in any order. You can use the standard input
 (`stdin`) instead of using an input file by setting the `-` argument.
 With no `-o` flag, touist will output to the standard output (`stdout`).
 
+### Return codes
+
+|------|-------------------|
+| Code | Label             |
+|:----:|-------------------|
+| 0    | `OK             ` |
+| 1    | `UNKNOWN        ` |
+| 2    | `CMD_USAGE`       |
+| 3    | `CMD_UNSUPPORTED` |
+| 7    | `TOUIST_UNKNOWN ` |
+| 5    | `TOUIST_TIMEOUT ` |
+| 4    | `TOUIST_SYNTAX`   |
+| 6    | `SOLVER_UNKNOWN`  |
+| 7    | `SOLVER_UNSAT`    |
+| 8    | `SOLVER_TIMEOUT`  |
+| 9    | `SOLVER_MEMORY`   |
+|------|-------------------|
+
 ### Usage for propositional logic (SAT mode)
 
 The language accepted for propositional logic is described in
