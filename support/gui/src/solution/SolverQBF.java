@@ -61,6 +61,7 @@ public class SolverQBF extends Solver {
 	private BufferedReader stderr;
 	private BufferedReader stdout;
 	private List<String> options = new ArrayList<>();
+	public List<TranslationError> errors = new ArrayList<TranslationError>();
 
 	private Map<Integer, String> literalsMap; // "table de correspondance"
 
@@ -154,6 +155,18 @@ public class SolverQBF extends Solver {
 		System.out.println("close(): solver has been closed correctly");
 	}
 
+	public final static int OK               = 0;
+	public final static int UNKNOWN          = 1;
+	public final static int CMD_USAGE        = 2;
+	public final static int CMD_UNSUPPORTED  = 3;
+	public final static int TOUIST_UNKNOWN   = 7;
+	public final static int TOUIST_TIMEOUT   = 5;
+	public final static int TOUIST_SYNTAX    = 4;
+	public final static int SOLVER_UNKNOWN   = 6;
+	public final static int SOLVER_UNSAT     = 7;
+	public final static int SOLVER_TIMEOUT   = 8;
+	public final static int SOLVER_MEMORY    = 9;
+	
 	@Override
 	protected Model nextModel() throws IOException, SolverExecutionException {
 		final int WAIT_FOR_MODEL_TIMEOUT = 5000000; // ms
@@ -181,11 +194,20 @@ public class SolverQBF extends Solver {
 		}
 		// Case 2 : no text but solver still running
 		if(!stdout.ready() && System.currentTimeMillis() >= timeout) { // Nothing has been read
-			throw new SolverExecutionException("nextModel(): exception: "
-					+ "the solver didn't give any output (timeout = "
+			throw new SolverExecutionException("nextModel(): timeout = "
 					+Integer.toString(WAIT_FOR_MODEL_TIMEOUT)+"ms)");
 		}
-		return modelParsed;
+		
+		if(p.exitValue() == SOLVER_UNSAT)
+			return modelParsed;
+		else if(p.exitValue() != OK) {
+			String linesStdErr = "";
+			while (stderr.ready())
+				linesStdErr += stderr.readLine() + "\n";
+			errors = TranslationError.parse(linesStdErr);
+			throw new SolverExecutionException("nextModel(): touist returned error code "+Integer.toString(p.exitValue())+"\n"+linesStdErr);
+		} else
+			return modelParsed;
 	}
 
 	@Override
@@ -220,11 +242,11 @@ public class SolverQBF extends Solver {
 		return literalsMap;
 	}
 
-	public List<TranslationError> getErrors() throws IOException {
-		String linesStdErr = "";
-		while (stderr.ready()) {
-			linesStdErr += stderr.readLine() + "\n";
-		}
-		return TranslationError.parse(linesStdErr);
+	public int getReturnCode() {
+		return p.exitValue();
+	}
+	
+	public List<TranslationError> getErrors() {
+		return errors;
 	}
 }
