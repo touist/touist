@@ -80,8 +80,7 @@ public class SolverTestSAT4J extends Solver {
 	 * @warning ONLY FOR TESTS PURPOSE
 	 * @param dimacsFilePath
 	 */
-	public SolverTestSAT4J(String dimacsFilePath) {
-		this.dimacsFilePath = dimacsFilePath;
+	public SolverTestSAT4J() {
 		this.literalsMap = null;
 		this.p = null;
 		this.stdin = null;
