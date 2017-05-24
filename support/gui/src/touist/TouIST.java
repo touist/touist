@@ -23,8 +23,12 @@
 
 package touist;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
@@ -60,6 +64,26 @@ public class TouIST {
 		System.out.println("main(): running app from folder '"+ System.getProperty("user.dir")+"'");
 		MainFrame frame = new MainFrame();
 		frame.setVisible(true);
+	}
+	/**
+	 * We use this for getting the actual place where touist.jar is located in.
+	 * We do not use getProperty("user.dir") because on linux, it returns (when
+	 * opening by clicking on touist.jar) the $HOME instead of the actual place where
+	 * touist.jar is.
+	 * @return
+	 */
+	public static String getTouistDir() {
+		URL url = ClassLoader.getSystemClassLoader().getResource(".");
+		URI uri = null;
+		// URISyntaxException should ne ever be thrown because we expect getResource(".")
+		// to give a correct URL
+		try {
+			uri = new URI(url.toString());
+		} catch (URISyntaxException e) {
+			System.err.println("Something went wrong when trying to get where touist.jar is located:\n" + e.getMessage());
+		}
+		File path = new File(uri);
+		return path.getAbsolutePath();
 	}
 }
 
