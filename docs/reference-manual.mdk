@@ -654,6 +654,25 @@ the SMT2-LIB-compliant file.
 Describe the SMT language
 ~
 
+## QBF formulas
+
+Using the `--qbf` flag (in touist) or the QBF selector (in the graphical interface),
+you can solve QBF problems with existential and universal quantifiers over boolean
+values. This logic is basically the same as the SAT grammar, except for two new
+operators:
+``` Grammar
+    | "exists" <comma-list(<prop>|<var>)> ":" <formula-qbf> 
+    | "forall" <comma-list(<prop>|<var>)> ":" <formula-qbf>
+```
+
+One quantifier can quantify over multiple propositions. For example:
+``` Touist
+forall e,d: (exists a,b: a => b) => (e and forall c: e => c) 
+```
+~ Math
+\forall e. \forall d. (\exists a. \exists b. a \Rightarrow b) \Rightarrow (e \wedge \forall c. e \Rightarrow c)
+~
+
 ## Formal grammar
 
 This section presents the grammar formatted in a BNF-like way. Some rules (a
@@ -803,6 +822,15 @@ TERM      = [_0-9]*[a-zA-Z][a-zA-Z_0-9]*
     | <num-operations_standard(<expr-smt>)>
     | <equality(<expr-smt>)>
     | <in_parenthesis(<expr-smt>)>
+
+<formula-qbf> ::=
+    | "Top"
+    | "Bot"
+    | <prop>
+    | <var>
+    | <formula(<formula-qbf>)>
+    | "exists" <comma-list(<prop>|<var>)> ":" <formula-qbf> 
+    | "forall" <comma-list(<prop>|<var>)> ":" <formula-qbf>
 ```
 
 # Command-line tool (`touist`)
@@ -865,6 +893,9 @@ code to the [DIMACS][dimacs] format and then output the mapping table
 (that maps each proposition to an integer > 0) in DIMACS comments.
 You can redirect this mapping table using the `--table <filename>` flag. 
 [dimacs]: <http://www.satcompetition.org/2009/format-benchmarks2009.html>
+
+### Usage for quantified boolean logic (QBF mode)
+
 
 #### Options:
 
