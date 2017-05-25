@@ -119,7 +119,8 @@ public class TranslatorSAT {
 		cmd.add(outputTableFilePath);
 		cmd.add("-o");
 		cmd.add(outputFilePath);
-		cmd.add("--detailed-position");
+		cmd.add("--error-format");
+		cmd.add("%l:%c:%b:%B: %t: %m");
 		cmd.addAll(options);
 		
         System.out.println("translate(): cmd executed: "+cmd.toString());
