@@ -896,8 +896,28 @@ generated during the CNF expansion by the [Tseitin][tseitlin] transformation.
 also shortens then evaluation step by bypassing the expansive ``bigand``,
 ``exact``, ``powerset``... constructs.
 
-**`--detailed-position`**. Adds the absolute character position in error
-and warning messages with for format `line:col:abs_first:abs_last: message`.
+**`--error-format`**. Allows to format the errors as you wish. This
+argument can be useful for plugging touist to another program that needs
+to read the errors. The placeholders you can use are:
+
+|:----:|:----------------------------------|
+| `%f` | file name                         |
+| `%l` | line number (start)               |
+| `%L` | line number (end)                 |
+| `%c` | column number (start)             |
+| `%C` | column number (end)               |
+| `%b` | buffer offset (start)             |
+| `%B` | buffer offset (end)               |
+| `%t` | error type (_warning_ or _error_) |
+| `%m` | error message                     |
+| `\n` | new line                          |
+|------|-----------------------------------|
+By default, the errors and warnings will display with the formatting `%l:%c: %t: %m`.
+An ending newline (`\n`) is automatically added.
+
+**`--wrap-width N`**. Lets you choose the width of the messages (errors,
+warnings) given by touist. By default, touist will wrap all messages with a 78
+characters limit. With N set to 0, you can disable the wrapping.
 
 **`--debug-syntax`**. This is a development option that adds to the error
 and warning messages the state number of the LL(1) automaton. Each state
