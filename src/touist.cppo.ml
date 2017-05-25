@@ -21,11 +21,12 @@ let show_hidden_lits = ref false
 let equiv_file_path = ref ""
 let input_equiv = ref stdin
 let linter = ref false (* for displaying syntax errors (during parse and eval) *)
-let error_format = ref "%f: line %l, col %c-%C: %t: %m\n" (* display absolute position of error *)
+let error_format = ref "%f: line %l, col %c-%C: %t: %m" (* display absolute position of error *)
 let debug_syntax = ref false
 let debug_cnf = ref false
 let latex = ref false
 let show = ref false
+let wrap_width = ref 78
 
 (* [process_arg_alone] is the function called by the command-line argument
    parser when it finds an argument with no preceeding -flag (-f, -x...).
@@ -36,9 +37,12 @@ let exit_with (exit_code:error) = exit (get_code exit_code)
 
 (* In case we have had non-fatal messages (= warnings) during any of the touist commands,
    display them before exiting. *)
-let show_msgs_and_exit msgs (exit_code:error) = 
-  Msgs.print_msgs ~color:(Unix.isatty Unix.stderr) ~fmt:!error_format msgs;
-  exit (get_code exit_code)
+let show_msgs_and_exit msgs (exit_code:error) =
+  let _ = begin
+    Printf.fprintf stderr "%s\n" (Msgs.string_of_msgs ~width:!wrap_width
+      ~color:(Unix.isatty Unix.stderr) ~fmt:!error_format msgs);
+    exit (get_code exit_code)
+  end in ()
 
 (* The main program *)
 let () =
@@ -75,6 +79,7 @@ let () =
     ("--equiv", Arg.Set_string equiv_file_path,"INPUT2 (with --solve) Check that INPUT2 has the same models as INPUT (equivalency)");
     ("--linter", Arg.Set linter,"Display syntax and semantic errors and exit");
     ("--error-format", Arg.Set_string error_format,"Customize the formatting of error messages");
+    ("--wrap-width", Arg.Set_int wrap_width,"Wrapping width for error messages [default: 78]");
   ]
   in
   let usage =
