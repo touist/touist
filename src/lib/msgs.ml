@@ -1,9 +1,9 @@
-(** This is where the compiler errors are managed. 
+(** This is where the compiler errors are managed.
 
     We call a 'message' an error or a warning.
     Two cases for displaying the errors:
     - either one of the parse/eval/smt/sat function will raise the Fatal exception.
-      In this case, after the exception is catched, you can run [print_msgs]. 
+      In this case, after the exception is catched, you can run [print_msgs].
     - or no fatal error has been encoundered; if you want to display the errors,
       you can run [print_msgs]. *)
 
@@ -77,28 +77,45 @@ let replace (placeholder : char -> string) text =
 let string_of_loc ?(fmt="%l:%c") (loc:loc) : string =
   replace (loc_placeholders loc) fmt
 
+(** Wraps the text at width. Indendation is kept as long no new line is read.
+    If width = 0, do not wrap. *)
+let format_width width text =
+  let rec format prev_indent text =
+    let indent = try Str.search_forward (Str.regexp "[^ ]") text 0 with Not_found -> 0 in
+    let wrap_pos =
+      let newline =
+        try Str.search_forward (Str.regexp "\n") text 0
+        with Not_found -> String.length text in
+      if newline > width then width else newline
+    in
+    let rec spaces = function 0 -> "" | x -> " "^ spaces (x-1) in
+    (*Printf.printf "%s\n-> newline=%d,indent=%d,prev_indent=%d,len=%d\n\n" text wrap_pos indent prev_indent (String.length text);*)
+    match wrap_pos with
+    | wrap when wrap = String.length text -> spaces prev_indent ^ text
+    | wrap when String.get text wrap = '\n' -> (* wrap at a \n symbol *)
+      spaces prev_indent ^ Str.string_before text (wrap+1) ^ format 0 (Str.string_after text (wrap+1))
+    | wrap -> (* wrap at any point because width is too large *)
+      let last_space = try Str.search_backward (Str.regexp "[ :,.]") text wrap with Not_found -> wrap in
+        spaces prev_indent
+        ^ Str.string_before text (if (String.get text last_space)=' ' then last_space else last_space+1)
+        ^ "\n" ^ format (indent+prev_indent) (Str.string_after text (last_space+1))
+  in if width != 0 then format 0 text else text;;
+
+let rm_trailing_whitespace text = Str.global_replace (Str.regexp "[\n ]*$") "" text
+
 (* NOTE: all msg should be finished by a trailing newline (\n) *)
-let rec string_of_msgs ?(color=false) ?(fmt="%l:%c: %t: %m\n") (messages:t) =
+let rec string_of_msgs ?(width=78) ?(color=false) ?(fmt="%l:%c: %t: %m") (messages:t) =
   fold
     (fun (typ,_,msg,loc) acc ->
-      (replace (all_placeholders loc typ color msg) fmt) ^ acc)
+      let msg = rm_trailing_whitespace msg in
+      (replace (all_placeholders loc typ color msg) fmt |> format_width width) ^ acc)
     messages ""
 
-(** [print_msgs] will display the messages that have been produced by parse, eval, sat,
-    cnf or smt.
-    @param detailed enables the 'detailed location' mode (adds the absolute positions)  *)
-let rec print_msgs ?(color=false) ?(fmt="%l:%c: %t: %m\n") (msgs:t) =
-  Printf.fprintf stderr "%s" (string_of_msgs ~color:color ~fmt:fmt msgs)
-
-  (** [string_of_loc] will print the position of the error; the two positions
-    correspond to where the error starts and where it ends.
-    Example of call with dummy positions:
-        string_of_loc (Lexing.dummy_pos,Lexing.dummy_pos)
-    When you have only one Lexing.pos available, repeat it twice:
-        string_of_loc (pos,pos)
-    Optional 'detailed' will give two extra numbers which are the absolute
-    positions in terms of characters from the beginning of the file:
-        string_of_loc ~detailed:true loc
-    'loc' is the location (with start and end) of a faulty piece of code we
-    want to write an error about. 
+(** Rules for good error or warning messages:
+    - use \n only when the line break is mandatory for understanding.
+      The text will be wrapped automatically.
+    - use indentations for pieces of code you want to show: the indentation
+      will be kept when wrapping as long as no \n is encountered.
+    - you must not end your message with a new line (the \n character).
+      This new line will be automatically removed anyway.
 *)

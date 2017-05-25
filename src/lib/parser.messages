@@ -8,7 +8,9 @@
 #
 # How to write the error messages
 # ===============================
-# We can use the tokens $0, $1, $2... that will be replaced by the i-th last
+# Do not use new lines for wrapping; use it only for semantic purposes.
+#
+# You can use the tokens $0, $1, $2... that will be replaced by the i-th last
 # token that has been read. $0 will typically show the token that has been read
 # right before an error occurred.
 # Example:
@@ -283,8 +285,7 @@ touist_simple: VARTUPLE UNION VAR COMMA VAR WHEN
 ## UNION expr COMMA expr 
 ##
 
-Ill-formed $4. Either finish it with ')' or continue the expression
-beginning with:
+Ill-formed $4. Either finish it with ')' or continue the expression beginning with:
     $1
 Instead, the following statement were read:
     $0
@@ -344,8 +345,7 @@ touist_simple: EXACT VAR COMMA XOR
 ## EXACT expr COMMA 
 ##
 
-Ill-formed $3. An expression is expected after $1.
-Instead, the following statement were read:
+Ill-formed $3. An expression is expected after $1. Instead, the following statement were read:
     $0
 
 touist_simple: VARTUPLE DIFF VAR COMMA XOR 
@@ -385,8 +385,7 @@ touist_simple: VARTUPLE UNION VAR COMMA XOR
 ## UNION expr COMMA 
 ##
 
-Ill-formed $3. An expression is expected after $1.
-Instead, the following statement were read:
+Ill-formed $3. An expression is expected after $1. Instead, the following statement were read:
     $0
 
 touist_smt: ATLEAST XOR 
@@ -444,8 +443,7 @@ touist_simple: EXACT XOR
 ## EXACT 
 ##
 
-Ill-formed $3. At this point, an integer expression is expected.
-Instead, the following statement were read:
+Ill-formed $3. At this point, an integer expression is expected. Instead, the following statement were read:
     $0
 
 touist_smt: IF XOR 
@@ -485,8 +483,7 @@ touist_simple: BIGOR VAR IN VAR WHEN XOR
 ## WHEN 
 ##
 
-Ill-formed $3. At this point, a boolean expression is expected.
-Instead, the following statement were read:
+Ill-formed $3. At this point, a boolean expression is expected. Instead, the following statement were read:
     $0
 
 touist_simple: VARTUPLE CARD XOR 
@@ -553,8 +550,7 @@ touist_simple: VARTUPLE UNION XOR
 ## UNION 
 ##
 
-Ill-formed $3. A set expression is expected at this point.
-Instead, the following statement were read:
+Ill-formed $3. A set expression is expected at this point. Instead, the following statement were read:
     $0
 
 touist_simple: VARTUPLE LBRACK XOR 
@@ -571,7 +567,7 @@ touist_simple: VARTUPLE LBRACK XOR
 
 Ill-formed set definition. At this point is expected one of the following:
 - a comma-separated of floats, integers or proposition expressions;
-- a float or integer expression followed by '..'
+- a float or integer expression followed by '..'.
 Instead, the following statement were read:
     $0
 
@@ -621,8 +617,7 @@ touist_simple: VARTUPLE SUB XOR
 ## SUB 
 ##
 
-Ill-formed $1. At this point is expected an int or float expression.
-Instead, the following statement were read:
+Ill-formed $1. At this point is expected an int or float expression. Instead, the following statement were read:
     $0
 
 touist_simple: VARTUPLE LPAREN VAR WHEN 
@@ -652,9 +647,7 @@ touist_simple: VARTUPLE LPAREN VAR WHEN
 ## LPAREN expr 
 ##
 
-Ill-formed $1. At this point, either finish the expression with ')'
-or continue it with an operator (>,<,!=,==,and,or...)
-Instead, the following statement were read:
+Ill-formed $1. At this point, either finish the expression with ')' or continue it with an operator (>,<,!=,==,and,or...). Instead, the following statement were read:
     $0
 
 touist_smt: SUB LPAREN VAR XOR 
@@ -677,9 +670,7 @@ touist_smt: SUB LPAREN VAR XOR
 ## LPAREN expr_smt 
 ##
 
-Ill-formed $1. At this point, either finish the SMT expression with ')'
-or continue it with an operator (>,<,>=,<=,!=,==,+,-,/,*)
-Instead, the following statement were read:
+Ill-formed $1. At this point, either finish the SMT expression with ')' or continue it with an operator (>,<,>=,<=,!=,==,+,-,/,*). Instead, the following statement were read:
     $0
 
 touist_simple: VARTUPLE LPAREN XOR 
@@ -692,8 +683,7 @@ touist_simple: VARTUPLE LPAREN XOR
 ## LPAREN 
 ##
 
-Ill-formed $1. At this point is expected an expression.
-Instead, the following statement were read:
+Ill-formed $1. At this point is expected an expression. Instead, the following statement were read:
     $0
 
 touist_smt: SUB LPAREN XOR 
@@ -706,8 +696,7 @@ touist_smt: SUB LPAREN XOR
 ## LPAREN 
 ##
 
-Ill-formed $1. At this point is expected an SMT expression.
-Instead, the following statement were read:
+Ill-formed $1. At this point is expected an SMT expression. Instead, the following statement were read:
     $0
 
 touist_simple: VARTUPLE NOT XOR 
@@ -720,8 +709,7 @@ touist_simple: VARTUPLE NOT XOR
 ## NOT 
 ##
 
-Ill-formed $1. At this point is expected a boolean expression.
-Instead, the following statement were read:
+Ill-formed $1. At this point is expected a boolean expression. Instead, the following statement were read:
     $0
 
 touist_smt: BIGAND XOR 
@@ -761,9 +749,7 @@ touist_simple: BIGOR XOR
 ## BIGOR 
 ##
 
-Ill-formed $1. At this point is expected a comma-separated
-list of variables, i.e., '$i,$j'
-Instead, the following statement were read:
+Ill-formed $1. At this point is expected a comma-separated list of variables, i.e., '$i,$j'. Instead, the following statement were read:
     $0
 
 touist_smt: LET XOR 
@@ -785,9 +771,7 @@ touist_simple: LET XOR
 ## LET 
 ##
 
-Ill-formed local variable declaration.
-At this point, a variable is expected.
-Instead, the following statement were read:
+Ill-formed local variable declaration. At this point, a variable is expected. Instead, the following statement were read:
     $0
 
 touist_smt: LPAREN XOR 
@@ -828,8 +812,7 @@ touist_simple: NOT XOR
 ## NOT 
 ##
 
-Ill-formed $1. At this point, a formula is expected.
-Instead, the following statement were read:
+Ill-formed $1. At this point, a formula is expected. Instead, the following statement were read:
     $0
 
 touist_simple: VARTUPLE XOR 
@@ -842,9 +825,7 @@ touist_simple: VARTUPLE XOR
 ## VARTUPLE 
 ##
 
-Ill-formed variable-tuple. At this point, a comma-separated list
-of expressions (which we call 'indices' of the variable-tuple).
-Instead, the following statement were read:
+Ill-formed variable-tuple. At this point, a comma-separated list of expressions (which we call 'indices' of the variable-tuple). Instead, the following statement were read:
     $0
 
 touist_simple: VAR WHEN 
@@ -868,10 +849,7 @@ touist_smt: VAR WHEN
 ## var 
 ##
 
-Either the variable $1 was meant to be part of a formula, in which case
-the formula must end (I don't know exactly why when I wrote this error);
-Or you wanted to affect $1, in which case '=' is expected.
-Instead, the following statement were read:
+Either the variable $1 was meant to be part of a formula, in which case the formula must end (I don't know exactly why when I wrote this error). Or you wanted to affect $1, in which case '=' is expected. Instead, the following statement were read:
     $0
 
 touist_simple: VAR AFFECT XOR 
@@ -893,8 +871,7 @@ touist_smt: VAR AFFECT XOR
 ## var AFFECT 
 ##
 
-Ill-formed global variable affectation. At this point, an expression is expected.
-Instead, the following statement were read:
+Ill-formed global variable affectation. At this point, an expression is expected. Instead, the following statement were read:
     $0
 
 touist_simple: VAR AFFECT VAR WHEN 
@@ -950,8 +927,7 @@ touist_smt: VAR AFFECT VAR WHEN
 ## var AFFECT expr 
 ##
 
-Ill-formed global variable affectation. At this point, either continue the
-expression with an operator (+,-,>=,!=,==,and,or...) or begin a new formula.
+Ill-formed global variable affectation. At this point, either continue the expression with an operator (+,-,>=,!=,==,and,or...) or begin a new formula.
 
 touist_simple: TUPLE XOR 
 ##
@@ -963,10 +939,7 @@ touist_simple: TUPLE XOR
 ## TUPLE 
 ##
 
-Ill-formed term-tuple. At this point, a comma-separated list
-of expressions (which we call 'indices' of the variable-tuple)
-is expected.
-Instead, the following statement were read:
+Ill-formed term-tuple. At this point, a comma-separated list of expressions (which we call 'indices' of the variable-tuple) is expected. Instead, the following statement were read:
     $0
 
 touist_smt: BIGAND VAR IN VAR COLON TOP TUPLE 
@@ -1038,9 +1011,7 @@ touist_simple: BIGOR VAR IN VAR COLON TOP WHEN
 ## BIGOR comma_list(var) IN comma_list(expr) option(when_cond) COLON formula_simple 
 ##
 
-Ill-formed $7. At this point, either finish by 'end' the formula
-or continue the formula with one of and,or,xor,=>,<=>.
-Instead, the following statement were read:
+Ill-formed $7. At this point, either finish by 'end' the formula or continue the formula with one of and,or,xor,=>,<=>. Instead, the following statement were read:
     $0
 
 touist_smt: BIGAND VAR IN VAR COLON XOR 
@@ -1080,8 +1051,7 @@ touist_simple: BIGOR VAR IN VAR COLON XOR
 ## BIGOR comma_list(var) IN comma_list(expr) option(when_cond) COLON 
 ##
 
-Ill-formed $6. After $1, a formula is expected.
-Instead, the following statement were read:
+Ill-formed $6. After $1, a formula is expected. Instead, the following statement were read:
     $0
 
 touist_smt: BIGAND VAR IN VAR VARTUPLE 
@@ -1145,9 +1115,7 @@ touist_simple: BIGOR VAR IN VAR VARTUPLE
 ## In state 86, spurious reduction of production comma_list(expr) -> expr 
 ##
 
-Ill-formed $4. At this point, either continue the set expression list with ','
-or finish it with 'when' or ':'.
-Instead, the following statement were read:
+Ill-formed $4. At this point, either continue the set expression list with ',' or finish it with 'when' or ':'. Instead, the following statement were read:
     $0
 
 touist_smt: BIGAND VAR IN XOR 
@@ -1187,9 +1155,7 @@ touist_simple: BIGOR VAR IN XOR
 ## BIGOR comma_list(var) IN 
 ##
 
-Ill-formed $3 operator. After $1, a comma-separated list of set expressions
-is expected.
-Instead, the following statement were read:
+Ill-formed $3 operator. After $1, a comma-separated list of set expressions is expected. Instead, the following statement were read:
     $0
 
 touist_smt: BIGAND VAR XOR 
@@ -1253,9 +1219,7 @@ touist_simple: BIGOR VAR XOR
 ## In state 135, spurious reduction of production comma_list(var) -> var 
 ##
 
-Ill-formed $2. At this point, either continue the list or variables with ','
-or finish it with 'in'.
-Instead, the following statement were read:
+Ill-formed $2. At this point, either continue the list or variables with ',' or finish it with 'in'. Instead, the following statement were read:
     $0
 
 touist_smt: IF VAR THEN TOP ELSE TOP TUPLE 
@@ -1293,9 +1257,7 @@ touist_simple: IF VAR THEN TOP ELSE TOP WHEN
 ## IF expr THEN formula_simple ELSE formula_simple 
 ##
 
-Ill-formed 'if' statement. At this point, either finish the formula with 'end'
-or continue it with one of and,or,xor,=>,<=>.
-Instead, the following statement were read:
+Ill-formed 'if' statement. At this point, either finish the formula with 'end' or continue it with one of and,or,xor,=>,<=>. Instead, the following statement were read:
     $0
 
 touist_smt: IF VAR THEN TOP ELSE XOR 
@@ -1317,8 +1279,7 @@ touist_simple: IF VAR THEN TOP ELSE XOR
 ## IF expr THEN formula_simple ELSE 
 ##
 
-Ill-formed 'if' statement. After $1, a formula is expected.
-Instead, the following statement were read:
+Ill-formed 'if' statement. After $1, a formula is expected. Instead, the following statement were read:
     $0
 
 touist_smt: IF VAR THEN TOP TUPLE 
@@ -1356,9 +1317,7 @@ touist_simple: IF VAR THEN TOP WHEN
 ## IF expr THEN formula_simple 
 ##
 
-Ill-formed 'if' statement. At this point, either finish the formula
-with 'else' or continue it with one of and,or,xor,=>,<=>.
-Instead, the following statement were read:
+Ill-formed 'if' statement. At this point, either finish the formula with 'else' or continue it with one of and,or,xor,=>,<=>. Instead, the following statement were read:
     $0
 
 touist_simple: VARTUPLE IF VAR THEN VAR ELSE VAR WHEN 
@@ -1388,9 +1347,7 @@ touist_simple: VARTUPLE IF VAR THEN VAR ELSE VAR WHEN
 ## IF expr THEN expr ELSE expr 
 ##
 
-Ill-formed 'if' statement. At this point, either finish the expression
-with 'end' or continue it with an operator (<,>,!=,==,and,or...).
-Instead, the following statement were read:
+Ill-formed 'if' statement. At this point, either finish the expression with 'end' or continue it with an operator (<,>,!=,==,and,or...). Instead, the following statement were read:
     $0
 
 touist_simple: VARTUPLE IF VAR THEN VAR ELSE XOR 
@@ -1403,8 +1360,7 @@ touist_simple: VARTUPLE IF VAR THEN VAR ELSE XOR
 ## IF expr THEN expr ELSE 
 ##
 
-Ill-formed 'if' statement. At this point, an expression is expected.
-Instead, the following statement were read:
+Ill-formed 'if' statement. At this point, an expression is expected. Instead, the following statement were read:
     $0
 
 touist_simple: VARTUPLE IF VAR THEN VAR WHEN 
@@ -1434,9 +1390,7 @@ touist_simple: VARTUPLE IF VAR THEN VAR WHEN
 ## IF expr THEN expr 
 ##
 
-Ill-formed 'if' statement. At this point, either finish the expression
-with 'else' or continue it with an operator (<,>,!=,==,and,or...).
-Instead, the following statement were read:
+Ill-formed 'if' statement. At this point, either finish the expression with 'else' or continue it with an operator (<,>,!=,==,and,or...). Instead, the following statement were read:
     $0
 
 touist_smt: IF VAR THEN XOR 
@@ -1458,9 +1412,7 @@ touist_simple: IF VAR THEN XOR
 ## IF expr THEN 
 ##
 
-Ill-formed 'if' statement. At this point, either finish the formula
-with 'else' or continue it with one of and,or,xor,=>,<=>.
-Instead, the following statement were read:
+Ill-formed 'if' statement. At this point, either finish the formula with 'else' or continue it with one of and,or,xor,=>,<=>. Instead, the following statement were read:
     $0
 
 touist_simple: VARTUPLE IF VAR THEN XOR 
@@ -1473,8 +1425,7 @@ touist_simple: VARTUPLE IF VAR THEN XOR
 ## IF expr THEN 
 ##
 
-Ill-formed 'if' statement. At this point, an expression is expected.
-Instead, the following statement were read:
+Ill-formed 'if' statement. At this point, an expression is expected. Instead, the following statement were read:
     $0
 
 touist_simple: VARTUPLE IF VAR WHEN 
@@ -1530,9 +1481,7 @@ touist_simple: IF VAR WHEN
 ## IF expr 
 ##
 
-Ill-formed 'if' statement. At this point, either finish the expression
-with 'then' or continue it with an operator (<,>,!=,==,and,or...).
-Instead, the following statement were read:
+Ill-formed 'if' statement. At this point, either finish the expression with 'then' or continue it with an operator (<,>,!=,==,and,or...). Instead, the following statement were read:
     $0
 
 touist_smt: LET VAR AFFECT VAR COLON LPAREN BOTTOM RPAREN WHEN 
@@ -1555,9 +1504,7 @@ touist_smt: LET VAR AFFECT VAR COLON LPAREN BOTTOM RPAREN WHEN
 ## expr_smt 
 ##
 
-At this point, either finish the formula with a new formula
-or continue it with one of and,or,xor,=>,<=>.
-Instead, the following statement were read:
+At this point, either finish the formula with a new formula or continue it with one of and,or,xor,=>,<=>. Instead, the following statement were read:
     $0
 
 touist_smt: LET VAR AFFECT VAR COLON XOR 
@@ -1570,8 +1517,7 @@ touist_smt: LET VAR AFFECT VAR COLON XOR
 ## LET var AFFECT expr COLON 
 ##
 
-Ill-formed local variable declaration. After $1, a formula is expected.
-Instead, the following statement were read:
+Ill-formed local variable declaration. After $1, a formula is expected. Instead, the following statement were read:
     $0
 
 touist_smt: LET VAR AFFECT VAR WHEN 
@@ -1601,9 +1547,7 @@ touist_smt: LET VAR AFFECT VAR WHEN
 ## LET var AFFECT expr 
 ##
 
-Ill-formed local variable declaration. At this point, either finish
-the expression with ':' or continue it with an operator (>,<,!=,==,and,or...).
-Instead, the following statement were read:
+Ill-formed local variable declaration. At this point, either finish the expression with ':' or continue it with an operator (>,<,!=,==,and,or...). Instead, the following statement were read:
     $0
 
 touist_smt: LET VAR AFFECT XOR 
@@ -1616,9 +1560,7 @@ touist_smt: LET VAR AFFECT XOR
 ## LET var AFFECT 
 ##
 
-Ill-formed local variable declaration. At this point,
-an expression is expected.
-Instead, the following statement were read:
+Ill-formed local variable declaration. At this point, an expression is expected. Instead, the following statement were read:
     $0
 
 touist_smt: LET VAR XOR 
@@ -1631,8 +1573,7 @@ touist_smt: LET VAR XOR
 ## LET var 
 ##
 
-Ill-formed local variable declaration. At this point, '=' is expected.
-Instead, the following statement were read:
+Ill-formed local variable declaration. At this point, '=' is expected. Instead, the following statement were read:
     $0
 
 touist_smt: LPAREN TOP TUPLE 
@@ -1656,9 +1597,7 @@ touist_smt: LPAREN TOP TUPLE
 ## LPAREN expr_smt 
 ##
 
-Ill-formed formula. At this point, finish the formula with ')' or
-continue it with and,or,xor,=>,<=>.
-Instead, the following statement were read:
+Ill-formed formula. At this point, finish the formula with ')' or continue it with and,or,xor,=>,<=>. Instead, the following statement were read:
     $0
 
 touist_smt: TOP AND XOR 
@@ -1707,8 +1646,7 @@ touist_smt: TOP XOR XOR
 ## formula_smt XOR 
 ##
 
-Ill-formed $1. At this point, a formula is expected.
-Instead, the following statement were read:
+Ill-formed $1. At this point, a formula is expected. Instead, the following statement were read:
     $0
 
 touist_smt: VAR OR LPAREN NOT BOTTOM RPAREN WHEN 
@@ -1768,9 +1706,7 @@ touist_smt: VAR EQUIV LPAREN NOT BOTTOM RPAREN WHEN
 ## formula_smt EQUIV formula_smt 
 ##
 
-Ill-formed $2. At this point, a continuation of the formula
-is expected with and,or,=>,...
-Instead, the following statement were read:
+Ill-formed $2. At this point, a continuation of the formula is expected with and,or,=>,... Instead, the following statement were read:
     $0
 
 touist_smt: SUB XOR 
@@ -1819,8 +1755,7 @@ touist_smt: VAR SUB XOR
 ## expr_smt SUB 
 ##
 
-Ill-formed $1. At this point, an expression is expected.
-Instead, the following statement were read:
+Ill-formed $1. At this point, an expression is expected. Instead, the following statement were read:
     $0
 
 touist_smt: VAR SUB VAR WHEN 
@@ -1862,9 +1797,7 @@ touist_smt: VAR ADD VAR WHEN
 ## expr_smt ADD expr_smt 
 ##
 
-Ill-formed SMT expression. At this point, either begin a new expression
-or continue the existing one with an operator (+,-,*,/)
-Instead, the following statement were read:
+Ill-formed SMT expression. At this point, either begin a new expression or continue the existing one with an operator (+,-,*,/). Instead, the following statement were read:
     $0
 
 touist_smt: VAR NOTEQUAL VAR WHEN 
@@ -2001,9 +1934,7 @@ touist_smt: SUB VAR WHEN
 ## SUB expr_smt 
 ##
 
-Ill-formed SMT formula. At this point, either begin a new formula
-or continue the existing one with an operator (and,or,xor,=>,<=>,!=,==,>,<)
-Instead, the following statement were read:
+Ill-formed SMT formula. At this point, either begin a new formula or continue the existing one with an operator (and,or,xor,=>,<=>,!=,==,>,<). Instead, the following statement were read:
     $0
 
 touist_smt: VAR NOTEQUAL XOR 
@@ -2061,8 +1992,7 @@ touist_smt: VAR LT XOR
 ## expr_smt LT 
 ##
 
-Ill-formed $1. At this point, a SMT expression is expected.
-Instead, the following statement were read:
+Ill-formed $1. At this point, a SMT expression is expected. Instead, the following statement were read:
     $0
 
 touist_smt: XOR 
@@ -2096,8 +2026,7 @@ touist_simple: BIGOR VAR COMMA XOR
 ## var COMMA 
 ##
 
-Ill-formed list of variables. At this point, a variable is expected.
-Instead, the following statement were read:
+Ill-formed list of variables. At this point, a variable is expected. Instead, the following statement were read:
     $0
 
 touist_simple: LET VAR AFFECT VAR COLON TOP WHEN 
@@ -2129,10 +2058,7 @@ touist_smt: LET VAR AFFECT VAR COLON LPAREN NOT BOTTOM RPAREN WHEN
 ## LET var AFFECT expr COLON formula_smt 
 ##
 
-Ill-formed local variable block. At this point, either
-finish the formula by starting a new one or continue it
-with and,or,xor,=>,<=>.
-Instead, the following statement were read:
+Ill-formed local variable block. At this point, either finish the formula by starting a new one or continue it with and,or,xor,=>,<=>. Instead, the following statement were read:
     $0
 
 touist_simple: LET VAR AFFECT VAR COLON XOR 
@@ -2145,9 +2071,7 @@ touist_simple: LET VAR AFFECT VAR COLON XOR
 ## LET var AFFECT expr COLON 
 ##
 
-Ill-formed local variable block. At this point, a formula
-is expected.
-Instead, the following statement were read:
+Ill-formed local variable block. At this point, a formula is expected. Instead, the following statement were read:
     $0
 
 touist_simple: LET VAR AFFECT VAR WHEN 
@@ -2177,10 +2101,7 @@ touist_simple: LET VAR AFFECT VAR WHEN
 ## LET var AFFECT expr 
 ##
 
-Ill-formed local variable block. At this point, either
-finish the expression by starting a new one or continue it
-with a operator (and,or,xor,=>,<=>,!=,==,>,<,+,-,...).
-Instead, the following statement were read:
+Ill-formed local variable block. At this point, either finish the expression by starting a new one or continue it with a operator (and,or,xor,=>,<=>,!=,==,>,<,+,-,...). Instead, the following statement were read:
     $0
 
 touist_simple: LET VAR AFFECT XOR 
@@ -2193,9 +2114,7 @@ touist_simple: LET VAR AFFECT XOR
 ## LET var AFFECT 
 ##
 
-Ill-formed local variable block. At this point, an expression
-is expected.
-Instead, the following statement were read:
+Ill-formed local variable block. At this point, an expression is expected. Instead, the following statement were read:
     $0
 
 touist_simple: LET VAR XOR 
@@ -2208,8 +2127,7 @@ touist_simple: LET VAR XOR
 ## LET var 
 ##
 
-Ill-formed local variable block. At this point, '=' is expected.
-Instead, the following statement were read:
+Ill-formed local variable block. At this point, '=' is expected. Instead, the following statement were read:
     $0
 
 touist_simple: LPAREN TOP WHEN 
@@ -2248,9 +2166,7 @@ touist_smt: LPAREN NOT BOTTOM VARTUPLE
 ## In state 290, spurious reduction of production formula_smt -> NOT formula_smt 
 ##
 
-Ill-formed formula. At this point, either finish it with ')'
-or continue it with and,or,xor,=>,<=>.
-Instead, the following statement were read:
+Ill-formed formula. At this point, either finish it with ')' or continue it with and,or,xor,=>,<=>. Instead, the following statement were read:
     $0
 
 touist_simple: TOP AND TOP WHEN 
@@ -2310,9 +2226,7 @@ touist_simple: TOP OR TOP WHEN
 ## formula_simple OR formula_simple 
 ##
 
-Ill-formed $2. At this point, a continuation of the formula
-is expected, using either and,or,xor,=>,<=>.
-Instead, the following statement were read:
+Ill-formed $2. At this point, a continuation of the formula is expected, using either and,or,xor,=>,<=>. Instead, the following statement were read:
     $0
 
 touist_simple: TOP AND XOR 
@@ -2361,8 +2275,7 @@ touist_simple: TOP XOR XOR
 ## formula_simple XOR 
 ##
 
-Ill-formed $2. At this point, a formula is expected.
-Instead, the following statement were read:
+Ill-formed $2. At this point, a formula is expected. Instead, the following statement were read:
     $0
 
 touist_simple: TOP WHEN 
@@ -2457,10 +2370,7 @@ touist_simple: VARTUPLE LBRACK VAR RANGE VAR WHEN
 ## LBRACK expr RANGE expr 
 ##
 
-Ill-formed range-based set declaration. At this point,
-either finish the expression with ']' or continue it
-with an operator (<,>,!=,==,and,or...).
-Instead, the following statement were read:
+Ill-formed range-based set declaration. At this point, either finish the expression with ']' or continue it with an operator (<,>,!=,==,and,or...). Instead, the following statement were read:
     $0
 
 touist_simple: VARTUPLE LBRACK VAR RANGE XOR 
@@ -2473,9 +2383,7 @@ touist_simple: VARTUPLE LBRACK VAR RANGE XOR
 ## LBRACK expr RANGE 
 ##
 
-Ill-formed range-based set declaration. At this point,
-an expression is expected (int or float).
-Instead, the following statement were read:
+Ill-formed range-based set declaration. At this point, an expression is expected (int or float). Instead, the following statement were read:
     $0
 
 touist_simple: VARTUPLE LBRACK VAR WHEN 
@@ -2494,9 +2402,7 @@ touist_simple: VARTUPLE LBRACK VAR WHEN
 ## In state 81, spurious reduction of production comma_list(expr) -> expr 
 ##
 
-Ill-formed set declaration. At this point, either
-continue the list of expressions or finish it with ']'.
-Instead, the following statement were read:
+Ill-formed set declaration. At this point, either continue the list of expressions or finish it with ']'. Instead, the following statement were read:
     $0
 
 touist_simple: VARTUPLE TOFLOAT VAR WHEN 
@@ -2786,11 +2692,7 @@ touist_simple: EXACT VAR WHEN
 ## EXACT expr 
 ##
 
-Ill-formed $2. At this point, either finish the integer expression
-using ',' or continue it using an operator.
-
-
-
+Ill-formed $2. At this point, either finish the integer expression using ',' or continue it using an operator.
 
 touist_simple: VARTUPLE DIFF VAR WHEN 
 ##
@@ -2871,9 +2773,7 @@ touist_simple: VARTUPLE SUBSET VAR WHEN
 ## SUBSET expr 
 ##
 
-Ill-formed $2. At this point, either finish the set expression with ','
-or continue it using an operator (and,or,>,<,!=,==...).
-Instead, the following statement were read:
+Ill-formed $2. At this point, either finish the set expression with ',' or continue it using an operator (and,or,>,<,!=,==...). Instead, the following statement were read:
     $0
 
 touist_simple: VARTUPLE EMPTY VAR WHEN 
@@ -2955,9 +2855,7 @@ touist_simple: VARTUPLE CARD VAR WHEN
 ## CARD expr 
 ##
 
-Ill-formed $2. At this point, either finish the set expression with ')'
-or continue it using an operator (and,or,>,<,!=,==...).
-Instead, the following statement were read:
+Ill-formed $2. At this point, either finish the set expression with ')' or continue it using an operator (and,or,>,<,!=,==...). Instead, the following statement were read:
     $0
 
 touist_simple: VARTUPLE NOT VAR UNION 
@@ -3065,9 +2963,7 @@ touist_simple: VARTUPLE ABS VAR WHEN
 ## ABS expr 
 ##
 
-Ill-formed $2. At this point, a continuation of the expression
-is expected with an operator (<,>,!=,==,and,or...)
-Instead, the following statement were read:
+Ill-formed $2. At this point, a continuation of the expression is expected with an operator (<,>,!=,==,and,or...). Instead, the following statement were read:
     $0
 
 touist_simple: VARTUPLE VAR ADD VAR UNION 
@@ -3487,9 +3383,7 @@ touist_simple: VARTUPLE VAR XOR VAR UNION
 ## expr XOR expr 
 ##
 
-Ill-formed $2. At this point, a continuation of the expression
-is expected, using an operator (>,<,!=,==,and,or...).
-Instead, the following statement were read:
+Ill-formed $2. At this point, a continuation of the expression is expected, using an operator (>,<,!=,==,and,or...). Instead, the following statement were read:
     $0
 
 touist_simple: VARTUPLE VAR ADD XOR 
@@ -3655,8 +3549,7 @@ touist_simple: VARTUPLE LBRACK VAR COMMA XOR
 ## expr COMMA 
 ##
 
-Ill-formed list of expressions. At this point, an expression is expected.
-Instead, the following statement were read:
+Ill-formed list of expressions. At this point, an expression is expected. Instead, the following statement were read:
     $0
 
 touist_simple: VARTUPLE VAR COMMA XOR 
@@ -3669,9 +3562,7 @@ touist_simple: VARTUPLE VAR COMMA XOR
 ## expr COMMA 
 ##
 
-Ill-formed list indices. At this point, an expression is expected
-(an 'index' is an expression).
-Instead, the following statement were read:
+Ill-formed list indices. At this point, an expression is expected (an 'index' is an expression). Instead, the following statement were read:
     $0
 
 touist_simple: VARTUPLE VAR WHEN 
@@ -3690,10 +3581,7 @@ touist_simple: VARTUPLE VAR WHEN
 ## In state 106, spurious reduction of production comma_list(indices) -> expr 
 ##
 
-Ill-formed variable-tuple. At this point, either continue the list
-of indices (= expressions) using ',' or finish the variable-tuple
-using ')'.
-Instead, the following statement were read:
+Ill-formed variable-tuple. At this point, either continue the list of indices (= expressions) using ',' or finish the variable-tuple using ')'. Instead, the following statement were read:
     $0
 
 touist_simple: TUPLE VAR WHEN 
@@ -3712,8 +3600,5 @@ touist_simple: TUPLE VAR WHEN
 ## In state 106, spurious reduction of production comma_list(indices) -> expr 
 ##
 
-Ill-formed proposition-tuple. At this point, either continue the list
-of indices (= expressions) using ',' or finish the proposition-tuple
-using ')'.
-Instead, the following statement were read:
+Ill-formed proposition-tuple. At this point, either continue the list of indices (= expressions) using ',' or finish the proposition-tuple using ')'. Instead, the following statement were read:
     $0

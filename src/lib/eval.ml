@@ -67,11 +67,11 @@ let raise_with_loc msgs (ast:ast) (message:string) = match ast with
    'an integer or a float'. *)
 let raise_type_error msgs operator operand expanded (expected_types:string) = 
   raise_with_loc msgs operator (
-    "'"^(string_of_ast_type operator)^"' expects "^expected_types^".\n"^
+    "'"^(string_of_ast_type operator)^"' expects "^expected_types^". "^
     "The operand:\n"^
     "    "^(string_of_ast operand)^"\n"^
     "has been expanded to something of type '"^(string_of_ast_type expanded)^"':\n"^
-    "    "^(string_of_ast expanded)^"")
+    "    "^(string_of_ast expanded))
 
 (* Same as above but for functions of two parameters. Example: with And (x,y),
    operator is And (x,y),
@@ -79,20 +79,19 @@ let raise_type_error msgs operator operand expanded (expected_types:string) =
    exp1 and exp2 are the expanded parameters x and y. *)
 let raise_type_error2 msgs operator op1 exp1 op2 exp2 (expected_types:string) =
   raise_with_loc msgs operator
-    ("incorrect types with '"^(string_of_ast_type operator)^"'; expects "^expected_types^".\n"^
+    ("incorrect types with '"^(string_of_ast_type operator)^"'; expects "^expected_types^" "^
     "In statement:\n"^
     "    "^(string_of_ast operator)^"\n"^
     "Left-hand operand has type '"^(string_of_ast_type exp1)^"':\n"^
     "    "^(string_of_ast exp1)^"\n"^
     "Right-hand operand has type '"^(string_of_ast_type exp2)^"':\n"^
-    "    "^(string_of_ast exp2)^""^
-    "")
+    "    "^(string_of_ast exp2))
 
 (* [raise_set_decl] is the same as [raise_type_error2] but between one element
    and the set this element is supposed to be added to. *)
 let raise_set_decl msgs ast elmt elmt_expanded set set_expanded (expected_types:string) =
   raise_with_loc msgs ast
-    ("Ill-formed set declaration. It expects "^expected_types^".\n"^
+    ("Ill-formed set declaration. It expects "^expected_types^". "^
     "One of the elements is of type '"^(string_of_ast_type elmt_expanded)^"':\n"^
     "    "^(string_of_ast elmt)^"\n"^
     "This element has been expanded to\n"^
@@ -100,7 +99,7 @@ let raise_set_decl msgs ast elmt elmt_expanded set set_expanded (expected_types:
     "Up to now, the set declaration\n"^
     "    "^(string_of_ast set)^"\n"^
     "has been expanded to:\n"^
-    "    "^(string_of_ast set_expanded)^"")
+    "    "^(string_of_ast set_expanded))
 
 
 let check_nb_vars_same_as_nb_sets msgs (ast:ast) (vars:ast list) (sets:ast list) : unit =
@@ -111,11 +110,11 @@ let check_nb_vars_same_as_nb_sets msgs (ast:ast) (vars:ast list) (sets:ast list)
   match (List.length vars) = (List.length sets) with
   | true -> ()
   | false -> add_fatal msgs (Error,Eval,
-    "Ill-formed '"^(string_of_ast_type ast)^"'. The number of variables and sets must be the same.\n"^
+    "Ill-formed '"^(string_of_ast_type ast)^"'. The number of variables and sets must be the same. "^
     "You defined "^(string_of_int (List.length vars))^" variables:\n"^
     "    "^(string_of_ast_list "," vars)^"\n"^
     "but you gave "^(string_of_int (List.length sets))^" sets:\n"^
-    "    "^(string_of_ast_list "," sets)^""
+    "    "^(string_of_ast_list "," sets)
     ,loc)
 
 let extenv = ref (Hashtbl.create 0)
@@ -181,8 +180,8 @@ and eval_ast (msgs:Msgs.t ref) (env:env) (ast:ast) :ast =
       with Not_found ->
       try let (content,_) = Hashtbl.find !extenv name in content
       with Not_found -> raise_with_loc msgs ast
-          ("variable '" ^ name ^"' does not seem to be known. Either you forgot\n"^
-          "to declare it globally or it has been previously declared locally\n"^
+          ("variable '" ^ name ^"' does not seem to be known. Either you forgot "^
+          "to declare it globally or it has been previously declared locally "^
           "(with bigand, bigor or let) and you are out of its scope.")
     end
   | Set x -> Set x
@@ -315,7 +314,7 @@ and eval_ast (msgs:Msgs.t ref) (env:env) (ast:ast) :ast =
   | In (x,y) ->
     begin match eval_ast x, eval_ast y with
       | x', Set y' -> Bool (AstSet.mem x' y')
-      | x',y' -> raise_type_error2 msgs ast x x' y y' "\nan 'int', 'float' or 'prop' on the left-hand and a 'set' on the right-hand"
+      | x',y' -> raise_type_error2 msgs ast x x' y y' "an 'int', 'float' or 'prop' on the left-hand and a 'set' on the right-hand"
     end
   | Equal (x,y) -> begin match eval_ast x, eval_ast y with
       | Int x, Int y -> Bool (x = y)
@@ -358,7 +357,7 @@ and eval_set_decl (msgs:Msgs.t ref) (env:env) (set_decl:ast) =
     | Set _  , Set x   -> Set x
     | _ -> raise_set_decl msgs set_decl elmt elmt_expanded
              (Set_decl sets) (Set_decl sets_expanded)
-             ("at this point a\ncomma-separated list of '"^string_of_ast_type first_elmt^"', because previous elements\nof the list had this type")
+             ("at this point a comma-separated list of '"^string_of_ast_type first_elmt^"', because previous elements of the list had this type")
   in
   match sets, sets_expanded with
   | [],[] -> Set AstSet.empty
@@ -367,9 +366,9 @@ and eval_set_decl (msgs:Msgs.t ref) (env:env) (set_decl:ast) =
       | Int _ | Float _ | Prop _ | Set _ -> Set (AstSet.of_list (List.map2 (unwrap_set first) sets sets_expanded))
       | _ -> raise_set_decl msgs set_decl x first
                     (Set_decl sets) (Set_decl sets_expanded)
-                    "elements of type 'int',\n'float', 'prop' or 'set'"
+                    "elements of type 'int', 'float', 'prop' or 'set'"
     end
-  | [],x::_ | x::_,[] -> failwith "shouldn't happen: len(sets)!=len(sets_expanded)" 
+  | [],x::_ | x::_,[] -> failwith "shouldn't happen: len(sets)!=len(sets_expanded)"
 
 
 (* [eval_ast_formula] evaluates formulas; nothing in formulas should be
@@ -449,11 +448,11 @@ and eval_ast_formula (msgs:Msgs.t ref) (env:env) (ast:ast) : ast =
         | Int x when !smt -> Int x
         | Float x when !smt -> Float x
         | _ -> raise_with_loc msgs ast
-            ("local variable '" ^ name ^ "' (defined in bigand, bigor or let)\n"^
-            "cannot be expanded into a 'prop' because its content\n"^
+            ("local variable '" ^ name ^ "' (defined in bigand, bigor or let) "^
+            "cannot be expanded into a 'prop' because its content "^
             "is of type '"^(string_of_ast_type content)^"' instead of "^
-              (if !smt then "'prop', 'int' or 'float'" else "'prop'") ^ ".\n"^
-            "Why? Because this variable is part of a formula, and thus is expected\n"^
+              (if !smt then "'prop', 'int' or 'float'" else "'prop'") ^ ". "^
+            "Why? Because this variable is part of a formula, and thus is expected"^
             "to be a proposition. Here is the content of '" ^name^"':\n"^
             "    "^(string_of_ast content))
       with Not_found ->
@@ -466,12 +465,12 @@ and eval_ast_formula (msgs:Msgs.t ref) (env:env) (ast:ast) : ast =
         | Int x when !smt -> Int x
         | Float x when !smt -> Float x
         | _ -> raise_with_loc msgs ast
-            ("global variable '" ^ name ^ "' cannot be expanded into a 'prop'\n"^
+            ("global variable '" ^ name ^ "' cannot be expanded into a 'prop' "^
             "because its content is of type '"^(string_of_ast_type content)^"' instead of "^
-               (if !smt then "'prop', 'int' or 'float'" else "'prop'") ^ ".\n"^
-            "Why? Because this variable is part of a formula, and thus is expected\n"^
+               (if !smt then "'prop', 'int' or 'float'" else "'prop'") ^ ". "^
+            "Why? Because this variable is part of a formula, and thus is expected "^
             "to be a proposition. Here is the content of '" ^name^"':\n"^
-            "    "^(string_of_ast content)^"\n")
+            "    "^(string_of_ast content))
       with Not_found ->
       try
         match (p,i) with
@@ -496,15 +495,15 @@ and eval_ast_formula (msgs:Msgs.t ref) (env:env) (ast:ast) : ast =
           let term = match content with
             | Prop x -> Prop x
             | wrong -> add_fatal msgs (Error,Eval,
-                "the proposition '" ^ name ^ "' cannot be expanded because '"^prefix^"' is of type '"^(string_of_ast_type wrong)^"'.\n" ^
-                "In order to produce an expanded proposition of this kind, '"^prefix^"' must be a proposition.\n"^
-                "Why? Because this variable is part of a formula, and thus is expected\n"^
+                "the proposition '" ^ name ^ "' cannot be expanded because '"^prefix^"' is of type '"^(string_of_ast_type wrong)^"'. " ^
+                "In order to produce an expanded proposition of this kind, '"^prefix^"' must be a proposition. "^
+                "Why? Because this variable is part of a formula, and thus is expected "^
                 "to be a proposition. Here is the content of '" ^prefix^"':\n"^
-                "    "^(string_of_ast content)^"\n", loc_affect)
+                "    "^(string_of_ast content), loc_affect)
           in eval_ast_formula (UnexpProp ((string_of_ast term), Some indices))
       (* Case 5. the variable was of the form '$v(1,2,3)' and was not declared
          and '$v' is not either declared, so we can safely guess that this var has not been declared. *)
-      with Not_found -> raise_with_loc msgs ast ("'" ^ name ^ "' has not been declared\n")
+      with Not_found -> raise_with_loc msgs ast ("'" ^ name ^ "' has not been declared")
     end
   | Not Top    -> Bottom
   | Not Bottom -> Top
@@ -529,21 +528,21 @@ and eval_ast_formula (msgs:Msgs.t ref) (env:env) (ast:ast) : ast =
       | Int 0, Set s when AstSet.is_empty s -> Top
       | Int k, Set s when AstSet.is_empty s -> Bottom
       | Int x, Set s -> if !check_only then Prop "dummy" else exact_str (AstSet.exact x s)
-      | x',y' -> raise_type_error2 msgs ast x x' y y' "'int' (left-hand)\nand a 'prop-set' (right-hand)"
+      | x',y' -> raise_type_error2 msgs ast x x' y y' "'int' (left-hand) and a 'prop-set' (right-hand)"
     end
   | Atleast (x,y) -> rm_top_bot begin
       match eval_ast x, eval_ast y with
       | Int 0, Set s when AstSet.is_empty s -> Top
       | Int k, Set s when k > 0 && AstSet.is_empty s -> Bottom
       | Int x, Set s -> if !check_only then Prop "dummy" else atleast_str (AstSet.atleast x s)
-      | x',y' -> raise_type_error2 msgs ast x x' y y' "'int' (left-hand)\nand a 'prop-set' (right-hand)"
+      | x',y' -> raise_type_error2 msgs ast x x' y y' "'int' (left-hand) and a 'prop-set' (right-hand)"
     end
   | Atmost (x,y) -> rm_top_bot begin
       match eval_ast x, eval_ast y with
       | Int _, Set s when AstSet.is_empty s -> Top
       | Int 0, Set _ -> Bottom
       | Int x, Set s -> if !check_only then Prop "dummy" else atmost_str (AstSet.atmost x s)
-      | x',y' -> raise_type_error2 msgs ast x x' y y' "'int' (left-hand)\nand a 'prop-set' (right-hand)"
+      | x',y' -> raise_type_error2 msgs ast x x' y y' "'int' (left-hand) and a 'prop-set' (right-hand)"
     end
   (* We consider 'bigand' as the universal quantification; it could be translated as
          for all elements i of E, p(i) is true
@@ -699,7 +698,7 @@ and set_to_ast_list (msgs:Msgs.t ref) (env:env) (ast:ast) :ast list =
       "after 'in', only sets are allowed, but got '"^(string_of_ast_type ast')^"':\n"^
       "    "^(string_of_ast ast')^"\n"^
       "This element has been expanded to\n"^
-      "    "^(string_of_ast ast')^"")
+      "    "^(string_of_ast ast'))
   in match !check_only, lst with (* useful when you only want to check types *)
           | false,      _      -> lst
           | true,       []     -> []

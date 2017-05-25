@@ -286,15 +286,15 @@ let report text buffer checkpoint debug' : string =
     (* If the state number cannot be found -- which, in principle,
        should not happen, since our list of erroneous states is
        supposed to be complete! -- produce a generic message. *)
-    Printf.sprintf "This is an unknown syntax error (%d).\n\
-                    This error %d is missing in parser.messages (see HOWTODEBUG.md).\n" s s
+    Printf.sprintf "This is an unknown syntax error (number %d). This error \
+                   is missing in parser.messages (see HOWTODEBUG.md)." s
   in
   (* Construct the full error message. *)
-  let message = Printf.sprintf "syntax error %s.\n%s"
+  let message = Printf.sprintf "syntax error %s. %s"
     where
     message
   ^
   if !debug then
-      Printf.sprintf "Debug: Automaton state: %d (see src/parser.messages)\n" s
+      Printf.sprintf "Debug: Automaton state: %d (see src/parser.messages)" s
   else ""
 in message
