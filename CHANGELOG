@@ -7,6 +7,9 @@ v3.2.0
           filename: line 9, col 67-80: error: the error message
     - added the argument --wrap-width N that allows to choose the width
       of the error messages. If N is set to 0, the wrapping is disabled.
+v3.2.0
+  - (experimental) added support for QBF (quantified boolean formula). It relies
+    on Simon Cruanes' ocaml-qbf project, which relies on quantor and picosat.
 v3.1.0
   - touist:
     - (experimental) an SMT solver is now available directly from the touist
