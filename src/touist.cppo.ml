@@ -249,7 +249,7 @@ let () =
   else if !qbf_flag then begin
     #ifdef qbf
       let ast,msgs = Parse.parse_qbf ~debug:!debug_syntax (string_of_chan !input) in
-      Printf.fprintf !output "%s\n" (Pprint.string_of_ast ast)
+      Printf.fprintf !output "%s\n" (Pprint.string_of_ast ~utf8:true ast)
     #else
       Printf.fprintf stderr
         ("This touist binary has not been compiled with qbf support.");
