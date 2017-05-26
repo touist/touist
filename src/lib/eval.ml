@@ -605,6 +605,14 @@ and eval_ast_formula (msgs:Msgs.t ref) (env:env) (ast:ast) : ast =
     let name = (expand_var_name msgs env (p,i)) and desc = (eval_ast content,loc)
     in eval_ast_formula_env ((name,desc)::env) formula
   | Paren x -> eval_ast_formula x
+  | Exists (p,f) -> let p = match eval_ast_formula p with
+    | Prop p -> Prop p
+    | wrong -> raise_with_loc msgs p ("'exists' only works on propositions")
+    in Exists (p, eval_ast_formula f)
+  | Forall (p,f) -> let p = match eval_ast_formula p with
+    | Prop p -> Prop p
+    | wrong -> raise_with_loc msgs p ("'forall' only works on propositions")
+    in Forall (p, eval_ast_formula f)
   | e -> raise_with_loc msgs ast ("this expression is not a formula: " ^ string_of_ast e)
 
 and exact_str lst =
