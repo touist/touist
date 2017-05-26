@@ -67,7 +67,7 @@ let rec latex_of_ast = function
   | Diff   (x,y) -> (latex_of_ast x) ^ "\\setminus " ^ (latex_of_ast y)
   | Range  (x,y) -> "["       ^ (latex_of_ast x) ^ ".." ^ (latex_of_ast y) ^ "]"
   | Subset (x,y) -> (latex_of_ast x) ^ "\\subset " ^ (latex_of_ast y)
-  | Powerset x   -> "\\textrm{powerset}(" ^ string_of_ast x ^ ")"
+  | Powerset x   -> "\\textrm{powerset}(" ^ latex_of_ast x ^ ")"
   | In     (x,y) -> (latex_of_ast x) ^ " \\in " ^ (latex_of_ast y)
   | Empty x -> "\\textrm{empty}(" ^ (latex_of_ast x) ^ ")"
   | Card  x -> "\\textrm{card}("  ^ (latex_of_ast x) ^ ")"
@@ -92,8 +92,8 @@ let rec latex_of_ast = function
   | Affect (v,c) -> (latex_of_ast v) ^ " \\leftarrow " ^ (latex_of_ast c)
   | Loc (x,_) -> latex_of_ast x
   | Paren x -> "(" ^ latex_of_ast x ^ ")"
-  | Exists (v,f) -> "\\exists "^(string_of_ast v) ^". "^ (string_of_ast f)
-  | Forall (v,f) -> "\\forall "^(string_of_ast v) ^". "^ (string_of_ast f)
+  | Exists (v,f) -> "\\exists "^(latex_of_ast v) ^". "^ (latex_of_ast f)
+  | Forall (v,f) -> "\\forall "^(latex_of_ast v) ^". "^ (latex_of_ast f)
 
   and latex_of_commalist sep el = String.concat sep (List.map latex_of_ast el)
   and escape_underscore txt =
