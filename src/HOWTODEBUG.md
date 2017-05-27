@@ -167,3 +167,11 @@ Just make sure that everything is compiled (with make build) and that
 you are compiling in bytecode; to enable that:
 
     ./configure --override is_native false
+
+Unexpected exception: where does it come from?
+=============================================
+Backtrace for exceptions is disabled by default as it needs more computation.
+To enable backtracing on exception, you just have to set to 'b' the
+OCAMLRUNPARAM env variable:
+
+    OCAMLRUNPARAM=b ./touist.native
