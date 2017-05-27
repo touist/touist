@@ -52,7 +52,7 @@ let debug_syntax = ref false
 let debug_cnf = ref false
 let latex = ref false
 let show = ref false
-let wrap_width = ref 78
+let wrap_width = ref 76
 
 (* [process_arg_alone] is the function called by the command-line argument
    parser when it finds an argument with no preceeding -flag (-f, -x...).
@@ -65,7 +65,7 @@ let exit_with (exit_code:error) = exit (get_code exit_code)
    display them before exiting. *)
 let show_msgs_and_exit msgs (exit_code:error) =
   let _ = begin
-    Printf.fprintf stderr "%s\n" (Msgs.string_of_msgs ~width:!wrap_width
+    Printf.fprintf stderr "%s" (Msgs.string_of_msgs ~width:!wrap_width
       ~color:(Unix.isatty Unix.stderr) ~fmt:!error_format msgs);
     exit (get_code exit_code)
   end in ()
@@ -180,7 +180,7 @@ let () =
       match !mode with
       | Sat -> Parse.parse_sat ~filename:!input_file_path (string_of_chan !input)
       | Smt -> Parse.parse_smt ~filename:!input_file_path (string_of_chan !input)
-      | Qbf -> Parse.parse_qbf ~filename:!input_file_path (string_of_chan !input)
+      | Qbf -> (Parse.parse_qbf ~filename:!input_file_path (string_of_chan !input))
     in (Printf.fprintf !output "%s\n" (Latex.latex_of_ast ast); show_msgs_and_exit !msgs OK));
 
   (* linter = only show syntax and semantic errors *)
