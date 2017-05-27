@@ -2607,7 +2607,7 @@ touist_qbf: XOR
 ## 
 ##
 
-No formulas have been given.
+No formula has been given.
 
 touist_simple: BIGOR VAR COMMA XOR 
 ##

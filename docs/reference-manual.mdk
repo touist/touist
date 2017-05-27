@@ -969,7 +969,7 @@ By default, the errors and warnings will display with the formatting `%l:%c: %t:
 An ending newline (`\n`) is automatically added.
 
 **`--wrap-width N`**. Lets you choose the width of the messages (errors,
-warnings) given by touist. By default, touist will wrap all messages with a 78
+warnings) given by touist. By default, touist will wrap all messages with a 76
 characters limit. With N set to 0, you can disable the wrapping.
 
 **`--debug-syntax`**. This is a development option that adds to the error
