@@ -63,8 +63,6 @@ public class SolverQBF extends Solver {
 	private List<String> options = new ArrayList<>();
 	public List<TranslationError> errors = new ArrayList<TranslationError>();
 
-	private Map<Integer, String> literalsMap; // "table de correspondance"
-
 	private ModelList models;
 
 	/**
@@ -73,25 +71,15 @@ public class SolverQBF extends Solver {
 	 * @param dimacsFilePath the DIMACS file
 	 * @param literalsMap the "literals map" ("table de correspondance")
 	 */
-	public SolverQBF(BufferedReader reader,
-			Map<Integer, String> literalsMap) {
+	public SolverQBF(BufferedReader reader) {
 		this.reader = reader;
-		this.literalsMap = literalsMap;
 		this.p = null;
 		this.stdin = null;
 		models = new ModelList(this);
 	}
-
-	/**
-	 * This constructor is useful when the user wants to solve a problem without
-	 * using a "literalsMap" ("table de correspondance"). Hence the user has
-	 * only to pass a DIMACS file path.
-	 * @warning ONLY FOR TESTS PURPOSE
-	 * @param dimacsFilePath
-	 */
-	public SolverQBF(BufferedReader reader) {
+	public SolverQBF(BufferedReader reader, List<String> options) {
+		this.options = options;
 		this.reader = reader;
-		this.literalsMap = null;
 		this.p = null;
 		this.stdin = null;
 		models = new ModelList(this);
@@ -177,25 +165,14 @@ public class SolverQBF extends Solver {
 		String[] assignements;
 		Model modelParsed = null;
 		// We wait for any output from the solver unless we get a timeout
-		final long timeout = System.currentTimeMillis() + WAIT_FOR_MODEL_TIMEOUT;
-		while(!stdout.ready() && isAlive(p) && System.currentTimeMillis() < timeout){
-			// Active waiting (I know, it is a bad way to do it!)
-			try {
-				synchronized (this) { // for JavaRE6 compliance
-					this.wait(10);
-				}
-			} catch (InterruptedException e) {
-				// TODO I added this wait to avoid active complete waiting
-				e.printStackTrace();
-			}
-		}
+		boolean no_timeout = waitResult(WAIT_FOR_MODEL_TIMEOUT);
 		// Case 1 : we got some text to read from stdout
 		if(stdout.ready() && p.exitValue() == 0) {
 			assignements = stdout.readLine().split("\\n");
 			modelParsed = parseModel(assignements);
 		}
 		// Case 2 : no text but solver still running
-		if(!stdout.ready() && System.currentTimeMillis() >= timeout) { // Nothing has been read
+		if(!stdout.ready() && ! no_timeout) { // Nothing has been read
 			throw new SolverExecutionException("nextModel(): timeout = "
 					+Integer.toString(WAIT_FOR_MODEL_TIMEOUT)+"ms)");
 		}
@@ -203,11 +180,7 @@ public class SolverQBF extends Solver {
 		if(p.exitValue() == SOLVER_UNSAT)
 			return modelParsed;
 		else if(p.exitValue() != OK) {
-			String linesStdErr = "";
-			while (stderr.ready())
-				linesStdErr += stderr.readLine() + "\n";
-			errors = TranslationError.parse(linesStdErr);
-			throw new SolverExecutionException("nextModel(): touist returned error code "+Integer.toString(p.exitValue())+"\n"+linesStdErr);
+			throw new SolverExecutionException("nextModel(): touist returned error code "+Integer.toString(p.exitValue())+"\n"+errors.toString());
 		} else
 			return modelParsed;
 	}
@@ -236,19 +209,39 @@ public class SolverQBF extends Solver {
 		return reader;
 	}
 
-	/**
-	 * ONLY used by Models
-	 * @return the literalsMap (DIMACS integer to string names)
-	 */
-	protected Map<Integer, String> getLiteralsMap() {
-		return literalsMap;
-	}
-
 	public int getReturnCode() {
 		return p.exitValue();
 	}
 	
 	public List<TranslationError> getErrors() {
 		return errors;
+	}
+	
+	/**
+	 * 
+	 * @param timeout in milliseconds
+	 * @return true if the result has been given before the timeout
+	 * @throws IOException
+	 */
+	public boolean waitResult(int timeout) throws IOException {
+		final long timeout_time = System.currentTimeMillis() + timeout;
+		while(!stdout.ready() && isAlive(p) && System.currentTimeMillis() < timeout_time){
+			// Active waiting (I know, it is a bad way to do it!)
+			try {
+				synchronized (this) { // for JavaRE6 compliance
+					this.wait(10);
+				}
+			} catch (InterruptedException e) {
+				// TODO I added this wait to avoid active complete waiting
+				e.printStackTrace();
+			}
+		}
+		if(p.exitValue() != OK) {
+			String linesStdErr = "";
+			while (stderr.ready())
+				linesStdErr += stderr.readLine() + "\n";
+			errors = TranslationError.parse(linesStdErr);
+		}
+		return System.currentTimeMillis() < timeout_time;
 	}
 }
