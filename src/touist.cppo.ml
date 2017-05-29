@@ -5,26 +5,28 @@ type error =
   | UNKNOWN
   | CMD_USAGE
   | CMD_UNSUPPORTED
-  | TOUIST_UNKNOWN
-  | TOUIST_TIMEOUT
   | TOUIST_SYNTAX
-  | SOLVER_UNKNOWN
+  | TOUIST_TIMEOUT
+  | TOUIST_MEMORY
+  | TOUIST_UNKNOWN
   | SOLVER_UNSAT
+  | SOLVER_UNKNOWN
   | SOLVER_TIMEOUT
   | SOLVER_MEMORY
 
 let get_code (e : error) : int = match e with
-  | OK               -> 0
-  | UNKNOWN          -> 1
-  | CMD_USAGE        -> 2
-  | CMD_UNSUPPORTED  -> 3
-  | TOUIST_UNKNOWN   -> 7
-  | TOUIST_TIMEOUT   -> 5
-  | TOUIST_SYNTAX    -> 4
-  | SOLVER_UNKNOWN   -> 6
-  | SOLVER_UNSAT     -> 7
-  | SOLVER_TIMEOUT   -> 8
-  | SOLVER_MEMORY    -> 9
+  | OK              -> 0
+  | UNKNOWN         -> 1
+  | CMD_USAGE       -> 2
+  | CMD_UNSUPPORTED -> 3
+  | TOUIST_SYNTAX   -> 4
+  | TOUIST_TIMEOUT  -> 5
+  | TOUIST_MEMORY   -> 6
+  | TOUIST_UNKNOWN  -> 7
+  | SOLVER_UNSAT    -> 8
+  | SOLVER_UNKNOWN  -> 9
+  | SOLVER_TIMEOUT  -> 10
+  | SOLVER_MEMORY   -> 11
 
 type language = Sat | Smt | Qbf
 let sat_flag = ref false
