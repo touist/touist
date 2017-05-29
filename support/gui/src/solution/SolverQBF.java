@@ -155,18 +155,19 @@ public class SolverQBF extends Solver {
 		System.out.println("close(): solver has been closed correctly");
 	}
 
-	public final static int OK               = 0;
-	public final static int UNKNOWN          = 1;
-	public final static int CMD_USAGE        = 2;
-	public final static int CMD_UNSUPPORTED  = 3;
-	public final static int TOUIST_UNKNOWN   = 7;
-	public final static int TOUIST_TIMEOUT   = 5;
-	public final static int TOUIST_SYNTAX    = 4;
-	public final static int SOLVER_UNKNOWN   = 6;
-	public final static int SOLVER_UNSAT     = 7;
-	public final static int SOLVER_TIMEOUT   = 8;
-	public final static int SOLVER_MEMORY    = 9;
-	
+	public final static int OK              = 0;
+	public final static int UNKNOWN         = 1;
+	public final static int CMD_USAGE       = 2;
+	public final static int CMD_UNSUPPORTED = 3;
+	public final static int TOUIST_SYNTAX   = 4;
+	public final static int TOUIST_TIMEOUT  = 5;
+	public final static int TOUIST_MEMORY   = 6;
+	public final static int TOUIST_UNKNOWN  = 7;
+	public final static int SOLVER_UNSAT    = 8;
+	public final static int SOLVER_UNKNOWN  = 9;
+	public final static int SOLVER_TIMEOUT  = 10;
+	public final static int SOLVER_MEMORY   = 11;
+
 	@Override
 	protected Model nextModel() throws IOException, SolverExecutionException {
 		final int WAIT_FOR_MODEL_TIMEOUT = 5000000; // ms
