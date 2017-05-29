@@ -871,15 +871,16 @@ With no `-o` flag, touist will output to the standard output (`stdout`).
 |:----:|-------------------|
 | 0    | `OK             ` |
 | 1    | `UNKNOWN        ` |
-| 2    | `CMD_USAGE`       |
+| 2    | `CMD_USAGE      ` |
 | 3    | `CMD_UNSUPPORTED` |
-| 7    | `TOUIST_UNKNOWN ` |
+| 4    | `TOUIST_SYNTAX  ` |
 | 5    | `TOUIST_TIMEOUT ` |
-| 4    | `TOUIST_SYNTAX`   |
-| 6    | `SOLVER_UNKNOWN`  |
-| 7    | `SOLVER_UNSAT`    |
-| 8    | `SOLVER_TIMEOUT`  |
-| 9    | `SOLVER_MEMORY`   |
+| 6    | `TOUIST_MEMORY  ` |
+| 7    | `TOUIST_UNKNOWN ` |
+| 8    | `SOLVER_UNSAT   ` |
+| 9    | `SOLVER_UNKNOWN ` |
+| 10   | `SOLVER_TIMEOUT ` |
+| 11   | `SOLVER_MEMORY  ` |
 |------|-------------------|
 
 ### Usage for propositional logic (SAT mode)
@@ -988,5 +989,27 @@ The flag `--smt LOGIC` enables the SMT mode.
 ~ Todo
 Explain which `LOGIC` can be given and how to use `--smt`
 ~
+
+# Technical details
+
+How 
+
+## One single syntax error per run
+
+You might have noticed that on every run of `touist`, only one error is
+shown at a time. Many compilers are able to show multiple errors across
+the file (e.g., any C compiler). Some other compilers, like OCaml, only
+display one error at a time. This feature is often expected by developers
+as a time saver: one single run of the compiler to squash as many mistakes
+as possible. 
+
+This feature is tightly liked to one particular trait of the grammar of
+the language: the semi-colon (`;`). When an error comes up, the semi-colon
+will act as a checkpoint to which the parser will try to skip to. Hoping
+that this error is only contained in this instruction, the parser will try
+to continue after the semi-colon.
+
+The touist grammar does not have such an instruction marker; because of
+that, we are not able to skip to the next instruction.
 
 [BIB]
