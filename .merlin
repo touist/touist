@@ -8,6 +8,7 @@ S src
 B _build/src
 B _build/src/lib
 B _build/src/lib/yices2
+B _build/src/lib/qbf
 PKG menhirLib
 PKG str
 PKG fileutils
