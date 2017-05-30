@@ -177,13 +177,19 @@ let () =
   try
 
   (* latex = parse and transform with latex_of_ast *)
-  if !latex then
-    (let ast,msgs =
+  if !latex || !linter then begin
+    let ast_plain,msgs =
       match !mode with
-      | Sat -> Parse.parse_sat ~filename:!input_file_path (string_of_chan !input)
-      | Smt -> Parse.parse_smt ~filename:!input_file_path (string_of_chan !input)
-      | Qbf -> (Parse.parse_qbf ~filename:!input_file_path (string_of_chan !input))
-    in (Printf.fprintf !output "%s\n" (Latex.latex_of_ast ast); show_msgs_and_exit !msgs OK));
+      | Sat -> Parse.parse_sat ~debug:!debug_syntax ~filename:!input_file_path (string_of_chan !input)
+      | Smt -> Parse.parse_smt ~debug:!debug_syntax ~filename:!input_file_path (string_of_chan !input)
+      | Qbf -> Parse.parse_qbf ~debug:!debug_syntax ~filename:!input_file_path (string_of_chan !input)
+    in
+    let msgs = if !linter then
+      let _,msgs =  (ast_plain,msgs) |> Eval.eval ~smt:(!mode = Smt) ~onlychecktypes:true in msgs else msgs
+    in
+    if !latex then Printf.fprintf !output "%s\n" (Latex.latex_of_ast ast_plain);
+    show_msgs_and_exit !msgs OK
+  end;
 
   (* linter = only show syntax and semantic errors *)
   if !linter then begin
