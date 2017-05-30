@@ -1,26 +1,24 @@
 package gui.editionView.editor;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.StringReader;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.fife.ui.rsyntaxtextarea.RSyntaxDocument;
 import org.fife.ui.rsyntaxtextarea.parser.AbstractParser;
 import org.fife.ui.rsyntaxtextarea.parser.DefaultParseResult;
 import org.fife.ui.rsyntaxtextarea.parser.ParseResult;
-import org.fife.ui.rsyntaxtextarea.parser.ParserNotice;
 
-import solution.SolverExecutionException;
-import solution.SolverQBF;
+import gui.TranslatorLatex.TranslationLatex;
+import gui.editionView.EditionPanel;
 import translation.TranslationError;
-import translation.TranslatorSAT;
-import translation.TranslatorSMT;
 
 public class ErrorParser extends AbstractParser {
-	private List<TranslationError> bufferErrors; 
-	
+	private List<TranslationError> bufferErrors;
+	public EditionPanel edition = null;
+
+	public ErrorParser(EditionPanel e) {
+		edition = e;
+	}
+	public ErrorParser() {}
 	
 	@Override // lang can be set using editor.setSyntaxEditingStyle
 	public ParseResult parse(RSyntaxDocument code, String lang) {
@@ -29,14 +27,12 @@ public class ErrorParser extends AbstractParser {
 			return result;
 		if(bufferErrors == null) {
 			try {
-				if(lang == "sat") {
-					bufferErrors = linterSAT(new StringReader(code.getText(0, code.getLength())));
-				} else if (lang == "smt") {
-					bufferErrors = linterSMT(new StringReader(code.getText(0, code.getLength())));
-				} else if (lang == "qbf") {
-					bufferErrors = linterQBF(new StringReader(code.getText(0, code.getLength())));
+				TranslationLatex tr = new TranslationLatex(code.getText(0, code.getLength()), lang, true);
+				bufferErrors = tr.getErrors();
+				if (tr.getFormula().length() != 0 && edition != null) {
+					edition.setLatex(tr.getFormula());
 				}
-				
+
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -57,29 +53,5 @@ public class ErrorParser extends AbstractParser {
 	 */
 	public void linterFromExisting(List<TranslationError> errors) {
 		bufferErrors = errors;
-	}
-	
-	public List<TranslationError> linterSAT(StringReader s) throws IOException, InterruptedException {
-		List<String> options = new ArrayList<String>();
-		options.add("--linter");
-		TranslatorSAT translator = new TranslatorSAT(options);
-		translator.translate(s);
-		return translator.getErrors();
-	}
-	public List<TranslationError> linterSMT(StringReader s) throws IOException, InterruptedException {
-		List<String> options = new ArrayList<String>();
-		options.add("--linter");
-		TranslatorSMT translator = new TranslatorSMT(options);
-		translator.translate(s, "QF_IDL"); // QF_IDL is an arbitrary SMT2 logic
-		return translator.getErrors();
-	}
-	public List<TranslationError> linterQBF(StringReader s) throws IOException, InterruptedException {
-		List<String> options = new ArrayList<String>();
-		options.add("--linter");
-		
-		SolverQBF touist = new SolverQBF(new BufferedReader(s), options);
-		touist.launch();
-		touist.waitResult(10000);
-		return touist.getErrors();
 	}
 }

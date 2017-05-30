@@ -101,9 +101,9 @@ public class SnippetContainer extends AbstractComponentPanel {
 		sectionConnect.addInsertButton(new InsertionButton(editorTextArea, "bigand $i in $a: \n\tp($i) \nend", snippetsBigand,"bigand"));
 		sectionConnect.addInsertButton(new InsertionButton(editorTextArea, "bigor $i in $a: \n\tp($i) \nend", snippetsBigor,"bigor"));
 
-		sectionCard.addInsertButton(new InsertionButton(editorTextArea, "atmost($n,$i,$s,$p)", snippetsAtMost, "at most"));
-		sectionCard.addInsertButton(new InsertionButton(editorTextArea, "atleast($n,$i,$s,$p)", snippetsAtLeast, "at least"));
-		sectionCard.addInsertButton(new InsertionButton(editorTextArea, "exact($n,$i,$s,$p)", snippetsExact, "exact"));
+		sectionCard.addInsertButton(new InsertionButton(editorTextArea, "atmost($n,$S)", snippetsAtMost, "at most"));
+		sectionCard.addInsertButton(new InsertionButton(editorTextArea, "atleast($n,$S)", snippetsAtLeast, "at least"));
+		sectionCard.addInsertButton(new InsertionButton(editorTextArea, "exact($n,$S)", snippetsExact, "exact"));
 
 		sectionOthers.addInsertButton(new InsertionButton(editorTextArea, "if $a \nthen \n\t$b \nelse \n\t$c\n", snippetsIf, "if then else","if\\,\\$a \\\\ then\\\\\\quad\\$b \\\\ else\\\\\\quad\\$c"));
 
