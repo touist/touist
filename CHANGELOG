@@ -1,13 +1,11 @@
 v3.2.0
-  - touist:
-    - (breaking) removed '--detailed' that wasn't really helpful to
-      '--error-format' that allows to use placeholders (%l for line, %c for
-      column...) to customize how errors should display.
-    - (breaking) error messages are now using a more informative layout:
-          filename: line 9, col 67-80: error: the error message
-    - added the argument --wrap-width N that allows to choose the width
-      of the error messages. If N is set to 0, the wrapping is disabled.
-v3.2.0
+  - (breaking) removed '--detailed' that wasn't really helpful to
+    '--error-format' that allows to use placeholders (%l for line, %c for
+    column...) to customize how errors should display.
+  - (breaking) error messages are now using a more informative layout:
+        filename: line 9, col 67-80: error: the error message
+  - added the argument --wrap-width N that allows to choose the width
+    of the error messages. If N is set to 0, the wrapping is disabled.
   - (experimental) added support for QBF (quantified boolean formula). It relies
     on Simon Cruanes' ocaml-qbf project, which relies on quantor and picosat.
 v3.1.0
