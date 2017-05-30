@@ -88,8 +88,8 @@ if [ "x$VERSION" = x ]; then
         exit 1
     fi
     echo -e "${Q} Should we use \033[92m${VERSION}\033[0m from CHANGELOG? [Y/n]"
-    read answer
-    case $answer in n)
+    read answerAutoNumber
+    case $answerAutoNumber in n)
         exit 1 ;;
     esac
 fi
@@ -108,11 +108,13 @@ oasis2opam --local -y
 
 echo -e "${I} Changes done."
 echo -e "${Q} Do you want to commit using message '\033[92mBump to $VERSION\033[0m'? [Y/n]"
-read anwser
-case $answer in
-    y|Y)
+read answerCommit
+echo $answerCommit
+case $answerCommit in
+    y | Y)
         echo -e "${I} Running 'git add setup.ml _oasis src/lib/META opam/*'\033[0m"
-        git add setup.ml _oasis src/lib/META opam/*
+        git add setup.ml _oasis opam/*
+        find . -name META -exec git add {} \;
         echo -e "${I} Commiting with message '\033[92mBump to $VERSION\033[0m'"
         git commit -m "Bump to $VERSION"
         ;;
