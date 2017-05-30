@@ -2588,6 +2588,9 @@ touist_smt: XOR
 ## The known suffix of the stack is as follows:
 ## 
 ##
+
+Either formula is empty or this SMT formula does not start correctly.
+
 touist_simple: XOR 
 ##
 ## Ends in an error in state: 211.
@@ -2597,6 +2600,9 @@ touist_simple: XOR
 ## The known suffix of the stack is as follows:
 ## 
 ##
+
+Either formula is empty or this SAT formula does not start correctly.
+
 touist_qbf: XOR 
 ##
 ## Ends in an error in state: 0.
@@ -2607,7 +2613,7 @@ touist_qbf: XOR
 ## 
 ##
 
-No formula has been given.
+Either formula is empty or this QBF formula does not start correctly.
 
 touist_simple: BIGOR VAR COMMA XOR 
 ##
