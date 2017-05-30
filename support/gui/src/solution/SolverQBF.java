@@ -162,14 +162,16 @@ public class SolverQBF extends Solver {
 		final int WAIT_FOR_MODEL_TIMEOUT = 5000000; // ms
 		if (p == null) // Should not happen
 			throw new SolverExecutionException("nextModel(): exception: launch() has not been called");
-		String[] assignements;
+
 		Model modelParsed = null;
 		// We wait for any output from the solver unless we get a timeout
 		boolean no_timeout = waitResult(WAIT_FOR_MODEL_TIMEOUT);
 		// Case 1 : we got some text to read from stdout
 		if(stdout.ready() && p.exitValue() == 0) {
-			assignements = stdout.readLine().split("\\n");
-			modelParsed = parseModel(assignements);
+			String assignements = "";
+			while(stdout.ready())
+				assignements += stdout.readLine() + "\n";
+			modelParsed = parseModel(assignements.split("\\n"));
 		}
 		// Case 2 : no text but solver still running
 		if(!stdout.ready() && ! no_timeout) { // Nothing has been read
