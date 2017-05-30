@@ -38,20 +38,21 @@ public class TranslationLatex {
     private String latexFormula;
     private Process p;
     private List<TranslationError> errors = new ArrayList<TranslationError>();
-    
+    private boolean also_linter;
     /**
      * @param language can be "sat", "smt" or "qbf".
      */
-	public TranslationLatex(String touistl, String language) throws Exception {
+	public TranslationLatex(String touistl, String language, boolean also_linter) throws Exception {
+		this.also_linter = also_linter;
         if(touistl.length() == 0) {
             latexFormula = "";
         }
         else {
     		BufferedReader reader = new BufferedReader(new StringReader(touistl));
             try {
-            	latexify(reader, language);
+            	this.latexify(reader, language);
 			} catch (Exception e) {
-				// TODO: handle exception
+				System.err.println("latexity(): error with "+touistl);
 			}
         }
     }
@@ -66,6 +67,10 @@ public class TranslationLatex {
         out.close();
     }
     
+    public List<TranslationError> getErrors() {
+    	return errors;
+    }
+    
     public boolean latexify(BufferedReader reader, String language) throws IOException, InterruptedException {
 		String pathtouist = touist.TouIST.getTouistDir() + File.separator + "external" + File.separator + "touist";
 		
@@ -74,6 +79,7 @@ public class TranslationLatex {
 		cmd.add(pathtouist);
 		cmd.add("-");
 		cmd.add("--latex");
+		if(also_linter) cmd.add("--linter");
 		if (language == "qbf") {
 			cmd.add("--qbf");	
 		} else if (language == "sat") {

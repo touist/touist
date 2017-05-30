@@ -63,43 +63,27 @@ public class EditionPanel extends AbstractComponentPanel {
      * Creates new form EditorPanel
      */
     
-    public void UpdateLatexLabel()
-    {
-            try {
-                TranslationLatex T = new TranslationLatex(editorTextArea.getText(),editorTextArea.getSyntaxEditingStyle());
-                TeXFormula formula = new TeXFormula(T.getFormula());
-                TeXIcon ti = formula.createTeXIcon(TeXConstants.ALIGN_TOP, 20+zoom);
-                latexLabel.setIcon(ti);
-            }
-            catch (Exception exc) {
-                System.err.println("Erreur lors de la conversion latex");
-                System.err.println(exc.toString());
-            }
+    public void reparseLatex() {
+	    
+		try {
+			TranslationLatex tr = new TranslationLatex("", this.getEditorTextArea().getSyntaxEditingStyle(), true);
+			setLatex(tr.getFormula());
+		} catch (Exception e) {
+			System.out.println("reparseLatex(): could not parse to latex");
+		}
+    }
+    
+    public void setLatex(String latex) {
+    	TeXFormula formula = new TeXFormula(latex);
+	    TeXIcon ti = formula.createTeXIcon(TeXConstants.ALIGN_TOP, 20+zoom);
+	    latexLabel.setIcon(ti);
     }
     
     public void zoom(int step) {
         zoom += step;
         zoom = Math.min(200,zoom);
         zoom = Math.max(-19,zoom);
-        UpdateLatexLabel();
-    }
-    
-    class UpdateLatexListener implements DocumentListener {
-        
-         @Override
-        public void insertUpdate(DocumentEvent e) {
-            UpdateLatexLabel();
-        }
-
-        @Override
-        public void removeUpdate(DocumentEvent e) {
-            UpdateLatexLabel();
-        }
-        
-        @Override
-        public void changedUpdate(DocumentEvent e) {
-            UpdateLatexLabel();
-        }
+        reparseLatex();
     }    
     
     class ScaleLatexListener implements MouseWheelListener {
@@ -121,8 +105,7 @@ public class EditionPanel extends AbstractComponentPanel {
         // Editor textArea set-up
         try {
              editorTextArea = new Editor();
-             editorTextArea.getDocument().addDocumentListener(new UpdateLatexListener());
-             editorTextArea.addParser(parser = new ErrorParser());
+             editorTextArea.addParser(parser = new ErrorParser(this));
              editorTextArea.setSyntaxEditingStyle("sat");
         }
         catch (IOException e) {
