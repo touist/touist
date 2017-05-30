@@ -20,7 +20,9 @@ let rec to_prenex quant_prop_l ast : ast =
     | Prop name -> to_prenex (name::quant_prop_l) ast
     | e -> failwith ("[shouldnt happen] a quantor must be a proposition, not a '"^Pprint.string_of_ast_type e^"' in " ^ Pprint.string_of_ast e)
   in
-  (* [to_prenex]  *)
+  (* [to_prenex]
+     WARNING: this function will remove all xor and equiv as they cannot be
+     translated into prenex form otherwise. *)
   let to_prenex ast = to_prenex quant_prop_l ast
   in
   match ast with
@@ -41,9 +43,12 @@ let rec to_prenex quant_prop_l ast : ast =
   | Not x -> Not (to_prenex x)
   | And (x,y) -> And (to_prenex x, to_prenex y)
   | Or (x,y) -> Or (to_prenex x, to_prenex y)
-  | Xor (x,y) -> failwith "TODO: xor has not been implemented yet for use with qbf"
+  | Xor (x,y) -> to_prenex (And (Or (x,y), Or (Not x, Not y)))
   | Implies (x,y) -> Implies (to_prenex x, to_prenex y)
-  | Equiv (x,y) -> failwith "TODO: xor has not been implemented yet for use with qbf"
+  (* ∃x ⇔ y   ≡   (∃x ⇒ y)⋀(y ⇒ ∃x)  ≡  ∀x.(x ⇒ y) ⋀ ∃x1.(y ⇒ x1), and thus
+     we cannot translate to prenex and keep the equivalence notation: x is used
+     twice. *)
+  | Equiv (x,y) -> to_prenex (And (Implies (x,y),Implies (y,x)))
   | Prop x -> if List.exists (fun y -> y=x) quant_prop_l then Prop (add_suffix x) else Prop x
   | e -> failwith ("[shouldnt happen] a qbf formula shouldn't contain '"^Pprint.string_of_ast_type e^"' in " ^ Pprint.string_of_ast e)
 
