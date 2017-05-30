@@ -487,6 +487,19 @@ $\rightarrow$ (``=>``) or $\leftrightarrow$ (``<=>``).
     | <T> "<=>" <T>
 ```
 
+~ Note
+You can chain multiple variables in ``bigand`` or ``bigor`` by giving a
+list of variables and sets. This will translate into nested
+``bigand``/``bigor``. You can even use the value of outer variables in
+inner set declarations:
+
+``` Touist
+bigand $i,$j in [1..3], [1..$i]:
+    p($i,$j)
+end
+```
+~
+
 ### Generalized connectors
 Generalized connectors ``bigand``, ``bigor``, ``exact``, ``atmost`` and
 ``atleast`` are also available for generalizing the formulas using sets. Here
@@ -623,7 +636,7 @@ Using this syntax, the formula ``exact(5,p([1..20])`` is equivalent to
 ~~
 ~
 
-##### Special cases for quantifier elimination
+##### Special cases for operator elimination
 
 The following table sums up the various "limit" cases that may not be obvious.
 In this table, $k$ is a positive integer and $P$ is a set of propositions.
@@ -669,7 +682,7 @@ The constants $\top$ (``Top``) and $\bot$ (``Bot``) allows to express the
     | <let-affect(<T>)>
 
 ```
-### SMT formulas
+## SMT formulas
 
 Touist can also be given Satisfiability Modulo Theory (SMT) formulas and output
 the SMT2-LIB-compliant file.
