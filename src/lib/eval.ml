@@ -523,6 +523,10 @@ and eval_ast_formula (msgs:Msgs.t ref) (env:env) (ast:ast) : ast =
   | Implies (x,Bottom) -> eval_ast_formula (Not x)
   | Implies (Top,x) -> eval_ast_formula x
   | Implies (x,y) -> Implies (eval_ast_formula x, eval_ast_formula y)
+  | Equiv   (x,Top) (* x ⇔ ⊤  ≡  (¬x ⋁ ⊤) ⋀ (¬⊤ ⋁ x)  ≡  ⊤ ⋀ x  ≡  x *)
+  | Equiv   (Top,x) -> eval_ast_formula x
+  | Equiv   (x,Bottom) (* x ⇔ ⊥  ≡  (¬x ⋁ ⊥) ⋀ (¬⊥ ⋁ x)  ≡  ¬x ⋀ ⊤  ≡  ¬x *)
+  | Equiv   (Bottom,x) -> eval_ast_formula (Not x)
   | Equiv   (x,y) -> Equiv (eval_ast_formula x, eval_ast_formula y)
   | Exact (x,y) -> rm_top_bot begin (* !check_only simplifies by returning a dummy proposition *)
       match eval_ast x, eval_ast y with
