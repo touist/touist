@@ -756,6 +756,8 @@ and set_to_ast_list (msgs:Msgs.t ref) (env:env) (ast:ast) :ast list =
     | Lesser_or_equal  (x,y) -> has_top_or_bot x || has_top_or_bot y
     | Greater_than     (x,y) -> has_top_or_bot x || has_top_or_bot y
     | Greater_or_equal (x,y) -> has_top_or_bot x || has_top_or_bot y
+    | Exists (_,y)           -> has_top_or_bot y
+    | Forall (_,y)           -> has_top_or_bot y
     | _ -> false
   (* Simplify an AST by removing Bot and Top that can be absorbed
      by And or Or. *)
