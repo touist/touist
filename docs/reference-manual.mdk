@@ -264,7 +264,15 @@ are expanded whether they are in an expression or in a formula:
 ## Numeric expression
 
 The available operations on integers and floats are `+`, `-`, `*`, `/`,
-``$x mod $y`` (modulo) and ``abs($x)`` (absolute value).
+``$x mod $y`` (modulo) and ``abs($x)`` (absolute value). Parenthesis can
+be used. The order of priority for the infix operators is:
+
+|--------------------|:-----------:|
+| *highest priority* | ``mod``     |
+|                    | ``*``,``/`` |
+| *lowest priority*  | ``+``,``-`` |
+|--------------------|-------------|
+
 
 Here is the complete rule for numeric operators:
 ``` Grammar
@@ -343,6 +351,20 @@ true or false) is not done during the translation from touist to the
 "solver-friendly" language. Conversely, a boolean expression must be
 evaluable during the translation.
 ~
+
+Parenthesis can be used in boolean expressions. The priority order for
+booleans is:
+
+|--------------------|:-----------------------------------------------:|
+| *highest priority* | ``==``,``!=``,``<=``,``>=``,``<``,``>``, ``in`` |
+|                    | ``not``                                         |
+|                    | ``xor``                                         |
+|                    | ``and``                                         |
+|                    | ``or``                                          |
+| *lowest priority*  | ``=>``, ``<=>``                                 |
+|--------------------|-------------------------------------------------|
+
+Note that ``=>`` and ``<=>`` associativity is evaluated from right to left.
 
 Here is the full grammar rule for booleans:
 ``` Grammar
@@ -621,9 +643,10 @@ In this table, $k$ is a positive integer and $P$ is a set of propositions.
 |                  |$k=0$ | any            |``Top``                        |
 |------------------|------|----------------|-------------------------------|
 ~
-How to read the table: for example, the row where $k>0$ and $\vert P\vert<k$
-should be read "when using ``atleast``, all couples 
-$(k,P) \in \{(k,P)|k>0,\vert P\vert<k\}$ will produce the special case ``Top``".
+How to read the table: for example, the row where $k>0$ and
+$\vert P\vert<k$ should be read "when using ``atleast``, all couples
+$(k,P) \in \{(k,P)|k>0,\vert P\vert<k\}$ will produce the special case
+``Top``".
 
 ### Propositional logic formulas
 
@@ -656,10 +679,10 @@ Describe the SMT language
 
 ## QBF formulas
 
-Using the `--qbf` flag (in touist) or the QBF selector (in the graphical interface),
-you can solve QBF problems with existential and universal quantifiers over boolean
-values. This logic is basically the same as the SAT grammar, except for two new
-operators:
+Using the `--qbf` flag (in touist) or the QBF selector (in the graphical
+interface), you can solve QBF problems with existential and universal
+quantifiers over boolean values. This logic is basically the same as the
+SAT grammar, except for two new operators:
 ``` Grammar
     | "exists" <comma-list(<prop>|<var>)> ":" <formula-qbf> 
     | "forall" <comma-list(<prop>|<var>)> ":" <formula-qbf>
@@ -675,16 +698,17 @@ forall e,d: (exists a,b: a => b) => (e and forall c: e => c)
 
 ## Formal grammar
 
-This section presents the grammar formatted in a BNF-like way. Some rules (a
-rule begins with "`::=`") are parametrized so that some parts of the grammar
-are "factorized" (the idea of parametrized rules come from the Menhir parser
-generator used for generating the touist parser).
+This section presents the grammar formatted in a BNF-like way. Some rules
+(a rule begins with "`::=`") are parametrized so that some parts of the
+grammar are "factorized" (the idea of parametrized rules come from the
+Menhir parser generator used for generating the touist parser).
 
 ~ Note
-This grammar specification is not LR(1) and could not be implemented as such
-using Menhir; most of the type checking is made after the abstract syntactic
-tree is produced. The only purpose of the present specification is to give a
-clear view of what is possible and not possible with this language.
+This grammar specification is not LR(1) and could not be implemented as
+such using Menhir; most of the type checking is made after the abstract
+syntactic tree is produced. The only purpose of the present specification
+is to give a clear view of what is possible and not possible with this
+language.
 ~
 
 ``` Grammar
@@ -836,18 +860,18 @@ TERM      = [_0-9]*[a-zA-Z][a-zA-Z_0-9]*
 # Command-line tool (`touist`)
 
 ## Installation
-The main tool that parses and solves the touist programs is written in Ocaml.
-It is easily installable (as long as you have installed `ocaml` and `opam`)
-with the command
+The main tool that parses and solves the touist programs is written in
+Ocaml. It is easily installable (as long as you have installed `ocaml`
+and `opam`) with the command
 ```
   opam install touist
 ```
 
 ~ Note
 `touist` can only solve SAT problems (written using propositional logic).
-Problems written using the Satisfiability Modulo Theory (SMT) extension of
-`touist` cannot (yet) be solved, but can still be translated to the SMT2-LIB
-format which can then be fed to a SMT solver.
+Problems written using the Satisfiability Modulo Theory (SMT) extension
+of `touist` cannot (yet) be solved, but can still be translated to the
+SMT2-LIB format which can then be fed to a SMT solver.
 ~
 
 ## Usage {#cli}
@@ -885,11 +909,11 @@ The language accepted for propositional logic is described in
 [#sec-propositional-logic-formulas]. This mode is enabled by
 default, but can be optionally expressed using the `--sat` flag.
 
-With no other argument, touist will simply translate the touist
-code to the [DIMACS][dimacs] format and then output the mapping table
-(that maps each proposition to an integer > 0) in DIMACS comments.
-You can redirect this mapping table using the `--table <filename>` flag. 
-[dimacs]: <http://www.satcompetition.org/2009/format-benchmarks2009.html>
+With no other argument, touist will simply translate the touist code to
+the [DIMACS][dimacs] format and then output the mapping table (that maps
+each proposition to an integer > 0) in DIMACS comments. You can redirect
+this mapping table using the `--table <filename>` flag.  [dimacs]:
+<http://www.satcompetition.org/2009/format-benchmarks2009.html>
 
 ### Usage for quantified boolean logic (QBF mode)
 
@@ -898,8 +922,8 @@ You can redirect this mapping table using the `--table <filename>` flag.
 
 **`--solve`**. Ask touist to solve the SAT problem. By default, the first
 model is displayed; you can ask for more models using the `--limit N`
-option. The models are separated by lines beginning with `====` and
-for one model, each line contains a valuation followed by the corresponding
+option. The models are separated by lines beginning with `====` and for
+one model, each line contains a valuation followed by the corresponding
 proposition. For example:
 ``` Touist
   echo a and b | touist - --solve
@@ -911,36 +935,37 @@ will display
   1 a
   ==== Found 1 models, limit is 1 (--limit N for more models)
 ```
-which corresponds to the valuation $\{a \leftarrow 1, b \leftarrow 1\}$. Note
-that the model counter begins at 0. With this format, you can easily filter
-the results. For example, the following command will only show the propositions
-that are ``true``:
+which corresponds to the valuation $\{a \leftarrow 1, b \leftarrow 1\}$.
+Note that the model counter begins at 0. With this format, you can easily
+filter the results. For example, the following command will only show the
+propositions that are ``true``:
 ```
   echo a and b | touist - --solve | grep ^1
 ```
 
-**`--limit N`**. In conjunction with `--solve`, set the maximum number
-of models returned. When N=0, all models are returned.
+**`--limit N`**. In conjunction with `--solve`, set the maximum number of
+models returned. When N=0, all models are returned.
 
-**`--count`**. Instead of returning the models, just return the count
-of models. This option will only work for small problems: the number of
+**`--count`**. Instead of returning the models, just return the count of
+models. This option will only work for small problems: the number of
 models explodes when the number of propositions is big.
 
 ### Other options
-**`--latex`**. Translates the given touist code to &logolatex;. The resulting
-latex code only require the `mathtools` package and is compatible with
-Mathjax (JavaScript tool for displaying math in HTML). This command does
-not print `\begin{document}`{language:latex} nor any latex headers
-(`\usepackage{}`{language:latex}...). 
+**`--latex`**. Translates the given touist code to &logolatex;. The
+resulting latex code only require the `mathtools` package and is
+compatible with Mathjax (JavaScript tool for displaying math in HTML).
+This command does not print `\begin{document}`{language:latex} nor any
+latex headers (`\usepackage{}`{language:latex}...).
 
 **`--show`**. This option prints the formula generated by the given
-touist file. This is useful for debugging and testing that the
-constructs ``bigand``, ``bigor``, ``exact``... are correclty evaluated.
+touist file. This is useful for debugging and testing that the constructs
+``bigand``, ``bigor``, ``exact``... are correclty evaluated.
 
 **`--show-hidden`**. This is specific to the SAT mode. When displaying
 the DIMACS result, also include the hidden propositions that have been
-generated during the CNF expansion by the [Tseitin][tseitlin] transformation.
-[tseitlin]: <https://en.wikipedia.org/wiki/Conjunctive_normal_form>
+generated during the CNF expansion by the [Tseitin][tseitlin]
+transformation. [tseitlin]:
+<https://en.wikipedia.org/wiki/Conjunctive_normal_form>
 
 **`--linter`**. This option disables all outputs except for errors. It
 also shortens then evaluation step by bypassing the expansive ``bigand``,
@@ -962,20 +987,21 @@ to read the errors. The placeholders you can use are:
 | `%m` | error message                     |
 | `\n` | new line                          |
 |------|-----------------------------------|
-By default, the errors and warnings will display with the formatting `%l:%c: %t: %m`.
-An ending newline (`\n`) is automatically added.
+By default, the errors and warnings will display with the formatting
+`%l:%c: %t: %m`. An ending newline (`\n`) is automatically added.
 
 **`--wrap-width N`**. Lets you choose the width of the messages (errors,
-warnings) given by touist. By default, touist will wrap all messages with a 76
-characters limit. With N set to 0, you can disable the wrapping.
+warnings) given by touist. By default, touist will wrap all messages with
+a 76 characters limit. With N set to 0, you can disable the wrapping.
 
 **`--debug-syntax`**. This is a development option that adds to the error
 and warning messages the state number of the LL(1) automaton. Each state
-number that may trigger a syntax error should have a corresponding message 
-in `src/parser.messages`.
+number that may trigger a syntax error should have a corresponding
+message in `src/parser.messages`.
 
 **`--debug-cnf`**. This is also a development option; in SAT mode, it
-prints the successive recursive transformations that produce the CNF formula.
+prints the successive recursive transformations that produce the CNF
+formula.
 
 ### Usage for Satisfiability Modulo Theory (SMT mode)
 
@@ -996,14 +1022,14 @@ You might have noticed that on every run of `touist`, only one error is
 shown at a time. Many compilers are able to show multiple errors across
 the file (e.g., any C compiler). Some other compilers, like OCaml, only
 display one error at a time. This feature is often expected by developers
-as a time saver: one single run of the compiler to squash as many mistakes
-as possible. 
+as a time saver: one single run of the compiler to squash as many
+mistakes as possible.
 
 This feature is tightly liked to one particular trait of the grammar of
-the language: the semi-colon (`;`). When an error comes up, the semi-colon
-will act as a checkpoint to which the parser will try to skip to. Hoping
-that this error is only contained in this instruction, the parser will try
-to continue after the semi-colon.
+the language: the semi-colon (`;`). When an error comes up, the
+semi-colon will act as a checkpoint to which the parser will try to skip
+to. Hoping that this error is only contained in this instruction, the
+parser will try to continue after the semi-colon.
 
 The touist grammar does not have such an instruction marker; because of
 that, we are not able to skip to the next instruction.
