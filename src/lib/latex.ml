@@ -94,6 +94,7 @@ let rec latex_of_ast = function
   | Paren x -> "(" ^ latex_of_ast x ^ ")"
   | Exists (v,f) -> "\\exists "^(latex_of_ast v) ^". "^ (latex_of_ast f)
   | Forall (v,f) -> "\\forall "^(latex_of_ast v) ^". "^ (latex_of_ast f)
+  | For (v,c,f)  -> "\\textrm{for} "^latex_of_ast v^" \\in "^latex_of_ast c^":"^ latex_of_ast f
 
   and latex_of_commalist sep el = String.concat sep (List.map latex_of_ast el)
   and escape_underscore txt =
