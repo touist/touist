@@ -81,12 +81,15 @@ let rec quantify_free_variables env ast =
     | Implies (x,y) -> search_free env x @ search_free env y
     | Equiv   (x,y) -> search_free env x @ search_free env y
     | e -> failwith ("quantify_free_variables(): a qbf formula shouldn't \
-      contain '"^Pprint.string_of_ast_type e^"' in " ^ Pprint.string_of_ast e)
+      contain '"^Pprint.string_of_ast_type e^"' in " ^ Pprint.string_of_ast e) in
+  let rec remove_dups = function
+    | [] -> []
+    | h::t -> h::(remove_dups (List.filter (fun x -> x<>h) t))
   in match ast with
   | Exists (Prop x,f) -> Exists (Prop x,quantify_free_variables (x::env) f)
   | Forall (Prop x,f) -> Forall (Prop x,quantify_free_variables (x::env) f)
   | other -> let free = search_free env other in
-    free |> List.fold_left (fun acc x -> Exists (Prop x,acc)) other
+    free |> remove_dups |> List.fold_left (fun acc x -> Exists (Prop x,acc)) other
 
 
 let prenex ast =
