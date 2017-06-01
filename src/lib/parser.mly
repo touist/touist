@@ -39,6 +39,7 @@
 %token LET
 %token EOF
 %token FORALL EXISTS
+%token FOR
 
 
 (* The following lines define in which order the tokens should
@@ -307,5 +308,17 @@ expr_smt:
 
 %inline prop_or_var: p=prop | p=var {p}
 
-%inline exists(F): EXISTS v=comma_list(prop_or_var) COLON form=F { List.fold_right (fun v acc -> Loc (Exists (v,acc),($startpos,$endpos))) v form }
-%inline forall(F): FORALL v=comma_list(prop_or_var) COLON form=F { List.fold_right (fun v acc -> Loc (Forall (v,acc),($startpos,$endpos))) v form }
+%inline exists(F): EXISTS v=comma_list(prop_or_var) for_opt=for_statement? COLON form=F
+  { let res = form |> List.fold_right (fun v acc -> Loc (Exists (v,acc),($startpos,$endpos))) v in
+    match for_opt with
+    | None -> res
+    | Some (var,content) -> Loc (For (var,content,res),($startpos,$endpos))
+  }
+%inline forall(F): FORALL v=comma_list(prop_or_var) for_opt=for_statement? COLON form=F
+  { let res = form |> List.fold_right (fun v acc -> Loc (Forall (v,acc),($startpos,$endpos))) v in
+    match for_opt with
+    | None -> res
+    | Some (var,content) -> Loc (For (var,content,res),($startpos,$endpos))
+  }
+
+%inline for_statement: FOR v=var IN content=expr { (v,content) }

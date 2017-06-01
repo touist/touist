@@ -83,6 +83,7 @@
     "powerset(",     POWERSET;
     "exists",        EXISTS;
     "forall",        FORALL;
+    "for",        FOR;
     ]
 }
 
