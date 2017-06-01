@@ -55,9 +55,9 @@ configure:
 # setup.ml) when using ./configure + make
 #
 
-.PHONY: missing FORCE pre-build clean-pre-build
+.PHONY: missing FORCE pre-build clean-pre-build aadjnzdljah
 
-targets = src/lib/parser_messages.ml src/lib/version.ml
+targets = src/lib/version.ml src/lib/parser_messages.ml
 pre-build: $(targets)
 
 # Produced by menhir
@@ -76,9 +76,9 @@ pre-build: $(targets)
 ifeq ($(shell test -d .git && echo yes),yes)
 # If we are in a git repo, whenever the content of
 # .git/ changes, we want to run the rule %version.ml.
-git_prerequisite=.git/HEAD .git/refs/heads
+src/lib/version.ml: .git/HEAD .git/refs/heads/
 endif
-%version.ml: %version.cppo.ml $(git_prerequisite)
+src/lib/version.ml: src/lib/version.cppo.ml
 	@mkdir -p $(dir $@)
 	@[ $(HAS_YICES2) ] || (echo "Please set the HAS_YICES2 var, e.g., 'make $@ HAS_YICES2=true'" && exit 1)
 	@[ $(HAS_QBF) ] || (echo "Please set the HAS_QBF var, e.g., 'make $@ HAS_QBF=true'" && exit 1)
