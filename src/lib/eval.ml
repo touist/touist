@@ -620,6 +620,13 @@ and eval_ast_formula (msgs:Msgs.t ref) (env:env) (ast:ast) : ast =
     | wrong -> raise_with_loc msgs p ("'forall' only works on propositions. Instead, got a "
         ^"'"^string_of_ast_type wrong^"'.\n")
     in Forall (p, eval_ast_formula f)
+  | For (Loc (Var (p,i),loc), content, Loc (formula,_)) ->
+    let name = (expand_var_name msgs env (p,i)) in begin
+    match formula, eval_ast content with
+    | Exists (x,f), Set s -> AstSet.fold (fun content acc -> Exists (eval_ast_formula_env ((name,(content,loc))::env) x, acc)) s (eval_ast_formula f)
+    | Forall (x,f), Set s -> AstSet.fold (fun content acc -> Forall (eval_ast_formula_env ((name,(content,loc))::env) x, acc)) s (eval_ast_formula f)
+    | _,content' -> raise_type_error msgs ast content content' " 'prop-set'"
+    end
   | e -> raise_with_loc msgs ast ("this expression is not a formula: " ^ string_of_ast e ^"\n")
 
 and exact_str lst =
