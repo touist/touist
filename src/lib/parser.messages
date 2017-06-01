@@ -2906,7 +2906,7 @@ touist_simple: TOP WHEN
 ## formula_simple 
 ##
 
-Ill-formed SMT formula. At this point, either:
+Ill-formed formula. At this point, either:
 - continue the formula with an operator (and,or,xor,=>,<=>),
 - or begin a new formula by a blank space,
 - or affect a global variable.
