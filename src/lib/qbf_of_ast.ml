@@ -67,7 +67,31 @@ let rec is_prenex = function
   | Exists (_,f) | Forall (_,f) -> is_prenex f
   | f -> is_unquant f
 
+(* [] takes a prenex form and quantifies existentially any free variable
+   in the innermost way possible. *)
+let rec quantify_free_variables env ast =
+  let rec search_free env ast =
+    match ast with
+    | Prop x -> if List.exists (fun y -> y=x) env then [] else [x]
+    | Top | Bottom  -> []
+    | Not x         -> search_free env x
+    | And     (x,y) -> search_free env x @ search_free env y
+    | Or      (x,y) -> search_free env x @ search_free env y
+    | Xor     (x,y) -> search_free env x @ search_free env y
+    | Implies (x,y) -> search_free env x @ search_free env y
+    | Equiv   (x,y) -> search_free env x @ search_free env y
+    | e -> failwith ("quantify_free_variables(): a qbf formula shouldn't \
+      contain '"^Pprint.string_of_ast_type e^"' in " ^ Pprint.string_of_ast e)
+  in match ast with
+  | Exists (Prop x,f) -> Exists (Prop x,quantify_free_variables (x::env) f)
+  | Forall (Prop x,f) -> Forall (Prop x,quantify_free_variables (x::env) f)
+  | other -> let free = search_free env other in
+    free |> List.fold_left (fun acc x -> Exists (Prop x,acc)) other
+
+
 let prenex ast =
   let rec to_prenex_loop ast =
     if is_prenex ast then ast else ast |> to_prenex [] |> to_prenex_loop
-  in to_prenex_loop ast
+  in let intermediate = to_prenex_loop ast in
+  (* Printf.printf "before_bounding_free: %s\n" (Pprint.string_of_ast ~utf8:true intermediate);*)
+  intermediate |> quantify_free_variables []
