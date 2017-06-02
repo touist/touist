@@ -98,8 +98,8 @@ let format_width color width text =
     match wrap_pos with
     | _ when from_pos >= wrap_pos -> ""
     | _ when wrap_pos = String.length text ->
-      Printf.fprintf stdout "newline=%d,indent=%d,prev_indent=%d,len=%d, '%s'\n"
-      wrap_pos cur_indent prev_indent (String.length text) (String.sub text from_pos (wrap_pos-from_pos));
+      (*Printf.fprintf stdout "newline=%d,indent=%d,prev_indent=%d,len=%d, '%s'\n"
+      wrap_pos cur_indent prev_indent (String.length text) (String.sub text from_pos (wrap_pos-from_pos)); *)
       spaces prev_indent ^ String.sub text from_pos (wrap_pos-from_pos)
     | _ when String.get text wrap_pos = '\n' -> (* wrap at a \n symbol *)
       spaces prev_indent ^ String.sub text from_pos (wrap_pos-from_pos)
