@@ -117,12 +117,28 @@ code could be equivalently written
                 | EOF
 ```
 
-A touist file is a whitespace-separated list of affectations and formulas.
-Affectations are global and cannot be done in nested formulas. They can be
-anywhere in the file (at the beginning, at the end or interlaced with formulas).
-A whitespace is a space, tab or newline.
+A touist file is a whitespace-separated[^whitespace] list of affectations
+and formulas. Affectations are global and can be interlaced with formulas
+as long as they are not nested in formulas (for local variables, you can
+use ``let``, see [#sec-local-affectation-let-construct]). Comments begin
+with the "``;;``" sequence.
 
-Comments begin with the "``;;``" sequence.
+[^whitespace]: A whitespace is a space, tab or newline.
+
+~ Note
+The whitespace-separated list of formulas is actually going to be
+converted to a conjunction; it avoids many intermediate ``and``.
+**Warning:** each formula in this list is going to be put into
+parenthesis:
+``` Touist
+a or b
+c => a
+```
+will be translated to
+``` Touist
+(a and b) and (c => a)
+```
+~
 
 ## Variables
 
