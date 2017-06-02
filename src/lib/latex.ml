@@ -35,7 +35,7 @@ let rec latex_of_ast = function
   | Top    -> "\\top "
   | Bottom -> "\\bot "
   | Prop x | UnexpProp (x, None)-> escape_underscore x
-  | UnexpProp (x,Some y) -> x ^ "_{" ^ (latex_of_commalist "," y) ^ "}"
+  | UnexpProp (x,Some y) -> escape_underscore x ^ "_{" ^ (latex_of_commalist "," y) ^ "}"
   | Var (name,ind)   -> "\\mathbf{" ^ escape_underscore (rm_dollar name) ^ "}" ^
     (match ind with Some ind -> ("("^ (latex_of_commalist "," ind) ^")") | None->"")
   | Set    x -> "["^latex_of_commalist "," (AstSet.elements x) ^ "]"
@@ -98,4 +98,4 @@ let rec latex_of_ast = function
 
   and latex_of_commalist sep el = String.concat sep (List.map latex_of_ast el)
   and escape_underscore txt =
-    Str.global_replace (Str.regexp "_") "\\_" txt
+    Str.global_replace (Str.regexp "_") "\\\\_" txt
