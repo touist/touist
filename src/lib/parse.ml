@@ -69,11 +69,11 @@ let parse (parser) ?debug:(debug=false) filename (text:string) : ast * Msgs.t re
   and fail checkpoint =
     let msg = (Parser_error_report.report text !buffer checkpoint debug)
     and loc = Parser_error_report.area_pos !buffer (* area_pos returns (start_pos,end_pos) *)
-    in add_fatal msgs (Error,Parse,msg,loc)
+    in add_fatal msgs (Error,Parse,msg,Some loc)
   in
     let ast =
       try Parser.MenhirInterpreter.loop_handle succeed fail supplier checkpoint
-      with Lexer.Error (msg,loc) -> Msgs.add_fatal msgs (Error,Lex,msg,loc)
+      with Lexer.Error (msg,loc) -> Msgs.add_fatal msgs (Error,Lex,msg,Some loc)
     in ast,msgs
 
 (** Directly calls [parser] with [Parser.Incremental.touist_simple] *)
