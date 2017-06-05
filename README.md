@@ -2,7 +2,7 @@ TouIST, the language for propositional logic
 ===========================================
 
 
-|      Mac, Linux      |         Windows         |    Documentation     |
+|      Mac, Linux      |         Windows         | [Reference manual][ref] |
 | :------------------: | :---------------------: | :------------------: |
 | [![trv-img]][travis] | [![apvy-img]][appveyor] | [![cir-img]][circle] |
 

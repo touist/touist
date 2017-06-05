@@ -19,15 +19,15 @@ machine:
 
 checkout:
   post:
-    - git fetch --unshallow || git fetch
+    - git fetch --unshallow 2>/dev/null --tags || git fetch --tags
 
 dependencies:
   override:
     - npm install -g madoko
-      
+
 test:
   override:
-    # We must use the pdflatex through the options 
+    # We must use the pdflatex through the options
     #    -mmath-latex:pdflatex -mmath-latex-full:pdflatex
     # because of a texlive-2016 bug between xelatex and dvisvgm. The bug
     # is called "DVI format 7 not supported" and occurs because xetex uses
@@ -40,21 +40,32 @@ test:
     # file and it will be replaced by the git last tag.
     #
     # "-mmath-mode:static" is because I use "Math Mode: mathjax" when editing
-    # the .mdk. I want to produce SVG math images instead of using mathjax 
+    # the .mdk. I want to produce SVG math images instead of using mathjax
     # for the final HTML.
-    - cd docs && madoko -vvvv -mversion:`git describe --tags` -mmath-mode:static -mmath-latex:pdflatex -mmath-latex-full:pdflatex reference-manual.mdk
-    - cd docs && madoko -vvvv -mversion:`git describe --tags` -mmath-mode:static -mmath-latex:pdflatex -mmath-latex-full:pdflatex --pdf reference-manual.mdk
-    - cp docs/out/reference-manual.pdf docs/out/reference-manual.html "$CIRCLE_ARTIFACTS"
+    - |
+      cd docs
+      madoko -vvvv -mversion:$(git describe --tags) -mmath-mode:static -mmath-latex:pdflatex -mmath-latex-full:pdflatex reference-manual.mdk
+      madoko -vvvv -mversion:$(git describe --tags) -mmath-mode:static -mmath-latex:pdflatex -mmath-latex-full:pdflatex --pdf reference-manual.mdk
+    - cp docs/out/reference-manual.{pdf,html} "$CIRCLE_ARTIFACTS"
     # I had to add a ssh pair of keys to circle-ci and github. The
     # full explaination is here:
     # https://circleci.com/docs/1.0/adding-read-write-deployment-key/
-    - git clone git@github.com:touist/touist.github.io.git
-    - cp docs/out/reference-manual.pdf docs/out/reference-manual.html touist.github.io
-    - |
-       cd touist.github.io
-       git pull
-       git config user.name "CircleCI"
-       git config user.email "robot@circleci.com"
-       git add reference-manual.pdf reference-manual.html
-       git commit -m "Generated mdk (modako) documentation for `cd .. && git describe --tags`"
-       git push
+deployment:
+  release:
+    tag: /v.*/
+    owner: touist
+    commands:
+      - |
+        git clone git@github.com:touist/touist.github.io.git
+        cp docs/out/reference-manual.pdf docs/out/reference-manual-$(git describe --tags).pdf
+        cp docs/out/reference-manual.html docs/out/reference-manual-$(git describe --tags).html
+        cp docs/out/reference-manual*.{pdf,html} touist.github.io
+        cd touist.github.io
+        pip install mako
+        ./make_index.py . --regex "reference-manual.*" --header "Reference manual revisions" > manual-revision.html
+        git pull
+        git config user.name "CircleCI"
+        git config user.email "robot@circleci.com"
+        git add reference-manual*.{pdf,html} manual-revision.html
+        git commit -m "Generated mdk (modako) documentation for `cd .. && git describe --tags`"
+        git push
