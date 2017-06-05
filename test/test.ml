@@ -4,17 +4,20 @@ open OUnit2;;
    that the place where the error was found is the right one.  *)
 
 let find_msg msgs typ during loc_str =
-  let m = Msgs.filter 
-    (fun msg -> match msg with 
-      | t,d,_,l when String.compare (Msgs.string_of_loc l) loc_str == 0
+  let m = Msgs.filter
+    (fun msg -> match msg with
+      | t,d,_,Some l when String.compare (Msgs.string_of_loc l) loc_str = 0
             && t == typ
-            && d == during -> true 
+            && d == during -> true
+      | t,d,_,None when loc_str = ""
+            && t == typ
+            && d == during -> true
       | _ -> false)
     msgs
   in Msgs.elements m
 
 let test_raise (parse:(string->Msgs.t)) (during:Msgs.during) typ nth_msg (loc_expected:string) text =
-  let raised_error,msgs = (try let msgs = parse text in false,msgs with Msgs.Fatal msgs -> true,msgs) in
+  let raised_error,msgs = (try let msgs = parse text in false,msgs with Msgs.Fatal (_,msgs) -> true,msgs) in
   if typ == Msgs.Error && raised_error == false then
     OUnit2.assert_failure ("this test didn't raise an error at location '"^loc_expected^"' as expected")
   else
@@ -32,7 +35,7 @@ let test_sat text _ =
   if Msgs.has_error msgs then OUnit2.assert_failure
     ("this test didn't raise any exceptions but errors had been outputed:\n"^
       Msgs.string_of_msgs msgs)
-  with Msgs.Fatal msg -> OUnit2.assert_failure 
+  with Msgs.Fatal (_,msg) -> OUnit2.assert_failure
     ("this test shouldn't have raised a Fatal exception. Here is the exception:\n"^
       Msgs.string_of_msgs msg)
 
@@ -41,7 +44,7 @@ let test_smt ?(logic="QF_IDL") text _ =
   if Msgs.has_error msgs then OUnit2.assert_failure
       ("this test didn't raise any exceptions but errors had been outputed:\n"^
         Msgs.string_of_msgs msgs)
-    with Msgs.Fatal msg -> OUnit2.assert_failure 
+    with Msgs.Fatal (_,msg) -> OUnit2.assert_failure
       ("this test shouldn't have raised a Fatal exception. Here is the exception:\n"^
         Msgs.string_of_msgs msg)
 
@@ -61,15 +64,15 @@ let sat_models_are text expected _ =
 let sat_expands_to text expected _ =
   OUnit2.assert_equal ~printer:(fun s -> s)
     expected (let ast,_ = Parse.parse_sat text |> Eval.eval in Pprint.string_of_ast ast)
-                       
-(*  A standard test in oUnit should first define a function 
+
+(*  A standard test in oUnit should first define a function
         let test1 context : unit = OUnit2.assert_bool true
     and then you add it to the suite:
         let suite = "suite">:::["test1">::test1;"test2">::test2]
     but instead, I chose to put these functions directly inside the
     list.
     Example of test checking that the exception is raised:
-      fun c -> OUnit2.assert_raises (Eval.Error 
+      fun c -> OUnit2.assert_raises (Eval.Error
       ("incorrect types with '<', which expects a float or int.\n"
        "The content of the variable '$i' has type 'int':\n"
        "    1\n"
@@ -88,10 +91,10 @@ and read_file (filename:string) : string list =
     close_in chan;
     List.rev !lines ;;
 
-let open_stream name = 
-  let chan = open_in name 
+let open_stream name =
+  let chan = open_in name
   in Stream.from (
-    fun _ -> try Some (input_line chan) 
+    fun _ -> try Some (input_line chan)
              with End_of_file -> None)
 
 
@@ -101,7 +104,7 @@ let check_solution (sorted_solution:string) (stream:char Stream.t) =
       | '\n' -> ""
       | c -> (Printf.sprintf "%c" c) ^ one_line stream
     with Stream.Failure -> ""
-  in 
+  in
   let lines_from_stream (stream:char Stream.t) : string list =
     let rec multiple_lines stream = match one_line stream with
     | "" -> []
@@ -124,7 +127,7 @@ let check_solution (sorted_solution:string) (stream:char Stream.t) =
   in check expected actual
 
 (* Name the test cases and group them together *)
-let () = 
+let () =
 run_test_tt_main (
 "touist">:::[
 

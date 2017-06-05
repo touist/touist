@@ -34,9 +34,9 @@ type env = (string * (ast * loc)) list
    The description is a couple (content, location) *)
 type extenv = (string, (ast * loc)) Hashtbl.t
 
-let get_loc (ast:ast) : loc = match ast with 
-    | Loc (_,loc) -> loc
-    | _ -> (Lexing.dummy_pos,Lexing.dummy_pos)
+let get_loc (ast:ast) : loc option = match ast with 
+    | Loc (_,loc) -> Some loc
+    | _ -> None
 
 let warning msgs (ast:ast) (message:string) =
   add_msg msgs (Warning,Eval,message,get_loc ast)
@@ -55,8 +55,8 @@ let ast_whithout_loc (ast:ast) : ast = match ast with
    [ast_whithout_loc] should not have been previously applied to [ast]
    because ast_whithout_loc will remove the Loc thing. *)
 let raise_with_loc msgs (ast:ast) (message:string) = match ast with
-  | Loc (ast,loc) -> add_fatal msgs (Error,Eval,message,loc)
-  | _ -> add_fatal msgs (Error,Eval,message,(Lexing.dummy_pos,Lexing.dummy_pos))
+  | Loc (ast,loc) -> add_fatal msgs (Error,Eval,message,Some loc)
+  | _ -> add_fatal msgs (Error,Eval,message,None)
 
 (* [raise_type_error] raises the errors that come from one-parameter functions.
    operator is the non-expanded (expand = eval_ast) operator.
@@ -115,7 +115,7 @@ let check_nb_vars_same_as_nb_sets msgs (ast:ast) (vars:ast list) (sets:ast list)
     "    "^(string_of_ast_list "," vars)^"\n"^
     "but you gave "^(string_of_int (List.length sets))^" sets:\n"^
     "    "^(string_of_ast_list "," sets)^"\n"
-    ,loc)
+    ,Some loc)
 
 let extenv = ref (Hashtbl.create 0)
 let check_only = ref false
@@ -500,7 +500,7 @@ and eval_ast_formula (msgs:Msgs.t ref) (env:env) (ast:ast) : ast =
                 "In order to produce an expanded proposition of this kind, '"^prefix^"' must be a proposition. "^
                 "Why? Because this variable is part of a formula, and thus is expected "^
                 "to be a proposition. Here is the content of '" ^prefix^"':\n"^
-                "    "^(string_of_ast content)^"\n",loc_affect)
+                "    "^(string_of_ast content)^"\n",Some loc_affect)
           in eval_ast_formula (UnexpProp ((string_of_ast term), Some indices))
       (* Case 5. the variable was of the form '$v(1,2,3)' and was not declared
          and '$v' is not either declared, so we can safely guess that this var has not been declared. *)
