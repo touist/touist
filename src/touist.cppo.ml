@@ -1,4 +1,5 @@
 open Parse
+open Msgs
 
 type error =
   | OK
@@ -123,6 +124,8 @@ let () =
    * it is the touistl input file (this is handled by [process_arg_alone]) *)
   Arg.parse argspecs process_arg_alone usage; (* parses the arguments *)
 
+  try
+
   (* Step 1.5: if we are asked the version number
    * NOTE: !version_asked means like in C, *version_asked.
    * It doesn't mean "not version_asked" *)
@@ -139,16 +142,14 @@ let () =
 
   (* Check (file | -) and open input and output *)
   if (!input_file_path = "/dev/stdin") && not !use_stdin (* NOTE: !var is like *var in C *)
-  then (
-    Printf.fprintf stderr "%s: you must give an input file.\nTo read from stdin, add - to the arguments. For more info, try --help.\n" cmd;
-    exit_with CMD_USAGE
-  );
-  if !use_stdin then input := stdin else (input := open_in !input_file_path);
+  then single_msg (Error,Usage,"you must give an input file (use - for reading from stdin).\n",None);
+
+  if !use_stdin then input := stdin else input := open_in !input_file_path;
 
   let count = List.fold_left (fun acc v -> if v then acc+1 else acc) 0
   in
   if (count [!sat_flag; !smt_flag<>""; !qbf_flag]) > 1 then
-    (Printf.fprintf stderr "%s: only one of --sat, --smt or --qbf must be given.\n" cmd; exit_with CMD_USAGE);
+    single_msg (Error,Usage,"only one of --sat, --smt or --qbf must be given.\n",None);
 
   (* Set the mode *)
   if      !sat_flag     then mode := Sat
@@ -160,9 +161,8 @@ let () =
 #ifdef yices2
   (* SMT Mode: check if one of the available QF_? has been given after --smt *)
   if (!mode = Smt) && not (Solvesmt.logic_supported !smt_flag) then
-    (Printf.fprintf stderr
-    "%s: you must give a correct SMT-LIB logic after --smt (try --help)\nExample: --smt QF_IDL\n" cmd;
-    exit_with CMD_USAGE);
+    single_msg (Error,Usage,"you must give a correct SMT-LIB \
+    logic after --smt (try --help)\nExample: --smt QF_IDL\n",None);
 #endif
 
   if !output_file_path <> ""
@@ -173,8 +173,6 @@ let () =
 
   if !equiv_file_path <> ""
   then input_equiv := open_in !equiv_file_path;
-
-  try
 
   (* latex = parse and transform with latex_of_ast *)
   if !latex || !linter then begin
@@ -275,7 +273,7 @@ let () =
       if str = ""
       then (Printf.fprintf stderr "unsat\n"; show_msgs_and_exit !msgs SOLVER_UNSAT)
       else Printf.fprintf !output "%s\n" str;
-      show_msgs_and_exit !msgs OK
+      show_msgs_and_exit !msgs OK;
     #else
       Printf.fprintf stderr
         ("This touist binary has not been compiled with yices2 support.");
@@ -319,5 +317,11 @@ let () =
   exit_with OK
 
   with
-    | Msgs.Fatal msgs -> (show_msgs_and_exit msgs TOUIST_SYNTAX)
+    | Fatal (Usage,msgs) -> (show_msgs_and_exit msgs CMD_USAGE)
+    | Fatal (Parse,msgs) -> (show_msgs_and_exit msgs TOUIST_SYNTAX)
+    | Fatal (Lex,msgs) -> (show_msgs_and_exit msgs TOUIST_SYNTAX)
+    | Fatal (Eval,msgs) -> (show_msgs_and_exit msgs TOUIST_SYNTAX)
+    | Fatal (Sat,msgs) -> (show_msgs_and_exit msgs TOUIST_SYNTAX)
+    | Fatal (Cnf,msgs) -> (show_msgs_and_exit msgs TOUIST_SYNTAX)
+    | Sys_error err -> show_msgs_and_exit (of_list [(Error,Usage,err^"\n",None)]) CMD_USAGE
     | x -> raise x

@@ -21,8 +21,8 @@ open Lexing (* for Lexing.position *)
 
 type msg_type = Error | Warning
 type loc = Lexing.position * Lexing.position
-type during = Parse | Lex | Eval | Sat | Cnf
-type msg = msg_type * during * string * loc
+type during = Usage | Parse | Lex | Eval | Sat | Cnf
+type msg = msg_type * during * string * loc option
 
 module Msg =
 struct
@@ -32,14 +32,20 @@ end
 
 include Set.Make(Msg)
 
-exception Fatal of t
+exception Fatal of during * t
 
 let has_error (msgs : t) : bool =
   exists (fun msg -> match msg with Error,_,_,_ -> true | _ -> false) msgs
 
 let add_msg (msgs:t ref) msg = msgs := add msg !msgs
 let add_fatal (msgs:t ref) msg =
-  add_msg msgs msg; raise (Fatal !msgs)
+  let _,during,_,_ = msg in
+  add_msg msgs msg; raise (Fatal (during,!msgs))
+
+let single_msg msg =
+  let _,during,_,_ = msg in
+  let msgs = ref empty in
+  add_msg msgs msg; raise (Fatal (during,!msgs))
 
 let null_loc = (Lexing.dummy_pos,Lexing.dummy_pos)
 
@@ -61,11 +67,15 @@ let loc_placeholders loc chr =
 let all_placeholders loc typ with_colors msg = function
   | 'm' -> msg
   | 't' -> (match typ with Warning -> "warning" | Error -> "error")
-  | c -> loc_placeholders loc c
+  | c -> match loc with None -> "" | Some loc -> loc_placeholders loc c
 
 (** [replace] replaces all '%c' for any character 'c' using the provided
     function 'placeholder'. Also replaces all two-characters '\n' to actual
-    one-character newline. *)
+    one-character newline.
+    %t must always be set before %m.
+    If location isn't available, all text/placeholders before the first
+    non-location placeholder (as well as any trailing whitespaces) will be
+    skipped. *)
 let replace (placeholder : char -> string) text =
   let text = Str.global_replace (Str.regexp "\\\\n") "\n" text in
   let text = Str.global_replace (Str.regexp "\\\\t") "\t" text in
@@ -77,7 +87,8 @@ let replace (placeholder : char -> string) text =
         ^ (String.get text (next_pos+1) |> placeholder)
         ^ if next_pos+2 <= String.length text-1 then replace (next_pos+2) else ""
     with Not_found -> String.sub text cur_pos (String.length text - cur_pos)
-  in replace 0
+  in replace (if (placeholder 'l')=""
+    then Str.search_forward (Str.regexp "%[^flcLCbB]") text 0 else 0)
 
 let string_of_loc ?(fmt="%l:%c") (loc:loc) : string =
   replace (loc_placeholders loc) fmt
