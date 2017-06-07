@@ -294,10 +294,10 @@ let () =
         Printf.fprintf stderr "    cnf: cannot print it for now\n"
       end;
       match Solveqbf.solve (qcnf,table) with
-      | true -> ()
-      | false ->
+      | Some str -> Printf.fprintf !output "%s\n" str
+      | None ->
         (Printf.fprintf stderr ("unsat\n");
-        exit_with SOLVER_UNSAT)
+        exit_with SOLVER_UNSAT);
     #else
       Printf.fprintf stderr
         ("This touist binary has not been compiled with qbf support.");
