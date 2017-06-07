@@ -36,12 +36,12 @@ let string_of_assign (assign:assignment) : string = match assign with
   | False -> "0"
   | Undef -> "?"
 
-let solve (f,table:QCNF.t * (Qbf.Lit.t,string) Hashtbl.t) =
+let solve (f,table:QCNF.t * (Qbf.Lit.t,string) Hashtbl.t) : string option =
   let res = solve Quantor.solver f
   in match res with
   | Unknown -> failwith "the quantor solver returned an unknown error"
   | Timeout -> failwith "the quantor solver took too much time to solve"
   | Spaceout -> failwith "the quantor solver ran out of memory"
-  | Unsat -> false
+  | Unsat -> None
   | Sat assign ->
-    print_endline (Hashtbl.fold (fun lit name acc -> (if acc="" then "" else acc^"\n")^ (assign lit |> string_of_assign) ^" "^ name) table ""); true
+    Some (Hashtbl.fold (fun lit name acc -> (if acc="" then "" else acc^"\n")^ (assign lit |> string_of_assign) ^" "^ name) table "")
