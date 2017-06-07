@@ -118,6 +118,7 @@ let () =
     "and supports conversion to SAT-DIMACS and SMT-LIB2 solver formats.\n"^
     "Usage: " ^ cmd ^ " [--sat] [-o OUTPUT] [--table TABLE] (INPUT | -)\n"^
     "Usage: " ^ cmd ^ " --smt (QF_IDL|QF_RDL|QF_LIA|QF_LRA) [-o OUTPUT] (INPUT | -)\n"^
+    "Usage: " ^ cmd ^ " --qbf [-o OUTPUT] (INPUT | -)\n"^
     "Note: in --sat mode, if TABLE and OUTPUT aren't given, both output will be mixed in stdout."
   in
   (* Step 1: we parse the args. If an arg. is "alone", we suppose
