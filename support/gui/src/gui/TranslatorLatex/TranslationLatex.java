@@ -35,7 +35,7 @@ import translation.TranslationError;
 public class TranslationLatex {
     
     // Result of touistl string translation to Latex 
-    private String latexFormula;
+    private String latexFormula = "";
     private Process p;
     private List<TranslationError> errors = new ArrayList<TranslationError>();
     private boolean also_linter;
@@ -88,6 +88,8 @@ public class TranslationLatex {
 			cmd.add("--smt");
 			cmd.add("QF_IDL");
 		}
+		cmd.add("--error-format");
+		cmd.add("%l:%L:%b:%B: %t: %m");
 		
         System.out.println("latexify(): cmd executed: "+cmd.toString());
 		
