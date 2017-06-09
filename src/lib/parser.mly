@@ -39,7 +39,7 @@
 %token LET
 %token EOF
 %token FORALL EXISTS
-%token FOR
+%token FOR NEWLINE
 
 
 (* The following lines define in which order the tokens should
@@ -252,6 +252,7 @@ expr:
   | POWERSET (*LPAREN*) s=T RPAREN {Loc (Powerset s,($startpos,$endpos))}
 
 %inline formula(F):
+  | NEWLINE f=F { Newline f }
   | f=in_parenthesis(F)
   | f=if_statement(F)
   | f=connectors(F)

@@ -626,7 +626,8 @@ and eval_ast_formula (msgs:Msgs.t ref) (env:env) (ast:ast) : ast =
     | Exists (x,f), Set s -> AstSet.fold (fun content acc -> Exists (eval_ast_formula_env ((name,(content,loc))::env) x, acc)) s (eval_ast_formula f)
     | Forall (x,f), Set s -> AstSet.fold (fun content acc -> Forall (eval_ast_formula_env ((name,(content,loc))::env) x, acc)) s (eval_ast_formula f)
     | _,content' -> raise_type_error msgs ast content content' " 'prop-set'"
-    end
+  end
+  | Newline f -> eval_ast_formula f
   | e -> raise_with_loc msgs ast ("this expression is not a formula: " ^ string_of_ast e ^"\n")
 
 and exact_str lst =
