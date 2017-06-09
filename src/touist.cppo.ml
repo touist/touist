@@ -283,7 +283,7 @@ let () =
   end
   else if !qbf_flag then begin
     #ifdef qbf
-      let ast,msgs = Parse.parse_qbf ~debug:!debug_syntax (string_of_chan !input)
+      let ast,msgs = Parse.parse_qbf ~debug:!debug_syntax ~filename:!input_file_path (string_of_chan !input)
                   |> Eval.eval ~smt:(!mode = Smt) in
       let prenex = Qbf_of_ast.prenex ast in
       let formula,table = Solveqbf.ocamlqbf_of_ast prenex in

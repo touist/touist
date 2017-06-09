@@ -102,6 +102,7 @@ module rec Ast : sig
     | Exists           of ast * ast
     | Forall           of ast * ast
     | For              of ast * ast * ast
+    | Newline          of ast
 end = Ast (* see (1) *)
 
 (* From the type [Ast], we create an ordered type [AstOrdered] in order to be able
