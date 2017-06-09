@@ -109,6 +109,7 @@ let rec string_of_ast ?(utf8=false) ?(show_var=(fun ast -> "")) ?(debug=false) ?
   | Forall (v,f) when utf8 -> "∀" ^ of_ast v ^"."^ of_ast f
   | Forall (v,f)             -> "forall "^ of_ast v ^": "^ of_ast f
   | For (v,c,f)           -> "for "^of_ast v^" in "^of_ast c^":"^ of_ast f
+  | Newline f -> of_ast f
 
 and string_of_ast_type = function
   | Int    x               -> "int"
@@ -168,6 +169,7 @@ and string_of_ast_type = function
   | Paren x -> string_of_ast_type x
   | Exists (v,f)           -> "exact"
   | Forall (v,f)           -> "forall"
-  | For (_,_,_)           -> "for"
+  | For (_,_,_)            -> "for"
+  | Newline f              -> "newline"
 
 and string_of_ast_list sep el = String.concat sep (List.map string_of_ast el)

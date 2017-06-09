@@ -129,6 +129,7 @@ rule token = parse (* is a function (Lexing.lexbuf -> Parser.token list) *)
   | "="               {[ AFFECT       ]}
   | ":"               {[ COLON        ]}
   | ")"               {[ RPAREN       ]}
+  | "\\\\"               {[ NEWLINE       ]}
   | '$'(var as v)'('  {[ VARTUPLE ("$" ^ v)]}
   | '$'(var as v)     {[ VAR ("$" ^ v)]}
     (* This rule is going to take care of both identifiers
