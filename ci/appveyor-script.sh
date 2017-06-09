@@ -12,7 +12,7 @@ bash opam32/install.sh
 opam init -y -a mingw https://github.com/fdopen/opam-repository-mingw.git --comp 4.03.0+mingw32c --switch 4.03.0+mingw32c
 eval `opam config env`
 opam install -y fileutils menhir minisat cppo zarith depext-cygwinports
-opam pin add -y qbf https://github.com/maelvalais/ocaml-qbf.git
+opam pin add -y qbf https://github.com/c-cube/ocaml-qbf.git
 
 if ! ocamlfind query yices2; then
     # We want a static libgmp.a. The mingw64-i686-gmp version only contains a
