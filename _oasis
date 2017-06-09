@@ -109,11 +109,14 @@ Library touist_qbf
   FindlibParent:  touist
   FindlibName:    qbf
 
+# The 'custom' mode forces the use of static libraries (this is important when
+# using qbf). It allows the binary to be stand-alone.
 Executable touist
   CompiledObject: best
   Path:           src
   MainIs:         touist.ml
   BuildDepends:   touist
+  Custom:         true
 # if flag(yices2)
 #   BuildDepends+:touist.yices2         <- not possible on oasis 0.4.8. See (2)
 # if flag(qbf)
