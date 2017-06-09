@@ -5,7 +5,7 @@
 true: use_menhir
 
 # OASIS_START
-# DO NOT EDIT (digest: 9fb13639d35e6c4a79bdb6ff0865061c)
+# DO NOT EDIT (digest: eacb9143f0b056a9545a4258519cad2e)
 # Ignore VCS directories, you can use the same kind of rule outside
 # OASIS_START/STOP if you want to exclude directories that contains
 # useless stuff for the build process
@@ -54,6 +54,7 @@ true: annot, bin_annot
 <src/*.ml{,i,y}>: package(minisat)
 <src/*.ml{,i,y}>: package(str)
 <src/*.ml{,i,y}>: use_touist
+<src/touist.{native,byte}>: custom
 # Executable test
 "test/test.byte": package(fileutils)
 "test/test.byte": package(menhirLib)
