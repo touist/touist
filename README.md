@@ -14,19 +14,28 @@ TouIST, the language for propositional logic
 [apvy-img]: https://ci.appveyor.com/api/projects/status/rayupfflmut8xbe0/branch/master?svg=true
 
 ## Try it
-Touist can be either used as a command-line tool or through a graphical
-interface that wraps the command-line tool:
 
-* The graphical interface can be downloaded on the [releases] page. It embeds
-  the command-line tool. The graphical interface works on **macOS** (x86_64
-  only), **Linux** x86\_64 and **Windows** (x86 or x64\_86). Just download it,
-  unzip and double-click on `touist.jar` (the command-line tool `touist` is in
-  `./external/`)
-* The command-line tool can be installed using `opam install touist`. To use
-  it, type for example `echo a and b | touist - --solve`
+* You can install the command-line-based `touist` though opam:
 
- You can also look at the [Touist language reference][ref]
- ([pdf version][ref-pdf]).
+      opam install touist
+
+  If you want to use the optional solvers, they must be installed first so
+  that `touist` knows you want to include them:
+  1. SMT solver: `opam install yices2`
+  2. QBF solver: `opam install qbf`
+  and then `opam reinstall/install touist`.
+
+  You can try `touist` with
+
+      echo 'a and b => c' | touist - --solve
+
+ * `touist` also has a java-based graphical interface can be downloaded in the
+   [releases] page. It embeds the command-line tool. The graphical interface
+   works on **macOS** (x86_64 only), **Linux** x86\_64 and **Windows** (x86 or
+   x64\_86).
+
+You can also look at the [Touist language reference][ref]
+([pdf version][ref-pdf]).
 
 [releases]: https://github.com/touist/touist/releases
 [ref]: http://touist.github.io/reference-manual.html
