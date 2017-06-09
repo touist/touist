@@ -35,12 +35,18 @@ Name:         touist
 Version:      3.2.0
 Synopsis:     The solver for the Touist language
 Description:  The Touist language is a friendly language for writing
-  propositional logic and logic on real and integers (SMT). This language
-  aims to formalize real-life problems (e.g., the sudoku can be solved in a
-  few lines). Touist embeds the minisat solver (for propositional logic) and the
-  yices2 solver (optional, for SMT logic). It can also generate the DIMACS, SMT2
-  and latex formats from you touist file. To use the SMT solver, install yices2 with
-      opam install yices2
+  propositional logic, logic on real and integers (SMT) and quantified boolean
+  formulas (QBF). This language aims to formalize real-life problems (e.g., the
+  sudoku can be solved in a few lines). Touist embeds the minisat solver (for
+  propositional logic) and the yices2 solver (optional, for SMT logic). It can
+  also generate the DIMACS, SMT2 and latex formats from you touist file.
+
+   Optionnal solvers:
+   - for using the embeded SMT solver, run `opam install yices2` and then do
+     `opam reinstall touist`
+   - for using the embeded QBF solver, run `opam install qbf` and then do
+     `opam reinstall touist`
+
 Maintainers:  Maël Valais <mael.valais@gmail.com>
 Authors:      Maël Valais <mael.valais@gmail.com>, Olivier Lezaud
 Homepage:     http://touist.github.io
