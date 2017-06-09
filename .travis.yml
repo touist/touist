@@ -42,7 +42,7 @@ before_install:
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update && brew install opam ant; fi
   - opam init --auto-setup
   - eval `opam config env`
-  - opam install -y ocamlfind menhir fileutils minisat cppo yices2
+  - opam install -y ocamlfind menhir fileutils minisat cppo yices2 ounit
   - opam pin add -y qbf https://github.com/c-cube/ocaml-qbf.git
   # Put the dependency yices-smt2 to external/
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then file=yices-2.4.2-x86_64-apple-darwin15.2.0-static-gmp.tar.gz; fi
