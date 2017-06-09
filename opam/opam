@@ -45,12 +45,17 @@ conflicts: [
 ]
 available: [ ocaml-version >= "4.01.0" ]
 post-messages: [
-"Touist built without yices2 support.
-To enable the SMT solver (yices2), please install yices2 with the command:
-    opam install yices2" {success & !yices2:installed}
+"- Touist built without yices2. If you also wanted to use the SMT solver, do:
+      opam install yices2
+      opam reinstall touist" {success & !yices2:installed}
+"- Touist built without quantor. If you also wanted to use the QBF solver, do
+      opam install qbf
+      opam reinstall touist" {success & !qbf:installed}
 
-"Touist built with yices2 support.
-**Yices2 is free [only] for non-commercial use**
-License terms: http://yices.csl.sri.com/yices-newnewlicense.html" {success & yices2:installed}
+"- Touist has been built with the yices2 solver. Yices2 is free [only] for
+   non-commercial use. License terms:
+       http://yices.csl.sri.com/yices-newnewlicense.html" {success & yices2:installed}
+"- Touist has been built with the solver 'quantor'. Quantor is under BSD
+   license." {success & qbf:installed}
 ]
 
