@@ -43,7 +43,7 @@ before_install:
   - opam init --auto-setup
   - eval `opam config env`
   - opam install -y ocamlfind menhir fileutils minisat cppo yices2
-  - opam pin add -y qbf https://github.com/maelvalais/ocaml-qbf.git
+  - opam pin add -y qbf https://github.com/c-cube/ocaml-qbf.git
   # Put the dependency yices-smt2 to external/
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then file=yices-2.4.2-x86_64-apple-darwin15.2.0-static-gmp.tar.gz; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then file=yices-2.4.2-x86_64-unknown-linux-gnu-static-gmp.tar.gz; fi
