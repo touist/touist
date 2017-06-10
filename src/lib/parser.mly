@@ -58,6 +58,8 @@
  *   The precedence rule has no direction; this often
  *   applies for unary oparators *)
 
+%left NEWLINE
+%left newlineBefore
 %nonassoc affect_before_exprsmt
 %nonassoc low_precedence (* Lesser priority on precedence *)
 %right EQUIV IMPLIES
@@ -252,12 +254,13 @@ expr:
   | POWERSET (*LPAREN*) s=T RPAREN {Loc (Powerset s,($startpos,$endpos))}
 
 %inline formula(F):
-  | NEWLINE f=F { Newline f }
   | f=in_parenthesis(F)
   | f=if_statement(F)
   | f=connectors(F)
   | f=generalized_connectors(F) (* are only on formulas! No need for parametrization *)
   | f=let_affect(expr,F) {f}
+  | NEWLINE f=F { NewlineBefore f } %prec newlineBefore
+  | f=F NEWLINE { NewlineAfter f }
 
 let_affect(T,F): LET var=var AFFECT content=T COLON form=F 
   {Loc (Let (var,content,form),($startpos,$endpos))} %prec low_precedence

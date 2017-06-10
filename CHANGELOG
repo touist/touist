@@ -8,6 +8,8 @@ v3.2.0
     of the error messages. If N is set to 0, the wrapping is disabled.
   - (experimental) added support for QBF (quantified boolean formula). It relies
     on Simon Cruanes' ocaml-qbf project, which relies on quantor and picosat.
+  - added '\\' for spliting a long formula on two lines in latex view (inspired
+    from latex language).
 v3.1.0
   - touist:
     - (experimental) an SMT solver is now available directly from the touist
