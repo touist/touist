@@ -247,7 +247,7 @@ Comment     = ";;"[^\n]*
    	{Double}			{ addToken(Token.LITERAL_NUMBER_FLOAT); }   
 
 
-   	{Comment}			{ addToken(Token.COMMENT_MARKUP); }
+   	{Comment} | "\\\\"	{ addToken(Token.COMMENT_MARKUP); }
 
 	{Identifier}				{ addToken(Token.IDENTIFIER);}
 
