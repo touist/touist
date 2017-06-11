@@ -15,27 +15,29 @@ TouIST, the language for propositional logic
 
 ## Try it
 
-* You can install the command-line-based `touist` though opam:
+1. You can install the command-line `touist` though opam:
 
-      opam install touist
+       opam install touist
 
-  If you want to use the optional solvers, they must be installed first so
-  that `touist` knows you want to include them:
-  1. SMT solver: `opam install yices2`
-  2. QBF solver: `opam install qbf`
-  and then `opam reinstall/install touist`.
+   If you want to use the optional solvers, they must be installed first so
+   that `touist` knows you want to include them:
 
-  You can try `touist` with
+   * SMT solver: `opam install yices2`
+   * QBF solver: `opam install qbf`
 
-      echo 'a and b => c' | touist - --solve
+   and then `opam reinstall/install touist`.
 
- * `touist` also has a java-based graphical interface can be downloaded in the
+   Now, if we want to know if `a ⋀ b ⇒ c` is statisfiable:
+
+       echo 'a and b => c' | touist - --solve
+
+2. `touist` also has a java-based graphical interface can be downloaded in the
    [releases] page. It embeds the command-line tool. The graphical interface
    works on **macOS** (x86_64 only), **Linux** x86\_64 and **Windows** (x86 or
    x64\_86).
 
-You can also look at the [Touist language reference][ref]
-([pdf version][ref-pdf]).
+3. You can also look at the [Touist language reference][ref]
+   ([pdf version][ref-pdf]).
 
 [releases]: https://github.com/touist/touist/releases
 [ref]: http://touist.github.io/reference-manual.html
@@ -52,42 +54,38 @@ any problem that can be expressed in propositionnal logic.
 
 The TouIST has been initialized by Frederic Maris and Olivier Gasquet,
 associate professors at the _Institut de Recherche en Informatique de Toulouse_
-(IRIT). It is a "second" or "new" version of a previous program, [SAToulouse].
+(IRIT). It is a "second" or "new" version of a previous program,
+[SAToulouse](#references).
 
-The development is done by a team of five students in first year of master's
+The development is done by a team of five students[1] in first year of master's
 degree at the _Université Toulouse III — Paul Sabatier_. This project is a part
-of their work at school. See [CONTRIBUTORS].
+of their work at school.
 
-Here is the main screen with the formulas:  
+Here is the main screen with the formulas:
 ![formulas]
 
-And the screen with the sets:  
+And the screen with the sets:
 ![sets]
 
-[SAToulouse]: http://www.irit.fr/satoulouse
-[CONTRIBUTORS]: https://github.com/touist/touist/blob/master/CONTRIBUTORS.md
+[1]: https://github.com/touist/touist/blob/master/CONTRIBUTORS.md
 [formulas]: https://cloud.githubusercontent.com/assets/2195781/13850422/185bcf66-ec5a-11e5-9fee-59b5c2ae38b7.png
 [sets]: https://cloud.githubusercontent.com/assets/2195781/13850431/20162d82-ec5a-11e5-884a-e8b6aaafe416.png
 
-Touist is platform-specific because of the ocaml `touist` translator that
-translates the high-level `.touistl` (touist language files) into `SAT_DIMACS`
-or `SMT2` is compiled into an architecture-specific binary (for performances).
-
-We have some issues with compiling the ocaml translator for Windows. Some of
-the first releases have been compiled for Windows, but the tool we used has
-been discontinued ([see corresponding issue][issue5]).
-
-[issue5]: https://github.com/touist/touist/issues/5
-
 ## What is Touist made of?
-Touist uses Java (>= jre7) and embeds an architecture-specific binary, [touist]
-(we coded it in ocaml), which translates touistl language to dimacs. The dimacs
-files are then given to another binary, the SAT (or SMT) solver, and then
-displayed to the user (cf. [DIMACS] and [SMT2]).
 
-_touist_ can also be used in command-line.
+1. the main program, [`touist`], is written in OCaml and is compiled into a
+   native and standalone binary. It does the parsing, the transformations
+   (e.g., latex) and embeds one solver per theory (SAT, SMT and QBF) in order
+   to solve the problem.
 
-[touist]: https://github.com/touist/touist/tree/master
+2. the java-based graphical interface uses Java (>= jre7) and Swing; it embeds
+   a copy of the `touist` binary.
+
+Here is a small figure showing the architecture of the whole program:  
+![Architecture of touist][arch]
+
+[arch]: docs/images/architecture.png
+[touist]: https://github.com/touist/touist
 [DIMACS]: http://www.satcompetition.org/2009/format-benchmarks2009.html
 [SMT2]: http://smtlib.github.io/jSMTLIB/SMTLIBTutorial.pdf
 
@@ -96,12 +94,6 @@ See the [./INSTALL.md][install] file.
 
 [install]: https://github.com/touist/touist/blob/master/INSTALL.md
 
-------------
-Here is a small figure showing the architecture of the whole program:  
-![Architecture of touist][arch]
-
-[arch]: https://cloud.githubusercontent.com/assets/2195781/7631517/94c276e0-fa43-11e4-9a5c-351b84c2d1e1.png
-
 ## Bugs and feature requests
 You can report bugs by creating a new Github issue. Feature requests can also
 be submitted using the issue system.
@@ -109,3 +101,24 @@ be submitted using the issue system.
 You can contribute to the project by forking/pull-requesting.
 
 
+## References
+
+1. Khaled Skander Ben Slimane, Alexis Comte, Olivier Gasquet, Abdelwahab Heba,
+  Olivier Lezaud, Frédéric Maris, and Maël Valais [La Logique Facile Avec
+  TouIST (formalisez et Résolvez Facilement Des Problèmes Du Monde Réel
+  )][pfia_touist2015]. In Actes Des 9es Journées d’Intelligence Artificielle
+  Fondamentale (IAF 2015). 2015.
+
+2. Khaled Skander Ben Slimane, Alexis Comte, Olivier Gasquet, Abdelwahab Heba,
+  Olivier Lezaud, Frederic Maris, and Mael Valais. [Twist Your Logic with
+  TouIST][ttl_touist2015]. CoRR abs/1507.03663. 2015.
+
+3. Gasquet O., Schwarzentruber F., Strecker M. [Satoulouse: The Computational
+  Power of Propositional Logic Shown to Beginners][ttl_satoulouse2011]. In:
+  Blackburn P., van Ditmarsch H., Manzano M., Soler-Toscano F. (eds) Tools
+  for Teaching Logic. Lecture Notes in Computer Science, vol 6680. Springer,
+  Berlin, Heidelberg. 2011.
+
+[ttl_satoulouse2011]: https://www.irit.fr/~Martin.Strecker/Publications/ticttl_satoulouse2011.pdf
+[ttl_touist2015]: https://arxiv.org/abs/1507.03663
+[pfia_touist2015]: http://​pfia2015.​inria.​fr/​actes/​download.​php?​conf=​IAF&​file=​Ben_​Slimane_​IAF_​2015.​pdf
