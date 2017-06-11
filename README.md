@@ -42,9 +42,14 @@ problem](docs/images/screenshot.png)](https://github.com/maelvalais/allumettes)
 3. You can also look at the [Touist language reference][ref]
    ([pdf version][ref-pdf]).
 
+4. Syntax coloring is also available in **[VSCode]** through the extension
+   _touist_. I really encourage people to give a try to VSCode. Even though
+   it comes from Microsoft, it is open-source!
+
 [releases]: https://github.com/touist/touist/releases
 [ref]: http://touist.github.io/reference-manual.html
 [ref-pdf]: http://touist.github.io/reference-manual.pdf
+[VSCode]: https://code.visualstudio.com
 
 ## Description
 
@@ -68,19 +73,18 @@ of their work at school.
 
 ## What is Touist made of?
 
-1. the main program, [`touist`], is written in OCaml and is compiled into a
-   native and standalone binary. It does the parsing, the transformations
+1. the main program, `touist`, is written in OCaml and is compiled
+   into a native and standalone binary. It does the parsing, the transformations
    (e.g., latex) and embeds one solver per theory (SAT, SMT and QBF) in order
    to solve the problem.
 
 2. the java-based graphical interface uses Java (>= jre7) and Swing; it embeds
    a copy of the `touist` binary.
 
-Here is a small figure showing the architecture of the whole program:  
+Here is a small figure showing the architecture of the whole thing:  
 ![Architecture of touist][arch]
 
 [arch]: docs/images/architecture.png
-[touist]: https://github.com/touist/touist
 [DIMACS]: http://www.satcompetition.org/2009/format-benchmarks2009.html
 [SMT2]: http://smtlib.github.io/jSMTLIB/SMTLIBTutorial.pdf
 
