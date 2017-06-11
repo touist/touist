@@ -822,6 +822,10 @@ Problems written using the Satisfiability Modulo Theory (SMT) extension of
 format which can then be fed to a SMT solver.
 ~
 
+![architecture]
+
+[architecture]: images/architecture.[pdf,png] { vertical-align: middle }
+
 ## Usage {#cli}
 
 Any touist command is of the form:
