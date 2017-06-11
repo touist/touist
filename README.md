@@ -13,9 +13,12 @@ TouIST, the language for propositional logic
 [appveyor]: https://ci.appveyor.com/project/maelvalais/touist-kila4/branch/master
 [apvy-img]: https://ci.appveyor.com/api/projects/status/rayupfflmut8xbe0/branch/master?svg=true
 
+[![Screenshot of the graphical interface with a QBF
+problem](docs/images/screenshot.png)](https://github.com/maelvalais/allumettes)
+
 ## Try it
 
-1. You can install the command-line `touist` though opam:
+1. The main command-line program, `touist`, can be installed using opam:
 
        opam install touist
 
@@ -61,15 +64,7 @@ The development is done by a team of five students[1] in first year of master's
 degree at the _Université Toulouse III — Paul Sabatier_. This project is a part
 of their work at school.
 
-Here is the main screen with the formulas:
-![formulas]
-
-And the screen with the sets:
-![sets]
-
 [1]: https://github.com/touist/touist/blob/master/CONTRIBUTORS.md
-[formulas]: https://cloud.githubusercontent.com/assets/2195781/13850422/185bcf66-ec5a-11e5-9fee-59b5c2ae38b7.png
-[sets]: https://cloud.githubusercontent.com/assets/2195781/13850431/20162d82-ec5a-11e5-884a-e8b6aaafe416.png
 
 ## What is Touist made of?
 
