@@ -135,7 +135,8 @@ let rec quantify_free_variables env ast =
   | other -> let free = search_free env other in
     free |> remove_dups |> List.fold_left (fun acc x -> Exists (Prop x,acc)) other
 
-
+(* [prenex] loops over [to_prenex] as long as the formula is not in prenex
+   form. *)
 let prenex ?(debug=false) (ast,msgs) : ast * Msgs.t ref =
   let rec to_prenex_loop ast =
     if debug then Printf.printf "step: %s\n" (Pprint.string_of_ast ~utf8:true ast);
@@ -144,3 +145,12 @@ let prenex ?(debug=false) (ast,msgs) : ast * Msgs.t ref =
    if debug then Printf.printf "before bounding free vars: %s\n" (Pprint.string_of_ast ~utf8:true intermediate);
   let final = intermediate |> quantify_free_variables [] in
   final,msgs
+
+(* [cnf] calls Cnf.cnf on the inner formula (with no quantifiers) and
+   existentially quantifies any tseitlin variable in an innermost way. *)
+let cnf ?(debug=false) ast =
+  let rec process = function
+  | Forall (x,f) -> Forall (x, process f)
+  | Exists (x,f) -> Exists (x, process f)
+  | inner -> Cnf.ast_to_cnf ~debug inner
+  in ast |> process |> quantify_free_variables []

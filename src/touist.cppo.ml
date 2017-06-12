@@ -281,18 +281,24 @@ let () =
       exit_with CMD_UNSUPPORTED
     #endif
   end
-  else if !qbf_flag then begin
-    #ifdef qbf
+  else if !mode = Qbf then begin
       let ast,msgs = Parse.parse_qbf ~debug:!debug_syntax ~filename:!input_file_path (string_of_chan !input)
-                  |> Eval.eval ~smt:(!mode = Smt) in
+        |> Eval.eval ~smt:(!mode = Smt) in
       let (prenex,msgs) = Qbf_of_ast.prenex (ast,msgs) in
-      let formula,table = Solveqbf.ocamlqbf_of_ast prenex in
-      let qcnf = Qbf.QFormula.cnf formula in
+      let cnf = Qbf_of_ast.cnf prenex in
       if !debug_cnf then begin
         Printf.fprintf stderr "formula: %s\n" (Pprint.string_of_ast ~utf8:true ast);
         Printf.fprintf stderr " prenex: %s\n" (Pprint.string_of_ast ~utf8:true prenex);
-        Printf.fprintf stderr "    cnf: cannot print it for now\n"
+        Printf.fprintf stderr "    cnf: %s\n" (Pprint.string_of_ast ~utf8:true cnf)
       end;
+      if not !solve_flag then begin
+        Printf.fprintf stderr
+        ("The QDIMACS export has not been implemented yet. But you can --solve!\n");
+        exit_with CMD_UNSUPPORTED;
+      end
+      else (* --solve*)
+    #ifdef qbf
+      let qcnf,table = Solveqbf.qcnf_of_cnf cnf in
       match Solveqbf.solve (qcnf,table) with
       | Some str -> Printf.fprintf !output "%s\n" str
       | None ->
