@@ -2,42 +2,74 @@ open Types.Ast
 
 let add_suffix name =
   let open Str in
-  let regex = regexp "[0-9]$" in
-  if string_match regex name 0 then
-    name |> substitute_first regex (fun str -> string_of_int ((int_of_string str)+1))
-  else
-    name ^ "1"
+  try let _ = Str.search_backward (Str.regexp "_[0-9]+$") name (String.length name) in ();
+      name |> Str.substitute_first (Str.regexp "[0-9]+$")
+      (fun str -> ((str |> matched_string |> int_of_string)+1) |> string_of_int)
+  with Not_found -> name ^ "_1"
 
-(** I used the 'transformation rules' listed on wikipedia (fr). I know,
-    this is not serious!
-    'quantified' is the list of previously quantified propositions. We need this
-    to rename any overlapping quantor scope when transforming to prenex form. *)
-let rec to_prenex quant_prop_l ast : ast =
+(** [to_prenex] applies the 'transformation rules' listed on wikipedia (fr).
+    I know, this is not serious... :)
+    WARNING: this function will remove all xor and equiv as they cannot be
+    translated into prenex form otherwise.
+    * 'quant_l' is the list of previously quantified propositions. We need this
+    to rename any overlapping quantor scope when transforming to prenex form.
+    * 'conflict_t' is the list of must-currenlty-be-renamed list of props (as
+    strings).
+    * 'only_rename' allows us to skip the subsequent transformations if one
+    of the 14 transformations has been performed in the recursion. We
+    only want one exists/forall transformation per to_prenex full recursion
+    because of the variable renaming. *)
+let rec to_prenex debug msgs quant_l conflict_l only_rename ast : ast =
+  let string_of_prop prop = match prop with
+    | Prop name -> name
+    | e -> failwith ("[shouldnt happen] a quantor must be a proposition, not a '"^Pprint.string_of_ast_type e^"' in " ^ Pprint.string_of_ast e)
+  in
+  (* [to_prenew_new] is just going to add a newly quantified variable to the
+     list. But if the newly quantified variable is already in quant_l, then
+     an error is raised. *)
+  let to_prenex_new prop ast_inner =
+    if List.exists (fun y -> y=(string_of_prop prop)) quant_l
+    then Msgs.add_fatal msgs (Msgs.Error,Msgs.Prenex,
+      "the prop '"^Pprint.string_of_ast prop^"' has been quantified twice. \
+      For all the quantifiers quantifying on '"^Pprint.string_of_ast prop^"' \
+      in the following code, you should rename their variables:\n    "^Pprint.string_of_ast ast^"\n",None)
+    else ast_inner |> to_prenex debug msgs ((string_of_prop prop)::quant_l) conflict_l only_rename in
   (* [to_prenex_rn] will recursively launch a prenex where all propositions that
      have the same name as 'prop' will be renamed by adding a suffix
      (x1,x2...). *)
-  let to_prenex_rn prop ast = match prop with
-    | Prop name -> to_prenex (name::quant_prop_l) ast
-    | e -> failwith ("[shouldnt happen] a quantor must be a proposition, not a '"^Pprint.string_of_ast_type e^"' in " ^ Pprint.string_of_ast e)
+  let to_prenex_rn prop ast =
+    ast |> to_prenex debug msgs quant_l ((string_of_prop prop)::conflict_l) true in
+  (* [to_prenex] is the same as the outer 'to_prenex' except that the
+     non-changing arguments are already given. *)
+  let to_prenex ast = ast |> to_prenex debug msgs quant_l conflict_l only_rename in
+  if debug then Printf.printf "to_prenex_in  (%s): %s\n"
+    (if only_rename then "traversing  " else "transforming")
+    (Pprint.string_of_ast ~utf8:true ast);
+
+  (* To transform into prenex, I want to traverse recursively the AST so that
+     in every traversal of each branch, only ONE transformation can happen.
+     Do do that, we use the variable [only_rename] which is true if one
+     transformation has already happened previously in the recursion.
+     We call recursively [process] -> [transform] (if not only_rename) -> [traverse].
+     As soon as a [transform] has been completed, all inner recursions of
+     [to_prenex_rn] will disable any subsequent transformation to avoid any
+     colision between renaming and transforming (the subsequent calls
+     of [to_prenex_new] or [to_prenex] will still be able to run [transform]).
+     *)
+  let transform = function
+  | Not Forall (x,f) -> Forall (to_prenex x,Not (to_prenex_new x f)) (* 1 *)
+  | And (f,Forall (x,g)) | And (Forall (x,g),f)  -> Forall (to_prenex x,And (to_prenex_rn x f,to_prenex_new x g)) (* 2,5 *)
+  | Or (f,Forall (x,g)) | Or (Forall (x,g),f)  -> Forall (to_prenex x,And (to_prenex_rn x f,to_prenex_new x g)) (* 3,6 *)
+  | Implies (Forall (x,f),g) -> Exists (to_prenex x,Implies (to_prenex_new x f,to_prenex_rn x g)) (* 4 *)
+  | Implies (f,Forall (x,g)) -> Forall (to_prenex x,Implies (to_prenex_rn x f,to_prenex_new x g)) (* 7 *)
+  | Not Exists (x,f) -> Forall (to_prenex x,Not (to_prenex_new x f)) (* 8 *)
+  | And (f,Exists (x,g)) | And (Exists (x,g),f)  -> Exists (to_prenex x,And (to_prenex_rn x f,to_prenex_new x g)) (* 9,12 *)
+  | Or (f,Exists (x,g)) | Or (Exists (x,g),f)  -> Exists (to_prenex x,Or (to_prenex_rn x f,to_prenex_new x g)) (* 10,13 *)
+  | Implies (Exists (x,f),g) -> Forall (to_prenex x,Implies (to_prenex_new x f,to_prenex_rn x g)) (* 11 *)
+  | Implies (f,Exists (x,g)) -> Exists (to_prenex x,Implies (to_prenex_rn x f,to_prenex_new x g)) (* 14 *)
+  | _ -> raise Not_found
   in
-  (* [to_prenex]
-     WARNING: this function will remove all xor and equiv as they cannot be
-     translated into prenex form otherwise. *)
-  let to_prenex ast = to_prenex quant_prop_l ast
-  in
-  match ast with
-  | Forall (x,f) -> Forall (to_prenex x, to_prenex f)
-  | Exists (x,f) -> Exists (to_prenex x, to_prenex f)
-  | Not Forall (x,f) -> Forall (to_prenex x,Not (to_prenex f)) (* 1 *)
-  | And (f,Forall (x,g)) | And (Forall (x,g),f)  -> Forall (to_prenex x,And (to_prenex_rn x f,to_prenex g)) (* 2,5 *)
-  | Or (f,Forall (x,g)) | Or (Forall (x,g),f)  -> Forall (to_prenex x,And (to_prenex_rn x f,to_prenex g)) (* 3,6 *)
-  | Implies (Forall (x,f),g) -> Exists (to_prenex x,Implies (to_prenex f,to_prenex_rn x g)) (* 4 *)
-  | Implies (f,Forall (x,g)) -> Forall (to_prenex x,Implies (to_prenex_rn x f,to_prenex g)) (* 7 *)
-  | Not Exists (x,f) -> Forall (to_prenex x,Not (to_prenex f)) (* 8 *)
-  | And (f,Exists (x,g)) | And (Exists (x,g),f)  -> Exists (to_prenex x,And (to_prenex_rn x f,to_prenex g)) (* 9,12 *)
-  | Or (f,Exists (x,g)) | Or (Exists (x,g),f)  -> Exists (to_prenex x,Or (to_prenex_rn x f,to_prenex g)) (* 10,13 *)
-  | Implies (Exists (x,f),g) -> Forall (to_prenex x,Implies (to_prenex f,to_prenex_rn x g)) (* 11 *)
-  | Implies (f,Exists (x,g)) -> Exists (to_prenex x,Implies (to_prenex_rn x f,to_prenex g)) (* 14 *)
+  let traverse = function
   | Top -> Top
   | Bottom -> Bottom
   | Not x -> Not (to_prenex x)
@@ -49,8 +81,20 @@ let rec to_prenex quant_prop_l ast : ast =
      we cannot translate to prenex and keep the equivalence notation: x is used
      twice. *)
   | Equiv (x,y) -> to_prenex (And (Implies (x,y),Implies (y,x)))
-  | Prop x -> if List.exists (fun y -> y=x) quant_prop_l then Prop (add_suffix x) else Prop x
+  | Prop x -> if List.exists (fun y -> y=x) conflict_l then Prop (add_suffix x) else Prop x
   | e -> failwith ("[shouldnt happen] a qbf formula shouldn't contain '"^Pprint.string_of_ast_type e^"' in " ^ Pprint.string_of_ast e)
+  in
+  let process = function
+  | Forall (x,f) -> Forall (to_prenex x, to_prenex_new x f)
+  | Exists (x,f) -> Exists (to_prenex x, to_prenex_new x f)
+  | v -> if only_rename then traverse v
+    else try transform v with Not_found -> traverse v
+  in
+  let new_ast = process ast in
+  if debug then Printf.printf "to_prenex_out (%s): %s\n"
+    (if only_rename then "traversing  " else "transforming")
+    (Pprint.string_of_ast ~utf8:true ast);
+  new_ast
 
 (** [is_unquant] checks that the given formula does not contain any quantors. *)
 let rec is_unquant = function
@@ -92,9 +136,11 @@ let rec quantify_free_variables env ast =
     free |> remove_dups |> List.fold_left (fun acc x -> Exists (Prop x,acc)) other
 
 
-let prenex ast =
+let prenex ?(debug=false) (ast,msgs) : ast * Msgs.t ref =
   let rec to_prenex_loop ast =
-    if is_prenex ast then ast else ast |> to_prenex [] |> to_prenex_loop
+    if debug then Printf.printf "step: %s\n" (Pprint.string_of_ast ~utf8:true ast);
+    if is_prenex ast then ast else ast |> to_prenex debug msgs [] [] false |> to_prenex_loop
   in let intermediate = to_prenex_loop ast in
-  (* Printf.printf "before_bounding_free: %s\n" (Pprint.string_of_ast ~utf8:true intermediate);*)
-  intermediate |> quantify_free_variables []
+   if debug then Printf.printf "before bounding free vars: %s\n" (Pprint.string_of_ast ~utf8:true intermediate);
+  let final = intermediate |> quantify_free_variables [] in
+  final,msgs
