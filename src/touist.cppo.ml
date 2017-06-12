@@ -299,7 +299,7 @@ let () =
       else (* --solve*)
     #ifdef qbf
       let qcnf,table = Solveqbf.qcnf_of_cnf cnf in
-      match Solveqbf.solve (qcnf,table) with
+      match Solveqbf.solve ~hidden:!show_hidden_lits (qcnf,table) with
       | Some str -> Printf.fprintf !output "%s\n" str
       | None ->
         (Printf.fprintf stderr ("unsat\n");

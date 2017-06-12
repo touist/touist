@@ -54,7 +54,8 @@ let string_of_assign (assign:assignment) : string = match assign with
   | False -> "0"
   | Undef -> "?"
 
-let solve (f,table:QCNF.t * (Qbf.Lit.t,string) Hashtbl.t) : string option =
+(* hidden=false allows to display the tseitlin-added variables. *)
+let solve ?(hidden=false) (f,table:QCNF.t * (Qbf.Lit.t,string) Hashtbl.t) : string option =
   let res = solve Quantor.solver f
   in match res with
   | Unknown -> failwith "the quantor solver returned an unknown error"
@@ -62,4 +63,6 @@ let solve (f,table:QCNF.t * (Qbf.Lit.t,string) Hashtbl.t) : string option =
   | Spaceout -> failwith "the quantor solver ran out of memory"
   | Unsat -> None
   | Sat assign ->
-    Some (Hashtbl.fold (fun lit name acc -> (if acc="" then "" else acc^"\n")^ (assign lit |> string_of_assign) ^" "^ name) table "")
+    Some (Hashtbl.fold
+      (fun lit name acc -> if not hidden && (String.get name 0) = '&' then acc
+        else (if acc="" then "" else acc^"\n")^(assign lit |> string_of_assign)^" "^ name) table "")
