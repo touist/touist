@@ -3,6 +3,13 @@ open Qbf.Formula
 open Qbf.QFormula
 open Types.Ast
 
+
+(* [ocamlqbf_of_ast] transforms a touist quantified formula to a Qbf.QFormula.
+   The formula does no need to be in cnf. After calling this function, you
+   should use [QFormula.cnf].
+   This function had been written before [Qbf_of_ast.cnf] existed, this is why
+   I wrote a second function [qcnf_of_cnf] which allows me to use my own
+   CNF function (i.e., [Qbf_of_ast.cnf]). *)
 let rec ocamlqbf_of_ast (ast:ast) : Qbf.QFormula.t * (Qbf.Lit.t,string) Hashtbl.t =
   let str_to_lit = Hashtbl.create 500 in
   let lit_to_str = Hashtbl.create 500 in (* this duplicate is for the return value *)
@@ -30,6 +37,17 @@ let rec ocamlqbf_of_ast (ast:ast) : Qbf.QFormula.t * (Qbf.Lit.t,string) Hashtbl.
     | wrong -> failwith ("[shouldnt happen] when applying 'of_ast', formula still had quantors: "^Pprint.string_of_ast wrong)
   in let ocamlqbf = of_quant_ast ast
   in (simplify ocamlqbf,lit_to_str)
+
+(* [qcnf_of_cnf] does the same as [ocamlqbf_of_ast] except that its input ast
+   needs to be already in CNF form.
+   I should have skipped the call to Qbf.QFormula.cnf (as the formula is already
+   in cnf, it is useless) and instead I should transform from ast to QCNF but
+   you know... I already had done [ocamlqbf_of_ast], so I didn't bother... *)
+let rec qcnf_of_cnf (cnf_ast:ast) : Qbf.QCNF.t * (Qbf.Lit.t,string) Hashtbl.t =
+  let qformula,table = ocamlqbf_of_ast cnf_ast in
+  let qcnf = Qbf.QFormula.cnf qformula in
+  qcnf,table
+
 
 let string_of_assign (assign:assignment) : string = match assign with
   | True -> "1"
