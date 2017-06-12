@@ -27,6 +27,7 @@ let test_raise (parse:(string->Msgs.t)) (during:Msgs.during) typ nth_msg (loc_ex
 
 let sat text = let ast,msgs = Parse.parse_sat text |> Eval.eval in let _ = Cnf.ast_to_cnf ast |> Sat.cnf_to_clauses in !msgs
 let smt logic text = let ast,msgs = Parse.parse_smt text |> Eval.eval ~smt:true in let _ = Smt.to_smt2 logic ast in !msgs
+let qbf text = let ast,msgs = Parse.parse_qbf text |> Eval.eval ~smt:true |> Qbf_of_ast.prenex in !msgs
 
 (* The ending _ is necessary because the testing function
    must accept the 'context' thing. *)
@@ -48,8 +49,18 @@ let test_smt ?(logic="QF_IDL") text _ =
       ("this test shouldn't have raised a Fatal exception. Here is the exception:\n"^
         Msgs.string_of_msgs msg)
 
+let test_qbf text _ =
+  try let msgs = qbf text in ();
+  if Msgs.has_error msgs then OUnit2.assert_failure
+      ("this test didn't raise any exceptions but errors had been outputed:\n"^
+        Msgs.string_of_msgs msgs)
+    with Msgs.Fatal (_,msg) -> OUnit2.assert_failure
+      ("this test shouldn't have raised a Fatal exception. Here is the exception:\n"^
+        Msgs.string_of_msgs msg)
+
 let test_sat_raise ?(during=Msgs.Eval) ?(typ=Msgs.Error) ?(nth=0) loc text _ = test_raise sat during typ nth loc text
 let test_smt_raise ?(during=Msgs.Eval) ?(typ=Msgs.Error) ?(nth=0) ?(logic="QF_IDL") loc text _ = test_raise (smt logic) during typ nth loc text
+let test_qbf_raise ?(during=Msgs.Eval) ?(typ=Msgs.Error) ?(nth=0) ?(logic="QF_IDL") loc text _ = test_raise qbf during typ nth loc text
 
 let sat_models_are text expected _ =
   OUnit2.assert_equal ~printer:(fun s -> s)
@@ -64,6 +75,10 @@ let sat_models_are text expected _ =
 let sat_expands_to text expected _ =
   OUnit2.assert_equal ~printer:(fun s -> s)
     expected (let ast,_ = Parse.parse_sat text |> Eval.eval in Pprint.string_of_ast ast)
+
+let qbf_expands_to text expected _ =
+  OUnit2.assert_equal ~printer:(fun s -> s)
+    expected (let ast,_ = Parse.parse_qbf text |> Eval.eval |> Qbf_of_ast.prenex in Pprint.string_of_ast ast)
 
 (*  A standard test in oUnit should first define a function
         let test1 context : unit = OUnit2.assert_bool true
@@ -219,6 +234,29 @@ run_test_tt_main (
   "takuzu4x4.touistl">:: (test_smt (Parse.string_of_file "test/smt/takuzu4x4.touistl"))
 ];
 
+"QBF testing">:::[
+  "samples of code that should be correct with --qbf">:::[ (* 'c' is the testing context *)
+    "">::(test_qbf "exists x: x");
+    "">::(test_qbf "forall x: x");
+    "">::(test_qbf "exists a,b: a and b");
+    "">::(test_qbf "forall a,b: a and b");
+    "">::(test_qbf "forall a: exists b: a and b");
+    "allumettes2.touist">:: (test_qbf (Parse.string_of_file "test/qbf/allumettes2.touist"));
+  ];
+  "samples that shouldn't be correct with --qbf">:::[
+    "quantified var must be a prop">::(test_qbf_raise "1:13" "$x=1 exists $x: x");
+  ];
+  "test of exists ... for ... in ...:">:::[
+    "">::(qbf_expands_to "exists p($i) for $i in [1..2]: p(1) and p(2)" "exists p(2): exists p(1): (p(1) and p(2))");
+  ];
+  "prenex tests">:::[ (* 'c' is the testing context *)
+    "prenex renaming pbm: cannot rename inner 'a', is it bounded to the outer \
+    exists or the inner exists?">::(test_qbf_raise ~during:Msgs.Prenex "" "exists a: (a and exists a: a)");
+    "prenex renaming 2">::(qbf_expands_to "(exists a: a) and (exists a: a)" "exists a: exists a_1: (a and a_1)");
+    "prenex renaming 2">::(qbf_expands_to "(exists a: a) and (a and exists a: a)" "exists a: exists a_1: exists a_2: (a and (a_2 and a_1))");
+  ];
+];
+
 "real-size tests">:::[
   "with --sat --solve">:::[
   "sat/sodoku.touistl (SAT solver)">:: (fun ctx ->
@@ -240,6 +278,20 @@ run_test_tt_main (
       OUnit2.assert_command ~use_stderr:false ~ctxt:ctx
       ~foutput:(check_solution "test/smt/takuzu4x4_solution.txt")
       "./touist.native" ["--solve";"--smt";"QF_IDL";"test/smt/takuzu4x4.touistl"]);
+  ];
+  "with --qbf --solve">:::[
+  "sat/sodoku.touistl (using QBF solver)">:: (fun ctx ->
+        OUnit2.skip_if (Sys.os_type = "Win32") "won't work on windows (unix-only??)";
+        OUnit2.skip_if (not Version.has_qbf) "touist built without qbf";
+        OUnit2.assert_command ~use_stderr:false ~ctxt:ctx
+        ~foutput:(check_solution "test/sat/sudoku_solution.txt")
+        "./touist.native" ["--solve";"--qbf";"test/sat/sudoku.touistl"]);
+  "qbf/allumettes2.touist">:: (fun ctx ->
+      OUnit2.skip_if (Sys.os_type = "Win32") "won't work on windows (unix-only??)";
+      OUnit2.skip_if (not Version.has_qbf) "touist built without qbf";
+      OUnit2.assert_command ~use_stderr:false ~ctxt:ctx
+      ~foutput:(check_solution "test/qbf/allumettes2.solution")
+      "./touist.native" ["--solve";"--qbf";"test/qbf/allumettes2.touist"]);
   ]
 ];
 
