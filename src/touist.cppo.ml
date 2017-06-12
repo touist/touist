@@ -285,7 +285,7 @@ let () =
     #ifdef qbf
       let ast,msgs = Parse.parse_qbf ~debug:!debug_syntax ~filename:!input_file_path (string_of_chan !input)
                   |> Eval.eval ~smt:(!mode = Smt) in
-      let prenex = Qbf_of_ast.prenex ast in
+      let (prenex,msgs) = Qbf_of_ast.prenex (ast,msgs) in
       let formula,table = Solveqbf.ocamlqbf_of_ast prenex in
       let qcnf = Qbf.QFormula.cnf formula in
       if !debug_cnf then begin
@@ -324,5 +324,6 @@ let () =
     | Fatal (Eval,msgs) -> (show_msgs_and_exit msgs TOUIST_SYNTAX)
     | Fatal (Sat,msgs) -> (show_msgs_and_exit msgs TOUIST_SYNTAX)
     | Fatal (Cnf,msgs) -> (show_msgs_and_exit msgs TOUIST_SYNTAX)
+    | Fatal (Prenex,msgs) -> (show_msgs_and_exit msgs TOUIST_SYNTAX)
     | Sys_error err -> show_msgs_and_exit (of_list [(Error,Usage,err^"\n",None)]) CMD_USAGE
     | x -> raise x

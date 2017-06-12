@@ -21,7 +21,7 @@ open Lexing (* for Lexing.position *)
 
 type msg_type = Error | Warning
 type loc = Lexing.position * Lexing.position
-type during = Usage | Parse | Lex | Eval | Sat | Cnf
+type during = Usage | Parse | Lex | Eval | Sat | Cnf | Prenex
 type msg = msg_type * during * string * loc option
 
 module Msg =
