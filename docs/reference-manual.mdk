@@ -121,7 +121,8 @@ A touist file is a whitespace-separated[^whitespace] list of affectations
 and formulas. Affectations are global and can be interlaced with formulas
 as long as they are not nested in formulas (for local variables, you can
 use ``let``, see [#sec-local-affectation-let-construct]). Comments begin
-with the "``;;``" sequence.
+with the "``;;``" sequence. Two backslashes (``\\``) in a formula will
+produce a new line in the latex view.
 
 [^whitespace]: A whitespace is a space, tab or newline.
 
@@ -847,6 +848,7 @@ TERM      = [_0-9]*[a-zA-Z][a-zA-Z_0-9]*
     | <T> "<=>" <T>
 
 <formula(<T>)> ::=
+    | "\\" <T> | <T> "\\"             <- newline marker for latex display
     | "(" <T> ")"
     | "if" <bool> "then" <T> "else" <T> "end"
     | <connectors(<T>)>
