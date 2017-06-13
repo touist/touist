@@ -115,9 +115,9 @@ not cloudy              ;; Conclusion
 ```
 
 ~ Note
-In touist, the premises are simply formulas separated by a new line. A new line
-is semantically equivalent to the `and` connector: the previous bit of `touist`
-code could be equivalently written
+In touist, the premises are simply formulas separated by a new line. A
+new line is semantically equivalent to the `and` connector: the previous
+bit of `touist` code could be equivalently written
 ``` Touist
 (raining => cloudy) and raining and not cloudy  
 ```
@@ -161,8 +161,8 @@ will be translated to
 
 ## Variables
 
-First, we describe what a variable is. Then, we detail how to affect variables
-(with global or local affectations).
+First, we describe what a variable is. Then, we detail how to affect
+variables (with global or local affectations).
 
 ### Syntax of a variable
 
@@ -202,20 +202,21 @@ Here are some examples of variables:
 ### Global affectation {#global-var}
 
 We call "global variables" any variable that is affected in the top-level
-formula (meaning that global variables cannot be nested in other formulas)
-using the following affectation syntax:
+formula (meaning that global variables cannot be nested in other
+formulas) using the following affectation syntax:
 ``` Grammar
 <affect> ::= <var> "=" (<expr>)      <-- global affectation
 <expr> ::= <int>|<float>|<prop>|<bool>|<set>
 ```
 
-Global variables apply for the whole code, even if the affectation is located
-before it is first used. This is because all global affectations are evaluated
-before any formula.
+Global variables apply for the whole code, even if the affectation is
+located before it is first used. This is because all global affectations
+are evaluated before any formula.
 
-The only case where the order of affectation is important is when you want
-to use a variable in a global affectation expression. Global affectations are
-sequentially evaluated, so the order of affectation matters. For example:
+The only case where the order of affectation is important is when you
+want to use a variable in a global affectation expression. Global
+affectations are sequentially evaluated, so the order of affectation
+matters. For example:
 ``` Touist
 $N = 10
 $set = [1..$N]    ;; $N must be defined before $set
@@ -223,17 +224,18 @@ $set = [1..$N]    ;; $N must be defined before $set
 
 ### Local affectation (``let`` construct)
 
-Sometimes, you want to use the same result in multiple places and you cannot
-use a global variable (presented in [#global-var]) because of nested formulas.
-The ``let`` construct lets you create temporary variables inside formulas:
+Sometimes, you want to use the same result in multiple places and you
+cannot use a global variable (presented in [#global-var]) because of
+nested formulas. The ``let`` construct lets you create temporary
+variables inside formulas:
 ``` Grammar
 <let-affect<T>> ::=
     | "let" <var> "=" <expr> ":" <formula<T>>  <-- local affectation
 <expr> ::= <int>|<float>|<prop>|<bool>|<set>
 ```
-The ``let`` affectation can only be used in formulas (detailed in [#sec-formulas])
-and cannot be used in expressions (`<expr>`, i.e., integer, floating-point,
-boolean or set expressions).
+The ``let`` affectation can only be used in formulas (detailed
+in [#sec-formulas]) and cannot be used in expressions (`<expr>`, i.e.,
+integer, floating-point, boolean or set expressions).
 
 Example: 
 ``` Touist
@@ -248,9 +250,10 @@ bigand $letter,$number in $letters,[1..card($letters)]:
 end
 ```
 ~ Note
-The scope of a variable affected using ``let`` is limited to the formula that
-follows the colon (`:`). If this formula is followed by a whitespace and an other
-formula, the second formula will not be in the variable scope. Example:
+The scope of a variable affected using ``let`` is limited to the formula
+that follows the colon (`:`). If this formula is followed by a whitespace
+and an other formula, the second formula will not be in the variable
+scope. Example:
 ``` Touist
   let $v=10: prop($v)
   prop($v)    ;; error: $v is not in scope anymore  
@@ -269,16 +272,17 @@ TERM = [_0-9]*[a-zA-Z][a-zA-Z_0-9]*
 ```
 
 A simple proposition is a simple word that can contain numbers and the
-underscore symbol ("`_`"). A tuple proposition (we can it as a _predicate_),
-of the form ``prop(1,$i,abc)``, must have indexes of type integer, float,
-boolean or set.
+underscore symbol ("`_`"). A tuple proposition (we can it as a
+_predicate_), of the form ``prop(1,$i,abc)``, must have indexes of type
+integer, float, boolean or set.
 
 ### Tuple proposition containing a set {#tuple-prop-set}
 
-A tuple proposition that is in an expression and that contains at least one
-set in its indexes will be expanded to a set of the cartesian product of the
-set indexes. This feature is called **set-building** and is described in
-[#set-builder] and only works in expressions (not in formulas).
+A tuple proposition that is in an expression and that contains at least
+one set in its indexes will be expanded to a set of the cartesian product
+of the set indexes. This feature is called **set-building** and is
+described in [#set-builder] and only works in expressions (not in
+formulas).
 
 In the following table, the two right-columns show how the propositions
 are expanded whether they are in an expression or in a formula:
@@ -324,10 +328,10 @@ Here is the complete rule for numeric operators:
 
 ~ Note
 Integer and float expressions cannot be mixed. It is necessary to cast
-explicitely to the other type when the types are not matching. For example,
-the expression ``1+2.0`` is  invalid and should be written ``1+int(2.0)``
-(gives an integer) or ``float(1)+2.0`` (gives a float). Some operators are
-specific to integer or float types:
+explicitely to the other type when the types are not matching. For
+example, the expression ``1+2.0`` is invalid and should be written
+``1+int(2.0)`` (gives an integer) or ``float(1)+2.0`` (gives a float).
+Some operators are specific to integer or float types:
 
 * ``card([a,b])`` returns an integer,
 * ``sqrt(3)`` returns a float.
@@ -366,9 +370,10 @@ Here is the rule for writting correct integer expressions:
 
 ## Booleans
 
-The constants are ``true`` and ``false``. The boolean connectors are $>$, $<$,
-$\ge$ (`>=`), $\le$ (`<=`), $=$ (`==`) and $\neq$ (`!=`). The operators that
-return a boolean are ``subset($P,$Q)``, ``empty($P)`` and ``p in $P``:
+The constants are ``true`` and ``false``. The boolean connectors are $>$,
+$<$, $\ge$ (`>=`), $\le$ (`<=`), $=$ (`==`) and $\neq$ (`!=`). The
+operators that return a boolean are ``subset($P,$Q)``, ``empty($P)`` and
+``p in $P``:
 
 ~Center
 |-----------------|:-------------:|---------------------------------------:|
@@ -381,10 +386,10 @@ return a boolean are ``subset($P,$Q)``, ``empty($P)`` and ``p in $P``:
 Sets are detailed in [#sec-sets].
 
 ~ Note {#dont-mix-bool-formula}
-Booleans cannot be mixed with formulas. In a formula, the evaluation (choosing
-true or false) is not done during the translation from touist to the
-"solver-friendly" language. Conversely, a boolean expression must be
-evaluable during the translation.
+Booleans cannot be mixed with formulas. In a formula, the evaluation
+(choosing true or false) is not done during the translation from touist
+to the "solver-friendly" language. Conversely, a boolean expression must
+be evaluable during the translation.
 ~
 
 Parenthesis can be used in boolean expressions. The priority order for
@@ -612,12 +617,14 @@ Here is the list of "limit" cases where ``bigand`` and ``bigor`` will produce
 special results:
 
 * In ``bigand``, if a set is empty then ``Top`` is produced
-* In ``bigand``, if the ``when`` condition is always false then ``Top`` is produced
+* In ``bigand``, if the ``when`` condition is always false then ``Top``
+  is produced
 * In ``bigor``, if a set is empty then ``Bot`` is produced
-* In ``bigor``, if the ``when`` condition is always false then ``Bot`` is produced
+* In ``bigor``, if the ``when`` condition is always false then ``Bot`` is
+  produced
 
-These behaviors come from the idea of quantification behind the ``bigand``
-and ``bigor`` operators:
+These behaviors come from the idea of quantification behind the
+``bigand`` and ``bigor`` operators:
 
 ~ Center
 |:~~~~~~~~~~~~~~~~~~~~~~~~~|:~~~{width:25%}~~~~~~~:|:~~~~~~~~~~~~~~~~~~~~~~~~~~~~~|
@@ -640,9 +647,9 @@ Clarify this explanation.
 
 #### Exact, atmost and atleast
 
-Touist provides some specialized operators, namely ``exact``, ``atmost`` and ``atleast``.
-In some cases, these operators can drastically lower the size of some formulas. The
-syntax of these constructs is:
+Touist provides some specialized operators, namely ``exact``, ``atmost``
+and ``atleast``. In some cases, these operators can drastically lower the
+size of some formulas. The syntax of these constructs is:
 ~Center
 |-------------------------|------------------|
 | Math notation           | Touist syntax    |
@@ -653,19 +660,24 @@ syntax of these constructs is:
 |-------------------------|------------------|
 ~ 
 
-Let $P$ be a set of propositions, $x$ a proposition and $k$ a positive integer. Then:
+Let $P$ be a set of propositions, $x$ a proposition and $k$ a positive
+integer. Then:
 
-* $\leqslant_{x\in P}^k x$ represents "at any time, at most $k$ propositions $x \in P$ must be true"
-* $\geqslant_{x\in P}^k x$ represents "at any time, at least $k$ propositions $x \in P$ must be true"
-* ${<>}_{x\in P}^k x$ represents "at any time, exactly $k$ propositions $x \in P$ must be true"
+* $\leqslant_{x\in P}^k x$ represents "at any time, at most $k$
+  propositions $x \in P$ must be true"
+* $\geqslant_{x\in P}^k x$ represents "at any time, at least $k$
+  propositions $x \in P$ must be true"
+* ${<>}_{x\in P}^k x$ represents "at any time, exactly $k$ propositions
+  $x \in P$ must be true"
 
 These operators are extremely expensive in the sense that they produce formulas
 with an exponential size. For example, ``exact(5,p([1..20])``
 will produce a disjunction of $\binom{20}{5} = 15 504$ conjunctions. 
 
 ~Note
-The notation ``p([1..20])`` is called "set-builder" and is defined in [#set-builder].
-Using this syntax, the formula ``exact(5,p([1..20])`` is equivalent to 
+The notation ``p([1..20])`` is called "set-builder" and is defined
+in [#set-builder]. Using this syntax, the formula ``exact(5,p([1..20])``
+is equivalent to
 ~~ Math
 {<>}_{x\in P}^k p(x)
 ~~
@@ -1008,13 +1020,11 @@ default, but can be optionally expressed using the `--sat` flag.
 With no other argument, touist will simply translate the touist code to
 the [DIMACS][dimacs] format and then output the mapping table (that maps
 each proposition to an integer > 0) in DIMACS comments. You can redirect
-this mapping table using the `--table <filename>` flag.  [dimacs]:
-<http://www.satcompetition.org/2009/format-benchmarks2009.html>
+this mapping table using the `--table <filename>` flag. 
 
-### Usage for quantified boolean logic (QBF mode)
+[dimacs]: http://www.satcompetition.org/2009/format-benchmarks2009.html
 
-
-#### Options:
+#### `--sat` options:
 
 **`--solve`**. Ask touist to solve the SAT problem. By default, the first
 model is displayed; you can ask for more models using the `--limit N`
@@ -1046,6 +1056,22 @@ models returned. When N=0, all models are returned.
 models. This option will only work for small problems: the number of
 models explodes when the number of propositions is big.
 
+### Usage for quantified boolean logic (QBF mode)
+
+Touist embeds a QBF solver, [quantor]. By default, when installing
+`touist` through opam, it is not built with it. To enable the QBF solver,
+you must install `qbf`:
+```
+    opam install qbf
+```
+Then, you can solve any touist-written QBF problem:
+
+```
+    touist --qbf --solve instance.touist
+```
+
+[quantor]: http://fmv.jku.at/quantor/
+
 ### Other options
 **`--latex`**. Translates the given touist code to &logolatex;. The
 resulting latex code only require the `mathtools` package and is
@@ -1060,8 +1086,9 @@ touist file. This is useful for debugging and testing that the constructs
 **`--show-hidden`**. This is specific to the SAT mode. When displaying
 the DIMACS result, also include the hidden propositions that have been
 generated during the CNF expansion by the [Tseitin][tseitlin]
-transformation. [tseitlin]:
-<https://en.wikipedia.org/wiki/Conjunctive_normal_form>
+transformation.
+
+[tseitlin]: https://en.wikipedia.org/wiki/Conjunctive_normal_form
 
 **`--linter`**. This option disables all outputs except for errors. It
 also shortens then evaluation step by bypassing the expansive ``bigand``,
