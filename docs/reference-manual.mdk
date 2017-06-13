@@ -727,10 +727,10 @@ Describe the SMT language
 
 ## QBF formulas
 
-Using the `--qbf` flag (in touist) or the QBF selector (in the graphical
-interface), you can solve QBF problems with existential and universal
-quantifiers over boolean values. This logic is basically the same as the
-SAT grammar, except for two new operators:
+Using the `--qbf` and `--solve` flags (in `touist`) or the QBF selector
+(in the graphical interface), you can solve QBF problems with existential
+and universal quantifiers over boolean values. This logic is basically
+the same as the SAT grammar, except for two new operators:
 ``` Grammar
     | "exists" <comma-list(<prop>|<var>)> ":" <formula-qbf> 
     | "forall" <comma-list(<prop>|<var>)> ":" <formula-qbf>
@@ -738,11 +738,51 @@ SAT grammar, except for two new operators:
 
 One quantifier can quantify over multiple propositions. For example:
 ``` Touist
-forall e,d: (exists a,b: a => b) => (e and forall c: e => c) 
+    forall e,d: (exists a,b: a => b) => (e and forall c: e => c) 
 ```
 ~ Math
 \forall e. \forall d. (\exists a. \exists b. a \Rightarrow b) \Rightarrow (e \wedge \forall c. e \Rightarrow c)
 ~
+
+### Free variables
+
+Any free variable (i.e., not quantified) will be existentially quantified
+in an inner-most way. For example, $\forall a. a and b$ will become
+$\forall a. \forall b. a and b$. 
+
+### Renaming during the prenex transformation
+
+Using the rules for transforming an arbitraty formula into prenex form
+requires sometimes some renaming. For example, $(\forall a. a) and a$
+must be transformed into $(\forall a_1. a_1 and a)$.
+
+Sometimes, the renaming is not possible. For example, in
+$\forall a. (\exists a: a)$, we cannot guess which quantifier the
+rightmost $a$ should be bound to. In this case, `touist` will give and
+error.
+
+Also, the use of the whitespace-as-formula-separator can lead to some
+misunderstanding. For example, in formula
+
+```Touist
+    exists x: x
+    x => y
+```
+
+the ``x`` in the second line is free whereas the ``x`` in the first line
+is bounded. This is because two whitespace-separated formulas have
+different scopes. In fact, the previous formula could be re-written as
+```Touist
+    (exists x: x) and (x => y)
+```
+
+The only way to span the scope of a bounded variable across multiple lines
+is to continue the formula with a ``and`` instead of using a new line:
+
+```Touist
+    exists x: x
+    and (x => y)
+```
 
 ## Formal grammar
 
