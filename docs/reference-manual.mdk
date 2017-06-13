@@ -15,6 +15,24 @@ Package:[top=2.5cm,bottom=2.5cm,inner=2.5cm,outer=2.5cm]geometry
 
 [TOC]
 <!-- Maël: for now, you can ignore the error "undefined key: version" -->
+
+# Contribute to this document
+
+The source of this document is written in [madoko], a markdown dialect.
+This language has been chosen over Latex for its brevity (Pandoc could
+have also been chosen). You can contribute to this [document] through a
+pull-request or by discussing your thoughts in the [issue] tracker. To
+edit it, you can first take a look at what the madoko [editor] can do
+(with this link, the images and colorizer will not work), or see how to
+edit properly in [`CONTRIBUTE-TO-DOCS.md`][contribute] (located in
+`docs/`).
+
+[madoko]: https://www.madoko.net
+[issue]: https://github.com/touist/touist/issues
+[document]: https://github.com/touist/touist/glob/tree/master/docs/reference-manual.mdk
+[contribute]: https://github.com/touist/touist/tree/master/docs
+[editor]: https://www.madoko.net/editor.html?#tab=2&url=https://raw.githubusercontent.com/touist/touist/master/docs/reference-manual.mdk&options={"delayedUpdate":"true"}
+
 # Introduction
 
 Touist is a language that allows to express propositional logic
@@ -921,22 +939,25 @@ With no `-o` flag, touist will output to the standard output (`stdout`).
 
 ### Return codes
 
-|------|-------------------|
-| Code | Label             |
-|:----:|-------------------|
-| 0    | `OK             ` |
-| 1    | `UNKNOWN        ` |
-| 2    | `CMD_USAGE      ` |
-| 3    | `CMD_UNSUPPORTED` |
-| 4    | `TOUIST_SYNTAX  ` |
-| 5    | `TOUIST_TIMEOUT ` |
-| 6    | `TOUIST_MEMORY  ` |
-| 7    | `TOUIST_UNKNOWN ` |
-| 8    | `SOLVER_UNSAT   ` |
-| 9    | `SOLVER_UNKNOWN ` |
-| 10   | `SOLVER_TIMEOUT ` |
-| 11   | `SOLVER_MEMORY  ` |
-|------|-------------------|
+|-----|-----------------|-------------------------------------------------|
+|Code |Label            | Description                                     |
+|:---:|-----------------|-------------------------------------------------|
+|  0  |`OK             `|                                                 |
+|  1  |`UNKNOWN        `|                                                 |
+|  2  |`CMD_USAGE      `| something wrong with the command-line arguments |
+|  3  |`CMD_UNSUPPORTED`|                                                 |
+|  4  |`TOUIST_SYNTAX  `| any error of syntax, type or semantic           |
+|  5  |`TOUIST_TIMEOUT `|                                                 |
+|  6  |`TOUIST_MEMORY  `|                                                 |
+|  7  |`TOUIST_UNKNOWN `|                                                 |
+|  8  |`SOLVER_UNSAT   `| the solver did not find any model               |
+|  9  |`SOLVER_UNKNOWN `|                                                 |
+| 10  |`SOLVER_TIMEOUT `|                                                 |
+| 11  |`SOLVER_MEMORY  `|                                                 |
+|-----|-----------------|-------------------------------------------------|
+
+Note that the `SOLVER_UNSAT` is not really an error, but we choose to return
+a non-zero return code anyway.
 
 ### Usage for propositional logic (SAT mode)
 
