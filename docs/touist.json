@@ -33,7 +33,10 @@
   "let",
   "data",
   "powerset",
-  ":"],
+  ":",
+  "exists",
+  "forall",
+  "for"],
  
  "extraKeywords": [ "Top","Bot","true","false"],
 
