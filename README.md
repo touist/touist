@@ -3,8 +3,8 @@ TouIST, the language for propositional logic
 
 
 |      Mac, Linux      |         Windows         | [Reference manual][ref] |
-| :------------------: | :---------------------: | :------------------: |
-| [![trv-img]][travis] | [![apvy-img]][appveyor] | [![cir-img]][circle] |
+| :------------------: | :---------------------: | :---------------------: |
+| [![trv-img]][travis] | [![apvy-img]][appveyor] |  [![cir-img]][circle]   |
 
 [circle]: https://circleci.com/gh/touist/touist/tree/master
 [cir-img]: https://circleci.com/gh/touist/touist/tree/master.svg?style=svg
@@ -92,6 +92,22 @@ Here is a small figure showing the architecture of the whole thing:
 See the [./INSTALL.md][install] file.
 
 [install]: https://github.com/touist/touist/blob/master/INSTALL.md
+
+## Tested architectures
+
+
+|                        | GNU/Linux, BSD | Windows                | macOS |
+| ---------------------- | -------------- | ---------------------- | ----- |
+| `touist` (opam)        | yes            | yes (mingw32+mingw64)  | yes   |
+| `qbf` (opam)           | yes            | yes (minw32 only [^1]) | yes   |
+| `yices2` (opam) [^2]   | yes            | no                     | yes   |
+| `yices2` (source) [^2] | yes            | yes (mingw32+mingw64)  | yes   |
+
+[^1]: the `qbf` package only works on mingw32 because of a slight bug in the
+     `./configure` of quantor-3.2. See maelvalais's PR on the ocaml-qbf repo.
+
+[^2]: yices2 needs the gmp library on the system. On linux and macos, opam
+     will install it for you using the command `opam depext conf-gmp`.
 
 ## Bugs and feature requests
 You can report bugs by creating a new Github issue. Feature requests can also
