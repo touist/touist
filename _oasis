@@ -63,6 +63,7 @@ BetaFeatures: section_object
 # instead because oasis would add single-quotes around package(cppo_ocamlbuild);
 # single-quotes aren't interpreted by 'cmd' on windows, and thus they are left
 # as is, triggering an error. Instead, I use double-quotes.
+# Note that cppo_ocamlbuild is available in ocaml >= 4.01.0 and cppo >= 0.9.4
 
 Flag yices2
   Default: false
@@ -90,7 +91,7 @@ Library touist
   InternalModules: Lexer,Parser,Parser_error_report
   BuildTools+:    menhir, cppo
   BuildDepends:   menhirLib (>= 20151023), fileutils (>= 0.4.0), str,
-                  minisat
+                  minisat, cppo_ocamlbuild (>= 0.9.4)
 
 Library touist_yices2
   Build$:         flag(yices2)
