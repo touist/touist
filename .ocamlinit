@@ -2,7 +2,11 @@
  * bytecode over native code, use the following:
  *     ./configure --override is_native false
  *)
+
 #directory "_build/src";;
+#directory "_build/src/lib";;
+#directory "_build/src/lib/qbf";;
+#directory "_build/src/lib/yices2";;
 
 #require "menhirLib";;
 #require "minisat";;
@@ -24,6 +28,7 @@
 #load "cnf.cmo";;
 #load "sat.cmo";;
 #load "smt.cmo";;
+#load "latex.cmo";;
 
 (* From 'utop', you can test small pieces of your code. For example,
    I have been trying my ModelSet thing:
