@@ -28,7 +28,7 @@ open Pprint
 let rm_dollar x = String.sub x 1 (String.length x - 1)
 
 let rec latex_of_ast = function
-  | Touist_code (f) -> (latex_of_commalist "\\\\\n" f)
+  | Touist_code (f) -> (latex_of_commalist "\\\\\n" f) ^ "\\\\"
   | Int    x -> string_of_int x
   | Float  x -> string_of_float x
   | Bool   x -> string_of_bool x
@@ -92,8 +92,8 @@ let rec latex_of_ast = function
   | Affect (v,c) -> (latex_of_ast v) ^ " \\leftarrow " ^ (latex_of_ast c)
   | Loc (x,_) -> latex_of_ast x
   | Paren x -> if has_newline x
-    then "\\begin{pmatrix*}[l]" ^ latex_of_ast x ^ "\\end{pmatrix*}"
-    else "\\left(" ^ latex_of_ast x ^ "\\right)"
+      then "\\begin{pmatrix*}[l]" ^ latex_of_ast x ^ "\\end{pmatrix*}"
+      else "\\left(" ^ latex_of_ast x ^ "\\right)"
   | Exists (v,f) -> "\\exists "^(latex_of_ast v) ^". "^ (latex_of_ast f)
   | Forall (v,f) -> "\\forall "^(latex_of_ast v) ^". "^ (latex_of_ast f)
   | For (v,c,f)  -> "\\textrm{for} "^latex_of_ast v^" \\in "^latex_of_ast c^":"^ latex_of_ast f
@@ -108,69 +108,31 @@ let rec latex_of_ast = function
    cond is true. The tranversal order should not be considered. *)
 and ast_fun (f:('a -> ast -> 'a)) (acc:'a) ast : 'a =
   let acc = f acc ast in
-  let ast_fun ast acc = ast_fun f acc ast in
-  let ast_fun2 ast1 ast2 = acc |> ast_fun ast1 |> ast_fun ast2 in
-  let ast_fun1 ast = acc |> ast_fun ast in
+  let ast_fun' ast acc = ast_fun f acc ast in
+  let ast_fun2 ast1 ast2 = acc |> ast_fun' ast1 |> ast_fun' ast2 in
+  let ast_fun1 ast = acc |> ast_fun' ast in
   match ast with
-  | Touist_code listf   -> listf |> List.fold_left (fun acc f -> acc |> ast_fun f) acc
-  | Add (x,y)
-  | Sub (x,y)
-  | Mul (x,y)
-  | Div (x,y) -> ast_fun2 x y
-  | Neg      f
-  | Sqrt     f
-  | To_int   f
-  | To_float f
-  | Abs      f
-  | Not      f
-  | Bigand (_,_,_,f)
-  | Bigor  (_,_,_,f)
-  | Let (_,_,f)
-  | Loc (f,_)
-  | Paren f
-  | Exists (_,f)
-  | Forall (_,f)
-  | For (_,_,f)
-  | NewlineBefore f
-  | NewlineAfter  f -> ast_fun1 f
-  | If             (_,x,y)
-  | And              (x,y)
-  | Or               (x,y)
-  | Xor              (x,y)
-  | Implies          (x,y)
-  | Equiv            (x,y)
-  | Equal            (x,y)
-  | Not_equal        (x,y)
-  | Lesser_than      (x,y)
-  | Lesser_or_equal  (x,y)
-  | Greater_than     (x,y)
-  | Greater_or_equal (x,y) -> ast_fun2 x y
-  | Int _
-  | Float _
-  | Bool _
-  | Top
-  | Bottom
-  | Prop _
-  | UnexpProp (_, _)
-  | Var (_,_)
-  | Set _
-  | Set_decl _
-  | Card  _
-  | Exact   (_,_)
-  | Atmost  (_,_)
-  | Atleast (_,_)
-  | Affect  (_,_) -> acc
-  | Mod (x,y) -> ast_fun2 x y (* non-formula *)
+  | Touist_code listf
+      -> listf |> List.fold_left (fun acc f -> acc |> ast_fun' f) acc
+  | Add (x,y) | Sub (x,y) | Mul (x,y) | Div (x,y)
+      -> ast_fun2 x y
+  | Neg f | Sqrt f | To_int f | To_float f | Abs f | Not f
+  | Bigand (_,_,_,f) | Bigor  (_,_,_,f) | Let (_,_,f) | Loc (f,_)
+  | Paren f | Exists (_,f) | Forall (_,f) | For (_,_,f)
+  | NewlineBefore f | NewlineAfter  f
+      -> ast_fun1 f
+  | If (_,x,y) | And (x,y) | Or (x,y) | Xor (x,y) | Implies (x,y) | Equiv (x,y)
+  | Equal (x,y) | Not_equal (x,y) | Lesser_than (x,y) | Lesser_or_equal (x,y)
+  | Greater_than (x,y) | Greater_or_equal (x,y)
+      -> ast_fun2 x y
+  | Int _ | Float _ | Bool _ | Top | Bottom | Prop _ | UnexpProp _ | Var _
+  | Set _ | Set_decl _ | Card  _ | Exact _ | Atmost _ | Atleast _ | Affect  _
+      -> acc
   (* non-formulas *)
-  | Union  (x,y)     -> ast_fun2 x y
-  | Inter  (x,y)     -> ast_fun2 x y
-  | Diff   (x,y)     -> ast_fun2 x y
-  | Range  (x,y)     -> ast_fun2 x y
-  | Subset (x,y)     -> ast_fun2 x y
-  | Powerset x       -> ast_fun1 x
-  | In     (x,y)     -> ast_fun2 x y
-  | Empty x          -> ast_fun1 x
-  (*| _ -> failwith ("[shouldnt happen] this should be a formula: "^Pprint.string_of_ast ast)*)
+  | Mod _ | Union _ | Inter _ | Diff _ | Range _ | Subset _ | Powerset _
+  | In _ | Empty _
+      -> failwith ("[shouldnt happen] this should be a formula: "
+                    ^Pprint.string_of_ast ast)
 
 and has_newline ast =
-  ast |> ast_fun (fun acc ast -> match ast with Paren _ -> true | _ -> acc) false
+  ast |> ast_fun (fun acc ast -> (match ast with Paren _ -> true | _ -> acc); true) false
