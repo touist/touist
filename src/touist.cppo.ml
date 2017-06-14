@@ -54,6 +54,7 @@ let error_format = ref "%f: line %l, col %c-%C: %t: %m" (* display absolute posi
 let debug_syntax = ref false
 let debug_cnf = ref false
 let latex = ref false
+let latex_full = ref false
 let show = ref false
 let wrap_width = ref 76
 
@@ -105,7 +106,8 @@ let () =
     ("--limit", Arg.Set_int limit,"(with --solve) Instead of one model, return N models if they exist.
                                             With 0, return every possible model.");
     ("--count", Arg.Set only_count,"(with --solve) Instead of displaying models, return the number of models");
-    ("--latex", Arg.Set latex,"Transform the touistl laguage into latex");
+    ("--latex", Arg.Set latex,"Transform to latex without headers");
+    ("--latex-full", Arg.Set latex_full,"Transform to latex with headers");
     ("--show-hidden", Arg.Set show_hidden_lits,"(with --solve) Show the hidden '&a' literals used when translating to CNF");
     ("--equiv", Arg.Set_string equiv_file_path,"INPUT2 (with --solve) Check that INPUT2 has the same models as INPUT (equivalency)");
     ("--linter", Arg.Set linter,"Display syntax and semantic errors and exit");
@@ -176,7 +178,7 @@ let () =
   then input_equiv := open_in !equiv_file_path;
 
   (* latex = parse and transform with latex_of_ast *)
-  if !latex || !linter then begin
+  if !latex || !latex_full || !linter then begin
     let ast_plain,msgs =
       match !mode with
       | Sat -> Parse.parse_sat ~debug:!debug_syntax ~filename:!input_file_path (string_of_chan !input)
@@ -187,6 +189,14 @@ let () =
       let _,msgs =  (ast_plain,msgs) |> Eval.eval ~smt:(!mode = Smt) ~onlychecktypes:true in msgs else msgs
     in
     if !latex then Printf.fprintf !output "%s\n" (Latex.latex_of_ast ast_plain);
+    if !latex_full then
+      Printf.fprintf !output "\\documentclass[fleqn]{article} \n \
+      \\usepackage{mathtools} \n\
+      \\begin{document} \n\
+      \\begin{multline*}\n\
+      %s\n\
+      \\end{multline*} \n\
+      \\end{document}\n" (Latex.latex_of_ast ast_plain);
     show_msgs_and_exit !msgs OK
   end;
 
