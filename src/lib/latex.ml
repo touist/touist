@@ -92,7 +92,7 @@ let rec latex_of_ast = function
   | Affect (v,c) -> (latex_of_ast v) ^ " \\leftarrow " ^ (latex_of_ast c)
   | Loc (x,_) -> latex_of_ast x
   | Paren x -> if has_newline x
-    then "\\begin{pmatrix}" ^ latex_of_ast x ^ "\\end{pmatrix}"
+    then "\\begin{pmatrix*}[l]" ^ latex_of_ast x ^ "\\end{pmatrix*}"
     else "\\left(" ^ latex_of_ast x ^ "\\right)"
   | Exists (v,f) -> "\\exists "^(latex_of_ast v) ^". "^ (latex_of_ast f)
   | Forall (v,f) -> "\\forall "^(latex_of_ast v) ^". "^ (latex_of_ast f)
