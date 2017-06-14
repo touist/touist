@@ -5,7 +5,7 @@ $T = [0..$Nb] ;; set of turns
 ;; reste(t,n) = il reste n allumettes au temps t
 ;; prend(t,2) = au temps t, 2 allumettes si vrai, 1 sinon
 
-(
+
 exists prend(0,2): ;; joueur 0 (nous)
 forall prend(1,2): ;; joueur 1 (adversaire)
 exists prend(2,2): \\ ;; joueur 0 (nous)
@@ -23,9 +23,9 @@ and
 ;; Resultat de l'action de la prise : si on a pris, il faut baisser
 ;; le nombre d'allumettes.
 bigand $t,$n in $T,$N when $n>=2:
-  ((reste($t,$n) and prend($t,2)) => reste($t+1,$n-2))
+  (((reste($t,$n) and prend($t,2)) => reste($t+1,$n-2))\\
   and
-  ((reste($t,$n) and not prend($t,2)) => reste($t+1,$n-1))
+  ((reste($t,$n) and not prend($t,2)) => reste($t+1,$n-1)))
 end \\
 and
 
@@ -56,7 +56,7 @@ and
 ;; est inutile car toujours vrai. Et si on remplaçait ce morceau par
 ;;     and reste($t-1,1)
 ;; c'est aussi inutile car reste(_,0) n'apparait qu'une fois.
-(0_a_perdu <=>
+(0_a_perdu <=> \\
 bigor $t in $T when $t>0:
   tour_de_0($t) and reste($t,0) and not reste($t-1,1)
 end) \\
@@ -67,4 +67,3 @@ and
 bigand $t in $T:
   not tour_de_0($t) <=> tour_de_0($t+1)
 end
-)
