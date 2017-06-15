@@ -190,12 +190,13 @@ let () =
     in
     if !latex then Printf.fprintf !output "%s\n" (Latex.latex_of_ast ast_plain);
     if !latex_full then
-      Printf.fprintf !output "\\documentclass[fleqn]{article} \n \
-      \\usepackage{mathtools} \n\
-      \\begin{document} \n\
+      Printf.fprintf !output "\\documentclass[fleqn]{article}\n\
+      \\usepackage{mathtools}\n\
+      \\allowdisplaybreaks\n\
+      \\begin{document}\n\
       \\begin{multline*}\n\
       %s\n\
-      \\end{multline*} \n\
+      \\end{multline*}\n\
       \\end{document}\n" (Latex.latex_of_ast ast_plain);
     show_msgs_and_exit !msgs OK
   end;
