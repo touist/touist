@@ -6,7 +6,7 @@ Title Note: &date; (touist &version;)
 Bib: bibliography.bib
 Colorizer: touist
 Colorizer: grammar
-<!--Math Mode: mathjax-->
+Math Mode: mathjax
 .code2 { language: Touist } <!-- ``bigand`` will be touist-colored -->
 .code3 { language: Grammar }
 Package:[top=2.5cm,bottom=2.5cm,inner=2.5cm,outer=2.5cm]geometry
