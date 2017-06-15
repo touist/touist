@@ -4,14 +4,9 @@
 # I wanted something that could produce HTML and also beautiful
 # PDFs. NOTE: I could also have chosen Pandoc or smth like that.
 
-general:
-  branches:
-    only:
-      - master
-
 machine:
   pre:
-  - sudo add-apt-repository -y ppa:jonathonf/texlive-2017
+  - sudo add-apt-repository -y ppa:jonathonf/texlive-2016
   - sudo apt-get -q -y update
   # The following Texlive packages are the minimum required for
   # Madoko to run.
