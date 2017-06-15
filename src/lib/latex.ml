@@ -27,6 +27,25 @@ open Pprint
 
 let rm_dollar x = String.sub x 1 (String.length x - 1)
 
+(* Idea for adding the needed parenthesis (for understanding the priorities)
+   in the latex:
+   1. As long as the top formula finds 'and', we don't need parenthesis
+   2. If the top formula only contains 'and', we can omit the parenthesis
+   3. Big operators should have inside parenthesis when it contains anything
+      non-unary: or, and, =>, <=>
+   4. Big operators should not have inside parenthesis when they contain
+      something unary except for 'not' (?):
+      bigand, bigor, exists, forall, not
+
+    a and b or c               ->          (a and b or c)
+    a and b and c              ->          <same>
+    bigand x: x                ->          <same>
+    bigand x: x and y          ->          bigand x: (x and y)
+    a and bigand x: x          ->          <same>
+    a or bigand x: x           ->           (a or bigand x: x)
+    a or bigand x: x and y end ->           (a or bigand x: (x and y))
+*)
+
 let rec latex_of_ast = function
   | Touist_code (f) -> (latex_of_commalist "\\\\\n" f) ^ "\\\\"
   | Int    x -> string_of_int x
@@ -76,27 +95,38 @@ let rec latex_of_ast = function
       ^ "\\;\\textrm{then}\\;" ^ (latex_of_ast y)
       ^ "\\;\\textrm{else}\\;" ^ (latex_of_ast z)
   | Bigand (x,y,b,z) ->
-       "\\bigwedge\\limits_{\\substack{" ^ (latex_of_commalist "," x) ^
-       "\\in " ^ (latex_of_commalist "," y) ^
-       (match b with None -> "" | Some b -> "\\\\" ^ (latex_of_ast b)) ^ "}}" ^
-       (latex_of_ast z)
+      "\\bigwedge\\limits_{\\substack{" ^ (latex_of_commalist "," x) ^
+      "\\in " ^ (latex_of_commalist "," y) ^
+      (match b with None -> "" | Some b -> "\\\\" ^ (latex_of_ast b)) ^ "}}" ^
+      latex_of_ast (if z |> Eval.ast_whithout_loc |> is_binary_op then (Paren z) else z)
   | Bigor (x,y,b,z) ->
       "\\bigvee\\limits_{\\substack{" ^ (latex_of_commalist "," x) ^
        "\\in " ^ (latex_of_commalist "," y) ^
        (match b with None -> "" | Some b -> "\\\\" ^ (latex_of_ast b)) ^ "}}" ^
-       (latex_of_ast z)
+       latex_of_ast (if z |> Eval.ast_whithout_loc |> is_binary_op then (Paren z) else z)
   | Exact (x,y) -> "\\textrm{exact}(" ^ (latex_of_ast x) ^ "," ^ (latex_of_ast y) ^ ")"
   | Atmost (x,y) -> "\\textrm{atmost}(" ^ (latex_of_ast x) ^ "," ^ (latex_of_ast y) ^ ")"
   | Atleast (x,y) -> "\\textrm{atleast}(" ^ (latex_of_ast x) ^ "," ^ (latex_of_ast y) ^ ")"
   | Let (v,x,c) -> (latex_of_ast v) ^ " \\leftarrow " ^ (latex_of_ast x) ^ "\\\\" ^ (latex_of_ast c)
   | Affect (v,c) -> (latex_of_ast v) ^ " \\leftarrow " ^ (latex_of_ast c)
   | Loc (x,_) -> latex_of_ast x
-  | Paren x -> if has_newline x
+  | Paren x -> if contains_newline x
+      (* \left( and \right) must be on the same line in latex.
+          If there is a \\ in latex between two parenthesis, we use
+          a pmatrix instead. *)
       then "\\begin{pmatrix*}[l]" ^ latex_of_ast x ^ "\\end{pmatrix*}"
       else "\\left(" ^ latex_of_ast x ^ "\\right)"
   | Exists (v,f) -> "\\exists "^(latex_of_ast v) ^". "^ (latex_of_ast f)
   | Forall (v,f) -> "\\forall "^(latex_of_ast v) ^". "^ (latex_of_ast f)
-  | For (v,c,f)  -> "\\textrm{for} "^latex_of_ast v^" \\in "^latex_of_ast c^":"^ latex_of_ast f
+  | For (var,set,above_f) ->
+    let op, prop, f = match Eval.ast_whithout_loc above_f with
+    | Forall (prop,f) -> ("\\exists", prop, f)
+    | Exists (prop,f) -> ("\\forall", prop, f)
+    | f -> failwith ("[shoudlnt happen] only exists and forall allowed with \
+    'for' statement. This is an '"^Pprint.string_of_ast_type f^"': "^Pprint.string_of_ast above_f)
+    in
+        "\\displaystyle\\mathop{"^ op ^ latex_of_ast prop ^"}_{"
+        ^ (latex_of_ast var)^ "\\in "^latex_of_ast set ^"} ."^ latex_of_ast f
   | NewlineBefore f -> "\\\\\n" ^ latex_of_ast f
   | NewlineAfter f -> latex_of_ast f ^ "\\\\\n"
 
@@ -109,23 +139,23 @@ let rec latex_of_ast = function
    Whenever a non-formula is given, acc will be immediatly returned. *)
 and ast_fun (f:('a -> ast -> 'a)) (acc:'a) ast : 'a =
   let acc = f acc ast in
-  let ast_fun' ast acc = ast_fun f acc ast in
-  let ast_fun2 ast1 ast2 = acc |> ast_fun' ast1 |> ast_fun' ast2 in
-  let ast_fun1 ast = acc |> ast_fun' ast in
+  let ast_fun' ast acc =
+      let a = ast_fun f acc ast
+      in a
+  in
   match ast with
   | Touist_code listf
       -> listf |> List.fold_left (fun acc f -> acc |> ast_fun' f) acc
-  | Add (x,y) | Sub (x,y) | Mul (x,y) | Div (x,y)
-      -> ast_fun2 x y
   | Neg f | Sqrt f | To_int f | To_float f | Abs f | Not f
   | Bigand (_,_,_,f) | Bigor  (_,_,_,f) | Let (_,_,f) | Loc (f,_)
   | Paren f | Exists (_,f) | Forall (_,f) | For (_,_,f)
   | NewlineBefore f | NewlineAfter  f
-      -> ast_fun1 f
+      -> acc |> ast_fun' f
+  | Add (x,y) | Sub (x,y) | Mul (x,y) | Div (x,y)
   | If (_,x,y) | And (x,y) | Or (x,y) | Xor (x,y) | Implies (x,y) | Equiv (x,y)
   | Equal (x,y) | Not_equal (x,y) | Lesser_than (x,y) | Lesser_or_equal (x,y)
   | Greater_than (x,y) | Greater_or_equal (x,y)
-      -> ast_fun2 x y
+      -> acc |> ast_fun' x |> ast_fun' y
   | Int _ | Float _ | Bool _ | Top | Bottom | Prop _ | UnexpProp _ | Var _
   | Set _ | Set_decl _ | Card  _ | Exact _ | Atmost _ | Atleast _ | Affect  _
       -> acc
@@ -133,5 +163,15 @@ and ast_fun (f:('a -> ast -> 'a)) (acc:'a) ast : 'a =
   | Mod _ | Union _ | Inter _ | Diff _ | Range _ | Subset _ | Powerset _
   | In _ | Empty _ -> acc
 
-and has_newline ast =
-  ast |> ast_fun (fun acc ast -> (match ast with Paren _ -> true | _ -> acc); true) false
+and contains_newline ast =
+  ast |> ast_fun (fun acc ast -> match ast with
+    NewlineAfter _ | NewlineBefore _ -> true | _ -> acc) false
+
+and is_binary_op = function
+    | Add _ | Sub _ | Mul _ | Div _ | And _ | Or _ | Xor _ | Implies _ | Equiv _
+    | Equal _ | Not_equal _ | Lesser_than _ | Lesser_or_equal _
+    | Greater_than _ | Greater_or_equal _ -> true
+    | _ -> false
+
+and contains_binary_op ast =
+  ast |> ast_fun (fun acc ast -> if is_binary_op ast then true else acc) false
