@@ -11,7 +11,7 @@ general:
 
 machine:
   pre:
-  - sudo add-apt-repository -y ppa:jonathonf/texlive-2016
+  - sudo add-apt-repository -y ppa:jonathonf/texlive-2017
   - sudo apt-get -q -y update
   # The following Texlive packages are the minimum required for
   # Madoko to run.
