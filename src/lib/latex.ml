@@ -47,7 +47,10 @@ let rm_dollar x = String.sub x 1 (String.length x - 1)
 *)
 
 let rec latex_of_ast = function
-  | Touist_code (f) -> (latex_of_commalist "\\\\\n" f) ^ "\\\\"
+  (* TODO: If a top-formula contains any binary operator that have lesser
+     precedence than 'and', then the whole top-formula should be
+     parenthesized. *)
+  | Touist_code (f) -> latex_of_commalist "\\\\\n" f ^ "\\\\"
   | Int    x -> string_of_int x
   | Float  x -> string_of_float x
   | Bool   x -> string_of_bool x
