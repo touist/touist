@@ -62,10 +62,11 @@ deployment:
         cp docs/out/reference-manual*.{pdf,html} touist.github.io
         cd touist.github.io
         pip install mako
-        ./make_index.py . --regex "reference-manual.*" --header "Reference manual revisions" > manual-revision.html
+        cd doc
+        ../make_index.py . --regex "reference-manual.*" --header "Reference manual revisions" > manual-revision.html
         git pull
         git config user.name "CircleCI"
         git config user.email "robot@circleci.com"
         git add reference-manual*.{pdf,html} manual-revision.html
-        git commit -m "Generated mdk (modako) documentation for `cd .. && git describe --tags`"
+        git commit -m "Generated mdk (modako) documentation for `cd $TRAVIS_BUILD_DIR && git describe --tags`"
         git push

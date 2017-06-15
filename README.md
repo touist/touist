@@ -44,12 +44,13 @@ problem](docs/images/screenshot.png)](https://github.com/maelvalais/allumettes)
 
 4. Syntax coloring is also available in **[VSCode]** through the extension
    _touist_. I really encourage people to give a try to VSCode. Even though
-   it comes from Microsoft, it is open-source!
+   it comes from Microsoft, it is ([kind of][vscode-license]) open-source.
 
 [releases]: https://github.com/touist/touist/releases
-[ref]: http://touist.github.io/reference-manual.html
-[ref-pdf]: http://touist.github.io/reference-manual.pdf
+[ref]: http://www.irit.fr/touist/doc/reference-manual.html
+[ref-pdf]: http://www.irit.fr/touist/doc/reference-manual.pdf
 [VSCode]: https://code.visualstudio.com
+[vscode-license]: https://github.com/Microsoft/vscode/issues/60#issuecomment-161792005
 
 ## Description
 
