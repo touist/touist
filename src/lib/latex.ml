@@ -46,7 +46,13 @@ let rm_dollar x = String.sub x 1 (String.length x - 1)
     a or bigand x: x and y end ->           (a or bigand x: (x and y))
 *)
 
-let rec latex_of_ast = function
+(* [latex_of_ast] turns an AST into latex. Two latex variants are targeted:
+   * for light latex processors (mathjax, jlatexmath), you should use
+     ~full:false
+   * for fully-featured latex processors, you can use ~full:true. *)
+let rec latex_of_ast ?(full=false) ast =
+  let latex_of_ast = latex_of_ast ~full in
+  match ast with
   (* TODO: If a top-formula contains any binary operator that have lesser
      precedence than 'and', then the whole top-formula should be
      parenthesized. *)
@@ -113,7 +119,7 @@ let rec latex_of_ast = function
   | Let (v,x,c) -> (latex_of_ast v) ^ " \\leftarrow " ^ (latex_of_ast x) ^ "\\\\" ^ (latex_of_ast c)
   | Affect (v,c) -> (latex_of_ast v) ^ " \\leftarrow " ^ (latex_of_ast c)
   | Loc (x,_) -> latex_of_ast x
-  | Paren x -> if contains_newline x
+  | Paren x -> if full && contains_newline x
       (* \left( and \right) must be on the same line in latex.
           If there is a \\ in latex between two parenthesis, we use
           a pmatrix instead. *)
