@@ -1053,7 +1053,7 @@ model is displayed; you can ask for more models using the `--limit N`
 option. The models are separated by lines beginning with `====` and for
 one model, each line contains a valuation followed by the corresponding
 proposition. For example:
-``` Shell
+```
     echo a and b | touist - --solve
 ```
 will display
@@ -1142,7 +1142,7 @@ the successive recursive transformations that produce the CNF formula.
 
 ### Usage for Satisfiability Modulo Theory (SMT mode)
 
-To enable the optionnal embeded SMT solver, you need to install `yices2`
+To enable the optional embedded SMT solver, you need to install `yices2`
 through opam:
 
 ```
