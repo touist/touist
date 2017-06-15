@@ -6,7 +6,7 @@ Title Note: &date; (touist &version;)
 Bib: bibliography.bib
 Colorizer: touist
 Colorizer: grammar
-Math Mode: mathjax
+<!--Math Mode: mathjax-->
 .code2 { language: Touist } <!-- ``bigand`` will be touist-colored -->
 .code3 { language: Grammar }
 Package:[top=2.5cm,bottom=2.5cm,inner=2.5cm,outer=2.5cm]geometry
@@ -745,8 +745,12 @@ Using the `--qbf` and `--solve` flags (in `touist`) or the QBF selector
 and universal quantifiers over boolean values. This logic is basically
 the same as the SAT grammar, except for two new operators:
 ``` Grammar
-    | "exists" <comma-list(<prop>|<var>)> ":" <formula-qbf> 
-    | "forall" <comma-list(<prop>|<var>)> ":" <formula-qbf>
+<formula-qbf> ::=
+    [...]
+    | "exists" <comma-list(<prop>|<var>)> [<for>] ":" <formula-qbf> 
+    | "forall" <comma-list(<prop>|<var>)> [<for>] ":" <formula-qbf>
+
+<for> ::= "for" <var> "in" <set>
 ```
 
 One quantifier can quantify over multiple propositions. For example:
@@ -754,23 +758,23 @@ One quantifier can quantify over multiple propositions. For example:
     forall e,d: (exists a,b: a => b) => (e and forall c: e => c) 
 ```
 ~ Math
-\forall e. \forall d. (\exists a. \exists b. a \Rightarrow b) \Rightarrow (e \wedge \forall c. e \Rightarrow c)
+\forall e. \forall d. (\exists a. \exists b. (a \Rightarrow b)) \Rightarrow (e \wedge \forall c. (e \Rightarrow c))
 ~
 
 ### Free variables
 
 Any free variable (i.e., not quantified) will be existentially quantified
-in an inner-most way. For example, $\forall a. a and b$ will become
-$\forall a. \forall b. a and b$. 
+in an inner-most way. For example, $\forall a. a \wedge b$ will become
+$\forall a. \forall b. (a \wedge b)$. 
 
 ### Renaming during the prenex transformation
 
-Using the rules for transforming an arbitraty formula into prenex form
-requires sometimes some renaming. For example, $(\forall a. a) and a$
-must be transformed into $(\forall a_1. a_1 and a)$.
+Using the rules for transforming an arbitrary formula into prenex form
+requires sometimes some renaming. For example, $(\forall a. a) \wedge a$
+must be transformed into $\forall a_1. (a_1 \wedge a))$.
 
 Sometimes, the renaming is not possible. For example, in
-$\forall a. (\exists a: a)$, we cannot guess which quantifier the
+$\forall a. (\exists a. a)$, we cannot guess which quantifier the
 rightmost $a$ should be bound to. In this case, `touist` will give and
 error.
 
@@ -795,6 +799,19 @@ is to continue the formula with a ``and`` instead of using a new line:
 ```Touist
     exists x: x
     and (x => y)
+```
+
+### Multiple ``exists`` or ``forall``
+
+The keyword ``for`` used in ``exists`` or ``forall`` allow us to generate
+multiple quantifiers using sets. Imagine that you want to write
+~Math
+\exists a. \exists b. \exists c. \exists d. \Phi
+~
+You can use one of the two notations:
+```Touist
+    exists a: exists b: exists c: exists d: phi ;; (1)
+    exists $p for $p in [a,b,c,d]: phi          ;; equivalent to (1)
 ```
 
 ## Formal grammar
@@ -955,8 +972,10 @@ TERM      = [_0-9]*[a-zA-Z][a-zA-Z_0-9]*
     | <prop>
     | <var>
     | <formula(<formula-qbf>)>
-    | "exists" <comma-list(<prop>|<var>)> ":" <formula-qbf> 
-    | "forall" <comma-list(<prop>|<var>)> ":" <formula-qbf>
+    | "exists" <comma-list(<prop>|<var>)> [<for>] ":" <formula-qbf> 
+    | "forall" <comma-list(<prop>|<var>)> [<for>] ":" <formula-qbf>
+
+<for> ::= "for" <var> "in" <set>
 ```
 
 # Command-line tool (`touist`)
@@ -966,11 +985,11 @@ The main tool that parses and solves the touist programs is written in
 Ocaml. It is easily installable (as long as you have installed `ocaml`
 and `opam`) with the command
 ```
-  opam install touist
+    opam install touist
 ```
 
 ~ Note
-`touist` can only solve SAT problems (written using propositional logic).
+By default, `touist` only comes with a SAT solver. 
 Problems written using the Satisfiability Modulo Theory (SMT) extension
 of `touist` cannot (yet) be solved, but can still be translated to the
 SMT2-LIB format which can then be fed to a SMT solver.
@@ -978,13 +997,15 @@ SMT2-LIB format which can then be fed to a SMT solver.
 
 ![architecture]
 
-[architecture]: images/architecture.[pdf,png] { vertical-align: middle }
+[architecture]: images/architecture.[pdf,png] { vertical-align: middle; width:100% }
+<!-- This image has been created using Ipe. You can open architecture.pdf
+     with Ipe in order to edit it. -->
 
 ## Usage {#cli}
 
 Any touist command is of the form:
 ```
-  touist [-o OUTPUT] (INPUT | -) [options...]
+    touist [-o OUTPUT] (INPUT | -) [options...]
 ```
 The flags can be given in any order. You can use the standard input
 (`stdin`) instead of using an input file by setting the `-` argument.
@@ -1025,15 +1046,15 @@ this mapping table using the `--table <filename>` flag.
 
 [dimacs]: http://www.satcompetition.org/2009/format-benchmarks2009.html
 
-#### `--sat` options:
+#### Options usable with `--sat`
 
-**`--solve`**. Ask touist to solve the SAT problem. By default, the first
+**`--solve`** asks `touist` to solve the SAT problem. By default, the first
 model is displayed; you can ask for more models using the `--limit N`
 option. The models are separated by lines beginning with `====` and for
 one model, each line contains a valuation followed by the corresponding
 proposition. For example:
-``` Touist
-  echo a and b | touist - --solve
+``` Shell
+    echo a and b | touist - --solve
 ```
 will display
 ```
@@ -1047,33 +1068,17 @@ Note that the model counter begins at 0. With this format, you can easily
 filter the results. For example, the following command will only show the
 propositions that are ``true``:
 ```
-  echo a and b | touist - --solve | grep ^1
+    echo a and b | touist - --solve | grep ^1
 ```
 
-**`--limit N`**. In conjunction with `--solve`, set the maximum number of
+**`--limit N`** (only with `--solve`) sets the maximum number of
 models returned. When N=0, all models are returned.
 
-**`--count`**. Instead of returning the models, just return the count of
-models. This option will only work for small problems: the number of
+**`--count`** tries to return the count of models instead of returning
+the models. This option will only work for small problems: the number of
 models explodes when the number of propositions is big.
 
-### Usage for quantified boolean logic (QBF mode)
-
-Touist embeds a QBF solver, [quantor]. By default, when installing
-`touist` through opam, it is not built with it. To enable the QBF solver,
-you must install `qbf`:
-```
-    opam install qbf
-```
-Then, you can solve any touist-written QBF problem:
-
-```
-    touist --qbf --solve instance.touist
-```
-
-[quantor]: http://fmv.jku.at/quantor/
-
-### Other options
+### Other general options
 **`--latex`** translates the given touist code to &logolatex;. The
 resulting latex code only require the `mathtools` package and is
 compatible with Mathjax (JavaScript tool for displaying math in HTML).
@@ -1111,23 +1116,33 @@ needs to read the errors. The placeholders you can use are:
 | `%m` | error message                     |
 | `\n` | new line                          |
 |------|-----------------------------------|
-By default, the errors and warnings will display with the formatting
-`%l:%c: %t: %m`. An ending newline (`\n`) is automatically added.
 
-**`--wrap-width N`**. Lets you choose the width of the messages (errors,
+By default, the errors and warnings will display with the formatting
+`%f: line %l, col %c-%C: %t: %m`. An ending newline (`\n`) is
+automatically added.
+
+**`--wrap-width N`** lets you choose the width of the messages (errors,
 warnings) given by touist. By default, touist will wrap all messages with
 a 76 characters limit. With N set to 0, you can disable the wrapping.
 
-**`--debug-syntax`**. This is a development option that adds to the error
-and warning messages the state number of the LL(1) automaton. Each state
+**`--debug-syntax`** is a development option that adds to the error and
+warning messages the state number of the LL(1) automaton. Each state
 number that may trigger a syntax error should have a corresponding
 message in `src/parser.messages`.
 
-**`--debug-cnf`**. This is also a development option; in SAT mode, it
-prints the successive recursive transformations that produce the CNF
-formula.
+**`--debug-cnf`** is also a development option; in SAT mode, it prints
+the successive recursive transformations that produce the CNF formula.
 
 ### Usage for Satisfiability Modulo Theory (SMT mode)
+
+To enable the optionnal embeded SMT solver, you need to install `yices2`
+through opam:
+
+```
+    opam install yices2
+```
+If `touist` was previously installed, it will be re-installed to support
+the newly installed `yices2`.
 
 The language accepted by this mode is described in [#sec-smt-formulas].
 The flag `--smt LOGIC` enables the SMT mode.
@@ -1136,9 +1151,23 @@ The flag `--smt LOGIC` enables the SMT mode.
 Explain which `LOGIC` can be given and how to use `--smt`
 ~
 
-# Technical details
+### Usage for quantified boolean logic (QBF mode)
 
-How 
+Touist embeds a QBF solver, [quantor]. By default, when installing
+`touist` through opam, it is not built with it. To enable the QBF solver,
+you must install `qbf`:
+```
+    opam install qbf
+```
+Then, you can solve any touist-written QBF problem:
+
+```
+    touist --qbf --solve instance.touist
+```
+
+[quantor]: http://fmv.jku.at/quantor/
+
+# Technical details
 
 ## One single syntax error per run
 
