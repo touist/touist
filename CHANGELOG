@@ -1,3 +1,8 @@
+v3.2.1
+  - added the '--latex-full' option. It does the same as '--latex' except that
+    multi-line spanning parenthesis are translated with 'pmatrix' and a header
+    and footer are added to make the output direclty compatible with pdflatex.
+
 v3.2.0
   - (breaking) removed '--detailed' that wasn't really helpful to
     '--error-format' that allows to use placeholders (%l for line, %c for
