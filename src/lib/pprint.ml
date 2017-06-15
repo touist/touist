@@ -167,7 +167,7 @@ and string_of_ast_type = function
   | Touist_code (_)      -> "(touist code)"
   | Loc (x,_) -> string_of_ast_type x
   | Paren x -> string_of_ast_type x
-  | Exists (v,f)           -> "exact"
+  | Exists (v,f)           -> "exists"
   | Forall (v,f)           -> "forall"
   | For (_,_,_)            -> "for"
   | NewlineBefore f | NewlineAfter f -> "newline"
