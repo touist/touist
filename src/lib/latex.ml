@@ -105,7 +105,8 @@ let rec latex_of_ast = function
     Str.global_replace (Str.regexp "_") "\\\\_" txt
 
 (* [ast_fun] will apply f on all *formula*-related elements of the AST where
-   cond is true. The tranversal order should not be considered. *)
+   cond is true. The tranversal order should not be considered.
+   Whenever a non-formula is given, acc will be immediatly returned. *)
 and ast_fun (f:('a -> ast -> 'a)) (acc:'a) ast : 'a =
   let acc = f acc ast in
   let ast_fun' ast acc = ast_fun f acc ast in
@@ -130,9 +131,7 @@ and ast_fun (f:('a -> ast -> 'a)) (acc:'a) ast : 'a =
       -> acc
   (* non-formulas *)
   | Mod _ | Union _ | Inter _ | Diff _ | Range _ | Subset _ | Powerset _
-  | In _ | Empty _
-      -> failwith ("[shouldnt happen] this should be a formula: "
-                    ^Pprint.string_of_ast ast)
+  | In _ | Empty _ -> acc
 
 and has_newline ast =
   ast |> ast_fun (fun acc ast -> (match ast with Paren _ -> true | _ -> acc); true) false
