@@ -5,7 +5,7 @@ maintainer: "Maël Valais <mael.valais@gmail.com>"
 authors: [ "Maël Valais <mael.valais@gmail.com>"
            "Olivier Lezaud" ]
 license: "MIT"
-homepage: "http://touist.github.io"
+homepage: "https://www.irit.fr/touist"
 dev-repo: "https://github.com/touist/touist.git"
 bug-reports: "https://github.com/touist/touist/issues"
 build: [

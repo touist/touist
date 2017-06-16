@@ -50,7 +50,7 @@ Description:  The Touist language is a friendly language for writing
 
 Maintainers:  Maël Valais <mael.valais@gmail.com>
 Authors:      Maël Valais <mael.valais@gmail.com>, Olivier Lezaud
-Homepage:     http://touist.github.io
+Homepage:     https://www.irit.fr/touist
 License:      MIT
 Plugins:      META (0.4), DevFiles (0.4)
 BuildType:    ocamlbuild (0.4)
