@@ -50,8 +50,9 @@ let rm_dollar x = String.sub x 1 (String.length x - 1)
    * for light latex processors (mathjax, jlatexmath), you should use
      ~full:false
    * for fully-featured latex processors, you can use ~full:true. *)
-let rec latex_of_ast ?(full=false) ast =
-  let latex_of_ast = latex_of_ast ~full in
+let rec latex_of_ast ~full ast =
+  let latex_of_ast ast = latex_of_ast ~full ast in
+  let latex_of_commalist = latex_of_commalist ~full in
   match ast with
   (* TODO: If a top-formula contains any binary operator that have lesser
      precedence than 'and', then the whole top-formula should be
@@ -139,7 +140,7 @@ let rec latex_of_ast ?(full=false) ast =
   | NewlineBefore f -> "\\\\\n" ^ latex_of_ast f
   | NewlineAfter f -> latex_of_ast f ^ "\\\\\n"
 
-  and latex_of_commalist sep el = String.concat sep (List.map latex_of_ast el)
+  and latex_of_commalist ~full sep el = String.concat sep (List.map (latex_of_ast ~full) el)
   and escape_underscore txt =
     Str.global_replace (Str.regexp "_") "\\\\_" txt
 
@@ -148,10 +149,7 @@ let rec latex_of_ast ?(full=false) ast =
    Whenever a non-formula is given, acc will be immediatly returned. *)
 and ast_fun (f:('a -> ast -> 'a)) (acc:'a) ast : 'a =
   let acc = f acc ast in
-  let ast_fun' ast acc =
-      let a = ast_fun f acc ast
-      in a
-  in
+  let ast_fun' ast acc = ast_fun f acc ast in
   match ast with
   | Touist_code listf
       -> listf |> List.fold_left (fun acc f -> acc |> ast_fun' f) acc

@@ -112,7 +112,7 @@ let () =
     ("--equiv", Arg.Set_string equiv_file_path,"INPUT2 (with --solve) Check that INPUT2 has the same models as INPUT (equivalency)");
     ("--linter", Arg.Set linter,"Display syntax and semantic errors and exit");
     ("--error-format", Arg.Set_string error_format,"Customize the formatting of error messages");
-    ("--wrap-width", Arg.Set_int wrap_width,"Wrapping width for error messages [default: 78]");
+    ("--wrap-width", Arg.Set_int wrap_width,"Wrapping width for error messages [default: 76]");
   ]
   in
   let usage =
