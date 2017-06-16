@@ -9,7 +9,7 @@ If you want to edit the .mdk file, you have multiple choices:
 - (1. online madoko GUI and Github account)
   You first have to fork the touist project: https://github.com/touist/touist/fork
   Then, go to https://www.madoko.net/editor.html and log into your github account.
-  Select the project freshly forked with 
+  Select the project freshly forked with
       "Open..." -> "Github" -> "yourgithubname/touist" -> "master" -> "docs/" ->
   Then, you can open the .mdk.
   To submit the changes, do "Synchronize...". Type a commit message that explains
@@ -17,19 +17,27 @@ If you want to edit the .mdk file, you have multiple choices:
   Finally, go to your github fork https://github.com/yourgithubname/touist and
   open a new pull request against the https://github.com/touist/touist repo.
 
-- (2. madoko GUI locally) 
+- (2. madoko GUI locally)
   Install madoko-local with `npm install -g madoko-local` and you run the madoko
   webserver with `madoko-local --port 8080 --run -l .` from the `docs` directory
   and you Open... Local Disk... and you select the .mdk file.
   To get your changes reviewed and accepted, fork the project, commit your changes
   and submit a pull request.
-  
+
 - (3. no GUI)
   Install madoko (not madoko-local): `npm install -g madoko`.
   Edit the `.mdk` file; you can then render the HTML or PDF with:
   * HTML: madoko reference-manual.mdk
   * PDF: madoko reference-manual.mdk --pdf
   You can then submit a pull request with your changes.
+
+When submitting your pull-request, you will be able to check that the
+`reference-manual.pdf` and `reference-manual.html` are looking as expected
+through the `CircleCI` build. For example, if your PR is number 196,
+you can browse the produced `reference-manual.{html,pdf}` here:
+
+    https://circleci.com/gh/touist/touist/196#artifacts/containers/0
+
 
 Thanks a lot for your help!!
 
@@ -107,14 +115,14 @@ Ideas to improve madoko
 ## -mvalue:key should overwrite existing metadata declarations
 
 When passing -mkey:value to madoko, for example to give the git version number, like
- 
+
     madoko -mversion:`git describe --tags` reference-manual.mdk
 because I want to set the git last tag dynamically in reference-manual.mdk:
 
     Title Note: Draft, `&date; (touist &version;)`
-  
+
 and the "&version;" is replaced with "v2.3.0-22-ga4450f3fa" for example.
-  
+
 When run in madoko-local, an error says that "version" is not known. My idea is to set
 a "default" version number, for example:
 
@@ -122,7 +130,7 @@ a "default" version number, for example:
 
 but it won't work because the -mkey:value thing does not "replace" the existing metadata.
 
-This behaviour could also help because I usually want to have 
+This behaviour could also help because I usually want to have
 
     Math mode: mathjax
 
@@ -142,6 +150,7 @@ It would be great to be able to do multiline tables... For example with the ":"
 syntax that continues the line (note that the new line with two trailing spaces
 would not work...):
 
+```
 |-----------|------------------|
 | Heading 1 | Centered 2       |
 +-----------|:----------------:+
@@ -150,19 +159,26 @@ would not work...):
 :           : continues on the :
 :           : same line.       :
 |-----------|------------------|
+```
 
-# Open a document with its dependencies with `?#url=http://...`
+# Edit `reference-manual.mdk` in one click
 
-It is already possible to open a document that is hosted on the web, but the
-files surrounding it don't seem to be loaded. What I propose is to enable
-the loading of these files. Example: if I have the file
+It is already possible to open a document on madoko.net that is hosted on
+the web with `?#url=http://...`, but the files surrounding it don't seem
+to be loaded. What I propose is to enable the loading of these files.
+Example: if I have the file
+
     https://github.com/touist/touist/tree/master/docs/reference-manual.mdk
+
 and it uses the external colorizer `Colorizer: touist`, then madoko-local would
 load the file
+
     https://github.com/touist/touist/tree/master/docs/touist.json
 
 A simpler way would be for madoko-local to copy all the files that have the prefix
+
     https://github.com/touist/touist/tree/master/docs/
+
 into the browser cache. But I have no idea how that would be possible to list
 these files (easy if the document is hosted on a simple web server that has
 direcoty listing enable (`Options +Indexes`), or if the document is on github
