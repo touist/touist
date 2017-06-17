@@ -1135,19 +1135,25 @@ a 76 characters limit. With N set to 0, you can disable the wrapping.
 **`--debug-syntax`** is a development option that adds to the error and
 warning messages the state number of the LL(1) automaton. Each state
 number that may trigger a syntax error should have a corresponding
-message in `src/parser.messages`.
+message in `src/lib/parser.messages`.
 
-**`--debug-cnf`** is also a development option; in SAT mode, it prints
-the successive recursive transformations that produce the CNF formula.
+**`--debug-cnf`** is also a development option; in SAT and QBF modes,
+it prints the successive recursive transformations that produce the CNF
+formula.
 
 ### Usage for Satisfiability Modulo Theory (SMT mode)
 
-To enable the optional embedded SMT solver, you need to install `yices2`
-through opam:
+TouIST can embed an optional SMT solver, [Yices 2.5.2][yices-sri].
+It is developped by SRI (Stanford Research Institute), California. It is free
+to use for non-commercial purposes. Its code is licensed under a restrictive
+non-commercial EULA which the user must agree before using
+(see the [license][yices-lic]). To enable it, you need to install the
+OCaml binding [`yices2`][yices] which embeds the Yices sources:
 
 ```
     opam install yices2
 ```
+
 If `touist` was previously installed, it will be re-installed to support
 the newly installed `yices2`.
 
@@ -1158,14 +1164,21 @@ The flag `--smt LOGIC` enables the SMT mode.
 Explain which `LOGIC` can be given and how to use `--smt`
 ~
 
+[yices]: https://github.com/polazarus/ocamlyices2
+[yices-lic]: http://yices.csl.sri.com/yices-newnewlicense.html
+
 ### Usage for quantified boolean logic (QBF mode)
 
-Touist embeds a QBF solver, [quantor]. By default, when installing
-`touist` through opam, it is not built with it. To enable the QBF solver,
-you must install `qbf`:
+`touist` can embed an optional QBF solver, [Quantor 3.2][quantor]. It is
+developped at the Johannes Kepler University, Austria. Its source is
+under a (non-restrictive) BSD license.
+To enable the QBF solver, you must install the OCaml binding
+[`qbf`][ocaml-qbf] which embeds the Quantor source:
+
 ```
     opam install qbf
 ```
+
 Then, you can solve any touist-written QBF problem:
 
 ```
@@ -1173,6 +1186,7 @@ Then, you can solve any touist-written QBF problem:
 ```
 
 [quantor]: http://fmv.jku.at/quantor/
+[ocaml-qbf]: https://github.com/c-cube/ocaml-qbf
 
 # Technical details
 
