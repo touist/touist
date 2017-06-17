@@ -120,7 +120,7 @@ In touist, the premises are simply formulas separated by a new line. A
 new line is semantically equivalent to the `and` connector: the previous
 bit of `touist` code could be equivalently written
 ``` Touist
-(raining => cloudy) and raining and not cloudy  
+(raining => cloudy) and raining and not cloudy
 ```
 ~
 
@@ -238,7 +238,7 @@ The ``let`` affectation can only be used in formulas (detailed
 in [#sec-formulas]) and cannot be used in expressions (`<expr>`, i.e.,
 integer, floating-point, boolean or set expressions).
 
-Example: 
+Example:
 ``` Touist
 ;; This piece of code has no actual meaning
 $letters = [a,b,c,d,e]
@@ -246,7 +246,7 @@ bigand $letter,$number in $letters,[1..card($letters)]:
   has($letter,$number) =>
   let $without_letter = diff($letters,$letter): ;; keep temorary result
   bigand $l1 in $without_letter:
-      p($letter) 
+      p($letter)
   end
 end
 ```
@@ -257,8 +257,8 @@ and an other formula, the second formula will not be in the variable
 scope. Example:
 ``` Touist
   let $v=10: prop($v)
-  prop($v)    ;; error: $v is not in scope anymore  
-``` 
+  prop($v)    ;; error: $v is not in scope anymore
+```
 ~
 
 ## Propositions
@@ -491,12 +491,12 @@ have also been described in the boolean section ([#sec-booleans]).
 
 #### Powerset {#powerset}
 The ``powerset($Q)`` operator generates all possible subsets $S$ such
-that $S \subseteq Q$. It is defined as 
+that $S \subseteq Q$. It is defined as
 ~Math
 \mathcal{P}(Q) := \{S~|~S\subseteq Q\}
 ~
 The empty set is included in these subsets. Example:
-``powerset([1,2])`` generates ``[[],[1],[2],[1,2]]``. 
+``powerset([1,2])`` generates ``[[],[1],[2],[1,2]]``.
 
 Here is the complete rule for sets:
 ``` Grammar
@@ -575,7 +575,7 @@ sets). For example,
 |---------------------------------|--------------------------|
 <!--meta
 bigand_example: $\bigwedge\limits_{\substack{i\in \{1,...,2\}\\j \in \{a,b\}}} p_{i,j}$
-bigand_expanded: $p_{1,a} \wedge p_{1,b} \wedge p_{2,a} \wedge p_{2,b}$ 
+bigand_expanded: $p_{1,a} \wedge p_{1,b} \wedge p_{2,a} \wedge p_{2,b}$
 -->
 ~
 
@@ -604,7 +604,7 @@ $\bigvee\limits_{\substack{v\in [A,B,C]\\x \in [1..9]\\y\in[3..4]\\x \ne y \\ x 
 ~~ Column
 ``` Touist
 bigor $v,$x,$y
-      in [A,B,C],[1..9],[3..4] 
+      in [A,B,C],[1..9],[3..4]
       when $v!=A and $x!=$y:
     $v($x)
 end
@@ -659,7 +659,7 @@ size of some formulas. The syntax of these constructs is:
 |$\geqslant_{x\in P}^k x$ |``atleast($k,$P)``|
 |${<>}_{x\in P}^k x$      |``exact($k,$P)``  |
 |-------------------------|------------------|
-~ 
+~
 
 Let $P$ be a set of propositions, $x$ a proposition and $k$ a positive
 integer. Then:
@@ -673,7 +673,7 @@ integer. Then:
 
 These operators are extremely expensive in the sense that they produce formulas
 with an exponential size. For example, ``exact(5,p([1..20])``
-will produce a disjunction of $\binom{20}{5} = 15 504$ conjunctions. 
+will produce a disjunction of $\binom{20}{5} = 15 504$ conjunctions.
 
 ~Note
 The notation ``p([1..20])`` is called "set-builder" and is defined
@@ -747,7 +747,7 @@ the same as the SAT grammar, except for two new operators:
 ``` Grammar
 <formula-qbf> ::=
     [...]
-    | "exists" <comma-list(<prop>|<var>)> [<for>] ":" <formula-qbf> 
+    | "exists" <comma-list(<prop>|<var>)> [<for>] ":" <formula-qbf>
     | "forall" <comma-list(<prop>|<var>)> [<for>] ":" <formula-qbf>
 
 <for> ::= "for" <var> "in" <set>
@@ -755,7 +755,7 @@ the same as the SAT grammar, except for two new operators:
 
 One quantifier can quantify over multiple propositions. For example:
 ``` Touist
-    forall e,d: (exists a,b: a => b) => (e and forall c: e => c) 
+    forall e,d: (exists a,b: a => b) => (e and forall c: e => c)
 ```
 ~ Math
 \forall e. \forall d. (\exists a. \exists b. (a \Rightarrow b)) \Rightarrow (e \wedge \forall c. (e \Rightarrow c))
@@ -765,7 +765,7 @@ One quantifier can quantify over multiple propositions. For example:
 
 Any free variable (i.e., not quantified) will be existentially quantified
 in an inner-most way. For example, $\forall a. a \wedge b$ will become
-$\forall a. \forall b. (a \wedge b)$. 
+$\forall a. \forall b. (a \wedge b)$.
 
 ### Renaming during the prenex transformation
 
@@ -911,7 +911,7 @@ TERM      = [_0-9]*[a-zA-Z][a-zA-Z_0-9]*
     | "[" <comma-list(<expr>)> "]"
     | "[ <int> ".." <int> "]"      <- step is 1
     | "[ <float> ".." <float> "]"  <- step is 1.0
-    | "union(" <set> "," <set> ")" 
+    | "union(" <set> "," <set> ")"
     | "inter(" <set> "," <set> ")"
     | "diff(" <set> "," <set> ")"
     | "powerset(" <set> ")"
@@ -972,7 +972,7 @@ TERM      = [_0-9]*[a-zA-Z][a-zA-Z_0-9]*
     | <prop>
     | <var>
     | <formula(<formula-qbf>)>
-    | "exists" <comma-list(<prop>|<var>)> [<for>] ":" <formula-qbf> 
+    | "exists" <comma-list(<prop>|<var>)> [<for>] ":" <formula-qbf>
     | "forall" <comma-list(<prop>|<var>)> [<for>] ":" <formula-qbf>
 
 <for> ::= "for" <var> "in" <set>
@@ -989,7 +989,7 @@ and `opam`) with the command
 ```
 
 ~ Note
-By default, `touist` only comes with a SAT solver. 
+By default, `touist` only comes with a SAT solver.
 Problems written using the Satisfiability Modulo Theory (SMT) extension
 of `touist` cannot (yet) be solved, but can still be translated to the
 SMT2-LIB format which can then be fed to a SMT solver.
@@ -1042,7 +1042,7 @@ default, but can be optionally expressed using the `--sat` flag.
 With no other argument, touist will simply translate the touist code to
 the [DIMACS][dimacs] format and then output the mapping table (that maps
 each proposition to an integer > 0) in DIMACS comments. You can redirect
-this mapping table using the `--table <filename>` flag. 
+this mapping table using the `--table <filename>` flag.
 
 [dimacs]: http://www.satcompetition.org/2009/format-benchmarks2009.html
 
