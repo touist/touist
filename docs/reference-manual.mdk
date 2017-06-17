@@ -1143,12 +1143,24 @@ formula.
 
 ### Usage for Satisfiability Modulo Theory (SMT mode)
 
-TouIST can embed an optional SMT solver, [Yices 2.5.2][yices-sri].
-It is developped by SRI (Stanford Research Institute), California. It is free
-to use for non-commercial purposes. Its code is licensed under a restrictive
-non-commercial EULA which the user must agree before using
-(see the [license][yices-lic]). To enable it, you need to install the
-OCaml binding [`yices2`][yices] which embeds the Yices sources:
+The language accepted by the SMT mode is described in [#sec-smt-formulas].
+
+By default, `touist` is able to translate problems into the
+[`SMT-LIB`][SMT-LIB] format with the `--smt LOGIC` flag. In this mode,
+`LOGIC` can be any non-whitespace string of characters (which will be
+transformed in uppercase automatically). `LOGIC` will simply be used
+to fill the correct field in the `SMT-LIB` file.
+
+[SMT-LIB]: http://smtlib.cs.uiowa.edu/language.shtml
+
+#### SMT solver {#smt-solver}
+
+TouIST can embed an optional SMT solver, [Yices 2.5.2][yices-sri] (see
+[Dutertre:cav2014]). It is developped by SRI (Stanford Research Institute),
+California. It is free to use for non-commercial purposes. Its code is
+licensed under a restrictive non-commercial EULA which the user must agree
+before using (see the [license][yices-lic]). To enable it, you need to
+install the OCaml binding [`yices2`][yices] which embeds the Yices sources:
 
 ```
     opam install yices2
@@ -1157,23 +1169,38 @@ OCaml binding [`yices2`][yices] which embeds the Yices sources:
 If `touist` was previously installed, it will be re-installed to support
 the newly installed `yices2`.
 
-The language accepted by this mode is described in [#sec-smt-formulas].
-The flag `--smt LOGIC` enables the SMT mode.
+Using `--smt LOGIC --solve`, the `LOGIC` argument must be one of [the
+logics][yices-logics] Yices 2.5.2 supports. Here is a table with some of
+the most used logic fragments supported:
 
-~ Todo
-Explain which `LOGIC` can be given and how to use `--smt`
-~
+
+| `LOGIC`  | Meaning                   |
+|----------|---------------------------|
+| `QF_BV ` | Bitvectors (SAT)          |
+| `QF_IDL` | Integer Difference Logic  |
+| `QF_LIA` | Linear Integer Arithmetic |
+| `QF_LRA` | Linear Real Arithmetic    |
+
+Note that QF means quantifier-free. You can solve any SAT problem using the
+SMT solver with the `QF_BV` mode.
 
 [yices]: https://github.com/polazarus/ocamlyices2
 [yices-lic]: http://yices.csl.sri.com/yices-newnewlicense.html
+[yices-logics]: http://yices.csl.sri.com/doc/smt-logics.html
 
 ### Usage for quantified boolean logic (QBF mode)
 
-`touist` can embed an optional QBF solver, [Quantor 3.2][quantor]. It is
-developped at the Johannes Kepler University, Austria. Its source is
-under a (non-restrictive) BSD license.
-To enable the QBF solver, you must install the OCaml binding
-[`qbf`][ocaml-qbf] which embeds the Quantor source:
+For now, the `QDIMACS` format (which is the equivalent of `DIMACS` for
+quantified boolean formulas) cannot be printed from a touist file.
+You can still solve problems using `--qbf --solve` (see [below][#qbf-solver]).
+
+#### QBF solver {#qbf-solver}
+
+`touist` can embed an optional QBF solver, [Quantor 3.2][quantor] (see
+[Biere2004]). It is developped at the Johannes Kepler University, Austria.
+Its source is under a (non-restrictive) BSD license. To enable the QBF
+solver, you must install the OCaml binding [`qbf`][ocaml-qbf] which embeds
+the Quantor source:
 
 ```
     opam install qbf
