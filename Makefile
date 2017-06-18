@@ -157,3 +157,6 @@ check-opam-packages:
 		'  opam pin add -y minisat'\
 	    ''\''https://github.com/maelvalais/ocaml-minisat.git#v0.0.2'\''\n'\
 	&& exit 6)
+
+manual:
+	make -C docs
