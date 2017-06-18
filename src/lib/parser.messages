@@ -4527,7 +4527,7 @@ touist_qbf: FORALL VAR FOR XOR
 ##
 ## Ends in an error in state: 140.
 ##
-## option(for_statement) -> FOR . var IN expr [ COLON ]
+## option(for_statement) -> FOR . comma_list(var) IN comma_list(expr) [ COLON ]
 ##
 ## The known suffix of the stack is as follows:
 ## FOR 
@@ -4539,10 +4539,16 @@ touist_qbf: FORALL VAR FOR VAR XOR
 ##
 ## Ends in an error in state: 141.
 ##
-## option(for_statement) -> FOR var . IN expr [ COLON ]
+## option(for_statement) -> FOR comma_list(var) . IN comma_list(expr) [ COLON ]
 ##
 ## The known suffix of the stack is as follows:
-## FOR var 
+## FOR comma_list(var) 
+##
+## WARNING: This example involves spurious reductions.
+## This implies that, although the LR(1) items shown above provide an
+## accurate view of the past (what has been recognized so far), they
+## may provide an INCOMPLETE view of the future (what was expected next).
+## In state 122, spurious reduction of production comma_list(var) -> var 
 ##
 
 Ill-formed 'for' statement. After the variable $1, 'in' is expected.
@@ -4551,17 +4557,17 @@ touist_qbf: FORALL VAR FOR VAR IN XOR
 ##
 ## Ends in an error in state: 142.
 ##
-## option(for_statement) -> FOR var IN . expr [ COLON ]
+## option(for_statement) -> FOR comma_list(var) IN . comma_list(expr) [ COLON ]
 ##
 ## The known suffix of the stack is as follows:
-## FOR var IN 
+## FOR comma_list(var) IN 
 ##
 
 Ill-formed 'for' statement. After 'in', a set is expected.
 
-touist_qbf: FORALL VAR FOR VAR IN VAR WHEN 
+touist_qbf: EXISTS VAR FOR VAR IN BOOL CARD 
 ##
-## Ends in an error in state: 143.
+## Ends in an error in state: 148.
 ##
 ## expr -> expr . ADD expr [ XOR SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COLON AND ADD ]
 ## expr -> expr . SUB expr [ XOR SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COLON AND ADD ]
