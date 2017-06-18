@@ -7,9 +7,11 @@ Bib: bibliography.bib
 Colorizer: touist
 Colorizer: grammar
 Math Mode: mathjax
-.code2 { language: Touist } <!-- ``bigand`` will be touist-colored -->
-.code3 { language: Grammar }
+.code2 { language: Touist } <!-- Coloring touist: ``bigand`` -->
+.code3 { language: Grammar } <!-- Coloring grammar: ```<rule> ::= a|b``` -->
 Package:[top=2.5cm,bottom=2.5cm,inner=2.5cm,outer=2.5cm]geometry
+<!-- Custom variable for TouIST name: &touist; -->
+touist: [TouIST]{font-variant: small-caps}
 
 [TITLE]
 
@@ -26,6 +28,12 @@ edit it, you can first take a look at what the madoko [editor] can do
 (with this link, the images and colorizer will not work), or see how to
 edit properly in `CONTRIBUTE-TO-DOCS.md` (located in [`docs/`][docs]).
 
+~ Note
+For now, this reference manual terribly lacks of user-friendliness. We still
+need to write a step-by-step tutorial as well as many examples to illustrate
+each concept.
+~
+
 [madoko]: https://www.madoko.net
 [issue]: https://github.com/touist/touist/issues
 [document]: https://github.com/touist/touist/glob/tree/master/docs/reference-manual.mdk
@@ -35,19 +43,19 @@ edit properly in `CONTRIBUTE-TO-DOCS.md` (located in [`docs/`][docs]).
 
 # Introduction
 
-Touist is a language that allows us to express propositional
+&touist; is a language that allows us to express propositional
 logic [@Ben_Slimane_IAF_2015;@SlimaneCGHLMV15]. You are provided with two
 programs: a graphical interface, refered as `touist.jar` (as it is
 written in Java) and `touist`, the command-line compiler and solver
 (written in Ocaml).
 
-The touist language aims at making the writing of propositional logic as
+The &touist; language aims at making the writing of propositional logic as
 approchable as possible. Propositions and connectors syntaxes are close to what
 would be written on paper. Here are some examples of formulas:
 
 ~ Center
 |-----------------------|-------------------|
-| Propositional logic   | `touist` language |
+| Propositional logic   | &touist; language |
 |:---------------------:|:-----------------:|
 | $\neg p$              | ``not p``         |
 | $p \wedge q$          | ``p and q``       |
@@ -58,18 +66,18 @@ would be written on paper. Here are some examples of formulas:
 |-----------------------|-------------------|
 ~
 
-After typing a formula, you can ask `touist` to find a valuation (true or
+After typing a formula, you can ask &touist; to find a valuation (true or
 false) of each proposition so that the whole formula is true (such valuation,
 also called _interpretation_, is called _model_). When a model exists, your
 formula is _satisfiable_. For example, a model of $p \vee q$ is $\{p = true,q =
-false\}$. To check the models of this formula using `touist`, you can do
+false\}$. To check the models of this formula using &touist;, you can do
 
 ~ Center
 |-------------------------------------|-------------------------------------|
 | Graphical Java interface            | Command-line interface (see [#cli]) |
 |-------------------------------------|-------------------------------------|
 | 1. Type ``p and q``                 | 1. Create a file ``p and q``        |
-| 2. Press "Solve"                    | 2. Type `./touist --solve yourfile` |
+| 2. Press "Solve"                    | 2. Type `touist --solve yourfile` |
 | 3. Press "Next" to see other models | 3. The first model is displayed     |
 ~
 
@@ -90,7 +98,7 @@ This inference can be written
 \{ raining \rightarrow cloudy, raining\} \models cloudy
 ~
 
-The _infer_ (or _entails_) symbol ($\models$) does not belong to the `touist`
+The _infer_ (or _entails_) symbol ($\models$) does not belong to the &touist;
 language (we call it "metalanguage"). This means that we have to transform
 this notation to an actual propositional formula.
 
@@ -106,7 +114,7 @@ From this theorem, we just have to check that the set of formulas
 ~ Math
 \{ raining \rightarrow cloudy, raining, \neg cloudy \}
 ~
-has no model. We can translate this set to `touist` language (comments begin
+has no model. We can translate this set to &touist; language (comments begin
 with two semi-colon "`;;`"):
 
 ``` Touist
@@ -116,9 +124,9 @@ not cloudy              ;; Conclusion
 ```
 
 ~ Note
-In touist, the premises are simply formulas separated by a new line. A
+In &touist;, the premises are simply formulas separated by a new line. A
 new line is semantically equivalent to the `and` connector: the previous
-bit of `touist` code could be equivalently written
+bit of &touist; code could be equivalently written
 ``` Touist
 (raining => cloudy) and raining and not cloudy
 ```
@@ -128,7 +136,7 @@ bit of `touist` code could be equivalently written
 
 # Language reference
 
-## Structure of a touist file
+## Structure of a &touist; file
 
 ``` Grammar
 <touist-file> ::= <affect> <touist-file>
@@ -136,7 +144,7 @@ bit of `touist` code could be equivalently written
                 | EOF
 ```
 
-A touist file is a whitespace-separated[^whitespace] list of affectations
+A &touist; file is a whitespace-separated[^whitespace] list of affectations
 and formulas. Affectations are global and can be interlaced with formulas
 as long as they are not nested in formulas (for local variables, you can
 use ``let``, see [#sec-local-affectation-let-construct]). Comments begin
@@ -388,7 +396,7 @@ Sets are detailed in [#sec-sets].
 
 ~ Note {#dont-mix-bool-formula}
 Booleans cannot be mixed with formulas. In a formula, the evaluation
-(choosing true or false) is not done during the translation from touist
+(choosing true or false) is not done during the translation from &touist;
 to the "solver-friendly" language. Conversely, a boolean expression must
 be evaluable during the translation.
 ~
@@ -583,7 +591,7 @@ The ``when`` is optional and allows us to apply a condition to each
 couple of valued variable.
 
 On the following two examples, the math expression is given on the left
-and the matching touist code is given on the right:
+and the matching &touist; code is given on the right:
 
 ~ Begin Columns
 ~~ Column { width:30% }
@@ -648,16 +656,17 @@ Clarify this explanation.
 
 #### Exact, atmost and atleast
 
-Touist provides some specialized operators, namely ``exact``, ``atmost``
-and ``atleast``. In some cases, these operators can drastically lower the
-size of some formulas. The syntax of these constructs is:
+The &touist; language provides some specialized operators, namely
+``exact``, ``atmost`` and ``atleast``. In some cases, these operators can
+drastically lower the size of some formulas. The syntax of these constructs
+is:
+
 ~Center
 |-------------------------|------------------|
-| Math notation           | Touist syntax    |
+| Math notation           | &touist; syntax    |
 |:-----------------------:|------------------|
-|$\leqslant_{x\in P}^k x$ |``atmost($k,$P)`` |
-|$\geqslant_{x\in P}^k x$ |``atleast($k,$P)``|
-|${<>}_{x\in P}^k x$      |``exact($k,$P)``  |
+|$\leqslant_{x\in P}^k x$ |``atmost($k,$P)`` | |$\geqslant_{x\in P}^k x$
+|``atleast($k,$P)``| |${<>}_{x\in P}^k x$      |``exact($k,$P)``  |
 |-------------------------|------------------|
 ~
 
@@ -732,18 +741,21 @@ the "always true" and "always false". Here is the complete grammar:
 ```
 ## SMT formulas
 
-Touist can also be given Satisfiability Modulo Theory (SMT) formulas and output
-the SMT2-LIB-compliant file.
+The &touist; language also accepts formulas of the Satisfiability Modulo Theory (SMT).
+To use the `touist` program with SMT formulas, see [#usage-smt] 
+
 ~ Todo
 Describe the SMT language
 ~
 
 ## QBF formulas
 
-Using the `--qbf` and `--solve` flags (in `touist`) or the QBF selector
-(in the graphical interface), you can solve QBF problems with existential
-and universal quantifiers over boolean values. This logic is basically
-the same as the SAT grammar, except for two new operators:
+The &touist; language accepts Quantified Boolean Formulas (QBF). Using
+the `--qbf` and `--solve` flags (in `touist`) or the QBF selector (in the
+graphical interface), you can solve QBF problems with existential and
+universal quantifiers over boolean values. This logic is basically the
+same as the SAT grammar, except for two new operators $\exists$
+(``exists``) and $\forall$ (``forall``):
 ``` Grammar
 <formula-qbf> ::=
     [...]
@@ -819,7 +831,7 @@ You can use one of the two notations:
 This section presents the grammar formatted in a BNF-like way. Some rules
 (a rule begins with "`::=`") are parametrized so that some parts of the
 grammar are "factorized" (the idea of parametrized rules come from the
-Menhir parser generator used for generating the touist parser).
+Menhir parser generator used for generating the &touist; parser).
 
 ~ Note
 This grammar specification is not LR(1) and could not be implemented as
@@ -981,7 +993,7 @@ TERM      = [_0-9]*[a-zA-Z][a-zA-Z_0-9]*
 # Command-line tool (`touist`)
 
 ## Installation
-The main tool that parses and solves the touist programs is written in
+The main tool that parses and solves the &touist; programs is written in
 Ocaml. It is easily installable (as long as you have installed `ocaml`
 and `opam`) with the command
 ```
@@ -989,10 +1001,9 @@ and `opam`) with the command
 ```
 
 ~ Note
-By default, `touist` only comes with a SAT solver.
-Problems written using the Satisfiability Modulo Theory (SMT) extension
-of `touist` cannot (yet) be solved, but can still be translated to the
-SMT2-LIB format which can then be fed to a SMT solver.
+By default, `touist` only comes with a SAT solver. Problems written in
+&touist; using the Satisfiability Modulo Theory (SMT) or Quantified
+Boolean Formulas (QBF) grammars can also be used. See [#]
 ~
 
 ![architecture]
@@ -1003,13 +1014,13 @@ SMT2-LIB format which can then be fed to a SMT solver.
 
 ## Usage {#cli}
 
-Any touist command is of the form:
+Any `touist` command is of the form:
 ```
     touist [-o OUTPUT] (INPUT | -) [options...]
 ```
 The flags can be given in any order. You can use the standard input
 (`stdin`) instead of using an input file by setting the `-` argument.
-With no `-o` flag, touist will output to the standard output (`stdout`).
+With no `-o` flag, `touist` will output to the standard output (`stdout`).
 
 ### Return codes
 
@@ -1033,22 +1044,22 @@ With no `-o` flag, touist will output to the standard output (`stdout`).
 Note that the `SOLVER_UNSAT` is not really an error, but we choose to return
 a non-zero return code anyway.
 
-### Usage for propositional logic (SAT mode)
+### Usage for propositional logic (SAT mode) {#usage-sat}
 
 The language accepted for propositional logic is described in
 [#sec-propositional-logic-formulas]. This mode is enabled by
 default, but can be optionally expressed using the `--sat` flag.
 
-With no other argument, touist will simply translate the touist code to
+With no other argument, `touist` will simply translate the &touist; code to
 the [DIMACS][dimacs] format and then output the mapping table (that maps
 each proposition to an integer > 0) in DIMACS comments. You can redirect
 this mapping table using the `--table <filename>` flag.
 
 [dimacs]: http://www.satcompetition.org/2009/format-benchmarks2009.html
 
-#### SAT solver
+#### SAT solver {#usage-sat-solver}
 
-By default, `touist` embeds [Minisat] [@Sörensson02minisatv1.13], a SAT solver
+By default, `touist` embeds [Minisat][minisat] (see [@Sorensson02minisatv1_13]), a SAT solver
 written in C++ at the Chalmers University of Technology, Sweden. It is
 distributed under the MIT license. To be able to embed it into OCaml,
 we use the binding [ocaml-minisat] which relies on a C version of Minisat
@@ -1084,12 +1095,15 @@ models returned. When N=0, all models are returned.
 the models. This option will only work for small problems: the number of
 models explodes when the number of propositions is big.
 
-[Minisat]: http://minisat.se
+[minisat]: http://minisat.se
 [ocaml-minisat]: https://github.com/c-cube/ocaml-minisat
 
-### Other general options
+### Other general options {#usage-general-options}
 
-**`--latex`**, **`--latex-full`** translate the given touist code to
+The following general options must be using in conjunction of `--smt`
+, `--qbf` or `--sat` (`--sat` is used by default and can be omitted).
+
+**`--latex`**, **`--latex-full`** translate the given &touist; code to
 &logolatex;. Two options are available:
 
 * with `--latex`, only the math formulas are translated and no
@@ -1102,7 +1116,7 @@ models explodes when the number of propositions is big.
   `\begin{pmatrix*}`{language:latex} when matching parenthesis span
   across multiple lines.
 
-**`--show`** prints the formula generated by the given touist file. This
+**`--show`** prints the formula generated by the given &touist; file. This
 is useful for debugging and testing that the constructs ``bigand``,
 ``bigor``, ``exact``... are correclty evaluated.
 
@@ -1118,7 +1132,7 @@ then evaluation step by bypassing the expansive ``bigand``, ``exact``,
 ``powerset``... constructs.
 
 **`--error-format`** allows the user to format the errors as you wish.
-This argument can be useful for plugging touist to another program that
+This argument can be useful for plugging `touist` to another program that
 needs to read the errors. The placeholders you can use are:
 
 |:----:|:----------------------------------|
@@ -1139,7 +1153,7 @@ By default, the errors and warnings will display with the formatting
 automatically added.
 
 **`--wrap-width N`** lets you choose the width of the messages (errors,
-warnings) given by touist. By default, touist will wrap all messages with
+warnings) given by `touist`. By default, `touist` will wrap all messages with
 a 76 characters limit. With N set to 0, you can disable the wrapping.
 
 **`--debug-syntax`** is a development option that adds to the error and
@@ -1151,7 +1165,7 @@ message in `src/lib/parser.messages`.
 it prints the successive recursive transformations that produce the CNF
 formula.
 
-### Usage for Satisfiability Modulo Theory (SMT mode)
+### Usage for Satisfiability Modulo Theory (SMT mode) {#usage-smt}
 
 The language accepted by the SMT mode is described in [#sec-smt-formulas].
 
@@ -1165,7 +1179,7 @@ to fill the correct field in the `SMT-LIB` file.
 
 #### SMT solver {#smt-solver}
 
-TouIST can embed an optional SMT solver, [Yices 2.5.2][yices-sri] (see
+&touist; can embed an optional SMT solver, [Yices 2.5.2][yices-sri] (see
 [@Dutertre:cav2014]). It is developed by SRI (Stanford Research Institute,
 California) and is written in C. It is free to use for non-commercial
 purposes. Its code is licensed under a restrictive non-commercial EULA
@@ -1198,7 +1212,7 @@ SMT solver with the `QF_BV` mode.
 For example:
 
 ```
-    echo 'x > 3' | ./touist.native --smt QF_IDL --solve -
+    echo 'x > 3' | touist --smt QF_IDL --solve -
 ```
 which will give you the model
 ```
@@ -1211,14 +1225,14 @@ which should be read as $x$ takes the value 4.
 [yices-lic]: http://yices.csl.sri.com/yices-newnewlicense.html
 [yices-logics]: http://yices.csl.sri.com/doc/smt-logics.html
 
-### Usage for quantified boolean logic (QBF mode)
+### Usage for quantified boolean logic (QBF mode) {#usage-qbf}
 
 For now, the `QDIMACS` format (which is the equivalent of `DIMACS` for
-quantified boolean formulas) cannot be printed from a touist file.
+quantified boolean formulas) cannot be printed from a &touist; file.
 You can still solve problems using both `--qbf` and `--solve`
-(see [below][#qbf-solver]).
+(see [below][#usage-qbf-solver]).
 
-#### QBF solver {#qbf-solver}
+#### QBF solver {#usage-qbf-solver}
 
 `touist` can embed an optional QBF solver, [Quantor 3.2][quantor] (see
 [@Biere2004]). It is developed at the Johannes Kepler University, Austria.
@@ -1267,7 +1281,7 @@ semi-colon will act as a checkpoint to which the parser will try to skip
 to. Hoping that this error is only contained in this instruction, the
 parser will try to continue after the semi-colon.
 
-The touist grammar does not have such an instruction marker; because of
+The &touist; grammar does not have such an instruction marker; because of
 that, we are not able to skip to the next instruction.
 
 [BIB]
