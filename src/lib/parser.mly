@@ -246,7 +246,7 @@ expr:
 %inline set_decl_range(T): LBRACK s1=T RANGE s2=T RBRACK {Loc (Range (s1,s2),($startpos,$endpos))}
 %inline set_decl_explicit(T): LBRACK l=comma_list(T) RBRACK {Loc (Set_decl l,($startpos,$endpos))}
 %inline set_empty: LBRACK RBRACK {Loc (Set_decl [],($startpos,$endpos))}
-  
+
 %inline set_operation(T):
   | UNION (*LPAREN*) s1=T COMMA s2=T RPAREN {Loc (Union (s1,s2),($startpos,$endpos))}
   | INTER (*LPAREN*) s1=T COMMA s2=T RPAREN {Loc (Inter (s1,s2),($startpos,$endpos))}
@@ -267,7 +267,9 @@ let_affect(T,F): LET vars=comma_list(var) AFFECT contents=comma_list(T) COLON fo
       Loc (Let (var,content,acc),($startpos,$endpos))) vars contents form
     with Invalid_argument _ -> let open Msgs in
       single_msg (Error,Parse,
-        ("'let' statement does not have the same number of variables and values.\n"),
+        ("'let' has "^ string_of_int (List.length vars) ^" variables and "
+          ^ string_of_int (List.length contents) ^" values after ':'. \
+          It should be the same number.\n"),
         Some ($startpos,$endpos))
     } %prec low_precedence
 
@@ -322,13 +324,26 @@ expr_smt:
   { let res = form |> List.fold_right (fun v acc -> Loc (Exists (v,acc),($startpos,$endpos))) v in
     match for_opt with
     | None -> res
-    | Some (var,content) -> Loc (For (var,content,res),($startpos,$endpos))
+    | Some for_list -> List.fold_left
+      (fun acc (var,content) -> Loc (For (var,content,acc),($startpos,$endpos)))
+      form for_list
   }
 %inline forall(F): FORALL v=comma_list(prop_or_var) for_opt=for_statement? COLON form=F
   { let res = form |> List.fold_right (fun v acc -> Loc (Forall (v,acc),($startpos,$endpos))) v in
     match for_opt with
     | None -> res
-    | Some (var,content) -> Loc (For (var,content,res),($startpos,$endpos))
+    | Some for_list -> List.fold_left
+      (fun acc (var,content) -> Loc (For (var,content,acc),($startpos,$endpos)))
+      form for_list
   }
 
-%inline for_statement: FOR v=var IN content=expr { (v,content) }
+(* This rule gives a (ast*ast) list in reversed order *)
+%inline for_statement: FOR vars=comma_list(var) IN contents=comma_list(expr)
+  { try List.fold_left2 (fun acc var content -> (var,content)::acc) [] vars contents
+    with Invalid_argument _ -> let open Msgs in
+      single_msg (Error,Parse,
+        ("'for' has "^ string_of_int (List.length contents) ^" variables and "
+          ^ string_of_int (List.length contents) ^" elements after 'in'. \
+          It should be the same number.\n"),
+        Some ($startpos,$endpos))
+    }
