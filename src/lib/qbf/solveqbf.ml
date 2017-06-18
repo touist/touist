@@ -34,7 +34,7 @@ let rec ocamlqbf_of_ast (ast:ast) : Qbf.QFormula.t * (Qbf.Lit.t,string) Hashtbl.
     | Xor     (f,g) -> xor_l [of_ast f; of_ast g]
     | Implies (f,g) -> imply (of_ast f) (of_ast g)
     | Equiv   (f,g) -> equiv_l [of_ast f; of_ast g]
-    | wrong -> failwith ("[shouldnt happen] when applying 'of_ast', formula still had quantors: "^Pprint.string_of_ast wrong)
+    | wrong -> failwith ("[shouldnt happen] when applying 'of_ast', formula still had quantors: "^Pprint.string_of_ast ~debug:true wrong)
   in let ocamlqbf = of_quant_ast ast
   in (simplify ocamlqbf,lit_to_str)
 
