@@ -1195,6 +1195,17 @@ with some of the most used logic fragments supported:
 Note that _QF_ means quantifier-free. You can solve any SAT problem using the
 SMT solver with the `QF_BV` mode.
 
+For example:
+
+```
+    echo 'x > 3' | ./touist.native --smt QF_IDL --solve -
+```
+which will give you the model
+```
+    4 x
+```
+which should be read as $x$ takes the value 4.
+
 [yices]: https://github.com/polazarus/ocamlyices2
 [yices-sri]: http://yices.csl.sri.com
 [yices-lic]: http://yices.csl.sri.com/yices-newnewlicense.html
