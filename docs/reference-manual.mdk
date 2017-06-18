@@ -1073,27 +1073,46 @@ followed by the corresponding proposition. For example:
 ```
     echo a and b | touist - --solve
 ```
-will display
+will return a single model (and in this case, there is only one single model):
 ```
-  ==== model 0
-  1 b
-  1 a
-  ==== Found 1 models, limit is 1 (--limit N for more models)
+    1 a
+    1 b
 ```
-which corresponds to the valuation $\{a \leftarrow 1, b \leftarrow 1\}$.
-Note that the model counter begins at 0. With this format, you can easily
-filter the results. For example, the following command will only show the
-propositions that are ``true``:
+
+Each line corresponds to a valuation, and each valuation should be read
+`value proposition`. In the example, $a$ takes the value 1 (true).
+With this format, you can easily filter the results. For example,
+the following command will only show the propositions that are ``true``:
+
 ```
     echo a and b | touist - --solve | grep ^1
 ```
 
-**`--limit N`** (only with `--solve`) sets the maximum number of
-models returned. When N=0, all models are returned.
+**`--solve --limit N`** allows to display multiple models. With this option,
+the models are separated by lines beginning with `====` and for one model,
+each line contains a valuation followed by the corresponding proposition.
+For example, with `--limit 0` which displays an unlimited number of models:
+```
+    echo a or b | touist - --solve --limit 0
+```
+will display
+```
+    ==== model 0
+    1 a
+    0 b
+    ==== model 1
+    0 a
+    1 b
+    ==== model 2
+    1 a
+    1 b
+    ==== found 3 models, limit is 0 (--limit N for more models)
+```
+Note that the model counter begins at 0.
 
-**`--count`** tries to return the count of models instead of returning
-the models. This option will only work for small problems: the number of
-models explodes when the number of propositions is big.
+**`--solve --count`** tries to return the count of models instead of
+returning the models. This option will only work for small problems: the
+number of models explodes when the number of propositions is big.
 
 [minisat]: http://minisat.se
 [ocaml-minisat]: https://github.com/c-cube/ocaml-minisat
