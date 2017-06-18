@@ -1122,10 +1122,9 @@ is useful for debugging and testing that the constructs ``bigand``,
 
 **`--show-hidden`** is specific to the SAT mode. When displaying the
 DIMACS result, also include the hidden propositions that have been
-generated during the CNF expansion by the [Tseitin][tseitlin]
-transformation.
+generated during the CNF expansion by the [Tseitin] transformation.
 
-[tseitlin]: https://en.wikipedia.org/wiki/Conjunctive_normal_form
+[Tseitin]: https://en.wikipedia.org/wiki/Conjunctive_normal_form
 
 **`--linter`** disables all outputs except for errors. It also shortens
 then evaluation step by bypassing the expansive ``bigand``, ``exact``,
