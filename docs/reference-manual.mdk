@@ -1215,7 +1215,8 @@ which should be read as $x$ takes the value 4.
 
 For now, the `QDIMACS` format (which is the equivalent of `DIMACS` for
 quantified boolean formulas) cannot be printed from a touist file.
-You can still solve problems using `--qbf --solve` (see [below][#qbf-solver]).
+You can still solve problems using both `--qbf` and `--solve`
+(see [below][#qbf-solver]).
 
 #### QBF solver {#qbf-solver}
 
@@ -1229,11 +1230,22 @@ the Quantor source:
     opam install qbf
 ```
 
-Then, you can solve any touist-written QBF problem:
+Then, we can solve a small example:
 
 ```
-    touist --qbf --solve instance.touist
+    echo 'forall x: x or (exists y: y)' | touist --qbf --solve -
 ```
+which will give you a partial model:
+```
+    ? x
+    ? y
+```
+where `?` means that this value is undefined. To get an actual mode, we
+must _force_ the valuations (and doing so, we explore the tree of possible
+valuations). `touist` and its graphical interface are unable to force these
+valuations and explore the tree. As a consequence, they are also unable
+to visualize the tree (where each leaf would be a model). For now, the only
+way to do it is by hand.
 
 [quantor]: http://fmv.jku.at/quantor/
 [ocaml-qbf]: https://github.com/c-cube/ocaml-qbf
