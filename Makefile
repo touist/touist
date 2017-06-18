@@ -142,7 +142,7 @@ check-requirements: opam m4 ant git
 	"ocamlfind is not installed.\n\
 	Install it with\n\n    opam install -y ocamlfind\n" && exit 3)
 
-%:
+opam m4 ant git madoko madoko-local:
 	@command -v $@ || (echo \
 	"$@ is not installed.\n\
 	Install it with\n\n    sudo apt install $@\n" && exit 5)
