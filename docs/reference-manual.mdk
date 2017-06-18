@@ -1002,7 +1002,8 @@ and `opam`) with the command
 ~ Note
 By default, `touist` only comes with a SAT solver. Problems written in
 &touist; using the Satisfiability Modulo Theory (SMT) or Quantified
-Boolean Formulas (QBF) grammars can also be used. See [#]
+Boolean Formulas (QBF) grammars can also be used (see [#usage-smt] and
+[#usage-qbf]).
 ~
 
 ![architecture]
