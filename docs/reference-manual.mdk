@@ -163,7 +163,7 @@ illustrating examples. Feel free to contribute!
 A &touist; file is a whitespace-separated[^whitespace] list of affectations
 and formulas. Affectations are global and can be interlaced with formulas
 as long as they are not nested in formulas (for local variables, you can
-use ``let``, see [#sec-local-affectation-let-construct]). Comments begin
+use ``let``, see [#let-construct]). Comments begin
 with the "``;;``" sequence. Two backslashes (``\\``) in a formula will
 produce a new line in the latex view.
 
@@ -247,7 +247,7 @@ $N = 10
 $set = [1..$N]    ;; $N must be defined before $set
 ```
 
-### Local affectation (``let`` construct)
+### Local affectation (``let`` construct) {#let-construct}
 
 Sometimes, you want to use the same result in multiple places and you
 cannot use a global variable (presented in [#global-var]) because of
@@ -255,7 +255,8 @@ nested formulas. The ``let`` construct lets you create temporary
 variables inside formulas:
 ``` Grammar
 <let-affect<T>> ::=
-    | "let" <var> "=" <expr> ":" <formula<T>>  <-- local affectation
+    | "let" <var> "=" <expr> ":" <formula<T>>     <-- local affectation
+    | "let" <comma-list(<var>)> "=" <comma-list(<expr>)> ":" <formula<T>>
 <expr> ::= <int>|<float>|<prop>|<bool>|<set>
 ```
 The ``let`` affectation can only be used in formulas (detailed
@@ -264,7 +265,7 @@ integer, floating-point, boolean or set expressions).
 
 Example:
 ``` Touist
-;; This piece of code has no actual meaning
+;; This piece of code has no actual purpose
 $letters = [a,b,c,d,e]
 bigand $letter,$number in $letters,[1..card($letters)]:
   has($letter,$number) =>
@@ -274,6 +275,13 @@ bigand $letter,$number in $letters,[1..card($letters)]:
   end
 end
 ```
+
+You can also chain multiple variables in a single ``let``:
+
+```Touist
+    let $E,$x,$y = [1..2],3,4: ...
+```
+
 ~ Note
 The scope of a variable affected using ``let`` is limited to the formula
 that follows the colon (`:`). If this formula is followed by a whitespace
@@ -881,6 +889,8 @@ TERM      = [_0-9]*[a-zA-Z][a-zA-Z_0-9]*
 
 <let-affect<T>> ::=
     | "let" <var> "=" <expr> ":" <formula<T>>
+    | "let" <comma-list(<var>)> "=" <comma-list(<expr>)>
+                             ":" <formula<T>>
 
 <equality(<T>)> ::=
     | <T> "!=" <T>
