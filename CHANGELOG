@@ -12,7 +12,7 @@ v3.2.1
     the --smt and --qbf solvers also return the first model.
   - the 'let' statement can now be used with a list of vars/values. For
     example: let $i,$j = 1,2: p($i,$j)
-
+  - the 'for' statement can now be used with a list of variables/sets.
 v3.2.0
   - (breaking) removed '--detailed' that wasn't really helpful to
     '--error-format' that allows to use placeholders (%l for line, %c for
