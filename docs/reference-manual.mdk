@@ -18,20 +18,20 @@ Package:[top=2.5cm,bottom=2.5cm,inner=2.5cm,outer=2.5cm]geometry
 
 # Contribute to this document
 
-The source of this document is written in [madoko], a markdown dialect.
+The [source] of this document is written in [madoko], a markdown dialect.
 This language has been chosen over Latex for its brevity (Pandoc could
 have also been chosen). You can contribute to this [document] through a
 pull-request or by discussing your thoughts in the [issue] tracker. To
 edit it, you can first take a look at what the madoko [editor] can do
 (with this link, the images and colorizer will not work), or see how to
-edit properly in [`CONTRIBUTE-TO-DOCS.md`][contribute] (located in
-`docs/`).
+edit properly in `CONTRIBUTE-TO-DOCS.md` (located in [`docs/`][docs]).
 
 [madoko]: https://www.madoko.net
 [issue]: https://github.com/touist/touist/issues
 [document]: https://github.com/touist/touist/glob/tree/master/docs/reference-manual.mdk
-[contribute]: https://github.com/touist/touist/tree/master/docs
 [editor]: https://www.madoko.net/editor.html?#tab=2&url=https://raw.githubusercontent.com/touist/touist/master/docs/reference-manual.mdk&options={"delayedUpdate":"true"}
+[docs]: https://github.com/touist/touist/tree/master/docs
+[source]: https://github.com/touist/touist/blob/master/docs/reference-manual.mdk
 
 # Introduction
 
@@ -1046,13 +1046,19 @@ this mapping table using the `--table <filename>` flag.
 
 [dimacs]: http://www.satcompetition.org/2009/format-benchmarks2009.html
 
-#### Options usable with `--sat`
+#### SAT solver
 
-**`--solve`** asks `touist` to solve the SAT problem. By default, the first
-model is displayed; you can ask for more models using the `--limit N`
-option. The models are separated by lines beginning with `====` and for
-one model, each line contains a valuation followed by the corresponding
-proposition. For example:
+By default, `touist` embeds [Minisat] [@Sörensson02minisatv1.13], a SAT solver
+written in C++ at the Chalmers University of Technology, Sweden. It is
+distributed under the MIT license. To be able to embed it into OCaml,
+we use the binding [ocaml-minisat] which relies on a C version of Minisat
+(Minisat-C-1.14.1) for portability concerns.
+
+**`--solve`** asks `touist` to solve the SAT problem using the embedded
+Minisat solver. By default, the first model is displayed; you can ask for
+more models using the `--limit N` option. The models are separated by lines
+beginning with `====` and for one model, each line contains a valuation
+followed by the corresponding proposition. For example:
 ```
     echo a and b | touist - --solve
 ```
@@ -1078,7 +1084,11 @@ models returned. When N=0, all models are returned.
 the models. This option will only work for small problems: the number of
 models explodes when the number of propositions is big.
 
+[Minisat]: http://minisat.se
+[ocaml-minisat]: https://github.com/c-cube/ocaml-minisat
+
 ### Other general options
+
 **`--latex`**, **`--latex-full`** translate the given touist code to
 &logolatex;. Two options are available:
 
@@ -1155,13 +1165,13 @@ to fill the correct field in the `SMT-LIB` file.
 
 #### SMT solver {#smt-solver}
 
-TouIST can embed an optional SMT solver, [Yices 2.5.2][yices-sri]
-(see [@Dutertre:cav2014]). It is developed by SRI (Stanford Research
-Institute), California. It is free to use for non-commercial purposes.
-Its code is licensed under a restrictive non-commercial EULA which the
-user must agree before using (see the [license][yices-lic]). To enable
-it, you need to install the OCaml binding [`yices2`][yices] which embeds
-the Yices sources:
+TouIST can embed an optional SMT solver, [Yices 2.5.2][yices-sri] (see
+[@Dutertre:cav2014]). It is developed by SRI (Stanford Research Institute,
+California) and is written in C. It is free to use for non-commercial
+purposes. Its code is licensed under a restrictive non-commercial EULA
+which the user must agree before using (see the [license][yices-lic]). To
+enable it, you need to install the OCaml binding [`yices2`][yices] which
+embeds the Yices sources:
 
 ```
     opam install yices2
