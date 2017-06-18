@@ -29,9 +29,8 @@ edit it, you can first take a look at what the madoko [editor] can do
 edit properly in `CONTRIBUTE-TO-DOCS.md` (located in [`docs/`][docs]).
 
 ~ Note
-For now, this reference manual terribly lacks of user-friendliness. We still
-need to write a step-by-step tutorial as well as many examples to illustrate
-each concept.
+This reference manual still lacks of a step-by-step tutorial as well as
+illustrating examples. Feel free to contribute!
 ~
 
 [madoko]: https://www.madoko.net
@@ -46,8 +45,8 @@ each concept.
 &touist; is a language that allows us to express propositional
 logic [@Ben_Slimane_IAF_2015;@SlimaneCGHLMV15]. You are provided with two
 programs: a graphical interface, refered as `touist.jar` (as it is
-written in Java) and `touist`, the command-line compiler and solver
-(written in Ocaml).
+written in Java) and `touist`, a command-line program written in OCaml that
+compiles and solves &touist; problems (see [#touist-program] for usage).
 
 The &touist; language aims at making the writing of propositional logic as
 approchable as possible. Propositions and connectors syntaxes are close to what
@@ -990,7 +989,7 @@ TERM      = [_0-9]*[a-zA-Z][a-zA-Z_0-9]*
 <for> ::= "for" <var> "in" <set>
 ```
 
-# Command-line tool (`touist`)
+# Command-line tool (`touist`) {#touist-program}
 
 ## Installation
 The main tool that parses and solves the &touist; programs is written in
@@ -1160,9 +1159,9 @@ warning messages the state number of the LL(1) automaton. Each state
 number that may trigger a syntax error should have a corresponding
 message in `src/lib/parser.messages`.
 
-**`--debug-cnf`** is also a development option; in SAT and QBF modes,
-it prints the successive recursive transformations that produce the CNF
-formula.
+**`--debug-cnf`** (only with `--sat` or `--qbf)`) is also a development
+option; in SAT and QBF modes, it prints the successive recursive
+transformations that produce the CNF formula.
 
 ### Usage for Satisfiability Modulo Theory (SMT mode) {#usage-smt}
 
