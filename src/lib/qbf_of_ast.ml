@@ -82,7 +82,7 @@ let rec to_prenex debug msgs quant_l conflict_l only_rename ast : ast =
      twice. *)
   | Equiv (x,y) -> to_prenex (And (Implies (x,y),Implies (y,x)))
   | Prop x -> if List.exists (fun y -> y=x) conflict_l then Prop (add_suffix x) else Prop x
-  | e -> failwith ("[shouldnt happen] a qbf formula shouldn't contain '"^Pprint.string_of_ast_type e^"' in " ^ Pprint.string_of_ast e)
+  | e -> failwith ("[shouldnt happen] a qbf formula shouldn't contain '"^Pprint.string_of_ast_type e^"' in " ^ Pprint.string_of_ast ~debug:true e)
   in
   let process = function
   | Forall (x,f) -> Forall (to_prenex x, to_prenex_new x f)
@@ -106,7 +106,7 @@ let rec is_unquant = function
   | Xor     (x,y)          -> is_unquant x && is_unquant y
   | Implies (x,y)          -> is_unquant x && is_unquant y
   | Equiv   (x,y)          -> is_unquant x && is_unquant y
-  | e -> failwith ("[shouldnt happen] a qbf formula shouldn't contain '"^Pprint.string_of_ast_type e^"' in " ^ Pprint.string_of_ast e)
+  | e -> failwith ("[shouldnt happen] a qbf formula shouldn't contain '"^Pprint.string_of_ast_type e^"' in " ^ Pprint.string_of_ast ~debug:true e)
 let rec is_prenex = function
   | Exists (_,f) | Forall (_,f) -> is_prenex f
   | f -> is_unquant f
@@ -125,7 +125,7 @@ let rec quantify_free_variables env ast =
     | Implies (x,y) -> search_free env x @ search_free env y
     | Equiv   (x,y) -> search_free env x @ search_free env y
     | e -> failwith ("quantify_free_variables(): a qbf formula shouldn't \
-      contain '"^Pprint.string_of_ast_type e^"' in " ^ Pprint.string_of_ast e) in
+      contain '"^Pprint.string_of_ast_type e^"' in " ^ Pprint.string_of_ast ~debug:true e) in
   let rec remove_dups = function
     | [] -> []
     | h::t -> h::(remove_dups (List.filter (fun x -> x<>h) t))

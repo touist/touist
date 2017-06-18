@@ -79,7 +79,7 @@ let rec push_lit (lit:ast) (cnf:ast) : ast =
   | Not (Prop x)     -> Or (lit, Not (Prop x))
   | And (x,y)        -> And (push_lit lit x, push_lit lit y)
   | Or (x,y)         -> Or (lit, Or (x,y))
-  | ast -> failwith ("[shouldnt happen] this doesn't seem to be a formula: '" ^ (string_of_ast ast) ^ "'")
+  | ast -> failwith ("[shouldnt happen] this doesn't seem to be a formula: '" ^ (string_of_ast ~debug:true ast) ^ "'")
 
 
 
@@ -191,7 +191,7 @@ and to_cnf depth (stop:stop) (ast:ast) : ast =
     | Implies (x,y) -> to_cnf (Or (Not x, y))
     | Equiv (x,y) -> to_cnf (And (Implies (x,y), Implies (y,x)))
     | Xor (x,y) -> to_cnf (And (Or (x,y), Or (Not x, Not y)))
-    | _ -> failwith ("[shouldnt happen] this doesn't seem to be a formula: '" ^ (string_of_ast ast) ^ "'")
+    | _ -> failwith ("[shouldnt happen] this doesn't seem to be a formula: '" ^ (string_of_ast ~debug:true ast) ^ "'")
     end in
     if !debug then print_debug "out: " depth [cnf];
     cnf

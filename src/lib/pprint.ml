@@ -7,8 +7,8 @@ open Types.Ast
 (** [string_of_ast] takes an abstract syntaxic tree.
     @param ast of type [Types.Ast.ast] *)
 let rec string_of_ast ?(utf8=false) ?(show_var=(fun ast -> "")) ?(debug=false) ?(parenthesis=debug) ast =
-  let of_ast = string_of_ast ~utf8:utf8 ~show_var:show_var ~parenthesis:parenthesis ~debug:debug in
-  let of_ast_list = string_of_ast_list in
+  let of_ast = string_of_ast ~utf8 ~show_var ~parenthesis ~debug in
+  let of_ast_list = string_of_ast_list ~utf8 ~show_var ~parenthesis ~debug in
   match ast with
   | Int    x -> string_of_int x
   | Float  x -> string_of_float x
@@ -102,7 +102,7 @@ let rec string_of_ast ?(utf8=false) ?(show_var=(fun ast -> "")) ?(debug=false) ?
   | Let (v,x,c) -> of_ast v ^ "=" ^ of_ast x ^ ": " ^ of_ast c
   | Affect (v,c) -> of_ast v ^ "=" ^ of_ast c
   | Touist_code (f) -> (of_ast_list "\n" f)
-  | Loc (x,l) -> (if debug then "("^ Msgs.string_of_loc l ^")" else "") ^ of_ast x
+  | Loc (x,l) -> (if debug then "loc "^ Msgs.string_of_loc l ^":" else "") ^ of_ast x
   | Paren x -> of_ast x
   | Exists (v,f) when utf8 -> "∃"^ of_ast v ^"."^ of_ast f
   | Exists (v,f)             -> "exists "^ of_ast v ^": "^ of_ast f
@@ -111,7 +111,9 @@ let rec string_of_ast ?(utf8=false) ?(show_var=(fun ast -> "")) ?(debug=false) ?
   | For (v,c,f)           -> "for "^of_ast v^" in "^of_ast c^":"^ of_ast f
   | NewlineBefore f | NewlineAfter f -> of_ast f
 
-and string_of_ast_type = function
+and string_of_ast_type ?(debug=false) (ast:ast) : string =
+  let of_ast_type ast = string_of_ast_type ~debug ast in
+  match ast with
   | Int    x               -> "int"
   | Float  x               -> "float"
   | Bool      x            -> "bool"
@@ -165,12 +167,13 @@ and string_of_ast_type = function
   | Let (v,x,c)            -> "let"
   | Affect (_,_)           -> "="
   | Touist_code (_)      -> "(touist code)"
-  | Loc (x,_) -> string_of_ast_type x
-  | Paren x -> string_of_ast_type x
+  | Loc (x,_) -> if debug then "location" else of_ast_type x
+  | Paren x -> of_ast_type x
   | Exists (v,f)           -> "exists"
   | Forall (v,f)           -> "forall"
   | For (_,_,_)            -> "for"
   | NewlineBefore f | NewlineAfter f -> "newline"
 
 
-and string_of_ast_list sep el = String.concat sep (List.map string_of_ast el)
+and string_of_ast_list ?(utf8=false) ?(show_var=(fun ast -> "")) ?(debug=false) ?(parenthesis=debug) sep el =
+    String.concat sep (List.map (string_of_ast ~utf8 ~show_var ~parenthesis ~debug) el)

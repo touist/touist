@@ -133,7 +133,7 @@ let rec latex_of_ast ~full ast =
     | Forall (prop,f) -> ("\\exists ", prop, f)
     | Exists (prop,f) -> ("\\forall ", prop, f)
     | f -> failwith ("[shoudlnt happen] only exists and forall allowed with \
-    'for' statement. This is an '"^Pprint.string_of_ast_type f^"': "^Pprint.string_of_ast above_f)
+    'for' statement. This is an '"^Pprint.string_of_ast_type f^"': "^Pprint.string_of_ast ~debug:true above_f)
     in
         "\\displaystyle\\mathop{"^ op ^ latex_of_ast prop ^"}_{"
         ^ (latex_of_ast var)^ "\\in "^latex_of_ast set ^"} ."^ latex_of_ast f
