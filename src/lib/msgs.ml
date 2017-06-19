@@ -124,9 +124,11 @@ let format_width color width text =
 
 let rec string_of_msgs ?(width=78) ?(color=false) ?(fmt="%l:%c: %t: %m") (messages:t) =
   let color_backquote text = let colorize str = "\x1b[33m" ^ str ^ "\x1b[0m" in
-    Str.global_substitute (Str.regexp "`\\([^`]\\)`") (fun s -> "`"^ colorize (Str.matched_group 1 s) ^"`") text in
+    Str.global_substitute (Str.regexp "`\\([^`]+\\)`") (fun s -> "`"^ colorize (Str.matched_group 1 s) ^"`") text in
   let color_quoted text = let colorize str = "\x1b[33m" ^ str ^ "\x1b[0m" in
-    Str.global_substitute (Str.regexp "'\\([^']+\\)'") (fun s -> "'"^ colorize (Str.matched_group 1 s) ^"'") text in
+    Str.global_substitute (Str.regexp "'\\([^']*\\)'") (fun s ->
+      let s = (Str.matched_group 1 s) in
+      if (String.length s) = 0 then "''" else "'"^ colorize s ^"'") text in
   let color_code text = let colorize str = "\x1b[37m" ^ str ^ "\x1b[0m" in
     Str.global_substitute (Str.regexp "^\\(    +.*\\)$") (fun s -> colorize (Str.matched_group 1 s)) text in
   let color_type text = let colorize str = match str with
