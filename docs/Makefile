@@ -11,9 +11,10 @@ html:
 pdf:
 	madoko reference-manual.mdk -mversion:$$(git describe --tags) --pdf
 
-# MacOS only
 open:
+ifeq ($(shell uname -s),Darwin)
 	open out/reference-manual.html -g
+endif
 
 # vim:ft=make
 #
