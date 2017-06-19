@@ -2,7 +2,10 @@ v3.2.1
   - added the '--latex-full' option. It does the same as '--latex' except that
     multi-line spanning parenthesis are translated with 'pmatrix' and a header
     and footer are added to make the output direclty compatible with pdflatex.
-
+  - (breaking) With --sat --solve which by default only returns one model,
+    touist now omits the ==== lines (which are useless for one model).
+    This change also allows us to have a unified --solve experience, as
+    the --smt and --qbf solvers also return the first model.
 v3.2.0
   - (breaking) removed '--detailed' that wasn't really helpful to
     '--error-format' that allows to use placeholders (%l for line, %c for

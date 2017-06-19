@@ -247,12 +247,17 @@ let () =
         let models =
           (if !only_count then Sat.solve_clauses (clauses,table)
            else
-             let print_model model i = Printf.fprintf !output "==== model %d\n%s\n" i (Sat.Model.pprint ~sep:"\n" table model)
+             let print_model model i =
+               if !limit != 1
+               then Printf.fprintf !output "==== model %d\n%s\n" i (Sat.Model.pprint ~sep:"\n" table model)
+               else Printf.fprintf !output "%s\n" (Sat.Model.pprint ~sep:"\n" table model)
               in Sat.solve_clauses ~limit:!limit ~print:print_model (clauses,table))
         in
         match Sat.ModelSet.cardinal !models with
         | i when !only_count -> Printf.fprintf !output "%d\n" i; show_msgs_and_exit !msgs OK
         | 0 -> Printf.fprintf stderr "unsat\n"; show_msgs_and_exit !msgs SOLVER_UNSAT
+        | 1 -> (* case where we already printed models in [solve_clause] *)
+          show_msgs_and_exit !msgs OK
         | i -> (* case where we already printed models in [solve_clause] *)
           Printf.fprintf !output "==== found %d models, limit is %d (--limit N for more models)\n" i !limit; show_msgs_and_exit !msgs OK
     else
