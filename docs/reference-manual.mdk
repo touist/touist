@@ -42,11 +42,18 @@ illustrating examples. Feel free to contribute!
 
 # Introduction
 
-&touist; is a language that allows us to express propositional
-logic [@Ben_Slimane_IAF_2015;@SlimaneCGHLMV15]. You are provided with two
-programs: a graphical interface, refered as `touist.jar` (as it is
-written in Java) and `touist`, a command-line program written in OCaml that
-compiles and solves &touist; problems (see [#touist-program] for usage).
+&touist;[^touist-meaning] is a language that allows us to express
+propositional logic [@Ben_Slimane_IAF_2015;@SlimaneCGHLMV15]. You are
+provided with two programs: a graphical interface, refered as `touist.jar`
+(as it is written in Java) and `touist`, a command-line program written in
+OCaml that compiles and solves &touist; problems (see [#touist-program] for
+usage).
+
+[^touist-meaning]: _**Tou**louse **I**ntegrated **S**atisfiability **T**ool_.
+                   It is prononced _twist_. We were looking for a memorable and
+                   pronounceable name that had no homonym on Google. And it
+                   had to sound like fun, too!
+
 
 The &touist; language aims at making the writing of propositional logic as
 approchable as possible. Propositions and connectors syntaxes are close to what
