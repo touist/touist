@@ -1221,18 +1221,17 @@ the newly installed `yices2`.
 
 When using both `--smt LOGIC` and `--solve`, the `LOGIC` argument must be
 one of [the logics][yices-logics] Yices 2.5.2 supports. Here is a table
-with some of the most used logic fragments supported:
-
+with the logics that are can be used through the &touist; language:
 
 | `LOGIC`  | Meaning                   |
 |----------|---------------------------|
-| `QF_BV ` | Bitvectors (SAT)          |
 | `QF_IDL` | Integer Difference Logic  |
+| `QF_RDL` | Real Difference Logic     |
 | `QF_LIA` | Linear Integer Arithmetic |
 | `QF_LRA` | Linear Real Arithmetic    |
 
-Note that _QF_ means quantifier-free. You can solve any SAT problem using the
-SMT solver with the `QF_BV` mode.
+Note that _QF_ means quantifier-free. Also note that you can solve any
+SAT problem using any SMT logic solver.
 
 For example:
 
