@@ -2,9 +2,9 @@ TouIST, the language for propositional logic
 ===========================================
 
 
-|      Mac, Linux      |         Windows         | [Reference manual][ref] |
-| :------------------: | :---------------------: | :---------------------: |
-| [![trv-img]][travis] | [![apvy-img]][appveyor] |  [![cir-img]][circle]   |
+|      Mac, Linux      |         Windows         | [Reference manual][ref] |    Come and discuss!    |
+|:--------------------:|:-----------------------:|:-----------------------:|:-----------------------:|
+| [![trv-img]][travis] | [![apvy-img]][appveyor] |  [![cir-img]][circle]   | [![gitter-img]][gitter] |
 
 [circle]: https://circleci.com/gh/touist/touist/tree/master
 [cir-img]: https://circleci.com/gh/touist/touist/tree/master.svg?style=svg
@@ -12,6 +12,8 @@ TouIST, the language for propositional logic
 [trv-img]: https://travis-ci.org/touist/touist.svg?branch=master
 [appveyor]: https://ci.appveyor.com/project/maelvalais/touist-kila4/branch/master
 [apvy-img]: https://ci.appveyor.com/api/projects/status/rayupfflmut8xbe0/branch/master?svg=true
+[gitter]: https://gitter.im/touist-project/touist
+[gitter-img]: https://badges.gitter.im/touist-project/touist.svg "Join the chat at https://gitter.im/touist-project/touist"
 
 [![Screenshot of the graphical interface with a QBF
 problem](docs/images/screenshot.png)](https://github.com/maelvalais/allumettes)
