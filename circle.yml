@@ -69,12 +69,11 @@ deployment:
         git clone git@github.com:touist/touist.github.io.git
         cp docs/out/reference-manual.pdf docs/out/reference-manual-$(git describe --tags).pdf
         cp docs/out/reference-manual.html docs/out/reference-manual-$(git describe --tags).html
-        cp docs/out/reference-manual*.{pdf,html} touist.github.io
+        cp docs/out/reference-manual*.{pdf,html} touist.github.io/doc
         cd touist.github.io
         pip install mako
         cd doc
         ../make_index.py . --regex "reference-manual.*" --header "Reference manual revisions" > manual-revision.html
-        git pull
         git config user.name "CircleCI"
         git config user.email "robot@circleci.com"
         git add reference-manual*.{pdf,html} manual-revision.html
