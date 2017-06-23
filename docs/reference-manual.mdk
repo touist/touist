@@ -11,36 +11,24 @@ Math Mode: mathjax
 .code3 { language: Grammar } <!-- Coloring grammar: ```<rule> ::= a|b``` -->
 Package:[top=2.5cm,bottom=2.5cm,inner=2.5cm,outer=2.5cm]geometry
 <!-- Custom variable for TouIST name: &touist; -->
-touist: [TouIST]{font-variant: small-caps}
+Touist: [TouIST]{font-variant: small-caps}
+
+[INCLUDE=book]
+[INCLUDE=webtoc]
+[INCLUDE=webanchors]
 
 [TITLE]
 
+~ Begin SidePanel
 [TOC]
+~ End SidePanel
+
+~ Begin MainPanel
 <!-- Maël: for now, you can ignore the error "undefined key: version" -->
 
-# Contribute to this document
-
-The [source] of this document is written in [madoko], a markdown dialect.
-This language has been chosen over Latex for its brevity (Pandoc could
-have also been chosen). You can contribute to this [document] through a
-pull-request or by discussing your thoughts in the [issue] tracker. To
-edit it, you can first take a look at what the madoko [editor] can do
-(with this link, the images and colorizer will not work), or see how to
-edit properly in `CONTRIBUTE-TO-DOCS.md` (located in [`docs/`][docs]).
-
-~ Note
-This reference manual still lacks of a step-by-step tutorial as well as
-illustrating examples. Feel free to contribute!
-~
-
-[madoko]: https://www.madoko.net
-[issue]: https://github.com/touist/touist/issues
-[document]: https://github.com/touist/touist/glob/tree/master/docs/reference-manual.mdk
-[editor]: https://www.madoko.net/editor.html?#tab=2&url=https://raw.githubusercontent.com/touist/touist/master/docs/reference-manual.mdk&options={"delayedUpdate":"true"}
-[docs]: https://github.com/touist/touist/tree/master/docs
-[source]: https://github.com/touist/touist/blob/master/docs/reference-manual.mdk
-
 # Introduction
+
+## What is &touist;?
 
 &touist;[^touist-meaning] is a language that allows us to express
 propositional logic [@Ben_Slimane_IAF_2015;@SlimaneCGHLMV15]. You are
@@ -138,6 +126,28 @@ bit of &touist; code could be equivalently written
 ```
 ~
 
+
+## Contribute to this document
+
+The [source] of this document is written in [madoko], a markdown dialect.
+This language has been chosen over Latex for its brevity (Pandoc could
+have also been chosen). You can contribute to this [document] through a
+pull-request or by discussing your thoughts in the [issue] tracker. To
+edit it, you can first take a look at what the madoko [editor] can do
+(with this link, the images and colorizer will not work), or see how to
+edit properly in `CONTRIBUTE-TO-DOCS.md` (located in [`docs/`][docs]).
+
+~ Note
+This reference manual still lacks of a step-by-step tutorial as well as
+illustrating examples. Feel free to contribute!
+~
+
+[madoko]: https://www.madoko.net
+[issue]: https://github.com/touist/touist/issues
+[document]: https://github.com/touist/touist/glob/tree/master/docs/reference-manual.mdk
+[editor]: https://www.madoko.net/editor.html?#tab=2&url=https://raw.githubusercontent.com/touist/touist/master/docs/reference-manual.mdk&options={"delayedUpdate":"true"}
+[docs]: https://github.com/touist/touist/tree/master/docs
+[source]: https://github.com/touist/touist/blob/master/docs/reference-manual.mdk
 
 
 # Language reference
@@ -1309,3 +1319,4 @@ The &touist; grammar does not have such an instruction marker; because of
 that, we are not able to skip to the next instruction.
 
 [BIB]
+~ End MainPanel

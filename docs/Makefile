@@ -3,17 +3,25 @@
 # Maël Valais, 2017-06-18 13:04
 #
 
-all: html open
+all: html
 
 html:
-	madoko reference-manual.mdk -mversion:$$(git describe --tags)
+out/%.html: %.mdk
+	madoko $^ -mversion:$$(git describe --tags)
 
-pdf:
-	madoko reference-manual.mdk -mversion:$$(git describe --tags) --pdf
+out/%.pdf: %.mdk
+	madoko $^ -mversion:$$(git describe --tags) --pdf
 
-open:
-ifeq ($(shell uname -s),Darwin)
+html: out/reference-manual.html
+pdf: out/reference-manual.pdf
+
+open-html: html
+ifeq ($(shell uname -s),darwin)
 	open out/reference-manual.html -g
+endif
+open-pdf: pdf
+ifeq ($(shell uname -s),darwin)
+	open out/reference-manual.pdf -g
 endif
 
 # vim:ft=make
