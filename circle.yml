@@ -8,20 +8,8 @@ machine:
   pre:
   - sudo add-apt-repository -y ppa:jonathonf/texlive-2016
   - sudo apt-get -q -y update
-  # The following Texlive packages are the minimum required for
-  # Madoko to run.
+  # The following Texlive packages are the minimum required for Madoko to run.
   - sudo apt-get -q -y --no-install-recommends install libkpathsea-dev libpotrace-dev curl texlive texlive-xetex texlive-extra-utils texlive-latex-extra texlive-generic-extra texlive-math-extra lmodern
-  # install latest dvisvgm to make madoko happy
-  - |
-    if [ ! -d dvisvgm_build ]; then
-      curl -L https://github.com/mgieseki/dvisvgm/releases/download/2.1.3/dvisvgm-2.1.3.tar.gz | tar xz
-      mv dvisvgm-* dvisvgm_build
-    fi
-    cd dvisvgm_build
-    ./configure
-    make
-    sudo make install
-    cd ..
 
 checkout:
   post:
@@ -32,6 +20,18 @@ dependencies:
     - npm install -g madoko
   cache_directories:
     - "~/dvisvgm_build"
+  post:
+    # install latest dvisvgm to make madoko happy
+    - |
+      if [ ! -d dvisvgm_build ]; then
+        curl -L https://github.com/mgieseki/dvisvgm/releases/download/2.1.3/dvisvgm-2.1.3.tar.gz | tar xz
+        mv dvisvgm-* dvisvgm_build
+      fi
+      cd dvisvgm_build
+      ./configure
+      make
+      sudo make install
+      cd ..
 
 
 test:
