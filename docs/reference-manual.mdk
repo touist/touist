@@ -1082,11 +1082,11 @@ distributed under the MIT license. To be able to embed it into OCaml,
 we use the binding [ocaml-minisat] which relies on a C version of Minisat
 (Minisat-C-1.14.1) for portability concerns.
 
-**`--solve`** asks `touist` to solve the SAT problem using the embedded
-Minisat solver. By default, the first model is displayed; you can ask for
-more models using the `--limit N` option. The models are separated by lines
-beginning with `====` and for one model, each line contains a valuation
-followed by the corresponding proposition. For example:
+**`--solve`** asks `touist` to solve the SAT problem. By default, the first
+model is displayed; you can ask for more models using the `--limit N`
+option. The models are separated by lines beginning with `====` and for
+one model, each line contains a valuation followed by the corresponding
+proposition. For example:
 ```
     echo a and b | touist - --solve
 ```
