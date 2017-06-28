@@ -6,29 +6,34 @@ is an online editor (madoko.net/editor.html).
 
 If you want to edit the .mdk file, you have multiple choices:
 
-- (1. online madoko GUI and Github account)
-  You first have to fork the touist project: https://github.com/touist/touist/fork
-  Then, go to https://www.madoko.net/editor.html and log into your github account.
-  Select the project freshly forked with
-      "Open..." -> "Github" -> "yourgithubname/touist" -> "master" -> "docs/" ->
-  Then, you can open the .mdk.
-  To submit the changes, do "Synchronize...". Type a commit message that explains
-  what you changed and press "Commit".
-  Finally, go to your github fork https://github.com/yourgithubname/touist and
-  open a new pull request against the https://github.com/touist/touist repo.
+- **A. Online madoko GUI and Github account**
+  1. You first have to fork the touist project using your Github account:
+      https://github.com/touist/touist/fork
+  2. Then, go to the [madoko editor](https://www.madoko.net/editor.html)
+   and open the forked `docs/reference-manual.mdk` by doing:
 
-- (2. madoko GUI locally)
+            Open... -> Github -> accept linking Madoko to your Github account
+                 -> select the repo 'yourgithubname/touist'
+                 -> master -> docs/ -> reference-manual.mdk
+
+  3. Once you have done some changes and want to submit them back to the TouIST project,
+  'Synchronize...' (or alt-s). Type a commit message that explains what you changed
+  and press 'Commit'.
+  4. Finally, go to your github [fork](https://github.com/touist/touist/fork)
+  and [open a new pull request](https://github.com/maelvalais/touist/pull/new/master)
+  against the [TouIST](https://github.com/touist/touist) repo.
+
+- **B. madoko GUI locally**  
   Install madoko-local with `npm install -g madoko-local` and you run the madoko
   webserver with `madoko-local --port 8080 --run -l .` from the `docs` directory
   and you Open... Local Disk... and you select the .mdk file.
   To get your changes reviewed and accepted, fork the project, commit your changes
   and submit a pull request.
 
-- (3. no GUI)
+- **C. no GUI**  
   Install madoko (not madoko-local): `npm install -g madoko`.
-  Edit the `.mdk` file; you can then render the HTML or PDF with:
-  * HTML: madoko reference-manual.mdk
-  * PDF: madoko reference-manual.mdk --pdf
+  Edit the `.mdk` file; you can then render the HTML with `make html` or PDF
+  with `make pdf`.
   You can then submit a pull request with your changes.
 
 When submitting your pull-request, you will be able to check that the
