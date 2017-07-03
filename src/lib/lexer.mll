@@ -62,7 +62,7 @@
     "when",          WHEN;
     "Top",           TOP;
     "Bot",           BOTTOM;
-    "card",          CARD;
+    "card(",          CARD;
     "mod",           MOD;
     "sqrt(",         SQRT;
     "int(",          TOINT;

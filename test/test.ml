@@ -155,6 +155,13 @@ run_test_tt_main (
   "1.0 == 1 should raise error">::(test_sat_raise "1:3" "t(1.0==1)");
   "1 == 1 should be true">::(sat_expands_to "t(1==1)" "t(true)");
 ];
+"unary operators">:::[
+  "abs()">::(sat_expands_to "p(abs(-1))" "p(1)");
+  "card()">::(sat_expands_to "p(card([1..4]))" "p(4)");
+  "empty()">::(sat_expands_to "p(empty([]))" "p(true)");
+  "empty()">::(sat_expands_to "p(empty([1]))" "p(false)");
+];
+
 "exact, atleast and atmost">:::[
   "exact(5,[]) should be false">::(sat_expands_to "exact(5,[])" "Bot");
   "exact(0,[]) should be true">::(sat_expands_to "exact(0,[])" "Top");
