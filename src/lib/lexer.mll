@@ -51,9 +51,12 @@
     "in",            IN;
     "subset(",       SUBSET;
     "empty(",        EMPTY;
-    "union(",        UNION;
-    "inter(",        INTER;
-    "diff(",         DIFF;
+    "union(",        UNION_PR;
+    "inter(",        INTER_PR;
+    "diff(",         DIFF_PR;
+    "union",        UNION;
+    "inter",        INTER;
+    "diff",         DIFF;
     "exact(",        EXACT;
     "atmost(",       ATMOST;
     "atleast(",      ATLEAST;

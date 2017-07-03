@@ -26,7 +26,9 @@
 %token AND OR XOR IMPLIES EQUIV NOT
 %token EQUAL NOTEQUAL LE LT GE GT
 %token IN WHEN
-%token UNION INTER DIFF SUBSET RANGE POWERSET
+%token RANGE POWERSET
+%token UNION_PR INTER_PR DIFF_PR SUBSET_PR (* PR = prefixed version *)
+%token UNION INTER DIFF SUBSET (* infix versions *)
 %token EMPTY CARD
 %token LBRACK RBRACK
 %token LPAREN RPAREN
@@ -62,6 +64,10 @@
 %left newlineBefore
 %nonassoc affect_before_exprsmt
 %nonassoc low_precedence (* Lesser priority on precedence *)
+%left INTER
+%left UNION
+%left SUBSET
+%left DIFF
 %right EQUIV IMPLIES
 %left OR
 %left AND
@@ -217,7 +223,8 @@ expr:
   | b=equality(expr)
   | b=order(expr) {b}
   | EMPTY  (*LPAREN*) s=expr RPAREN {Loc (Empty s,($startpos,$endpos))}
-  | SUBSET (*LPAREN*) s1=expr   COMMA s2=expr   RPAREN {Loc (Subset (s1,s2),($startpos,$endpos))}
+  | s1=expr SUBSET s2=expr {Loc (Subset (s1,s2),($startpos,$endpos))}
+  | SUBSET_PR (*LPAREN*) s1=expr   COMMA s2=expr   RPAREN {Loc (Subset (s1,s2),($startpos,$endpos))}
   | p=prop {p}
   | x=expr   IN s=expr {Loc (In (x,s),($startpos,$endpos))}
   | x=set_decl_range(expr)
@@ -246,11 +253,14 @@ expr:
 %inline set_decl_range(T): LBRACK s1=T RANGE s2=T RBRACK {Loc (Range (s1,s2),($startpos,$endpos))}
 %inline set_decl_explicit(T): LBRACK l=comma_list(T) RBRACK {Loc (Set_decl l,($startpos,$endpos))}
 %inline set_empty: LBRACK RBRACK {Loc (Set_decl [],($startpos,$endpos))}
-  
+
 %inline set_operation(T):
-  | UNION (*LPAREN*) s1=T COMMA s2=T RPAREN {Loc (Union (s1,s2),($startpos,$endpos))}
-  | INTER (*LPAREN*) s1=T COMMA s2=T RPAREN {Loc (Inter (s1,s2),($startpos,$endpos))}
-  | DIFF  (*LPAREN*) s1=T COMMA s2=T RPAREN {Loc (Diff (s1,s2),($startpos,$endpos))}
+  | s1=T UNION s2=T {Loc (Union (s1,s2),($startpos,$endpos))}
+  | s1=T INTER s2=T {Loc (Inter (s1,s2),($startpos,$endpos))}
+  | s1=T DIFF s2=T {Loc (Diff (s1,s2),($startpos,$endpos))}
+  | UNION_PR (*LPAREN*) s1=T COMMA s2=T RPAREN {Loc (Union (s1,s2),($startpos,$endpos))}
+  | INTER_PR (*LPAREN*) s1=T COMMA s2=T RPAREN {Loc (Inter (s1,s2),($startpos,$endpos))}
+  | DIFF_PR  (*LPAREN*) s1=T COMMA s2=T RPAREN {Loc (Diff (s1,s2),($startpos,$endpos))}
   | POWERSET (*LPAREN*) s=T RPAREN {Loc (Powerset s,($startpos,$endpos))}
 
 %inline formula(F):
