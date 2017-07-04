@@ -130,8 +130,8 @@ let rec latex_of_ast ~full ast =
   | Forall (v,f) -> "\\forall "^(latex_of_ast v) ^". "^ (latex_of_ast f)
   | For (var,set,above_f) ->
     let op, prop, f = match Eval.ast_whithout_loc above_f with
-    | Forall (prop,f) -> ("\\exists", prop, f)
-    | Exists (prop,f) -> ("\\forall", prop, f)
+    | Forall (prop,f) -> ("\\exists ", prop, f)
+    | Exists (prop,f) -> ("\\forall ", prop, f)
     | f -> failwith ("[shoudlnt happen] only exists and forall allowed with \
     'for' statement. This is an '"^Pprint.string_of_ast_type f^"': "^Pprint.string_of_ast above_f)
     in
