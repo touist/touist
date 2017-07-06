@@ -2921,6 +2921,21 @@ touist_simple: TOP WHEN
 ## The known suffix of the stack is as follows:
 ## formula_simple 
 ##
+touist_simple: NEWLINE VAR WHEN 
+##
+## Ends in an error in state: 286.
+##
+## formula_simple -> formula_simple . AND formula_simple [ XOR VARTUPLE VAR TUPLE TOP TERM RPAREN OR NOT NEWLINE LPAREN LET IMPLIES IF EXACT EQUIV EOF END ELSE DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ]
+## formula_simple -> formula_simple . OR formula_simple [ XOR VARTUPLE VAR TUPLE TOP TERM RPAREN OR NOT NEWLINE LPAREN LET IMPLIES IF EXACT EQUIV EOF END ELSE DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ]
+## formula_simple -> formula_simple . XOR formula_simple [ XOR VARTUPLE VAR TUPLE TOP TERM RPAREN OR NOT NEWLINE LPAREN LET IMPLIES IF EXACT EQUIV EOF END ELSE DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ]
+## formula_simple -> formula_simple . IMPLIES formula_simple [ XOR VARTUPLE VAR TUPLE TOP TERM RPAREN OR NOT NEWLINE LPAREN LET IMPLIES IF EXACT EQUIV EOF END ELSE DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ]
+## formula_simple -> formula_simple . EQUIV formula_simple [ XOR VARTUPLE VAR TUPLE TOP TERM RPAREN OR NOT NEWLINE LPAREN LET IMPLIES IF EXACT EQUIV EOF END ELSE DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ]
+## formula_simple -> NEWLINE formula_simple . [ XOR VARTUPLE VAR TUPLE TOP TERM RPAREN OR NOT NEWLINE LPAREN LET IMPLIES IF EXACT EQUIV EOF END ELSE DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ]
+## formula_simple -> formula_simple . NEWLINE [ XOR VARTUPLE VAR TUPLE TOP TERM RPAREN OR NOT NEWLINE LPAREN LET IMPLIES IF EXACT EQUIV EOF END ELSE DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ]
+##
+## The known suffix of the stack is as follows:
+## NEWLINE formula_simple 
+##
 
 Ill-formed formula. At this point, either:
 - continue the formula with an operator (and,or,xor,=>,<=>),
@@ -2950,6 +2965,21 @@ touist_smt: TOP RPAREN
 ## may provide an INCOMPLETE view of the future (what was expected next).
 ## In state 372, spurious reduction of production formula_smt -> expr_smt 
 ##
+touist_smt: NEWLINE LPAREN BOTTOM NEWLINE RPAREN WHEN 
+##
+## Ends in an error in state: 393.
+##
+## formula_smt -> formula_smt . AND formula_smt [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOT NEWLINE LPAREN LET INT IMPLIES IF FLOAT EXACT EQUIV EOF END ELSE DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ]
+## formula_smt -> formula_smt . OR formula_smt [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOT NEWLINE LPAREN LET INT IMPLIES IF FLOAT EXACT EQUIV EOF END ELSE DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ]
+## formula_smt -> formula_smt . XOR formula_smt [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOT NEWLINE LPAREN LET INT IMPLIES IF FLOAT EXACT EQUIV EOF END ELSE DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ]
+## formula_smt -> formula_smt . IMPLIES formula_smt [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOT NEWLINE LPAREN LET INT IMPLIES IF FLOAT EXACT EQUIV EOF END ELSE DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ]
+## formula_smt -> formula_smt . EQUIV formula_smt [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOT NEWLINE LPAREN LET INT IMPLIES IF FLOAT EXACT EQUIV EOF END ELSE DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ]
+## formula_smt -> NEWLINE formula_smt . [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOT NEWLINE LPAREN LET INT IMPLIES IF FLOAT EXACT EQUIV EOF END ELSE DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ]
+## formula_smt -> formula_smt . NEWLINE [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOT NEWLINE LPAREN LET INT IMPLIES IF FLOAT EXACT EQUIV EOF END ELSE DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ]
+##
+## The known suffix of the stack is as follows:
+## NEWLINE formula_smt 
+##
 
 Ill-formed SMT formula. At this point, either:
 - continue the formula with an operator (and,or,xor,=>,<=>),
@@ -2973,6 +3003,21 @@ touist_qbf: TOP WHEN
 ## The known suffix of the stack is as follows:
 ## formula_qbf 
 ##
+touist_qbf: NEWLINE VAR WHEN 
+##
+## Ends in an error in state: 207.
+##
+## formula_qbf -> formula_qbf . AND formula_qbf [ XOR VARTUPLE VAR TUPLE TOP TERM RPAREN OR NOT NEWLINE LPAREN LET IMPLIES IF FORALL EXISTS EXACT EQUIV EOF END ELSE DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ]
+## formula_qbf -> formula_qbf . OR formula_qbf [ XOR VARTUPLE VAR TUPLE TOP TERM RPAREN OR NOT NEWLINE LPAREN LET IMPLIES IF FORALL EXISTS EXACT EQUIV EOF END ELSE DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ]
+## formula_qbf -> formula_qbf . XOR formula_qbf [ XOR VARTUPLE VAR TUPLE TOP TERM RPAREN OR NOT NEWLINE LPAREN LET IMPLIES IF FORALL EXISTS EXACT EQUIV EOF END ELSE DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ]
+## formula_qbf -> formula_qbf . IMPLIES formula_qbf [ XOR VARTUPLE VAR TUPLE TOP TERM RPAREN OR NOT NEWLINE LPAREN LET IMPLIES IF FORALL EXISTS EXACT EQUIV EOF END ELSE DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ]
+## formula_qbf -> formula_qbf . EQUIV formula_qbf [ XOR VARTUPLE VAR TUPLE TOP TERM RPAREN OR NOT NEWLINE LPAREN LET IMPLIES IF FORALL EXISTS EXACT EQUIV EOF END ELSE DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ]
+## formula_qbf -> NEWLINE formula_qbf . [ XOR VARTUPLE VAR TUPLE TOP TERM RPAREN OR NOT NEWLINE LPAREN LET IMPLIES IF FORALL EXISTS EXACT EQUIV EOF END ELSE DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ]
+## formula_qbf -> formula_qbf . NEWLINE [ XOR VARTUPLE VAR TUPLE TOP TERM RPAREN OR NOT NEWLINE LPAREN LET IMPLIES IF FORALL EXISTS EXACT EQUIV EOF END ELSE DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ]
+##
+## The known suffix of the stack is as follows:
+## NEWLINE formula_qbf 
+##
 
 Ill-formed QBF formula. At this point, either:
 - continue the formula with an operator (and,or,xor,=>,<=>),
@@ -2980,6 +3025,42 @@ Ill-formed QBF formula. At this point, either:
 - or affect a global variable.
 Instead, the following statement were read:
     $0
+
+touist_qbf: NEWLINE XOR 
+##
+## Ends in an error in state: 119.
+##
+## formula_qbf -> NEWLINE . formula_qbf [ XOR VARTUPLE VAR TUPLE TOP TERM RPAREN OR NOT NEWLINE LPAREN LET IMPLIES IF FORALL EXISTS EXACT EQUIV EOF END ELSE DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ]
+##
+## The known suffix of the stack is as follows:
+## NEWLINE 
+##
+
+A QBF formula is expected after '\\'. $0 does not seem to be a formula.
+
+touist_simple: NEWLINE XOR 
+##
+## Ends in an error in state: 223.
+##
+## formula_simple -> NEWLINE . formula_simple [ XOR VARTUPLE VAR TUPLE TOP TERM RPAREN OR NOT NEWLINE LPAREN LET IMPLIES IF EXACT EQUIV EOF END ELSE DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ]
+##
+## The known suffix of the stack is as follows:
+## NEWLINE 
+##
+
+A SAT formula is expected after '\\'. $0 does not seem to be a formula.
+
+touist_smt: NEWLINE XOR 
+##
+## Ends in an error in state: 331.
+##
+## formula_smt -> NEWLINE . formula_smt [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOT NEWLINE LPAREN LET INT IMPLIES IF FLOAT EXACT EQUIV EOF END ELSE DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ]
+##
+## The known suffix of the stack is as follows:
+## NEWLINE 
+##
+
+A SMT formula is expected after '\\'. $0 does not seem to be a formula.
 
 touist_simple: VAR DATA AND 
 ##
@@ -4441,6 +4522,71 @@ touist_qbf: EXISTS XOR
 
 Ill-formed existential quantifier. After $1, a comma-separated list of propositions or variables is expected. Instead, the following statement were read:
     $0
+
+touist_qbf: FORALL VAR FOR XOR 
+##
+## Ends in an error in state: 140.
+##
+## option(for_statement) -> FOR . var IN expr [ COLON ]
+##
+## The known suffix of the stack is as follows:
+## FOR 
+##
+
+Ill-formed 'for' statement. At this point, a variable is expected.
+
+touist_qbf: FORALL VAR FOR VAR XOR 
+##
+## Ends in an error in state: 141.
+##
+## option(for_statement) -> FOR var . IN expr [ COLON ]
+##
+## The known suffix of the stack is as follows:
+## FOR var 
+##
+
+Ill-formed 'for' statement. After the variable $1, 'in' is expected.
+
+touist_qbf: FORALL VAR FOR VAR IN XOR 
+##
+## Ends in an error in state: 142.
+##
+## option(for_statement) -> FOR var IN . expr [ COLON ]
+##
+## The known suffix of the stack is as follows:
+## FOR var IN 
+##
+
+Ill-formed 'for' statement. After 'in', a set is expected.
+
+touist_qbf: FORALL VAR FOR VAR IN VAR WHEN 
+##
+## Ends in an error in state: 143.
+##
+## expr -> expr . ADD expr [ XOR SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COLON AND ADD ]
+## expr -> expr . SUB expr [ XOR SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COLON AND ADD ]
+## expr -> expr . MUL expr [ XOR SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COLON AND ADD ]
+## expr -> expr . DIV expr [ XOR SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COLON AND ADD ]
+## expr -> expr . MOD expr [ XOR SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COLON AND ADD ]
+## expr -> expr . AND expr [ XOR SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COLON AND ADD ]
+## expr -> expr . OR expr [ XOR SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COLON AND ADD ]
+## expr -> expr . XOR expr [ XOR SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COLON AND ADD ]
+## expr -> expr . IMPLIES expr [ XOR SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COLON AND ADD ]
+## expr -> expr . EQUIV expr [ XOR SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COLON AND ADD ]
+## expr -> expr . EQUAL expr [ XOR SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COLON AND ADD ]
+## expr -> expr . NOTEQUAL expr [ XOR SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COLON AND ADD ]
+## expr -> expr . LT expr [ XOR SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COLON AND ADD ]
+## expr -> expr . LE expr [ XOR SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COLON AND ADD ]
+## expr -> expr . GT expr [ XOR SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COLON AND ADD ]
+## expr -> expr . GE expr [ XOR SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COLON AND ADD ]
+## expr -> expr . IN expr [ XOR SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COLON AND ADD ]
+## option(for_statement) -> FOR var IN expr . [ COLON ]
+##
+## The known suffix of the stack is as follows:
+## FOR var IN expr 
+##
+
+Ill-formed 'for' statement. At this point, a ':' is expected.
 
 touist_qbf: FORALL TERM COMMA XOR 
 ##
