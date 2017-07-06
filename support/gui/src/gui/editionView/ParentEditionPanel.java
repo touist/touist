@@ -65,6 +65,8 @@ public class ParentEditionPanel extends AbstractComponentPanel {
 	private static final int ERROR_MESSAGE_MAX_LENGTH = 76;
     private String jLabelErrorMessageText;
     private Thread testThread;
+    protected String onDiskPath = null;
+    protected String onDiskFilename = null;
 
     /**
      * Creates new form FormulasPanel
@@ -314,11 +316,11 @@ public class ParentEditionPanel extends AbstractComponentPanel {
         switch(((MainFrame)(getRootPane().getParent())).state) {
             case EDITION :
                 setState(State.EDITION);
-                exportHandler();
+                exportHandler(true);
                 break;
             case EDITION_ERROR :
                 setState(State.EDITION_ERROR);
-                exportHandler();
+                exportHandler(true);
                 break;
             case NO_RESULT :
                 // impossible
@@ -394,23 +396,33 @@ public class ParentEditionPanel extends AbstractComponentPanel {
             //Réinitialisation des sets et des formules
             String text = getFrame().getTextInEditor().get();
             editor.setText(text);
+            this.onDiskPath = d.getDirectory();
+            this.onDiskFilename = d.getFile();
         }   
     }
 
-    public void exportHandler() {
+    public void exportHandler(boolean saveAs) {
         getFrame().getTextInEditor().set(editor.getText());
 
-    	FileDialog d = new FileDialog(getFrame()); 
-    	d.setDirectory(getFrame().getDefaultDirectoryPath());
-    	d.setMode(FileDialog.SAVE);
-    	d.setVisible(true);
-
-    	String path;
+        if(saveAs || onDiskPath == null) {
+        	FileDialog d = new FileDialog(getFrame());
+        	
+        	if(onDiskPath == null) {
+        		d.setDirectory(getFrame().getDefaultDirectoryPath());
+        	} else {
+        		d.setDirectory(onDiskPath);
+        	}
+        	
+        	d.setMode(FileDialog.SAVE);
+        	d.setVisible(true);
+        	if(d.getFile() != null){
+        		onDiskPath = d.getDirectory();
+           	 	onDiskFilename = d.getFile();
+           }
+        }
+    	
         try {
-            if(d.getFile() != null){
-            	 path = d.getDirectory() + d.getFile();
-                getFrame().getTextInEditor().saveToFile(path);
-            }
+        	getFrame().getTextInEditor().saveToFile(onDiskPath + onDiskFilename);
         } catch (IOException e) {
             String warningWindowTitle = getFrame().getLang().getWord(Lang.EDITION_EXPORT_FAILURE_TITLE);
             String warningWindowText = getFrame().getLang().getWord(Lang.EDITION_EXPORT_FAILURE_TEXT);
