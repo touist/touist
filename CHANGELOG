@@ -1,3 +1,5 @@
+v3.2.2
+  - fixed `card()` that was expecting two closing parenthesis instead of one
 v3.2.1
   - added the '--latex-full' option. It does the same as '--latex' except that
     multi-line spanning parenthesis are translated with 'pmatrix' and a header
