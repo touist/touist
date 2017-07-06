@@ -687,10 +687,11 @@ is:
 
 ~Center
 |-------------------------|------------------|
-| Math notation           | &touist; syntax    |
+| Math notation           | &touist; syntax  |
 |:-----------------------:|------------------|
-|$\leqslant_{x\in P}^k x$ |``atmost($k,$P)`` | |$\geqslant_{x\in P}^k x$
-|``atleast($k,$P)``| |${<>}_{x\in P}^k x$      |``exact($k,$P)``  |
+|$\leqslant_{x\in P}^k x$ |``atmost($k,$P)`` |
+|$\geqslant_{x\in P}^k x$ |``atleast($k,$P)``|
+|${<>}_{x\in P}^k x$      |``exact($k,$P)``  |
 |-------------------------|------------------|
 ~
 
