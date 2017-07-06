@@ -262,8 +262,14 @@ expr:
   | NEWLINE f=F { NewlineBefore f } %prec newlineBefore
   | f=F NEWLINE { NewlineAfter f }
 
-let_affect(T,F): LET var=var AFFECT content=T COLON form=F 
-  {Loc (Let (var,content,form),($startpos,$endpos))} %prec low_precedence
+let_affect(T,F): LET vars=comma_list(var) AFFECT contents=comma_list(T) COLON form=F
+    {try List.fold_right2 (fun var content acc ->
+      Loc (Let (var,content,acc),($startpos,$endpos))) vars contents form
+    with Invalid_argument _ -> let open Msgs in
+      single_msg (Error,Parse,
+        ("'let' statement does not have the same number of variables and values.\n"),
+        Some ($startpos,$endpos))
+    } %prec low_precedence
 
 formula_simple:
   | f=var {f}

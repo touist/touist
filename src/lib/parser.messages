@@ -182,7 +182,7 @@ touist_simple: EXACT VAR COMMA VAR WHEN
 ##
 touist_qbf: EXACT VAR COMMA VAR WHEN 
 ##
-## Ends in an error in state: 150.
+## Ends in an error in state: 153.
 ##
 ## expr -> expr . ADD expr [ XOR SUB RPAREN OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
 ## expr -> expr . SUB expr [ XOR SUB RPAREN OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
@@ -424,7 +424,7 @@ touist_simple: EXACT VAR COMMA XOR
 ##
 touist_qbf: EXACT VAR COMMA XOR 
 ##
-## Ends in an error in state: 149.
+## Ends in an error in state: 152.
 ##
 ## formula_qbf -> EXACT expr COMMA . expr RPAREN [ XOR VARTUPLE VAR TUPLE TOP TERM RPAREN OR NOT NEWLINE LPAREN LET IMPLIES IF FORALL EXISTS EXACT EQUIV EOF END ELSE DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ]
 ##
@@ -549,7 +549,7 @@ touist_simple: EXACT XOR
 ##
 touist_qbf: EXACT XOR 
 ##
-## Ends in an error in state: 147.
+## Ends in an error in state: 150.
 ##
 ## formula_qbf -> EXACT . expr COMMA expr RPAREN [ XOR VARTUPLE VAR TUPLE TOP TERM RPAREN OR NOT NEWLINE LPAREN LET IMPLIES IF FORALL EXISTS EXACT EQUIV EOF END ELSE DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ]
 ##
@@ -608,7 +608,7 @@ touist_simple: VARTUPLE IF XOR
 ##
 touist_qbf: IF XOR 
 ##
-## Ends in an error in state: 126.
+## Ends in an error in state: 129.
 ##
 ## formula_qbf -> IF . expr THEN formula_qbf ELSE formula_qbf END [ XOR VARTUPLE VAR TUPLE TOP TERM RPAREN OR NOT NEWLINE LPAREN LET IMPLIES IF FORALL EXISTS EXACT EQUIV EOF END ELSE DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ]
 ##
@@ -905,7 +905,7 @@ touist_simple: BIGOR XOR
 ##
 touist_qbf: BIGOR XOR 
 ##
-## Ends in an error in state: 153.
+## Ends in an error in state: 156.
 ##
 ## formula_qbf -> BIGOR . comma_list(var) IN comma_list(expr) option(when_cond) COLON formula_qbf END [ XOR VARTUPLE VAR TUPLE TOP TERM RPAREN OR NOT NEWLINE LPAREN LET IMPLIES IF FORALL EXISTS EXACT EQUIV EOF END ELSE DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ]
 ##
@@ -1476,7 +1476,7 @@ touist_smt: BIGAND VAR XOR
 ## This implies that, although the LR(1) items shown above provide an
 ## accurate view of the past (what has been recognized so far), they
 ## may provide an INCOMPLETE view of the future (what was expected next).
-## In state 154, spurious reduction of production comma_list(var) -> var 
+## In state 122, spurious reduction of production comma_list(var) -> var 
 ##
 touist_smt: BIGOR VAR XOR 
 ##
@@ -1491,7 +1491,7 @@ touist_smt: BIGOR VAR XOR
 ## This implies that, although the LR(1) items shown above provide an
 ## accurate view of the past (what has been recognized so far), they
 ## may provide an INCOMPLETE view of the future (what was expected next).
-## In state 154, spurious reduction of production comma_list(var) -> var 
+## In state 122, spurious reduction of production comma_list(var) -> var 
 ##
 touist_simple: BIGAND VAR XOR 
 ##
@@ -1506,7 +1506,7 @@ touist_simple: BIGAND VAR XOR
 ## This implies that, although the LR(1) items shown above provide an
 ## accurate view of the past (what has been recognized so far), they
 ## may provide an INCOMPLETE view of the future (what was expected next).
-## In state 154, spurious reduction of production comma_list(var) -> var 
+## In state 122, spurious reduction of production comma_list(var) -> var 
 ##
 touist_simple: BIGOR VAR XOR 
 ##
@@ -1521,7 +1521,7 @@ touist_simple: BIGOR VAR XOR
 ## This implies that, although the LR(1) items shown above provide an
 ## accurate view of the past (what has been recognized so far), they
 ## may provide an INCOMPLETE view of the future (what was expected next).
-## In state 154, spurious reduction of production comma_list(var) -> var 
+## In state 122, spurious reduction of production comma_list(var) -> var 
 ##
 touist_qbf: BIGOR VAR XOR 
 ##
@@ -1536,7 +1536,7 @@ touist_qbf: BIGOR VAR XOR
 ## This implies that, although the LR(1) items shown above provide an
 ## accurate view of the past (what has been recognized so far), they
 ## may provide an INCOMPLETE view of the future (what was expected next).
-## In state 154, spurious reduction of production comma_list(var) -> var 
+## In state 122, spurious reduction of production comma_list(var) -> var 
 ##
 touist_qbf: BIGAND VAR XOR 
 ##
@@ -1551,7 +1551,7 @@ touist_qbf: BIGAND VAR XOR
 ## This implies that, although the LR(1) items shown above provide an
 ## accurate view of the past (what has been recognized so far), they
 ## may provide an INCOMPLETE view of the future (what was expected next).
-## In state 154, spurious reduction of production comma_list(var) -> var 
+## In state 122, spurious reduction of production comma_list(var) -> var 
 ##
 
 Ill-formed $2. At this point, either continue the list or variables with ',' or finish it with 'in'. Instead, the following statement were read:
@@ -1791,7 +1791,7 @@ touist_simple: IF VAR THEN XOR
 ##
 touist_qbf: IF VAR THEN XOR 
 ##
-## Ends in an error in state: 128.
+## Ends in an error in state: 131.
 ##
 ## formula_qbf -> IF expr THEN . formula_qbf ELSE formula_qbf END [ XOR VARTUPLE VAR TUPLE TOP TERM RPAREN OR NOT NEWLINE LPAREN LET IMPLIES IF FORALL EXISTS EXACT EQUIV EOF END ELSE DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ]
 ##
@@ -1869,7 +1869,7 @@ touist_simple: IF VAR WHEN
 ##
 touist_qbf: IF VAR WHEN 
 ##
-## Ends in an error in state: 127.
+## Ends in an error in state: 130.
 ##
 ## expr -> expr . ADD expr [ XOR THEN SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
 ## expr -> expr . SUB expr [ XOR THEN SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV AND ADD ]
@@ -1930,10 +1930,10 @@ touist_simple: LET VAR AFFECT VAR COLON TOP WHEN
 ## formula_simple -> formula_simple . IMPLIES formula_simple [ XOR VARTUPLE VAR TUPLE TOP TERM RPAREN OR NOT NEWLINE LPAREN LET IMPLIES IF EXACT EQUIV EOF END ELSE DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ]
 ## formula_simple -> formula_simple . EQUIV formula_simple [ XOR VARTUPLE VAR TUPLE TOP TERM RPAREN OR NOT NEWLINE LPAREN LET IMPLIES IF EXACT EQUIV EOF END ELSE DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ]
 ## formula_simple -> formula_simple . NEWLINE [ XOR VARTUPLE VAR TUPLE TOP TERM RPAREN OR NOT NEWLINE LPAREN LET IMPLIES IF EXACT EQUIV EOF END ELSE DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ]
-## let_affect(expr,formula_simple) -> LET var AFFECT expr COLON formula_simple . [ XOR VARTUPLE VAR TUPLE TOP TERM RPAREN OR NOT NEWLINE LPAREN LET IMPLIES IF EXACT EQUIV EOF END ELSE DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ]
+## let_affect(expr,formula_simple) -> LET comma_list(var) AFFECT comma_list(expr) COLON formula_simple . [ XOR VARTUPLE VAR TUPLE TOP TERM RPAREN OR NOT NEWLINE LPAREN LET IMPLIES IF EXACT EQUIV EOF END ELSE DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ]
 ##
 ## The known suffix of the stack is as follows:
-## LET var AFFECT expr COLON formula_simple 
+## LET comma_list(var) AFFECT comma_list(expr) COLON formula_simple 
 ##
 touist_smt: LET VAR AFFECT VAR COLON LPAREN NOT BOTTOM RPAREN WHEN 
 ##
@@ -1945,10 +1945,10 @@ touist_smt: LET VAR AFFECT VAR COLON LPAREN NOT BOTTOM RPAREN WHEN
 ## formula_smt -> formula_smt . IMPLIES formula_smt [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOT NEWLINE LPAREN LET INT IMPLIES IF FLOAT EXACT EQUIV EOF END ELSE DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ]
 ## formula_smt -> formula_smt . EQUIV formula_smt [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOT NEWLINE LPAREN LET INT IMPLIES IF FLOAT EXACT EQUIV EOF END ELSE DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ]
 ## formula_smt -> formula_smt . NEWLINE [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOT NEWLINE LPAREN LET INT IMPLIES IF FLOAT EXACT EQUIV EOF END ELSE DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ]
-## let_affect(expr,formula_smt) -> LET var AFFECT expr COLON formula_smt . [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOT NEWLINE LPAREN LET INT IMPLIES IF FLOAT EXACT EQUIV EOF END ELSE DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ]
+## let_affect(expr,formula_smt) -> LET comma_list(var) AFFECT comma_list(expr) COLON formula_smt . [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOT NEWLINE LPAREN LET INT IMPLIES IF FLOAT EXACT EQUIV EOF END ELSE DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ]
 ##
 ## The known suffix of the stack is as follows:
-## LET var AFFECT expr COLON formula_smt 
+## LET comma_list(var) AFFECT comma_list(expr) COLON formula_smt 
 ##
 touist_qbf: LET VAR AFFECT VAR COLON VAR WHEN 
 ##
@@ -1960,10 +1960,10 @@ touist_qbf: LET VAR AFFECT VAR COLON VAR WHEN
 ## formula_qbf -> formula_qbf . IMPLIES formula_qbf [ XOR VARTUPLE VAR TUPLE TOP TERM RPAREN OR NOT NEWLINE LPAREN LET IMPLIES IF FORALL EXISTS EXACT EQUIV EOF END ELSE DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ]
 ## formula_qbf -> formula_qbf . EQUIV formula_qbf [ XOR VARTUPLE VAR TUPLE TOP TERM RPAREN OR NOT NEWLINE LPAREN LET IMPLIES IF FORALL EXISTS EXACT EQUIV EOF END ELSE DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ]
 ## formula_qbf -> formula_qbf . NEWLINE [ XOR VARTUPLE VAR TUPLE TOP TERM RPAREN OR NOT NEWLINE LPAREN LET IMPLIES IF FORALL EXISTS EXACT EQUIV EOF END ELSE DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ]
-## let_affect(expr,formula_qbf) -> LET var AFFECT expr COLON formula_qbf . [ XOR VARTUPLE VAR TUPLE TOP TERM RPAREN OR NOT NEWLINE LPAREN LET IMPLIES IF FORALL EXISTS EXACT EQUIV EOF END ELSE DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ]
+## let_affect(expr,formula_qbf) -> LET comma_list(var) AFFECT comma_list(expr) COLON formula_qbf . [ XOR VARTUPLE VAR TUPLE TOP TERM RPAREN OR NOT NEWLINE LPAREN LET IMPLIES IF FORALL EXISTS EXACT EQUIV EOF END ELSE DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ]
 ##
 ## The known suffix of the stack is as follows:
-## LET var AFFECT expr COLON formula_qbf 
+## LET comma_list(var) AFFECT comma_list(expr) COLON formula_qbf 
 ##
 
 Ill-formed local variable block. At this point, either finish the formula by starting a new one or continue it with and,or,xor,=>,<=>. Instead, the following statement were read:
@@ -1973,28 +1973,28 @@ touist_smt: LET VAR AFFECT VAR COLON XOR
 ##
 ## Ends in an error in state: 337.
 ##
-## let_affect(expr,formula_smt) -> LET var AFFECT expr COLON . formula_smt [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOT NEWLINE LPAREN LET INT IMPLIES IF FLOAT EXACT EQUIV EOF END ELSE DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ]
+## let_affect(expr,formula_smt) -> LET comma_list(var) AFFECT comma_list(expr) COLON . formula_smt [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOT NEWLINE LPAREN LET INT IMPLIES IF FLOAT EXACT EQUIV EOF END ELSE DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ]
 ##
 ## The known suffix of the stack is as follows:
-## LET var AFFECT expr COLON 
+## LET comma_list(var) AFFECT comma_list(expr) COLON 
 ##
 touist_simple: LET VAR AFFECT VAR COLON XOR 
 ##
 ## Ends in an error in state: 229.
 ##
-## let_affect(expr,formula_simple) -> LET var AFFECT expr COLON . formula_simple [ XOR VARTUPLE VAR TUPLE TOP TERM RPAREN OR NOT NEWLINE LPAREN LET IMPLIES IF EXACT EQUIV EOF END ELSE DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ]
+## let_affect(expr,formula_simple) -> LET comma_list(var) AFFECT comma_list(expr) COLON . formula_simple [ XOR VARTUPLE VAR TUPLE TOP TERM RPAREN OR NOT NEWLINE LPAREN LET IMPLIES IF EXACT EQUIV EOF END ELSE DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ]
 ##
 ## The known suffix of the stack is as follows:
-## LET var AFFECT expr COLON 
+## LET comma_list(var) AFFECT comma_list(expr) COLON 
 ##
 touist_qbf: LET VAR AFFECT VAR COLON XOR 
 ##
-## Ends in an error in state: 125.
+## Ends in an error in state: 128.
 ##
-## let_affect(expr,formula_qbf) -> LET var AFFECT expr COLON . formula_qbf [ XOR VARTUPLE VAR TUPLE TOP TERM RPAREN OR NOT NEWLINE LPAREN LET IMPLIES IF FORALL EXISTS EXACT EQUIV EOF END ELSE DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ]
+## let_affect(expr,formula_qbf) -> LET comma_list(var) AFFECT comma_list(expr) COLON . formula_qbf [ XOR VARTUPLE VAR TUPLE TOP TERM RPAREN OR NOT NEWLINE LPAREN LET IMPLIES IF FORALL EXISTS EXACT EQUIV EOF END ELSE DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ]
 ##
 ## The known suffix of the stack is as follows:
-## LET var AFFECT expr COLON 
+## LET comma_list(var) AFFECT comma_list(expr) COLON 
 ##
 
 Ill-formed local variable declaration. After $1, a formula is expected. Instead, the following statement were read:
@@ -2004,79 +2004,46 @@ touist_smt: LET VAR AFFECT VAR WHEN
 ##
 ## Ends in an error in state: 336.
 ##
-## expr -> expr . ADD expr [ XOR SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COLON AND ADD ]
-## expr -> expr . SUB expr [ XOR SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COLON AND ADD ]
-## expr -> expr . MUL expr [ XOR SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COLON AND ADD ]
-## expr -> expr . DIV expr [ XOR SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COLON AND ADD ]
-## expr -> expr . MOD expr [ XOR SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COLON AND ADD ]
-## expr -> expr . AND expr [ XOR SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COLON AND ADD ]
-## expr -> expr . OR expr [ XOR SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COLON AND ADD ]
-## expr -> expr . XOR expr [ XOR SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COLON AND ADD ]
-## expr -> expr . IMPLIES expr [ XOR SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COLON AND ADD ]
-## expr -> expr . EQUIV expr [ XOR SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COLON AND ADD ]
-## expr -> expr . EQUAL expr [ XOR SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COLON AND ADD ]
-## expr -> expr . NOTEQUAL expr [ XOR SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COLON AND ADD ]
-## expr -> expr . LT expr [ XOR SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COLON AND ADD ]
-## expr -> expr . LE expr [ XOR SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COLON AND ADD ]
-## expr -> expr . GT expr [ XOR SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COLON AND ADD ]
-## expr -> expr . GE expr [ XOR SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COLON AND ADD ]
-## expr -> expr . IN expr [ XOR SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COLON AND ADD ]
-## let_affect(expr,formula_smt) -> LET var AFFECT expr . COLON formula_smt [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOT NEWLINE LPAREN LET INT IMPLIES IF FLOAT EXACT EQUIV EOF END ELSE DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ]
+## let_affect(expr,formula_smt) -> LET comma_list(var) AFFECT comma_list(expr) . COLON formula_smt [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOT NEWLINE LPAREN LET INT IMPLIES IF FLOAT EXACT EQUIV EOF END ELSE DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ]
 ##
 ## The known suffix of the stack is as follows:
-## LET var AFFECT expr 
+## LET comma_list(var) AFFECT comma_list(expr) 
+##
+## WARNING: This example involves spurious reductions.
+## This implies that, although the LR(1) items shown above provide an
+## accurate view of the past (what has been recognized so far), they
+## may provide an INCOMPLETE view of the future (what was expected next).
+## In state 86, spurious reduction of production comma_list(expr) -> expr 
 ##
 touist_simple: LET VAR AFFECT VAR WHEN 
 ##
 ## Ends in an error in state: 228.
 ##
-## expr -> expr . ADD expr [ XOR SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COLON AND ADD ]
-## expr -> expr . SUB expr [ XOR SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COLON AND ADD ]
-## expr -> expr . MUL expr [ XOR SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COLON AND ADD ]
-## expr -> expr . DIV expr [ XOR SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COLON AND ADD ]
-## expr -> expr . MOD expr [ XOR SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COLON AND ADD ]
-## expr -> expr . AND expr [ XOR SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COLON AND ADD ]
-## expr -> expr . OR expr [ XOR SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COLON AND ADD ]
-## expr -> expr . XOR expr [ XOR SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COLON AND ADD ]
-## expr -> expr . IMPLIES expr [ XOR SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COLON AND ADD ]
-## expr -> expr . EQUIV expr [ XOR SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COLON AND ADD ]
-## expr -> expr . EQUAL expr [ XOR SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COLON AND ADD ]
-## expr -> expr . NOTEQUAL expr [ XOR SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COLON AND ADD ]
-## expr -> expr . LT expr [ XOR SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COLON AND ADD ]
-## expr -> expr . LE expr [ XOR SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COLON AND ADD ]
-## expr -> expr . GT expr [ XOR SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COLON AND ADD ]
-## expr -> expr . GE expr [ XOR SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COLON AND ADD ]
-## expr -> expr . IN expr [ XOR SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COLON AND ADD ]
-## let_affect(expr,formula_simple) -> LET var AFFECT expr . COLON formula_simple [ XOR VARTUPLE VAR TUPLE TOP TERM RPAREN OR NOT NEWLINE LPAREN LET IMPLIES IF EXACT EQUIV EOF END ELSE DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ]
+## let_affect(expr,formula_simple) -> LET comma_list(var) AFFECT comma_list(expr) . COLON formula_simple [ XOR VARTUPLE VAR TUPLE TOP TERM RPAREN OR NOT NEWLINE LPAREN LET IMPLIES IF EXACT EQUIV EOF END ELSE DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ]
 ##
 ## The known suffix of the stack is as follows:
-## LET var AFFECT expr 
+## LET comma_list(var) AFFECT comma_list(expr) 
+##
+## WARNING: This example involves spurious reductions.
+## This implies that, although the LR(1) items shown above provide an
+## accurate view of the past (what has been recognized so far), they
+## may provide an INCOMPLETE view of the future (what was expected next).
+## In state 86, spurious reduction of production comma_list(expr) -> expr 
 ##
 touist_qbf: LET VAR AFFECT VAR WHEN 
 ##
-## Ends in an error in state: 124.
+## Ends in an error in state: 127.
 ##
-## expr -> expr . ADD expr [ XOR SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COLON AND ADD ]
-## expr -> expr . SUB expr [ XOR SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COLON AND ADD ]
-## expr -> expr . MUL expr [ XOR SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COLON AND ADD ]
-## expr -> expr . DIV expr [ XOR SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COLON AND ADD ]
-## expr -> expr . MOD expr [ XOR SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COLON AND ADD ]
-## expr -> expr . AND expr [ XOR SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COLON AND ADD ]
-## expr -> expr . OR expr [ XOR SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COLON AND ADD ]
-## expr -> expr . XOR expr [ XOR SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COLON AND ADD ]
-## expr -> expr . IMPLIES expr [ XOR SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COLON AND ADD ]
-## expr -> expr . EQUIV expr [ XOR SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COLON AND ADD ]
-## expr -> expr . EQUAL expr [ XOR SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COLON AND ADD ]
-## expr -> expr . NOTEQUAL expr [ XOR SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COLON AND ADD ]
-## expr -> expr . LT expr [ XOR SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COLON AND ADD ]
-## expr -> expr . LE expr [ XOR SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COLON AND ADD ]
-## expr -> expr . GT expr [ XOR SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COLON AND ADD ]
-## expr -> expr . GE expr [ XOR SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COLON AND ADD ]
-## expr -> expr . IN expr [ XOR SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COLON AND ADD ]
-## let_affect(expr,formula_qbf) -> LET var AFFECT expr . COLON formula_qbf [ XOR VARTUPLE VAR TUPLE TOP TERM RPAREN OR NOT NEWLINE LPAREN LET IMPLIES IF FORALL EXISTS EXACT EQUIV EOF END ELSE DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ]
+## let_affect(expr,formula_qbf) -> LET comma_list(var) AFFECT comma_list(expr) . COLON formula_qbf [ XOR VARTUPLE VAR TUPLE TOP TERM RPAREN OR NOT NEWLINE LPAREN LET IMPLIES IF FORALL EXISTS EXACT EQUIV EOF END ELSE DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ]
 ##
 ## The known suffix of the stack is as follows:
-## LET var AFFECT expr 
+## LET comma_list(var) AFFECT comma_list(expr) 
+##
+## WARNING: This example involves spurious reductions.
+## This implies that, although the LR(1) items shown above provide an
+## accurate view of the past (what has been recognized so far), they
+## may provide an INCOMPLETE view of the future (what was expected next).
+## In state 86, spurious reduction of production comma_list(expr) -> expr 
 ##
 
 Ill-formed local variable declaration. At this point, either finish the expression with ':' or continue it with an operator (>,<,!=,==,and,or...). Instead, the following statement were read:
@@ -2086,28 +2053,28 @@ touist_smt: LET VAR AFFECT XOR
 ##
 ## Ends in an error in state: 335.
 ##
-## let_affect(expr,formula_smt) -> LET var AFFECT . expr COLON formula_smt [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOT NEWLINE LPAREN LET INT IMPLIES IF FLOAT EXACT EQUIV EOF END ELSE DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ]
+## let_affect(expr,formula_smt) -> LET comma_list(var) AFFECT . comma_list(expr) COLON formula_smt [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOT NEWLINE LPAREN LET INT IMPLIES IF FLOAT EXACT EQUIV EOF END ELSE DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ]
 ##
 ## The known suffix of the stack is as follows:
-## LET var AFFECT 
+## LET comma_list(var) AFFECT 
 ##
 touist_simple: LET VAR AFFECT XOR 
 ##
 ## Ends in an error in state: 227.
 ##
-## let_affect(expr,formula_simple) -> LET var AFFECT . expr COLON formula_simple [ XOR VARTUPLE VAR TUPLE TOP TERM RPAREN OR NOT NEWLINE LPAREN LET IMPLIES IF EXACT EQUIV EOF END ELSE DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ]
+## let_affect(expr,formula_simple) -> LET comma_list(var) AFFECT . comma_list(expr) COLON formula_simple [ XOR VARTUPLE VAR TUPLE TOP TERM RPAREN OR NOT NEWLINE LPAREN LET IMPLIES IF EXACT EQUIV EOF END ELSE DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ]
 ##
 ## The known suffix of the stack is as follows:
-## LET var AFFECT 
+## LET comma_list(var) AFFECT 
 ##
 touist_qbf: LET VAR AFFECT XOR 
 ##
-## Ends in an error in state: 123.
+## Ends in an error in state: 126.
 ##
-## let_affect(expr,formula_qbf) -> LET var AFFECT . expr COLON formula_qbf [ XOR VARTUPLE VAR TUPLE TOP TERM RPAREN OR NOT NEWLINE LPAREN LET IMPLIES IF FORALL EXISTS EXACT EQUIV EOF END ELSE DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ]
+## let_affect(expr,formula_qbf) -> LET comma_list(var) AFFECT . comma_list(expr) COLON formula_qbf [ XOR VARTUPLE VAR TUPLE TOP TERM RPAREN OR NOT NEWLINE LPAREN LET IMPLIES IF FORALL EXISTS EXACT EQUIV EOF END ELSE DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ]
 ##
 ## The known suffix of the stack is as follows:
-## LET var AFFECT 
+## LET comma_list(var) AFFECT 
 ##
 
 Ill-formed local variable declaration. At this point, an expression is expected. Instead, the following statement were read:
@@ -2117,28 +2084,46 @@ touist_smt: LET VAR XOR
 ##
 ## Ends in an error in state: 334.
 ##
-## let_affect(expr,formula_smt) -> LET var . AFFECT expr COLON formula_smt [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOT NEWLINE LPAREN LET INT IMPLIES IF FLOAT EXACT EQUIV EOF END ELSE DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ]
+## let_affect(expr,formula_smt) -> LET comma_list(var) . AFFECT comma_list(expr) COLON formula_smt [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOT NEWLINE LPAREN LET INT IMPLIES IF FLOAT EXACT EQUIV EOF END ELSE DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ]
 ##
 ## The known suffix of the stack is as follows:
-## LET var 
+## LET comma_list(var) 
+##
+## WARNING: This example involves spurious reductions.
+## This implies that, although the LR(1) items shown above provide an
+## accurate view of the past (what has been recognized so far), they
+## may provide an INCOMPLETE view of the future (what was expected next).
+## In state 122, spurious reduction of production comma_list(var) -> var 
 ##
 touist_simple: LET VAR XOR 
 ##
 ## Ends in an error in state: 226.
 ##
-## let_affect(expr,formula_simple) -> LET var . AFFECT expr COLON formula_simple [ XOR VARTUPLE VAR TUPLE TOP TERM RPAREN OR NOT NEWLINE LPAREN LET IMPLIES IF EXACT EQUIV EOF END ELSE DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ]
+## let_affect(expr,formula_simple) -> LET comma_list(var) . AFFECT comma_list(expr) COLON formula_simple [ XOR VARTUPLE VAR TUPLE TOP TERM RPAREN OR NOT NEWLINE LPAREN LET IMPLIES IF EXACT EQUIV EOF END ELSE DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ]
 ##
 ## The known suffix of the stack is as follows:
-## LET var 
+## LET comma_list(var) 
+##
+## WARNING: This example involves spurious reductions.
+## This implies that, although the LR(1) items shown above provide an
+## accurate view of the past (what has been recognized so far), they
+## may provide an INCOMPLETE view of the future (what was expected next).
+## In state 122, spurious reduction of production comma_list(var) -> var 
 ##
 touist_qbf: LET VAR XOR 
 ##
-## Ends in an error in state: 122.
+## Ends in an error in state: 125.
 ##
-## let_affect(expr,formula_qbf) -> LET var . AFFECT expr COLON formula_qbf [ XOR VARTUPLE VAR TUPLE TOP TERM RPAREN OR NOT NEWLINE LPAREN LET IMPLIES IF FORALL EXISTS EXACT EQUIV EOF END ELSE DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ]
+## let_affect(expr,formula_qbf) -> LET comma_list(var) . AFFECT comma_list(expr) COLON formula_qbf [ XOR VARTUPLE VAR TUPLE TOP TERM RPAREN OR NOT NEWLINE LPAREN LET IMPLIES IF FORALL EXISTS EXACT EQUIV EOF END ELSE DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ]
 ##
 ## The known suffix of the stack is as follows:
-## LET var 
+## LET comma_list(var) 
+##
+## WARNING: This example involves spurious reductions.
+## This implies that, although the LR(1) items shown above provide an
+## accurate view of the past (what has been recognized so far), they
+## may provide an INCOMPLETE view of the future (what was expected next).
+## In state 122, spurious reduction of production comma_list(var) -> var 
 ##
 
 Ill-formed local variable declaration. At this point, '=' is expected. Instead, the following statement were read:
@@ -2148,7 +2133,7 @@ touist_smt: LET XOR
 ##
 ## Ends in an error in state: 333.
 ##
-## let_affect(expr,formula_smt) -> LET . var AFFECT expr COLON formula_smt [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOT NEWLINE LPAREN LET INT IMPLIES IF FLOAT EXACT EQUIV EOF END ELSE DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ]
+## let_affect(expr,formula_smt) -> LET . comma_list(var) AFFECT comma_list(expr) COLON formula_smt [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOT NEWLINE LPAREN LET INT IMPLIES IF FLOAT EXACT EQUIV EOF END ELSE DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ]
 ##
 ## The known suffix of the stack is as follows:
 ## LET 
@@ -2157,7 +2142,7 @@ touist_simple: LET XOR
 ##
 ## Ends in an error in state: 225.
 ##
-## let_affect(expr,formula_simple) -> LET . var AFFECT expr COLON formula_simple [ XOR VARTUPLE VAR TUPLE TOP TERM RPAREN OR NOT NEWLINE LPAREN LET IMPLIES IF EXACT EQUIV EOF END ELSE DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ]
+## let_affect(expr,formula_simple) -> LET . comma_list(var) AFFECT comma_list(expr) COLON formula_simple [ XOR VARTUPLE VAR TUPLE TOP TERM RPAREN OR NOT NEWLINE LPAREN LET IMPLIES IF EXACT EQUIV EOF END ELSE DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ]
 ##
 ## The known suffix of the stack is as follows:
 ## LET 
@@ -2166,7 +2151,7 @@ touist_qbf: LET XOR
 ##
 ## Ends in an error in state: 121.
 ##
-## let_affect(expr,formula_qbf) -> LET . var AFFECT expr COLON formula_qbf [ XOR VARTUPLE VAR TUPLE TOP TERM RPAREN OR NOT NEWLINE LPAREN LET IMPLIES IF FORALL EXISTS EXACT EQUIV EOF END ELSE DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ]
+## let_affect(expr,formula_qbf) -> LET . comma_list(var) AFFECT comma_list(expr) COLON formula_qbf [ XOR VARTUPLE VAR TUPLE TOP TERM RPAREN OR NOT NEWLINE LPAREN LET IMPLIES IF FORALL EXISTS EXACT EQUIV EOF END ELSE DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ]
 ##
 ## The known suffix of the stack is as follows:
 ## LET 
@@ -2636,9 +2621,9 @@ Either formula is empty or this QBF formula does not start correctly.
 
 touist_simple: BIGOR VAR COMMA XOR 
 ##
-## Ends in an error in state: 155.
+## Ends in an error in state: 123.
 ##
-## comma_list(var) -> var COMMA . comma_list(var) [ IN ]
+## comma_list(var) -> var COMMA . comma_list(var) [ IN AFFECT ]
 ##
 ## The known suffix of the stack is as follows:
 ## var COMMA 
@@ -3379,7 +3364,7 @@ touist_simple: EXACT VAR WHEN
 ##
 touist_qbf: EXACT VAR WHEN 
 ##
-## Ends in an error in state: 148.
+## Ends in an error in state: 151.
 ##
 ## expr -> expr . ADD expr [ XOR SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COMMA AND ADD ]
 ## expr -> expr . SUB expr [ XOR SUB OR NOTEQUAL MUL MOD LT LE IN IMPLIES GT GE EQUIV EQUAL DIV COMMA AND ADD ]
@@ -4388,7 +4373,7 @@ Ill-formed universal quantifier. At this point, either continue the QBF formula 
 
 touist_qbf: FORALL VAR COLON XOR 
 ##
-## Ends in an error in state: 142.
+## Ends in an error in state: 145.
 ##
 ## formula_qbf -> FORALL comma_list(prop_or_var) option(for_statement) COLON . formula_qbf [ XOR VARTUPLE VAR TUPLE TOP TERM RPAREN OR NOT NEWLINE LPAREN LET IMPLIES IF FORALL EXISTS EXACT EQUIV EOF END ELSE DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ]
 ##
@@ -4401,7 +4386,7 @@ Ill-formed universal quantifier. After $1, a QBF formula is expected. Instead, t
 
 touist_qbf: FORALL XOR 
 ##
-## Ends in an error in state: 129.
+## Ends in an error in state: 132.
 ##
 ## formula_qbf -> FORALL . comma_list(prop_or_var) option(for_statement) COLON formula_qbf [ XOR VARTUPLE VAR TUPLE TOP TERM RPAREN OR NOT NEWLINE LPAREN LET IMPLIES IF FORALL EXISTS EXACT EQUIV EOF END ELSE DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ]
 ##
@@ -4433,7 +4418,7 @@ Ill-formed existential quantifier. At this point, either continue the QBF formul
 
 touist_qbf: EXISTS VAR COLON XOR 
 ##
-## Ends in an error in state: 146.
+## Ends in an error in state: 149.
 ##
 ## formula_qbf -> EXISTS comma_list(prop_or_var) option(for_statement) COLON . formula_qbf [ XOR VARTUPLE VAR TUPLE TOP TERM RPAREN OR NOT NEWLINE LPAREN LET IMPLIES IF FORALL EXISTS EXACT EQUIV EOF END ELSE DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ]
 ##
@@ -4446,7 +4431,7 @@ Ill-formed existential quantifier. After $1, a QBF formula is expected. Instead,
 
 touist_qbf: EXISTS XOR 
 ##
-## Ends in an error in state: 143.
+## Ends in an error in state: 146.
 ##
 ## formula_qbf -> EXISTS . comma_list(prop_or_var) option(for_statement) COLON formula_qbf [ XOR VARTUPLE VAR TUPLE TOP TERM RPAREN OR NOT NEWLINE LPAREN LET IMPLIES IF FORALL EXISTS EXACT EQUIV EOF END ELSE DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ]
 ##
@@ -4459,7 +4444,7 @@ Ill-formed existential quantifier. After $1, a comma-separated list of propositi
 
 touist_qbf: FORALL TERM COMMA XOR 
 ##
-## Ends in an error in state: 133.
+## Ends in an error in state: 136.
 ##
 ## comma_list(prop_or_var) -> prop COMMA . comma_list(prop_or_var) [ FOR COLON ]
 ##
@@ -4468,7 +4453,7 @@ touist_qbf: FORALL TERM COMMA XOR
 ##
 touist_qbf: FORALL VAR COMMA XOR 
 ##
-## Ends in an error in state: 131.
+## Ends in an error in state: 134.
 ##
 ## comma_list(prop_or_var) -> var COMMA . comma_list(prop_or_var) [ FOR COLON ]
 ##
@@ -4481,7 +4466,7 @@ Ill-formed proposition/variable list. After $1, a variable or proposition is exp
 
 touist_qbf: FORALL TERM XOR 
 ##
-## Ends in an error in state: 132.
+## Ends in an error in state: 135.
 ##
 ## comma_list(prop_or_var) -> prop . [ FOR COLON ]
 ## comma_list(prop_or_var) -> prop . COMMA comma_list(prop_or_var) [ FOR COLON ]
@@ -4491,7 +4476,7 @@ touist_qbf: FORALL TERM XOR
 ##
 touist_qbf: FORALL VAR XOR 
 ##
-## Ends in an error in state: 130.
+## Ends in an error in state: 133.
 ##
 ## comma_list(prop_or_var) -> var . [ FOR COLON ]
 ## comma_list(prop_or_var) -> var . COMMA comma_list(prop_or_var) [ FOR COLON ]
