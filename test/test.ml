@@ -188,6 +188,7 @@ run_test_tt_main (
   ];
   "bigand and >">::    (test_sat "bigand $i in [1..5] when $i > 2: p($i) end");
   "let declaration">:: (test_sat "let $i = 3: p($i-$i*3-1 mod 2 / 1)");
+  "let multiple declaration">:: (sat_expands_to "let $i,$j = 3,4: p($i,$j)" "p(3,4)");
   "bigand">::          (test_sat "bigand $i in [a]: p($i) end");
   "bigor">::           (test_sat "bigor $i in [a,b,c] when $i==a and $i!=d: $i(a) end");
   "bigand imply">::    (test_sat "bigand $i,$j in [1..3],[1..3]:
