@@ -1,3 +1,6 @@
+v3.2.3
+  - added an option (--debug) which enable the display of stacktrace
+    on exception catched on exit
 v3.2.2
   - fixed `card()` that was expecting two closing parenthesis instead of one
   - the 'let' construct can now handle multiple variables separated with ','
