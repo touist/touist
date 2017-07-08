@@ -6,7 +6,7 @@ Title Note: &date; (touist &version;)
 Bib: bibliography.bib
 Colorizer: touist
 Colorizer: grammar
-Math Mode: mathjax
+<!--Math Mode: mathjax-->
 .code2 { language: Touist } <!-- Coloring touist: ``bigand`` -->
 .code3 { language: Grammar } <!-- Coloring grammar: ```<rule> ::= a|b``` -->
 Package:[top=2.5cm,bottom=2.5cm,inner=2.5cm,outer=2.5cm]geometry
@@ -709,12 +709,19 @@ These operators are extremely expensive in the sense that they produce formulas
 with an exponential size. For example, ``exact(5,p([1..20])``
 will produce a disjunction of $\binom{20}{5} = 15 504$ conjunctions.
 
-~Note
+~ Note
 The notation ``p([1..20])`` is called "set-builder" and is defined
 in [#set-builder]. Using this syntax, the formula ``exact(5,p([1..20])``
 is equivalent to
 ~~ Math
 {<>}_{x\in P}^k p(x)
+~~
+~
+
+~ Example
+``exact(2,[a,b,c])`` is equivalent to
+~~ Math
+\left(a \wedge b \wedge \neg c\right) \vee \left(a \wedge \neg b \wedge c\right) \vee \left(\neg a \wedge b \wedge c\right)
 ~~
 ~
 

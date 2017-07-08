@@ -5,7 +5,6 @@
 
 all: html
 
-html:
 out/%.html: %.mdk
 	madoko $^ -mversion:$$(git describe --tags)
 
@@ -16,11 +15,11 @@ html: out/reference-manual.html
 pdf: out/reference-manual.pdf
 
 open-html: html
-ifeq ($(shell uname -s),darwin)
+ifeq ($(shell uname -s),Darwin)
 	open out/reference-manual.html -g
 endif
 open-pdf: pdf
-ifeq ($(shell uname -s),darwin)
+ifeq ($(shell uname -s),Darwin)
 	open out/reference-manual.pdf -g
 endif
 
