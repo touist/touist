@@ -405,12 +405,12 @@ Here is the rule for writting correct integer expressions:
 
 The constants are ``true`` and ``false``. The boolean connectors are $>$,
 $<$, $\ge$ (`>=`), $\le$ (`<=`), $=$ (`==`) and $\neq$ (`!=`). The
-operators that return a boolean are ``subset($P,$Q)``, ``empty($P)`` and
+operators that return a boolean are ``$P subset $Q``, ``empty($P)`` and
 ``p in $P``:
 
 ~Center
 |-----------------|:-------------:|---------------------------------------:|
-|``subset($P,$Q)``|$P \subseteq Q$|$P$ is a subset (or is included in) $Q$ |
+|``$P subset $Q`` |$P \subseteq Q$|$P$ is a subset (or is included in) $Q$ |
 |``empty($P)``    |$P=\emptyset$  |$P$ is an empty set                     |
 |``$i in $P``     |$i \in P$      |$i$ is an element of the set $P$        |
 |-----------------|---------------|----------------------------------------|
@@ -508,18 +508,35 @@ Some common set operators are available. Let $P$ and $Q$ denote two sets:
 |-------------|-----------------|----------------|----------------------|
 |Type         | Syntax          | Math notation  | Description          |
 |-------------|-----------------|:--------------:|----------------------|
-|```<set>```  |``inter($P,$Q)`` |$P \cap Q$      | intersection         |
-|```<set>```  |``union($P,$Q)`` |$P \cup Q$      | union                |
-|```<set>```  |``diff($P,$Q)``  |$P \setminus Q$ | difference           |
+|```<set>```  |``$P inter $Q``  |$P \cap Q$      | intersection         |
+|```<set>```  |``$P union $Q``  |$P \cup Q$      | union                |
+|```<set>```  |``$P diff $Q``   |$P \setminus Q$ | difference           |
 |```<set>```  |``powerset($Q)`` |$\mathcal{P}(Q)$| [powerset][#powerset]|
 |```<int>```  |``card($S)``     |$\vert S \vert$ | cardinal             |
 |```<bool>``` |``empty($P)``    |$P=\emptyset$   | set is empty         |
 |```<bool>``` |``$e in $P``     |$e \in P$       | belongs to           |
-|```<bool>``` |``subset($P,$Q)``|$P \subseteq Q$ | is a subset or equal |
+|```<bool>``` |``$P subset $Q`` |$P \subseteq Q$ | is a subset or equal |
 |-------------|-----------------|----------------|----------------------|
 ~
 The three last operators of type `<bool>` (``empty``, ``in`` and ``subset``)
 have also been described in the boolean section ([#sec-booleans]).
+
+The priority on operators is:
+
+~ Center
+|-----------------|-------------------|
+|highest priority |``inter``          |
+|lowest priority  |``union``, ``diff``|
+|-----------------|-------------------|
+~
+
+~ Note
+Up to &touist; v3.2.2, the operators ``inter``, ``union``, ``diff`` and
+``subset`` were prefix operators (e.g., ``inter($A,$B)``). From v3.2.3
+and later, these prefix operators are deprecated (but still usable).
+Instead, we provide more human-friendly infix operators (e.g.,
+``$A inter $B``).
+~
 
 #### Powerset {#powerset}
 The ``powerset($Q)`` operator generates all possible subsets $S$ such
@@ -537,9 +554,9 @@ Here is the complete rule for sets:
     | "[" <comma-list(<int>|<float>|<prop>|<bool>)> "]"
     | "[ <int> ".." <int> "]"      <- step is 1
     | "[ <float> ".." <float> "]"  <- step is 1.0
-    | "union(" <set> "," <set> ")"
-    | "inter(" <set> "," <set> ")"
-    | "diff(" <set> "," <set> ")"
+    | <set> "inter" <set>
+    | <set> "union" <set>
+    | <set> "diff" <set>
     | "powerset(" <set> ")"
 ```
 
