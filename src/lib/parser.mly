@@ -13,6 +13,8 @@
 
 %{
   open Types.Ast
+  open Msgs
+  let msgs = ref Msgs.empty
 %}
 
 %token <int> INT
@@ -65,9 +67,8 @@
 %nonassoc affect_before_exprsmt
 %nonassoc low_precedence (* Lesser priority on precedence *)
 %left INTER
-%left UNION
+%left UNION DIFF
 %left SUBSET
-%left DIFF
 %right EQUIV IMPLIES
 %left OR
 %left AND
@@ -135,7 +136,7 @@
 *)
 
 (* The two entry points of our parser *)
-%start <Types.Ast.ast> touist_simple, touist_smt, touist_qbf
+%start <Types.Ast.ast * Msgs.t ref> touist_simple, touist_smt, touist_qbf
 
 %% (* Everthing below that mark is expected to be a production rule *)
    (* Note that VAR { $0 } is equivalent to v=VAR { v } *)
@@ -153,14 +154,14 @@ affect_or(T):
 
 (* [touist_simple] is the entry point of the parser in sat mode *)
 touist_simple:
-  | f=affect_or(formula_simple)+ EOF {Loc (Touist_code (f),($startpos,$endpos))}
+  | f=affect_or(formula_simple)+ EOF {(Loc (Touist_code (f),($startpos,$endpos)),msgs)}
 
 
 (* [touist_smt] is the entry point of the parser in smt mode *)
 touist_smt:
-  | f=affect_or(formula_smt)+ EOF {Loc (Touist_code (f),($startpos,$endpos))}
+  | f=affect_or(formula_smt)+ EOF {(Loc (Touist_code (f),($startpos,$endpos)),msgs)}
 
-touist_qbf: f=affect_or(formula_qbf)+ EOF {Loc (Touist_code (f),($startpos,$endpos))}
+touist_qbf: f=affect_or(formula_qbf)+ EOF {(Loc (Touist_code (f),($startpos,$endpos)),msgs)}
 
 (* Used in tuple expression; see tuple_variable and tuple_term *)
 %inline indices: i=expr { i }
@@ -224,7 +225,11 @@ expr:
   | b=order(expr) {b}
   | EMPTY  (*LPAREN*) s=expr RPAREN {Loc (Empty s,($startpos,$endpos))}
   | s1=expr SUBSET s2=expr {Loc (Subset (s1,s2),($startpos,$endpos))}
-  | SUBSET_PR (*LPAREN*) s1=expr   COMMA s2=expr   RPAREN {Loc (Subset (s1,s2),($startpos,$endpos))}
+  | SUBSET_PR (*LPAREN*) s1=expr COMMA s2=expr RPAREN {
+      let loc = ($startpos,$endpos) in
+      add_msg msgs (Warning,Parse,"'subset(A,B)' is deprecated, please use \
+        'A subset B' instead.\n",Some loc);
+      Loc (Subset (s1,s2),loc)}
   | p=prop {p}
   | x=expr   IN s=expr {Loc (In (x,s),($startpos,$endpos))}
   | x=set_decl_range(expr)
@@ -258,9 +263,21 @@ expr:
   | s1=T UNION s2=T {Loc (Union (s1,s2),($startpos,$endpos))}
   | s1=T INTER s2=T {Loc (Inter (s1,s2),($startpos,$endpos))}
   | s1=T DIFF s2=T {Loc (Diff (s1,s2),($startpos,$endpos))}
-  | UNION_PR (*LPAREN*) s1=T COMMA s2=T RPAREN {Loc (Union (s1,s2),($startpos,$endpos))}
-  | INTER_PR (*LPAREN*) s1=T COMMA s2=T RPAREN {Loc (Inter (s1,s2),($startpos,$endpos))}
-  | DIFF_PR  (*LPAREN*) s1=T COMMA s2=T RPAREN {Loc (Diff (s1,s2),($startpos,$endpos))}
+  | UNION_PR (*LPAREN*) s1=T COMMA s2=T RPAREN {
+      let loc = ($startpos,$endpos) in
+      add_msg msgs (Warning,Parse,"'union(A,B)' is deprecated, please use \
+        'A union B' instead.\n",Some loc);
+      Loc (Union (s1,s2),loc)}
+  | INTER_PR (*LPAREN*) s1=T COMMA s2=T RPAREN {
+      let loc = ($startpos,$endpos) in
+      add_msg msgs (Warning,Parse,"'inter(A,B)' is deprecated, please use \
+        'A inter B' instead.\n",Some loc);
+      Loc (Inter (s1,s2),loc)}
+  | DIFF_PR  (*LPAREN*) s1=T COMMA s2=T RPAREN {
+      let loc = ($startpos,$endpos) in
+      add_msg msgs (Warning,Parse,"'diff(A,B)' is deprecated, please use \
+        'A diff B' instead.\n",Some loc);
+      Loc (Diff (s1,s2),loc)}
   | POWERSET (*LPAREN*) s=T RPAREN {Loc (Powerset s,($startpos,$endpos))}
 
 %inline formula(F):
@@ -275,7 +292,7 @@ expr:
 let_affect(T,F): LET vars=comma_list(var) AFFECT contents=comma_list(T) COLON form=F
     {try List.fold_right2 (fun var content acc ->
       Loc (Let (var,content,acc),($startpos,$endpos))) vars contents form
-    with Invalid_argument _ -> let open Msgs in
+    with Invalid_argument _ ->
       single_msg (Error,Parse,
         ("'let' statement does not have the same number of variables and values.\n"),
         Some ($startpos,$endpos))

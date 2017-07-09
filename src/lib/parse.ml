@@ -59,7 +59,6 @@ let lexer buffer : (Lexing.lexbuf -> Parser.token) =
     indicated to the user: useless because we only handle a single touistl file 
 *)
 let parse (parser) ?debug:(debug=false) filename (text:string) : ast * Msgs.t ref =
-  let msgs = ref Msgs.empty in
   let buffer = ref Parser_error_report.Zero in
   let lexbuf = Lexing.from_string text in
   lexbuf.lex_curr_p <- {lexbuf.lex_curr_p with pos_fname = filename; pos_lnum = 1};
@@ -69,11 +68,11 @@ let parse (parser) ?debug:(debug=false) filename (text:string) : ast * Msgs.t re
   and fail checkpoint =
     let msg = (Parser_error_report.report text !buffer checkpoint debug)
     and loc = Parser_error_report.area_pos !buffer (* area_pos returns (start_pos,end_pos) *)
-    in add_fatal msgs (Error,Parse,msg,Some loc)
+    in single_msg (Error,Parse,msg,Some loc)
   in
-    let ast =
+    let ast,msgs =
       try Parser.MenhirInterpreter.loop_handle succeed fail supplier checkpoint
-      with Lexer.Error (msg,loc) -> Msgs.add_fatal msgs (Error,Lex,msg,Some loc)
+      with Lexer.Error (msg,loc) -> Msgs.single_msg (Error,Lex,msg,Some loc)
     in ast,msgs
 
 (** Directly calls [parser] with [Parser.Incremental.touist_simple] *)
