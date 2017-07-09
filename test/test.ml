@@ -162,6 +162,17 @@ run_test_tt_main (
   "empty()">::(sat_expands_to "p(empty([1]))" "p(false)");
 ];
 
+"binary operators">:::[
+  "inter prefix">::(sat_expands_to "p(inter([1],[1,2]))" "p([1])");
+  "inter infix">::(sat_expands_to "p([1] inter [1,2])" "p([1])");
+  "union prefix">::(sat_expands_to "p(union([1],[1,2]))" "p([1,2])");
+  "union infix">::(sat_expands_to "p([1] union [1,2])" "p([1,2])");
+  "diff prefix">::(sat_expands_to "p(diff([1,2],[2]))" "p([1])");
+  "diff infix">::(sat_expands_to "p([1,2] diff [2])" "p([1])");
+  "subset prefix">::(sat_expands_to "p(subset([1],[1,2]))" "p(true)");
+  "subset infix">::(sat_expands_to "p([1] subset [1,2])" "p(true)");
+];
+
 "exact, atleast and atmost">:::[
   "exact(5,[]) should be false">::(sat_expands_to "exact(5,[])" "Bot");
   "exact(0,[]) should be true">::(sat_expands_to "exact(0,[])" "Top");
