@@ -51,6 +51,7 @@ let equiv_file_path = ref ""
 let input_equiv = ref stdin
 let linter = ref false (* for displaying syntax errors (during parse and eval) *)
 let error_format = ref "%f: line %l, col %c-%C: %t: %m" (* display absolute position of error *)
+let debug = ref false
 let debug_syntax = ref false
 let debug_cnf = ref false
 let latex = ref false
@@ -98,6 +99,7 @@ let () =
       ));
     ("--version", Arg.Set version_asked, "Display version number");
     ("-", Arg.Set use_stdin,"reads from stdin instead of file");
+    ("--debug", Arg.Set debug, "Print information for debugging touist");
     ("--debug-syntax", Arg.Set debug_syntax, "Print information for debugging
     syntax errors given by parser.messages");
     ("--debug-cnf", Arg.Set debug_cnf,"Print step by step CNF transformation");
@@ -340,12 +342,13 @@ let () =
   exit_with OK
 
   with
-    | Fatal (Usage,msgs) -> (show_msgs_and_exit msgs CMD_USAGE)
-    | Fatal (Parse,msgs) -> (show_msgs_and_exit msgs TOUIST_SYNTAX)
-    | Fatal (Lex,msgs) -> (show_msgs_and_exit msgs TOUIST_SYNTAX)
-    | Fatal (Eval,msgs) -> (show_msgs_and_exit msgs TOUIST_SYNTAX)
-    | Fatal (Sat,msgs) -> (show_msgs_and_exit msgs TOUIST_SYNTAX)
-    | Fatal (Cnf,msgs) -> (show_msgs_and_exit msgs TOUIST_SYNTAX)
-    | Fatal (Prenex,msgs) -> (show_msgs_and_exit msgs TOUIST_SYNTAX)
+    | Fatal (during,msgs) ->
+      (show_msgs_and_exit msgs
+        (match during with
+          | Usage -> CMD_USAGE
+          | _ -> TOUIST_SYNTAX
+        )
+      );
+      if !debug then Printf.eprintf "Stacktrace:\n%s\n" (Printexc.get_backtrace ())
     | Sys_error err -> show_msgs_and_exit (of_list [(Error,Usage,err^"\n",None)]) CMD_USAGE
     | x -> raise x
