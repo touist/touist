@@ -331,6 +331,9 @@ and eval_set_decl (env:env) (set_decl:Ast.t) =
              ("at this point a comma-separated list of '"^string_of_ast_type first_elmt^"', \
              because previous elements of the list had this type"^"\n")
   in
+  (* We take the first elmnt of 'sets' and 'sets_expanded' in order to enforce
+     what the following elmnts should be. 'x' is only useful for raising the
+     error as we need the unexpanded faulty elmt in the error message. *)
   match sets, sets_expanded with
   | [],[] -> Set AstSet.empty
   | x::_,first::_ -> begin
