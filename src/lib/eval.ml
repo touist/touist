@@ -344,7 +344,7 @@ and eval_ast (msgs:Msgs.t ref) (env:env) (ast:ast) :ast =
   | Prop x -> Prop x
   | Loc (x,l) -> eval_ast x
   | Paren x -> eval_ast x
-  | e -> raise_with_loc msgs ast ("[shouldnt happen] this expression cannot be expanded: " ^ string_of_ast e ^"\n")
+  | e -> failwith ("[shouldnt happen] this expression cannot be expanded: " ^ string_of_ast e ^"\n")
   in expanded
 
 and eval_set_decl (msgs:Msgs.t ref) (env:env) (set_decl:ast) =
@@ -369,7 +369,7 @@ and eval_set_decl (msgs:Msgs.t ref) (env:env) (set_decl:ast) =
                     (Set_decl sets) (Set_decl sets_expanded)
                     "elements of type 'int', 'float', 'prop' or 'set'"
     end
-  | [],x::_ | x::_,[] -> failwith "shouldn't happen: len(sets)!=len(sets_expanded)"
+  | [],x::_ | x::_,[] -> failwith "[shouldn't happen] len(sets)!=len(sets_expanded)"
 
 
 (* [eval_ast_formula] evaluates formulas; nothing in formulas should be
