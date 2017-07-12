@@ -128,6 +128,7 @@ let () =
   (* Step 1: we parse the args. If an arg. is "alone", we suppose
    * it is the touistl input file (this is handled by [process_arg_alone]) *)
   Arg.parse argspecs process_arg_alone usage; (* parses the arguments *)
+  if !debug then Printexc.record_backtrace true;
 
   try
 
@@ -343,12 +344,12 @@ let () =
 
   with
     | Fatal (during,msgs) ->
+      if !debug then Printf.eprintf "Stacktrace:\n%s\n" (Printexc.get_backtrace ());
       (show_msgs_and_exit msgs
         (match during with
           | Usage -> CMD_USAGE
           | _ -> TOUIST_SYNTAX
         )
-      );
-      if !debug then Printf.eprintf "Stacktrace:\n%s\n" (Printexc.get_backtrace ())
+      )
     | Sys_error err -> show_msgs_and_exit (of_list [(Error,Usage,err^"\n",None)]) CMD_USAGE
     | x -> raise x
