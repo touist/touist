@@ -28,11 +28,11 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
+import java.nio.file.FileSystems;
+import java.nio.file.Path;
 import java.util.prefs.Preferences;
 
 import javax.swing.JOptionPane;
-import javax.swing.UIManager;
 
 import gui.MainFrame;
 import solution.SolverExecutionException;
@@ -42,24 +42,16 @@ import solution.SolverExecutionException;
  */
 public class TouIST {
 	private static TouistProperties properties = new TouistProperties();
+	private static Preferences preferences;
 
 	/**
 	 * @param args the command line arguments
 	 */
-	private static String CurrentPath=System.getProperty("user.dir");
 	public static void main(String[] args) throws IOException, InterruptedException, FileNotFoundException, SolverExecutionException {
 		String version = System.getProperty("java.version");
 		if(Float.valueOf(version.substring(0,3)) < 1.7) {
 			JOptionPane.showMessageDialog(null, "Your java version is "+version+" but version higher or equal to 1.7 is required");
 			return;
-		}
-		// Better user interface integration with macOS
-		if(System.getProperty("os.name").toLowerCase().contains("mac")) {
-			System.setProperty("apple.laf.useScreenMenuBar", "true");
-			System.setProperty("com.apple.mrj.application.apple.menu.about.name", "Touist");
-			try {
-				UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-			} catch (Exception e) {}
 		}
 
 		System.out.println("TouIST: running app from folder '"+ System.getProperty("user.dir")+"'");
@@ -67,6 +59,25 @@ public class TouIST {
 		System.out.println("* Files are saved in '"+getWhereToSave()+"'");
 		MainFrame frame = new MainFrame();
 		frame.setVisible(true);
+		
+		if(args.length > 0) {
+			frame.getEditorPanel1().open(args[0]);
+		}
+		// Better user interface integration with macOS
+//		if(System.getProperty("os.name").toLowerCase().contains("mac")) {
+//			System.setProperty("apple.laf.useScreenMenuBar", "true");
+//			System.setProperty("com.apple.mrj.application.apple.menu.about.name", "TouIST");
+//		    Application a = Application.getApplication();
+//		    a.setOpenFileHandler(new OpenFilesHandler() {
+//		        @Override
+//		        public void openFiles(OpenFilesEvent e) {
+//		            for (File file : e.getFiles()){
+//		            	frame.getEditorPanel1().open(file.getAbsolutePath());
+//		            }
+//		        }
+//		    });
+//		}
+
 	}
 	/**
 	 * We use this for getting the actual place where touist.jar is located in.
@@ -101,13 +112,9 @@ public class TouIST {
 		return checkPath(TouIST.getTouistDir() + File.separator + relativePath);
 	}
 	
-	private static String checkPath(String URIPath) {
-		try {
-			return (new File(new URI("file://"+URIPath))).getAbsolutePath();
-		} catch (URISyntaxException e) {
-			System.err.println("Something went wrong when trying to get where touist.jar is located:\n" + e.getMessage());
-			return null;
-		}
+	public static String checkPath(String path) {
+		Path p = FileSystems.getDefault().getPath(path);
+		return p.normalize().toString();
 	}
 
 }

@@ -41,6 +41,8 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.StringReader;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ListIterator;
 import java.util.Map;
 
@@ -385,21 +387,25 @@ public class ParentEditionPanel extends AbstractComponentPanel {
         if (d.getFile() != null) 
         {
         	String path = d.getDirectory() + d.getFile();
-
-            try {
-                getFrame().getTextInEditor().loadFile(path);
-            } catch(Exception e) {
-                System.err.println("Failed to load file: " + path);
-                showErrorMessage(e,"Failed to load file: '" + path + "'","");
-
-            }
-
-            //Réinitialisation des sets et des formules
-            String text = getFrame().getTextInEditor().get();
+            open(path);
+        }
+    }
+    
+    public void open(String filepath) {
+    	System.out.println("Opening file '"+filepath+"'");
+    	File file = (new File(filepath)).getAbsoluteFile();
+        try {
+            getFrame().getTextInEditor().loadFile(file.getAbsolutePath());
+        } catch(Exception e) {
+            System.err.println("Failed to load file: " + file.getAbsolutePath());
+            showErrorMessage(e,"Failed to load file: '" + file.getAbsolutePath() + "'","");
+        }
+    	if(file.exists()) {
+    		String text = getFrame().getTextInEditor().get();
             editor.setText(text);
-            this.onDiskPath = d.getDirectory();
-            this.onDiskFilename = d.getFile();
-        }   
+    		this.onDiskPath = file.getParent();
+            this.onDiskFilename = file.getName();
+    	}
     }
 
     public void exportHandler(boolean saveAs) {
@@ -481,14 +487,15 @@ public class ParentEditionPanel extends AbstractComponentPanel {
         sinon passer à l'état SINGLE_RESULT
         Si aucun model n'existe alors passer a l'état NO_RESULT
         */
-        String bigAndFilePath = "temp.touistl"; //TODO se mettre d'accord sur un nom standard ou ajouter a Translator et BaseDeClause des méthode pour s'échange de objets File
+        String path = touist.TouIST.checkPath(touist.TouIST.getWhereToSave() + File.separator + "temp.touistl");
+        File touistFile = new File(path); //TODO se mettre d'accord sur un nom standard ou ajouter a Translator et BaseDeClause des méthode pour s'échange de objets File
         String errorMessage;
         
         
         try {
-            getFrame().getTextInEditor().saveToFile(bigAndFilePath);
+            getFrame().getTextInEditor().saveToFile(touistFile.getAbsolutePath());
         } catch (IOException ex) {
-            errorMessage = "Couldn't create file '" + bigAndFilePath + "':\n"+ex.getMessage();
+            errorMessage = "Couldn't create file '" + touistFile.getAbsolutePath() + "':\n"+ex.getMessage()+"\nPath: "+path;
             showErrorMessage(errorMessage, getFrame().getLang().getWord(Lang.ERROR_TRADUCTION));
             return State.EDITION;
         }
@@ -499,7 +506,7 @@ public class ParentEditionPanel extends AbstractComponentPanel {
         if (getFrame().getEditorPanel1().editor.getEditorTextArea().getSyntaxEditingStyle() == "sat") {
            
             try {
-            	boolean ok = getFrame().getTranslatorSAT().translate(bigAndFilePath);
+            	boolean ok = getFrame().getTranslatorSAT().translate(touistFile.getAbsolutePath());
             	errorMessage = "";
                 for (TranslationError error : getFrame().getTranslatorSAT().getErrors()) {
                         errorMessage += error + "\n";
@@ -514,11 +521,12 @@ public class ParentEditionPanel extends AbstractComponentPanel {
                 if(!ok) {
                     return State.EDITION;
                 }
-                File f = new File(bigAndFilePath);
+                File f = touistFile;
                 f.deleteOnExit();
             } catch (IOException ex) {
                 ex.printStackTrace();
-                errorMessage = "The translator returned an IOException: \n"+ex.getMessage()+"\nCheck that touist is in "+TouIST.getTouistExternalDir()+"+and that it has the right permissions.";
+                errorMessage = "The translator returned an IOException: \n"+ex.getMessage()+"\n"+
+                	"Check that touist is in "+TouIST.getTouistExternalDir()+" and that it has the right permissions.";
                 showErrorMessage(ex, errorMessage, getFrame().getLang().getWord(Lang.ERROR_TRADUCTION));
                 return State.EDITION;
             } catch (InterruptedException ex) {
@@ -596,7 +604,7 @@ public class ParentEditionPanel extends AbstractComponentPanel {
                         break;
                     default :
                 }
-                boolean ok = getFrame().getTranslatorSMT().translate(bigAndFilePath, logic); 
+                boolean ok = getFrame().getTranslatorSMT().translate(touistFile.getAbsolutePath(), logic); 
                 errorMessage = "";
                 for (TranslationError error : getFrame().getTranslatorSMT().getErrors()) {
                 	errorMessage += error + "\n";
@@ -611,7 +619,7 @@ public class ParentEditionPanel extends AbstractComponentPanel {
                 }
                 
                 solveButton.setText("Solving");
-                File f = new File(bigAndFilePath);
+                File f = touistFile;
                 f.deleteOnExit();
             } catch (IOException ex) {
                 ex.printStackTrace();
