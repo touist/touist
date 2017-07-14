@@ -48,11 +48,10 @@ import touist.TouIST;
  * @Modified by Mael
  */
 public class TranslatorSAT {
-	final private String outputFilePath = "out.cnf";
-	final private String outputTableFilePath = "out.table";
+	final private String outputFilePath = touist.TouIST.getWhereToSave() + File.separator + "out.cnf";
+	final private String outputTableFilePath = touist.TouIST.getWhereToSave() + File.separator + "out.table";
 	private Map<Integer,String> literalsMap = new HashMap<Integer,String>();
 	private List<TranslationError> errors = new ArrayList<TranslationError>();
-    private String currentPath = TouIST.getWhereToSave();
 	private Process p;
 	private List<String> options = new ArrayList<String>();
 
@@ -156,7 +155,7 @@ public class TranslatorSAT {
 		errors = TranslationError.parse(linesStdErr);
 		
 		if(return_code == OK) {
-			parseLiteralsMapFile(currentPath+File.separatorChar+outputTableFilePath);
+			parseLiteralsMapFile(outputTableFilePath);
 		}
 		return return_code == OK;
 	}
@@ -181,7 +180,7 @@ public class TranslatorSAT {
 	 * @return the file path
 	 */
 	public String getDimacsFilePath() {
-		return touist.TouIST.getWhereToSave() +File.separatorChar + outputFilePath;
+		return outputFilePath;
 	}
 
 	/**
