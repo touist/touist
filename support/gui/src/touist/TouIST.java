@@ -43,6 +43,7 @@ import solution.SolverExecutionException;
 public class TouIST {
 	private static TouistProperties properties = new TouistProperties();
 	private static Preferences preferences;
+	private static MainFrame frame;
 
 	/**
 	 * @param args the command line arguments
@@ -57,26 +58,26 @@ public class TouIST {
 		System.out.println("TouIST: running app from folder '"+ System.getProperty("user.dir")+"'");
 		System.out.println("* External binaries are in '"+getTouistExternalDir()+"'");
 		System.out.println("* Files are saved in '"+getWhereToSave()+"'");
-		MainFrame frame = new MainFrame();
+		frame = new MainFrame();
 		frame.setVisible(true);
 		
 		if(args.length > 0) {
 			frame.getEditorPanel1().open(args[0]);
 		}
 		// Better user interface integration with macOS
-//		if(System.getProperty("os.name").toLowerCase().contains("mac")) {
-//			System.setProperty("apple.laf.useScreenMenuBar", "true");
-//			System.setProperty("com.apple.mrj.application.apple.menu.about.name", "TouIST");
-//		    Application a = Application.getApplication();
-//		    a.setOpenFileHandler(new OpenFilesHandler() {
-//		        @Override
-//		        public void openFiles(OpenFilesEvent e) {
-//		            for (File file : e.getFiles()){
-//		            	frame.getEditorPanel1().open(file.getAbsolutePath());
-//		            }
-//		        }
-//		    });
-//		}
+		if(System.getProperty("os.name").toLowerCase().contains("mac")) {
+			System.setProperty("apple.laf.useScreenMenuBar", "true");
+			System.setProperty("com.apple.mrj.application.apple.menu.about.name", "TouIST");
+			com.apple.eawt.Application a = com.apple.eawt.Application.getApplication();
+			a.setOpenFileHandler(new com.apple.eawt.OpenFilesHandler() {
+		        @Override
+		        public void openFiles(com.apple.eawt.AppEvent.OpenFilesEvent e) {
+					if (e.getFiles().get(0) instanceof File) {
+						frame.getEditorPanel1().open(((File) e.getFiles().get(0)).getAbsolutePath());
+					}
+		        }
+		    });
+		}
 
 	}
 	/**
