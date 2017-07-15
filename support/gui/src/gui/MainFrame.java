@@ -75,10 +75,6 @@ public class MainFrame extends javax.swing.JFrame {
         return lang;
     }
     
-    public String getDefaultDirectoryPath() {
-        return defaultDirectoryPath;
-    }
-    
     public void setDefaultDirectoryPath(String path) {
         defaultDirectoryPath = path;
         //TODO save the path in a config file
