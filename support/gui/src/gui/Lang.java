@@ -93,6 +93,7 @@ public class Lang {
     public static final String EDITION_EXPORT_FAILURE_TITLE = "ParentEditionPanel.exportFailure.title";
     public static final String EDITION_EXPORT_FAILURE_TEXT = "ParentEditionPanel.exportFailure.text";
     public static final String EDITION_MENUITEM_SAVEFILE = "EditionMenuBar.jMenuItemSaveFile.text";
+    public static final String EDITION_MENUITEM_SAVEASFILE = "EditionMenuBar.jMenuItemSaveAsFile.text";
     public static final String EDITION_MENUITEM_LOADFILE = "EditionMenuBar.jMenuItemLoadFile.text";
     public static final String EDITION_MENUITEM_HELPEDITION = "EditionMenuBar.jMenuItemHelpEdition.text";
     public static final String EDITION_MENUITEM_ABOUT = "EditionMenuBar.jMenuItemAbout.text";
