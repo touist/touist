@@ -30,7 +30,6 @@ import gui.editionView.ParentEditionPanel;
 import gui.resultsView.ResultsPanel;
 
 import java.awt.CardLayout;
-import java.io.File;
 import java.io.IOException;
 import java.util.ListIterator;
 import java.util.Locale;
@@ -38,7 +37,6 @@ import java.util.Locale;
 import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 
-import solution.TextInEditor;
 import solution.ModelList;
 import solution.Solver;
 import touist.TouistProperties;
@@ -51,7 +49,6 @@ import translation.TranslatorSMT;
  */
 public class MainFrame extends javax.swing.JFrame {
     private TouistProperties properties = new TouistProperties();
-    private TextInEditor clause = new TextInEditor();
     private TranslatorSAT translatorSAT = new TranslatorSAT();
     private TranslatorSMT translatorSMT = new TranslatorSMT();
     private Solver solver;
@@ -127,10 +124,6 @@ public class MainFrame extends javax.swing.JFrame {
         } else {
             this.setTitle(windowTitle + " - " + name);
         }
-    }
-
-    public TextInEditor getTextInEditor() {
-        return clause;
     }
 
     public Solver getSolver() {
