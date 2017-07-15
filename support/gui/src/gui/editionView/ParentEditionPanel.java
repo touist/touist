@@ -35,6 +35,8 @@ import java.awt.AWTException;
 import java.awt.FileDialog;
 import java.awt.Robot;
 import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.*;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
@@ -54,6 +56,8 @@ import solution.SolverTestSAT4J;
 import touist.TouIST;
 import translation.TranslationError;
 
+import static javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE;
+
 /**
  *
  * @author Skander
@@ -65,6 +69,22 @@ public class ParentEditionPanel extends AbstractComponentPanel {
     private Thread testThread;
     protected Path openedFile = null;
     protected MainFrame mainframe = null;
+
+    public boolean hasUnsavedChanges() {
+        if(openedFile == null) {
+            return ! editor.getEditorTextArea().getText().isEmpty();
+        } else {
+            String textInFile = "";
+            try {
+                textInFile = mainframe.getTextInEditor().open(openedFile.toString());
+            } catch (IOException e) {
+                return false;
+            }
+            // If the texts are the same between the editor and the file, then
+            // we have no unsaved files (= we return false).
+            return ! editor.getEditorTextArea().getText().equals(textInFile);
+        }
+    }
 
     /**
      * Creates new form FormulasPanel
@@ -83,6 +103,7 @@ public class ParentEditionPanel extends AbstractComponentPanel {
             selectSatOrSmt.addItem(solverType);
         }
 
+        // Nice icons!
         FontIcon f = new FontIcon();
         f.setIkon(new FontAwesomeIkonHandler().resolve("fa-save"));
         f.setIconSize(18);
@@ -96,6 +117,40 @@ public class ParentEditionPanel extends AbstractComponentPanel {
         f.setIconSize(18);
         solveButton.setIcon(f);
 
+        // On macOS, handle the drag-and-drop for opening files
+        if(System.getProperty("os.name").toLowerCase().contains("mac")) {
+            com.apple.eawt.Application a = com.apple.eawt.Application.getApplication();
+            a.setOpenFileHandler(new com.apple.eawt.OpenFilesHandler() {
+                @Override
+                public void openFiles(com.apple.eawt.AppEvent.OpenFilesEvent e) {
+                    if (e.getFiles().get(0) instanceof File) {
+                        open(((File) e.getFiles().get(0)).getAbsolutePath());
+                    }
+                }
+            });
+        }
+
+        // Ask the user if he wants to save before quitting
+        parent.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+        parent.addWindowListener(new WindowAdapter() {
+            public void windowClosing(WindowEvent e) {
+                if(hasUnsavedChanges()) {
+                    int confirmed = JOptionPane.showConfirmDialog(null,
+                            getFrame().getLang().getWord("ParentEditionPanel.saveOrLooseOnQuit"),
+                            "", JOptionPane.YES_NO_CANCEL_OPTION);
+                    if (confirmed == JOptionPane.YES_OPTION) {
+                        saveHandler(false);
+                        System.exit(0);
+                    } else if (confirmed == JOptionPane.NO_OPTION) {
+                        System.exit(0);
+                    } else if (confirmed == JOptionPane.CANCEL_OPTION) {
+                        return;
+                    }
+                } else {
+                    System.exit(0);
+                }
+            }
+        });
     }
     
     public void updateComboBoxSelectedSolver() {
@@ -385,6 +440,17 @@ public class ParentEditionPanel extends AbstractComponentPanel {
     // End of variables declaration//GEN-END:variables
 
     public void openHandler() {
+        if(hasUnsavedChanges()) {
+            int confirmed = JOptionPane.showConfirmDialog(null,
+                    getFrame().getLang().getWord("ParentEditionPanel.saveOrLooseOnOpen"),
+                    "", JOptionPane.YES_NO_CANCEL_OPTION);
+            if (confirmed == JOptionPane.YES_OPTION) {
+                saveHandler(false);
+            } else if (confirmed == JOptionPane.NO_OPTION) {
+            } else if (confirmed == JOptionPane.CANCEL_OPTION) {
+                return;
+            }
+        }
 
 		FileDialog d = new FileDialog(getFrame()); 
 		d.setDirectory(touist.TouIST.getWhereToSave());
@@ -404,7 +470,7 @@ public class ParentEditionPanel extends AbstractComponentPanel {
     	System.out.println("Opening file '"+filepath+"'");
     	Path file = FileSystems.getDefault().getPath(filepath);
         try {
-            getFrame().getTextInEditor().loadFile(file.toString());
+            getFrame().getTextInEditor().loadIntoTextEditor(file.toString());
             String text = getFrame().getTextInEditor().get();
             editor.setText(text);
             openedFile = file;

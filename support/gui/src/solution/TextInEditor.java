@@ -35,14 +35,6 @@ import java.io.IOException;
  * @author Skander
  */
 
-class FormatException extends Exception {
-    public FormatException() {}
-
-    public FormatException(String message) {
-        super(message);
-    }
-}
-
 public class TextInEditor {
     private String textInEditor;
 
@@ -69,19 +61,20 @@ public class TextInEditor {
     /**
      * Import the list of formules from a file
      * @param path of the file containing the list of formules and sets
-     * @throws FileNotFoundException if the path of the file is invalid
      * @throws IOException if any I/O exception occurs during file reading
-     * @throws FormatException if the filedefines incorrectly the formula
-     *                         section
      */
-    public void loadFile(String path) throws FileNotFoundException,
-                                               IOException,
-                                               FormatException {
+    public static String open(String path) throws IOException {
+        String text = "";
         BufferedReader in = new BufferedReader(new FileReader(path));
         String line;
         while((line = in.readLine()) != null) {
-            textInEditor = textInEditor.concat(line + "\n");
+            text = text.concat(line + "\n");
         }
+        return text;
+    }
+
+    public void loadIntoTextEditor(String path) throws IOException {
+        textInEditor = open(path);
     }
 
     public void saveToFile(String path) throws IOException {

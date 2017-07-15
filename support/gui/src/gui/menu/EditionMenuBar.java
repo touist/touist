@@ -28,6 +28,7 @@ import gui.MainFrame;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.WindowEvent;
 import java.util.Locale;
 import java.util.Scanner;
 
@@ -60,6 +61,7 @@ public class EditionMenuBar extends JMenuBar {
     JMenuItem jMenuItemSaveFile;
     JMenuItem jMenuItemSaveAsFile;
     JMenuItem jMenuItemLoadFile;
+    JMenuItem jMenuItemQuit;
     JMenuItem jMenuItemHelpEditor;
     JMenuItem jMenuItemAbout;
     JMenuItem jMenuItemUndo;
@@ -87,6 +89,8 @@ public class EditionMenuBar extends JMenuBar {
         jMenuItemSaveAsFile.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_S, Event.SHIFT_MASK + Event.META_MASK));
         jMenuItemLoadFile = new JMenuItem();
         jMenuItemLoadFile.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_O, java.awt.Event.META_MASK));
+        jMenuItemQuit = new JMenuItem();
+        jMenuItemQuit.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_Q, java.awt.Event.META_MASK));
         
         jMenuItemUndo = new JMenuItem();
         jMenuItemUndo.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_Z, java.awt.Event.META_MASK));
@@ -128,6 +132,9 @@ public class EditionMenuBar extends JMenuBar {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jMenuItemLoadFileActionPerformed(evt);
             }
+        });
+        jMenuItemQuit.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {jMenuItemQuitActionPerformed(evt);}
         });
         
         jMenuItemHelpEditor.addActionListener(new java.awt.event.ActionListener() {
@@ -177,6 +184,7 @@ public class EditionMenuBar extends JMenuBar {
         jMenuFile.add(jMenuItemSaveFile);
         jMenuFile.add(jMenuItemSaveAsFile);
         jMenuFile.add(jMenuItemLoadFile);
+        jMenuFile.add(jMenuItemQuit);
         jMenuLanguage.add(jMenuItemFrench);
         jMenuLanguage.add(jMenuItemEnglish);
         jMenuHelp.add(jMenuItemHelpEditor);
@@ -219,6 +227,9 @@ public class EditionMenuBar extends JMenuBar {
     
     private void jMenuItemLoadFileActionPerformed(java.awt.event.ActionEvent evt) {  
         parent.getEditorPanel1().openHandler();
+    }
+    private void jMenuItemQuitActionPerformed(java.awt.event.ActionEvent evt) {
+        parent.dispatchEvent(new WindowEvent(parent, WindowEvent.WINDOW_CLOSING));
     }
     
     private void jMenuItemHelpEditorActionPerformed(java.awt.event.ActionEvent evt) {  
@@ -309,6 +320,7 @@ public class EditionMenuBar extends JMenuBar {
         this.jMenuItemSaveFile.setText(parent.getLang().getWord(Lang.EDITION_MENUITEM_SAVEFILE));
         this.jMenuItemSaveAsFile.setText(parent.getLang().getWord(Lang.EDITION_MENUITEM_SAVEASFILE));
         this.jMenuItemLoadFile.setText(parent.getLang().getWord(Lang.EDITION_MENUITEM_LOADFILE));
+        this.jMenuItemQuit.setText(parent.getLang().getWord("EditionMenuBar.jMenuItemQuit.text"));
         this.jMenuItemHelpEditor.setText(parent.getLang().getWord(Lang.EDITION_MENUITEM_HELPEDITION));
         this.jMenuItemAbout.setText(parent.getLang().getWord(Lang.EDITION_MENUITEM_ABOUT));
         this.jMenuItemUndo.setText(parent.getLang().getWord(Lang.EDITION_MENUITEM_UNDO));
@@ -316,6 +328,7 @@ public class EditionMenuBar extends JMenuBar {
         this.jMenuItemZoomMore.setText(parent.getLang().getWord(Lang.EDITION_MENUITEM_ZOOMMORE));
         this.jMenuItemZoomLess.setText(parent.getLang().getWord(Lang.EDITION_MENUITEM_ZOOMLESS));
         this.jMenuItemSettings.setText(parent.getLang().getWord(Lang.SETTINGS_TITLE));
+
     }
     
 }
