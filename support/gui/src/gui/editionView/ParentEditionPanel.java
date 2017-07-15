@@ -375,7 +375,7 @@ public class ParentEditionPanel extends AbstractComponentPanel {
     public void openHandler() {
 
 		FileDialog d = new FileDialog(getFrame()); 
-		d.setDirectory(getFrame().getDefaultDirectoryPath());
+		d.setDirectory(touist.TouIST.getWhereToSave());
     	d.setMode(FileDialog.LOAD);
     	d.setVisible(true);
     	
@@ -416,7 +416,7 @@ public class ParentEditionPanel extends AbstractComponentPanel {
         	FileDialog d = new FileDialog(getFrame());
         	
         	if(openedFile == null) {
-        		d.setDirectory(getFrame().getDefaultDirectoryPath());
+        		d.setDirectory(touist.TouIST.getWhereToSave());
         	} else {
         		d.setDirectory(openedFile.getParent().toString());
         	}
