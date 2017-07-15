@@ -37,12 +37,11 @@ import java.awt.Robot;
 import java.awt.event.KeyEvent;
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.StringReader;
-import java.net.URI;
-import java.net.URISyntaxException;
+import java.nio.file.FileSystems;
+import java.nio.file.Path;
 import java.util.ListIterator;
 import java.util.Map;
 
@@ -50,14 +49,12 @@ import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-import solution.ModelList;
 import solution.SolverExecutionException;
 import solution.SolverQBF;
 import solution.SolverSMT;
 import solution.SolverTestSAT4J;
 import touist.TouIST;
 import translation.TranslationError;
-import translation.TranslatorSAT;
 
 /**
  *
@@ -68,15 +65,15 @@ public class ParentEditionPanel extends AbstractComponentPanel {
 	private static final int ERROR_MESSAGE_MAX_LENGTH = 76;
     private String jLabelErrorMessageText;
     private Thread testThread;
-    protected String onDiskPath = null;
-    protected String onDiskFilename = null;
+    protected Path openedFile = null;
+    protected MainFrame mainframe = null;
 
     /**
      * Creates new form FormulasPanel
      */
-    public ParentEditionPanel() {
+    public ParentEditionPanel(MainFrame parent) {
         initComponents();
-        
+        mainframe = parent;
         testThread = new Thread();
         
         editor.initPalette();
@@ -393,43 +390,47 @@ public class ParentEditionPanel extends AbstractComponentPanel {
     
     public void open(String filepath) {
     	System.out.println("Opening file '"+filepath+"'");
-    	File file = (new File(filepath)).getAbsoluteFile();
+    	Path file = FileSystems.getDefault().getPath(filepath);
         try {
-            getFrame().getTextInEditor().loadFile(file.getAbsolutePath());
-        } catch(Exception e) {
-            System.err.println("Failed to load file: " + file.getAbsolutePath());
-            showErrorMessage(e,"Failed to load file: '" + file.getAbsolutePath() + "'","");
-        }
-    	if(file.exists()) {
-    		String text = getFrame().getTextInEditor().get();
+            getFrame().getTextInEditor().loadFile(file.toString());
+            String text = getFrame().getTextInEditor().get();
             editor.setText(text);
-    		this.onDiskPath = file.getParent();
-            this.onDiskFilename = file.getName();
-    	}
+            openedFile = file;
+            mainframe.setOpenedFilename(file.toString());
+        } catch(Exception e) {
+            System.err.println("Failed to load file: " + file.toString() + "\n" + e.getMessage());
+            showErrorMessage(e,"Failed to load file: '" + file.toString() + "'\n" + e.toString(),"");
+        }
     }
 
+    /**
+     *
+     * @param saveAs if set to true, will always behave like 'save as';
+     *               if set to false, will behave either as a 'save' (or save as
+     *               if no fil is already opened)
+     */
     public void exportHandler(boolean saveAs) {
         getFrame().getTextInEditor().set(editor.getText());
 
-        if(saveAs || onDiskPath == null) {
+        if(saveAs || openedFile == null) {
         	FileDialog d = new FileDialog(getFrame());
         	
-        	if(onDiskPath == null) {
+        	if(openedFile == null) {
         		d.setDirectory(getFrame().getDefaultDirectoryPath());
         	} else {
-        		d.setDirectory(onDiskPath);
+        		d.setDirectory(openedFile.getParent().toString());
         	}
         	
         	d.setMode(FileDialog.SAVE);
         	d.setVisible(true);
         	if(d.getFile() != null){
-        		onDiskPath = d.getDirectory();
-           	 	onDiskFilename = d.getFile();
+        		openedFile = FileSystems.getDefault().getPath(d.getDirectory() + File.separator + d.getFile());
            }
         }
     	
         try {
-        	getFrame().getTextInEditor().saveToFile(onDiskPath + onDiskFilename);
+        	getFrame().getTextInEditor().saveToFile(openedFile.toString());
+            mainframe.setOpenedFilename(openedFile.toString());
         } catch (IOException e) {
             String warningWindowTitle = getFrame().getLang().getWord(Lang.EDITION_EXPORT_FAILURE_TITLE);
             String warningWindowText = getFrame().getLang().getWord(Lang.EDITION_EXPORT_FAILURE_TEXT);

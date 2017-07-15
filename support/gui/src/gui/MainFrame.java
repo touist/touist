@@ -91,7 +91,7 @@ public class MainFrame extends javax.swing.JFrame {
         lang = new Lang(Locale.getDefault());
         
     	cards = new JPanel(new CardLayout());
-    	editorPanel1 = new ParentEditionPanel();
+    	editorPanel1 = new ParentEditionPanel(this);
         resultsPanel1 = new ResultsPanel();
         resultsMenuBar = new ResultsMenuBar(this);
         editionMenuBar = new EditionMenuBar(this);
@@ -117,11 +117,20 @@ public class MainFrame extends javax.swing.JFrame {
     }
     
     public void updateLanguage() {
-        this.setTitle(lang.getWord(Lang.FRAME_TITLE) +" "+ properties.getProperty("version"));
+        setOpenedFilename("");
         editorPanel1.updateLanguage();
         resultsPanel1.updateLanguage();
         resultsMenuBar.updateLanguage();
         editionMenuBar.updateLanguage();
+    }
+
+    public void setOpenedFilename(String name) {
+        String windowTitle = lang.getWord(Lang.FRAME_TITLE) +" "+ properties.getProperty("version");
+        if(name.isEmpty()) {
+            this.setTitle(windowTitle);
+        } else {
+            this.setTitle(windowTitle + " - " + name);
+        }
     }
 
     public TextInEditor getTextInEditor() {
