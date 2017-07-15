@@ -124,6 +124,17 @@ public class ParentEditionPanel extends AbstractComponentPanel {
                 @Override
                 public void openFiles(com.apple.eawt.AppEvent.OpenFilesEvent e) {
                     if (e.getFiles().get(0) instanceof File) {
+                        if(hasUnsavedChanges()) {
+                            int confirmed = JOptionPane.showConfirmDialog(null,
+                                    getFrame().getLang().getWord("ParentEditionPanel.saveOrLooseOnOpen"),
+                                    "", JOptionPane.YES_NO_CANCEL_OPTION);
+                            if (confirmed == JOptionPane.YES_OPTION) {
+                                saveHandler(false);
+                            } else if (confirmed == JOptionPane.NO_OPTION) {
+                            } else if (confirmed == JOptionPane.CANCEL_OPTION) {
+                                return;
+                            }
+                        }
                         open(((File) e.getFiles().get(0)).getAbsolutePath());
                     }
                 }
