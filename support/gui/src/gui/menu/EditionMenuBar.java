@@ -28,7 +28,11 @@ import gui.MainFrame;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
+
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.awt.event.WindowEvent;
+import java.net.URI;
 import java.util.Locale;
 import java.util.Scanner;
 
@@ -69,6 +73,11 @@ public class EditionMenuBar extends JMenuBar {
     JMenuItem jMenuItemZoomMore;
     JMenuItem jMenuItemZoomLess;
     JMenuItem jMenuItemSettings;
+    JMenuItem jMenuItemManualPdf;
+    JMenuItem jMenuItemManualHtml;
+    JMenuItem jMenuItemChangelog;
+    JMenuItem jMenuItemProjectPage;
+    JMenuItem jMenuItemLicense;
     
     
     public EditionMenuBar(MainFrame parent){
@@ -79,106 +88,146 @@ public class EditionMenuBar extends JMenuBar {
         jMenuEdit = new JMenu();
         jMenuView = new JMenu();
         
-        
         jMenuItemEnglish = new JMenuItem("English");
         jMenuItemFrench = new JMenuItem("Fran\u00E7ais");
         
         jMenuItemSaveFile = new JMenuItem();
-        jMenuItemSaveFile.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_S, java.awt.Event.META_MASK));
+        jMenuItemSaveFile.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, KeyEvent.META_MASK));
         jMenuItemSaveAsFile = new JMenuItem();
-        jMenuItemSaveAsFile.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_S, Event.SHIFT_MASK + Event.META_MASK));
+        jMenuItemSaveAsFile.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, KeyEvent.SHIFT_MASK + KeyEvent.META_MASK));
         jMenuItemLoadFile = new JMenuItem();
-        jMenuItemLoadFile.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_O, java.awt.Event.META_MASK));
+        jMenuItemLoadFile.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, KeyEvent.META_MASK));
         jMenuItemQuit = new JMenuItem();
-        jMenuItemQuit.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_Q, java.awt.Event.META_MASK));
+        jMenuItemQuit.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Q, KeyEvent.META_MASK));
         
         jMenuItemUndo = new JMenuItem();
-        jMenuItemUndo.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_Z, java.awt.Event.META_MASK));
+        jMenuItemUndo.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Z, KeyEvent.META_MASK));
         jMenuItemRedo = new JMenuItem();
-        jMenuItemRedo.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_Y, java.awt.Event.META_MASK));
+        jMenuItemRedo.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Y, KeyEvent.META_MASK));
         
         jMenuItemZoomMore = new JMenuItem();
-        jMenuItemZoomMore.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_PLUS, java.awt.Event.META_MASK));
+        jMenuItemZoomMore.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_PLUS, KeyEvent.META_MASK));
         jMenuItemZoomLess = new JMenuItem();
-        jMenuItemZoomLess.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_MINUS, java.awt.Event.META_MASK));
+        jMenuItemZoomLess.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, KeyEvent.META_MASK));
         
         
         jMenuItemHelpEditor = new JMenuItem();
         jMenuItemAbout = new JMenuItem();
         
         jMenuItemSettings = new JMenuItem();
+
+        jMenuItemManualPdf = new JMenuItem();
+        jMenuItemManualHtml = new JMenuItem();
+        jMenuItemChangelog = new JMenuItem();
+        jMenuItemProjectPage = new JMenuItem();
+        jMenuItemLicense = new JMenuItem();
         
-        jMenuItemEnglish.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        jMenuItemEnglish.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
                 jMenuItemEnglishActionPerformed(evt);
             }
         });
         
-        jMenuItemFrench.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        jMenuItemFrench.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
                 jMenuItemFrenchActionPerformed(evt);
             }
         });
         
-        jMenuItemSaveFile.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) { jMenuItemSaveFileActionPerformed(evt); }
+        jMenuItemSaveFile.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) { jMenuItemSaveFileActionPerformed(evt); }
         });
 
-        jMenuItemSaveAsFile.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) { jMenuItemSaveAsFileActionPerformed(evt); }
+        jMenuItemSaveAsFile.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) { jMenuItemSaveAsFileActionPerformed(evt); }
         });
         
-        jMenuItemLoadFile.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        jMenuItemLoadFile.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
                 jMenuItemLoadFileActionPerformed(evt);
             }
         });
-        jMenuItemQuit.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {jMenuItemQuitActionPerformed(evt);}
+        jMenuItemQuit.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {jMenuItemQuitActionPerformed(evt);}
         });
         
-        jMenuItemHelpEditor.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        jMenuItemHelpEditor.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
                 jMenuItemHelpEditorActionPerformed(evt);
             }
         });
         
-        jMenuItemAbout.addActionListener(new java.awt.event.ActionListener() {
+        jMenuItemAbout.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
                 jMenuItemAboutActionPerformed(evt);
             }
         });
         
-        jMenuItemUndo.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        jMenuItemUndo.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
                 jMenuItemUndoActionPerformed(evt);
             }
         });
         
-        jMenuItemRedo.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        jMenuItemRedo.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
                 jMenuItemRedoActionPerformed(evt);
             }
         });
         
-        jMenuItemZoomMore.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        jMenuItemZoomMore.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
                 jMenuItemZoomMoreActionPerformed(evt);
             }
         });
         
-        jMenuItemZoomLess.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        jMenuItemZoomLess.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
                 jMenuItemZoomLessActionPerformed(evt);
             }
         });
         
-        jMenuItemSettings.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        jMenuItemSettings.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
                 jMenuItemSettingsActionPerformed(evt);
             }
         });
-        
+
+        jMenuItemManualPdf.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                if(Desktop.isDesktopSupported())
+                    try {Desktop.getDesktop().browse(new URI("https://www.irit.fr/touist/doc/reference-manual.html"));}
+                    catch (Exception e) { System.err.println(e.getMessage());}
+            }
+        });
+        jMenuItemManualHtml.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                if(Desktop.isDesktopSupported())
+                    try {Desktop.getDesktop().browse(new URI("https://www.irit.fr/touist/doc/reference-manual.pdf"));}
+                    catch (Exception e) { System.err.println(e.getMessage());}
+            }
+        });
+        jMenuItemChangelog.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                if(Desktop.isDesktopSupported())
+                    try {Desktop.getDesktop().browse(new URI("https://github.com/touist/touist/blob/master/CHANGELOG"));}
+                    catch (Exception e) { System.err.println(e.getMessage());}
+            }
+        });
+        jMenuItemProjectPage.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                if(Desktop.isDesktopSupported())
+                    try {Desktop.getDesktop().browse(new URI("https://www.irit.fr/touist"));}
+                    catch (Exception e) { System.err.println(e.getMessage());}
+            }
+        });
+        jMenuItemLicense.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                if(Desktop.isDesktopSupported())
+                    try {Desktop.getDesktop().browse(new URI("https://github.com/touist/touist/blob/master/LICENSE"));}
+                    catch (Exception e) { System.err.println(e.getMessage());}
+            }
+        });
         
         
         jMenuFile.add(jMenuItemSaveFile);
@@ -187,9 +236,15 @@ public class EditionMenuBar extends JMenuBar {
         jMenuFile.add(jMenuItemQuit);
         jMenuLanguage.add(jMenuItemFrench);
         jMenuLanguage.add(jMenuItemEnglish);
-        jMenuHelp.add(jMenuItemHelpEditor);
+        jMenuHelp.add(jMenuItemManualPdf);
+        jMenuHelp.add(jMenuItemManualHtml);
+        jMenuHelp.add(jMenuItemChangelog);
+        jMenuHelp.add(jMenuItemProjectPage);
+        jMenuHelp.add(jMenuItemLicense);
         jMenuHelp.add(jMenuItemSettings);
         jMenuHelp.add(jMenuItemAbout);
+        jMenuHelp.add(jMenuItemHelpEditor);
+
         jMenuEdit.add(jMenuItemUndo);
         jMenuEdit.add(jMenuItemRedo);
         jMenuView.add(jMenuItemZoomMore);
@@ -205,34 +260,34 @@ public class EditionMenuBar extends JMenuBar {
         
     }
     
-    private void jMenuItemEnglishActionPerformed(java.awt.event.ActionEvent evt) {
+    private void jMenuItemEnglishActionPerformed(ActionEvent evt) {
         parent.setLanguage(Locale.ENGLISH);
         parent.updateLanguage();
         System.out.println("Language set to ENGLISH");
     }                                           
     
-    private void jMenuItemFrenchActionPerformed(java.awt.event.ActionEvent evt) { 
+    private void jMenuItemFrenchActionPerformed(ActionEvent evt) { 
         parent.setLanguage(Locale.FRENCH);        
         parent.updateLanguage();
         System.out.println("Language set to FRENCH");
         
     }
     
-    private void jMenuItemSaveFileActionPerformed(java.awt.event.ActionEvent evt) {  
+    private void jMenuItemSaveFileActionPerformed(ActionEvent evt) {  
         parent.getEditorPanel1().saveHandler(false);
     }
-    private void jMenuItemSaveAsFileActionPerformed(java.awt.event.ActionEvent evt) {
+    private void jMenuItemSaveAsFileActionPerformed(ActionEvent evt) {
         parent.getEditorPanel1().saveHandler(true);
     }
     
-    private void jMenuItemLoadFileActionPerformed(java.awt.event.ActionEvent evt) {  
+    private void jMenuItemLoadFileActionPerformed(ActionEvent evt) {  
         parent.getEditorPanel1().openHandler();
     }
-    private void jMenuItemQuitActionPerformed(java.awt.event.ActionEvent evt) {
+    private void jMenuItemQuitActionPerformed(ActionEvent evt) {
         parent.dispatchEvent(new WindowEvent(parent, WindowEvent.WINDOW_CLOSING));
     }
     
-    private void jMenuItemHelpEditorActionPerformed(java.awt.event.ActionEvent evt) {  
+    private void jMenuItemHelpEditorActionPerformed(ActionEvent evt) {  
 		// create jeditorpane
         JEditorPane jEditorPane = new JEditorPane();
         
@@ -278,26 +333,26 @@ public class EditionMenuBar extends JMenuBar {
         j.setVisible(true);
     }
     
-    private void jMenuItemAboutActionPerformed(java.awt.event.ActionEvent evt) {
+    private void jMenuItemAboutActionPerformed(ActionEvent evt) {
         JOptionPane.showMessageDialog(this, 
                 new AboutPanel(), 
                 parent.getLang().getWord(Lang.EDITION_MENUITEM_ABOUT), 
                 JOptionPane.PLAIN_MESSAGE);
     }
     
-    private void jMenuItemUndoActionPerformed(java.awt.event.ActionEvent evt) {  
+    private void jMenuItemUndoActionPerformed(ActionEvent evt) {  
         parent.getEditorPanel1().undo();
     }
     
-    private void jMenuItemRedoActionPerformed(java.awt.event.ActionEvent evt) {  
+    private void jMenuItemRedoActionPerformed(ActionEvent evt) {  
         parent.getEditorPanel1().redo();
     }
     
-    private void jMenuItemZoomMoreActionPerformed(java.awt.event.ActionEvent evt) {  
+    private void jMenuItemZoomMoreActionPerformed(ActionEvent evt) {  
         parent.getEditorPanel1().zoom(1);
     }
     
-    private void jMenuItemZoomLessActionPerformed(java.awt.event.ActionEvent evt) {  
+    private void jMenuItemZoomLessActionPerformed(ActionEvent evt) {  
         parent.getEditorPanel1().zoom(-1);
     }
 
@@ -329,6 +384,10 @@ public class EditionMenuBar extends JMenuBar {
         this.jMenuItemZoomLess.setText(parent.getLang().getWord(Lang.EDITION_MENUITEM_ZOOMLESS));
         this.jMenuItemSettings.setText(parent.getLang().getWord(Lang.SETTINGS_TITLE));
 
+        this.jMenuItemManualPdf.setText(parent.getLang().getWord("EditionMenuBar.jMenuItemManualPdf"));
+        this.jMenuItemManualHtml.setText(parent.getLang().getWord("EditionMenuBar.jMenuItemManualHtml"));
+        this.jMenuItemChangelog.setText(parent.getLang().getWord("EditionMenuBar.jMenuItemChangelog"));
+        this.jMenuItemProjectPage.setText(parent.getLang().getWord("EditionMenuBar.jMenuItemProjectPage"));
+        this.jMenuItemLicense.setText(parent.getLang().getWord("EditionMenuBar.jMenuItemLicense"));
     }
-    
 }
