@@ -1,3 +1,13 @@
+v3.4.0
+  - interface: 'save' and 'open' now remember the last file opened; the current
+    file is displayed in the window title. Also, a friendly warning is now
+    displayed when opening or quitting while the current file is unsaved.
+  - interface: drag-and-drop enabled on macOS (dropping on the dock or in the
+    app) and on Windows (only on the exe)
+  - interface: added links to the manual in 'Help' menu
+  - interface: on macOS, a native application is now available; on Windows,
+    a .exe is available (instead of clicking on the .jar). On Linux, a simple
+    script launches the jar.
 v3.2.3
   - added an option (--debug) which enable the display of stacktrace
     on exception catched on exit
