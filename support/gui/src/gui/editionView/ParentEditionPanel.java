@@ -206,11 +206,11 @@ public class ParentEditionPanel extends AbstractComponentPanel {
         switch(((MainFrame)(getRootPane().getParent())).state) {
             case EDITION :
                 setState(State.EDITION);
-                importHandler();
+                openHandler();
                 break;
             case EDITION_ERROR :
                 setState(State.EDITION_ERROR);
-                importHandler();
+                openHandler();
                 break;
             case NO_RESULT :
                 // impossible
@@ -316,11 +316,11 @@ public class ParentEditionPanel extends AbstractComponentPanel {
         switch(((MainFrame)(getRootPane().getParent())).state) {
             case EDITION :
                 setState(State.EDITION);
-                exportHandler(true);
+                saveHandler(true);
                 break;
             case EDITION_ERROR :
                 setState(State.EDITION_ERROR);
-                exportHandler(true);
+                saveHandler(true);
                 break;
             case NO_RESULT :
                 // impossible
@@ -372,7 +372,7 @@ public class ParentEditionPanel extends AbstractComponentPanel {
     private javax.swing.JButton solveButton;
     // End of variables declaration//GEN-END:variables
 
-    public void importHandler() {
+    public void openHandler() {
 
 		FileDialog d = new FileDialog(getFrame()); 
 		d.setDirectory(getFrame().getDefaultDirectoryPath());
@@ -409,7 +409,7 @@ public class ParentEditionPanel extends AbstractComponentPanel {
      *               if set to false, will behave either as a 'save' (or save as
      *               if no fil is already opened)
      */
-    public void exportHandler(boolean saveAs) {
+    public void saveHandler(boolean saveAs) {
         getFrame().getTextInEditor().set(editor.getText());
 
         if(saveAs || openedFile == null) {

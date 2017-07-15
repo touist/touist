@@ -206,11 +206,11 @@ public class EditionMenuBar extends JMenuBar {
     }
     
     private void jMenuItemSaveFileActionPerformed(java.awt.event.ActionEvent evt) {  
-        parent.getEditorPanel1().exportHandler(false);
+        parent.getEditorPanel1().saveHandler(false);
     }
     
     private void jMenuItemLoadFileActionPerformed(java.awt.event.ActionEvent evt) {  
-        parent.getEditorPanel1().importHandler();
+        parent.getEditorPanel1().openHandler();
     }
     
     private void jMenuItemHelpEditorActionPerformed(java.awt.event.ActionEvent evt) {  
