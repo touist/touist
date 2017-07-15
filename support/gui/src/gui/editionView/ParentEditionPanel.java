@@ -67,8 +67,20 @@ public class ParentEditionPanel extends AbstractComponentPanel {
 	private static final int ERROR_MESSAGE_MAX_LENGTH = 76;
     private String jLabelErrorMessageText;
     private Thread testThread;
-    protected Path openedFile = null;
+    private Path openedFile = null;
     protected MainFrame mainframe = null;
+
+
+    public void setOpenedFile(Path file) {
+        String windowTitle = mainframe.getLang().getWord(Lang.FRAME_TITLE) + " "
+                + touist.TouIST.properties.getProperty("version");
+        if(file == null) {
+            mainframe.setTitle(windowTitle);
+        } else {
+            mainframe.setTitle(windowTitle + " - " + file.toString());
+        }
+        openedFile = file;
+    }
 
     public boolean hasUnsavedChanges() {
         if(openedFile == null) {
@@ -482,8 +494,7 @@ public class ParentEditionPanel extends AbstractComponentPanel {
     	Path file = FileSystems.getDefault().getPath(filepath);
         try {
             editor.loadIntoTextEditor(file.toString());
-            openedFile = file;
-            mainframe.setOpenedFilename(file.toString());
+            setOpenedFile(file);
         } catch(Exception e) {
             System.err.println("Failed to load file: " + file.toString() + "\n" + e.getMessage());
             showErrorMessage(e,"Failed to load file: '" + file.toString() + "'\n" + e.toString(),"");
@@ -510,14 +521,13 @@ public class ParentEditionPanel extends AbstractComponentPanel {
         	d.setMode(FileDialog.SAVE);
         	d.setVisible(true);
         	if(d.getFile() != null){
-        		openedFile = FileSystems.getDefault().getPath(d.getDirectory() + File.separator + d.getFile());
+                setOpenedFile(FileSystems.getDefault().getPath(d.getDirectory() + File.separator + d.getFile()));
            }
         }
 
         try {
             if(openedFile != null) {
                 editor.saveToFile(openedFile.toString());
-                mainframe.setOpenedFilename(openedFile.toString());
             }
         } catch (IOException e) {
             String warningWindowTitle = getFrame().getLang().getWord(Lang.EDITION_EXPORT_FAILURE_TITLE);
@@ -839,6 +849,7 @@ public class ParentEditionPanel extends AbstractComponentPanel {
     
     @Override
     public void updateLanguage() {
+        setOpenedFile(openedFile);
         importButton.setText(getFrame().getLang().getWord(Lang.EDITION_IMPORT));
         importButton.setToolTipText(getFrame().getLang().getWord("ParentEditionPanel.importButton.tooltip"));
         exportButton.setText(getFrame().getLang().getWord(Lang.EDITION_EXPORT));

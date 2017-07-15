@@ -42,8 +42,7 @@ import solution.SolverExecutionException;
  * @author Skander
  */
 public class TouIST {
-	private static TouistProperties properties = new TouistProperties();
-	private static Preferences preferences;
+	public static TouistProperties properties = new TouistProperties();
 	private static MainFrame frame;
 
 	/**

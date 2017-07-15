@@ -48,7 +48,6 @@ import translation.TranslatorSMT;
  * @author Skander
  */
 public class MainFrame extends javax.swing.JFrame {
-    private TouistProperties properties = new TouistProperties();
     private TranslatorSAT translatorSAT = new TranslatorSAT();
     private TranslatorSMT translatorSMT = new TranslatorSMT();
     private Solver solver;
@@ -103,27 +102,17 @@ public class MainFrame extends javax.swing.JFrame {
             setIconImage(ImageIO.read(this.getClass().getResourceAsStream("/images/logo64.png")));
         } catch (IOException ex) {
             ex.printStackTrace();
-        }  
+        }
         
         this.setJMenuBar(editionMenuBar);
         updateLanguage();
     }
     
     public void updateLanguage() {
-        setOpenedFilename("");
         editorPanel1.updateLanguage();
         resultsPanel1.updateLanguage();
         resultsMenuBar.updateLanguage();
         editionMenuBar.updateLanguage();
-    }
-
-    public void setOpenedFilename(String name) {
-        String windowTitle = lang.getWord(Lang.FRAME_TITLE) +" "+ properties.getProperty("version");
-        if(name.isEmpty()) {
-            this.setTitle(windowTitle);
-        } else {
-            this.setTitle(windowTitle + " - " + name);
-        }
     }
 
     public Solver getSolver() {
