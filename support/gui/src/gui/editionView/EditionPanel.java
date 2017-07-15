@@ -117,8 +117,8 @@ public class EditionPanel extends AbstractComponentPanel {
         latexView.setLayout(new FlowLayout());
         latexView.add(latexLabel = new JLabel(),FlowLayout.LEFT);
         latexLabel.setVisible(true);
-        
-        
+
+
         editorTextArea.addCaretListener(new CaretListener() {
 
             @Override

@@ -36,6 +36,7 @@ import javax.swing.JOptionPane;
 
 import gui.MainFrame;
 import solution.SolverExecutionException;
+
 /**
  *
  * @author Skander
@@ -64,21 +65,6 @@ public class TouIST {
 		if(args.length > 0) {
 			frame.getEditorPanel1().open(args[0]);
 		}
-		// Better user interface integration with macOS
-		if(System.getProperty("os.name").toLowerCase().contains("mac")) {
-			System.setProperty("apple.laf.useScreenMenuBar", "true");
-			System.setProperty("com.apple.mrj.application.apple.menu.about.name", "TouIST");
-			com.apple.eawt.Application a = com.apple.eawt.Application.getApplication();
-			a.setOpenFileHandler(new com.apple.eawt.OpenFilesHandler() {
-		        @Override
-		        public void openFiles(com.apple.eawt.AppEvent.OpenFilesEvent e) {
-					if (e.getFiles().get(0) instanceof File) {
-						frame.getEditorPanel1().open(((File) e.getFiles().get(0)).getAbsolutePath());
-					}
-		        }
-		    });
-		}
-
 	}
 	/**
 	 * We use this for getting the actual place where touist.jar is located in.
@@ -117,6 +103,5 @@ public class TouIST {
 		Path p = FileSystems.getDefault().getPath(path);
 		return p.normalize().toString();
 	}
-
 }
 
