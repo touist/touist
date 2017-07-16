@@ -1,0 +1,184 @@
+plugins {
+    id "edu.sc.seis.macAppBundle" version "2.1.6" // For TouIST.app on macOS
+    id 'edu.sc.seis.launch4j' version '2.3.0' // For TouIST.exe on Windows
+    id 'com.palantir.git-version' version '0.8.0'
+    //id "com.github.johnrengelman.shadow" version "2.0.1" // For building the 'fat-jar' touist.jar that includes deps
+    id 'eclipse'
+    id 'idea'
+}
+
+//apply plugin: 'com.github.johnrengelman.shadow'
+apply plugin: 'edu.sc.seis.launch4j'
+apply plugin: 'java'
+apply plugin: 'application'
+
+
+description = 'A friendly language for propositional logic and more'
+group = 'org.irit'
+sourceCompatibility = 1.7
+version gitVersion()
+mainClassName = 'touist.TouIST'
+applicationName = project.name
+applicationDefaultJvmArgs = [
+        "-Dtouist.externalRelativeDir=../lib",
+        "-Dtouist.saveRelativeDir=../"
+]
+
+repositories{
+    jcenter()
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '4.0.1'
+}
+
+tasks.withType(JavaCompile) {
+    sourceCompatibility='1.7'
+}
+
+task generateVersion {
+    inputs.property("version", project.version) // regenerate if project.version changes
+    outputs.dir file("resources/version.properties")
+    doLast {
+        def props = new Properties()
+        props.setProperty("version", project.version)
+        props.setProperty("description", project.description)
+        props.setProperty("timestamp", new Date().toString())
+        file("resources/version.properties").withPrintWriter { props.list(it) }
+    }
+}
+compileJava.dependsOn generateVersion
+
+sourceSets {
+    main {
+        java {
+            srcDir 'src'
+        }
+        resources {
+            srcDir 'resources'
+            exclude '**/launch4j','**/macappbundle'
+        }
+    }
+}
+
+dependencies {
+    //shadow 'com.yuvimasory:orange-extensions:1.3.0'
+    //shadow 'com.fifesoft:rsyntaxtextarea:2.6.1'
+    //shadow 'org.scilab.forge:jlatexmath:1.0.6'
+    //shadow 'org.kordamp.ikonli:ikonli-swing:1.9.0'
+    //shadow 'org.kordamp.ikonli:ikonli-fontawesome-pack:1.9.0'
+
+    compile 'com.fifesoft:rsyntaxtextarea:2.6.1'
+    compile 'org.scilab.forge:jlatexmath:1.0.6'
+    compile 'com.yuvimasory:orange-extensions:1.3.0'
+    compile 'org.kordamp.ikonli:ikonli-swing:1.9.0'
+    compile 'org.kordamp.ikonli:ikonli-fontawesome-pack:1.9.0'
+}
+
+jar {
+    baseName = 'touist'
+    manifest {
+        // WARNING: do not remove the '.' from the classpath. If you do,
+        // there will be a nullPointerException because we use getResource(".")
+        attributes 'Class-Path': '.'
+    }
+}
+
+//shadowJar {
+//    baseName = 'touist'
+//    configurations = [project.configurations.compile]
+//}
+
+distributions {
+    main {
+        contents {
+            //exclude 'lib'
+            //from jar {into 'lib'}
+            from ('external') {
+                include 'touist','yices-smt2','minisat.jar'
+                into 'lib'
+            }
+            //from startScripts
+        }
+    }
+}
+
+macAppBundle {
+    mainClassName = project.mainClassName
+    bundleJRE = false
+    icon = 'resources/macappbundle/logo.icns'
+    javaProperties.put("apple.laf.useScreenMenuBar", "true")
+    javaProperties.put("touist.externalRelativeDir", "../external")
+    javaProperties.put("touist.saveRelativeDir", "../../..")
+    javaProperties.put("apple.laf.useScreenMenuBar", "true")
+    javaProperties.put("com.apple.macos.use-file-dialog-packages", "true")
+    javaProperties.put("com.apple.macos.useScreenMenuBar", "true")
+    javaProperties.put("com.apple.mrj.application.apple.menu.about.name", name)
+    javaProperties.put("com.apple.smallTabs", "true")
+    javaProperties.put("file.encoding", "UTF-8")
+    // The following allows macOS to recognize .touist and .touistl files
+    bundleExtras.put("CFBundleDocumentTypes", [ [
+        CFBundleTypeExtensions: [ 'touist','touistl' ],
+        CFBundleTypeIconFile: 'logo.icns',
+        CFBundleTypeName: project.name + ' source file',
+        CFBundleTypeRole: 'Editor',
+        LSHandlerRank: 'Owner'
+    ]])
+    javaExtras.put('-Xdock:name', name)
+    arguments = []
+    highResolutionCapable = false
+    // Using './gradlew -Ddebug=true createApp' we debug remotely TouIST.app
+    if (System.getProperty('debug', 'false') == 'true') {
+        javaExtras.put('-agentlib:jdwp','transport=dt_socket,server=y,suspend=n,address=5005')
+        javaProperties.put("debug", "true")
+    }
+}
+
+// This task will simpy copy 'touist', 'minisat.jar' and any other external binary to
+// the newly created TouIST.app
+// Copied from the build.gradle of https://github.com/crashinvaders/gdx-texture-packer-gui/
+task copyToMacAppBundle (type: Copy) {
+    from ('external')
+    include 'touist','yices-smt2','minisat.jar'
+    into "build/${macAppBundle.appOutputDir}/TouIST.app/Contents/external"
+}
+createApp.dependsOn copyToMacAppBundle
+
+createExe {
+    mainClassName = project.mainClassName
+    icon = "${project.rootDir}/resources/launch4j/logo.ico"
+    jreMinVersion = '1.7.0'
+    version = version
+    textVersion = version
+    companyName = 'IRIT'
+    copyright = '2017 © IRIT'
+    jvmOptions = [
+            //'-Dswing.defaultlaf=javax.swing.plaf.nimbus.NimbusLookAndFeel',
+            '-Dtouist.externalRelativeDir=lib',
+            '-Dtouist.saveRelativeDir=.',
+            '-Dfile.encoding=UTF-8'
+    ]
+    fileDescription = project.description
+    productName = project.name
+}
+
+task copyToWindowsBundle (type: Copy) {
+    from ('external')
+    include 'touist','yices-smt2','minisat.jar'
+    into "build/${launch4j.outputDir}/${launch4j.libraryDir}"
+}
+createExe.dependsOn copyToWindowsBundle
+
+task createExeZip(type: Zip) {
+    dependsOn createExe
+    from "build/${launch4j.outputDir}"
+    include '*'
+    include '*/*'
+    archiveName 'TouIST.zip'
+    destinationDir file('build/winApp')
+}
+
+
+createDmg.enabled = false
+distTar.enabled = false
+//shadowDistTar.enabled = false
