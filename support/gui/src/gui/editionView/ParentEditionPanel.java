@@ -336,33 +336,37 @@ public class ParentEditionPanel extends AbstractComponentPanel {
     
 	private boolean isStopInsteadOfTest = false;
     private void solveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_solveButtonActionPerformed
+        solve();
+    }//GEN-LAST:event_solveButtonActionPerformed
+
+    public void solve() {
         switch(((MainFrame)(getRootPane().getParent())).state) {
             case EDITION :
                 setJLabelErrorMessageText("");
-                
+
                 this.solveButton.setText(isStopInsteadOfTest
-                		?getFrame().getLang().getWord("ParentEditionPanel.testButton.text")
-                		:getFrame().getLang().getWord("ParentEditionPanel.stopButton.text"));
+                        ?getFrame().getLang().getWord("ParentEditionPanel.testButton.text")
+                        :getFrame().getLang().getWord("ParentEditionPanel.stopButton.text"));
                 isStopInsteadOfTest = (isStopInsteadOfTest)?false:true;
-                
+
                 if(testThread.isAlive()) {
                     testThread.interrupt();
                 }
-                
+
                 Process p = null;
-                
+
                 if (getFrame().getSolverSelection().getSelectedSolver() == SolverSelection.SolverType.SAT) {
                     p = getFrame().getTranslatorSAT().getP();
                 } else {
                     p = getFrame().getTranslatorSMT().getP();
                 }
-                
+
                 if(p != null && isAlive(p)){
                     p.destroy();
                 }
 
                 if(!isStopInsteadOfTest)
-                        break;
+                    break;
 
                 Runnable r = new Runnable() {
                     public void run() {
@@ -397,10 +401,10 @@ public class ParentEditionPanel extends AbstractComponentPanel {
             case LAST_RESULT :
                 // impossible
                 break;
-            default : 
+            default :
                 System.out.println("Undefined action set for the state : " + getState());
         }
-    }//GEN-LAST:event_solveButtonActionPerformed
+    }
 
     private void exportButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exportButtonActionPerformed
         switch(((MainFrame)(getRootPane().getParent())).state) {
