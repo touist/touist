@@ -38,6 +38,7 @@ import java.util.Map;
 
 import entity.Literal;
 import entity.Model;
+import touist.TouIST;
 
 /**
  * This class is a first implementation of the "Solver" abstract class. It
@@ -112,7 +113,7 @@ public class SolverTestSAT4J extends Solver {
 		 * 5 = solver timeout
 		 */
 
-		String pathminisat = getTouistDir() + File.separator + "external" + File.separator + "minisat.jar";
+		String pathminisat = TouIST.getTouistExternalDir() + File.separator + "minisat.jar";
 
 		String [] command = { "java", "-jar",pathminisat, this.dimacsFilePath} ;
 		System.out.println("launch(): cmd executed: "+Arrays.toString(command));
@@ -212,26 +213,5 @@ public class SolverTestSAT4J extends Solver {
 	 */
 	protected Map<Integer, String> getLiteralsMap() {
 		return literalsMap;
-	}
-	
-	/**
-	 * We use this for getting the actual place where touist.jar is located in.
-	 * We do not use getProperty("user.dir") because on linux, it returns (when
-	 * opening by clicking on touist.jar) the $HOME instead of the actual place where
-	 * touist.jar is.
-	 * @return
-	 */
-	private String getTouistDir() {
-		URL url = ClassLoader.getSystemClassLoader().getResource(".");
-		URI uri = null;
-		// URISyntaxException should ne ever be thrown because we expect getResource(".")
-		// to give a correct URL
-		try {
-			uri = new URI(url.toString());
-		} catch (URISyntaxException e) {
-			System.err.println("Something went wrong when trying to get where touist.jar is located:\n" + e.getMessage());
-		}
-		File path = new File(uri);
-		return path.getAbsolutePath();
 	}
 }

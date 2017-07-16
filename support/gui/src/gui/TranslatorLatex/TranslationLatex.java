@@ -72,7 +72,7 @@ public class TranslationLatex {
     }
     
     public boolean latexify(BufferedReader reader, String language) throws IOException, InterruptedException {
-		String pathtouist = touist.TouIST.getTouistDir() + File.separator + "external" + File.separator + "touist";
+		String pathtouist = touist.TouIST.getTouistBin();
 		
 		List<String> cmd = new ArrayList<String>();
 		

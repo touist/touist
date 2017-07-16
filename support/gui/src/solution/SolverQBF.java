@@ -103,7 +103,7 @@ public class SolverQBF extends Solver {
 		// TODO We should be warned if the "java -cp" command fails because it
 		// can't find the files
 
-		String pathtouist = touist.TouIST.getTouistDir() + File.separator + "external" + File.separator + "touist";
+		String pathtouist = touist.TouIST.getTouistBin();
 		
 		List<String> cmd = new ArrayList<String>();
 		

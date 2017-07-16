@@ -25,7 +25,7 @@ public class SolverSMT extends Solver {
     private BufferedReader stdout;
     private String smtpath;
     private static String CurrentPath=System.getProperty("user.dir");
-    public static String pathsolver=CurrentPath+File.separatorChar+"external"+File.separatorChar+"yices-smt2";
+    public static String pathsolver = touist.TouIST.getTouistExternalDir() + File.separatorChar + "yices-smt2";
     public SolverSMT(String smtpath) throws FileNotFoundException{
         File testfile=new File(smtpath);
         if (testfile.isFile())

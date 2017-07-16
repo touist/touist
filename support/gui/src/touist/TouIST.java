@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.prefs.Preferences;
 
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
@@ -61,7 +62,9 @@ public class TouIST {
 			} catch (Exception e) {}
 		}
 
-		System.out.println("main(): running app from folder '"+ System.getProperty("user.dir")+"'");
+		System.out.println("TouIST: running app from folder '"+ System.getProperty("user.dir")+"'");
+		System.out.println("* External binaries are in '"+getTouistExternalDir()+"'");
+		System.out.println("* Files are saved in '"+getWhereToSave()+"'");
 		MainFrame frame = new MainFrame();
 		frame.setVisible(true);
 	}
@@ -73,17 +76,39 @@ public class TouIST {
 	 * @return
 	 */
 	public static String getTouistDir() {
-		URL url = ClassLoader.getSystemClassLoader().getResource(".");
-		URI uri = null;
+		String pathToJar = ClassLoader.getSystemClassLoader().getResource(".").toString();
 		// URISyntaxException should ne ever be thrown because we expect getResource(".")
 		// to give a correct URL
+		String path = "";
 		try {
-			uri = new URI(url.toString());
+			path = (new File(new URI(pathToJar))).getAbsolutePath();
 		} catch (URISyntaxException e) {
 			System.err.println("Something went wrong when trying to get where touist.jar is located:\n" + e.getMessage());
 		}
-		File path = new File(uri);
-		return path.getAbsolutePath();
+		return path;
 	}
+	public static String getTouistExternalDir() {
+		String relativePath = System.getProperty("touist.externalRelativeDir");
+		if(relativePath == null) relativePath = "external";
+		return checkPath(TouIST.getTouistDir() + File.separator + relativePath);
+	}
+	public static String getTouistBin() {
+		return checkPath(TouIST.getTouistExternalDir() + File.separator + "touist"); 
+	}
+	public static String getWhereToSave() {
+		String relativePath = System.getProperty("touist.saveRelativeDir");
+		if(relativePath == null) relativePath = "..";
+		return checkPath(TouIST.getTouistDir() + File.separator + relativePath);
+	}
+	
+	private static String checkPath(String URIPath) {
+		try {
+			return (new File(new URI("file://"+URIPath))).getAbsolutePath();
+		} catch (URISyntaxException e) {
+			System.err.println("Something went wrong when trying to get where touist.jar is located:\n" + e.getMessage());
+			return null;
+		}
+	}
+
 }
 
