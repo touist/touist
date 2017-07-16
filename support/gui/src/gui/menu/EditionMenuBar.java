@@ -90,25 +90,25 @@ public class EditionMenuBar extends JMenuBar {
         
         jMenuItemEnglish = new JMenuItem("English");
         jMenuItemFrench = new JMenuItem("Fran\u00E7ais");
-        
+        int meta = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
         jMenuItemSaveFile = new JMenuItem();
-        jMenuItemSaveFile.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, KeyEvent.META_MASK));
+        jMenuItemSaveFile.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, meta));
         jMenuItemSaveAsFile = new JMenuItem();
-        jMenuItemSaveAsFile.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, KeyEvent.SHIFT_MASK + KeyEvent.META_MASK));
+        jMenuItemSaveAsFile.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, KeyEvent.SHIFT_MASK + meta));
         jMenuItemLoadFile = new JMenuItem();
-        jMenuItemLoadFile.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, KeyEvent.META_MASK));
+        jMenuItemLoadFile.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, meta));
         jMenuItemQuit = new JMenuItem();
-        jMenuItemQuit.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Q, KeyEvent.META_MASK));
+        jMenuItemQuit.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Q, meta));
         
         jMenuItemUndo = new JMenuItem();
-        jMenuItemUndo.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Z, KeyEvent.META_MASK));
+        jMenuItemUndo.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Z, meta));
         jMenuItemRedo = new JMenuItem();
-        jMenuItemRedo.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Y, KeyEvent.META_MASK));
+        jMenuItemRedo.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Y, meta));
         
         jMenuItemZoomMore = new JMenuItem();
-        jMenuItemZoomMore.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_PLUS, KeyEvent.META_MASK));
+        jMenuItemZoomMore.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_PLUS, meta));
         jMenuItemZoomLess = new JMenuItem();
-        jMenuItemZoomLess.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, KeyEvent.META_MASK));
+        jMenuItemZoomLess.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, meta));
         
         
         jMenuItemHelpEditor = new JMenuItem();
