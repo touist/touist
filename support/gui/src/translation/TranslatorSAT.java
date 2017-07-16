@@ -41,6 +41,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import touist.TouIST;
+
 /**
  * @author Abdel
  * @Modified by Mael
@@ -50,7 +52,7 @@ public class TranslatorSAT {
 	final private String outputTableFilePath = "out.table";
 	private Map<Integer,String> literalsMap = new HashMap<Integer,String>();
 	private List<TranslationError> errors = new ArrayList<TranslationError>();
-    private String currentPath = System.getProperty("user.dir");
+    private String currentPath = TouIST.getWhereToSave();
 	private Process p;
 	private List<String> options = new ArrayList<String>();
 
@@ -108,7 +110,7 @@ public class TranslatorSAT {
 		 */
 		// Check if translatorProgramFilePath is there
 		
-		String pathtouist = touist.TouIST.getTouistDir() + File.separator + "external" + File.separator + "touist";
+		String pathtouist = touist.TouIST.getTouistBin();
 
 		List<String> cmd = new ArrayList<String>();
 		
@@ -179,7 +181,7 @@ public class TranslatorSAT {
 	 * @return the file path
 	 */
 	public String getDimacsFilePath() {
-		return currentPath+File.separatorChar+outputFilePath;
+		return touist.TouIST.getWhereToSave() +File.separatorChar + outputFilePath;
 	}
 
 	/**

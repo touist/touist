@@ -53,6 +53,7 @@ import solution.SolverExecutionException;
 import solution.SolverQBF;
 import solution.SolverSMT;
 import solution.SolverTestSAT4J;
+import touist.TouIST;
 import translation.TranslationError;
 import translation.TranslatorSAT;
 
@@ -517,7 +518,7 @@ public class ParentEditionPanel extends AbstractComponentPanel {
                 f.deleteOnExit();
             } catch (IOException ex) {
                 ex.printStackTrace();
-                errorMessage = "The translator returned an IOException: \n"+ex.getMessage()+"\nCheck that touist is in external/ and that it has the right permissions.";
+                errorMessage = "The translator returned an IOException: \n"+ex.getMessage()+"\nCheck that touist is in "+TouIST.getTouistExternalDir()+"+and that it has the right permissions.";
                 showErrorMessage(ex, errorMessage, getFrame().getLang().getWord(Lang.ERROR_TRADUCTION));
                 return State.EDITION;
             } catch (InterruptedException ex) {
