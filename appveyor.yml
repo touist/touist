@@ -45,11 +45,11 @@ clone_folder: c:\touist
 
 environment:
   JAVA_HOME: 'C:\\Program Files (x86)\\Java\\jdk1.7.0'
-  CYG_ROOT: c:\ocaml32
   CYG_MIRROR: http://cygwin.mirror.constant.com
+  CYG_ROOT:  c:\ocaml32
+  CYG_BASH:  c:\ocaml32\bin\bash
+  CYG_SETUP: c:\setup-x86.exe
   CYG_CACHE: c:\ocaml32\var\cache\setup
-  CYG_BASH: c:\ocaml32\bin\bash
-  CYG_SETUP: setup-x86.exe
 
 
 # Build cache to preserve files/folders between builds (saves time)
@@ -66,7 +66,7 @@ cache:
 install:
   # Opam on Windows: http://fdopen.github.io/opam-repository-mingw
   - javac -version
-  - ps: 'Invoke-WebRequest http://cygwin.com/$env:CYG_SETUP -OutFile "$env:CYG_SETUP"'
+  - ps: 'Invoke-WebRequest http://cygwin.com/setup-x86.exe -OutFile "$env:CYG_SETUP"'
   - '%CYG_SETUP% --quiet-mode --no-shortcuts --only-site --root "%CYG_ROOT%" --site "%CYG_MIRROR%" --local-package-dir "%CYG_CACHE%" --packages rsync,patch,diffutils,curl,make,unzip,git,m4,perl,mingw64-i686-gcc-core,mingw64-i686-gmp --upgrade-also'
 
 build_script:
