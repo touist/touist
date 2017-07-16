@@ -134,6 +134,10 @@ macAppBundle {
     }
 }
 
+createAppZip {
+    archiveName "TouIST-${project.version}-mac.zip"
+}
+
 // This task will simpy copy 'touist', 'minisat.jar' and any other external binary to
 // the newly created TouIST.app
 // Copied from the build.gradle of https://github.com/crashinvaders/gdx-texture-packer-gui/
@@ -174,8 +178,8 @@ task createExeZip(type: Zip) {
     from "build/${launch4j.outputDir}"
     include '*'
     include '*/*'
-    archiveName 'TouIST.zip'
-    destinationDir file('build/winApp')
+    archiveName "TouIST-${project.version}-windows.zip"
+    destinationDir file('build/distributions')
 }
 
 
