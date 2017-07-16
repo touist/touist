@@ -75,3 +75,5 @@ support/gui/resources/version.properties
 src/version.ml
 
 support/gui/dist.zip
+
+.vscode
