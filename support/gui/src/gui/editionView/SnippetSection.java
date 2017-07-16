@@ -23,13 +23,17 @@
 
 package gui.editionView;
 
+import org.kordamp.ikonli.Ikon;
+import org.kordamp.ikonli.fontawesome.FontAwesomeIkonHandler;
+import org.kordamp.ikonli.swing.FontIcon;
+
 import java.awt.GridLayout;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.imageio.ImageIO;
-import javax.swing.ImageIcon;
+import javax.swing.*;
 
 /**
  *
@@ -38,8 +42,8 @@ import javax.swing.ImageIcon;
 public class SnippetSection extends javax.swing.JPanel {
 
     private List<InsertionButton> buttons;
-    private ImageIcon foldedIcon;
-    private ImageIcon unfoldedIcon;
+    private Icon foldedIcon;
+    private Icon unfoldedIcon;
     private boolean isFold;
 
     
@@ -58,7 +62,15 @@ public class SnippetSection extends javax.swing.JPanel {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-        snippetExpandButton.setIcon(foldedIcon);
+        FontIcon f = new FontIcon();
+        f.setIkon(new FontAwesomeIkonHandler().resolve("fa-angle-down"));
+        f.setIconSize(16);
+        foldedIcon = f;
+        f = new FontIcon();
+        f.setIkon(new FontAwesomeIkonHandler().resolve("fa-angle-left"));
+        f.setIconSize(16);
+        unfoldedIcon = f;
+        snippetExpandButton.setIcon(unfoldedIcon);
         buttons = new ArrayList<InsertionButton>();
         isFold = true;
     }

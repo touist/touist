@@ -35,11 +35,7 @@ import java.awt.AWTException;
 import java.awt.FileDialog;
 import java.awt.Robot;
 import java.awt.event.KeyEvent;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.StringReader;
+import java.io.*;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.util.ListIterator;
@@ -49,6 +45,8 @@ import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import org.kordamp.ikonli.fontawesome.FontAwesomeIkonHandler;
+import org.kordamp.ikonli.swing.FontIcon;
 import solution.SolverExecutionException;
 import solution.SolverQBF;
 import solution.SolverSMT;
@@ -84,6 +82,20 @@ public class ParentEditionPanel extends AbstractComponentPanel {
         for (SolverType solverType : SolverSelection.SolverType.values()) {
             selectSatOrSmt.addItem(solverType);
         }
+
+        FontIcon f = new FontIcon();
+        f.setIkon(new FontAwesomeIkonHandler().resolve("fa-save"));
+        f.setIconSize(18);
+        exportButton.setIcon(f);
+        f = new FontIcon();
+        f.setIkon(new FontAwesomeIkonHandler().resolve("fa-folder-open"));
+        f.setIconSize(18);
+        importButton.setIcon(f);
+        f = new FontIcon();
+        f.setIkon(new FontAwesomeIkonHandler().resolve("fa-gears"));
+        f.setIconSize(18);
+        solveButton.setIcon(f);
+
     }
     
     public void updateComboBoxSelectedSolver() {
@@ -316,11 +328,11 @@ public class ParentEditionPanel extends AbstractComponentPanel {
         switch(((MainFrame)(getRootPane().getParent())).state) {
             case EDITION :
                 setState(State.EDITION);
-                saveHandler(true);
+                saveHandler(false);
                 break;
             case EDITION_ERROR :
                 setState(State.EDITION_ERROR);
-                saveHandler(true);
+                saveHandler(false);
                 break;
             case NO_RESULT :
                 // impossible
@@ -414,7 +426,7 @@ public class ParentEditionPanel extends AbstractComponentPanel {
 
         if(saveAs || openedFile == null) {
         	FileDialog d = new FileDialog(getFrame());
-        	
+        	d.setFile("*.touist");
         	if(openedFile == null) {
         		d.setDirectory(touist.TouIST.getWhereToSave());
         	} else {
@@ -427,10 +439,12 @@ public class ParentEditionPanel extends AbstractComponentPanel {
         		openedFile = FileSystems.getDefault().getPath(d.getDirectory() + File.separator + d.getFile());
            }
         }
-    	
+
         try {
-        	getFrame().getTextInEditor().saveToFile(openedFile.toString());
-            mainframe.setOpenedFilename(openedFile.toString());
+            if(openedFile != null) {
+                getFrame().getTextInEditor().saveToFile(openedFile.toString());
+                mainframe.setOpenedFilename(openedFile.toString());
+            }
         } catch (IOException e) {
             String warningWindowTitle = getFrame().getLang().getWord(Lang.EDITION_EXPORT_FAILURE_TITLE);
             String warningWindowText = getFrame().getLang().getWord(Lang.EDITION_EXPORT_FAILURE_TEXT);
@@ -488,7 +502,7 @@ public class ParentEditionPanel extends AbstractComponentPanel {
         sinon passer à l'état SINGLE_RESULT
         Si aucun model n'existe alors passer a l'état NO_RESULT
         */
-        String path = touist.TouIST.checkPath(touist.TouIST.getWhereToSave() + File.separator + "temp.touistl");
+        String path = touist.TouIST.checkPath(touist.TouIST.getWhereToSave() + File.separator + "temp.touist");
         File touistFile = new File(path); //TODO se mettre d'accord sur un nom standard ou ajouter a Translator et BaseDeClause des méthode pour s'échange de objets File
         String errorMessage;
         

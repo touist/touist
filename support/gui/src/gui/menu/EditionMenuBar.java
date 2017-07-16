@@ -117,9 +117,11 @@ public class EditionMenuBar extends JMenuBar {
         });
         
         jMenuItemSaveFile.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItemSaveFileActionPerformed(evt);
-            }
+            public void actionPerformed(java.awt.event.ActionEvent evt) { jMenuItemSaveFileActionPerformed(evt); }
+        });
+
+        jMenuItemSaveAsFile.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) { jMenuItemSaveAsFileActionPerformed(evt); }
         });
         
         jMenuItemLoadFile.addActionListener(new java.awt.event.ActionListener() {
@@ -210,6 +212,9 @@ public class EditionMenuBar extends JMenuBar {
     
     private void jMenuItemSaveFileActionPerformed(java.awt.event.ActionEvent evt) {  
         parent.getEditorPanel1().saveHandler(false);
+    }
+    private void jMenuItemSaveAsFileActionPerformed(java.awt.event.ActionEvent evt) {
+        parent.getEditorPanel1().saveHandler(true);
     }
     
     private void jMenuItemLoadFileActionPerformed(java.awt.event.ActionEvent evt) {  
