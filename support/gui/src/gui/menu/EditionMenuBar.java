@@ -66,6 +66,7 @@ public class EditionMenuBar extends JMenuBar {
     JMenuItem jMenuItemSaveAsFile;
     JMenuItem jMenuItemLoadFile;
     JMenuItem jMenuItemQuit;
+    JMenuItem jMenuItemSolve;
     JMenuItem jMenuItemHelpEditor;
     JMenuItem jMenuItemAbout;
     JMenuItem jMenuItemUndo;
@@ -99,6 +100,8 @@ public class EditionMenuBar extends JMenuBar {
         jMenuItemLoadFile.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, meta));
         jMenuItemQuit = new JMenuItem();
         jMenuItemQuit.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Q, meta));
+        jMenuItemSolve = new JMenuItem();
+        jMenuItemSolve.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_M, meta));
         
         jMenuItemUndo = new JMenuItem();
         jMenuItemUndo.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Z, meta));
@@ -149,6 +152,9 @@ public class EditionMenuBar extends JMenuBar {
         });
         jMenuItemQuit.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {jMenuItemQuitActionPerformed(evt);}
+        });
+        jMenuItemSolve.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) { jMenuItemSolveActionPerformed(evt); }
         });
         
         jMenuItemHelpEditor.addActionListener(new ActionListener() {
@@ -229,10 +235,11 @@ public class EditionMenuBar extends JMenuBar {
             }
         });
         
-        
+
         jMenuFile.add(jMenuItemSaveFile);
         jMenuFile.add(jMenuItemSaveAsFile);
         jMenuFile.add(jMenuItemLoadFile);
+        jMenuFile.add(jMenuItemSolve);
         jMenuFile.add(jMenuItemQuit);
         jMenuLanguage.add(jMenuItemFrench);
         jMenuLanguage.add(jMenuItemEnglish);
@@ -270,7 +277,6 @@ public class EditionMenuBar extends JMenuBar {
         parent.setLanguage(Locale.FRENCH);        
         parent.updateLanguage();
         System.out.println("Language set to FRENCH");
-        
     }
     
     private void jMenuItemSaveFileActionPerformed(ActionEvent evt) {  
@@ -285,6 +291,9 @@ public class EditionMenuBar extends JMenuBar {
     }
     private void jMenuItemQuitActionPerformed(ActionEvent evt) {
         parent.dispatchEvent(new WindowEvent(parent, WindowEvent.WINDOW_CLOSING));
+    }
+    private void jMenuItemSolveActionPerformed(ActionEvent evt) {
+        parent.getEditorPanel1().solve();
     }
     
     private void jMenuItemHelpEditorActionPerformed(ActionEvent evt) {  
@@ -376,6 +385,7 @@ public class EditionMenuBar extends JMenuBar {
         this.jMenuItemSaveAsFile.setText(parent.getLang().getWord(Lang.EDITION_MENUITEM_SAVEASFILE));
         this.jMenuItemLoadFile.setText(parent.getLang().getWord(Lang.EDITION_MENUITEM_LOADFILE));
         this.jMenuItemQuit.setText(parent.getLang().getWord("EditionMenuBar.jMenuItemQuit.text"));
+        this.jMenuItemSolve.setText(parent.getLang().getWord("EditionMenuBar.jMenuItemSolve"));
         this.jMenuItemHelpEditor.setText(parent.getLang().getWord(Lang.EDITION_MENUITEM_HELPEDITION));
         this.jMenuItemAbout.setText(parent.getLang().getWord(Lang.EDITION_MENUITEM_ABOUT));
         this.jMenuItemUndo.setText(parent.getLang().getWord(Lang.EDITION_MENUITEM_UNDO));
