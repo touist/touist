@@ -43,8 +43,7 @@ import java.nio.file.Path;
 import java.util.ListIterator;
 import java.util.Map;
 
-import javax.swing.JFileChooser;
-import javax.swing.JOptionPane;
+import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import org.kordamp.ikonli.fontawesome.FontAwesomeIkonHandler;
@@ -56,8 +55,6 @@ import solution.SolverTestSAT4J;
 import touist.TouIST;
 import translation.TranslationError;
 
-import static javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE;
-
 /**
  *
  * @author Skander
@@ -68,7 +65,7 @@ public class ParentEditionPanel extends AbstractComponentPanel {
     private String jLabelErrorMessageText;
     private Thread testThread;
     private Path openedFile = null;
-    protected MainFrame mainframe = null;
+    final protected MainFrame mainframe;
 
 
     public void setOpenedFile(Path file) {
@@ -154,8 +151,8 @@ public class ParentEditionPanel extends AbstractComponentPanel {
         }
 
         // Ask the user if he wants to save before quitting
-        parent.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-        parent.addWindowListener(new WindowAdapter() {
+        mainframe.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+        mainframe.addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
                 if(hasUnsavedChanges()) {
                     int confirmed = JOptionPane.showConfirmDialog(null,

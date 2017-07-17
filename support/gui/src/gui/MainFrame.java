@@ -80,6 +80,7 @@ public class MainFrame extends javax.swing.JFrame {
      * Creates new form MainFrame
      */
     public MainFrame() {
+        initComponents();
         lang = new Lang(Locale.getDefault());
         
     	cards = new JPanel(new CardLayout());
@@ -94,8 +95,6 @@ public class MainFrame extends javax.swing.JFrame {
         cards.add(resultsPanel1, RESULTS_PANEL);
         setViewToEditor();
 
-        initComponents();
-        
         editorPanel1.updateComboBoxSelectedSolver();
         
         try {
@@ -189,7 +188,6 @@ public class MainFrame extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setMinimumSize(new java.awt.Dimension(800, 600));
         getContentPane().setLayout(new java.awt.CardLayout());
 
