@@ -20,8 +20,8 @@ version gitVersion()
 mainClassName = 'touist.TouIST'
 applicationName = project.name
 applicationDefaultJvmArgs = [
-        "-Dtouist.externalRelativeDir=../lib",
-        "-Dtouist.saveRelativeDir=../"
+        "-Dtouist.externalRelativeDir=../../../../external",
+        "-Dtouist.saveRelativeDir=../../../"
 ]
 
 repositories{
