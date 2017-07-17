@@ -69,23 +69,23 @@ install:
     case $TRAVIS_OS_NAME in
     linux)
       ./gradlew distZip
-      zip=$(find build/distributions -name "TouIST*" | head -1)
-      linuxzip=$(echo $zip | sed 's/\(.*\)\.zip$/\1-linux.zip/')
-      mv $zip $linuxzip
-      zip=$linuxzip
+      ARCH=linux-x86_64
       ;;
     osx)
       ./gradlew createAppZip
-      zip=$(find build/distributions -name "TouIST*" | head -1)
+      ARCH=mac-x86_64
       ;;
     esac
+  - |
+    temp=$(find build/distributions -name "TouIST*" | head -1)
+    zip=$(echo $temp | sed 's/\(.*\)\.zip$/\1-${ARCH}.zip/')
+    mv $temp $zip
   - ls -l $zip
   - cd $TRAVIS_BUILD_DIR
   - |
     git status
-    if [ "$(git status 2> /dev/null | tail -n1)" != "nothing to commit (working directory clean)" ]; then
-      echo "git says the repo is dirty"
-      exit 1
+    if ! git status 2> /dev/null | tail -n1 | grep "nothing to commit.*tree clean"; then
+      echo "Error, git says the repo is dirty!" >&2; exit 1
     fi
 
 # This part is meant for unit tests (among others).
