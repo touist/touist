@@ -41,6 +41,11 @@ problem](docs/images/screenshot.png)](https://github.com/maelvalais/allumettes)
    works on **macOS** (x86_64 only), **Linux** x86\_64 and **Windows** (x86 or
    x64\_86).
 
+   ⚠️ WARNING ⚠️ On macOS Sierra, `TouIST.app` will show a 'broken' message.
+   You must run `sudo spctl --master-disable` which will enable the
+   _Open app from anywhere_ thing. If we want to avoid this, we have to pay
+   Apple $99 every year for signing the app. We should do that at some point!
+
 3. You can also look at the [Touist language reference][ref]
    ([pdf version][ref-pdf]).
 
