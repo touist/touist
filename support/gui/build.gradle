@@ -144,6 +144,14 @@ task copyToMacAppBundle (type: Copy) {
 }
 createApp.dependsOn copyToMacAppBundle
 
+
+task copyToWindowsBundle (type: Copy) {
+    dependsOn createExe
+    from ('external')
+    include 'touist','yices-smt2','minisat.jar'
+    into "build/${launch4j.outputDir}/${launch4j.libraryDir}"
+}
+
 createExe {
     mainClassName = project.mainClassName
     icon = "${project.rootDir}/resources/launch4j/logo.ico"
@@ -160,14 +168,8 @@ createExe {
     ]
     fileDescription = project.description
     productName = project.name
+    finalizedBy copyToWindowsBundle
 }
-
-task copyToWindowsBundle (type: Copy) {
-    from ('external')
-    include 'touist','yices-smt2','minisat.jar'
-    into "build/${launch4j.outputDir}/${launch4j.libraryDir}"
-}
-createExe.dependsOn copyToWindowsBundle
 
 task createExeZip(type: Zip) {
     dependsOn createExe
