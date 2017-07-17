@@ -56,7 +56,7 @@ fi
 
 # Build the actual TouIST.exe
 cd support/gui
-./gradlew createExeZip
+TERM=dumb ./gradlew createExeZip
 ARCH=windows-x86
 temp=$(find build/distributions -name "TouIST*" | head -1)
 zip=$(echo $temp | sed "s/\(.*\)\.zip$/\1-${ARCH}.zip/")
