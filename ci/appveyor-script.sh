@@ -60,3 +60,10 @@ cd support/gui
 artifacts=$(find build/distributions -name "TouIST*" | head -1)
 echo $artifacts
 cd ../..
+
+
+git status
+if [ "$(git status 2> /dev/null | tail -n1)" != "nothing to commit (working directory clean)" ]; then
+    echo "git says the repo is dirty"
+    exit 1
+fi
