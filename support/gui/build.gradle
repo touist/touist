@@ -134,16 +134,52 @@ macAppBundle {
     }
 }
 
+
+def warning_macos = file "build/tmp/TouIST-OPENING.txt"
+warning_macos.text =
+"""On macOS Sierra (10.12.5) and some other previous macOS versions, opening
+TouIST will show the error:
+
+    TouIST is damaged and can’t be opened. You should move it to the Trash.
+
+This is because we did not pay Apple \$99 for signing TouIST.app. One easy way
+of fixing this is to enable the opening of applications coming from 'anywhere':
+
+    sudo spctl --master-disable
+
+This fix is the only way to go on macOS Sierra. On previous versions, you can
+alternatively go to
+
+    System Preferences > Security > unlock the lock
+                       > Authorize applications downloaded from > anywhere
+Sorry for the inconvenience!
+"""
 // This task will simpy copy 'touist', 'minisat.jar' and any other external binary to
 // the newly created TouIST.app
 // Copied from the build.gradle of https://github.com/crashinvaders/gdx-texture-packer-gui/
 task copyToMacAppBundle (type: Copy) {
-    from ('external')
-    include 'touist','yices-smt2','minisat.jar'
-    into "build/${macAppBundle.appOutputDir}/TouIST.app/Contents/external"
+    into '.'
+    from ('external') {
+        include 'touist', 'yices-smt2', 'minisat.jar'
+        into "build/${macAppBundle.appOutputDir}/TouIST.app/Contents/external"
+    }
 }
 createApp.dependsOn copyToMacAppBundle
 
+task createMacAppZip(type: Zip) {
+    dependsOn createApp
+    destinationDir file("build/distributions")
+    archiveName "${project.name}-${project.version}.zip"
+    from("${buildDir}/${macAppBundle.appOutputDir}") {
+        include "${project.name}.app/**"
+        exclude "${project.name}.app/Contents/MacOS"
+    }
+    from("${buildDir}/${macAppBundle.appOutputDir}") {
+        include "${project.name}.app/Contents/MacOS/**"
+        fileMode 0777  // octal requires leading zero
+    }
+    from warning_macos
+}
 
 task copyToWindowsBundle (type: Copy) {
     dependsOn createExe
