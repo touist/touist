@@ -135,8 +135,11 @@ macAppBundle {
 }
 
 
-def warning_macos = file "build/tmp/TouIST-OPENING.txt"
-warning_macos.text =
+task warningMac() {
+    mkdir 'build/tmp'
+    def f = file "build/tmp/TouIST-OPENING.txt"
+    outputs.dir f
+    f.text =
 """On macOS Sierra (10.12.5) and some other previous macOS versions, opening
 TouIST will show the error:
 
@@ -154,6 +157,7 @@ alternatively go to
                        > Authorize applications downloaded from > anywhere
 Sorry for the inconvenience!
 """
+}
 // This task will simpy copy 'touist', 'minisat.jar' and any other external binary to
 // the newly created TouIST.app
 // Copied from the build.gradle of https://github.com/crashinvaders/gdx-texture-packer-gui/
@@ -178,7 +182,7 @@ task createMacAppZip(type: Zip) {
         include "${project.name}.app/Contents/MacOS/**"
         fileMode 0777  // octal requires leading zero
     }
-    from warning_macos
+    from warningMac
 }
 
 task copyToWindowsBundle (type: Copy) {
