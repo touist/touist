@@ -43,17 +43,6 @@ ocamlfind remove touist
 make
 make install # Only install binary 'touist' as long as --enable-lib is not given
 
-# Build the Java GUI touist.jar (in support/gui)
-# First, put the SMT solver into support/gui/external/
-if [ ! -d /cygdrive/c/yices ]; then
-    curl -L -o yices.zip "http://yices.csl.sri.com/cgi-bin/yices2-newnewdownload.cgi?file=yices-2.4.2-i686-pc-mingw32-static-gmp.zip&accept=I+Agree"
-    unzip -q yices.zip
-    rm yices.zip
-    mv yices* /cygdrive/c/yices
-    cp /cygdrive/c/yices/bin/yices-smt2.exe support/gui/external
-    cp /cygdrive/c/yices/bin/libyices.dll support/gui/external
-fi
-
 # Build the actual TouIST.exe
 cd support/gui
 TERM=dumb ./gradlew createExeZip
@@ -66,6 +55,4 @@ cd ../..
 
 
 git status
-if ! git status 2> /dev/null | tail -n1 | grep "nothing.*clean"; then
-    echo "Error, git says the repo is dirty!" >&2; exit 1
-fi
+git status 2> /dev/null | tail -n1 | grep "nothing.*clean"

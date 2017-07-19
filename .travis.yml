@@ -46,14 +46,6 @@ before_install:
   - eval `opam config env`
   - opam install -y ocamlfind menhir fileutils minisat cppo yices2 qbf ounit
   # Put the dependency yices-smt2 to external/
-  - |
-    case $TRAVIS_OS_NAME in
-      osx) file=yices-2.4.2-x86_64-apple-darwin15.2.0-static-gmp.tar.gz ;;
-      linux) file=yices-2.4.2-x86_64-unknown-linux-gnu-static-gmp.tar.gz ;;
-    esac
-  - curl -o $HOME/yices.tar.gz "http://yices.csl.sri.com/cgi-bin/yices2-newnewdownload.cgi?file=${file}&accept=I+Agree"
-  - tar xzf $HOME/yices.tar.gz -C $HOME
-  - cp $HOME/yices-*/bin/yices-smt2 support/gui/external
 install:
   # Build touist
   - cd $TRAVIS_BUILD_DIR
@@ -72,7 +64,7 @@ install:
       ARCH=linux-x86_64
       ;;
     osx)
-      TERM=dumb ./gradlew createAppZip
+      TERM=dumb ./gradlew createMacAppZip
       ARCH=mac-x86_64
       ;;
     esac
@@ -84,9 +76,7 @@ install:
   - cd $TRAVIS_BUILD_DIR
   - |
     git status
-    if ! git status 2> /dev/null | tail -n1 | grep "nothing.*clean"; then
-      echo "Error, git says the repo is dirty!" >&2; exit 1
-    fi
+    git status 2> /dev/null | tail -n1 | grep "nothing.*clean"
 
 # This part is meant for unit tests (among others).
 script:
