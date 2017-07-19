@@ -108,26 +108,17 @@ missing:
 # and checks that all the necessary
 #
 
-.PHONY: build-gui clean-gui run-gui smt
+.PHONY: build-gui clean-gui run-gui
 
-# This target builds 'touist'
-support/gui/external/touist: check-opam-packages build
-	cp _build/src/touist.native support/gui/external/touist
+build-gui: build check-requirements check-opam-packages
+	cd support/gui/ && ./gradlew build
+	@echo "Done! Now you can run touist with 'make run-gui'"
 
-
-build-gui: check-requirements support/gui/external/touist support/gui/external/minisat.jar
-	cd support/gui/ &&\
-	./gradlew jar
-	@echo "Done! Now you can run touist with './gradlew run'"
+run-gui: build-gui
+	cd support/gui/ && ./gradlew run
 
 clean-gui:
 	cd support/gui/ && ./gradlew clean
-
-smt:
-	@echo "You must download yices-smt2 (there is a binary for mac, win, linux):"
-	@echo "     http://yices.csl.sri.com"
-	@echo "Then, put the binary yices-smt2 into support/gui/external/"
-	@echo "Finally, launch 'make' again "
 
 
 ##### Check for tools/programs required ######

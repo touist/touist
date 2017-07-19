@@ -8,16 +8,6 @@ you must have git-cloned the repository. To install the tools:
     sudo apt install git default-jdk    # Ubuntu
     brew cask install java              # MacOS
 
-Then, you must check/add the external binaries in `external`:
-
-- (mandatory) `external/touist` (see `INSTALL.md` at the root of the project) must be
-  compiled and moved to `external`. Don't forget to rename it to `touist`.
-- (already there) `external/minisat.jar` is the SAT solver; we build the .jar
-  from the `./temporary-solver/src` sources and then move `minisat.jar` to
-  `external`. This file should already be there.
-- (optionnal) `external/yices-smt2` must be downloaded from
-  http://yices.csl.sri.com.
-
 ### Building for debugging/testing
 
     ./gradlew build
