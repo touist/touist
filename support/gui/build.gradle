@@ -179,6 +179,7 @@ macAppBundle {
     icon = 'resources/macappbundle/logo.icns'
     javaProperties.put("touist.externalRelativeDir", "../external")
     javaProperties.put("touist.saveRelativeDir", "../../..")
+    javaProperties.put("touist.tempInHomeRelativeDir",".touist")
     // The following allows macOS to recognize .touist and .touistl files
     bundleExtras.put("CFBundleDocumentTypes", [ [
         CFBundleTypeExtensions: [ 'touist','touistl' ],

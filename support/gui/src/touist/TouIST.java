@@ -29,8 +29,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.nio.file.FileSystems;
-import java.nio.file.Path;
+import java.nio.file.*;
 import java.util.Properties;
 import java.util.prefs.Preferences;
 
@@ -106,7 +105,20 @@ public class TouIST {
 	public static String getWhereToSaveTemp() {
 		String relativePath = System.getProperty("touist.tempInHomeRelativeDir");
 		if(relativePath == null) return getWhereToSave();
-		else return checkPath(System.getProperty("user.dir") + File.separator + relativePath);
+		else {
+			String path = checkPath(System.getProperty("user.dir") + File.separator + relativePath);
+			Path p = Paths.get(relativePath);
+			if(!Files.exists(p,LinkOption.NOFOLLOW_LINKS)) {
+				try {
+					Files.createDirectories(p);
+				} catch (IOException e) {
+					System.err.println("Could not create directory '"+path+"'");
+					e.printStackTrace();
+					System.exit(1);
+				}
+			}
+			return p.toString();
+		}
 	}
 	public static String checkPath(String path) {
 		Path p = FileSystems.getDefault().getPath(path);
