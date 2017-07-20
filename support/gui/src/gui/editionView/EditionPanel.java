@@ -32,7 +32,7 @@ import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
-import java.io.IOException;
+import java.io.*;
 
 import javax.swing.JLabel;
 import javax.swing.event.CaretEvent;
@@ -98,7 +98,7 @@ public class EditionPanel extends AbstractComponentPanel {
             }
         }
         
-    }    
+    }
     
     public EditionPanel() {
         initComponents();
@@ -117,8 +117,8 @@ public class EditionPanel extends AbstractComponentPanel {
         latexView.setLayout(new FlowLayout());
         latexView.add(latexLabel = new JLabel(),FlowLayout.LEFT);
         latexLabel.setVisible(true);
-        
-        
+
+
         editorTextArea.addCaretListener(new CaretListener() {
 
             @Override
@@ -154,6 +154,33 @@ public class EditionPanel extends AbstractComponentPanel {
     
     public void setText(String text) {
         editorTextArea.setText(text);
+    }
+
+    /**
+     * Import the list of formules from a file
+     * @param path of the file containing the list of formules and sets
+     * @throws IOException if any I/O exception occurs during file reading
+     */
+    public static String open(String path) throws IOException {
+        String text = "";
+        BufferedReader in = new BufferedReader(new FileReader(path));
+        String line;
+        while((line = in.readLine()) != null) {
+            text = text.concat(line + "\n");
+        }
+        return text;
+    }
+
+    public void loadIntoTextEditor(String path) throws IOException {
+        setText(open(path));
+    }
+
+    public void saveToFile(String path) throws IOException {
+        int sizeBuffer = 8192;
+        BufferedWriter writer = new BufferedWriter(new FileWriter(path), sizeBuffer);
+        writer.write(this.getText());
+        writer.flush();
+        writer.close();
     }
     
     /**

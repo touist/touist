@@ -36,21 +36,16 @@ cache:
   apt: true
   directories:
     - $HOME/.opam
+    - $HOME/.gradle
 
 before_install:
   # Install packages using brew on osx environment
   - javac -version
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update && brew install opam ant; fi
+  - if [ $TRAVIS_OS_NAME = osx ]; then brew update && brew install opam; fi
   - opam init -y --auto-setup
   - eval `opam config env`
   - opam install -y ocamlfind menhir fileutils minisat cppo yices2 qbf ounit
   # Put the dependency yices-smt2 to external/
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then file=yices-2.4.2-x86_64-apple-darwin15.2.0-static-gmp.tar.gz; fi
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then file=yices-2.4.2-x86_64-unknown-linux-gnu-static-gmp.tar.gz; fi
-  - echo $file
-  - curl -o yices.tar.gz "http://yices.csl.sri.com/cgi-bin/yices2-newnewdownload.cgi?file=${file}&accept=I+Agree"
-  - tar xzf yices.tar.gz
-  - cp yices-*/bin/yices-smt2 support/gui/external
 install:
   # Build touist
   - cd $TRAVIS_BUILD_DIR
@@ -61,9 +56,27 @@ install:
   # Build the Java GUI touist.jar (in support/gui)
   - cd $TRAVIS_BUILD_DIR/support/gui
   - chmod ugo+x external/touist
-  - ant -e zip
-  - zip=$(ls | grep 'touist.*\.zip' | head -1) # The artifact's name for later use
-  - echo $zip && cd $TRAVIS_BUILD_DIR
+  - |
+    set -e # exit if one of the following commands fail
+    case $TRAVIS_OS_NAME in
+    linux)
+      TERM=dumb ./gradlew distZip
+      ARCH=linux-x86_64
+      ;;
+    osx)
+      TERM=dumb ./gradlew createMacAppZip
+      ARCH=mac-x86_64
+      ;;
+    esac
+  - |
+    temp=$(find build/distributions -name "TouIST*" | head -1)
+    zip=$(echo $temp | sed "s/\(.*\)\.zip$/\1-${ARCH}.zip/")
+    mv $temp $zip
+  - ls -l $zip
+  - cd $TRAVIS_BUILD_DIR
+  - |
+    git status
+    git status 2> /dev/null | tail -n1 | grep "nothing.*clean"
 
 # This part is meant for unit tests (among others).
 script:

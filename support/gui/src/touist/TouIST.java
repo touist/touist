@@ -28,42 +28,42 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
+import java.nio.file.FileSystems;
+import java.nio.file.Path;
+import java.util.prefs.Preferences;
 
 import javax.swing.JOptionPane;
-import javax.swing.UIManager;
 
 import gui.MainFrame;
 import solution.SolverExecutionException;
+
 /**
  *
  * @author Skander
  */
 public class TouIST {
-	private static TouistProperties properties = new TouistProperties();
+	public static TouistProperties properties = new TouistProperties();
+	private static MainFrame frame;
 
 	/**
 	 * @param args the command line arguments
 	 */
-	private static String CurrentPath=System.getProperty("user.dir");
 	public static void main(String[] args) throws IOException, InterruptedException, FileNotFoundException, SolverExecutionException {
 		String version = System.getProperty("java.version");
 		if(Float.valueOf(version.substring(0,3)) < 1.7) {
 			JOptionPane.showMessageDialog(null, "Your java version is "+version+" but version higher or equal to 1.7 is required");
 			return;
 		}
-		// Better user interface integration with macOS
-		if(System.getProperty("os.name").toLowerCase().contains("mac")) {
-			System.setProperty("apple.laf.useScreenMenuBar", "true");
-			System.setProperty("com.apple.mrj.application.apple.menu.about.name", "Touist");
-			try {
-				UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-			} catch (Exception e) {}
-		}
 
-		System.out.println("main(): running app from folder '"+ System.getProperty("user.dir")+"'");
-		MainFrame frame = new MainFrame();
+		System.out.println("TouIST: running app from folder '"+ System.getProperty("user.dir")+"'");
+		System.out.println("* External binaries are in '"+getTouistExternalDir()+"'");
+		System.out.println("* Files are saved in '"+getWhereToSave()+"'");
+		frame = new MainFrame();
 		frame.setVisible(true);
+		
+		if(args.length > 0) {
+			frame.getEditorPanel1().open(args[0]);
+		}
 	}
 	/**
 	 * We use this for getting the actual place where touist.jar is located in.
@@ -73,17 +73,34 @@ public class TouIST {
 	 * @return
 	 */
 	public static String getTouistDir() {
-		URL url = ClassLoader.getSystemClassLoader().getResource(".");
-		URI uri = null;
+		String pathToJar = ClassLoader.getSystemClassLoader().getResource(".").toString();
 		// URISyntaxException should ne ever be thrown because we expect getResource(".")
 		// to give a correct URL
+		String path = "";
 		try {
-			uri = new URI(url.toString());
+			path = (new File(new URI(pathToJar))).getAbsolutePath();
 		} catch (URISyntaxException e) {
 			System.err.println("Something went wrong when trying to get where touist.jar is located:\n" + e.getMessage());
 		}
-		File path = new File(uri);
-		return path.getAbsolutePath();
+		return path;
+	}
+	public static String getTouistExternalDir() {
+		String relativePath = System.getProperty("touist.externalRelativeDir");
+		if(relativePath == null) relativePath = "external";
+		return checkPath(TouIST.getTouistDir() + File.separator + relativePath);
+	}
+	public static String getTouistBin() {
+		return checkPath(TouIST.getTouistExternalDir() + File.separator + "touist"); 
+	}
+	public static String getWhereToSave() {
+		String relativePath = System.getProperty("touist.saveRelativeDir");
+		if(relativePath == null) relativePath = "..";
+		return checkPath(TouIST.getTouistDir() + File.separator + relativePath);
+	}
+	
+	public static String checkPath(String path) {
+		Path p = FileSystems.getDefault().getPath(path);
+		return p.normalize().toString();
 	}
 }
 

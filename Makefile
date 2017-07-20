@@ -104,37 +104,25 @@ missing:
 
 #
 # These targets aim to build the java GUI in support/gui/
-# It basically calls `ant` (which is like `make` but for java)
-# and checks that all the necessary 
+# It basically calls `./gradlew` (which is like `make` but for java)
+# and checks that all the necessary
 #
 
-.PHONY: build-gui clean-gui run-gui smt
+.PHONY: build-gui clean-gui run-gui
 
-# This target builds 'touist'
-support/gui/external/touist: check-opam-packages build
-	cp _build/src/touist.native support/gui/external/touist
-
-
-build-gui: check-requirements support/gui/external/touist support/gui/external/minisat.jar
-	cd support/gui/ &&\
-	ant -e jar
+build-gui: build check-requirements check-opam-packages
+	cd support/gui/ && ./gradlew build
 	@echo "Done! Now you can run touist with 'make run-gui'"
 
-run-gui: support/gui/build/*
-	cd support/gui/ && java -jar touist.jar
+run-gui: build-gui
+	cd support/gui/ && ./gradlew run
 
 clean-gui:
-	cd support/gui/ && ant clean
-
-smt:
-	@echo "You must download yices-smt2 (there is a binary for mac, win, linux):"
-	@echo "     http://yices.csl.sri.com"
-	@echo "Then, put the binary yices-smt2 into support/gui/external/"
-	@echo "Finally, launch 'make' again "
+	cd support/gui/ && ./gradlew clean
 
 
 ##### Check for tools/programs required ######
-check-requirements: opam m4 ant git
+check-requirements: opam m4 git
 	@command -v javac || (echo \
 	"javac is not installed.\n \
 	Install Java JDK with\n\n    sudo apt install default-jdk'.\n" && exit 2)
@@ -142,7 +130,7 @@ check-requirements: opam m4 ant git
 	"ocamlfind is not installed.\n\
 	Install it with\n\n    opam install -y ocamlfind\n" && exit 3)
 
-opam m4 ant git madoko madoko-local:
+opam m4 git madoko madoko-local:
 	@command -v $@ || (echo \
 	"$@ is not installed.\n\
 	Install it with\n\n    sudo apt install $@\n" && exit 5)

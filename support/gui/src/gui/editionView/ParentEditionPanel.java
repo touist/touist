@@ -35,26 +35,25 @@ import java.awt.AWTException;
 import java.awt.FileDialog;
 import java.awt.Robot;
 import java.awt.event.KeyEvent;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.StringReader;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.io.*;
+import java.nio.file.FileSystems;
+import java.nio.file.Path;
 import java.util.ListIterator;
 import java.util.Map;
 
-import javax.swing.JFileChooser;
-import javax.swing.JOptionPane;
+import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-import solution.ModelList;
+import org.kordamp.ikonli.fontawesome.FontAwesomeIkonHandler;
+import org.kordamp.ikonli.swing.FontIcon;
 import solution.SolverExecutionException;
 import solution.SolverQBF;
 import solution.SolverSMT;
 import solution.SolverTestSAT4J;
+import touist.TouIST;
 import translation.TranslationError;
-import translation.TranslatorSAT;
 
 /**
  *
@@ -65,15 +64,43 @@ public class ParentEditionPanel extends AbstractComponentPanel {
 	private static final int ERROR_MESSAGE_MAX_LENGTH = 76;
     private String jLabelErrorMessageText;
     private Thread testThread;
-    protected String onDiskPath = null;
-    protected String onDiskFilename = null;
+    private Path openedFile = null;
+    final protected MainFrame mainframe;
+
+
+    public void setOpenedFile(Path file) {
+        String windowTitle = mainframe.getLang().getWord(Lang.FRAME_TITLE) + " "
+                + touist.TouIST.properties.getProperty("version");
+        if(file == null) {
+            mainframe.setTitle(windowTitle);
+        } else {
+            mainframe.setTitle(windowTitle + " - " + file.toString());
+        }
+        openedFile = file;
+    }
+
+    public boolean hasUnsavedChanges() {
+        if(openedFile == null) {
+            return ! editor.getEditorTextArea().getText().isEmpty();
+        } else {
+            String textInFile = "";
+            try {
+                textInFile = editor.open(openedFile.toString());
+            } catch (IOException e) {
+                return false;
+            }
+            // If the texts are the same between the editor and the file, then
+            // we have no unsaved files (= we return false).
+            return ! editor.getEditorTextArea().getText().equals(textInFile);
+        }
+    }
 
     /**
      * Creates new form FormulasPanel
      */
-    public ParentEditionPanel() {
+    public ParentEditionPanel(MainFrame parent) {
         initComponents();
-        
+        mainframe = parent;
         testThread = new Thread();
         
         editor.initPalette();
@@ -84,6 +111,66 @@ public class ParentEditionPanel extends AbstractComponentPanel {
         for (SolverType solverType : SolverSelection.SolverType.values()) {
             selectSatOrSmt.addItem(solverType);
         }
+
+        // Nice icons!
+        FontIcon f = new FontIcon();
+        f.setIkon(new FontAwesomeIkonHandler().resolve("fa-save"));
+        f.setIconSize(18);
+        exportButton.setIcon(f);
+        f = new FontIcon();
+        f.setIkon(new FontAwesomeIkonHandler().resolve("fa-folder-open"));
+        f.setIconSize(18);
+        importButton.setIcon(f);
+        f = new FontIcon();
+        f.setIkon(new FontAwesomeIkonHandler().resolve("fa-gears"));
+        f.setIconSize(18);
+        solveButton.setIcon(f);
+
+        // On macOS, handle the drag-and-drop for opening files
+        if(System.getProperty("os.name").toLowerCase().contains("mac")) {
+            com.apple.eawt.Application a = com.apple.eawt.Application.getApplication();
+            a.setOpenFileHandler(new com.apple.eawt.OpenFilesHandler() {
+                @Override
+                public void openFiles(com.apple.eawt.AppEvent.OpenFilesEvent e) {
+                    if (e.getFiles().get(0) instanceof File) {
+                        if(hasUnsavedChanges()) {
+                            int confirmed = JOptionPane.showConfirmDialog(null,
+                                    getFrame().getLang().getWord("ParentEditionPanel.saveOrLooseOnOpen"),
+                                    "", JOptionPane.YES_NO_CANCEL_OPTION);
+                            if (confirmed == JOptionPane.YES_OPTION) {
+                                saveHandler(false);
+                            } else if (confirmed == JOptionPane.NO_OPTION) {
+                            } else if (confirmed == JOptionPane.CANCEL_OPTION) {
+                                return;
+                            }
+                        }
+                        open(((File) e.getFiles().get(0)).getAbsolutePath());
+                    }
+                }
+            });
+        }
+
+        // Ask the user if he wants to save before quitting
+        mainframe.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+        mainframe.addWindowListener(new WindowAdapter() {
+            public void windowClosing(WindowEvent e) {
+                if(hasUnsavedChanges()) {
+                    int confirmed = JOptionPane.showConfirmDialog(null,
+                            getFrame().getLang().getWord("ParentEditionPanel.saveOrLooseOnQuit"),
+                            "", JOptionPane.YES_NO_CANCEL_OPTION);
+                    if (confirmed == JOptionPane.YES_OPTION) {
+                        saveHandler(false);
+                        System.exit(0);
+                    } else if (confirmed == JOptionPane.NO_OPTION) {
+                        System.exit(0);
+                    } else if (confirmed == JOptionPane.CANCEL_OPTION) {
+                        return;
+                    }
+                } else {
+                    System.exit(0);
+                }
+            }
+        });
     }
     
     public void updateComboBoxSelectedSolver() {
@@ -206,11 +293,11 @@ public class ParentEditionPanel extends AbstractComponentPanel {
         switch(((MainFrame)(getRootPane().getParent())).state) {
             case EDITION :
                 setState(State.EDITION);
-                importHandler();
+                openHandler();
                 break;
             case EDITION_ERROR :
                 setState(State.EDITION_ERROR);
-                importHandler();
+                openHandler();
                 break;
             case NO_RESULT :
                 // impossible
@@ -246,33 +333,37 @@ public class ParentEditionPanel extends AbstractComponentPanel {
     
 	private boolean isStopInsteadOfTest = false;
     private void solveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_solveButtonActionPerformed
+        solve();
+    }//GEN-LAST:event_solveButtonActionPerformed
+
+    public void solve() {
         switch(((MainFrame)(getRootPane().getParent())).state) {
             case EDITION :
                 setJLabelErrorMessageText("");
-                
+
                 this.solveButton.setText(isStopInsteadOfTest
-                		?getFrame().getLang().getWord("ParentEditionPanel.testButton.text")
-                		:getFrame().getLang().getWord("ParentEditionPanel.stopButton.text"));
+                        ?getFrame().getLang().getWord("ParentEditionPanel.testButton.text")
+                        :getFrame().getLang().getWord("ParentEditionPanel.stopButton.text"));
                 isStopInsteadOfTest = (isStopInsteadOfTest)?false:true;
-                
+
                 if(testThread.isAlive()) {
                     testThread.interrupt();
                 }
-                
+
                 Process p = null;
-                
+
                 if (getFrame().getSolverSelection().getSelectedSolver() == SolverSelection.SolverType.SAT) {
                     p = getFrame().getTranslatorSAT().getP();
                 } else {
-                    p = getFrame().getTranslatorSMT().getP();                    
+                    p = getFrame().getTranslatorSMT().getP();
                 }
-                
+
                 if(p != null && isAlive(p)){
                     p.destroy();
                 }
 
                 if(!isStopInsteadOfTest)
-                        break;
+                    break;
 
                 Runnable r = new Runnable() {
                     public void run() {
@@ -307,20 +398,20 @@ public class ParentEditionPanel extends AbstractComponentPanel {
             case LAST_RESULT :
                 // impossible
                 break;
-            default : 
+            default :
                 System.out.println("Undefined action set for the state : " + getState());
         }
-    }//GEN-LAST:event_solveButtonActionPerformed
+    }
 
     private void exportButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exportButtonActionPerformed
         switch(((MainFrame)(getRootPane().getParent())).state) {
             case EDITION :
                 setState(State.EDITION);
-                exportHandler(true);
+                saveHandler(false);
                 break;
             case EDITION_ERROR :
                 setState(State.EDITION_ERROR);
-                exportHandler(true);
+                saveHandler(false);
                 break;
             case NO_RESULT :
                 // impossible
@@ -345,7 +436,7 @@ public class ParentEditionPanel extends AbstractComponentPanel {
         if (jLabelErrorMessageText.length() > ERROR_MESSAGE_MAX_LENGTH) {
             JOptionPane.showMessageDialog(this,
                     jLabelErrorMessageText, 
-                    getFrame().getLang().getWord(Lang.ERROR_MESSAGE_TITLE), 
+                    getFrame().getLang().getWord(Lang.ERROR_MESSAGE_TITLE),
                     JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_bottomMessageMouseClicked
@@ -372,57 +463,73 @@ public class ParentEditionPanel extends AbstractComponentPanel {
     private javax.swing.JButton solveButton;
     // End of variables declaration//GEN-END:variables
 
-    public void importHandler() {
+    public void openHandler() {
+        if(hasUnsavedChanges()) {
+            int confirmed = JOptionPane.showConfirmDialog(null,
+                    getFrame().getLang().getWord("ParentEditionPanel.saveOrLooseOnOpen"),
+                    "", JOptionPane.YES_NO_CANCEL_OPTION);
+            if (confirmed == JOptionPane.YES_OPTION) {
+                saveHandler(false);
+            } else if (confirmed == JOptionPane.NO_OPTION) {
+            } else if (confirmed == JOptionPane.CANCEL_OPTION) {
+                return;
+            }
+        }
 
-		FileDialog d = new FileDialog(getFrame()); 
-		d.setDirectory(getFrame().getDefaultDirectoryPath());
+		FileDialog d = new FileDialog(getFrame());
+		d.setDirectory(touist.TouIST.getWhereToSave());
     	d.setMode(FileDialog.LOAD);
     	d.setVisible(true);
     	
-        getFrame().getTextInEditor().set("");
+        editor.setText("");
 
         if (d.getFile() != null) 
         {
         	String path = d.getDirectory() + d.getFile();
-
-            try {
-                getFrame().getTextInEditor().loadFile(path);
-            } catch(Exception e) {
-                System.err.println("Failed to load file: " + path);
-                showErrorMessage(e,"Failed to load file: '" + path + "'","");
-
-            }
-
-            //Réinitialisation des sets et des formules
-            String text = getFrame().getTextInEditor().get();
-            editor.setText(text);
-            this.onDiskPath = d.getDirectory();
-            this.onDiskFilename = d.getFile();
-        }   
+            open(path);
+        }
+    }
+    
+    public void open(String filepath) {
+    	System.out.println("Opening file '"+filepath+"'");
+    	Path file = FileSystems.getDefault().getPath(filepath);
+        try {
+            editor.loadIntoTextEditor(file.toString());
+            setOpenedFile(file);
+        } catch(Exception e) {
+            System.err.println("Failed to load file: " + file.toString() + "\n" + e.getMessage());
+            showErrorMessage(e,"Failed to load file: '" + file.toString() + "'\n" + e.toString(),"");
+        }
     }
 
-    public void exportHandler(boolean saveAs) {
-        getFrame().getTextInEditor().set(editor.getText());
+    /**
+     *
+     * @param saveAs if set to true, will always behave like 'save as';
+     *               if set to false, will behave either as a 'save' (or save as
+     *               if no fil is already opened)
+     */
+    public void saveHandler(boolean saveAs) {
 
-        if(saveAs || onDiskPath == null) {
+        if(saveAs || openedFile == null) {
         	FileDialog d = new FileDialog(getFrame());
-        	
-        	if(onDiskPath == null) {
-        		d.setDirectory(getFrame().getDefaultDirectoryPath());
+        	d.setFile("*.touist");
+        	if(openedFile == null) {
+        		d.setDirectory(touist.TouIST.getWhereToSave());
         	} else {
-        		d.setDirectory(onDiskPath);
+        		d.setDirectory(openedFile.getParent().toString());
         	}
         	
         	d.setMode(FileDialog.SAVE);
         	d.setVisible(true);
         	if(d.getFile() != null){
-        		onDiskPath = d.getDirectory();
-           	 	onDiskFilename = d.getFile();
+                setOpenedFile(FileSystems.getDefault().getPath(d.getDirectory() + File.separator + d.getFile()));
            }
         }
-    	
+
         try {
-        	getFrame().getTextInEditor().saveToFile(onDiskPath + onDiskFilename);
+            if(openedFile != null) {
+                editor.saveToFile(openedFile.toString());
+            }
         } catch (IOException e) {
             String warningWindowTitle = getFrame().getLang().getWord(Lang.EDITION_EXPORT_FAILURE_TITLE);
             String warningWindowText = getFrame().getLang().getWord(Lang.EDITION_EXPORT_FAILURE_TEXT);
@@ -470,7 +577,7 @@ public class ParentEditionPanel extends AbstractComponentPanel {
 
     private State initResultView() {
         // Initialisation de BaseDeClause
-        getFrame().getTextInEditor().set(editor.getText());
+        editor.setText(editor.getText());
         
         /*
         Faire appel au solveur avec les fichiers générés par le traducteur
@@ -480,14 +587,15 @@ public class ParentEditionPanel extends AbstractComponentPanel {
         sinon passer à l'état SINGLE_RESULT
         Si aucun model n'existe alors passer a l'état NO_RESULT
         */
-        String bigAndFilePath = "temp.touistl"; //TODO se mettre d'accord sur un nom standard ou ajouter a Translator et BaseDeClause des méthode pour s'échange de objets File
+        String path = touist.TouIST.checkPath(touist.TouIST.getWhereToSave() + File.separator + "temp.touist");
+        File touistFile = new File(path); //TODO se mettre d'accord sur un nom standard ou ajouter a Translator et BaseDeClause des méthode pour s'échange de objets File
         String errorMessage;
         
         
         try {
-            getFrame().getTextInEditor().saveToFile(bigAndFilePath);
+            editor.saveToFile(touistFile.getAbsolutePath());
         } catch (IOException ex) {
-            errorMessage = "Couldn't create file '" + bigAndFilePath + "':\n"+ex.getMessage();
+            errorMessage = "Couldn't create file '" + touistFile.getAbsolutePath() + "':\n"+ex.getMessage()+"\nPath: "+path;
             showErrorMessage(errorMessage, getFrame().getLang().getWord(Lang.ERROR_TRADUCTION));
             return State.EDITION;
         }
@@ -498,7 +606,7 @@ public class ParentEditionPanel extends AbstractComponentPanel {
         if (getFrame().getEditorPanel1().editor.getEditorTextArea().getSyntaxEditingStyle() == "sat") {
            
             try {
-            	boolean ok = getFrame().getTranslatorSAT().translate(bigAndFilePath);
+            	boolean ok = getFrame().getTranslatorSAT().translate(touistFile.getAbsolutePath());
             	errorMessage = "";
                 for (TranslationError error : getFrame().getTranslatorSAT().getErrors()) {
                         errorMessage += error + "\n";
@@ -513,11 +621,12 @@ public class ParentEditionPanel extends AbstractComponentPanel {
                 if(!ok) {
                     return State.EDITION;
                 }
-                File f = new File(bigAndFilePath);
+                File f = touistFile;
                 f.deleteOnExit();
             } catch (IOException ex) {
                 ex.printStackTrace();
-                errorMessage = "The translator returned an IOException: \n"+ex.getMessage()+"\nCheck that touist is in external/ and that it has the right permissions.";
+                errorMessage = "The translator returned an IOException: \n"+ex.getMessage()+"\n"+
+                	"Check that touist is in "+TouIST.getTouistExternalDir()+" and that it has the right permissions.";
                 showErrorMessage(ex, errorMessage, getFrame().getLang().getWord(Lang.ERROR_TRADUCTION));
                 return State.EDITION;
             } catch (InterruptedException ex) {
@@ -595,7 +704,7 @@ public class ParentEditionPanel extends AbstractComponentPanel {
                         break;
                     default :
                 }
-                boolean ok = getFrame().getTranslatorSMT().translate(bigAndFilePath, logic); 
+                boolean ok = getFrame().getTranslatorSMT().translate(touistFile.getAbsolutePath(), logic);
                 errorMessage = "";
                 for (TranslationError error : getFrame().getTranslatorSMT().getErrors()) {
                 	errorMessage += error + "\n";
@@ -610,7 +719,7 @@ public class ParentEditionPanel extends AbstractComponentPanel {
                 }
                 
                 solveButton.setText("Solving");
-                File f = new File(bigAndFilePath);
+                File f = touistFile;
                 f.deleteOnExit();
             } catch (IOException ex) {
                 ex.printStackTrace();
@@ -637,7 +746,7 @@ public class ParentEditionPanel extends AbstractComponentPanel {
             }
         } else if (getFrame().getEditorPanel1().editor.getEditorTextArea().getSyntaxEditingStyle() == "qbf") {
         	solveButton.setText("Solving");
-        	BufferedReader reader = new BufferedReader(new StringReader(getFrame().getTextInEditor().get()));
+        	BufferedReader reader = new BufferedReader(new StringReader(editor.getText()));
             SolverQBF s = new SolverQBF(reader);
             getFrame().setSolver(s);
             try {
@@ -741,12 +850,13 @@ public class ParentEditionPanel extends AbstractComponentPanel {
     
     @Override
     public void updateLanguage() {
+        setOpenedFile(openedFile);
         importButton.setText(getFrame().getLang().getWord(Lang.EDITION_IMPORT));
         importButton.setToolTipText(getFrame().getLang().getWord("ParentEditionPanel.importButton.tooltip"));
         exportButton.setText(getFrame().getLang().getWord(Lang.EDITION_EXPORT));
         exportButton.setToolTipText(getFrame().getLang().getWord("ParentEditionPanel.exportButton.tooltip"));
         solveButton.setText(getFrame().getLang().getWord(Lang.EDITION_TEST));
-        solveButton.setToolTipText(getFrame().getLang().getWord("ParentEditionPanel.testButton.tooltip")); 
+        solveButton.setToolTipText(getFrame().getLang().getWord("ParentEditionPanel.testButton.tooltip"));
         editor.updateLanguage();
         selectSatOrSmt.setToolTipText(getFrame().getLang().getWord("ParentEditionPanel.comboBoxSATSMT.tooltip"));
         cursorPosition.setToolTipText(getFrame().getLang().getWord("ParentEditionPanel.jLabelCaretPosition.tooltip"));

@@ -45,12 +45,11 @@ clone_folder: c:\touist
 
 environment:
   JAVA_HOME: 'C:\\Program Files (x86)\\Java\\jdk1.7.0'
-  ANT_HOME: C:\ant
-  CYG_ROOT: c:\ocaml32
   CYG_MIRROR: http://cygwin.mirror.constant.com
+  CYG_ROOT:  c:\ocaml32
+  CYG_BASH:  c:\ocaml32\bin\bash
+  CYG_SETUP: c:\setup-x86.exe
   CYG_CACHE: c:\ocaml32\var\cache\setup
-  CYG_BASH: c:\ocaml32\bin\bash
-  CYG_SETUP: setup-x86.exe
 
 
 # Build cache to preserve files/folders between builds (saves time)
@@ -59,17 +58,16 @@ environment:
 # on appveyor.com...
 cache:
   - '%CYG_CACHE% -> appveyor.yml'
-  - C:\ant -> appveyor.yml
   - C:\yices -> appveyor.yml
   - '%CYG_ROOT%\home\appveyor\.opam -> appveyor.yml'
+  - C:\Users\appveyor\.gradle -> appveyor.yml
 
 # Scripts that run after cloning repository. "ps:" means windows PowerShell
 install:
   # Opam on Windows: http://fdopen.github.io/opam-repository-mingw
   - javac -version
-  - ps: 'Invoke-WebRequest http://cygwin.com/$env:CYG_SETUP -OutFile "$env:CYG_SETUP"'
+  - ps: 'Invoke-WebRequest http://cygwin.com/setup-x86.exe -OutFile "$env:CYG_SETUP"'
   - '%CYG_SETUP% --quiet-mode --no-shortcuts --only-site --root "%CYG_ROOT%" --site "%CYG_MIRROR%" --local-package-dir "%CYG_CACHE%" --packages rsync,patch,diffutils,curl,make,unzip,git,m4,perl,mingw64-i686-gcc-core,mingw64-i686-gmp --upgrade-also'
-  - ps: $env:Path = $env:Path + ";C:\ant\bin"
 
 build_script:
   - '%CYG_BASH% -lc "cd /cygdrive/c/touist && ./ci/appveyor-script.sh"'
@@ -85,7 +83,7 @@ test_script:
 # you want to upload have not been given in "path:", the
 # deploy: artifact: thing will do nothing.
 artifacts:
-  - path: support/gui/touist-*.zip
+  - path: support/gui/build/distributions/TouIST-*.zip
 
 skip_tags: false
 
@@ -95,7 +93,7 @@ deploy:
     auth_token:
       # maelvalais ciphered credetials using appveyor encryption
       secure: "EWLXzbe9BdCFxAyFoz+kUJOZNyLLIpeCcXrl+aisecK9HMin6aAIt3wFaGSqvWPS"
-    artifact: /touist-.*\.zip/          # upload all touist*.zip to release
+    artifact: /TouIST-.*\.zip/          # upload all touist*.zip to release
     #draft: true
     #prerelease: true
     on:

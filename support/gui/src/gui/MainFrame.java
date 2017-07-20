@@ -30,7 +30,6 @@ import gui.editionView.ParentEditionPanel;
 import gui.resultsView.ResultsPanel;
 
 import java.awt.CardLayout;
-import java.io.File;
 import java.io.IOException;
 import java.util.ListIterator;
 import java.util.Locale;
@@ -38,7 +37,6 @@ import java.util.Locale;
 import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 
-import solution.TextInEditor;
 import solution.ModelList;
 import solution.Solver;
 import touist.TouistProperties;
@@ -50,8 +48,6 @@ import translation.TranslatorSMT;
  * @author Skander
  */
 public class MainFrame extends javax.swing.JFrame {
-    private TouistProperties properties = new TouistProperties();
-    private TextInEditor clause = new TextInEditor();
     private TranslatorSAT translatorSAT = new TranslatorSAT();
     private TranslatorSMT translatorSMT = new TranslatorSMT();
     private Solver solver;
@@ -75,10 +71,6 @@ public class MainFrame extends javax.swing.JFrame {
         return lang;
     }
     
-    public String getDefaultDirectoryPath() {
-        return defaultDirectoryPath;
-    }
-    
     public void setDefaultDirectoryPath(String path) {
         defaultDirectoryPath = path;
         //TODO save the path in a config file
@@ -88,10 +80,11 @@ public class MainFrame extends javax.swing.JFrame {
      * Creates new form MainFrame
      */
     public MainFrame() {
+        initComponents();
         lang = new Lang(Locale.getDefault());
         
     	cards = new JPanel(new CardLayout());
-    	editorPanel1 = new ParentEditionPanel();
+    	editorPanel1 = new ParentEditionPanel(this);
         resultsPanel1 = new ResultsPanel();
         resultsMenuBar = new ResultsMenuBar(this);
         editionMenuBar = new EditionMenuBar(this);
@@ -102,30 +95,23 @@ public class MainFrame extends javax.swing.JFrame {
         cards.add(resultsPanel1, RESULTS_PANEL);
         setViewToEditor();
 
-        initComponents();
-        
         editorPanel1.updateComboBoxSelectedSolver();
         
         try {
             setIconImage(ImageIO.read(this.getClass().getResourceAsStream("/images/logo64.png")));
         } catch (IOException ex) {
             ex.printStackTrace();
-        }  
+        }
         
         this.setJMenuBar(editionMenuBar);
         updateLanguage();
     }
     
     public void updateLanguage() {
-        this.setTitle(lang.getWord(Lang.FRAME_TITLE) +" "+ properties.getProperty("version"));
         editorPanel1.updateLanguage();
         resultsPanel1.updateLanguage();
         resultsMenuBar.updateLanguage();
         editionMenuBar.updateLanguage();
-    }
-
-    public TextInEditor getTextInEditor() {
-        return clause;
     }
 
     public Solver getSolver() {
@@ -202,7 +188,6 @@ public class MainFrame extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setMinimumSize(new java.awt.Dimension(800, 600));
         getContentPane().setLayout(new java.awt.CardLayout());
 

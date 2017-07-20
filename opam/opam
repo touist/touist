@@ -1,6 +1,6 @@
 opam-version: "1.2"
 name: "touist"
-version: "3.2.2"
+version: "3.4.0"
 maintainer: "Maël Valais <mael.valais@gmail.com>"
 authors: [ "Maël Valais <mael.valais@gmail.com>"
            "Olivier Lezaud" ]

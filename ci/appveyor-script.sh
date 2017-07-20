@@ -43,26 +43,16 @@ ocamlfind remove touist
 make
 make install # Only install binary 'touist' as long as --enable-lib is not given
 
-# I download apache-ant directly from the web because `choco install ant` was re-installing
-# the jdk8 on each build, making them last much more time.
-if [ ! -d /cygdrive/c/ant ]; then
-    curl -L -o ant.zip "http://www.us.apache.org/dist/ant/binaries/apache-ant-1.9.9-bin.zip"
-    unzip -q ant.zip
-    rm ant.zip
-    mv apache-ant* /cygdrive/c/ant
-fi
-
-# Build the Java GUI touist.jar (in support/gui)
-# First, put the SMT solver into support/gui/external/
-if [ ! -d /cygdrive/c/yices ]; then
-    curl -L -o yices.zip "http://yices.csl.sri.com/cgi-bin/yices2-newnewdownload.cgi?file=yices-2.4.2-i686-pc-mingw32-static-gmp.zip&accept=I+Agree"
-    unzip -q yices.zip
-    rm yices.zip
-    mv yices* /cygdrive/c/yices
-    cp /cygdrive/c/yices/bin/yices-smt2.exe support/gui/external
-    cp /cygdrive/c/yices/bin/libyices.dll support/gui/external
-fi
-
+# Build the actual TouIST.exe
 cd support/gui
-ant -e zip
+TERM=dumb ./gradlew createExeZip
+ARCH=windows-x86
+temp=$(find build/distributions -name "TouIST*" | head -1)
+zip=$(echo $temp | sed "s/\(.*\)\.zip$/\1-${ARCH}.zip/")
+mv $temp $zip
+echo $zip
 cd ../..
+
+
+git status
+git status 2> /dev/null | tail -n1 | grep "nothing.*clean"

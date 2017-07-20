@@ -32,7 +32,7 @@
 OASISFormat:  0.4
 OcamlVersion: >= 4.01.0
 Name:         touist
-Version:      3.2.2
+Version:      3.4.0
 Synopsis:     The solver for the Touist language
 Description:  The Touist language is a friendly language for writing
   propositional logic (SAT), logic on real and integers (SMT) and quantified
