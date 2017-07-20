@@ -48,8 +48,8 @@ import touist.TouIST;
  * @Modified by Mael
  */
 public class TranslatorSAT {
-	final private String outputFilePath = touist.TouIST.getWhereToSave() + File.separator + "out.cnf";
-	final private String outputTableFilePath = touist.TouIST.getWhereToSave() + File.separator + "out.table";
+	final private String outputFilePath = touist.TouIST.getWhereToSaveTemp() + File.separator + "out.cnf";
+	final private String outputTableFilePath = touist.TouIST.getWhereToSaveTemp() + File.separator + "out.table";
 	private Map<Integer,String> literalsMap = new HashMap<Integer,String>();
 	private List<TranslationError> errors = new ArrayList<TranslationError>();
 	private Process p;

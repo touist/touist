@@ -59,10 +59,10 @@ public class TouIST {
 
 		System.out.println("TouIST: running app from folder '"+ System.getProperty("user.dir")+"'");
 		System.out.println("* External binaries are in '"+getTouistExternalDir()+"'");
-		System.out.println("* Files are saved in '"+getWhereToSave()+"'");
+		System.out.println("* Files saved in '"+getWhereToSave()+"', temp in '"+getWhereToSaveTemp()+"'");
 		frame = new MainFrame();
 		frame.setVisible(true);
-		
+
 		if(args.length > 0) {
 			frame.getEditorPanel1().open(args[0]);
 		}
@@ -103,7 +103,11 @@ public class TouIST {
 		if(relativePath == null) relativePath = "..";
 		return checkPath(TouIST.getTouistDir() + File.separator + relativePath);
 	}
-	
+	public static String getWhereToSaveTemp() {
+		String relativePath = System.getProperty("touist.tempInHomeRelativeDir");
+		if(relativePath == null) return getWhereToSave();
+		else return checkPath(System.getProperty("user.dir") + File.separator + relativePath);
+	}
 	public static String checkPath(String path) {
 		Path p = FileSystems.getDefault().getPath(path);
 		return p.normalize().toString();
