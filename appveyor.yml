@@ -83,7 +83,7 @@ test_script:
 # you want to upload have not been given in "path:", the
 # deploy: artifact: thing will do nothing.
 artifacts:
-  - path: support/gui/build/distributions/TouIST-*.zip
+  - path: support/gui/build/distributions/*
 
 skip_tags: false
 
@@ -93,7 +93,7 @@ deploy:
     auth_token:
       # maelvalais ciphered credetials using appveyor encryption
       secure: "EWLXzbe9BdCFxAyFoz+kUJOZNyLLIpeCcXrl+aisecK9HMin6aAIt3wFaGSqvWPS"
-    artifact: /TouIST-.*\.zip/          # upload all touist*.zip to release
+    artifact: /.*\.zip/          # upload all touist*.zip to release
     #draft: true
     #prerelease: true
     on:

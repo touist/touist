@@ -27,9 +27,9 @@ Gradle relieves you from the burden of managing the classpath.
 
 Gradle has three commands to build distributable zip in `build/distributions`:
 
-    ./gradlew createMacAppZip   # Contains TouIST.app (macOS)
-    ./gradlew createExeZip      # Contains TouIST.exe and lib/ (Windows)
-    ./gradlew distZip           # Contains bin/ + lib/ (macOS, Windows, Linux)
+    ./gradlew createMacAppZip   # TouIST.app (macOS)
+    ./gradlew createExeZip      # TouIST.exe and lib/ (Windows)
+    ./gradlew createJarZip      # touist.jar and external/ (macOS, Windows, Linux)
 
 ### Editing the graphical interface (`.form`)
 
