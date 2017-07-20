@@ -39,7 +39,6 @@ import javax.swing.JPanel;
 
 import solution.ModelList;
 import solution.Solver;
-import touist.TouistProperties;
 import translation.TranslatorSAT;
 import translation.TranslatorSMT;
 

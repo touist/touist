@@ -26,10 +26,12 @@ package touist;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
+import java.util.Properties;
 import java.util.prefs.Preferences;
 
 import javax.swing.JOptionPane;
@@ -42,13 +44,13 @@ import solution.SolverExecutionException;
  * @author Skander
  */
 public class TouIST {
-	public static TouistProperties properties = new TouistProperties();
 	private static MainFrame frame;
 
 	/**
 	 * @param args the command line arguments
 	 */
 	public static void main(String[] args) throws IOException, InterruptedException, FileNotFoundException, SolverExecutionException {
+		loadProperties();
 		String version = System.getProperty("java.version");
 		if(Float.valueOf(version.substring(0,3)) < 1.7) {
 			JOptionPane.showMessageDialog(null, "Your java version is "+version+" but version higher or equal to 1.7 is required");
@@ -73,14 +75,18 @@ public class TouIST {
 	 * @return
 	 */
 	public static String getTouistDir() {
-		String pathToJar = ClassLoader.getSystemClassLoader().getResource(".").toString();
-		// URISyntaxException should ne ever be thrown because we expect getResource(".")
-		// to give a correct URL
 		String path = "";
+		final String resourcePath = ".";
 		try {
+			String pathToJar = ClassLoader.getSystemClassLoader().getResource(resourcePath).toString();
+			// URISyntaxException should ne ever be thrown because we expect getResource(".")
+			// to give a correct URL
 			path = (new File(new URI(pathToJar))).getAbsolutePath();
 		} catch (URISyntaxException e) {
 			System.err.println("Something went wrong when trying to get where touist.jar is located:\n" + e.getMessage());
+		} catch (NullPointerException e) {
+			System.err.println("The path '"+resourcePath+"' does not belong to the Class-Path\n");
+			System.exit(1);
 		}
 		return path;
 	}
@@ -101,6 +107,21 @@ public class TouIST {
 	public static String checkPath(String path) {
 		Path p = FileSystems.getDefault().getPath(path);
 		return p.normalize().toString();
+	}
+
+	private static void loadProperties() {
+		try {
+			Properties prop = new Properties();
+			InputStream in = ClassLoader.getSystemClassLoader().getResourceAsStream("version.properties");
+			if(in == null) throw new IOException();
+			else prop.load(in);
+			// System properties are merged into our new prop in order to make
+			// sure that they are not overriden by our property file
+			prop.putAll(System.getProperties());
+			System.setProperties(prop);
+		} catch (IOException e) {
+			System.out.println("Warning: the property file version.properties was not found");
+		}
 	}
 }
 

@@ -70,7 +70,7 @@ public class ParentEditionPanel extends AbstractComponentPanel {
 
     public void setOpenedFile(Path file) {
         String windowTitle = mainframe.getLang().getWord(Lang.FRAME_TITLE) + " "
-                + touist.TouIST.properties.getProperty("version");
+                + System.getProperty("touist.version");
         if(file == null) {
             mainframe.setTitle(windowTitle);
         } else {

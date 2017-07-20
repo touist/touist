@@ -10,22 +10,18 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import touist.TouistProperties;
-
 /**
  *
  * @author Skander
  */
 public class AboutPanel extends javax.swing.JPanel {
-	public static TouistProperties properties = new TouistProperties();
-
 
     /**
      * Creates new form About
      */
     public AboutPanel() {
         initComponents();
-        versionNumber.setText(properties.getProperty("version"));
+        versionNumber.setText(System.getProperty("touist.version"));
     }
 
     /**
