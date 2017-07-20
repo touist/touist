@@ -70,6 +70,7 @@ task prepareExternal(type: Copy) {
     }
     into "${buildDir}/external/"
 }
+run.dependsOn prepareExternal
 
 task wrapper(type: Wrapper) {
     gradleVersion = '4.0.1'
