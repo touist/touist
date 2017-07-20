@@ -60,23 +60,28 @@ install:
     set -e # exit if one of the following commands fail
     case $TRAVIS_OS_NAME in
     linux)
-      TERM=dumb ./gradlew distZip
+      TERM=dumb ./gradlew createJarZip
       ARCH=linux-x86_64
       ;;
     osx)
-      TERM=dumb ./gradlew createMacAppZip
+      TERM=dumb ./gradlew createMacAppZip createJarZip
       ARCH=mac-x86_64
       ;;
     esac
   - |
-    temp=$(find build/distributions -name "TouIST*" | head -1)
-    zip=$(echo $temp | sed "s/\(.*\)\.zip$/\1-${ARCH}.zip/")
-    mv $temp $zip
-  - ls -l $zip
+    # Add $ARCH to the end of the .zip filename
+    for f in $(find build/distributions -name "TouIST*"); do
+      mv $f $(echo $f | sed "s/\(.*\)\.zip$/\1-${ARCH}.zip/")
+    done
+  - ls build/distributions
   - cd $TRAVIS_BUILD_DIR
   - |
     git status
-    git status 2> /dev/null | tail -n1 | grep "nothing.*clean"
+    if ! git status 2> /dev/null | tail -n1 | grep "nothing.*clean"; then
+      echo 'STOP!!! The build ends in a dirty state; see the diff:'
+      git diff
+      exit 1
+    fi
 
 # This part is meant for unit tests (among others).
 script:
@@ -94,7 +99,8 @@ deploy:
     # This is maelvalais's ciphered credentials.
     # It has been ciphered by travis's encryption system.
     secure: PNvSXUUBTgQjfio2QL9qQYtV8JCpT6nWkvRNDGFoAwdskusi719jRLjGYDKHrTHelxiehepKSxiFcPcOCfFD/WkfOLZvEBs463Xb3fldoNxUgRAWwYy/uEWwlD3lbSBREgtqrfuHP3uVKF7tYDlJXhTFpdM/nuwXGIwU5AuUhCw=
-  file: support/gui/$zip
+  file_glob: true
+  file: support/gui/build/distributions/*
   on:
     branch: master
     tags: true
