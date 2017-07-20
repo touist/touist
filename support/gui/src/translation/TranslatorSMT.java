@@ -51,7 +51,7 @@ public class TranslatorSMT {
 	private String translatorProgramFilePath;
 	private Map<Integer,String> literalsMap = new HashMap<Integer,String>();
 	private List<TranslationError> errors = new ArrayList<TranslationError>();
-	private String currentPath = TouIST.getWhereToSave();
+	private String currentPath = TouIST.getWhereToSaveTemp();
 	private Process p;
 	private List<String> options = new ArrayList<String>();
 

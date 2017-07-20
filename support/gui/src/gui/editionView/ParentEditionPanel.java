@@ -587,7 +587,7 @@ public class ParentEditionPanel extends AbstractComponentPanel {
         sinon passer à l'état SINGLE_RESULT
         Si aucun model n'existe alors passer a l'état NO_RESULT
         */
-        String path = touist.TouIST.checkPath(touist.TouIST.getWhereToSave() + File.separator + "temp.touist");
+        String path = touist.TouIST.checkPath(touist.TouIST.getWhereToSaveTemp() + File.separator + "temp.touist");
         File touistFile = new File(path); //TODO se mettre d'accord sur un nom standard ou ajouter a Translator et BaseDeClause des méthode pour s'échange de objets File
         String errorMessage;
         
