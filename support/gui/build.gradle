@@ -247,7 +247,7 @@ task createMacAppZip(type: Zip) {
 
 task copyToWindowsBundle (type: Copy) {
     from (files(prepareExternal))
-    into "build/${launch4j.outputDir}/${launch4j.libraryDir}"
+    into "build/${launch4j.outputDir}/${launch4j.libraryDir}/external"
 }
 
 createExe {
@@ -260,11 +260,13 @@ createExe {
     copyright = '2017 (C) IRIT'
     jvmOptions = [
             //'-Dswing.defaultlaf=javax.swing.plaf.nimbus.NimbusLookAndFeel',
-            '-Dtouist.externalRelativeDir=lib',
+            '-Dtouist.externalRelativeDir=lib/external',
             '-Dtouist.saveRelativeDir=.',
     ]
     fileDescription = project.description
     productName = project.name
+    copyConfigurable = shadowJar.outputs.files
+    jar = "lib/${shadowJar.archiveName}"
     finalizedBy copyToWindowsBundle
 }
 
@@ -273,6 +275,7 @@ task createExeZip(type: Zip) {
     from "build/${launch4j.outputDir}"
     include '*'
     include '*/*'
+    include '*/*/*'
     archiveName "${project.name}-native-${project.version}.zip"
     destinationDir file('build/distributions')
 }
