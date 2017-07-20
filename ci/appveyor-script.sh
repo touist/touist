@@ -45,14 +45,20 @@ make install # Only install binary 'touist' as long as --enable-lib is not given
 
 # Build the actual TouIST.exe
 cd support/gui
-TERM=dumb ./gradlew createExeZip
+TERM=dumb ./gradlew createExeZip createJarZip
 ARCH=windows-x86
-temp=$(find build/distributions -name "TouIST*" | head -1)
-zip=$(echo $temp | sed "s/\(.*\)\.zip$/\1-${ARCH}.zip/")
-mv $temp $zip
-echo $zip
+
+# Add $ARCH to the end of the .zip filename
+for f in $(find build/distributions -name "TouIST*"); do
+      mv $f $(echo $f | sed "s/\(.*\)\.zip$/\1-${ARCH}.zip/")
+done
+ls build/distributions
 cd ../..
 
 
 git status
-git status 2> /dev/null | tail -n1 | grep "nothing.*clean"
+if ! git status 2> /dev/null | tail -n1 | grep "nothing.*clean"; then
+    echo 'STOP!!! The build ends in a dirty state; see the diff:'
+    git diff
+    exit 1
+fi
