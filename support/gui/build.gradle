@@ -2,14 +2,14 @@ plugins {
     id "edu.sc.seis.macAppBundle" version "2.1.6" // For TouIST.app on macOS
     id 'edu.sc.seis.launch4j' version '2.3.0' // For TouIST.exe on Windows
     id 'com.palantir.git-version' version '0.8.0'
-    //id "com.github.johnrengelman.shadow" version "2.0.1" // For building the 'fat-jar' touist.jar that includes deps
+    id "com.github.johnrengelman.shadow" version "2.0.1" // For building the 'fat-jar' touist.jar that includes deps
     id "de.undercouch.download" version '3.2.0'
     id "com.google.osdetector" version "1.4.0"
     id 'eclipse'
     id 'idea'
 }
 
-//apply plugin: 'com.github.johnrengelman.shadow'
+apply plugin: 'com.github.johnrengelman.shadow'
 apply plugin: 'edu.sc.seis.launch4j'
 apply plugin: 'de.undercouch.download'
 apply plugin: 'com.google.osdetector'
@@ -84,9 +84,17 @@ task generateVersion {
     outputs.dir file("resources/version.properties")
     doLast {
         def props = new Properties()
-        props.setProperty("version", project.version)
-        props.setProperty("description", project.description)
-        props.setProperty("timestamp", new Date().toString())
+        props.setProperty("touist.version", project.version)
+        props.setProperty("touist.description", project.description)
+        props.setProperty("touist.buildTimestamp", new Date().toString())
+        //props.setProperty("touist.externalRelativeDir","../../../external")
+        //props.setProperty("touist.saveRelativeDir","../../../")
+        props.setProperty("apple.laf.useScreenMenuBar","true")
+        props.setProperty("com.apple.macos.use-file-dialog-packages","true")
+        props.setProperty("com.apple.macos.useScreenMenuBar","true")
+        props.setProperty("com.apple.mrj.application.apple.menu.about.name","${project.name}")
+        props.setProperty("com.apple.smallTabs","true")
+        props.setProperty("file.encoding","UTF-8")
         file("resources/version.properties").withPrintWriter { props.list(it) }
     }
 }
@@ -105,9 +113,9 @@ sourceSets {
 }
 
 dependencies {
-    //shadow 'com.yuvimasory:orange-extensions:1.3.0'
     //shadow 'com.fifesoft:rsyntaxtextarea:2.6.1'
     //shadow 'org.scilab.forge:jlatexmath:1.0.6'
+    //shadow 'com.yuvimasory:orange-extensions:1.3.0'
     //shadow 'org.kordamp.ikonli:ikonli-swing:1.9.0'
     //shadow 'org.kordamp.ikonli:ikonli-fontawesome-pack:1.9.0'
 
@@ -118,8 +126,21 @@ dependencies {
     compile 'org.kordamp.ikonli:ikonli-fontawesome-pack:1.9.0'
 }
 
-jar {
+ jar {
+     baseName = 'touist'
+     manifest {
+         // WARNING: do not remove the '.' from the classpath. If you do,
+         // there will be a nullPointerException because we use getResource(".")
+         attributes 'Class-Path': '.'
+     }
+ }
+
+shadowJar {
+    mergeServiceFiles()
     baseName = 'touist'
+    classifier = null
+    version = null
+    configurations = [project.configurations.compile]
     manifest {
         // WARNING: do not remove the '.' from the classpath. If you do,
         // there will be a nullPointerException because we use getResource(".")
@@ -127,36 +148,36 @@ jar {
     }
 }
 
-//shadowJar {
-//    baseName = 'touist'
-//    configurations = [project.configurations.compile]
-//}
+startScripts {
+    doLast {
+        if(osdetector.os == 'windows') delete unixScript
+        else delete windowsScript
+    }
+}
 
 distributions {
     main {
         contents {
-            //exclude 'lib'
-            //from jar {into 'lib'}
-            from (files(prepareExternal)) {
-                into 'lib'
+            into ('lib') {
+                from (prepareExternal)
             }
+//            into ('bin') {
+//                from (myStartScripts)
+//                if(osdetector.os == 'windows') include '*.bat'
+//                else exclude '*.bat'
+//                fileMode = 0755
+//            }
         }
     }
 }
+//startScripts.enabled false
 
 macAppBundle {
     mainClassName = project.mainClassName
     bundleJRE = false
     icon = 'resources/macappbundle/logo.icns'
-    javaProperties.put("apple.laf.useScreenMenuBar", "true")
     javaProperties.put("touist.externalRelativeDir", "../external")
     javaProperties.put("touist.saveRelativeDir", "../../..")
-    javaProperties.put("apple.laf.useScreenMenuBar", "true")
-    javaProperties.put("com.apple.macos.use-file-dialog-packages", "true")
-    javaProperties.put("com.apple.macos.useScreenMenuBar", "true")
-    javaProperties.put("com.apple.mrj.application.apple.menu.about.name", name)
-    javaProperties.put("com.apple.smallTabs", "true")
-    javaProperties.put("file.encoding", "UTF-8")
     // The following allows macOS to recognize .touist and .touistl files
     bundleExtras.put("CFBundleDocumentTypes", [ [
         CFBundleTypeExtensions: [ 'touist','touistl' ],
@@ -167,7 +188,7 @@ macAppBundle {
     ]])
     javaExtras.put('-Xdock:name', name)
     arguments = []
-    highResolutionCapable = false
+    highResolutionCapable = true
     // Using './gradlew -Ddebug=true createApp' we debug remotely TouIST.app
     if (System.getProperty('debug', 'false') == 'true') {
         javaExtras.put('-agentlib:jdwp','transport=dt_socket,server=y,suspend=n,address=5005')
@@ -212,7 +233,7 @@ createApp.dependsOn copyToMacAppBundle
 task createMacAppZip(type: Zip) {
     dependsOn createApp
     destinationDir file("build/distributions")
-    archiveName "${project.name}-${project.version}.zip"
+    archiveName "${project.name}-native-${project.version}.zip"
     from("${buildDir}/${macAppBundle.appOutputDir}") {
         include "${project.name}.app/**"
         exclude "${project.name}.app/Contents/MacOS"
@@ -225,9 +246,8 @@ task createMacAppZip(type: Zip) {
 }
 
 task copyToWindowsBundle (type: Copy) {
-    //dependsOn prepareExternal,createExe
     from (files(prepareExternal))
-    into "build/${launch4j.outputDir}/${launch4j.libraryDir}"
+    into "build/${launch4j.outputDir}/${launch4j.libraryDir}/external"
 }
 
 createExe {
@@ -237,15 +257,16 @@ createExe {
     version = version
     textVersion = version
     companyName = 'IRIT'
-    copyright = '2017 © IRIT'
+    copyright = '2017 (C) IRIT'
     jvmOptions = [
             //'-Dswing.defaultlaf=javax.swing.plaf.nimbus.NimbusLookAndFeel',
-            '-Dtouist.externalRelativeDir=lib',
+            '-Dtouist.externalRelativeDir=lib/external',
             '-Dtouist.saveRelativeDir=.',
-            '-Dfile.encoding=UTF-8'
     ]
     fileDescription = project.description
     productName = project.name
+    copyConfigurable = shadowJar.outputs.files
+    jar = "lib/${shadowJar.archiveName}"
     finalizedBy copyToWindowsBundle
 }
 
@@ -254,7 +275,16 @@ task createExeZip(type: Zip) {
     from "build/${launch4j.outputDir}"
     include '*'
     include '*/*'
-    archiveName "TouIST-${project.version}.zip"
+    include '*/*/*'
+    archiveName "${project.name}-native-${project.version}.zip"
+    destinationDir file('build/distributions')
+}
+
+task createJarZip(type: Zip) {
+    dependsOn shadowJar
+    from shadowJar
+    from (files(prepareExternal)) { into 'external' }
+    archiveName "${project.name}-jar-${project.version}.zip"
     destinationDir file('build/distributions')
 }
 
