@@ -49,14 +49,15 @@
   let _ = List.iter (fun (kwd, tok) -> Hashtbl.add reserved_keywords kwd tok)
    ["end",           END;
     "in",            IN;
-    "subset(",       SUBSET;
+    "subset(",       SUBSET_PR;
     "empty(",        EMPTY;
     "union(",        UNION_PR;
     "inter(",        INTER_PR;
     "diff(",         DIFF_PR;
-    "union",        UNION;
-    "inter",        INTER;
-    "diff",         DIFF;
+    "union",         UNION;
+    "inter",         INTER;
+    "diff",          DIFF;
+    "subset",        SUBSET;
     "exact(",        EXACT;
     "atmost(",       ATMOST;
     "atleast(",      ATLEAST;
