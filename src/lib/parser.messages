@@ -980,7 +980,7 @@ touist_qbf: VAR WHEN
 ## var 
 ##
 
-Either the variable $1 was meant to be part of a formula, in which case the formula must end (I don't know exactly why when I wrote this error). Or you wanted to affect $1, in which case '=' is expected. Instead, the following statement were read:
+Either the variable $1 was meant to be part of a formula, in which case the formula must end (I dont know exactly why when I wrote this error). Or you wanted to affect $1, in which case '=' is expected. Instead, the following statement were read:
     $0
 
 touist_simple: VAR AFFECT XOR 
