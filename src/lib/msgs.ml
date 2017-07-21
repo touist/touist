@@ -134,3 +134,5 @@ let rec string_of_msg ?(width=(!wrap_width)) ?(color=(!color)) ?(fmt=(!format)) 
 let add_msg msg = Printf.fprintf !out_channel_warning "%s" (string_of_msg msg)
 let add_fatal msg = raise (Fatal msg)
 let single_msg msg = raise (Fatal msg)
+
+let _ = Printexc.register_printer (fun ex -> match ex with Fatal msg -> Some (string_of_msg msg) | _ -> None)
