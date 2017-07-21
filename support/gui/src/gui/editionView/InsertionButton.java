@@ -43,19 +43,21 @@ import org.scilab.forge.jlatexmath.TeXIcon;
  * @author Skander
  */
 public class InsertionButton extends JButton {
-    
+
     private final Editor editorTextArea;
     private final String codeToInsert;
     private ArrayList<Integer> snipets;
-    
-    public InsertionButton(Editor editorTextArea, final String codeToInsert, ArrayList<Integer> snipets) {
+    private final String latex;
+
+    public InsertionButton(Editor editorTextArea, final String codeToInsert, final String latex, ArrayList<Integer> snipets) {
         this.editorTextArea = editorTextArea;
         this.codeToInsert = codeToInsert;
         this.snipets = snipets;
-        
+        this.latex = latex;
+
         this.setContentAreaFilled(false);
         //this.setBorderPainted(false);
-        
+
         addActionListener(new ActionListener() {
 
             @Override
@@ -84,44 +86,43 @@ public class InsertionButton extends JButton {
                     case LAST_RESULT :
                         // impossible
                         break;
-                    default : 
+                    default :
                         System.out.println("Undefined action set for the state : " + ((MainFrame)(getRootPane().getParent())).state);
                 }
             }
         });
-        
+
         try {
-            TranslationLatex toLatex = new TranslationLatex(codeToInsert,editorTextArea.getSyntaxEditingStyle(),false);
-            TeXFormula formula = new TeXFormula(toLatex.getFormula());
+            TeXFormula formula = new TeXFormula(this.latex);
             TeXIcon ti = formula.createTeXIcon(TeXConstants.ALIGN_TOP, 15);
             this.setIcon(ti);
         } catch (Exception ex) {
             System.err.println("Erreur lors de la traduction dun bouton "+codeToInsert);
         }
-        
-        
+
+
         this.setFocusable(false);
         this.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         this.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
     }
-    
-    public InsertionButton(Editor editorTextArea, String codeToInsert, ArrayList<Integer> snipets, String aide) {
-        this(editorTextArea, codeToInsert, snipets);
+
+    public InsertionButton(Editor editorTextArea, String codeToInsert, final String latex, ArrayList<Integer> snipets, String aide) {
+        this(editorTextArea, codeToInsert, latex, snipets);
         setToolTipText(aide);
-        
+
     }
-    
-    public InsertionButton(Editor editorTextArea, String codeToInsert, ArrayList<Integer> snipets, String aide, String latexFormula) {
-        this(editorTextArea, codeToInsert, snipets,aide);
+
+    public InsertionButton(Editor editorTextArea, String codeToInsert, final String latex, ArrayList<Integer> snipets, String aide, String latexFormula) {
+        this(editorTextArea, codeToInsert, latex, snipets,aide);
         TeXFormula formula = new TeXFormula(latexFormula);
         TeXIcon ti = formula.createTeXIcon(TeXConstants.ALIGN_TOP, 15);
         this.setIcon(ti);
     }
-    
-    
+
+
     /**
      * Insert text at the caret position in the textArea.
-     * @param text 
+     * @param text
      */
     private void insertAtCaret(String text) {
         Integer caretPosition = editorTextArea.getCaretPosition();
