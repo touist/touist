@@ -1,4 +1,6 @@
 v3.4.0
+  - 'inter', 'union', 'diff' and 'subset' are now infix operators; the prefix
+    versions are still available (but they produce a warning).
   - interface: 'save' and 'open' now remember the last file opened; the current
     file is displayed in the window title. Also, a friendly warning is now
     displayed when opening or quitting while the current file is unsaved.
@@ -12,9 +14,6 @@ v3.2.3
   - added an option (--debug) which enable the display of stacktrace
     on exception catched on exit
   - vars indices '$var(1,2)' are now printed as indices in latex
-v3.2.3
-  - inter, union, diff and subset are now infix operators; the prefix versions
-    are still available (but they produce a warning).
 v3.2.2
   - fixed `card()` that was expecting two closing parenthesis instead of one
   - the 'let' construct can now handle multiple variables separated with ','
