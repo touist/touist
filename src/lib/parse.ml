@@ -58,7 +58,7 @@ let lexer buffer : (Lexing.lexbuf -> Parser.token) =
     "foo.touistl"... For now, the name of the input file name is not
     indicated to the user: useless because we only handle a single touistl file 
 *)
-let parse (parser) ?debug:(debug=false) filename (text:string) : ast * Msgs.t ref =
+let parse (parser) ?debug:(debug=false) filename (text:string) : ast =
   let buffer = ref Parser_error_report.Zero in
   let lexbuf = Lexing.from_string text in
   lexbuf.lex_curr_p <- {lexbuf.lex_curr_p with pos_fname = filename; pos_lnum = 1};
@@ -70,10 +70,10 @@ let parse (parser) ?debug:(debug=false) filename (text:string) : ast * Msgs.t re
     and loc = Parser_error_report.area_pos !buffer (* area_pos returns (start_pos,end_pos) *)
     in single_msg (Error,Parse,msg,Some loc)
   in
-    let ast,msgs =
+    let ast =
       try Parser.MenhirInterpreter.loop_handle succeed fail supplier checkpoint
       with Lexer.Error (msg,loc) -> Msgs.single_msg (Error,Lex,msg,Some loc)
-    in ast,msgs
+    in ast
 
 (** Directly calls [parser] with [Parser.Incremental.touist_simple] *)
 let parse_sat ?debug:(d=false) ?(filename="foo.touistl") text = parse Parser.Incremental.touist_simple ~debug:d filename text

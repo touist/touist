@@ -3,60 +3,48 @@ open OUnit2;;
 (* To check that the error has occured curreclty, we only check
    that the place where the error was found is the right one.  *)
 
-let find_msg msgs typ during loc_str =
-  let m = Msgs.filter
-    (fun msg -> match msg with
-      | t,d,_,Some l when String.compare (Msgs.string_of_loc l) loc_str = 0
-            && t == typ
-            && d == during -> true
-      | t,d,_,None when loc_str = ""
-            && t == typ
-            && d == during -> true
-      | _ -> false)
-    msgs
-  in Msgs.elements m
+let is_msg typ during loc_str msg =
+  match msg with
+  | t,d,_,Some l when String.compare (Msgs.string_of_loc l) loc_str = 0
+        && t == typ
+        && d == during -> true
+  | t,d,_,None when loc_str = ""
+        && t == typ
+        && d == during -> true
+  | _ -> false
 
-let test_raise (parse:(string->Msgs.t)) (during:Msgs.during) typ nth_msg (loc_expected:string) text =
-  let raised_error,msgs = (try let msgs = parse text in false,msgs with Msgs.Fatal (_,msgs) -> true,msgs) in
-  if typ == Msgs.Error && raised_error == false then
-    OUnit2.assert_failure ("this test didn't raise an error at location '"^loc_expected^"' as expected")
-  else
-  match find_msg msgs typ during loc_expected with
-    | (t,d,msg,loc)::_ -> () (* OK *)
-    | _ -> OUnit2.assert_failure ("this test didn't give a message at location '"^loc_expected^"' as expected. Instead, got:\n"^Msgs.string_of_msgs msgs)
+let test_raise (parse:(string->unit)) (during:Msgs.during) typ nth_msg (loc_expected:string) text =
+  try parse text;
+    if typ == Msgs.Error then
+      OUnit2.assert_failure ("this test didn't raise an error at location '"^loc_expected^"' as expected")
+  with Msgs.Fatal msg ->
+    match msg |> is_msg typ during loc_expected with
+    | true -> () (* OK *)
+    | false -> OUnit2.assert_failure ("this test didn't give a message at location '"^loc_expected^"' as expected. Instead, got:\n"^Msgs.string_of_msg msg)
 
-let sat text = let ast,msgs = Parse.parse_sat text |> Eval.eval in let _ = Cnf.ast_to_cnf ast |> Sat.cnf_to_clauses in !msgs
-let smt logic text = let ast,msgs = Parse.parse_smt text |> Eval.eval ~smt:true in let _ = Smt.to_smt2 logic ast in !msgs
-let qbf text = let ast,msgs = Parse.parse_qbf text |> Eval.eval ~smt:true |> Qbf_of_ast.prenex in !msgs
+let sat text = let ast = Parse.parse_sat text |> Eval.eval in let _ = Cnf.ast_to_cnf ast |> Sat.cnf_to_clauses in ()
+let smt logic text = let ast = Parse.parse_smt text |> Eval.eval ~smt:true in let _ = Smt.to_smt2 logic ast in ()
+let qbf text = let ast = Parse.parse_qbf text |> Eval.eval ~smt:true |> Qbf_of_ast.prenex in ()
 
 (* The ending _ is necessary because the testing function
    must accept the 'context' thing. *)
 let test_sat text _ =
-  try let msgs = sat text in
-  if Msgs.has_error msgs then OUnit2.assert_failure
-    ("this test didn't raise any exceptions but errors had been outputed:\n"^
-      Msgs.string_of_msgs msgs)
-  with Msgs.Fatal (_,msg) -> OUnit2.assert_failure
+  try sat text
+  with Msgs.Fatal msg -> OUnit2.assert_failure
     ("this test shouldn't have raised a Fatal exception. Here is the exception:\n"^
-      Msgs.string_of_msgs msg)
+      Msgs.string_of_msg msg)
 
 let test_smt ?(logic="QF_IDL") text _ =
-  try let msgs = (smt logic) text in ();
-  if Msgs.has_error msgs then OUnit2.assert_failure
-      ("this test didn't raise any exceptions but errors had been outputed:\n"^
-        Msgs.string_of_msgs msgs)
-    with Msgs.Fatal (_,msg) -> OUnit2.assert_failure
-      ("this test shouldn't have raised a Fatal exception. Here is the exception:\n"^
-        Msgs.string_of_msgs msg)
+  try (smt logic) text
+  with Msgs.Fatal msg -> OUnit2.assert_failure
+    ("this test shouldn't have raised a Fatal exception. Here is the exception:\n"^
+      Msgs.string_of_msg msg)
 
 let test_qbf text _ =
-  try let msgs = qbf text in ();
-  if Msgs.has_error msgs then OUnit2.assert_failure
-      ("this test didn't raise any exceptions but errors had been outputed:\n"^
-        Msgs.string_of_msgs msgs)
-    with Msgs.Fatal (_,msg) -> OUnit2.assert_failure
-      ("this test shouldn't have raised a Fatal exception. Here is the exception:\n"^
-        Msgs.string_of_msgs msg)
+  try qbf text
+  with Msgs.Fatal msg -> OUnit2.assert_failure
+    ("this test shouldn't have raised a Fatal exception. Here is the exception:\n"^
+      Msgs.string_of_msg msg)
 
 let test_sat_raise ?(during=Msgs.Eval) ?(typ=Msgs.Error) ?(nth=0) loc text _ = test_raise sat during typ nth loc text
 let test_smt_raise ?(during=Msgs.Eval) ?(typ=Msgs.Error) ?(nth=0) ?(logic="QF_IDL") loc text _ = test_raise (smt logic) during typ nth loc text
@@ -65,7 +53,7 @@ let test_qbf_raise ?(during=Msgs.Eval) ?(typ=Msgs.Error) ?(nth=0) ?(logic="QF_ID
 let sat_models_are text expected _ =
   OUnit2.assert_equal ~printer:(fun s -> s)
     expected
-    (let ast,msgs = Parse.parse_sat text |> Eval.eval in let cl,tbl = Cnf.ast_to_cnf ast |> Sat.cnf_to_clauses in
+    (let ast = Parse.parse_sat text |> Eval.eval in let cl,tbl = Cnf.ast_to_cnf ast |> Sat.cnf_to_clauses in
       let models_str = ref [] in
         let _ = Sat.solve_clauses ~print:(fun m _ -> models_str := (Sat.Model.pprint ~sep:" " tbl m)::!models_str) (cl,tbl)
           in List.fold_left (fun acc s -> match acc with "" -> s | _ -> s^" | "^acc) "" !models_str)
@@ -74,11 +62,11 @@ let sat_models_are text expected _ =
    text. *)
 let sat_expands_to text expected _ =
   OUnit2.assert_equal ~printer:(fun s -> s)
-    expected (let ast,_ = Parse.parse_sat text |> Eval.eval in Pprint.string_of_ast ast)
+    expected (let ast = Parse.parse_sat text |> Eval.eval in Pprint.string_of_ast ast)
 
 let qbf_expands_to text expected _ =
   OUnit2.assert_equal ~printer:(fun s -> s)
-    expected (let ast,_ = Parse.parse_qbf text |> Eval.eval |> Qbf_of_ast.prenex in Pprint.string_of_ast ast)
+    expected (let ast = Parse.parse_qbf text |> Eval.eval |> Qbf_of_ast.prenex in Pprint.string_of_ast ast)
 
 (*  A standard test in oUnit should first define a function
         let test1 context : unit = OUnit2.assert_bool true

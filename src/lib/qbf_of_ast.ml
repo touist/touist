@@ -19,7 +19,7 @@ let add_suffix name =
     of the 14 transformations has been performed in the recursion. We
     only want one exists/forall transformation per to_prenex full recursion
     because of the variable renaming. *)
-let rec to_prenex debug msgs quant_l conflict_l only_rename ast : ast =
+let rec to_prenex debug quant_l conflict_l only_rename ast : ast =
   let string_of_prop prop = match prop with
     | Prop name -> name
     | e -> failwith ("[shouldnt happen] a quantor must be a proposition, not a '"^Pprint.string_of_ast_type e^"' in " ^ Pprint.string_of_ast e)
@@ -29,19 +29,19 @@ let rec to_prenex debug msgs quant_l conflict_l only_rename ast : ast =
      an error is raised. *)
   let to_prenex_new prop ast_inner =
     if List.exists (fun y -> y=(string_of_prop prop)) quant_l
-    then Msgs.add_fatal msgs (Msgs.Error,Msgs.Prenex,
+    then Msgs.add_fatal (Msgs.Error,Msgs.Prenex,
       "the prop '"^Pprint.string_of_ast prop^"' has been quantified twice. \
       For all the quantifiers quantifying on '"^Pprint.string_of_ast prop^"' \
       in the following code, you should rename their variables:\n    "^Pprint.string_of_ast ast^"\n",None)
-    else ast_inner |> to_prenex debug msgs ((string_of_prop prop)::quant_l) conflict_l only_rename in
+    else ast_inner |> to_prenex debug ((string_of_prop prop)::quant_l) conflict_l only_rename in
   (* [to_prenex_rn] will recursively launch a prenex where all propositions that
      have the same name as 'prop' will be renamed by adding a suffix
      (x1,x2...). *)
   let to_prenex_rn prop ast =
-    ast |> to_prenex debug msgs quant_l ((string_of_prop prop)::conflict_l) true in
+    ast |> to_prenex debug quant_l ((string_of_prop prop)::conflict_l) true in
   (* [to_prenex] is the same as the outer 'to_prenex' except that the
      non-changing arguments are already given. *)
-  let to_prenex ast = ast |> to_prenex debug msgs quant_l conflict_l only_rename in
+  let to_prenex ast = ast |> to_prenex debug quant_l conflict_l only_rename in
   if debug then Printf.printf "to_prenex_in  (%s): %s\n"
     (if only_rename then "traversing  " else "transforming")
     (Pprint.string_of_ast ~utf8:true ast);
@@ -137,14 +137,14 @@ let rec quantify_free_variables env ast =
 
 (* [prenex] loops over [to_prenex] as long as the formula is not in prenex
    form. *)
-let prenex ?(debug=false) (ast,msgs) : ast * Msgs.t ref =
+let prenex ?(debug=false) ast : ast =
   let rec to_prenex_loop ast =
     if debug then Printf.printf "step: %s\n" (Pprint.string_of_ast ~utf8:true ast);
-    if is_prenex ast then ast else ast |> to_prenex debug msgs [] [] false |> to_prenex_loop
+    if is_prenex ast then ast else ast |> to_prenex debug [] [] false |> to_prenex_loop
   in let intermediate = to_prenex_loop ast in
    if debug then Printf.printf "before bounding free vars: %s\n" (Pprint.string_of_ast ~utf8:true intermediate);
   let final = intermediate |> quantify_free_variables [] in
-  final,msgs
+  final
 
 (* [cnf] calls Cnf.cnf on the inner formula (with no quantifiers) and
    existentially quantifies any tseitlin variable in an innermost way. *)

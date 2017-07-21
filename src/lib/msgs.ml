@@ -31,30 +31,14 @@ type loc = Lexing.position * Lexing.position
 type during = Usage | Parse | Lex | Eval | Sat | Cnf | Prenex
 type msg = msg_type * during * string * loc option
 
-module Msg =
-struct
-  type t = msg
-  let compare l1 l2 = Pervasives.compare l1 l2
-end
+exception Fatal of msg
 
-include Set.Make(Msg)
-
-exception Fatal of during * t
-
-let has_error (msgs : t) : bool =
-  exists (fun msg -> match msg with Error,_,_,_ -> true | _ -> false) msgs
-
-let add_msg (msgs:t ref) msg = msgs := add msg !msgs
-let add_fatal (msgs:t ref) msg =
-  let _,during,_,_ = msg in
-  add_msg msgs msg; raise (Fatal (during,!msgs))
-
-let single_msg msg =
-  let _,during,_,_ = msg in
-  let msgs = ref empty in
-  add_msg msgs msg; raise (Fatal (during,!msgs))
-
-let null_loc = (Lexing.dummy_pos,Lexing.dummy_pos)
+(* Parameters that can be set globally *)
+let wrap_width = ref 76
+let format = ref "%l:%c: %t: %m"
+let loc_format = ref "%l:%c"
+let color = ref (Unix.isatty Unix.stderr)
+let out_channel_warning = ref stderr
 
 let replace pattern replacement text =
     let open Str in global_replace (regexp pattern) replacement text
@@ -97,7 +81,7 @@ let replace (placeholder : char -> string) text =
   in replace (if (placeholder 'l')=""
     then Str.search_forward (Str.regexp "%[^flcLCbB]") text 0 else 0)
 
-let string_of_loc ?(fmt="%l:%c") (loc:loc) : string =
+let string_of_loc ?(fmt=(!loc_format)) (loc:loc) : string =
   replace (loc_placeholders loc) fmt
 
 (** Wraps the text at width. Indendation is kept as long no new line is read.
@@ -129,7 +113,7 @@ let format_width color width text =
         ^ "\n" ^ format (cur_indent+prev_indent) (last_space_end+1)
   in if width != 0 then format 0 0 else text;;
 
-let rec string_of_msgs ?(width=78) ?(color=false) ?(fmt="%l:%c: %t: %m") (messages:t) =
+let rec string_of_msg ?(width=(!wrap_width)) ?(color=(!color)) ?(fmt=(!format)) (message:msg) =
   let color_backquote text = let colorize str = "\x1b[33m" ^ str ^ "\x1b[0m" in
     Str.global_substitute (Str.regexp "`\\([^`]+\\)`") (fun s -> "`"^ colorize (Str.matched_group 1 s) ^"`") text in
   let color_quoted text = let colorize str = "\x1b[33m" ^ str ^ "\x1b[0m" in
@@ -144,8 +128,9 @@ let rec string_of_msgs ?(width=78) ?(color=false) ?(fmt="%l:%c: %t: %m") (messag
     | str -> str
     in Str.substitute_first (Str.regexp "\\(error\\|warning\\)") (fun s -> colorize (Str.matched_group 1 s)) text in
   let color_all text = if color then text |> color_code |> color_backquote |> color_quoted |> color_type else text in
-  fold
-    (fun (typ,_,msg,loc) acc ->
-      (replace (all_placeholders loc typ color msg) fmt
-        |> format_width color width |> color_all) ^ acc)
-    messages ""
+  let typ,_,text,loc = message in
+    replace (all_placeholders loc typ color text) fmt |> format_width color width |> color_all
+
+let add_msg msg = Printf.fprintf !out_channel_warning "%s" (string_of_msg msg)
+let add_fatal msg = raise (Fatal msg)
+let single_msg msg = raise (Fatal msg)

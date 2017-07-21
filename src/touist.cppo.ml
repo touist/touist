@@ -66,15 +66,6 @@ let process_arg_alone (file_path:string) : unit = input_file_path := file_path
 
 let exit_with (exit_code:error) = exit (get_code exit_code)
 
-(* In case we have had non-fatal messages (= warnings) during any of the touist commands,
-   display them before exiting. *)
-let show_msgs_and_exit msgs (exit_code:error) =
-  let _ = begin
-    Printf.fprintf stderr "%s" (Msgs.string_of_msgs ~width:!wrap_width
-      ~color:(Unix.isatty Unix.stderr) ~fmt:!error_format msgs);
-    exit (get_code exit_code)
-  end in ()
-
 (* The main program *)
 let () =
   let cmd = (FilePath.basename Sys.argv.(0)) in (* ./touistl exec. name *)
@@ -129,6 +120,9 @@ let () =
    * it is the touistl input file (this is handled by [process_arg_alone]) *)
   Arg.parse argspecs process_arg_alone usage; (* parses the arguments *)
   if !debug then Printexc.record_backtrace true;
+  Msgs.wrap_width := !wrap_width;
+  Msgs.format := !error_format;
+  Msgs.color := (Unix.isatty Unix.stderr);
 
   try
 
@@ -182,14 +176,13 @@ let () =
 
   (* latex = parse and transform with latex_of_ast *)
   if !latex || !latex_full || !linter then begin
-    let ast_plain,msgs =
+    let ast_plain =
       match !mode with
       | Sat -> Parse.parse_sat ~debug:!debug_syntax ~filename:!input_file_path (string_of_chan !input)
       | Smt -> Parse.parse_smt ~debug:!debug_syntax ~filename:!input_file_path (string_of_chan !input)
       | Qbf -> Parse.parse_qbf ~debug:!debug_syntax ~filename:!input_file_path (string_of_chan !input)
     in
-    let msgs = if !linter then
-      let _,msgs =  (ast_plain,msgs) |> Eval.eval ~smt:(!mode = Smt) ~onlychecktypes:true in msgs else msgs
+    if !linter then let _ = ast_plain |> Eval.eval ~smt:(!mode = Smt) ~onlychecktypes:true
     in
     if !latex then Printf.fprintf !output "%s\n" (Latex.latex_of_ast ~full:false ast_plain);
     if !latex_full then
@@ -201,22 +194,22 @@ let () =
       %s\n\
       \\end{multline*}\n\
       \\end{document}\n" (Latex.latex_of_ast ~full:true ast_plain);
-    show_msgs_and_exit !msgs OK
+    exit_with OK
   end;
 
   (* linter = only show syntax and semantic errors *)
   if !linter then begin
-    let _,msgs = match !mode with
+    let _ = match !mode with
     | Sat -> Parse.parse_sat ~debug:!debug_syntax ~filename:!input_file_path (string_of_chan !input)
       |> Eval.eval ~smt:(!mode = Smt) ~onlychecktypes:true
     | Smt -> Parse.parse_smt ~debug:!debug_syntax ~filename:!input_file_path (string_of_chan !input)
       |> Eval.eval ~smt:(!mode = Smt) ~onlychecktypes:true
     | Qbf -> Parse.parse_qbf ~debug:!debug_syntax ~filename:!input_file_path (string_of_chan !input)
       |> Eval.eval ~smt:(!mode = Smt) ~onlychecktypes:true
-    in show_msgs_and_exit !msgs OK
+    in exit_with OK
   end;
   if !show then begin
-    let ast,msgs = match !mode with
+    let ast = match !mode with
     | Sat -> Parse.parse_sat ~debug:!debug_syntax ~filename:!input_file_path (string_of_chan !input)
         |> Eval.eval ~smt:(!mode = Smt)
     | Smt -> Parse.parse_smt ~debug:!debug_syntax ~filename:!input_file_path (string_of_chan !input)
@@ -224,7 +217,7 @@ let () =
     | Qbf -> Parse.parse_qbf ~debug:!debug_syntax ~filename:!input_file_path (string_of_chan !input)
         |> Eval.eval ~smt:(!mode = Smt)
     in (Printf.fprintf !output "%s\n" (Pprint.string_of_ast ~utf8:true ast);
-       show_msgs_and_exit !msgs OK)
+       exit_with OK)
     end;
 
   (* Step 3: translation *)
@@ -233,18 +226,18 @@ let () =
     if !solve_flag then
       if !equiv_file_path <> "" then begin
         let solve input =
-          let ast,msgs = Parse.parse_sat ~debug:!debug_syntax ~filename:!input_file_path (string_of_chan input) |> Eval.eval
+          let ast = Parse.parse_sat ~debug:!debug_syntax ~filename:!input_file_path (string_of_chan input) |> Eval.eval
           in let models = Cnf.ast_to_cnf ~debug:!debug_cnf ast |> Sat.cnf_to_clauses |> Sat.solve_clauses
-          in models,msgs
+          in models
         in
-        let models,msgs = solve !input
-        and models2,msgs2 = solve !input_equiv
+        let models = solve !input
+        and models2 = solve !input_equiv
         in match Sat.ModelSet.equal !models !models2 with
-        | true -> Printf.fprintf !output "Equivalent\n"; show_msgs_and_exit !msgs OK
-        | false -> Printf.fprintf !output "Not equivalent\n"; show_msgs_and_exit !msgs SOLVER_UNSAT
+        | true -> Printf.fprintf !output "Equivalent\n"; exit_with OK
+        | false -> Printf.fprintf !output "Not equivalent\n"; exit_with SOLVER_UNSAT
       end
       else
-        let ast,msgs = Parse.parse_sat ~debug:!debug_syntax ~filename:!input_file_path (string_of_chan !input) |> Eval.eval in
+        let ast = Parse.parse_sat ~debug:!debug_syntax ~filename:!input_file_path (string_of_chan !input) |> Eval.eval in
         let clauses,table = Cnf.ast_to_cnf ~debug:!debug_cnf ast |> Sat.cnf_to_clauses
         in
         let models =
@@ -257,43 +250,43 @@ let () =
               in Sat.solve_clauses ~limit:!limit ~print:print_model (clauses,table))
         in
         match Sat.ModelSet.cardinal !models with
-        | i when !only_count -> Printf.fprintf !output "%d\n" i; show_msgs_and_exit !msgs OK
-        | 0 -> Printf.fprintf stderr "unsat\n"; show_msgs_and_exit !msgs SOLVER_UNSAT
+        | i when !only_count -> Printf.fprintf !output "%d\n" i; exit_with OK
+        | 0 -> Printf.fprintf stderr "unsat\n"; exit_with SOLVER_UNSAT
         | 1 -> (* case where we already printed models in [solve_clause] *)
-          show_msgs_and_exit !msgs OK
+          exit_with OK
         | i -> (* case where we already printed models in [solve_clause] *)
-          Printf.fprintf !output "==== found %d models, limit is %d (--limit N for more models)\n" i !limit; show_msgs_and_exit !msgs OK
+          Printf.fprintf !output "==== found %d models, limit is %d (--limit N for more models)\n" i !limit; exit_with OK
     else
       (* B. solve not asked: print the Sat file *)
-      let ast,msgs = Parse.parse_sat ~debug:!debug_syntax ~filename:!input_file_path (string_of_chan !input) |> Eval.eval in
+      let ast = Parse.parse_sat ~debug:!debug_syntax ~filename:!input_file_path (string_of_chan !input) |> Eval.eval in
       let clauses,tbl = Cnf.ast_to_cnf ~debug:!debug_cnf ast |> Sat.cnf_to_clauses
       in
       (* tbl contains the literal-to-name correspondance table.
          The number of literals is (Hashtbl.length tbl) *)
       Sat.print_clauses_to_dimacs !output (Hashtbl.length tbl) clauses;
       Sat.print_table !output_table ~prefix:(if !output = !output_table then "c " else "") tbl;
-      show_msgs_and_exit !msgs OK
+      exit_with OK
         (* table_prefix allows to add the 'c' before each line of the table
            display, when and only when everything is outputed in a single
            file. Example:
               c 98 p(1,2,3)     -> c means 'comment' in any Sat file   *)
 
   else if !mode = Smt && not !solve_flag then begin
-    let ast,msgs = Parse.parse_smt ~debug:!debug_syntax ~filename:!input_file_path (string_of_chan !input)
+    let ast = Parse.parse_smt ~debug:!debug_syntax ~filename:!input_file_path (string_of_chan !input)
         |> Eval.eval ~smt:(!mode = Smt) in
     let smt = Smt.to_smt2 (String.uppercase !smt_flag) ast in
     Buffer.output_buffer !output smt;
-    show_msgs_and_exit !msgs OK
+    exit_with OK
   end
   else if !mode = Smt && !solve_flag then begin
     #ifdef yices2
-      let ast,msgs = Parse.parse_smt ~debug:!debug_syntax ~filename:!input_file_path (string_of_chan !input)
+      let ast = Parse.parse_smt ~debug:!debug_syntax ~filename:!input_file_path (string_of_chan !input)
           |> Eval.eval ~smt:(!mode = Smt) in
       let str = Solvesmt.ast_to_yices ast |> Solvesmt.model (String.uppercase !smt_flag) in
       if str = ""
-      then (Printf.fprintf stderr "unsat\n"; show_msgs_and_exit !msgs SOLVER_UNSAT)
+      then (Printf.fprintf stderr "unsat\n"; exit_with SOLVER_UNSAT)
       else Printf.fprintf !output "%s\n" str;
-      show_msgs_and_exit !msgs OK;
+      exit_with OK;
     #else
       Printf.fprintf stderr
         ("This touist binary has not been compiled with yices2 support.");
@@ -301,9 +294,9 @@ let () =
     #endif
   end
   else if !mode = Qbf then begin
-      let ast,msgs = Parse.parse_qbf ~debug:!debug_syntax ~filename:!input_file_path (string_of_chan !input)
+      let ast = Parse.parse_qbf ~debug:!debug_syntax ~filename:!input_file_path (string_of_chan !input)
         |> Eval.eval ~smt:(!mode = Smt) in
-      let (prenex,msgs) = Qbf_of_ast.prenex (ast,msgs) in
+      let prenex = Qbf_of_ast.prenex ast in
       let cnf = Qbf_of_ast.cnf prenex in
       if !debug_cnf then begin
         Printf.fprintf stderr "formula: %s\n" (Pprint.string_of_ast ~utf8:true ast);
@@ -343,13 +336,11 @@ let () =
   exit_with OK
 
   with
-    | Fatal (during,msgs) ->
+    | Fatal msg ->
       if !debug then Printf.eprintf "Stacktrace:\n%s\n" (Printexc.get_backtrace ());
-      (show_msgs_and_exit msgs
-        (match during with
-          | Usage -> CMD_USAGE
-          | _ -> TOUIST_SYNTAX
-        )
-      )
-    | Sys_error err -> show_msgs_and_exit (of_list [(Error,Usage,err^"\n",None)]) CMD_USAGE
+      Printf.eprintf "%s\n" (Msgs.string_of_msg msg);
+      exit_with (match msg with _,Usage,_,_ -> CMD_USAGE | _ -> TOUIST_SYNTAX)
+    | Sys_error err ->
+      Printf.eprintf "%s\n" (Msgs.string_of_msg (Error,Usage,err^"\n",None));
+      exit_with CMD_USAGE
     | x -> raise x
