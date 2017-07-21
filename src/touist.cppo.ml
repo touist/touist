@@ -274,7 +274,7 @@ let () =
   else if !mode = Smt && not !solve_flag then begin
     let ast = Parse.parse_smt ~debug:!debug_syntax ~filename:!input_file_path (string_of_chan !input)
         |> Eval.eval ~smt:(!mode = Smt) in
-    let smt = Smt.to_smt2 (String.uppercase !smt_flag) ast in
+    let smt = Smt.to_smt2 !smt_flag ast in
     Buffer.output_buffer !output smt;
     exit_with OK
   end
@@ -282,7 +282,7 @@ let () =
     #ifdef yices2
       let ast = Parse.parse_smt ~debug:!debug_syntax ~filename:!input_file_path (string_of_chan !input)
           |> Eval.eval ~smt:(!mode = Smt) in
-      let str = Solvesmt.ast_to_yices ast |> Solvesmt.model (String.uppercase !smt_flag) in
+      let str = Solvesmt.ast_to_yices ast |> Solvesmt.model !smt_flag in
       if str = ""
       then (Printf.fprintf stderr "unsat\n"; exit_with SOLVER_UNSAT)
       else Printf.fprintf !output "%s\n" str;
