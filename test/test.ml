@@ -1,5 +1,8 @@
 open OUnit2;;
 
+(* We redirect every warnings to /dev/null *)
+Msgs.discard_warnings := true;;
+
 (* To check that the error has occured curreclty, we only check
    that the place where the error was found is the right one.  *)
 
@@ -22,9 +25,9 @@ let test_raise (parse:(string->unit)) (during:Msgs.during) typ nth_msg (loc_expe
     | true -> () (* OK *)
     | false -> OUnit2.assert_failure ("this test didn't give a message at location '"^loc_expected^"' as expected. Instead, got:\n"^Msgs.string_of_msg msg)
 
-let sat text = let ast = Parse.parse_sat text |> Eval.eval in let _ = Cnf.ast_to_cnf ast |> Sat.cnf_to_clauses in ()
-let smt logic text = let ast = Parse.parse_smt text |> Eval.eval ~smt:true in let _ = Smt.to_smt2 logic ast in ()
-let qbf text = let ast = Parse.parse_qbf text |> Eval.eval ~smt:true |> Qbf_of_ast.prenex in ()
+let sat text = let _ = Parse.parse_sat text |> Eval.eval |> Cnf.ast_to_cnf |> Sat.cnf_to_clauses in ()
+let smt logic text = let _ = Parse.parse_smt text |> Eval.eval ~smt:true |> Smt.to_smt2 logic in ()
+let qbf text = let _ = Parse.parse_qbf text |> Eval.eval ~smt:true |> Qbf_of_ast.prenex in ()
 
 (* The ending _ is necessary because the testing function
    must accept the 'context' thing. *)

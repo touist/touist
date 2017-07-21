@@ -38,7 +38,7 @@ let wrap_width = ref 76
 let format = ref "%l:%c: %t: %m"
 let loc_format = ref "%l:%c"
 let color = ref (Unix.isatty Unix.stderr)
-let out_channel_warning = ref stderr
+let discard_warnings = ref false
 
 let replace pattern replacement text =
     let open Str in global_replace (regexp pattern) replacement text
@@ -131,7 +131,7 @@ let rec string_of_msg ?(width=(!wrap_width)) ?(color=(!color)) ?(fmt=(!format)) 
   let typ,_,text,loc = message in
     replace (all_placeholders loc typ color text) fmt |> format_width color width |> color_all
 
-let add_msg msg = Printf.fprintf !out_channel_warning "%s" (string_of_msg msg)
+let add_msg msg = if !discard_warnings then () else Printf.fprintf stderr "%s" (string_of_msg msg)
 let add_fatal msg = raise (Fatal msg)
 let single_msg msg = raise (Fatal msg)
 
