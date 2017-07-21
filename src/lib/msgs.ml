@@ -15,6 +15,13 @@
       will be kept when wrapping as long as no \n is encountered.
       Indented text is colored.
     - the text in simple quote '...' or backquotes `...` is colored
+
+    Why do I need to keep all error messages?
+    =========================================
+    This is because sometimes, the same error will be found multiple times
+    at the same place; to avoid duplicates, we compare the current error to
+    all previous found errors. Duplicates happen on bigand/bigor expensions
+
 *)
 
 open Lexing (* for Lexing.position *)
