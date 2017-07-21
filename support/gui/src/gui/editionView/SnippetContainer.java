@@ -92,20 +92,20 @@ public class SnippetContainer extends AbstractComponentPanel {
 		ArrayList<Integer> snippetsAtLeast = new ArrayList<Integer>(){{add(8);add(9);add(11);add(12);add(14);add(15);add(17);add(18);}};
 		ArrayList<Integer> snippetsExact = new ArrayList<Integer>(){{add(6);add(7);add(9);add(10);add(12);add(13);add(15);add(16);}};
 
-		sectionConnect.addInsertButton(new InsertionButton(editorTextArea, "$a and $b", snippetsAnd, "and"));
-		sectionConnect.addInsertButton(new InsertionButton(editorTextArea, "$a or $b", snippetsOr, "or"));
-		sectionConnect.addInsertButton(new InsertionButton(editorTextArea, "not $a", snippetsNot, "not"));
-		sectionConnect.addInsertButton(new InsertionButton(editorTextArea, "$a xor $b", snippetsXor, "xor"));
-		sectionConnect.addInsertButton(new InsertionButton(editorTextArea, "$a => $b", snippetsImply, "imply"));
-		sectionConnect.addInsertButton(new InsertionButton(editorTextArea, "$a <=> $b", snippetsEquivalent, "is equivalent to"));
-		sectionConnect.addInsertButton(new InsertionButton(editorTextArea, "bigand $i in $a: \n\tp($i) \nend", snippetsBigand,"bigand"));
-		sectionConnect.addInsertButton(new InsertionButton(editorTextArea, "bigor $i in $a: \n\tp($i) \nend", snippetsBigor,"bigor"));
+		sectionConnect.addInsertButton(new InsertionButton(editorTextArea, "$a and $b", "\\mathbf{a} \\wedge \\mathbf{b}", snippetsAnd, "and"));
+		sectionConnect.addInsertButton(new InsertionButton(editorTextArea, "$a or $b", "\\mathbf{a} \\vee \\mathbf{b}" , snippetsOr, "or"));
+		sectionConnect.addInsertButton(new InsertionButton(editorTextArea, "not $a", "\\neg \\mathbf{a}", snippetsNot, "not"));
+		sectionConnect.addInsertButton(new InsertionButton(editorTextArea, "$a xor $b", "\\mathbf{a} \\oplus \\mathbf{b}", snippetsXor, "xor"));
+		sectionConnect.addInsertButton(new InsertionButton(editorTextArea, "$a => $b", "\\mathbf{a} \\Rightarrow \\mathbf{b}", snippetsImply, "imply"));
+		sectionConnect.addInsertButton(new InsertionButton(editorTextArea, "$a <=> $b", "\\mathbf{a} \\Leftrightarrow \\mathbf{b}", snippetsEquivalent, "is equivalent to"));
+		sectionConnect.addInsertButton(new InsertionButton(editorTextArea, "bigand $i in $a: \n\tp($i) \nend", "\\bigwedge\\limits_{\\substack{\\mathbf{i}\\in \\mathbf{a}}}p_{\\mathbf{i}}", snippetsBigand,"bigand"));
+		sectionConnect.addInsertButton(new InsertionButton(editorTextArea, "bigor $i in $a: \n\tp($i) \nend", "\\bigvee\\limits_{\\substack{\\mathbf{i}\\in \\mathbf{a}}}p_{\\mathbf{i}}", snippetsBigor,"bigor"));
 
-		sectionCard.addInsertButton(new InsertionButton(editorTextArea, "atmost($n,$S)", snippetsAtMost, "at most"));
-		sectionCard.addInsertButton(new InsertionButton(editorTextArea, "atleast($n,$S)", snippetsAtLeast, "at least"));
-		sectionCard.addInsertButton(new InsertionButton(editorTextArea, "exact($n,$S)", snippetsExact, "exact"));
+		sectionCard.addInsertButton(new InsertionButton(editorTextArea, "atmost($n,$S)", "\\textrm{atmost}(\\mathbf{n},\\mathbf{S})", snippetsAtMost, "at most"));
+		sectionCard.addInsertButton(new InsertionButton(editorTextArea, "atleast($n,$S)", "\\textrm{atleast}(\\mathbf{n},\\mathbf{S})", snippetsAtLeast, "at least"));
+		sectionCard.addInsertButton(new InsertionButton(editorTextArea, "exact($n,$S)", "\\textrm{exact}(\\mathbf{n},\\mathbf{S})", snippetsExact, "exact"));
 
-		sectionOthers.addInsertButton(new InsertionButton(editorTextArea, "if $a \nthen \n\t$b \nelse \n\t$c\n", snippetsIf, "if then else","if\\,\\$a \\\\ then\\\\\\quad\\$b \\\\ else\\\\\\quad\\$c"));
+		sectionOthers.addInsertButton(new InsertionButton(editorTextArea, "if $a \nthen \n\t$b \nelse \n\t$c\n", "\\textrm{if}\\;\\mathbf{a}\\;\\textrm{then}\\;\\mathbf{b}\\;\\textrm{else}\\;\\mathbf{c}", snippetsIf, "if then else","if\\,\\$a \\\\ then\\\\\\quad\\$b \\\\ else\\\\\\quad\\$c"));
 
 
 		snippetSectionsContainer.setLayout(new BoxLayout(snippetSectionsContainer, BoxLayout.Y_AXIS));
@@ -118,11 +118,11 @@ public class SnippetContainer extends AbstractComponentPanel {
 
 		ArrayList<Integer> snippetsSet = new ArrayList<Integer>(){{add(0);add(1);}};
 
-		sectionSets.addInsertButton(new InsertionButton(editorTextArea, "$a = true", snippetsSet, ""));
-		sectionSets.addInsertButton(new InsertionButton(editorTextArea, "$a = false", snippetsSet, ""));
-		sectionSets.addInsertButton(new InsertionButton(editorTextArea, "$v = 0", snippetsSet, ""));
-		sectionSets.addInsertButton(new InsertionButton(editorTextArea, "$v = 0.0", snippetsSet, ""));
-		sectionSets.addInsertButton(new InsertionButton(editorTextArea, "$a = [a,b,c]", snippetsSet, ""));
+		sectionSets.addInsertButton(new InsertionButton(editorTextArea, "$a = true", "\\mathbf{a} \\leftarrow true", snippetsSet, ""));
+		sectionSets.addInsertButton(new InsertionButton(editorTextArea, "$a = false", "\\mathbf{a} \\leftarrow false", snippetsSet, ""));
+		sectionSets.addInsertButton(new InsertionButton(editorTextArea, "$v = 0", "\\mathbf{v} \\leftarrow 0", snippetsSet, ""));
+		sectionSets.addInsertButton(new InsertionButton(editorTextArea, "$v = 0.0", "\\mathbf{v} \\leftarrow 0.", snippetsSet, ""));
+		sectionSets.addInsertButton(new InsertionButton(editorTextArea, "$a = [a,b,c]", "\\mathbf{a} \\leftarrow [a,b,c]", snippetsSet, ""));
 
 		snippetSectionsContainer.setLayout(new BoxLayout(snippetSectionsContainer, BoxLayout.Y_AXIS));
 		snippetSectionsContainer.add(sectionSets);
