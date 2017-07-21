@@ -117,8 +117,6 @@ and AstOrdered : Set.OrderedType = struct
       | Prop x, Prop y -> Pervasives.compare x y
       | Set x, Set y -> Pervasives.compare x y
       | _ -> failwith "cannot compare"
-      let of_list =
-      List.fold_left (fun acc x -> add x acc) empty
 end
 
 

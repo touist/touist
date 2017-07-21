@@ -14,7 +14,6 @@
 %{
   open Types.Ast
   open Msgs
-  let msgs = ref Msgs.empty
 %}
 
 %token <int> INT
@@ -136,7 +135,7 @@
 *)
 
 (* The two entry points of our parser *)
-%start <Types.Ast.ast * Msgs.t ref> touist_simple, touist_smt, touist_qbf
+%start <Types.Ast.ast> touist_simple, touist_smt, touist_qbf
 
 %% (* Everthing below that mark is expected to be a production rule *)
    (* Note that VAR { $0 } is equivalent to v=VAR { v } *)
@@ -154,14 +153,14 @@ affect_or(T):
 
 (* [touist_simple] is the entry point of the parser in sat mode *)
 touist_simple:
-  | f=affect_or(formula_simple)+ EOF {(Loc (Touist_code (f),($startpos,$endpos)),msgs)}
+  | f=affect_or(formula_simple)+ EOF {Loc (Touist_code (f),($startpos,$endpos))}
 
 
 (* [touist_smt] is the entry point of the parser in smt mode *)
 touist_smt:
-  | f=affect_or(formula_smt)+ EOF {(Loc (Touist_code (f),($startpos,$endpos)),msgs)}
+  | f=affect_or(formula_smt)+ EOF {Loc (Touist_code (f),($startpos,$endpos))}
 
-touist_qbf: f=affect_or(formula_qbf)+ EOF {(Loc (Touist_code (f),($startpos,$endpos)),msgs)}
+touist_qbf: f=affect_or(formula_qbf)+ EOF {Loc (Touist_code (f),($startpos,$endpos))}
 
 (* Used in tuple expression; see tuple_variable and tuple_term *)
 %inline indices: i=expr { i }
@@ -227,7 +226,7 @@ expr:
   | s1=expr SUBSET s2=expr {Loc (Subset (s1,s2),($startpos,$endpos))}
   | SUBSET_PR (*LPAREN*) s1=expr COMMA s2=expr RPAREN {
       let loc = ($startpos,$endpos) in
-      add_msg msgs (Warning,Parse,"'subset(A,B)' is deprecated, please use \
+      add_msg (Warning,Parse,"'subset(A,B)' is deprecated, please use \
         'A subset B' instead.\n",Some loc);
       Loc (Subset (s1,s2),loc)}
   | p=prop {p}
@@ -265,17 +264,17 @@ expr:
   | s1=T DIFF s2=T {Loc (Diff (s1,s2),($startpos,$endpos))}
   | UNION_PR (*LPAREN*) s1=T COMMA s2=T RPAREN {
       let loc = ($startpos,$endpos) in
-      add_msg msgs (Warning,Parse,"'union(A,B)' is deprecated, please use \
+      add_msg (Warning,Parse,"'union(A,B)' is deprecated, please use \
         'A union B' instead.\n",Some loc);
       Loc (Union (s1,s2),loc)}
   | INTER_PR (*LPAREN*) s1=T COMMA s2=T RPAREN {
       let loc = ($startpos,$endpos) in
-      add_msg msgs (Warning,Parse,"'inter(A,B)' is deprecated, please use \
+      add_msg (Warning,Parse,"'inter(A,B)' is deprecated, please use \
         'A inter B' instead.\n",Some loc);
       Loc (Inter (s1,s2),loc)}
   | DIFF_PR  (*LPAREN*) s1=T COMMA s2=T RPAREN {
       let loc = ($startpos,$endpos) in
-      add_msg msgs (Warning,Parse,"'diff(A,B)' is deprecated, please use \
+      add_msg (Warning,Parse,"'diff(A,B)' is deprecated, please use \
         'A diff B' instead.\n",Some loc);
       Loc (Diff (s1,s2),loc)}
   | POWERSET (*LPAREN*) s=T RPAREN {Loc (Powerset s,($startpos,$endpos))}
