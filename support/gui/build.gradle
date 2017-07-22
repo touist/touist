@@ -181,6 +181,8 @@ macAppBundle {
     javaProperties.put("touist.saveRelativeDir", "../../..")
     javaProperties.put("touist.tempInHomeRelativeDir",".touist")
     // The following allows macOS to recognize .touist and .touistl files
+    // WARNING: actually, macOS only seems to accept extensions with 6 chars
+    // at most. Because 'touistl' is 7 characters, it is not recognized.
     bundleExtras.put("CFBundleDocumentTypes", [ [
         CFBundleTypeExtensions: [ 'touist','touistl' ],
         CFBundleTypeIconFile: 'logo.icns',
