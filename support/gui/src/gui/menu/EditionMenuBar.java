@@ -202,14 +202,14 @@ public class EditionMenuBar extends JMenuBar {
         jMenuItemManualPdf.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
                 if(Desktop.isDesktopSupported())
-                    try {Desktop.getDesktop().browse(new URI("https://www.irit.fr/touist/doc/reference-manual.html"));}
+                    try {Desktop.getDesktop().browse(new URI("https://www.irit.fr/touist/doc/reference-manual.pdf"));}
                     catch (Exception e) { System.err.println(e.getMessage());}
             }
         });
         jMenuItemManualHtml.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
                 if(Desktop.isDesktopSupported())
-                    try {Desktop.getDesktop().browse(new URI("https://www.irit.fr/touist/doc/reference-manual.pdf"));}
+                    try {Desktop.getDesktop().browse(new URI("https://www.irit.fr/touist/doc/reference-manual.html"));}
                     catch (Exception e) { System.err.println(e.getMessage());}
             }
         });
@@ -243,8 +243,8 @@ public class EditionMenuBar extends JMenuBar {
         jMenuFile.add(jMenuItemQuit);
         jMenuLanguage.add(jMenuItemFrench);
         jMenuLanguage.add(jMenuItemEnglish);
-        jMenuHelp.add(jMenuItemManualPdf);
         jMenuHelp.add(jMenuItemManualHtml);
+        jMenuHelp.add(jMenuItemManualPdf);
         jMenuHelp.add(jMenuItemChangelog);
         jMenuHelp.add(jMenuItemProjectPage);
         jMenuHelp.add(jMenuItemLicense);
