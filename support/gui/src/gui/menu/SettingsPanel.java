@@ -315,7 +315,6 @@ public class SettingsPanel extends AbstractComponentPanel {
         if (returnVal == JFileChooser.APPROVE_OPTION && jFileChooser.getSelectedFile() != null) {
             String path = jFileChooser.getSelectedFile().getPath();
             pathDefaultDirectory.setText(path);
-            parent.setDefaultDirectoryPath(path);
         }
         
     }//GEN-LAST:event_changeDefaultDirectoryActionPerformed

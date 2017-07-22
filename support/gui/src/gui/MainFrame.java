@@ -54,7 +54,6 @@ public class MainFrame extends javax.swing.JFrame {
     private SolverSelection solverSelection = new SolverSelection(this);
 
     public State state;
-    private String defaultDirectoryPath = ".";
 
     public final static String EDITOR_PANEL = "editor_panel";
     public final static String RESULTS_PANEL = "results_panel";
@@ -68,11 +67,6 @@ public class MainFrame extends javax.swing.JFrame {
     
     public Lang getLang() {
         return lang;
-    }
-    
-    public void setDefaultDirectoryPath(String path) {
-        defaultDirectoryPath = path;
-        //TODO save the path in a config file
     }
 
     /**
@@ -167,10 +161,6 @@ public class MainFrame extends javax.swing.JFrame {
     public void setResultView(Model m) {
         resultsPanel1.setActModel(m);
         resultsPanel1.setResult();
-    }
-    
-    public void setResultsPanelEmpty() {
-       resultsPanel1.setEmpty();
     }
     
     public void setLanguage(Locale language) {
