@@ -95,6 +95,7 @@ task generateVersion {
         props.setProperty("com.apple.macos.useScreenMenuBar","true")
         props.setProperty("com.apple.mrj.application.apple.menu.about.name","${project.name}")
         props.setProperty("com.apple.smallTabs","true")
+        props.setProperty("apple.eawt.quitStrategy", "CLOSE_ALL_WINDOWS")
         props.setProperty("file.encoding","UTF-8")
         file("resources/version.properties").withPrintWriter { props.list(it) }
     }

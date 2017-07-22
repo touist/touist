@@ -99,7 +99,7 @@ public class EditionMenuBar extends JMenuBar {
         jMenuItemLoadFile = new JMenuItem();
         jMenuItemLoadFile.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, meta));
         jMenuItemQuit = new JMenuItem();
-        jMenuItemQuit.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Q, meta));
+        //jMenuItemQuit.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Q, meta));
         jMenuItemSolve = new JMenuItem();
         jMenuItemSolve.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_M, meta));
         
