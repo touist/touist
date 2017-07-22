@@ -32,45 +32,46 @@ problem](docs/images/screenshot.png)](https://github.com/maelvalais/allumettes)
 
    and then `opam reinstall/install touist`.
 
-   Now, if we want to know if `a ⋀ b ⇒ c` is statisfiable:
+   Now, if we want to know if `a ⋀ b ⇒ c` is satisfiable:
 
        echo 'a and b => c' | touist - --solve
 
-2. `touist` also has a java-based graphical interface can be downloaded in the
-   [releases] page. It embeds the command-line tool. The graphical interface
-   works on **macOS** (x86_64 only), **Linux** x86\_64 and **Windows** (x86 or
-   x64\_86).
+2. TouIST also has a java-based graphical interface (which embeds the
+   command-line tool). It be downloaded in the [releases] page and is available
+   for Linux, Windows and macOS. Two options are available: the plain **jar**
+   for any platform or the non-signed **native** version for macOS and
+   Windows (see below warning).
 
-   ⚠️ WARNING ⚠️ On macOS Sierra, `TouIST.app` will show a 'broken' message.
-   You must run `sudo spctl --master-disable` which will enable the
-   _Open app from anywhere_ thing. If we want to avoid this, we have to pay
-   Apple $99 every year for signing the app. We should do that at some point!
+   ⚠ WARNING ⚠ On macOS Sierra, the native `TouIST.app` will show a
+   _broken_ message. You must run `sudo spctl --master-disable` which will
+   enable the _Open apps from anywhere_.
+
+   ⚠ WARNING ⚠ On Windows 10, the native `TouIST.exe` can't be opened unless
+   the _Windows Defender SmartScreen_ feature is disabled. You can still use
+   the **jar** version.
 
 3. You can also look at the [Touist language reference][ref]
    ([pdf version][ref-pdf]).
 
-4. Syntax coloring is also available in **[VSCode]** through the extension
-   [touist][touist-vscode]. I really encourage people to give a try to VSCode.
-   Even though it comes from Microsoft, it is ([kind of][vscode-license])
-   open-source.
+4. Syntax coloring is also available for **[VSCode][vscode]** (search
+   for the `touist` extension) and for **[Vim]** (Vim support is experimental).
 
    ![touist vscode extension](https://github.com/touist/touist-vscode/raw/master/images/screenshot.png)
 
 [releases]: https://github.com/touist/touist/releases
 [ref]: http://www.irit.fr/touist/doc/reference-manual.html
 [ref-pdf]: http://www.irit.fr/touist/doc/reference-manual.pdf
-[VSCode]: https://code.visualstudio.com
-[vscode-license]: https://github.com/Microsoft/vscode/issues/60#issuecomment-161792005
-[touist-vscode]: https://marketplace.visualstudio.com/items?itemName=maelvalais.touist
+[vscode]: https://marketplace.visualstudio.com/items?itemName=maelvalais.touist
+[Vim]: https://github.com/touist/touist-vim
 
 ## Description
 
-TouIST is a user-friendly tool for solving propositionnal logic problems using
+TouIST is a user-friendly tool for solving propositional logic problems using
 a high-level logic language (known as the _bigand_ format or syntax or
 language). This language allows complex expressions like _big and_, _sets_...
 
 We can for example solve the problem "Wolf, Sheep, Cabbage", or a sudoku, or
-any problem that can be expressed in propositionnal logic.
+any problem that can be expressed in propositional logic.
 
 The TouIST has been initialized by Frederic Maris and Olivier Gasquet,
 associate professors at the _Institut de Recherche en Informatique de Toulouse_
