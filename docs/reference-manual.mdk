@@ -180,7 +180,7 @@ c => a
 ```
 will be translated to
 ``` Touist
-(a and b) and (c => a)
+(a or b) and (c => a)
 ```
 ~
 
