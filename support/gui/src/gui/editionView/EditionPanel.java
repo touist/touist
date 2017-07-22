@@ -145,7 +145,7 @@ public class EditionPanel extends AbstractComponentPanel {
     
     public void initPalette() {
         snippetsContainer.initPaletteContent();
-        snippetsAndCodeAndLatex.setDividerLocation(120);
+        snippetsAndCodeAndLatex.setDividerLocation(82);
     }
 
     public String getText() {
@@ -200,12 +200,22 @@ public class EditionPanel extends AbstractComponentPanel {
         snippetsScroller = new javax.swing.JScrollPane();
         snippetsContainer = new gui.editionView.SnippetContainer(editorTextArea);
 
+        setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
+
+        snippetsAndCodeAndLatex.setBorder(javax.swing.BorderFactory.createEmptyBorder(3, 0, 0, 0));
+
+        codeAndLatexView.setBorder(null);
         codeAndLatexView.setDividerLocation(400);
         codeAndLatexView.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         codeAndLatexView.setOneTouchExpandable(true);
 
+        editorContainer.setBorder(javax.swing.BorderFactory.createEmptyBorder(3, 0, 0, 0));
         editorContainer.setLayout(new java.awt.BorderLayout());
         codeAndLatexView.setLeftComponent(editorContainer);
+
+        latexScroller.setBorder(null);
+
+        latexView.setBorder(javax.swing.BorderFactory.createEmptyBorder(3, 0, 0, 0));
 
         javax.swing.GroupLayout latexViewLayout = new javax.swing.GroupLayout(latexView);
         latexView.setLayout(latexViewLayout);
@@ -224,7 +234,12 @@ public class EditionPanel extends AbstractComponentPanel {
 
         snippetsAndCodeAndLatex.setRightComponent(codeAndLatexView);
 
+        snippetsScroller.setBorder(null);
         snippetsScroller.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        snippetsScroller.setPreferredSize(new java.awt.Dimension(20, 0));
+
+        snippetsContainer.setBorder(javax.swing.BorderFactory.createEmptyBorder(3, 0, 0, 0));
+        snippetsContainer.setPreferredSize(new java.awt.Dimension(20, 3));
         snippetsScroller.setViewportView(snippetsContainer);
 
         snippetsAndCodeAndLatex.setLeftComponent(snippetsScroller);
@@ -233,11 +248,11 @@ public class EditionPanel extends AbstractComponentPanel {
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(snippetsAndCodeAndLatex, javax.swing.GroupLayout.DEFAULT_SIZE, 600, Short.MAX_VALUE)
+            .addComponent(snippetsAndCodeAndLatex, javax.swing.GroupLayout.DEFAULT_SIZE, 598, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(snippetsAndCodeAndLatex, javax.swing.GroupLayout.Alignment.TRAILING)
+            .addComponent(snippetsAndCodeAndLatex, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 493, Short.MAX_VALUE)
         );
     }// </editor-fold>//GEN-END:initComponents
     

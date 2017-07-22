@@ -40,8 +40,8 @@ public class SnippetContainer extends AbstractComponentPanel {
 
 	@Override
 	public void updateLanguage() {
-		snippetSectionName.setText(getFrame().getLang().getWord(Lang.PALETTE_TEXT));
 		if(sectionConnect!=null) sectionConnect.setText(getFrame().getLang().getWord("SnippetSection.FormulasSection1"));
+		if(sectionBig!=null) sectionBig.setText(getFrame().getLang().getWord("SnippetSection.FormulaBigOps"));
 		if(sectionCard!=null) sectionCard.setText(getFrame().getLang().getWord("SnippetSection.FormulasSection2"));
 		if(sectionOthers!=null) sectionOthers.setText(getFrame().getLang().getWord("SnippetSection.FormulasSection3"));
 		if(sectionSets!=null) sectionSets.setText(getFrame().getLang().getWord("SnippetSection.SetsSection1"));
@@ -69,6 +69,7 @@ public class SnippetContainer extends AbstractComponentPanel {
 	}
 
 	private SnippetSection sectionConnect;
+	private SnippetSection sectionBig;
 	private SnippetSection sectionOthers;
 	private SnippetSection sectionCard;
 	private SnippetSection sectionSets;
@@ -76,6 +77,7 @@ public class SnippetContainer extends AbstractComponentPanel {
 	public void initPaletteContent() {
 
 		sectionConnect = new SnippetSection("Connectors");
+		sectionBig = new SnippetSection("Big ops");
 		sectionCard = new SnippetSection("Cardinality");
 		sectionOthers = new SnippetSection("Others");
 
@@ -98,20 +100,20 @@ public class SnippetContainer extends AbstractComponentPanel {
 		sectionConnect.addInsertButton(new InsertionButton(editorTextArea, "$a xor $b", "\\mathbf{a} \\oplus \\mathbf{b}", snippetsXor, "xor"));
 		sectionConnect.addInsertButton(new InsertionButton(editorTextArea, "$a => $b", "\\mathbf{a} \\Rightarrow \\mathbf{b}", snippetsImply, "imply"));
 		sectionConnect.addInsertButton(new InsertionButton(editorTextArea, "$a <=> $b", "\\mathbf{a} \\Leftrightarrow \\mathbf{b}", snippetsEquivalent, "is equivalent to"));
-		sectionConnect.addInsertButton(new InsertionButton(editorTextArea, "bigand $i in $a: \n\tp($i) \nend", "\\bigwedge\\limits_{\\substack{\\mathbf{i}\\in \\mathbf{a}}}p_{\\mathbf{i}}", snippetsBigand,"bigand"));
-		sectionConnect.addInsertButton(new InsertionButton(editorTextArea, "bigor $i in $a: \n\tp($i) \nend", "\\bigvee\\limits_{\\substack{\\mathbf{i}\\in \\mathbf{a}}}p_{\\mathbf{i}}", snippetsBigor,"bigor"));
 
-		sectionCard.addInsertButton(new InsertionButton(editorTextArea, "atmost($n,$S)", "\\textrm{atmost}(\\mathbf{n},\\mathbf{S})", snippetsAtMost, "at most"));
-		sectionCard.addInsertButton(new InsertionButton(editorTextArea, "atleast($n,$S)", "\\textrm{atleast}(\\mathbf{n},\\mathbf{S})", snippetsAtLeast, "at least"));
-		sectionCard.addInsertButton(new InsertionButton(editorTextArea, "exact($n,$S)", "\\textrm{exact}(\\mathbf{n},\\mathbf{S})", snippetsExact, "exact"));
+		sectionBig.addInsertButton(new InsertionButton(editorTextArea, "bigand $i in $a: \n\tp($i) \nend", "\\bigwedge\\limits_{\\substack{\\mathbf{i}\\in \\mathbf{a}}}p_{\\mathbf{i}}", snippetsBigand,"bigand"));
+		sectionBig.addInsertButton(new InsertionButton(editorTextArea, "bigor $i in $a: \n\tp($i) \nend", "\\bigvee\\limits_{\\substack{\\mathbf{i}\\in \\mathbf{a}}}p_{\\mathbf{i}}", snippetsBigor,"bigor"));
 
-		sectionOthers.addInsertButton(new InsertionButton(editorTextArea, "if $a \nthen \n\t$b \nelse \n\t$c\n", "\\textrm{if}\\;\\mathbf{a}\\;\\textrm{then}\\;\\mathbf{b}\\;\\textrm{else}\\;\\mathbf{c}", snippetsIf, "if then else","if\\,\\$a \\\\ then\\\\\\quad\\$b \\\\ else\\\\\\quad\\$c"));
+		sectionCard.addInsertButton(new InsertionButton(editorTextArea, "atmost($n,$S)", "\\textrm{atmost}(.,.)", snippetsAtMost, "at most"));
+		sectionCard.addInsertButton(new InsertionButton(editorTextArea, "atleast($n,$S)", "\\textrm{atleast}(.,.)", snippetsAtLeast, "at least"));
+		sectionCard.addInsertButton(new InsertionButton(editorTextArea, "exact($n,$S)", "\\textrm{exact}(.,.)", snippetsExact, "exact"));
+
+		sectionOthers.addInsertButton(new InsertionButton(editorTextArea, "if $a \nthen \n\t$b \nelse \n\t$c\n", "\\textrm{if}\\mathbf{a}\\textrm{then}\\mathbf{b}\\textrm{else}\\mathbf{c}", snippetsIf, "if then else","if\\,\\$a \\\\ then\\\\\\quad\\$b \\\\ else\\\\\\quad\\$c"));
 
 
 		snippetSectionsContainer.setLayout(new BoxLayout(snippetSectionsContainer, BoxLayout.Y_AXIS));
 		snippetSectionsContainer.add(sectionConnect);
-		snippetSectionsContainer.add(sectionCard);
-		snippetSectionsContainer.add(sectionOthers);
+		snippetSectionsContainer.add(sectionBig);
 
 
 		sectionSets = new SnippetSection("Sets");
@@ -119,15 +121,16 @@ public class SnippetContainer extends AbstractComponentPanel {
 		ArrayList<Integer> snippetsSet = new ArrayList<Integer>(){{add(0);add(1);}};
 
 		sectionSets.addInsertButton(new InsertionButton(editorTextArea, "$a = true", "\\mathbf{a} \\leftarrow true", snippetsSet, ""));
-		sectionSets.addInsertButton(new InsertionButton(editorTextArea, "$a = false", "\\mathbf{a} \\leftarrow false", snippetsSet, ""));
 		sectionSets.addInsertButton(new InsertionButton(editorTextArea, "$v = 0", "\\mathbf{v} \\leftarrow 0", snippetsSet, ""));
 		sectionSets.addInsertButton(new InsertionButton(editorTextArea, "$v = 0.0", "\\mathbf{v} \\leftarrow 0.", snippetsSet, ""));
-		sectionSets.addInsertButton(new InsertionButton(editorTextArea, "$a = [a,b,c]", "\\mathbf{a} \\leftarrow [a,b,c]", snippetsSet, ""));
+		sectionSets.addInsertButton(new InsertionButton(editorTextArea, "$a = [a,b]", "\\mathbf{a} \\leftarrow [a,b]", snippetsSet, ""));
 
-		snippetSectionsContainer.setLayout(new BoxLayout(snippetSectionsContainer, BoxLayout.Y_AXIS));
 		snippetSectionsContainer.add(sectionSets);
+		snippetSectionsContainer.add(sectionOthers);
+		snippetSectionsContainer.add(sectionCard);
 
 		sectionConnect.unfold();
+		sectionBig.unfold();
 	}
 
 
@@ -149,39 +152,29 @@ public int getMaxWidthIcons() {
  * regenerated by the Form Editor.
  */
 @SuppressWarnings("unchecked")
-// <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
-private void initComponents() {
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+    private void initComponents() {
 
-	snippetSectionName = new javax.swing.JLabel();
-	snippetSectionsContainer = new javax.swing.JPanel();
+        snippetSectionsContainer = new javax.swing.JPanel();
 
-	snippetSectionName.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
-	snippetSectionName.setText("Insert");
+        snippetSectionsContainer.setLayout(new javax.swing.BoxLayout(snippetSectionsContainer, javax.swing.BoxLayout.LINE_AXIS));
 
-	snippetSectionsContainer.setLayout(new javax.swing.BoxLayout(snippetSectionsContainer, javax.swing.BoxLayout.LINE_AXIS));
-
-	javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
-	this.setLayout(layout);
-	layout.setHorizontalGroup(
-			layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-			.addComponent(snippetSectionsContainer, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-			.addGroup(layout.createSequentialGroup()
-					.addContainerGap()
-					.addComponent(snippetSectionName)
-					.addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-			);
-	layout.setVerticalGroup(
-			layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-			.addGroup(layout.createSequentialGroup()
-					.addComponent(snippetSectionName)
-					.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-					.addComponent(snippetSectionsContainer, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-			);
-}// </editor-fold>//GEN-END:initComponents
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
+        this.setLayout(layout);
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(snippetSectionsContainer, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
+        layout.setVerticalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addGap(0, 0, 0)
+                .addComponent(snippetSectionsContainer, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+    }// </editor-fold>//GEN-END:initComponents
 
 
-// Variables declaration - do not modify//GEN-BEGIN:variables
-private javax.swing.JLabel snippetSectionName;
-private javax.swing.JPanel snippetSectionsContainer;
-// End of variables declaration//GEN-END:variables
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JPanel snippetSectionsContainer;
+    // End of variables declaration//GEN-END:variables
 }
