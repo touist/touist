@@ -2,5 +2,8 @@ build/
 .gradle/
 .idea/
 
+out/
+.nb-gradle/
+
 **/*.eml
 **/*.iml
