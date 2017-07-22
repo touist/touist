@@ -55,13 +55,7 @@ public class SnippetSection extends javax.swing.JPanel {
         initComponents();
         snippetSectionName.setText(name);
         snippetExpandButton.setText("");
-        try {
-			foldedIcon = new ImageIcon(ImageIO.read(getClass().getResourceAsStream("/images/paletteSectionFolded.png")));
-	        unfoldedIcon = new ImageIcon(ImageIO.read(getClass().getResourceAsStream("/images/paletteSectionUnfolded.png")));
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+        
         FontIcon f = new FontIcon();
         f.setIkon(new FontAwesomeIkonHandler().resolve("fa-angle-down"));
         f.setIconSize(16);
