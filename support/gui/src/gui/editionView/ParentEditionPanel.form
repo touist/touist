@@ -33,7 +33,7 @@
                       <Component id="cursorPosition" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="bottomMessage" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace pref="497" max="32767" attributes="0"/>
+                      <EmptySpace pref="568" max="32767" attributes="0"/>
                       <Component id="exportButton" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="importButton" min="-2" max="-2" attributes="0"/>
@@ -51,7 +51,7 @@
     <DimensionLayout dim="1">
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="0" attributes="0">
-              <Component id="editor" pref="511" max="32767" attributes="0"/>
+              <Component id="editor" pref="504" max="32767" attributes="0"/>
               <EmptySpace min="-2" pref="4" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="solveButton" alignment="3" min="-2" max="-2" attributes="0"/>
