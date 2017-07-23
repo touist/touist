@@ -201,6 +201,7 @@ public class ParentEditionPanel extends AbstractComponentPanel {
 
         fileChooser = new javax.swing.JFileChooser();
         popupMessage = new javax.swing.JOptionPane();
+        jSplitPane1 = new javax.swing.JSplitPane();
         editor = new gui.editionView.EditionPanel();
         solveButton = new javax.swing.JButton();
         importButton = new javax.swing.JButton();
@@ -234,6 +235,7 @@ public class ParentEditionPanel extends AbstractComponentPanel {
             }
         });
 
+        cursorPosition.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         cursorPosition.setText("1:1");
 
         selectSatOrSmt.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "SAT", "SMT" }));
@@ -255,36 +257,34 @@ public class ParentEditionPanel extends AbstractComponentPanel {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addComponent(cursorPosition)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(bottomMessage)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 568, Short.MAX_VALUE)
-                        .addComponent(exportButton)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(importButton)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(solveButton)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(selectSatOrSmt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(editor, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap())
+                .addGap(0, 0, 0)
+                .addComponent(cursorPosition, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(bottomMessage)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 346, Short.MAX_VALUE)
+                .addComponent(exportButton)
+                .addGap(0, 0, 0)
+                .addComponent(importButton)
+                .addGap(0, 0, 0)
+                .addComponent(solveButton)
+                .addGap(0, 0, 0)
+                .addComponent(selectSatOrSmt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, 0))
+            .addComponent(editor, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addComponent(editor, javax.swing.GroupLayout.DEFAULT_SIZE, 504, Short.MAX_VALUE)
-                .addGap(4, 4, 4)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addComponent(editor, javax.swing.GroupLayout.DEFAULT_SIZE, 440, Short.MAX_VALUE)
+                .addGap(1, 1, 1)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(solveButton)
+                    .addComponent(exportButton)
                     .addComponent(importButton)
-                    .addComponent(cursorPosition)
-                    .addComponent(bottomMessage)
+                    .addComponent(solveButton)
                     .addComponent(selectSatOrSmt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(exportButton))
-                .addContainerGap())
+                    .addComponent(cursorPosition)
+                    .addComponent(bottomMessage, javax.swing.GroupLayout.PREFERRED_SIZE, 17, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(0, 0, 0))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -457,6 +457,7 @@ public class ParentEditionPanel extends AbstractComponentPanel {
     private javax.swing.JButton exportButton;
     private javax.swing.JFileChooser fileChooser;
     private javax.swing.JButton importButton;
+    private javax.swing.JSplitPane jSplitPane1;
     private javax.swing.JOptionPane popupMessage;
     private javax.swing.JComboBox selectSatOrSmt;
     private javax.swing.JButton solveButton;

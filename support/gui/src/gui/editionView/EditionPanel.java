@@ -145,7 +145,7 @@ public class EditionPanel extends AbstractComponentPanel {
     
     public void initPalette() {
         snippetsContainer.initPaletteContent();
-        snippetsAndCodeAndLatex.setDividerLocation(82);
+        snippetsAndCodeAndLatex.setDividerLocation(92);
     }
 
     public String getText() {
@@ -209,13 +209,13 @@ public class EditionPanel extends AbstractComponentPanel {
         codeAndLatexView.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         codeAndLatexView.setOneTouchExpandable(true);
 
-        editorContainer.setBorder(javax.swing.BorderFactory.createEmptyBorder(3, 0, 0, 0));
+        editorContainer.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 0, 0, 0));
         editorContainer.setLayout(new java.awt.BorderLayout());
         codeAndLatexView.setLeftComponent(editorContainer);
 
         latexScroller.setBorder(null);
 
-        latexView.setBorder(javax.swing.BorderFactory.createEmptyBorder(3, 0, 0, 0));
+        latexView.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
         javax.swing.GroupLayout latexViewLayout = new javax.swing.GroupLayout(latexView);
         latexView.setLayout(latexViewLayout);
@@ -236,10 +236,9 @@ public class EditionPanel extends AbstractComponentPanel {
 
         snippetsScroller.setBorder(null);
         snippetsScroller.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-        snippetsScroller.setPreferredSize(new java.awt.Dimension(20, 0));
+        snippetsScroller.setPreferredSize(new java.awt.Dimension(70, 0));
 
-        snippetsContainer.setBorder(javax.swing.BorderFactory.createEmptyBorder(3, 0, 0, 0));
-        snippetsContainer.setPreferredSize(new java.awt.Dimension(20, 3));
+        snippetsContainer.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 0, 0, 0));
         snippetsScroller.setViewportView(snippetsContainer);
 
         snippetsAndCodeAndLatex.setLeftComponent(snippetsScroller);
