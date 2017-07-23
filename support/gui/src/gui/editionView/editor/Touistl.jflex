@@ -179,12 +179,10 @@ Digits 		= [0-9]
 Alpha 		= [a-zA-Z]
 Empty 		= [ \t\f]+
 Special 	= [_]
-Newline 	= [\r\n] | (\r\n)
 Identifier 	= ({Special}|{Digits})*{Alpha}({Alpha}|{Special}|{Digits})*
 Integer 	= {Digits}+
 Double		= {Digits}+\.{Digits}+
 Var 		= (\${Identifier})|(\?{Identifier})
-Nb 			= {Integer}|{Double}
 Comment     = ";;"[^\n]*
 
 %%
@@ -199,7 +197,7 @@ Comment     = ";;"[^\n]*
 	"else"  |
 	"when"
 			{ addToken(Token.RESERVED_WORD); }    
-   
+
 	/* Functions */   
 	"let" |
 	"bigand" |   
@@ -218,9 +216,12 @@ Comment     = ";;"[^\n]*
 	"atleast" |
 	"exact" |
 	"atmost" |
-	"forall" |
-	"exists" |
-	"diff" { addToken(Token.FUNCTION); }   
+	"inter" |
+    "union" |
+    "subset" |
+    "diff" |
+    "forall" |
+	"exists" { addToken(Token.FUNCTION); }
    
    
 	{Empty}				{ addToken(Token.WHITESPACE); }   
