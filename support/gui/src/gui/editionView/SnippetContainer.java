@@ -131,6 +131,7 @@ public class SnippetContainer extends AbstractComponentPanel {
 
 		sectionConnect.unfold();
 		sectionBig.unfold();
+		sectionSets.unfold();
 	}
 
 
@@ -163,7 +164,7 @@ public int getMaxWidthIcons() {
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(snippetSectionsContainer, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(snippetSectionsContainer, javax.swing.GroupLayout.DEFAULT_SIZE, 70, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
