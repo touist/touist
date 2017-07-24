@@ -133,7 +133,7 @@ The [source] of this document is written in [madoko], a markdown dialect.
 This language has been chosen over Latex for its brevity (Pandoc could
 have also been chosen). You can contribute to this [document] through a
 pull-request or by discussing your thoughts in the [issue] tracker. To
-edit it, you can first take a look at what the madoko [editor] can do
+edit it, you can first take a look at what the Madoko [editor] can do
 (with this link, the images and colorizer will not work), or see how to
 edit properly in `CONTRIBUTE-TO-DOCS.md` (located in [`docs/`][docs]).
 
@@ -169,7 +169,7 @@ produce a new line in the latex view.
 
 [^whitespace]: A whitespace is a space, tab or newline.
 
-~ Note
+~ Note {#newline-and-note}
 The whitespace-separated list of formulas is actually going to be
 converted to a conjunction; it avoids many intermediate ``and``.
 **Warning:** each formula in this list is going to be put into
@@ -568,7 +568,7 @@ $\neg p$ (``not``), $\wedge$ (``and``), $\vee$ (``or``), $\oplus$ (``xor``),
 $\rightarrow$ (``=>``) or $\leftrightarrow$ (``<=>``).
 
 ``` Grammar
-<connectors(<T>)> ::=
+<connectors(<formula<T>>)> ::=
     |     "not" <T>
     | <T> "and" <T>
     | <T> "or" <T>
@@ -576,6 +576,18 @@ $\rightarrow$ (``=>``) or $\leftrightarrow$ (``<=>``).
     | <T> "=>" <T>
     | <T> "<=>" <T>
 ```
+
+Parenthesis can be used in formulas in order to express priority. The
+default operator priority is:
+
+|--------------------|:----------------------------------:|
+| *highest priority* | ``not``                            |
+|                    | ``xor``                            |
+|                    | ``and``                            |
+|                    | ``or``                             |
+|                    | ``=>``, ``<=>``                    |
+| *lowest priority*  | newline-``and`` ([#newline]) |
+|--------------------|------------------------------------|
 
 ~ Note
 You can chain multiple variables in ``bigand`` or ``bigor`` by giving a
@@ -589,6 +601,48 @@ bigand $i,$j in [1..3], [1..$i]:
 end
 ```
 ~
+
+### Newline-``and`` {#newline}
+
+As mentioned in a [note][#newline-and-note] (first section), in **top-level**, a
+new line (or any kind of white spaces) separating two formulas will be
+translated into a lesser-priority ``and``. It is expressed in the grammar as:
+
+``` Grammar
+<formula(<T>)>:
+  | ...
+  | <T> ("\n"|" ") <T>   <- newline/whitespace in top-level is an 'and'
+```
+
+This notation is related to the idea of a set of formulas (premises). For
+example, a new line would allow to express the separation of these two
+formulas:
+
+~ Math
+  \{a, a \Rightarrow b, \neg c\}
+~
+
+You can write this either with
+
+``` Touist
+    a
+    a => b
+    not c
+```
+or
+``` Touist
+    a a => b not c
+```
+
+that are equivalent to
+
+~ Math
+  a \wedge (a \Rightarrow b) \wedge (\neg c)
+~
+
+The important thing to notice is that this _whitespace-``and``_ has a
+**lower priority** than any other connector.
+
 
 ### Generalized connectors
 Generalized connectors ``bigand``, ``bigor``, ``exact``, ``atmost`` and
@@ -1005,6 +1059,7 @@ TERM      = [_0-9]*[a-zA-Z][a-zA-Z_0-9]*
     | <connectors(<T>)>
     | <generalized-connectors(<T>)>
     | <let-affect(<T>)>
+    | <T> ("\n"|" ") <T>   <- newline/whitespace in top-level is an 'and'
 
 <formula-simple> ::=
     | "Top"
