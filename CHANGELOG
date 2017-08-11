@@ -1,6 +1,7 @@
 v3.4.0
   - 'inter', 'union', 'diff' and 'subset' are now infix operators; the prefix
     versions are still available (but they produce a warning).
+  - interface: 'inter', 'union' and 'subset' are now properly colored
   - interface: 'save' and 'open' now remember the last file opened; the current
     file is displayed in the window title. Also, a friendly warning is now
     displayed when opening or quitting while the current file is unsaved.
