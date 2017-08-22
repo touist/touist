@@ -227,7 +227,7 @@ public class SolverQBF extends Solver {
 	 */
 	public boolean waitResult(int timeout) throws IOException {
 		final long timeout_time = System.currentTimeMillis() + timeout;
-		while(!stdout.ready() && isAlive(p) && System.currentTimeMillis() < timeout_time){
+		while(isAlive(p) && System.currentTimeMillis() < timeout_time){
 			// Active waiting (I know, it is a bad way to do it!)
 			try {
 				synchronized (this) { // for JavaRE6 compliance
@@ -238,12 +238,15 @@ public class SolverQBF extends Solver {
 				e.printStackTrace();
 			}
 		}
+		if(isAlive(p))
+			return false;
+
 		if(p.exitValue() != OK) {
 			String linesStdErr = "";
 			while (stderr.ready())
 				linesStdErr += stderr.readLine() + "\n";
 			errors = TranslationError.parse(linesStdErr);
 		}
-		return System.currentTimeMillis() < timeout_time;
+		return true;
 	}
 }
