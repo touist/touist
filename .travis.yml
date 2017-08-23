@@ -44,7 +44,7 @@ before_install:
   - if [ $TRAVIS_OS_NAME = osx ]; then brew update && brew install opam; fi
   - opam init -y --auto-setup
   - eval `opam config env`
-  - opam install -y ocamlfind menhir fileutils minisat cppo yices2 qbf ounit
+  - opam install -y ocamlfind menhir fileutils minisat cppo_ocamlbuild yices2 qbf ounit
   # Put the dependency yices-smt2 to external/
 install:
   # Build touist
