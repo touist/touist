@@ -11,7 +11,7 @@ curl -L https://github.com/fdopen/opam-repository-mingw/releases/download/0.0.0.
 bash opam32/install.sh
 opam init -y -a mingw https://github.com/fdopen/opam-repository-mingw.git --comp 4.03.0+mingw32c --switch 4.03.0+mingw32c
 eval `opam config env`
-opam install -y fileutils menhir minisat cppo_ocamlbuild zarith depext-cygwinports ounit
+opam install -y fileutils menhir minisat cppo.0.9.4 zarith depext-cygwinports ounit
 opam pin add -y qbf https://github.com/c-cube/ocaml-qbf.git
 
 if ! ocamlfind query yices2; then
