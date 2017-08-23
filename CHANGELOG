@@ -11,6 +11,9 @@ v3.4.0
   - interface: on macOS, a native application is now available; on Windows,
     a .exe is available (instead of clicking on the .jar). On Linux, a simple
     script launches the jar.
+  - fixed the extremely slow/laggy scrolling of the latex right-panel when
+    using the mouse wheel.
+  - fixed the 'Solve' button hanging indefinitely in QBF mode
 v3.2.3
   - added an option (--debug) which enable the display of stacktrace
     on exception catched on exit
