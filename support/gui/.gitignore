@@ -1,6 +1,9 @@
 build/
 .gradle/
 .idea/
+out/
+bin/
+.nb*
 
 **/*.eml
 **/*.iml
