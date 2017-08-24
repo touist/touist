@@ -686,41 +686,70 @@ public class ParentEditionPanel extends AbstractComponentPanel {
                 return State.EDITION;
             }
         } else if (getFrame().getEditorPanel1().editor.getEditorTextArea().getSyntaxEditingStyle() == "smt") {
+            solveButton.setText("Solving");
+            String logic = "";
+            switch(getFrame().getSolverSelection().getSelectedSolver()) {
+                case QF_IDL :
+                    logic = "QF_IDL";
+                    break;
+                case QF_LIA :
+                    logic = "QF_LIA";
+                    break;
+                case QF_LRA :
+                    logic = "QF_LRA";
+                    break;
+                case QF_RDL :
+                    logic = "QF_RDL";
+                    break;
+                default :
+            }
+            BufferedReader reader = new BufferedReader(new StringReader(editor.getText()));
+            SolverSMT s = new SolverSMT(reader,logic);
+            getFrame().setSolver(s);
             try {
-            	solveButton.setText("Translating");
-                String logic = "";
-                switch(getFrame().getSolverSelection().getSelectedSolver()) {
-                    case QF_IDL : 
-                        logic = "QF_IDL";
-                        break;
-                    case QF_LIA :
-                        logic = "QF_LIA";
-                        break;
-                    case QF_LRA :
-                        logic = "QF_LRA";
-                        break;
-                    case QF_RDL :
-                        logic = "QF_RDL";
-                        break;
-                    default :
-                }
-                boolean ok = getFrame().getTranslatorSMT().translate(touistFile.getAbsolutePath(), logic);
+                s.launch();
                 errorMessage = "";
-                for (TranslationError error : getFrame().getTranslatorSMT().getErrors()) {
-                	errorMessage += error + "\n";
+                for (TranslationError error : s.getErrors()) {
+                    errorMessage += error + "\n";
                 }
                 setJLabelErrorMessageText(errorMessage);
                 if(errorMessage != "") {
                     System.out.println("touist returned errors:\n"+ errorMessage + "\n");
-                }
-                if(!ok) {
-   
                     return State.EDITION;
                 }
-                
-                solveButton.setText("Solving");
-                File f = touistFile;
-                f.deleteOnExit();
+
+                ListIterator<Model> iter = getFrame().getSolver().getModelList().iterator();
+                if(!iter.hasNext()) {
+                    if(s.getReturnCode() == SolverSMT.SOLVER_UNSAT) {
+                        System.out.println("This problem is unsatisfiable");
+                        errorMessage = "There is no solution";
+                        showErrorMessage(errorMessage, "Solver error");
+                    } else if(s.getReturnCode() != SolverSMT.OK) {
+                        errorMessage = "";
+                        for (TranslationError error : s.getErrors())
+                            errorMessage += error + "\n";
+                        setJLabelErrorMessageText(errorMessage);
+                        System.err.println("touist error: "+errorMessage);
+                    }
+                    return State.EDITION;
+                }
+                getFrame().updateResultsPanelIterator(iter);
+                /**
+                 * Si il y a plus d'un model, alors passer à l'état FIRST_RESULT
+                 * sinon passer à l'état SINGLE_RESULT
+                 */
+                if (iter.hasNext()) {
+                    getFrame().setResultView(iter.next());
+                    if (iter.hasNext()) {
+                        //iter.previous();
+                        return State.FIRST_RESULT;
+                    } else {
+                        //iter.previous();
+                        return State.SINGLE_RESULT;
+                    }
+                } else {
+                    return State.SINGLE_RESULT;
+                }
             } catch (IOException ex) {
                 ex.printStackTrace();
                 errorMessage = "The translator returned an IOException: \n"+ex.getMessage();
@@ -731,18 +760,12 @@ public class ParentEditionPanel extends AbstractComponentPanel {
                 errorMessage = "Translator has been interrupted.";
                 showErrorMessage(ex, errorMessage, getFrame().getLang().getWord(Lang.ERROR_TRADUCTION));
                 return State.EDITION;
-            }
-            try {
-                System.out.println(getFrame().getTranslatorSMT().getSMTFilePath());
-                getFrame().setSolver(new SolverSMT(getFrame().getTranslatorSMT().getSMTFilePath()));
-                //appel lors de la réussit du traducteur
-                Model model = ((SolverSMT)(getFrame().getSolver())).getresult();
-                System.out.println("eoo le model : "+model.toString());
-                getFrame().setResultView(model);
-                return State.SINGLE_RESULT;
-            } catch (Exception e) {
-                //TODO handle exceptions
-                
+            } catch (SolverExecutionException e) {
+                errorMessage = "The solver returned an error: \n"+e.getMessage();
+                for (TranslationError error : ((SolverSMT)getFrame().getSolver()).getErrors())
+                    errorMessage += error + "\n";
+                setJLabelErrorMessageText(errorMessage);
+                return State.EDITION;
             }
         } else if (getFrame().getEditorPanel1().editor.getEditorTextArea().getSyntaxEditingStyle() == "qbf") {
         	solveButton.setText("Solving");
