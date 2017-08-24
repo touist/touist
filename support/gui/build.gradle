@@ -261,7 +261,8 @@ task createJarZip(type: Zip) {
     destinationDir file('build/distributions')
 }
 
-
 createDmg.enabled = false
 distTar.enabled = false
-//shadowDistTar.enabled = false
+distZip.enabled = false
+shadowDistTar.enabled = false
+shadowDistZip.enabled = false
