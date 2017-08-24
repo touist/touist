@@ -534,8 +534,6 @@ public class ResultsPanel extends AbstractComponentPanel {
                 // interdit
                 break;
             case SINGLE_RESULT :
-                // interdit
-                break;
             case FIRST_RESULT :
             case MIDDLE_RESULT :
             case LAST_RESULT :
@@ -559,8 +557,6 @@ public class ResultsPanel extends AbstractComponentPanel {
                 // interdit
                 break;
             case SINGLE_RESULT :
-                // interdit
-                break;
             case FIRST_RESULT :
             case MIDDLE_RESULT :
             case LAST_RESULT :
