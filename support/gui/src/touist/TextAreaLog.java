@@ -61,7 +61,7 @@ public class TextAreaLog extends JFrame {
         setLayout(new GridBagLayout());
         GridBagConstraints constraints = new GridBagConstraints();
         constraints.gridx = 0;
-        constraints.gridy = 0;
+        constraints.gridy = 1;
         constraints.insets = new Insets(10, 10, 10, 10);
         constraints.anchor = GridBagConstraints.WEST;
 
@@ -69,7 +69,7 @@ public class TextAreaLog extends JFrame {
         add(buttonClear, constraints);
 
         constraints.gridx = 0;
-        constraints.gridy = 1;
+        constraints.gridy = 0;
         constraints.gridwidth = 2;
         constraints.fill = GridBagConstraints.BOTH;
         constraints.weightx = 1.0;
@@ -85,7 +85,7 @@ public class TextAreaLog extends JFrame {
                 try {
                     textArea.getDocument().remove(0,
                             textArea.getDocument().getLength());
-                    standardOut.println("Text area cleared");
+                    standardOut.println("Log cleared");
                 } catch (BadLocationException ex) {
                     ex.printStackTrace();
                 }
