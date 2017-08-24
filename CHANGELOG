@@ -20,6 +20,9 @@ v3.4.0
     single result was returned.
   - added the menu button 'Log' that allows to monitor what is happening
     under the hood.
+  - interface: the look of the main window has been (kind of) improved with
+    less useless blank spaces. Also, the window can be resized smaller
+    than before.
 v3.2.3
   - added an option (--debug) which enable the display of stacktrace
     on exception catched on exit
