@@ -18,6 +18,8 @@ v3.4.0
     and QBF modes.
   - fixed a bug that was preventing the user from filtering when a
     single result was returned.
+  - added the menu button 'Log' that allows to monitor what is happening
+    under the hood.
 v3.2.3
   - added an option (--debug) which enable the display of stacktrace
     on exception catched on exit
