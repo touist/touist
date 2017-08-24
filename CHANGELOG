@@ -14,6 +14,10 @@ v3.4.0
   - fixed the extremely slow/laggy scrolling of the latex right-panel when
     using the mouse wheel.
   - fixed the 'Solve' button hanging indefinitely in QBF mode
+  - fixed the filtering (regex or true/false) of the results on SMT
+    and QBF modes.
+  - fixed a bug that was preventing the user from filtering when a
+    single result was returned.
 v3.2.3
   - added an option (--debug) which enable the display of stacktrace
     on exception catched on exit
