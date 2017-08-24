@@ -23,17 +23,13 @@
 
 package touist;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.*;
 import java.util.Properties;
-import java.util.prefs.Preferences;
 
-import javax.swing.JOptionPane;
+import javax.swing.*;
 
 import gui.MainFrame;
 import solution.SolverExecutionException;
@@ -44,6 +40,7 @@ import solution.SolverExecutionException;
  */
 public class TouIST {
 	private static MainFrame frame;
+	public static TextAreaLog textAreaLog = new TextAreaLog();
 
 	/**
 	 * @param args the command line arguments

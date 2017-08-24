@@ -25,6 +25,7 @@ package gui.menu;
 
 import gui.Lang;
 import gui.MainFrame;
+import touist.TouIST;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -36,14 +37,7 @@ import java.net.URI;
 import java.util.Locale;
 import java.util.Scanner;
 
-import javax.swing.JEditorPane;
-import javax.swing.JFrame;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JScrollPane;
-import javax.swing.KeyStroke;
+import javax.swing.*;
 import javax.swing.text.Document;
 import javax.swing.text.html.HTMLEditorKit;
 import javax.swing.text.html.StyleSheet;
@@ -79,6 +73,7 @@ public class EditionMenuBar extends JMenuBar {
     JMenuItem jMenuItemChangelog;
     JMenuItem jMenuItemProjectPage;
     JMenuItem jMenuItemLicense;
+    JMenuItem jMenuItemLog;
     
     
     public EditionMenuBar(MainFrame parent){
@@ -112,11 +107,12 @@ public class EditionMenuBar extends JMenuBar {
         jMenuItemZoomMore.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_PLUS, meta));
         jMenuItemZoomLess = new JMenuItem();
         jMenuItemZoomLess.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, meta));
-        
-        
+        jMenuItemLog = new JMenuItem();
+        jMenuItemLog.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_L, meta));
+
         jMenuItemHelpEditor = new JMenuItem();
         jMenuItemAbout = new JMenuItem();
-        
+
         jMenuItemSettings = new JMenuItem();
 
         jMenuItemManualPdf = new JMenuItem();
@@ -124,7 +120,7 @@ public class EditionMenuBar extends JMenuBar {
         jMenuItemChangelog = new JMenuItem();
         jMenuItemProjectPage = new JMenuItem();
         jMenuItemLicense = new JMenuItem();
-        
+
         jMenuItemEnglish.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
                 jMenuItemEnglishActionPerformed(evt);
@@ -192,7 +188,13 @@ public class EditionMenuBar extends JMenuBar {
                 jMenuItemZoomLessActionPerformed(evt);
             }
         });
-        
+
+        jMenuItemLog.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                TouIST.textAreaLog.setVisible(true);
+            }
+        });
+
         jMenuItemSettings.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
                 jMenuItemSettingsActionPerformed(evt);
@@ -234,7 +236,7 @@ public class EditionMenuBar extends JMenuBar {
                     catch (Exception e) { System.err.println(e.getMessage());}
             }
         });
-        
+
 
         jMenuFile.add(jMenuItemSaveFile);
         jMenuFile.add(jMenuItemSaveAsFile);
@@ -256,6 +258,7 @@ public class EditionMenuBar extends JMenuBar {
         jMenuEdit.add(jMenuItemRedo);
         jMenuView.add(jMenuItemZoomMore);
         jMenuView.add(jMenuItemZoomLess);
+        jMenuView.add(jMenuItemLog);
         
         this.add(jMenuFile);
         this.add(jMenuEdit);
@@ -392,6 +395,8 @@ public class EditionMenuBar extends JMenuBar {
         this.jMenuItemRedo.setText(parent.getLang().getWord(Lang.EDITION_MENUITEM_REDO));
         this.jMenuItemZoomMore.setText(parent.getLang().getWord(Lang.EDITION_MENUITEM_ZOOMMORE));
         this.jMenuItemZoomLess.setText(parent.getLang().getWord(Lang.EDITION_MENUITEM_ZOOMLESS));
+        this.jMenuItemLog.setText("Log");
+
         this.jMenuItemSettings.setText(parent.getLang().getWord(Lang.SETTINGS_TITLE));
 
         this.jMenuItemManualPdf.setText(parent.getLang().getWord("EditionMenuBar.jMenuItemManualPdf"));
