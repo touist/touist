@@ -123,6 +123,11 @@ public class ResultsPanel extends AbstractComponentPanel {
         actModel = m;
     }
 
+    /**
+     * This method will be called when
+     *   1) the 'regex' text field is modified
+     *   2) the 'true' or 'false' check boxes are modified
+     */
     public void setResult() {
         
         boolean falseLiterals = showFalseLiterals.isSelected();
@@ -130,10 +135,12 @@ public class ResultsPanel extends AbstractComponentPanel {
         
         String regex = filterLiterals.getText();
         Pattern pattern = null;
+        boolean useRegex;
         try {
             pattern = Pattern.compile(regex);
+            useRegex = true;
         } catch (PatternSyntaxException e) {
-            regex = "";
+            useRegex = false;
         }
         
         String trueText = getFrame().getLang().getWord("ResultsPanel.trueText");
@@ -144,22 +151,27 @@ public class ResultsPanel extends AbstractComponentPanel {
         ArrayList<Literal> literals = (ArrayList<Literal>) actModel.literals;
         for(int i = 0; i < literals.size(); i++) {
             String name = literals.get(i).getLiteral();
-            if(literals.get(i).getArithmetic_value()==null){
-                boolean value = literals.get(i).isLiteral_positivity();
-
-               if(regex!="" && !pattern.matcher(name).find()){
-                   continue;
-               }
-
-               if(falseLiterals && !value){
-                   model.addRow(new String[]{name,falseText});
-               } else if(trueLiterals && value){
-                   model.addRow(new String[]{name,trueText});
-               }   
+            if (useRegex && !pattern.matcher(name).find()) {
+                continue;
             }
-            else{
-                System.out.println(literals.get(i).getArithmetic_value());
-              model.addRow(new String[]{name,literals.get(i).getArithmetic_value()});
+
+            // Case 1. Literal values are stored as booleans
+            if (literals.get(i).getArithmetic_value()==null){
+                boolean value = literals.get(i).isLiteral_positivity();
+                if (falseLiterals && (value == false)) model.addRow(new String[]{name, falseText});
+                else if (trueLiterals && (value == true)) model.addRow(new String[]{name, trueText});
+            }
+
+            // Case 2. Literal values are stored as strings
+            else {
+                String value = literals.get(i).getArithmetic_value();
+                if (value.equals("0")) {
+                    if (falseLiterals) model.addRow(new String[]{name, falseText});
+                }
+                else if (value.equals("1")) {
+                    if (trueLiterals) model.addRow(new String[]{name, trueText});
+                }
+                else model.addRow(new String[]{name, value});
             }
         }
     }
