@@ -232,7 +232,7 @@ run_test_tt_main (
         OUnit2.skip_if (Sys.os_type = "Win32") "won't work on windows (unix-only??)";
         OUnit2.assert_command ~use_stderr:false ~ctxt:ctx
         ~foutput:(check_solution "test/sat/unittest_setgen_solution.txt")
-        "./touist.native" ["--solve";"--sat";"test/sat/unittest_setgen.touistl"]);
+        "./touist.native" ["--solve";"--sat";"test/sat/unittest_setgen.touist"]);
 ];
 
 "samples of code that should be correct with --smt">:::[ (* 'c' is the testing context *)
@@ -241,7 +241,7 @@ run_test_tt_main (
   "">::(test_smt "a == 3");
   "">::(test_smt "a != 3");
   "for now, one of the two terms must be a float or int">::(test_smt "(a+1) > 3");
-  "takuzu4x4.touistl">:: (test_smt (Parse.string_of_file "test/smt/takuzu4x4.touistl"))
+  "takuzu4x4.touist">:: (test_smt (Parse.string_of_file "test/smt/takuzu4x4.touist"))
 ];
 
 "QBF testing">:::[
@@ -269,33 +269,33 @@ run_test_tt_main (
 
 "real-size tests">:::[
   "with --sat --solve">:::[
-  "sat/sodoku.touistl (SAT solver)">:: (fun ctx ->
+  "sat/sodoku.touist (SAT solver)">:: (fun ctx ->
       OUnit2.skip_if (Sys.os_type = "Win32") "won't work on windows (unix-only??)";
       OUnit2.assert_command ~use_stderr:false ~ctxt:ctx
       ~foutput:(check_solution "test/sat/sudoku_solution.txt")
-      "./touist.native" ["--solve";"--sat";"test/sat/sudoku.touistl"]);
+      "./touist.native" ["--solve";"--sat";"test/sat/sudoku.touist"]);
   ];
   "with --smt --solve">:::[
-  "sat/sodoku.touistl (using SMT QF_BV solver)">:: (fun ctx ->
+  "sat/sodoku.touist (using SMT QF_BV solver)">:: (fun ctx ->
         OUnit2.skip_if (Sys.os_type = "Win32") "won't work on windows (unix-only??)";
         OUnit2.skip_if (not Version.has_yices2) "touist built without yices2";
         OUnit2.assert_command ~use_stderr:false ~ctxt:ctx
         ~foutput:(check_solution "test/sat/sudoku_solution.txt")
-        "./touist.native" ["--solve";"--smt";"QF_BV";"test/sat/sudoku.touistl"]);
-  "smt/takuzu4x4.touistl">:: (fun ctx ->
+        "./touist.native" ["--solve";"--smt";"QF_BV";"test/sat/sudoku.touist"]);
+  "smt/takuzu4x4.touist">:: (fun ctx ->
       OUnit2.skip_if (Sys.os_type = "Win32") "won't work on windows (unix-only??)";
       OUnit2.skip_if (not Version.has_yices2) "touist built without yices2";
       OUnit2.assert_command ~use_stderr:false ~ctxt:ctx
       ~foutput:(check_solution "test/smt/takuzu4x4_solution.txt")
-      "./touist.native" ["--solve";"--smt";"QF_IDL";"test/smt/takuzu4x4.touistl"]);
+      "./touist.native" ["--solve";"--smt";"QF_IDL";"test/smt/takuzu4x4.touist"]);
   ];
   "with --qbf --solve">:::[
-  "sat/sodoku.touistl (using QBF solver)">:: (fun ctx ->
+  "sat/sodoku.touist (using QBF solver)">:: (fun ctx ->
         OUnit2.skip_if (Sys.os_type = "Win32") "won't work on windows (unix-only??)";
         OUnit2.skip_if (not Version.has_qbf) "touist built without qbf";
         OUnit2.assert_command ~use_stderr:false ~ctxt:ctx
         ~foutput:(check_solution "test/sat/sudoku_solution.txt")
-        "./touist.native" ["--solve";"--qbf";"test/sat/sudoku.touistl"]);
+        "./touist.native" ["--solve";"--qbf";"test/sat/sudoku.touist"]);
   "qbf/allumettes2.touist">:: (fun ctx ->
       OUnit2.skip_if (Sys.os_type = "Win32") "won't work on windows (unix-only??)";
       OUnit2.skip_if (not Version.has_qbf) "touist built without qbf";

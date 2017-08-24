@@ -175,6 +175,7 @@ let () =
   then input_equiv := open_in !equiv_file_path;
 
   (* latex = parse and transform with latex_of_ast *)
+  (* linter = only show syntax and semantic errors *)
   if !latex || !latex_full || !linter then begin
     let ast_plain =
       match !mode with
@@ -197,17 +198,6 @@ let () =
     exit_with OK
   end;
 
-  (* linter = only show syntax and semantic errors *)
-  if !linter then begin
-    let _ = match !mode with
-    | Sat -> Parse.parse_sat ~debug:!debug_syntax ~filename:!input_file_path (string_of_chan !input)
-      |> Eval.eval ~smt:(!mode = Smt) ~onlychecktypes:true
-    | Smt -> Parse.parse_smt ~debug:!debug_syntax ~filename:!input_file_path (string_of_chan !input)
-      |> Eval.eval ~smt:(!mode = Smt) ~onlychecktypes:true
-    | Qbf -> Parse.parse_qbf ~debug:!debug_syntax ~filename:!input_file_path (string_of_chan !input)
-      |> Eval.eval ~smt:(!mode = Smt) ~onlychecktypes:true
-    in exit_with OK
-  end;
   if !show then begin
     let ast = match !mode with
     | Sat -> Parse.parse_sat ~debug:!debug_syntax ~filename:!input_file_path (string_of_chan !input)

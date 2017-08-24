@@ -133,12 +133,13 @@ let smt = ref false
 (** Main function for checking the types and evaluating the touistl expressions
     (variables, bigand, bigor, let...).
 
-    @param ast is the AST given by [Parse.parse] 
+    @param ast is the AST given by [Parse.parse]
     @param onlychecktypes will limit the evaluation to its minimum in
            order to get type errors as fast as possible.
     @param smt enables the SMT mode. By default, the SAT mode is used.
 
-    @raise Eval.Error (msg,loc) *)
+    @raise Msgs.Fatal msg where [Msgs.msg] contains the error that could not be
+           recovered upon. *)
 let rec eval ?smt:(smt_mode=false) ?(onlychecktypes=false) ast : ast =
   check_only := onlychecktypes;
   smt := smt_mode;

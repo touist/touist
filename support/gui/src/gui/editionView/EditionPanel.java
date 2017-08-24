@@ -34,7 +34,7 @@ import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.io.*;
 
-import javax.swing.JLabel;
+import javax.swing.*;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import javax.swing.event.DocumentEvent;
@@ -141,6 +141,12 @@ public class EditionPanel extends AbstractComponentPanel {
         snippetsContainer.setEditorTextArea(editorTextArea);  
         codeAndLatexView.setResizeWeight(0.5);
         snippetsAndCodeAndLatex.setDividerSize(3);
+
+        latexScroller.getVerticalScrollBar().setUnitIncrement(16);
+        latexScroller.getHorizontalScrollBar().setUnitIncrement(16);
+        // Setting BACKINGSTORE_SCROLL_MODE instead of the default scrolling mode
+        // fixes the extremely slow and laggy wheel-scrolling.
+        latexScroller.getViewport().setScrollMode(JViewport.BACKINGSTORE_SCROLL_MODE);
     }
     
     public void initPalette() {

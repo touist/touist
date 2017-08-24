@@ -46,14 +46,6 @@ import entity.Literal;
 import entity.Model;
 import translation.TranslationError;
 
-/**
- * This class is a first implementation of the "Solver" abstract class. It
- * allows the user to use the "sat4j-sat.jar" program that Abdel prepared for
- * testing purpose.
- *
- * the next model.
- * @author Abdel
- */
 public class SolverQBF extends Solver {
 	private Process p;
 	private PrintWriter stdin;
@@ -66,10 +58,8 @@ public class SolverQBF extends Solver {
 	private ModelList models;
 
 	/**
-	 * This is the main constructor used by the user after he translated the
-	 * BIGAND file to a DIMACS file (and the "literalsMap" associated).
-	 * @param dimacsFilePath the DIMACS file
-	 * @param literalsMap the "literals map" ("table de correspondance")
+	 * Use this constructor each time you want to solve.
+	 * One SolverXXX object = one solver call.
 	 */
 	public SolverQBF(BufferedReader reader) {
 		this.reader = reader;
@@ -202,15 +192,7 @@ public class SolverQBF extends Solver {
 		}
 		return model;
 	}
-
-	/**
-	 * ONLY used by Models
-	 * @return the DIMACS file path
-	 */
-	protected BufferedReader getReader() {
-		return reader;
-	}
-
+	
 	public int getReturnCode() {
 		return p.exitValue();
 	}
@@ -227,7 +209,7 @@ public class SolverQBF extends Solver {
 	 */
 	public boolean waitResult(int timeout) throws IOException {
 		final long timeout_time = System.currentTimeMillis() + timeout;
-		while(!stdout.ready() && isAlive(p) && System.currentTimeMillis() < timeout_time){
+		while(isAlive(p) && System.currentTimeMillis() < timeout_time){
 			// Active waiting (I know, it is a bad way to do it!)
 			try {
 				synchronized (this) { // for JavaRE6 compliance
@@ -238,12 +220,15 @@ public class SolverQBF extends Solver {
 				e.printStackTrace();
 			}
 		}
+		if(isAlive(p))
+			return false;
+
 		if(p.exitValue() != OK) {
 			String linesStdErr = "";
 			while (stderr.ready())
 				linesStdErr += stderr.readLine() + "\n";
 			errors = TranslationError.parse(linesStdErr);
 		}
-		return System.currentTimeMillis() < timeout_time;
+		return true;
 	}
 }

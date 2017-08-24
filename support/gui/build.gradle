@@ -3,7 +3,6 @@ plugins {
     id 'edu.sc.seis.launch4j' version '2.3.0' // For TouIST.exe on Windows
     id 'com.palantir.git-version' version '0.8.0'
     id "com.github.johnrengelman.shadow" version "2.0.1" // For building the 'fat-jar' touist.jar that includes deps
-    id "de.undercouch.download" version '3.2.0'
     id "com.google.osdetector" version "1.4.0"
     id 'eclipse'
     id 'idea'
@@ -11,7 +10,6 @@ plugins {
 
 apply plugin: 'com.github.johnrengelman.shadow'
 apply plugin: 'edu.sc.seis.launch4j'
-apply plugin: 'de.undercouch.download'
 apply plugin: 'com.google.osdetector'
 apply plugin: 'java'
 apply plugin: 'application'
@@ -31,37 +29,7 @@ repositories{
     jcenter()
 }
 
-import de.undercouch.gradle.tasks.download.Download
-task downloadYices(type: Download) {
-    if (osdetector.os == "osx") {
-        src "http://yices.csl.sri.com/cgi-bin/yices2-newnewdownload.cgi?file=yices-2.4.2-x86_64-apple-darwin15.2.0-static-gmp.tar.gz&accept=I+Agree"
-        dest "${buildDir}/tmp/yices.tar.gz"
-    }
-    else if (osdetector.os == "linux") {
-        src "http://yices.csl.sri.com/cgi-bin/yices2-newnewdownload.cgi?file=yices-2.4.2-x86_64-unknown-linux-gnu-static-gmp.tar.gz&accept=I+Agree"
-        dest "${buildDir}/tmp/yices.tar.gz"
-    }
-    else {
-        src "http://yices.csl.sri.com/cgi-bin/yices2-newnewdownload.cgi?file=yices-2.4.2-i686-pc-mingw32-static-gmp.zip&accept=I+Agree"
-        dest "${buildDir}/tmp/yices.zip"
-    }
-    overwrite false
-    outputs.dir dest
-}
-
-task uncompressYices(type: Copy) {
-    dependsOn downloadYices
-    if (osdetector.os == "windows") from zipTree(downloadYices.dest)
-    else from tarTree(downloadYices.dest)
-    include "*/bin/*"
-    into "${buildDir}/tmp/yices/"
-}
-
 task prepareExternal(type: Copy) {
-    dependsOn uncompressYices
-    from (file(uncompressYices.destinationDir.toString()+'/yices-2.4.2/bin')) {
-        include 'yices-smt2*','*.dll'
-    }
     from ("../../_build/src/touist.native") {
         rename 'touist.native','touist'
     }
@@ -293,7 +261,8 @@ task createJarZip(type: Zip) {
     destinationDir file('build/distributions')
 }
 
-
 createDmg.enabled = false
 distTar.enabled = false
-//shadowDistTar.enabled = false
+distZip.enabled = false
+shadowDistTar.enabled = false
+shadowDistZip.enabled = false
