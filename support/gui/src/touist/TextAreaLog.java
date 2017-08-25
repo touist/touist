@@ -8,7 +8,6 @@ import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
-import java.util.Date;
 
 /**
  * This class extends from OutputStream to redirect output to a JTextArrea
@@ -18,44 +17,48 @@ import java.util.Date;
 
 class CustomOutputStream extends OutputStream {
     private JTextArea textArea;
+    private PrintStream secondary;
 
-    public CustomOutputStream(JTextArea textArea) {
+    public CustomOutputStream(JTextArea textArea, PrintStream secondary) {
         this.textArea = textArea;
+        this.secondary = secondary;
     }
 
     @Override
     public void write(int b) throws IOException {
-        // redirects data to the text area
+        secondary.print((char)b);
         textArea.append(String.valueOf((char)b));
-        // scrolls the text area to the end of data
         textArea.setCaretPosition(textArea.getDocument().getLength());
     }
 }
 
-
+/**
+ * This class allows us to open a window where stdout and stderr are displayed. Stdout and stderr are also
+ * redirected to their standard System.out and System.err.
+ */
 public class TextAreaLog extends JFrame {
     /**
      * The text area which is used for displaying logging information.
      */
     private JTextArea textArea;
-
     private JButton buttonClear = new JButton("Clear");
-
-    private PrintStream standardOut;
+    private PrintStream standardOut, standardErr;
 
     public TextAreaLog() {
         super("Stdout and stderr");
 
-        textArea = new JTextArea(50, 80);
-        textArea.setEditable(false);
-        PrintStream printStream = new PrintStream(new CustomOutputStream(textArea));
-
         // keeps reference of standard output stream
         standardOut = System.out;
+        standardErr = System.err;
+
+        textArea = new JTextArea(50, 80);
+        textArea.setEditable(false);
+        PrintStream printStreamOut = new PrintStream(new CustomOutputStream(textArea, standardOut));
+        PrintStream printStreamErr = new PrintStream(new CustomOutputStream(textArea, standardErr));
 
         // re-assigns standard output stream and error output stream
-        System.setOut(printStream);
-        System.setErr(printStream);
+        System.setOut(printStreamOut);
+        System.setErr(printStreamErr);
 
         // creates the GUI
         setLayout(new GridBagLayout());
