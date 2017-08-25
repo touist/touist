@@ -33,6 +33,7 @@ import java.awt.CardLayout;
 import java.io.IOException;
 import java.util.ListIterator;
 import java.util.Locale;
+import java.util.prefs.Preferences;
 
 import javax.imageio.ImageIO;
 import javax.swing.JPanel;

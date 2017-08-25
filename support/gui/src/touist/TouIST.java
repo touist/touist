@@ -23,30 +23,34 @@
 
 package touist;
 
-import java.io.*;
+import gui.MainFrame;
+import solution.SolverExecutionException;
+
+import javax.swing.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.*;
 import java.util.Properties;
-
-import javax.swing.*;
-
-import gui.MainFrame;
-import solution.SolverExecutionException;
+import java.util.prefs.Preferences;
 
 /**
  *
  * @author Skander
  */
 public class TouIST {
-	private static MainFrame frame;
 	public static TextAreaLog textAreaLog;
+	public static WindowBoundsRestorer restorer;
+	public static final Preferences prefs = Preferences.userNodeForPackage(TouIST.class);
 
 	/**
 	 * @param args the command line arguments
 	 */
-	public static void main(String[] args) throws IOException, InterruptedException, FileNotFoundException, SolverExecutionException {
+	public static void main(final String[] args) throws IOException, InterruptedException, SolverExecutionException {
 		loadProperties();
+
 		String version = System.getProperty("java.version");
 		if(Float.valueOf(version.substring(0,3)) < 1.7) {
 			JOptionPane.showMessageDialog(null, "Your java version is "+version+" but version higher or equal to 1.7 is required");
@@ -56,13 +60,22 @@ public class TouIST {
 		System.out.println("TouIST: running app from folder '"+ System.getProperty("user.dir")+"'");
 		System.out.println("* External binaries are in '"+getTouistExternalDir()+"'");
 		System.out.println("* Files saved in '"+getWhereToSave()+"', temp in '"+getWhereToSaveTemp()+"'");
-		frame = new MainFrame();
+
+		// We must make sure the opening of the whole GUI happens after all events
+		// have been processed (more specifically, we want 'loadProperties()' to be done)
+
+
+		MainFrame frame = new MainFrame();
+		restorer = new WindowBoundsRestorer(prefs);
+		restorer.restore(frame);
+
 		frame.setVisible(true);
 
 		if(args.length > 0) {
 			frame.getEditorPanel1().open(args[0]);
 		}
 	}
+
 	/**
 	 * We use this for getting the actual place where touist.jar is located in.
 	 * We do not use getProperty("user.dir") because on linux, it returns (when

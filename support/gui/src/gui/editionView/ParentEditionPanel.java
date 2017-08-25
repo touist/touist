@@ -112,6 +112,7 @@ public class ParentEditionPanel extends AbstractComponentPanel {
         }
 
         if(shouldExit) {
+            //TouIST.restorer.save(mainframe);
             System.exit(0);
         }
     }
