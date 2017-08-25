@@ -31,9 +31,7 @@ import gui.SolverSelection;
 import gui.SolverSelection.SolverType;
 import gui.State;
 
-import java.awt.AWTException;
-import java.awt.FileDialog;
-import java.awt.Robot;
+import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -42,10 +40,12 @@ import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.util.ListIterator;
 import java.util.Map;
+import java.util.prefs.Preferences;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import org.apache.commons.lang3.StringUtils;
 import org.kordamp.ikonli.fontawesome.FontAwesomeIkonHandler;
 import org.kordamp.ikonli.swing.FontIcon;
 import solution.SolverExecutionException;
@@ -92,6 +92,27 @@ public class ParentEditionPanel extends AbstractComponentPanel {
             // If the texts are the same between the editor and the file, then
             // we have no unsaved files (= we return false).
             return ! editor.getEditorTextArea().getText().equals(textInFile);
+        }
+    }
+
+    private void doCloses() {
+        boolean shouldExit = true;
+        if(hasUnsavedChanges()) {
+            int confirmed = JOptionPane.showConfirmDialog(null,
+                    getFrame().getLang().getWord("ParentEditionPanel.saveOrLooseOnQuit"),
+                    "", JOptionPane.YES_NO_CANCEL_OPTION);
+            if (confirmed == JOptionPane.YES_OPTION) {
+                saveHandler(false);
+                shouldExit = true;
+            } else if (confirmed == JOptionPane.NO_OPTION) {
+                shouldExit = true;
+            } else if (confirmed == JOptionPane.CANCEL_OPTION) {
+                shouldExit = false;
+            }
+        }
+
+        if(shouldExit) {
+            System.exit(0);
         }
     }
 
@@ -151,24 +172,12 @@ public class ParentEditionPanel extends AbstractComponentPanel {
         }
 
         // Ask the user if he wants to save before quitting
+        // NOTE: for Cmd+Q to run this function on MacOS, we also need to set
+        // apple.eawt.quitStrategy to CLOSE_ALL_WINDOWS.
         mainframe.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
         mainframe.addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
-                if(hasUnsavedChanges()) {
-                    int confirmed = JOptionPane.showConfirmDialog(null,
-                            getFrame().getLang().getWord("ParentEditionPanel.saveOrLooseOnQuit"),
-                            "", JOptionPane.YES_NO_CANCEL_OPTION);
-                    if (confirmed == JOptionPane.YES_OPTION) {
-                        saveHandler(false);
-                        System.exit(0);
-                    } else if (confirmed == JOptionPane.NO_OPTION) {
-                        System.exit(0);
-                    } else if (confirmed == JOptionPane.CANCEL_OPTION) {
-                        return;
-                    }
-                } else {
-                    System.exit(0);
-                }
+                doCloses();
             }
         });
     }
@@ -889,4 +898,8 @@ public class ParentEditionPanel extends AbstractComponentPanel {
     public EditionPanel getEditor() {
 		return editor;
 	}
+
+	public void saveInterface(Preferences prefs) {
+
+    }
 }
