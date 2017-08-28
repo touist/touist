@@ -40,7 +40,7 @@ import solution.SolverExecutionException;
  */
 public class TouIST {
 	private static MainFrame frame;
-	public static TextAreaLog textAreaLog = new TextAreaLog();
+	public static TextAreaLog textAreaLog;
 
 	/**
 	 * @param args the command line arguments
@@ -52,7 +52,7 @@ public class TouIST {
 			JOptionPane.showMessageDialog(null, "Your java version is "+version+" but version higher or equal to 1.7 is required");
 			return;
 		}
-
+		textAreaLog = new TextAreaLog();
 		System.out.println("TouIST: running app from folder '"+ System.getProperty("user.dir")+"'");
 		System.out.println("* External binaries are in '"+getTouistExternalDir()+"'");
 		System.out.println("* Files saved in '"+getWhereToSave()+"', temp in '"+getWhereToSaveTemp()+"'");
