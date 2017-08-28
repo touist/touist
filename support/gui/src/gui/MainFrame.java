@@ -40,7 +40,6 @@ import javax.swing.JPanel;
 import solution.ModelList;
 import solution.Solver;
 import translation.TranslatorSAT;
-import translation.TranslatorSMT;
 
 /**
  *
@@ -48,7 +47,6 @@ import translation.TranslatorSMT;
  */
 public class MainFrame extends javax.swing.JFrame {
     private TranslatorSAT translatorSAT = new TranslatorSAT();
-    private TranslatorSMT translatorSMT = new TranslatorSMT();
     private Solver solver;
     private ModelList models;
     private SolverSelection solverSelection = new SolverSelection(this);
@@ -125,10 +123,6 @@ public class MainFrame extends javax.swing.JFrame {
 
     public TranslatorSAT getTranslatorSAT() {
         return translatorSAT;
-    }
-    
-    public TranslatorSMT getTranslatorSMT() {
-        return translatorSMT;
     }
     
     public ResultsPanel getResultsPanel1() {

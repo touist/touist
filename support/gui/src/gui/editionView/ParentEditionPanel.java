@@ -330,7 +330,7 @@ public class ParentEditionPanel extends AbstractComponentPanel {
 	    }
 	}
     
-	private boolean isStopInsteadOfTest = false;
+	private boolean isStopInsteadOfSolve = false; // When solving, the 'Solve' button is replaced by a 'Stop' button
     private void solveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_solveButtonActionPerformed
         solve();
     }//GEN-LAST:event_solveButtonActionPerformed
@@ -340,10 +340,10 @@ public class ParentEditionPanel extends AbstractComponentPanel {
             case EDITION :
                 setJLabelErrorMessageText("");
 
-                this.solveButton.setText(isStopInsteadOfTest
+                this.solveButton.setText(isStopInsteadOfSolve
                         ?getFrame().getLang().getWord("ParentEditionPanel.testButton.text")
                         :getFrame().getLang().getWord("ParentEditionPanel.stopButton.text"));
-                isStopInsteadOfTest = (isStopInsteadOfTest)?false:true;
+                isStopInsteadOfSolve = (isStopInsteadOfSolve)?false:true;
 
                 if(testThread.isAlive()) {
                     testThread.interrupt();
@@ -353,22 +353,20 @@ public class ParentEditionPanel extends AbstractComponentPanel {
 
                 if (getFrame().getSolverSelection().getSelectedSolver() == SolverSelection.SolverType.SAT) {
                     p = getFrame().getTranslatorSAT().getP();
-                } else {
-                    p = getFrame().getTranslatorSMT().getP();
                 }
 
                 if(p != null && isAlive(p)){
                     p.destroy();
                 }
 
-                if(!isStopInsteadOfTest)
+                if(!isStopInsteadOfSolve)
                     break;
 
                 Runnable r = new Runnable() {
                     public void run() {
                         State state = initResultView();
                         solveButton.setText(getFrame().getLang().getWord("ParentEditionPanel.testButton.text"));
-                        isStopInsteadOfTest = false;
+                        isStopInsteadOfSolve = false;
                         if (state != State.EDITION) {
                             setState(state);
                             getFrame().setViewToResults();
