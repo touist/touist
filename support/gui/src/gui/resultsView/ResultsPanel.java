@@ -103,6 +103,10 @@ public class ResultsPanel extends AbstractComponentPanel {
     Model actModel;
     ExportDialog exportDialog;
 
+    public void setShowOthersCheckbox(boolean b) {
+        showOtherLiterals.setEnabled(b);
+    }
+
     /**
      * Creates new form ResultsPanel
      */
@@ -132,6 +136,7 @@ public class ResultsPanel extends AbstractComponentPanel {
         
         boolean falseLiterals = showFalseLiterals.isSelected();
         boolean trueLiterals = showTrueLiterals.isSelected();
+        boolean otherLiterals = showOtherLiterals.isSelected();
         
         String regex = filterLiterals.getText();
         Pattern pattern = null;
@@ -171,7 +176,9 @@ public class ResultsPanel extends AbstractComponentPanel {
                 else if (value.equals("1")) {
                     if (trueLiterals) model.addRow(new String[]{name, trueText});
                 }
-                else model.addRow(new String[]{name, value});
+                else {
+                    if (otherLiterals) model.addRow(new String[]{name, value});
+                }
             }
         }
     }
@@ -273,6 +280,7 @@ public class ResultsPanel extends AbstractComponentPanel {
         showFalseLiterals = new javax.swing.JCheckBox();
         filterLiterals = new javax.swing.JTextField();
         exportModel = new javax.swing.JButton();
+        showOtherLiterals = new javax.swing.JCheckBox();
 
         setMinimumSize(new java.awt.Dimension(400, 300));
 
@@ -314,6 +322,7 @@ public class ResultsPanel extends AbstractComponentPanel {
 
         showTrueLiterals.setSelected(true);
         showTrueLiterals.setText("true");
+        showTrueLiterals.setPreferredSize(new java.awt.Dimension(57, 16));
         showTrueLiterals.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 showTrueLiteralsActionPerformed(evt);
@@ -337,6 +346,14 @@ public class ResultsPanel extends AbstractComponentPanel {
             }
         });
 
+        showOtherLiterals.setSelected(true);
+        showOtherLiterals.setText("others");
+        showOtherLiterals.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                showOtherLiteralsActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -347,12 +364,14 @@ public class ResultsPanel extends AbstractComponentPanel {
                     .addComponent(literals)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(resultsLabel)
-                        .addGap(32, 32, 32)
-                        .addComponent(showTrueLiterals)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(showTrueLiterals, javax.swing.GroupLayout.PREFERRED_SIZE, 57, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(showFalseLiterals)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(filterLiterals, javax.swing.GroupLayout.DEFAULT_SIZE, 333, Short.MAX_VALUE)
+                        .addComponent(showOtherLiterals)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(filterLiterals, javax.swing.GroupLayout.DEFAULT_SIZE, 281, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(backToEditor))
                     .addGroup(layout.createSequentialGroup()
@@ -370,9 +389,10 @@ public class ResultsPanel extends AbstractComponentPanel {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(resultsLabel)
                     .addComponent(backToEditor)
-                    .addComponent(showTrueLiterals)
+                    .addComponent(showTrueLiterals, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(showFalseLiterals)
-                    .addComponent(filterLiterals, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(filterLiterals, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(showOtherLiterals))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(literals, javax.swing.GroupLayout.DEFAULT_SIZE, 291, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -568,6 +588,29 @@ public class ResultsPanel extends AbstractComponentPanel {
         this.updateUI();
     }//GEN-LAST:event_showTrueLiteralsActionPerformed
 
+    private void showOtherLiteralsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_showOtherLiteralsActionPerformed
+        switch(getState()) {
+            case EDITION :
+                // impossible
+                break;
+            case EDITION_ERROR :
+                // impossible
+                break;
+            case NO_RESULT :
+                // interdit
+                break;
+            case SINGLE_RESULT :
+            case FIRST_RESULT :
+            case MIDDLE_RESULT :
+            case LAST_RESULT :
+                this.setResult();
+                break;
+            default :
+                System.out.println("Undefined action set for the state : " + getState());
+        }
+        this.updateUI();
+    }//GEN-LAST:event_showOtherLiteralsActionPerformed
+
     private void exportModelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exportModelActionPerformed
          switch(getState()) {
             case EDITION :
@@ -606,6 +649,7 @@ public class ResultsPanel extends AbstractComponentPanel {
     private javax.swing.JButton previousModel;
     private javax.swing.JLabel resultsLabel;
     private javax.swing.JCheckBox showFalseLiterals;
+    private javax.swing.JCheckBox showOtherLiterals;
     private javax.swing.JCheckBox showTrueLiterals;
     // End of variables declaration//GEN-END:variables
 
@@ -623,6 +667,7 @@ public class ResultsPanel extends AbstractComponentPanel {
         literalsTable.getColumnModel().getColumn(1).setHeaderValue(getFrame().getLang().getWord(Lang.RESULTS_VALUE));
         showFalseLiterals.setText(getFrame().getLang().getWord("ResultsPanel.falseText"));
         showTrueLiterals.setText(getFrame().getLang().getWord("ResultsPanel.trueText"));
+        showOtherLiterals.setText(getFrame().getLang().getWord("ResultsPanel.othersText"));
         filterLiterals.setToolTipText(getFrame().getLang().getWord("ResultsPanel.searchTextField.tooltip"));
     }
 }

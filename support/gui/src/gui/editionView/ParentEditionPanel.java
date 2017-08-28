@@ -576,6 +576,11 @@ public class ParentEditionPanel extends AbstractComponentPanel {
     private State initResultView() {
         // Initialisation de BaseDeClause
         editor.setText(editor.getText());
+
+        // We only show the check box 'Others' (besides 'True' and 'False' buttons) when we are in 'qbf' or 'smt'
+        boolean showOthersCheckbox = (editor.getEditorTextArea().getSyntaxEditingStyle().equals("smt"))
+                                  || (editor.getEditorTextArea().getSyntaxEditingStyle().equals("qbf"));
+        getFrame().getResultsPanel1().setShowOthersCheckbox(showOthersCheckbox);
         
         /*
         Faire appel au solveur avec les fichiers générés par le traducteur
