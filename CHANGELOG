@@ -23,6 +23,9 @@ v3.4.0
   - interface: the look of the main window has been (kind of) improved with
     less useless blank spaces. Also, the window can be resized smaller
     than before.
+  - interface: in the result view, you can now hide all valuations that
+    are not true or false. For example, it allows us to hide all
+    undefined valuations (denoted by '?') that clutter the results.
 v3.2.3
   - added an option (--debug) which enable the display of stacktrace
     on exception catched on exit
