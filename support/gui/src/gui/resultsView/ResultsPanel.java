@@ -312,6 +312,7 @@ public class ResultsPanel extends AbstractComponentPanel {
                 "Name", "Value"
             },0
         ));
+        literalsTable.setSelectionForeground(new java.awt.Color(0, 51, 204));
         literalsTable.setAutoCreateRowSorter(true);
         literalsTable.setDefaultRenderer(Object.class, new ResultTableCellRenderer());
         literalsTable.setGridColor(Color.BLACK);
