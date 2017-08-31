@@ -274,6 +274,12 @@ run_test_tt_main (
       OUnit2.assert_command ~use_stderr:false ~ctxt:ctx
       ~foutput:(check_solution "test/sat/sudoku_solution.txt")
       "./touist.native" ["--solve";"--sat";"test/sat/sudoku.touist"]);
+  "sat/minisat_clause_add_unsat.touist, should be unsat">:: (fun ctx ->
+      OUnit2.skip_if (Sys.os_type = "Win32") "won't work on windows (unix-only??)";
+      OUnit2.assert_command
+        ~exit_code:(Unix.WEXITED 8)
+        ~use_stderr:true ~ctxt:ctx
+      "./touist.native" ["--solve";"--sat";"test/sat/minisat_clause_add_unsat.touist"]);
   ];
   "with --smt --solve">:::[
   "sat/sodoku.touist (using SMT QF_BV solver)">:: (fun ctx ->
