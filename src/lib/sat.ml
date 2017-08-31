@@ -1,7 +1,7 @@
- (** Processes the CNF-compliant version of the abstract syntaxic tree given by [Cnf.ast_to_cnf]
-     and produces a string in DIMACS format.
-     
-     [cnf_to_clauses] is the main function. *)
+(** Processes the CNF-compliant version of the abstract syntaxic tree given by [Cnf.ast_to_cnf]
+    and produces a string in DIMACS format.
+
+    [cnf_to_clauses] is the main function. *)
 
 (**
  * Project TouIST, 2015. Easily formalize and solve real-world sized problems
@@ -14,7 +14,7 @@
  * under the terms of the GNU Lesser General Public License (LGPL)
  * version 2.1 which accompanies this distribution, and is available at
  * http://www.gnu.org/licenses/lgpl-2.1.html
- *)
+*)
 
 open Types.Ast
 open Pprint
@@ -63,29 +63,33 @@ let cnf_to_clauses (ast:ast) : Lit.t list list * (Lit.t,string) Hashtbl.t =
                 not adding the clause, we translate it by '&top12 or not &top12'*)
       let lit=(gen_lit ("&top"^(string_of_int !num_lit))) in lit::(Lit.neg lit)::[]
     | Or (x,y) ->
-        (match process_clause x,process_clause y with 
-          | [],x | x,[] -> x (* [] is created by Bottom; remove [] as soon as another literal exists in the clause *)
-          | x,y -> x @ y)
+      (match process_clause x,process_clause y with 
+       | [],x | x,[] -> x (* [] is created by Bottom; remove [] as soon as another literal exists in the clause *)
+       | x,y -> x @ y)
     | _ -> failwith ("CNF: was expecting a clause but got '" ^ (string_of_ast ~debug:true ast) ^ "'")
   and gen_lit (s:string) : Lit.t =
     try Hashtbl.find str_to_lit s
     with Not_found -> 
       (let lit = Minisat.Lit.make !num_lit in
-        Hashtbl.add str_to_lit s lit; Hashtbl.add lit_to_str lit s;
-        incr num_lit;
-        lit)
+       Hashtbl.add str_to_lit s lit; Hashtbl.add lit_to_str lit s;
+       incr num_lit;
+       lit)
   in let clauses = process_cnf ast in clauses, lit_to_str
 
 (* [clauses_to_solver] takes a list of clauses (clause = list of literals)
-   and generates an intance of minisat solver. *)
-let clauses_to_solver (clauses:Lit.t list list) : Minisat.t * bool =
+   and generates an intance of minisat solver.
+   If, at any moment during the adding of the clauses, the formula becomes
+   unsat, [clauses_to_solver] will return None. If we continued to add the
+   other clauses, they would be discarded (not added) by minisat anyway. *)
+let clauses_to_solver ?(verbose=false) (clauses:Lit.t list list) : Minisat.t option =
   let solver = Minisat.create () in
-  let rec add_clauses solver (l:Lit.t list list) : bool =
+  if verbose then set_verbose solver 10;
+  let rec add_clauses solver (l:Lit.t list list) : Minisat.t option =
     match l with
-    | [] -> true
-    | cur::next -> (Minisat.Raw.add_clause_a solver (Array.of_list cur)) && (add_clauses solver next)
-  in let has_next_model = add_clauses solver clauses
-  in solver, has_next_model
+    | [] -> Some solver (* -> the formula did not become unsat while adding *)
+    | cur::next -> let a = Array.of_list cur in
+      if Minisat.Raw.add_clause_a solver a then add_clauses solver next else None
+  in add_clauses solver clauses
 
 let print_clauses_to_dimacs (out:out_channel) nblits (clauses:Lit.t list list) : unit =
   let nbclauses = List.length clauses in
@@ -97,7 +101,7 @@ let print_clauses_to_dimacs (out:out_channel) nblits (clauses:Lit.t list list) :
     | cur::next -> Printf.fprintf out "%s\n" (string_of_clause cur); print_listclause next
   in Printf.fprintf out "c CNF format file\np cnf %d %d\n" nblits nbclauses;
   print_listclause clauses
-  
+
 
 (* for printing the Minisat.value type *)
 let string_of_value = function
@@ -116,9 +120,9 @@ struct
      1 prop(1,2,9)
      O prop(1,4,2)... *)
   let pprint ?(sep="\n") table model = List.fold_left 
-    (fun acc (n,v) -> let str = (string_of_value v)^" "^(Hashtbl.find table n)
-      in match acc with "" -> str | _ -> str ^ sep ^ acc)
-     "" model
+      (fun acc (n,v) -> let str = (string_of_value v)^" "^(Hashtbl.find table n)
+        in match acc with "" -> str | _ -> str ^ sep ^ acc)
+      "" model
 end
 
 (* A set that contains all the models already found. *)
@@ -142,11 +146,12 @@ let get_model solver (table:(Lit.t,string) Hashtbl.t) (discard:string->bool): Mo
    Returns true if the given name corresponds to is a dummy literal *)
 let is_dummy (name:string) : bool = name.[0] = '&'
 
-(* [print_clause] dumps the clause in its literal-number form:
+(* [string_of_clause] dumps the clause in its literal-number form:
    e.g., 1 -5 3 9 -2 -7 *)
-let print_clause (clause:Lit.t list) : unit =
-  let str = List.fold_left (fun acc lit -> (Lit.to_string lit) ^" "^ acc) "" clause
-  in Printf.fprintf stderr "%s\n=====\n" str
+let string_of_clause (clause:Lit.t list) : string =
+  List.fold_left (fun acc lit -> (Lit.to_string lit) ^" "^ acc) "" clause
+let string_of_clauses = List.fold_left (fun acc v -> (if acc="" then "" else acc^"\n")^(string_of_clause v)) ""
+let print_clauses cls = Printf.fprintf stderr "%s" (string_of_clauses cls)
 
 (* 1. Prevent current model from reappearing
    =========================================
@@ -187,8 +192,10 @@ let print_clause (clause:Lit.t list) : unit =
       models (if [limit] is large) can be extremely long.
       Example: [~print:(Sat.Model.pprint table model)]
     @param limit is the limit of number of models you allow to be fetched.
-      When limit = 0, all models will be fetched. *)
+      When limit = 0, all models will be fetched.
+    @param verbose allows to turn on the verbose mode of minisat *)
 let solve_clauses
+    ?(verbose=false)
     ?(print: Model.t -> int -> unit = fun m i ->())
     ?(limit: int = 0)
     (clauses,table : Lit.t list list * (Lit.t,string) Hashtbl.t)
@@ -198,33 +205,36 @@ let solve_clauses
       | V_true -> (Minisat.Lit.neg l)::acc | V_false -> l::acc | _ -> acc
     in let counter_clause = Hashtbl.fold counter_clause table []
     in Minisat.Raw.add_clause_a solver (Array.of_list counter_clause)
-  in
-  let solver,_ = clauses_to_solver clauses in
-  let models = ref ModelSet.empty in (* for returning the models found *)
-  (* searching for duplicate is slow on ModelSet. For checking a model hasn't
-     appeared already, I use a way faster Hashtbl, ass it won't check on every
-     single literal but compute a hash of the model) *)
-  let models_hash = (Hashtbl.create 100) in
-  let rec solve_loop limit i =
-    if not (i<limit || limit==0) (* limit=0 means no limit *)
-    || not (Minisat.Raw.simplify solver)
-    || not (Minisat.Raw.solve solver [||])
-    then models
-    else
-      let model = get_model solver table (is_dummy) (* is_dummy removes &1 lits *)
-      and has_next_model = counter_current_model solver table in
-      let is_duplicate = Hashtbl.mem models_hash model in
-      match is_duplicate,has_next_model with
-      | true,false -> models (* is duplicate and no next model *)
-      | true,true  -> solve_loop limit i (* is duplicate but has next *)
-      | false, true ->  (* both not duplicate and has next *)
-        models := ModelSet.add model !models; print model i;
-        Hashtbl.add models_hash model ();
-        solve_loop limit (i+1)
-      | false, false -> (* is not duplicate and no next model *)
-        models := ModelSet.add model !models; print model i;
-        models
-  in solve_loop limit 0
+  in (* already_unsat means that during the adding of clauses, the formula
+        was found unsat. So we don't even need to solve it. *)
+  let models = ref ModelSet.empty in
+  match clauses_to_solver ~verbose clauses with
+  | None -> models
+  | Some solver ->
+    (* searching for duplicate is slow on ModelSet. For checking a model hasn't
+        appeared already, I use a way faster Hashtbl, ass it won't check on every
+        single literal but compute a hash of the model) *)
+    let models_hash = (Hashtbl.create 100) in
+    let rec solve_loop limit i =
+      if not (i<limit || limit==0) (* limit=0 means no limit *)
+      || not (Minisat.Raw.simplify solver)
+      || not (Minisat.Raw.solve solver [||])
+      then models
+      else
+        let model = get_model solver table (is_dummy) (* is_dummy removes &1 lits *)
+        and has_next_model = counter_current_model solver table in
+        let is_duplicate = Hashtbl.mem models_hash model in
+        match is_duplicate,has_next_model with
+        | true,false -> models (* is duplicate and no next model *)
+        | true,true  -> solve_loop limit i (* is duplicate but has next *)
+        | false, true ->  (* both not duplicate and has next *)
+          models := ModelSet.add model !models; print model i;
+          Hashtbl.add models_hash model ();
+          solve_loop limit (i+1)
+        | false, false -> (* is not duplicate and no next model *)
+          models := ModelSet.add model !models; print model i;
+          models
+    in solve_loop limit 0
 
 (** [print_solve] outputs the result of the solver. But it is much more recommanded
     to use the parameter '~print_model' of [solve_clauses] in order to output the

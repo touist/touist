@@ -26,6 +26,8 @@ v3.4.0
   - interface: in the result view, you can now hide all valuations that
     are not true or false. For example, it allows us to hide all
     undefined valuations (denoted by '?') that clutter the results.
+  - fixed a bug with --sat & --solve where touist was giving a model
+    although the formula is UNSAT (it was caused by a misuse of minisat).
 v3.2.3
   - added an option (--debug) which enable the display of stacktrace
     on exception catched on exit

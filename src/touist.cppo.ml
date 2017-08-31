@@ -217,7 +217,7 @@ let () =
       if !equiv_file_path <> "" then begin
         let solve input =
           let ast = Parse.parse_sat ~debug:!debug_syntax ~filename:!input_file_path (string_of_chan input) |> Eval.eval
-          in let models = Cnf.ast_to_cnf ~debug:!debug_cnf ast |> Sat.cnf_to_clauses |> Sat.solve_clauses
+          in let models = Cnf.ast_to_cnf ~debug:!debug_cnf ast |> Sat.cnf_to_clauses |> Sat.solve_clauses ~verbose:!debug
           in models
         in
         let models = solve !input
@@ -231,13 +231,13 @@ let () =
         let clauses,table = Cnf.ast_to_cnf ~debug:!debug_cnf ast |> Sat.cnf_to_clauses
         in
         let models =
-          (if !only_count then Sat.solve_clauses (clauses,table)
+          (if !only_count then Sat.solve_clauses ~verbose:!debug (clauses,table)
            else
              let print_model model i =
                if !limit != 1
                then Printf.fprintf !output "==== model %d\n%s\n" i (Sat.Model.pprint ~sep:"\n" table model)
                else Printf.fprintf !output "%s\n" (Sat.Model.pprint ~sep:"\n" table model)
-              in Sat.solve_clauses ~limit:!limit ~print:print_model (clauses,table))
+              in Sat.solve_clauses ~verbose:!debug ~limit:!limit ~print:print_model (clauses,table))
         in
         match Sat.ModelSet.cardinal !models with
         | i when !only_count -> Printf.fprintf !output "%d\n" i; exit_with OK
