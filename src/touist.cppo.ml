@@ -326,11 +326,13 @@ let () =
   exit_with OK
 
   with
+    (* Warning: the [msg] already contains an ending '\n'. No need for adding
+       another ending newline after it. *)
     | Fatal msg ->
       if !debug then Printf.eprintf "Stacktrace:\n%s\n" (Printexc.get_backtrace ());
-      Printf.eprintf "%s\n" (Msgs.string_of_msg msg);
+      Printf.eprintf "%s" (Msgs.string_of_msg msg);
       exit_with (match msg with _,Usage,_,_ -> CMD_USAGE | _ -> TOUIST_SYNTAX)
     | Sys_error err ->
-      Printf.eprintf "%s\n" (Msgs.string_of_msg (Error,Usage,err^"\n",None));
+      Printf.eprintf "%s" (Msgs.string_of_msg (Error,Usage,err,None));
       exit_with CMD_USAGE
     | x -> raise x
