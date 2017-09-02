@@ -122,7 +122,7 @@ let rec ast_to_cnf ?debug:(d=false) (ast:ast) : ast =
   debug := d;
   to_cnf 0 No ast
 
-(* Actual logic of [ast_to_cnf] 
+(* Actual logic of [ast_to_cnf]
  * The `depth` variable tells what is the current level of recursion and
  * helps for debugging the translation to CNF.
  * The `stop` boolean tells to_cnf if it should stop or continue the recursion
@@ -133,14 +133,18 @@ let rec ast_to_cnf ?debug:(d=false) (ast:ast) : ast =
  *     we want to limit the inner `to_cnf` expansion to let the possibily for
  *     the outer to_cnf to "simplify" with the Not as soon as possible.
  *     For inner `to_cnf`, we simply use `to_cnf_once` to prevent the inner
- *     `to_cnf` from recursing more than once. *)
+ *     `to_cnf` from recursing more than once.
+ * (2) All bottom and top must disappear for the CNF transformation; we use
+ *     the standard transformation to remove them (a and not a, b or not b) *)
 and to_cnf depth (stop:stop) (ast:ast) : ast =
   if !debug then print_debug "in:  " depth [ast];
   if (match stop with Yes 0 -> true | _ -> false) then ast else (* See (1) above*)
     let to_cnf_once = to_cnf (depth+1) (match stop with Yes i->Yes (i-1) | No->Yes 1) in
     let to_cnf = to_cnf (depth+1) (match stop with Yes i->Yes (i-1) | No->No) in
     let cnf = begin match ast with
-    | Top    -> Top
+    | Top when depth=0 -> let t = genterm () in Or (t,Not t) (* See (2) above *)
+    | Top -> Top
+    | Bottom when depth=0 -> let t = genterm () in And (t,Not t) (* See (2) *)
     | Bottom -> Bottom
     | Prop x -> Prop x
     | And (x,y) -> let (x,y) = (to_cnf x, to_cnf y) in
@@ -191,9 +195,12 @@ and to_cnf depth (stop:stop) (ast:ast) : ast =
     | Implies (x,y) -> to_cnf (Or (Not x, y))
     | Equiv (x,y) -> to_cnf (And (Implies (x,y), Implies (y,x)))
     | Xor (x,y) -> to_cnf (And (Or (x,y), Or (Not x, Not y)))
-    | _ -> failwith ("[shouldnt happen] this doesn't seem to be a formula: '" ^ (string_of_ast ~debug:true ast) ^ "'")
-    end in
+    | _ -> failwith ("[shouldnt happen] this doesn't seem to be a formula: '"
+      ^ (string_of_ast ~debug:true ast) ^ "'")
+    end
+    in
     if !debug then print_debug "out: " depth [cnf];
-    cnf
+    (* Last important thing: make sure no more Bot/Top are in the formula. *)
+    if depth=0 && Eval.has_top_or_bot cnf then to_cnf cnf else cnf
 
 

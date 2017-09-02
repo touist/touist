@@ -37,7 +37,8 @@ let print_table (out:out_channel) ?(prefix="") (table:(Lit.t,string) Hashtbl.t) 
    literals). Returns
    - the list of clauses,
    - the table literal-to-name (Lit.t doesn't store the proposition name)
-   Note that the total number of literals is exactly equal to the table size. *)
+   Note that the total number of literals is exactly equal to the table size.
+   IMPORTANT: ast must NOT have any bot or top. Only props, and, or. *)
 let cnf_to_clauses (ast:ast) : Lit.t list list * (Lit.t,string) Hashtbl.t =
   (* num = a number that will serve to identify a literal
      lit = a literal that has a number inside it to identify it *)
@@ -46,30 +47,16 @@ let cnf_to_clauses (ast:ast) : Lit.t list list * (Lit.t,string) Hashtbl.t =
   let num_lit = ref 1 in
   let rec process_cnf ast : Minisat.Lit.t list list = match ast with
     | And  (x,y) -> (process_cnf x) @ (process_cnf y)
-    | x when Cnf.is_clause x -> begin 
-        match process_clause x with
-        | [] -> let lit=(gen_lit ("&bot"^(string_of_int !num_lit))) 
-          in [[lit]] @ [[Lit.neg lit]]
-        (* This [] is caused by Bottom that was alone in the clause. We must 
-           trigger the Unsat case; to do so, we add '&bot12 and not &bot12'*)
-        | x -> [x]
-      end
+    | x when Cnf.is_clause x -> [process_clause x]
     | _ -> failwith ("CNF: was expecting a conjunction of clauses but got '" ^ (string_of_ast ~debug:true ast) ^ "'")
   and process_clause (ast:ast) : Minisat.Lit.t list = match ast with
     | Prop str        -> (gen_lit str)::[]
     | Not (Prop str) -> (Minisat.Lit.neg (gen_lit str))::[]
-    | Bottom -> [] (* if Bot is the only one in the clause, then the whole formula is false *)
-    | Top -> (* The clause shouldn't be added because Top is found. Instead of
-                not adding the clause, we translate it by '&top12 or not &top12'*)
-      let lit=(gen_lit ("&top"^(string_of_int !num_lit))) in lit::(Lit.neg lit)::[]
-    | Or (x,y) ->
-      (match process_clause x,process_clause y with 
-       | [],x | x,[] -> x (* [] is created by Bottom; remove [] as soon as another literal exists in the clause *)
-       | x,y -> x @ y)
+    | Or (x,y) -> process_clause x @ process_clause y
     | _ -> failwith ("CNF: was expecting a clause but got '" ^ (string_of_ast ~debug:true ast) ^ "'")
   and gen_lit (s:string) : Lit.t =
     try Hashtbl.find str_to_lit s
-    with Not_found -> 
+    with Not_found ->
       (let lit = Minisat.Lit.make !num_lit in
        Hashtbl.add str_to_lit s lit; Hashtbl.add lit_to_str lit s;
        incr num_lit;
@@ -240,14 +227,16 @@ let solve_clauses
           models
     in solve_loop 1
 
-(** [print_solve] outputs the result of the solver. But it is much more recommanded
-    to use the parameter '~print_model' of [solve_clauses] in order to output the
-    models as soon as they are found; if looking for a large number of models,
-    [print_solve] will have to wait [solve_clauses] is done.
+(** [print_solve] outputs the result of the solver. But it is much more
+    recommanded to use the parameter [solve_clauses ~print_model:print...] in
+    order to output the models as soon as they are found; if looking for a
+    large number of models, [print_solve] will have to wait [solve_clauses]
+    is done.
 
-    @param output is the [out_channel] you want to solutions to be written into.
-    @param show_hidden indicates that the hidden literals introduced during 
-      [ast_to_cnf].
+    [output] is the [out_channel] you want to solutions to be written
+    into.
+    [show_hidden] indicates that the hidden literals introduced during
+    [ast_to_cnf].
 
     CNF conversion should be shown. *)
 let print_solve ?(show_hidden=false) output (solver:Minisat.t) (table:(string, Minisat.Lit.t) Hashtbl.t) =

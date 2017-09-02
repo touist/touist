@@ -61,6 +61,12 @@ let sat_models_are text expected _ =
         let _ = Sat.solve_clauses ~print:(fun m _ -> models_str := (Sat.Model.pprint ~sep:" " tbl m)::!models_str) (cl,tbl)
           in List.fold_left (fun acc s -> match acc with "" -> s | _ -> s^" | "^acc) "" !models_str)
 
+          (* !models_str
+        |> List.sort (fun s1 s2 -> let open String in
+          compare (sub s1 2 (length s1)) (sub s2 2 (length s2)))
+        |> List.fold_left (fun acc s -> match acc with "" -> s | _ -> s^" | "^acc) "") *)
+
+
 (* Tests if the given [text] is translated into the [expected] expanded
    text. *)
 let sat_expands_to text expected _ =
@@ -173,13 +179,13 @@ run_test_tt_main (
   "atleast(5,[]) should be false">::(sat_expands_to "atleast(5,[])" "Bot");
   "normal cases">:::[
   "exact(0,[a,b]) should return 'not a and not b'">::(sat_expands_to "exact(0,[a,b])" "(not a and not b)");
-  "exact(1,[a,b,c]) should give 3 models">::(sat_models_are "exact(1,[a,b,c])" "0 a 0 b 1 c | 1 a 0 b 0 c | 0 a 1 b 0 c");
+  "exact(1,[a,b,c]) should give 3 models">::(sat_models_are "exact(1,[a,b,c])" "0 b 0 a 1 c | 0 b 1 a 0 c | 1 b 0 a 0 c");
   "exact(3,[a,b,c]) should give 1 model">::(sat_models_are "exact(3,[a,b,c])" "1 c 1 b 1 a");
-  "'atmost(2,[a,b,c]) a' should give 3 models">::(sat_models_are "atmost(2,[a,b,c]) a" "1 a 0 c 0 b | 1 a 0 c 1 b | 1 a 1 c 0 b");
+  "'atmost(2,[a,b,c]) a' should give 3 models">::(sat_models_are "atmost(2,[a,b,c]) a" "1 a 0 b 0 c | 1 a 0 b 1 c | 1 a 1 b 0 c");
   "'atmost(2,[a,b,c]) a b' should give 1 model">::(sat_models_are "atmost(2,[a,b,c]) a b" "1 b 1 a 0 c");
-  "'atleast(2,[a,b,c])' should give 4 model">::(sat_models_are "atleast(2,[a,b,c])" "1 c 1 b 0 a | 0 c 1 b 1 a | 1 c 0 b 1 a | 1 c 1 b 1 a");
+  "'atleast(2,[a,b,c])' should give 4 model">::(sat_models_are "atleast(2,[a,b,c])" "1 c 1 b 0 a | 1 c 1 b 1 a | 0 c 1 b 1 a | 1 c 0 b 1 a");
   "'atleast(2,[a,b,c]) a' should give 3 model">::(sat_models_are "atleast(2,[a,b,c]) a" "1 a 1 b 1 c | 1 a 1 b 0 c | 1 a 0 b 1 c");
-  "'atleast(2,[a,b,c]) a b' should give 2 model">::(sat_models_are "atleast(2,[a,b,c]) a b" "1 b 1 c 1 a | 1 b 0 c 1 a");
+  "'atleast(2,[a,b,c]) a b' should give 2 model">::(sat_models_are "atleast(2,[a,b,c]) a b" "1 b 1 a 1 c | 1 b 1 a 0 c");
   ];
 "bigand and bigor">:::[
   "empty cases">:::[
