@@ -185,19 +185,24 @@ let print_clauses cls = Printf.fprintf stderr "%s" (string_of_clauses cls)
     (4) go on with (1)
 *)
 
-(** [solve_clauses] finds the models for the given clauses. 
-    @param print is a function that will print a model as soon as it is found.
-      [i] is the number of the model.
+(** [solve_clauses] finds the models for the given clauses.
+    [print model N ] is a function that will print a model as soon as it is
+      found. [N] is the number of the model, it begins at 1.
       It can be useful to print the models as they appear because finding all
       models (if [limit] is large) can be extremely long.
       Example: [~print:(Sat.Model.pprint table model)]
-    @param limit is the limit of number of models you allow to be fetched.
-      When limit = 0, all models will be fetched.
-    @param verbose allows to turn on the verbose mode of minisat *)
+    [verbose] allows to turn on the verbose mode of minisat; apparently, this
+      minisat feature doesn't seem to be working and doesn't display any time
+      information.
+    [continue model nth] is a function called after every model that has been
+      found. [model] contains the found model and [N] says that this model was
+      the nth model found. This function tells [solve_clauses] to go on searching
+      models or not.
+  *)
 let solve_clauses
     ?(verbose=false)
     ?(print: Model.t -> int -> unit = fun m i ->())
-    ?(limit: int = 0)
+    ?(continue: Model.t -> int -> bool = fun _ _ -> true)
     (clauses,table : Lit.t list list * (Lit.t,string) Hashtbl.t)
   : (ModelSet.t ref) =
   let counter_current_model solver (table:(Lit.t,string) Hashtbl.t) : bool =
@@ -215,9 +220,8 @@ let solve_clauses
         appeared already, I use a way faster Hashtbl, ass it won't check on every
         single literal but compute a hash of the model) *)
     let models_hash = (Hashtbl.create 100) in
-    let rec solve_loop limit i =
-      if not (i<limit || limit==0) (* limit=0 means no limit *)
-      || not (Minisat.Raw.simplify solver)
+    let rec solve_loop i = (* i is the model counter *)
+      if not (Minisat.Raw.simplify solver)
       || not (Minisat.Raw.solve solver [||])
       then models
       else
@@ -226,15 +230,15 @@ let solve_clauses
         let is_duplicate = Hashtbl.mem models_hash model in
         match is_duplicate,has_next_model with
         | true,false -> models (* is duplicate and no next model *)
-        | true,true  -> solve_loop limit i (* is duplicate but has next *)
-        | false, true ->  (* both not duplicate and has next *)
+        | true,true  -> solve_loop i (* is duplicate but has next *)
+        | false,true ->  (* both not duplicate and has next *)
           models := ModelSet.add model !models; print model i;
           Hashtbl.add models_hash model ();
-          solve_loop limit (i+1)
+          if continue model i then solve_loop (i+1) else models
         | false, false -> (* is not duplicate and no next model *)
           models := ModelSet.add model !models; print model i;
           models
-    in solve_loop limit 0
+    in solve_loop 1
 
 (** [print_solve] outputs the result of the solver. But it is much more recommanded
     to use the parameter '~print_model' of [solve_clauses] in order to output the

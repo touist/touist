@@ -1195,6 +1195,9 @@ the following command will only show the propositions that are ``true``:
     echo a and b | touist - --solve | grep ^1
 ```
 
+**`--solve --interactive` allows the user to display the models one after
+the other. Press enter or any other key to continue and `q` or `n` to stop.
+
 **`--solve --limit N`** allows to display multiple models. With this option,
 the models are separated by lines beginning with `====` and for one model,
 each line contains a valuation followed by the corresponding proposition.
@@ -1289,6 +1292,10 @@ message in `src/lib/parser.messages`.
 **`--debug-cnf`** (only with `--sat` or `--qbf)`) is also a development
 option; in SAT and QBF modes, it prints the successive recursive
 transformations that produce the CNF formula.
+
+**`--debug`** is a development option that displays the status of the
+minisat solver, the callstack in case of unexpected errors and also
+displays errors with more AST context (`(loc)` for example).
 
 ### Usage for Satisfiability Modulo Theory (SMT mode) {#usage-smt}
 

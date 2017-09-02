@@ -58,6 +58,7 @@ let latex = ref false
 let latex_full = ref false
 let show = ref false
 let wrap_width = ref 76
+let sat_interactive = ref false
 
 (* [process_arg_alone] is the function called by the command-line argument
    parser when it finds an argument with no preceeding -flag (-f, -x...).
@@ -106,6 +107,7 @@ let () =
     ("--linter", Arg.Set linter,"Display syntax and semantic errors and exit");
     ("--error-format", Arg.Set_string error_format,"Customize the formatting of error messages");
     ("--wrap-width", Arg.Set_int wrap_width,"Wrapping width for error messages [default: 76]");
+    ("--interactive", Arg.Set sat_interactive ,"(--sat mode) Display next model on key press (INPUT must be a file)");
   ]
   in
   let usage =
@@ -231,13 +233,37 @@ let () =
         let clauses,table = Cnf.ast_to_cnf ~debug:!debug_cnf ast |> Sat.cnf_to_clauses
         in
         let models =
-          (if !only_count then Sat.solve_clauses ~verbose:!debug (clauses,table)
-           else
-             let print_model model i =
-               if !limit != 1
-               then Printf.fprintf !output "==== model %d\n%s\n" i (Sat.Model.pprint ~sep:"\n" table model)
-               else Printf.fprintf !output "%s\n" (Sat.Model.pprint ~sep:"\n" table model)
-              in Sat.solve_clauses ~verbose:!debug ~limit:!limit ~print:print_model (clauses,table))
+          begin
+          if !only_count then Sat.solve_clauses ~verbose:!debug (clauses,table)
+          else
+            let print_model model i =
+              if !limit != 1
+              then Printf.fprintf !output "==== model %d\n%s\n" i (Sat.Model.pprint ~sep:"\n" table model)
+              else Printf.fprintf !output "%s\n" (Sat.Model.pprint ~sep:"\n" table model)
+            (* Notes:
+              1) print_endline vs. printf: print_endline is a printf with
+              'flush stdout' at the end. If we don't put 'flush', the user
+              won't see the output before scanf asks for some input.
+              2) scanf: I don't know!!! *)
+            (* [continue_asking] is needed by [solve_clauses]; it simply
+               asks after displaying each model if it should continue
+               displaying the next one. *)
+            and continue_asking _ i =
+              Printf.fprintf !output "=== count: %d; continue? (y/n) " i; flush stdout;
+              try Scanf.scanf "%s\n" (fun c -> not (c="q" || c="n"))
+              with End_of_file -> Printf.eprintf "%s"
+                "error: could not enter interactive mode as stdin unexpectedly closed\n";
+                exit_with UNKNOWN
+                   (* stdin unexpectedly closed (e.g., piped cmd) *)
+            (* [continue_limit] is also needed by [solve_clauses]. It stops
+               the display of models as soon as the number of models displayed
+               reaches [limit]. *)
+            and continue_limit _ i = i < !limit
+            in
+            Sat.solve_clauses ~verbose:!debug ~print:print_model
+              ~continue:(if !sat_interactive then continue_asking else continue_limit)
+              (clauses,table)
+          end
         in
         match Sat.ModelSet.cardinal !models with
         | i when !only_count -> Printf.fprintf !output "%d\n" i; exit_with OK
