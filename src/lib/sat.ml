@@ -20,24 +20,12 @@ open Types.Ast
 open Pprint
 open Minisat
 
-(* [print_table] prints the correspondance table between literals (= numbers)
-   and user-defined proposition names, e.g.,
-       'p(1,2) 98'
-   where 98 is the literal id number (given automatically) and 'p(1,2)' is the
-   name of this proposition.
-   NOTE: you can add a prefix to 'p(1,2) 98', e.g.
-     string_of_table ~prefix:"c " table
-   in order to have all lines beginning by 'c' (=comment) in order to comply to
-   the DIMACS format. *)
-let print_table (out:out_channel) ?(prefix="") (table:(Lit.t,string) Hashtbl.t) =
-  let print_lit_and_name lit name = Printf.fprintf out "%s%s %d\n" prefix name (Lit.to_int lit)
-  in Hashtbl.iter print_lit_and_name table
-
 let minisat_clauses_of_cnf ast =
   let num_lit = ref 1 in
   let fresh_lit () = let lit = !num_lit in (incr num_lit; Minisat.Lit.make lit)
   in
-  Cnf.clauses_of_cnf Minisat.Lit.neg fresh_lit ast
+  let clauses,lit_to_str,_ = Cnf.clauses_of_cnf Minisat.Lit.neg fresh_lit ast
+  in clauses,lit_to_str
 
 (* [clauses_to_solver] takes a list of clauses (clause = list of literals)
    and generates an intance of minisat solver.
@@ -53,18 +41,6 @@ let clauses_to_solver ?(verbose=false) (clauses:Lit.t list list) : Minisat.t opt
     | cur::next -> let a = Array.of_list cur in
       if Minisat.Raw.add_clause_a solver a then add_clauses solver next else None
   in add_clauses solver clauses
-
-let print_clauses_to_dimacs (out:out_channel) nblits (clauses:Lit.t list list) : unit =
-  let nbclauses = List.length clauses in
-  let rec string_of_clause (cl:Lit.t list) = match cl with
-    | [] -> "0"
-    | cur::next -> (Lit.to_string cur) ^" "^ (string_of_clause next)
-  and print_listclause (cl:Lit.t list list) = match cl with
-    | [] -> ()
-    | cur::next -> Printf.fprintf out "%s\n" (string_of_clause cur); print_listclause next
-  in Printf.fprintf out "c CNF format file\np cnf %d %d\n" nblits nbclauses;
-  print_listclause clauses
-
 
 (* for printing the Minisat.value type *)
 let string_of_value = function

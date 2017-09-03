@@ -203,6 +203,8 @@ and to_cnf depth (stop:stop) (ast:ast) : ast =
     (* Last important thing: make sure no more Bot/Top are in the formula. *)
     if depth=0 && Eval.has_top_or_bot cnf then to_cnf cnf else cnf
 
+
+
 (* [clauses_of_cnf] translates the cnf ast (Not, And, Or, Prop; no Bot/Top)
    into a CNF formula that takes the form of a list of lists of litterals
    (conjunctions of disjunctions of possibly negated proprositions).
@@ -212,27 +214,73 @@ and to_cnf depth (stop:stop) (ast:ast) : ast =
    - the list of lists of litterals
    - the table literal-to-name
    Note that the total number of literals is exactly equal to the table size;
-   this size includes the special propositions beginning with '&' (e.g., '&4').
-   *)
-   let clauses_of_cnf (neg:'a->'a) (fresh:unit->'a) (ast:ast) : 'a list list * ('a, string) Hashtbl.t =
-    (* num = a number that will serve to identify a literal
-       lit = a literal that has a number inside it to identify it *)
-    let str_to_lit = Hashtbl.create 500 in
-    let lit_to_str = Hashtbl.create 500 in (* this duplicate is for the return value *)
-    let rec process_cnf ast : 'a list list = match ast with
-      | And  (x,y) -> (process_cnf x) @ (process_cnf y)
-      | x when is_clause x -> [process_clause x]
-      | _ -> failwith ("CNF: was expecting a conjunction of clauses but got '" ^ (string_of_ast ~debug:true ast) ^ "'")
-    and process_clause (ast:ast) : 'a list = match ast with
-      | Prop str        -> (gen_lit str)::[]
-      | Not (Prop str) -> (neg (gen_lit str))::[]
-      | Or (x,y) -> process_clause x @ process_clause y
-      | _ -> failwith ("CNF: was expecting a clause but got '" ^ (string_of_ast ~debug:true ast) ^ "'")
-    and gen_lit (s:string) : 'a =
-      try Hashtbl.find str_to_lit s
-      with Not_found ->
-        (let lit = fresh () in
-        Hashtbl.add str_to_lit s lit;
-        Hashtbl.add lit_to_str lit s;
-        lit)
-    in let clauses = process_cnf ast in clauses, lit_to_str
+   this size includes the special propositions beginning with '&' (e.g., '&4'). *)
+let clauses_of_cnf (neg:'a->'a) (fresh:unit->'a) (ast:ast)
+  : 'a list list * ('a, string) Hashtbl.t * (string, 'a) Hashtbl.t =
+  (* num = a number that will serve to identify a literal
+      lit = a literal that has a number inside it to identify it *)
+  let str_to_lit = Hashtbl.create 500 in
+  let lit_to_str = Hashtbl.create 500 in (* this duplicate is for the return value *)
+  let rec process_cnf ast : 'a list list = match ast with
+    | And  (x,y) -> (process_cnf x) @ (process_cnf y)
+    | x when is_clause x -> [process_clause x]
+    | _ -> failwith ("CNF: was expecting a conjunction of clauses but got '" ^ (string_of_ast ~debug:true ast) ^ "'")
+  and process_clause (ast:ast) : 'a list = match ast with
+    | Prop str        -> (gen_lit str)::[]
+    | Not (Prop str) -> (neg (gen_lit str))::[]
+    | Or (x,y) -> process_clause x @ process_clause y
+    | _ -> failwith ("CNF: was expecting a clause but got '" ^ (string_of_ast ~debug:true ast) ^ "'")
+  and gen_lit (s:string) : 'a =
+    try Hashtbl.find str_to_lit s
+    with Not_found ->
+      (let lit = fresh () in
+       Hashtbl.add str_to_lit s lit;
+       Hashtbl.add lit_to_str lit s;
+       lit)
+  in let clauses = process_cnf ast in clauses, lit_to_str, str_to_lit
+
+(** The following functions are for displaying dimacs/qdimacs format.
+    Example for the formula
+        rain=>wet and rain and not wet
+    we get the dimacs file:
+
+        c CNF format file                 <-- by hand
+        p cnf 2 3                         <-- by hand (nb_lits, nb_clauses)
+        -2 1 0                            <-- [print_clauses_to_dimacs]
+        -2 2 0
+        -2 -1 0
+        c wet 1                           <-- (optionnal) [print_table]
+        c rain 2
+*)
+
+(* [print_table] prints the correspondance table between literals (= numbers)
+   and user-defined proposition names, e.g.,
+       'p(1,2) 98'
+   where 98 is the literal id number (given automatically) and 'p(1,2)' is the
+   name of this proposition.
+   NOTE: you can add a prefix to 'p(1,2) 98', e.g.
+     string_of_table ~prefix:"c " table
+   in order to have all lines beginning by 'c' (=comment) in order to comply to
+   the DIMACS format. *)
+let print_table (int_of_lit: 'a->int) (out:out_channel) ?(prefix="") (table:('a,string) Hashtbl.t) =
+  let print_lit_and_name lit name = Printf.fprintf out "%s%s %d\n" prefix name (int_of_lit lit)
+  in Hashtbl.iter print_lit_and_name table
+
+  (* [print_clauses_to_dimacs] prints one disjunction per line ended by 0:
+        -2 1 0
+        -2 2 0
+   IMPORTANT: prints ONLY the clauses. You must print the dimacs/qdimacs
+   header yourself, e.g.:
+       p cnf <nb_lits> <nb_clauses>
+   with
+       <nb_lits> = Hashtbl.length table
+       <nb_clauses> = List.length clauses *)
+let print_clauses_to_dimacs (out:out_channel) (str_of_lit: 'a->string) (clauses:'a list list) : unit =
+  let rec string_of_clause (cl:'a list) = match cl with
+    | [] -> "0"
+    | cur::next -> (str_of_lit cur) ^" "^ (string_of_clause next)
+  and print_listclause (cl:'a list list) = match cl with
+    | [] -> ()
+    | cur::next -> Printf.fprintf out "%s\n" (string_of_clause cur); print_listclause next
+  in
+  print_listclause clauses

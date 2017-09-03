@@ -154,3 +154,76 @@ let cnf ?(debug=false) ast =
   | Exists (x,f) -> Exists (x, process f)
   | inner -> Cnf.ast_to_cnf ~debug inner
   in ast |> process |> quantify_free_variables []
+
+(* [regroup_quantors] gathers all succeeding Forall and Exists to a list
+   of list such that each sublist only contains one type of quantor.
+   Example:
+      Forall ("a",Forall ("b",Exists ("c", Forall ("d",_)))
+   becomes
+      [A of ["a";"b"]; E of ["c"]; A of ["d"]]
+   NOTE: I had to reverse the lists each time because the lists were
+   constructed the wrong way around.
+*)
+type 'a quantlist = A of 'a list | E of 'a list
+let rec regroup_quantors ast quantlist = match ast with
+  | Forall (Prop x,f) ->
+    let rec process_forall ast l = match ast with
+      | Forall (Prop x',f') -> process_forall f' (x'::l)
+      | f' -> (l,f')
+    in
+    let foralls,inner = process_forall f [x] in
+    regroup_quantors inner (A (List.rev foralls) :: quantlist)
+  | Exists (Prop x,f) ->
+    let rec process_exists ast l = match ast with
+      | Exists (Prop x',f') -> process_exists f' (x'::l)
+      | f' -> (l,f')
+    in
+    let exists,inner = process_exists f [x] in
+    regroup_quantors inner (E (List.rev exists) :: quantlist)
+  | inner -> (List.rev quantlist,inner)
+
+(**
+    [qbfclauses_of_cnf] translates an AST (which is in CNF) to three
+    structures:
+    1) a list of quantlist which reprensents the grouped quantifiers in the
+       Prenex Normal Form.
+    2) a list of lists of integers which represents the CNF formula embedded in
+    the Prenex Normal Form.
+    3) a correspondance table 'int -> litteral names'
+    NOTE: I use fold_right (which is non-tail recursive, thus less performant)
+    to avoid the mess yielded by the reversing of the lists with fold_left.
+*)
+let qbfclauses_of_cnf ast =
+  let quants, inner = regroup_quantors ast [] in
+  let num_lit = ref 1 in
+  let fresh_lit () = let lit = !num_lit in incr num_lit; lit in
+  let clauses_int,int_to_str,str_to_int = Cnf.clauses_of_cnf (fun v -> -v) fresh_lit inner in
+  let quantlist_int = quants |> List.fold_left (fun acc lst ->
+    let res = match lst with
+    | A l -> A (List.fold_right (fun p acc -> Hashtbl.find str_to_int p :: acc) l [])
+    | E l -> E (List.fold_right (fun p acc -> Hashtbl.find str_to_int p :: acc) l [])
+    in res::acc
+  ) []
+  in List.rev quantlist_int, clauses_int, int_to_str
+
+(* [print_qdimacs] prints the following:
+   1) dimacs header line ('p cnf 3 2')
+   2) the quantifiers lines grouped (one quantifier per line,
+   beginning with 'e' or 'a' and ending by 0)
+   3) the clauses (one conjunction per line, one line is a disjunction,
+   minus means 'not'). *)
+let print_qdimacs out out_table ast =
+  let quantlist_int,clauses_int,int_to_str = qbfclauses_of_cnf ast in
+  (* Display the mapping table (propositional names -> int) in dimacs comments *)
+  int_to_str |> Cnf.print_table (fun x->x) out_table ~prefix:"c ";
+  (* Display the dimacs' preamble line. *)
+  Printf.fprintf out "p cnf %d %d\n" (Hashtbl.length int_to_str) (List.length clauses_int);
+  (* Display the quantifiers lines *)
+  quantlist_int |> List.iter (fun quantlist ->
+      let open List in let open Printf in
+      match quantlist with
+      | A l -> fprintf out "a%s 0\n" (l |> fold_left (fun acc s -> acc^" "^ string_of_int s) "")
+      | E l -> fprintf out "e%s 0\n" (l |> fold_left (fun acc s -> acc^" "^ string_of_int s) "")
+    );
+  (* Display the clauses in dimacs way *)
+  clauses_int |> Cnf.print_clauses_to_dimacs out string_of_int;

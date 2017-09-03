@@ -277,10 +277,12 @@ let () =
       let ast = Parse.parse_sat ~debug:!debug_syntax ~filename:!input_file_path (string_of_chan !input) |> Eval.eval in
       let clauses,tbl = Cnf.ast_to_cnf ~debug:!debug_cnf ast |> Sat.minisat_clauses_of_cnf
       in
-      (* tbl contains the literal-to-name correspondance table.
-         The number of literals is (Hashtbl.length tbl) *)
-      Sat.print_clauses_to_dimacs !output (Hashtbl.length tbl) clauses;
-      Sat.print_table !output_table ~prefix:(if !output = !output_table then "c " else "") tbl;
+      (* Display the mapping table. *)
+      tbl |> Cnf.print_table (Minisat.Lit.to_int) !output_table ~prefix:(if !output = !output_table then "c " else "");
+      (* Display the dimacs' preamble line. *)
+      Printf.fprintf !output "p cnf %d %d\n" (Hashtbl.length tbl) (List.length clauses);
+      (* Display the dimacs clauses. *)
+      clauses |> Cnf.print_clauses_to_dimacs !output Minisat.Lit.to_string;
       exit_with OK
         (* table_prefix allows to add the 'c' before each line of the table
            display, when and only when everything is outputed in a single
@@ -320,9 +322,7 @@ let () =
         Printf.fprintf stderr "    cnf: %s\n" (Pprint.string_of_ast ~utf8:true cnf)
       end;
       if not !solve_flag then begin
-        Printf.fprintf stderr
-        ("The QDIMACS export has not been implemented yet. But you can --solve!\n");
-        exit_with CMD_UNSUPPORTED;
+        Qbf_of_ast.print_qdimacs !output !output_table cnf
       end
       else (* --solve*)
     #ifdef qbf

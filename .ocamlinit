@@ -13,6 +13,7 @@
 #require "str";;
 #require "fileutils";;
 #require "OUnit";;
+#require "qbf";;
 
 (* The order of the loads is important *)
 #load "msgs.cmo";;
@@ -29,6 +30,9 @@
 #load "sat.cmo";;
 #load "smt.cmo";;
 #load "latex.cmo";;
+(* #load "solveqbf.cmo";; *)
+#load "qbf_of_ast.cmo";;
+
 
 (* From 'utop', you can test small pieces of your code. For example,
    I have been trying my ModelSet thing:
