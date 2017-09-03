@@ -31,6 +31,9 @@ v3.4.0
   - command-line: in --sat mode, the new option --interactive will enable
     the display of one model at a time by pressing any key (q/n to stop).
   - command-line: it is now possible to output QDIMACS using --qbf
+  - (breaking) when displaying DIMACS and QDIMACS with --qbf or --sat,
+    the mapping table (between propositions names and numbers) will
+    be given before the preamble 'p cnf 4 7'.
 v3.2.3
   - added an option (--debug) which enable the display of stacktrace
     on exception catched on exit
