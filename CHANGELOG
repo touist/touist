@@ -30,6 +30,7 @@ v3.4.0
     although the formula is UNSAT (it was caused by a misuse of minisat).
   - command-line: in --sat mode, the new option --interactive will enable
     the display of one model at a time by pressing any key (q/n to stop).
+  - command-line: it is now possible to output QDIMACS using --qbf
 v3.2.3
   - added an option (--debug) which enable the display of stacktrace
     on exception catched on exit
