@@ -33,35 +33,11 @@ let print_table (out:out_channel) ?(prefix="") (table:(Lit.t,string) Hashtbl.t) 
   let print_lit_and_name lit name = Printf.fprintf out "%s%s %d\n" prefix name (Lit.to_int lit)
   in Hashtbl.iter print_lit_and_name table
 
-(* [cnf_to_clauses] translates the cnf into a list of clauses (clause = list of
-   literals). Returns
-   - the list of clauses,
-   - the table literal-to-name (Lit.t doesn't store the proposition name)
-   Note that the total number of literals is exactly equal to the table size.
-   IMPORTANT: ast must NOT have any bot or top. Only props, and, or. *)
-let cnf_to_clauses (ast:ast) : Lit.t list list * (Lit.t,string) Hashtbl.t =
-  (* num = a number that will serve to identify a literal
-     lit = a literal that has a number inside it to identify it *)
-  let str_to_lit = Hashtbl.create 500 in
-  let lit_to_str = Hashtbl.create 500 in (* this duplicate is for the return value *)
+let minisat_clauses_of_cnf ast =
   let num_lit = ref 1 in
-  let rec process_cnf ast : Minisat.Lit.t list list = match ast with
-    | And  (x,y) -> (process_cnf x) @ (process_cnf y)
-    | x when Cnf.is_clause x -> [process_clause x]
-    | _ -> failwith ("CNF: was expecting a conjunction of clauses but got '" ^ (string_of_ast ~debug:true ast) ^ "'")
-  and process_clause (ast:ast) : Minisat.Lit.t list = match ast with
-    | Prop str        -> (gen_lit str)::[]
-    | Not (Prop str) -> (Minisat.Lit.neg (gen_lit str))::[]
-    | Or (x,y) -> process_clause x @ process_clause y
-    | _ -> failwith ("CNF: was expecting a clause but got '" ^ (string_of_ast ~debug:true ast) ^ "'")
-  and gen_lit (s:string) : Lit.t =
-    try Hashtbl.find str_to_lit s
-    with Not_found ->
-      (let lit = Minisat.Lit.make !num_lit in
-       Hashtbl.add str_to_lit s lit; Hashtbl.add lit_to_str lit s;
-       incr num_lit;
-       lit)
-  in let clauses = process_cnf ast in clauses, lit_to_str
+  let fresh_lit () = let lit = !num_lit in (incr num_lit; Minisat.Lit.make lit)
+  in
+  Cnf.clauses_of_cnf Minisat.Lit.neg fresh_lit ast
 
 (* [clauses_to_solver] takes a list of clauses (clause = list of literals)
    and generates an intance of minisat solver.

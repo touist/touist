@@ -203,4 +203,36 @@ and to_cnf depth (stop:stop) (ast:ast) : ast =
     (* Last important thing: make sure no more Bot/Top are in the formula. *)
     if depth=0 && Eval.has_top_or_bot cnf then to_cnf cnf else cnf
 
-
+(* [clauses_of_cnf] translates the cnf ast (Not, And, Or, Prop; no Bot/Top)
+   into a CNF formula that takes the form of a list of lists of litterals
+   (conjunctions of disjunctions of possibly negated proprositions).
+   [neg lit] returns the negation of the litteral (not)
+   [fresh ()] returns a newly generated litteral
+   Returns:
+   - the list of lists of litterals
+   - the table literal-to-name
+   Note that the total number of literals is exactly equal to the table size;
+   this size includes the special propositions beginning with '&' (e.g., '&4').
+   *)
+   let clauses_of_cnf (neg:'a->'a) (fresh:unit->'a) (ast:ast) : 'a list list * ('a, string) Hashtbl.t =
+    (* num = a number that will serve to identify a literal
+       lit = a literal that has a number inside it to identify it *)
+    let str_to_lit = Hashtbl.create 500 in
+    let lit_to_str = Hashtbl.create 500 in (* this duplicate is for the return value *)
+    let rec process_cnf ast : 'a list list = match ast with
+      | And  (x,y) -> (process_cnf x) @ (process_cnf y)
+      | x when is_clause x -> [process_clause x]
+      | _ -> failwith ("CNF: was expecting a conjunction of clauses but got '" ^ (string_of_ast ~debug:true ast) ^ "'")
+    and process_clause (ast:ast) : 'a list = match ast with
+      | Prop str        -> (gen_lit str)::[]
+      | Not (Prop str) -> (neg (gen_lit str))::[]
+      | Or (x,y) -> process_clause x @ process_clause y
+      | _ -> failwith ("CNF: was expecting a clause but got '" ^ (string_of_ast ~debug:true ast) ^ "'")
+    and gen_lit (s:string) : 'a =
+      try Hashtbl.find str_to_lit s
+      with Not_found ->
+        (let lit = fresh () in
+        Hashtbl.add str_to_lit s lit;
+        Hashtbl.add lit_to_str lit s;
+        lit)
+    in let clauses = process_cnf ast in clauses, lit_to_str

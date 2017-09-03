@@ -219,7 +219,7 @@ let () =
       if !equiv_file_path <> "" then begin
         let solve input =
           let ast = Parse.parse_sat ~debug:!debug_syntax ~filename:!input_file_path (string_of_chan input) |> Eval.eval
-          in let models = Cnf.ast_to_cnf ~debug:!debug_cnf ast |> Sat.cnf_to_clauses |> Sat.solve_clauses ~verbose:!debug
+          in let models = Cnf.ast_to_cnf ~debug:!debug_cnf ast |> Sat.minisat_clauses_of_cnf |> Sat.solve_clauses ~verbose:!debug
           in models
         in
         let models = solve !input
@@ -230,7 +230,7 @@ let () =
       end
       else
         let ast = Parse.parse_sat ~debug:!debug_syntax ~filename:!input_file_path (string_of_chan !input) |> Eval.eval in
-        let clauses,table = Cnf.ast_to_cnf ~debug:!debug_cnf ast |> Sat.cnf_to_clauses
+        let clauses,table = Cnf.ast_to_cnf ~debug:!debug_cnf ast |> Sat.minisat_clauses_of_cnf
         in
         let models =
           begin
@@ -275,7 +275,7 @@ let () =
     else
       (* B. solve not asked: print the Sat file *)
       let ast = Parse.parse_sat ~debug:!debug_syntax ~filename:!input_file_path (string_of_chan !input) |> Eval.eval in
-      let clauses,tbl = Cnf.ast_to_cnf ~debug:!debug_cnf ast |> Sat.cnf_to_clauses
+      let clauses,tbl = Cnf.ast_to_cnf ~debug:!debug_cnf ast |> Sat.minisat_clauses_of_cnf
       in
       (* tbl contains the literal-to-name correspondance table.
          The number of literals is (Hashtbl.length tbl) *)

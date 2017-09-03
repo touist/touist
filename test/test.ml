@@ -25,7 +25,7 @@ let test_raise (parse:(string->unit)) (during:Msgs.during) typ nth_msg (loc_expe
     | true -> () (* OK *)
     | false -> OUnit2.assert_failure ("this test didn't give a message at location '"^loc_expected^"' as expected. Instead, got:\n"^Msgs.string_of_msg msg)
 
-let sat text = let _ = Parse.parse_sat text |> Eval.eval |> Cnf.ast_to_cnf |> Sat.cnf_to_clauses in ()
+let sat text = let _ = Parse.parse_sat text |> Eval.eval |> Cnf.ast_to_cnf |> Sat.minisat_clauses_of_cnf in ()
 let smt logic text = let _ = Parse.parse_smt text |> Eval.eval ~smt:true |> Smt.to_smt2 logic in ()
 let qbf text = let _ = Parse.parse_qbf text |> Eval.eval ~smt:true |> Qbf_of_ast.prenex in ()
 
@@ -56,7 +56,7 @@ let test_qbf_raise ?(during=Msgs.Eval) ?(typ=Msgs.Error) ?(nth=0) ?(logic="QF_ID
 let sat_models_are text expected _ =
   OUnit2.assert_equal ~printer:(fun s -> s)
     expected
-    (let ast = Parse.parse_sat text |> Eval.eval in let cl,tbl = Cnf.ast_to_cnf ast |> Sat.cnf_to_clauses in
+    (let ast = Parse.parse_sat text |> Eval.eval in let cl,tbl = Cnf.ast_to_cnf ast |> Sat.minisat_clauses_of_cnf in
       let models_str = ref [] in
         let _ = Sat.solve_clauses ~print:(fun m _ -> models_str := (Sat.Model.pprint ~sep:" " tbl m)::!models_str) (cl,tbl)
           in List.fold_left (fun acc s -> match acc with "" -> s | _ -> s^" | "^acc) "" !models_str)
