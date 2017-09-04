@@ -1,4 +1,4 @@
-(** Processes the CNF-compliant version of the AST given by [Cnf.ast_to_cnf]
+(** Processes the CNF-compliant version of the AST given by {!Cnf.ast_to_cnf}
     to create Minisat-compatible clauses with [minisat_clauses_of_cnf] and solve
     them with [solve_clauses].
 *)

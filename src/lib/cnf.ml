@@ -1,4 +1,4 @@
-(** Processes the "semantically correct" abstract syntax tree (ast) given by [Eval.eval]
+(** Processes the "semantically correct" abstract syntax tree (ast) given by {!Eval.eval}
     to produce a CNF-compliant version of the abstract syntax tree.
 
     [ast_to_cnf] is the main function.

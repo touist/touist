@@ -4,14 +4,14 @@
 
     After this step, the AST (its type is [Types.Ast.ast]) can go through
     different functions:
-    - (1) [Eval.eval] for type-checking and evaluation of the expressions
+    - (1) {!Eval.eval} for type-checking and evaluation of the expressions
         (bigor, bigand, variables...)
-    - (2) [Cnf.ast_to_cnf] and then [Sat.minisat_clauses_of_cnf] to transform
+    - (2) {!Cnf.ast_to_cnf} and then {!Sat.minisat_clauses_of_cnf} to transform
         the AST into a clause ready to use by Minisat
-    - (2') [Smt.to_smt2] to transform the AST into LIB-SMT2
-    - (2'') [Qbf_of_sat.prenex] to transform the CNF AST into QDIMACS
-    - (3) [Sat.clauses_to_solver] and [Sat.solve_clauses] to solve the SAT
-          problem
+    - (2') {!Smt.to_smt2} to transform the AST into LIB-SMT2
+    - (2'') {!Qbf_of_sat.prenex} to transform the CNF AST into QDIMACS
+    - (3) {!Sat.minisat_clauses_to_solver} and {!Sat.solve_clauses} to solve the
+          SAT problem
 *)
 
 open Parser
@@ -20,14 +20,14 @@ open Lexing
 open Msgs
 
 (** [lexer] is used [parse] in order to get the next token of the input
-    stream. It is an intermediate to the [Lexer.token] function (in lexer.mll);
-    - Rationale: the parser only accepts Parser.token; but [Lexer.token] returns
+    stream. It is an intermediate to the {!Lexer.token} function (in lexer.mll);
+    - Rationale: the parser only accepts Parser.token; but {!Lexer.token} returns
       Parser.token list. [lexer] acts as a buffer, returning one by one the list
-      of tokens returned by [Lexer.token].
+      of tokens returned by {!Lexer.token}.
     - Drawback: ALL tokens must be returned as a list, even though most token
       case returns a single token, e.g.,
         ["=>" { IMPLIES }]   must be translated into     [{ [IMPLIES] }]
-    - Note: see details in [Lexer.token] (file lexer.mll)
+    - Note: see details in {!Lexer.token} (file lexer.mll)
 
     @raise Lexer.Error (message, loc) where 'loc' contains the start/end of the
         faulty item

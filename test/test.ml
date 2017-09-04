@@ -216,7 +216,7 @@ run_test_tt_main (
   "powerset simple test">::(sat_expands_to "f(powerset([a,b]))" "f([[],[a],[a,b],[b]])")
 ];
 
-"samples of code that should raise errors in [Eval.eval]">:::[ (* 'c' is the testing context *)
+"samples of code that should raise errors in {!Eval.eval}">:::[ (* 'c' is the testing context *)
   "undefined var">::         (test_sat_raise "1:4" "   $a");
   "bigand: too many vars">::(test_sat_raise "1:8" "bigand $i,$j in [1]: p end");
   "bigand: too many sets">::(test_sat_raise "1:8" "bigand $i in [1],[2]: p end");

@@ -1,7 +1,7 @@
 (** Processes the "semantically correct" abstract syntaxic tree given by
-    [Eval.eval] and produces a string in SMT-LIB2 format. 
-    
-    [to_smt2] is the main function. *)
+    {!Eval.eval} and produces a string in SMT-LIB2 format.
+
+    {!to_smt2} is the main function. *)
 
 (* Project TouIST, 2015. Easily formalize and solve real-world sized problems
  * using propositional logic and linear theory of reals with a nice language and GUI.

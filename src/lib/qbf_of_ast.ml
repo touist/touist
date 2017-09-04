@@ -1,7 +1,7 @@
-(** Transform a semantically correct (=returned by [Eval.eval]) ast into Prenex
+(** Transform a semantically correct (=returned by {!Eval.eval}) ast into Prenex
     form, CNF and QDIMACS.
 
-    To transform into QDIMACS, you should call [prenex], [cnf] and finally
+    To transform into QDIMACS, you should call {!prenex}, [cnf] and finally
     [print_qdimacs].
 *)
 open Types.Ast
@@ -14,7 +14,7 @@ let add_suffix name =
   with Not_found -> name ^ "_1"
 
 (** [to_prenex] applies the 'transformation rules' listed on wikipedia (fr) in
-    order to transform a valid (= output of [Eval.eval]) AST into Prenex
+    order to transform a valid (= output of {!Eval.eval}) AST into Prenex
     Normal Form (PNF). Because we do not know any to transform 'xor' and '<=>',
     these two connectors will be re-written using the other connectors.
 
@@ -143,8 +143,8 @@ let rec quantify_free_variables env ast =
   | other -> let free = search_free env other in
     free |> remove_dups |> List.fold_left (fun acc x -> Exists (Prop x,acc)) other
 
-(** [prenex ast] loops over [to_prenex] as long as the formula is not in prenex
-    form. *)
+(** [prenex ast] loops over {!to_prenex} as long as the formula is not in
+    prenex form. *)
 let prenex ?(debug=false) ast : ast =
   let rec to_prenex_loop ast =
     if debug then Printf.printf "step: %s\n" (Pprint.string_of_ast ~utf8:true ast);
@@ -154,7 +154,7 @@ let prenex ?(debug=false) ast : ast =
   let final = intermediate |> quantify_free_variables [] in
   final
 
-(** [cnf ast] calls [Cnf.cnf] on the inner formula (with no quantifiers) and
+(** [cnf ast] calls {!Cnf.cnf} on the inner formula (with no quantifiers) and
     existentially quantifies any tseitlin variable in an innermost way. *)
 let cnf ?(debug=false) ast =
   let rec process = function
@@ -162,6 +162,8 @@ let cnf ?(debug=false) ast =
   | Exists (x,f) -> Exists (x, process f)
   | inner -> Cnf.ast_to_cnf ~debug inner
   in ast |> process |> quantify_free_variables []
+
+  type 'a quantlist = A of 'a list | E of 'a list
 
 (** [regroup_quantors] gathers all succeeding Forall and Exists to a list
     of list such that each sublist only contains one type of quantor.
@@ -172,9 +174,7 @@ let cnf ?(debug=false) ast =
     ]}
 
     NOTE: I had to reverse the lists each time because the lists were
-    constructed the wrong way around.
-*)
-type 'a quantlist = A of 'a list | E of 'a list
+    constructed the wrong way around. *)
 let rec regroup_quantors ast quantlist = match ast with
   | Forall (Prop x,f) ->
     let rec process_forall ast l = match ast with
@@ -217,8 +217,8 @@ let qbfclauses_of_cnf ast =
   ) []
   in List.rev quantlist_int, clauses_int, int_to_str
 
-(** [print_qdimacs out out_table ast] takes a Prenex-CNF formula [ast] and
-    prints the following:
+(** [print_qdimacs out out_table ast] takes a Prenex-CNF formula
+    {!Types.Ast.ast} and prints the following:
     - 1) the mapping table (litterals int to name)
     - 2) dimacs header line ('p cnf 3 2')
     - 3) the quantifiers lines grouped (one quantifier per line, beginning with

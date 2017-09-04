@@ -1,4 +1,5 @@
-(** Definition of types [Ast.ast] and [AstSet] constituting the abstract syntaxic tree *)
+(** Definition of types {!Ast.ast} and {!AstSet} constituting the
+    Abstract Syntaxic Tree *)
 
 (* Project TouIST, 2015. Easily formalize and solve real-world sized problems
  * using propositional logic and linear theory of reals with a nice language and GUI.

@@ -7,9 +7,9 @@ open Types.Ast
 (* [ocamlqbf_of_ast] transforms a touist quantified formula to a Qbf.QFormula.
    The formula does no need to be in cnf. After calling this function, you
    should use [QFormula.cnf].
-   This function had been written before [Qbf_of_ast.cnf] existed, this is why
+   This function had been written before {!Qbf_of_ast.cnf} existed, this is why
    I wrote a second function [qcnf_of_cnf] which allows me to use my own
-   CNF function (i.e., [Qbf_of_ast.cnf]). *)
+   CNF function (i.e., {!Qbf_of_ast.cnf}). *)
 let rec ocamlqbf_of_ast (ast:ast) : Qbf.QFormula.t * (Qbf.Lit.t,string) Hashtbl.t =
   let str_to_lit = Hashtbl.create 500 in
   let lit_to_str = Hashtbl.create 500 in (* this duplicate is for the return value *)

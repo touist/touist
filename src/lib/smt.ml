@@ -1,5 +1,5 @@
 (** Processes the "semantically correct" abstract syntaxic tree given by
-    [Eval.eval] and produces a string in SMT-LIB2 format. 
+    {!Eval.eval} and produces a string in SMT-LIB2 format. 
     
     [to_smt2] is the main function. *)
 
