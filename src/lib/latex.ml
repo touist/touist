@@ -1,4 +1,4 @@
-(** Transform AST to latex.
+(** Transform any AST (at any stage of transformation) to latex.
 
     Note that the headers are not included; if you want to compile
     the resulting latex text in a real latex document, you would need
@@ -27,16 +27,16 @@ open Pprint
 
 let rm_dollar x = String.sub x 1 (String.length x - 1)
 
-(* Idea for adding the needed parenthesis (for understanding the priorities)
-   in the latex:
-   1. As long as the top formula finds 'and', we don't need parenthesis
-   2. If the top formula only contains 'and', we can omit the parenthesis
-   3. Big operators should have inside parenthesis when it contains anything
+(** Idea for adding the needed parenthesis (for understanding the priorities)
+    in the latex:
+    - As long as the top formula finds 'and', we don't need parenthesis
+    - If the top formula only contains 'and', we can omit the parenthesis
+    - Big operators should have inside parenthesis when it contains anything
       non-unary: or, and, =>, <=>
-   4. Big operators should not have inside parenthesis when they contain
+    - Big operators should not have inside parenthesis when they contain
       something unary except for 'not' (?):
       bigand, bigor, exists, forall, not
-
+    {[
     a and b or c               ->          (a and b or c)
     a and b and c              ->          <same>
     bigand x: x                ->          <same>
@@ -44,12 +44,13 @@ let rm_dollar x = String.sub x 1 (String.length x - 1)
     a and bigand x: x          ->          <same>
     a or bigand x: x           ->           (a or bigand x: x)
     a or bigand x: x and y end ->           (a or bigand x: (x and y))
+    ]}
 *)
 
-(* [latex_of_ast] turns an AST into latex. Two latex variants are targeted:
-   * for light latex processors (mathjax, jlatexmath), you should use
-     ~full:false
-   * for fully-featured latex processors, you can use ~full:true. *)
+(** [latex_of_ast] turns an AST into latex. Two latex variants are targeted:
+    - for light latex processors (mathjax, jlatexmath), you should use
+      [~full:false]
+    - for fully-featured latex processors, you can use [~full:true]. *)
 let rec latex_of_ast ~full ast =
   let latex_of_ast ast = latex_of_ast ~full ast in
   let latex_of_commalist = latex_of_commalist ~full in
@@ -144,9 +145,9 @@ let rec latex_of_ast ~full ast =
   and escape_underscore txt =
     Str.global_replace (Str.regexp "_") "\\\\_" txt
 
-(* [ast_fun] will apply f on all *formula*-related elements of the AST where
-   cond is true. The tranversal order should not be considered.
-   Whenever a non-formula is given, acc will be immediatly returned. *)
+(** [ast_fun] will apply f on all *formula*-related elements of the AST where
+    cond is true. The tranversal order should not be considered.
+    Whenever a non-formula is given, acc will be immediatly returned. *)
 and ast_fun (f:('a -> ast -> 'a)) (acc:'a) ast : 'a =
   let acc = f acc ast in
   let ast_fun' ast acc = ast_fun f acc ast in

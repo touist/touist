@@ -1,5 +1,8 @@
 (** Transform a semantically correct (=returned by [Eval.eval]) ast into Prenex
     form, CNF and QDIMACS.
+
+    To transform into QDIMACS, you should call [prenex], [cnf] and finally
+    [print_qdimacs].
 *)
 open Types.Ast
 
@@ -51,7 +54,7 @@ let rec to_prenex debug quant_l conflict_l only_rename ast : ast =
     (if only_rename then "traversing  " else "transforming")
     (Pprint.string_of_ast ~utf8:true ast);
 
-  (* To transform into prenex, I want to traverse recursively the AST so that
+  (** To transform into prenex, I want to traverse recursively the AST so that
      in every traversal of each branch, only ONE transformation can happen.
      Do do that, we use the variable [only_rename] which is true if one
      transformation has already happened previously in the recursion.
@@ -116,8 +119,8 @@ let rec is_prenex = function
   | Exists (_,f) | Forall (_,f) -> is_prenex f
   | f -> is_unquant f
 
-(* [] takes a prenex form and quantifies existentially any free variable
-   in the innermost way possible. *)
+(* [quantify_free_variables] takes a prenex form and quantifies existentially
+   any free variable in the innermost way possible. *)
 let rec quantify_free_variables env ast =
   let rec search_free env ast =
     match ast with
@@ -140,8 +143,8 @@ let rec quantify_free_variables env ast =
   | other -> let free = search_free env other in
     free |> remove_dups |> List.fold_left (fun acc x -> Exists (Prop x,acc)) other
 
-(* [prenex] loops over [to_prenex] as long as the formula is not in prenex
-   form. *)
+(** [prenex ast] loops over [to_prenex] as long as the formula is not in prenex
+    form. *)
 let prenex ?(debug=false) ast : ast =
   let rec to_prenex_loop ast =
     if debug then Printf.printf "step: %s\n" (Pprint.string_of_ast ~utf8:true ast);
@@ -151,8 +154,8 @@ let prenex ?(debug=false) ast : ast =
   let final = intermediate |> quantify_free_variables [] in
   final
 
-(* [cnf] calls Cnf.cnf on the inner formula (with no quantifiers) and
-   existentially quantifies any tseitlin variable in an innermost way. *)
+(** [cnf ast] calls [Cnf.cnf] on the inner formula (with no quantifiers) and
+    existentially quantifies any tseitlin variable in an innermost way. *)
 let cnf ?(debug=false) ast =
   let rec process = function
   | Forall (x,f) -> Forall (x, process f)
@@ -160,14 +163,14 @@ let cnf ?(debug=false) ast =
   | inner -> Cnf.ast_to_cnf ~debug inner
   in ast |> process |> quantify_free_variables []
 
-(* [regroup_quantors] gathers all succeeding Forall and Exists to a list
-   of list such that each sublist only contains one type of quantor.
-   Example:
-      Forall ("a",Forall ("b",Exists ("c", Forall ("d",_)))
-   becomes
-      [A of ["a";"b"]; E of ["c"]; A of ["d"]]
-   NOTE: I had to reverse the lists each time because the lists were
-   constructed the wrong way around.
+(** [regroup_quantors] gathers all succeeding Forall and Exists to a list
+    of list such that each sublist only contains one type of quantor.
+    Example:
+       Forall ("a",Forall ("b",Exists ("c", Forall ("d",_)))
+    becomes
+       [A of ["a";"b"]; E of ["c"]; A of ["d"]]
+    NOTE: I had to reverse the lists each time because the lists were
+    constructed the wrong way around.
 *)
 type 'a quantlist = A of 'a list | E of 'a list
 let rec regroup_quantors ast quantlist = match ast with
@@ -187,8 +190,7 @@ let rec regroup_quantors ast quantlist = match ast with
     regroup_quantors inner (E (List.rev exists) :: quantlist)
   | inner -> (List.rev quantlist,inner)
 
-(**
-    [qbfclauses_of_cnf] translates an AST (which is in CNF) to three
+(** [qbfclauses_of_cnf] translates an AST (which is in CNF) to three
     structures:
     1) a list of quantlist which reprensents the grouped quantifiers in the
        Prenex Normal Form.
@@ -211,12 +213,14 @@ let qbfclauses_of_cnf ast =
   ) []
   in List.rev quantlist_int, clauses_int, int_to_str
 
-(* [print_qdimacs] prints the following:
-   1) dimacs header line ('p cnf 3 2')
-   2) the quantifiers lines grouped (one quantifier per line,
-   beginning with 'e' or 'a' and ending by 0)
-   3) the clauses (one conjunction per line, one line is a disjunction,
-   minus means 'not'). *)
+(** [print_qdimacs out out_table ast] takes a Prenex-CNF formula [ast] and
+    prints the following:
+
+    1) dimacs header line ('p cnf 3 2')
+    2) the quantifiers lines grouped (one quantifier per line, beginning with
+    'e' or 'a' and ending by 0)
+    3) the clauses (one conjunction per line, one line is a disjunction,
+    minus means 'not'). *)
 let print_qdimacs out out_table ast =
   let quantlist_int,clauses_int,int_to_str = qbfclauses_of_cnf ast in
   (* Display the mapping table (propositional names -> int) in dimacs comments *)
