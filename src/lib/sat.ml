@@ -1,10 +1,9 @@
-(** Processes the CNF-compliant version of the abstract syntaxic tree given by [Cnf.ast_to_cnf]
-    and produces a string in DIMACS format.
+(** Processes the CNF-compliant version of the AST given by [Cnf.ast_to_cnf]
+    to create Minisat-compatible clauses with [minisat_clauses_of_cnf] and solve
+    them with [solve_clauses].
+*)
 
-    [cnf_to_clauses] is the main function. *)
-
-(**
- * Project TouIST, 2015. Easily formalize and solve real-world sized problems
+(* Project TouIST, 2015. Easily formalize and solve real-world sized problems
  * using propositional logic and linear theory of reals with a nice language and GUI.
  *
  * https://github.com/touist/touist
@@ -13,13 +12,16 @@
  * This program and the accompanying materials are made available
  * under the terms of the GNU Lesser General Public License (LGPL)
  * version 2.1 which accompanies this distribution, and is available at
- * http://www.gnu.org/licenses/lgpl-2.1.html
-*)
+ * http://www.gnu.org/licenses/lgpl-2.1.html *)
 
 open Types.Ast
 open Pprint
 open Minisat
 
+(** [minisat_clauses_of_cnf ast] takes a CNF [ast] and outputs
+    - a list of lists of Minisat litterals,
+    - a mapping table (Minisat litterals -> name of the proposition)
+*)
 let minisat_clauses_of_cnf ast =
   let num_lit = ref 1 in
   let fresh_lit () = let lit = !num_lit in (incr num_lit; Minisat.Lit.make lit)
@@ -27,11 +29,11 @@ let minisat_clauses_of_cnf ast =
   let clauses,lit_to_str,_ = Cnf.clauses_of_cnf Minisat.Lit.neg fresh_lit ast
   in clauses,lit_to_str
 
-(* [clauses_to_solver] takes a list of clauses (clause = list of literals)
-   and generates an intance of minisat solver.
-   If, at any moment during the adding of the clauses, the formula becomes
-   unsat, [clauses_to_solver] will return None. If we continued to add the
-   other clauses, they would be discarded (not added) by minisat anyway. *)
+(** [clauses_to_solver] takes a list of clauses (clause = list of literals)
+    and generates an intance of minisat solver.
+    If, at any moment during the adding of the clauses, the formula becomes
+    unsat, [clauses_to_solver] will return None. If we continued to add the
+    other clauses, they would be discarded (not added) by minisat anyway. *)
 let clauses_to_solver ?(verbose=false) (clauses:Lit.t list list) : Minisat.t option =
   let solver = Minisat.create () in
   if verbose then set_verbose solver 10;
@@ -42,13 +44,13 @@ let clauses_to_solver ?(verbose=false) (clauses:Lit.t list list) : Minisat.t opt
       if Minisat.Raw.add_clause_a solver a then add_clauses solver next else None
   in add_clauses solver clauses
 
-(* for printing the Minisat.value type *)
+(** for printing the Minisat.value type *)
 let string_of_value = function
   | V_true -> "1"
   | V_false -> "0"
   | _ -> "?"
 
-(* A container for remembering a model *)
+(** A container for remembering a model *)
 module Model =
 struct
   type t = (Minisat.Lit.t * Minisat.value) list
@@ -64,26 +66,21 @@ struct
       "" model
 end
 
-(* A set that contains all the models already found. *)
+(** A set that contains all the models already found. *)
 module ModelSet = struct
   include Set.Make(Model)
   let dump models = fold (fun m acc -> (Model.dump m) ^ "\n" ^ acc) models ""
   let pprint table models = fold (fun m acc -> (Model.pprint table m) ^ "=====\n" ^ acc) models ""
 end
 
-(* [get_model] retrieves the valuations from the current state of the solver
-   and put them into a Model.t.
-   [discard] must return true if the literal that is mapped to the given
-   proposition name shouldn't be in the model. *)
+(** [get_model] retrieves the valuations from the current state of the solver
+    and put them into a Model.t.
+    [discard] must return true if the literal that is mapped to the given
+    proposition name shouldn't be in the model. *)
 let get_model solver (table:(Lit.t,string) Hashtbl.t) (discard:string->bool): Model.t =
-  Hashtbl.fold (fun lit name acc -> 
-      if not (discard name) then (lit,Minisat.value solver lit)::acc else acc) 
+  Hashtbl.fold (fun lit name acc ->
+      if not (discard name) then (lit,Minisat.value solver lit)::acc else acc)
     table []
-
-(* [is_dummy] filters the 'dummy' literals that were introduced during
-   cnf conversion; these literals are identified by their prefix '&'.
-   Returns true if the given name corresponds to is a dummy literal *)
-let is_dummy (name:string) : bool = name.[0] = '&'
 
 (* [string_of_clause] dumps the clause in its literal-number form:
    e.g., 1 -5 3 9 -2 -7 *)
@@ -164,7 +161,7 @@ let solve_clauses
       || not (Minisat.Raw.solve solver [||])
       then models
       else
-        let model = get_model solver table (is_dummy) (* is_dummy removes &1 lits *)
+        let model = get_model solver table Cnf.is_dummy (* is_dummy removes &1 lits *)
         and has_next_model = counter_current_model solver table in
         let is_duplicate = Hashtbl.mem models_hash model in
         match is_duplicate,has_next_model with

@@ -87,7 +87,7 @@ XOCamlbuildExtraArgs: -menhir \"menhir --table --inspection -v -la 2 --explain\"
 Library touist
   Install$:       flag(lib)
   Path:           src/lib
-  Modules:        Parse,Eval,Cnf,Sat,Smt,Pprint,Latex,Msgs,Types,Qbf_of_ast
+  Modules:        Parse,Eval,Cnf,Sat,Smt,Qbf_of_ast,Pprint,Latex,Msgs,Types
   InternalModules: Lexer,Parser,Parser_error_report
   BuildTools+:    menhir, cppo
   BuildDepends:   menhirLib (>= 20151023), fileutils (>= 0.4.0), str,

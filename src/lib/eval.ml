@@ -1,5 +1,6 @@
-(** Functions for semantic analysis of the abstract syntaxic tree produced by [Parse.parse].
-    
+(** Evaluate an AST produced by [Parse.parse] so it becomes a semantically
+    correct formula.
+
     [eval] is the main function. *)
 
 (* Project TouIST, 2015. Easily formalize and solve real-world sized problems

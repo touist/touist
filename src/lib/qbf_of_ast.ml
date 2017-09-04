@@ -165,10 +165,12 @@ let cnf ?(debug=false) ast =
 
 (** [regroup_quantors] gathers all succeeding Forall and Exists to a list
     of list such that each sublist only contains one type of quantor.
-    Example:
+    Example:   {[
        Forall ("a",Forall ("b",Exists ("c", Forall ("d",_)))
-    becomes
+    ]}  becomes  {[
        [A of ["a";"b"]; E of ["c"]; A of ["d"]]
+    ]}
+
     NOTE: I had to reverse the lists each time because the lists were
     constructed the wrong way around.
 *)
@@ -192,13 +194,15 @@ let rec regroup_quantors ast quantlist = match ast with
 
 (** [qbfclauses_of_cnf] translates an AST (which is in CNF) to three
     structures:
-    1) a list of quantlist which reprensents the grouped quantifiers in the
-       Prenex Normal Form.
-    2) a list of lists of integers which represents the CNF formula embedded in
-    the Prenex Normal Form.
-    3) a correspondance table 'int -> litteral names'
-    NOTE: I use fold_right (which is non-tail recursive, thus less performant)
-    to avoid the mess yielded by the reversing of the lists with fold_left.
+    - 1) a list of quantlist which reprensents the grouped quantifiers in the
+         Prenex Normal Form.
+    - 2) a list of lists of integers which represents the CNF formula embedded
+         in the Prenex Normal Form.
+    - 3) a correspondance table 'int -> litteral names'
+
+    NOTE: I use [fold_right] (which is non-tail recursive, thus less
+    performant) to avoid the mess yielded by the reversing of the lists with
+    [fold_left].
 *)
 let qbfclauses_of_cnf ast =
   let quants, inner = regroup_quantors ast [] in
@@ -215,11 +219,11 @@ let qbfclauses_of_cnf ast =
 
 (** [print_qdimacs out out_table ast] takes a Prenex-CNF formula [ast] and
     prints the following:
-
-    1) dimacs header line ('p cnf 3 2')
-    2) the quantifiers lines grouped (one quantifier per line, beginning with
+    - 1) the mapping table (litterals int to name)
+    - 2) dimacs header line ('p cnf 3 2')
+    - 3) the quantifiers lines grouped (one quantifier per line, beginning with
     'e' or 'a' and ending by 0)
-    3) the clauses (one conjunction per line, one line is a disjunction,
+    - 4) the clauses (one conjunction per line, one line is a disjunction,
     minus means 'not'). *)
 let print_qdimacs out out_table ast =
   let quantlist_int,clauses_int,int_to_str = qbfclauses_of_cnf ast in

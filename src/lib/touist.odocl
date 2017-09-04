@@ -1,13 +1,13 @@
 # OASIS_START
-# DO NOT EDIT (digest: a0a79b5969cb89b32689fdfa28fc8fef)
+# DO NOT EDIT (digest: f440900a3585471d2fa05f62999da004)
 Parse
 Eval
 Cnf
 Sat
 Smt
+Qbf_of_ast
 Pprint
 Latex
 Msgs
 Types
-Qbf_of_ast
 # OASIS_STOP
