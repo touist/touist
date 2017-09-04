@@ -1,5 +1,5 @@
 # OASIS_START
-# DO NOT EDIT (digest: cac3cc7cdd96d2d420166ccdeedd2089)
+# DO NOT EDIT (digest: d2a259416385c27fff7c6d5ae0ec57c9)
 Parse
 Eval
 Cnf
@@ -9,6 +9,7 @@ Pprint
 Latex
 Msgs
 Types
+Qbf_of_ast
 Lexer
 Parser
 Parser_error_report

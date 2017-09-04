@@ -1,26 +1,26 @@
 (** Processes the "semantically correct" abstract syntax tree (ast) given by [Eval.eval]
     to produce a CNF-compliant version of the abstract syntax tree.
-    
-    [ast_to_cnf] is the main function. 
-    
+
+    [ast_to_cnf] is the main function.
+
     {2 Vocabulary}
-    
+
     {ul{- Literal:
       a possibly negated proposition; we denote them as a, b... and
       their type is homogenous to [Prop _] or [Not(Prop _)] or [Top] or [Bottom].
       Exples:
          - [   a        ]                        is a literal,
          - [   not b    ]                        is a literal.
-    
+
     }{- Clause:
       a disjunction (= separated by "or") of possibly negated literals.
       Example of clause:
         - [   a or not b or c or d   ]          is a clause
-    
+
     }{- Conjunction:
       literals separated by "and"; example:
         - [   a and b and not and not d    ]    is a conjunction
-    
+
     }{- AST:
       abstract syntax tree; it is homogenous to Types.Ast.ast
       and is a recursive tree representing a formula, using Or, And, Implies...
@@ -33,7 +33,7 @@
       is a conjunction of disjunctions of literals. For example:
         - [   (a or not b) and (not c and d)   ]    is a CNF form
         - [   (a and b) or not (c or d)        ]    is not a CNF form
-    
+
     }}
 *)
 

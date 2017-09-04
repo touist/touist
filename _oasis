@@ -87,11 +87,14 @@ XOCamlbuildExtraArgs: -menhir \"menhir --table --inspection -v -la 2 --explain\"
 Library touist
   Install$:       flag(lib)
   Path:           src/lib
-  Modules:        Parse,Eval,Cnf,Sat,Smt,Pprint,Latex,Msgs,Types
+  Modules:        Parse,Eval,Cnf,Sat,Smt,Pprint,Latex,Msgs,Types,Qbf_of_ast
   InternalModules: Lexer,Parser,Parser_error_report
   BuildTools+:    menhir, cppo
   BuildDepends:   menhirLib (>= 20151023), fileutils (>= 0.4.0), str,
                   minisat, cppo_ocamlbuild (>= 0.9.4)
+# From version 1.6.0, cppo and cppo_ocamlbuild are in two separate opam
+# packages. Before 0.9.4, cppo_ocamlbuild did not exist. Also, I only use the
+# dependency 'cppo_ocamlbuild' because 'cppo_ocamlbuild' depends on 'cppo'.
 
 Library touist_yices2
   Build$:         flag(yices2)
@@ -158,7 +161,7 @@ Document touist
   XOCamlbuildPath: src/lib
   XOCamlbuildLibraries: touist
   XOCamlbuildExtraArgs: -docflags \"-colorize-code -short-functors -charset utf-8\"
-  XOCamlbuildExtraArgs+:-use-menhir -menhir \"menhir --table --inspection -v -la 2\"
+  XOCamlbuildExtraArgs+: -use-menhir -menhir \"menhir --table --inspection -v -la 2\"
 
 SourceRepository master
   Type:           git

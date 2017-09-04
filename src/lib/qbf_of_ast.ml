@@ -1,3 +1,6 @@
+(** Transform a semantically correct (=returned by [Eval.eval]) ast into Prenex
+    form, CNF and QDIMACS.
+*)
 open Types.Ast
 
 let add_suffix name =
@@ -7,18 +10,20 @@ let add_suffix name =
       (fun str -> ((str |> matched_string |> int_of_string)+1) |> string_of_int)
   with Not_found -> name ^ "_1"
 
-(** [to_prenex] applies the 'transformation rules' listed on wikipedia (fr).
-    I know, this is not serious... :)
-    WARNING: this function will remove all xor and equiv as they cannot be
-    translated into prenex form otherwise.
-    * 'quant_l' is the list of previously quantified propositions. We need this
+(** [to_prenex] applies the 'transformation rules' listed on wikipedia (fr) in
+    order to transform a valid (= output of [Eval.eval]) AST into Prenex
+    Normal Form (PNF). Because we do not know any to transform 'xor' and '<=>',
+    these two connectors will be re-written using the other connectors.
+
+    [quant_l] is the list of previously quantified propositions. We need this
     to rename any overlapping quantor scope when transforming to prenex form.
-    * 'conflict_t' is the list of must-currenlty-be-renamed list of props (as
+    [conflict_t] is the list of must-currenlty-be-renamed list of props (as
     strings).
-    * 'only_rename' allows us to skip the subsequent transformations if one
+    [only_rename] allows us to skip the subsequent transformations if one
     of the 14 transformations has been performed in the recursion. We
     only want one exists/forall transformation per to_prenex full recursion
-    because of the variable renaming. *)
+    because of the variable renaming.
+*)
 let rec to_prenex debug quant_l conflict_l only_rename ast : ast =
   let string_of_prop prop = match prop with
     | Prop name -> name
