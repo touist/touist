@@ -322,7 +322,24 @@ let () =
         Printf.fprintf stderr "    cnf: %s\n" (Pprint.string_of_ast ~utf8:true cnf)
       end;
       if not !solve_flag then begin
-        Qbf_of_ast.print_qdimacs !output !output_table cnf
+        let open Qbf_of_ast in
+        let quantlist_int,clauses_int,int_to_str = qbfclauses_of_cnf ast in
+        (* Display the mapping table (propositional names -> int)
+           1) if output = output_table, append 'c' (dimacs comments)
+           2) if output != output_table, print it as-is into output_table *)
+        int_to_str |> Cnf.print_table (fun x->x) !output_table
+          ~prefix:(if !output = !output_table then "" else "c ");
+        (* Display the dimacs' preamble line. *)
+        Printf.fprintf !output "p cnf %d %d\n" (Hashtbl.length int_to_str) (List.length clauses_int);
+        (* Display the quantifiers lines *)
+        quantlist_int |> List.iter (fun quantlist ->
+            let open List in let open Printf in
+            match quantlist with
+            | A l -> fprintf !output "a%s 0\n" (l |> fold_left (fun acc s -> acc^" "^ string_of_int s) "")
+            | E l -> fprintf !output "e%s 0\n" (l |> fold_left (fun acc s -> acc^" "^ string_of_int s) "")
+          );
+        (* Display the clauses in dimacs way *)
+        clauses_int |> Cnf.print_clauses_to_dimacs !output string_of_int;
       end
       else (* --solve*)
     #ifdef qbf
