@@ -34,6 +34,7 @@ v3.4.0
   - (breaking) when displaying DIMACS and QDIMACS with --qbf or --sat,
     the mapping table (between propositions names and numbers) will
     be given before the preamble 'p cnf 4 7'.
+  - command-line: fixed --latex that failing without --linter
 v3.2.3
   - added an option (--debug) which enable the display of stacktrace
     on exception catched on exit
