@@ -170,7 +170,7 @@ let () =
   if !output_file_path <> ""
   then output := open_out !output_file_path;
 
-  if !output_table_file_path <> "" && !mode = Sat
+  if !output_table_file_path <> ""
   then output_table := open_out !output_table_file_path;
 
   if !equiv_file_path <> ""
@@ -322,21 +322,20 @@ let () =
         Printf.fprintf stderr "    cnf: %s\n" (Pprint.string_of_ast ~utf8:true cnf)
       end;
       if not !solve_flag then begin
-        let open Qbf_of_ast in
-        let quantlist_int,clauses_int,int_to_str = qbfclauses_of_cnf ast in
+        let quantlist_int,clauses_int,int_to_str = Qbf_of_ast.qbfclauses_of_cnf cnf in
         (* Display the mapping table (propositional names -> int)
            1) if output = output_table, append 'c' (dimacs comments)
            2) if output != output_table, print it as-is into output_table *)
         int_to_str |> Cnf.print_table (fun x->x) !output_table
-          ~prefix:(if !output = !output_table then "" else "c ");
+          ~prefix:(if !output = !output_table then "c " else "");
         (* Display the dimacs' preamble line. *)
         Printf.fprintf !output "p cnf %d %d\n" (Hashtbl.length int_to_str) (List.length clauses_int);
         (* Display the quantifiers lines *)
         quantlist_int |> List.iter (fun quantlist ->
             let open List in let open Printf in
             match quantlist with
-            | A l -> fprintf !output "a%s 0\n" (l |> fold_left (fun acc s -> acc^" "^ string_of_int s) "")
-            | E l -> fprintf !output "e%s 0\n" (l |> fold_left (fun acc s -> acc^" "^ string_of_int s) "")
+            | Qbf_of_ast.A l -> fprintf !output "a%s 0\n" (l |> fold_left (fun acc s -> acc^" "^ string_of_int s) "")
+            | Qbf_of_ast.E l -> fprintf !output "e%s 0\n" (l |> fold_left (fun acc s -> acc^" "^ string_of_int s) "")
           );
         (* Display the clauses in dimacs way *)
         clauses_int |> Cnf.print_clauses_to_dimacs !output string_of_int;
