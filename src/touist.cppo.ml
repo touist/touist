@@ -176,37 +176,38 @@ let () =
   if !equiv_file_path <> ""
   then input_equiv := open_in !equiv_file_path;
 
+  let input_text = string_of_chan !input in
+
   (* latex = parse and transform with latex_of_ast *)
   (* linter = only show syntax and semantic errors *)
   if !latex || !latex_full || !linter then begin
     let ast_plain =
       match !mode with
-      | Sat -> Parse.parse_sat ~debug:!debug_syntax ~filename:!input_file_path (string_of_chan !input)
-      | Smt -> Parse.parse_smt ~debug:!debug_syntax ~filename:!input_file_path (string_of_chan !input)
-      | Qbf -> Parse.parse_qbf ~debug:!debug_syntax ~filename:!input_file_path (string_of_chan !input)
+      | Sat -> Parse.parse_sat ~debug:!debug_syntax ~filename:!input_file_path input_text
+      | Smt -> Parse.parse_smt ~debug:!debug_syntax ~filename:!input_file_path input_text
+      | Qbf -> Parse.parse_qbf ~debug:!debug_syntax ~filename:!input_file_path input_text
     in
-    if !linter then let _ = ast_plain |> Eval.eval ~smt:(!mode = Smt) ~onlychecktypes:true
-    in
-    if !latex then Printf.fprintf !output "%s\n" (Latex.latex_of_ast ~full:false ast_plain);
-    if !latex_full then
-      Printf.fprintf !output "\\documentclass[fleqn]{article}\n\
-      \\usepackage{mathtools}\n\
-      \\allowdisplaybreaks\n\
-      \\begin{document}\n\
-      \\begin{multline*}\n\
-      %s\n\
-      \\end{multline*}\n\
-      \\end{document}\n" (Latex.latex_of_ast ~full:true ast_plain);
+    (if !linter then let _= ast_plain |> Eval.eval ~smt:(!mode = Smt) ~onlychecktypes:true in ());
+    (if !latex then Printf.fprintf !output "%s\n" (Latex.latex_of_ast ~full:false ast_plain));
+    (if !latex_full then Printf.fprintf !output
+         "\\documentclass[fleqn]{article}\n\
+          \\usepackage{mathtools}\n\
+          \\allowdisplaybreaks\n\
+          \\begin{document}\n\
+          \\begin{multline*}\n\
+          %s\n\
+          \\end{multline*}\n\
+          \\end{document}\n" (Latex.latex_of_ast ~full:true ast_plain));
     exit_with OK
   end;
 
   if !show then begin
     let ast = match !mode with
-    | Sat -> Parse.parse_sat ~debug:!debug_syntax ~filename:!input_file_path (string_of_chan !input)
+    | Sat -> Parse.parse_sat ~debug:!debug_syntax ~filename:!input_file_path input_text
         |> Eval.eval ~smt:(!mode = Smt)
-    | Smt -> Parse.parse_smt ~debug:!debug_syntax ~filename:!input_file_path (string_of_chan !input)
+    | Smt -> Parse.parse_smt ~debug:!debug_syntax ~filename:!input_file_path input_text
         |> Eval.eval ~smt:(!mode = Smt)
-    | Qbf -> Parse.parse_qbf ~debug:!debug_syntax ~filename:!input_file_path (string_of_chan !input)
+    | Qbf -> Parse.parse_qbf ~debug:!debug_syntax ~filename:!input_file_path input_text
         |> Eval.eval ~smt:(!mode = Smt)
     in (Printf.fprintf !output "%s\n" (Pprint.string_of_ast ~utf8:true ast);
        exit_with OK)
@@ -229,7 +230,7 @@ let () =
         | false -> Printf.fprintf !output "Not equivalent\n"; exit_with SOLVER_UNSAT
       end
       else
-        let ast = Parse.parse_sat ~debug:!debug_syntax ~filename:!input_file_path (string_of_chan !input) |> Eval.eval in
+        let ast = Parse.parse_sat ~debug:!debug_syntax ~filename:!input_file_path input_text |> Eval.eval in
         let clauses,table = Cnf.ast_to_cnf ~debug:!debug_cnf ast |> Sat.minisat_clauses_of_cnf
         in
         let models =
@@ -274,7 +275,7 @@ let () =
           Printf.fprintf !output "==== found %d models, limit is %d (--limit N for more models)\n" i !limit; exit_with OK
     else
       (* B. solve not asked: print the Sat file *)
-      let ast = Parse.parse_sat ~debug:!debug_syntax ~filename:!input_file_path (string_of_chan !input) |> Eval.eval in
+      let ast = Parse.parse_sat ~debug:!debug_syntax ~filename:!input_file_path input_text |> Eval.eval in
       let clauses,tbl = Cnf.ast_to_cnf ~debug:!debug_cnf ast |> Sat.minisat_clauses_of_cnf
       in
       (* Display the mapping table. *)
@@ -290,7 +291,7 @@ let () =
               c 98 p(1,2,3)     -> c means 'comment' in any Sat file   *)
 
   else if !mode = Smt && not !solve_flag then begin
-    let ast = Parse.parse_smt ~debug:!debug_syntax ~filename:!input_file_path (string_of_chan !input)
+    let ast = Parse.parse_smt ~debug:!debug_syntax ~filename:!input_file_path input_text
         |> Eval.eval ~smt:(!mode = Smt) in
     let smt = Smt.to_smt2 !smt_flag ast in
     Buffer.output_buffer !output smt;
@@ -298,7 +299,7 @@ let () =
   end
   else if !mode = Smt && !solve_flag then begin
     #ifdef yices2
-      let ast = Parse.parse_smt ~debug:!debug_syntax ~filename:!input_file_path (string_of_chan !input)
+      let ast = Parse.parse_smt ~debug:!debug_syntax ~filename:!input_file_path input_text
           |> Eval.eval ~smt:(!mode = Smt) in
       let str = Solvesmt.ast_to_yices ast |> Solvesmt.model !smt_flag in
       if str = ""
@@ -312,7 +313,7 @@ let () =
     #endif
   end
   else if !mode = Qbf then begin
-      let ast = Parse.parse_qbf ~debug:!debug_syntax ~filename:!input_file_path (string_of_chan !input)
+      let ast = Parse.parse_qbf ~debug:!debug_syntax ~filename:!input_file_path input_text
         |> Eval.eval ~smt:(!mode = Smt) in
       let prenex = Qbf_of_ast.prenex ast in
       let cnf = Qbf_of_ast.cnf prenex in
