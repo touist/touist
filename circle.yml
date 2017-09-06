@@ -62,7 +62,8 @@ test:
     # https://circleci.com/docs/1.0/adding-read-write-deployment-key/
 deployment:
   release:
-    tag: /v.*/
+    # We only want the 'official' releases, not the beta (e.g., v3.2.2-beta1)
+    tag: /^v\d\.\d\.\d$/
     owner: touist
     commands:
       - |
@@ -78,4 +79,6 @@ deployment:
         git config user.email "robot@circleci.com"
         git add reference-manual*.{pdf,html} manual-revision.html
         git commit -m "Generated mdk (modako) documentation for `cd $TRAVIS_BUILD_DIR && git describe --tags`"
-        git push
+        git push origin
+        git remote add sash mvalais@sash.irit.fr:touist.github.io.git
+        git push sash
