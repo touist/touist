@@ -59,6 +59,7 @@ let latex_full = ref false
 let show = ref false
 let wrap_width = ref 76
 let sat_interactive = ref false
+let debug_dimacs = ref false
 
 (* [process_arg_alone] is the function called by the command-line argument
    parser when it finds an argument with no preceeding -flag (-f, -x...).
@@ -108,6 +109,7 @@ let () =
     ("--error-format", Arg.Set_string error_format,"Customize the formatting of error messages");
     ("--wrap-width", Arg.Set_int wrap_width,"Wrapping width for error messages [default: 76]");
     ("--interactive", Arg.Set sat_interactive ,"(--sat mode) Display next model on key press (INPUT must be a file)");
+    ("--debug-dimacs", Arg.Set debug_dimacs, "(--{sat,qbf} modes) Display names instead of integers in DIMACS/QDIMACS")
   ]
   in
   let usage =
@@ -283,7 +285,11 @@ let () =
       (* Display the dimacs' preamble line. *)
       Printf.fprintf !output "p cnf %d %d\n" (Hashtbl.length tbl) (List.length clauses);
       (* Display the dimacs clauses. *)
-      clauses |> Cnf.print_clauses_to_dimacs !output Minisat.Lit.to_string;
+      let print_lit l = if !debug_dimacs then
+        (if Minisat.Lit.sign l then "" else "-") ^ (Minisat.Lit.abs l |> Hashtbl.find tbl)
+        else Minisat.Lit.to_string l
+      in
+      clauses |> Cnf.print_clauses_to_dimacs !output print_lit;
       exit_with OK
         (* table_prefix allows to add the 'c' before each line of the table
            display, when and only when everything is outputed in a single
@@ -303,9 +309,8 @@ let () =
           |> Eval.eval ~smt:(!mode = Smt) in
       let str = Solvesmt.ast_to_yices ast |> Solvesmt.model !smt_flag in
       if str = ""
-      then (Printf.fprintf stderr "unsat\n"; exit_with SOLVER_UNSAT)
-      else Printf.fprintf !output "%s\n" str;
-      exit_with OK;
+      then (Printf.fprintf stderr "unsat\n"; exit_with SOLVER_UNSAT |> ignore)
+      else (Printf.fprintf !output "%s\n" str; exit_with OK);
     #else
       Printf.fprintf stderr
         ("This touist binary has not been compiled with yices2 support.");
@@ -324,6 +329,10 @@ let () =
       end;
       if not !solve_flag then begin
         let quantlist_int,clauses_int,int_to_str = Qbf_of_ast.qbfclauses_of_cnf cnf in
+        let print_lit = if !debug_dimacs then
+          fun v-> (if v<0 then "-" else "") ^ (abs v |> Hashtbl.find int_to_str)
+          else string_of_int
+        in
         (* Display the mapping table (propositional names -> int)
            1) if output = output_table, append 'c' (dimacs comments)
            2) if output != output_table, print it as-is into output_table *)
@@ -335,11 +344,11 @@ let () =
         quantlist_int |> List.iter (fun quantlist ->
             let open List in let open Printf in
             match quantlist with
-            | Qbf_of_ast.A l -> fprintf !output "a%s 0\n" (l |> fold_left (fun acc s -> acc^" "^ string_of_int s) "")
-            | Qbf_of_ast.E l -> fprintf !output "e%s 0\n" (l |> fold_left (fun acc s -> acc^" "^ string_of_int s) "")
+            | Qbf_of_ast.A l -> fprintf !output "a%s 0\n" (l |> fold_left (fun acc s -> acc^" "^ print_lit s) "")
+            | Qbf_of_ast.E l -> fprintf !output "e%s 0\n" (l |> fold_left (fun acc s -> acc^" "^ print_lit s) "")
           );
         (* Display the clauses in dimacs way *)
-        clauses_int |> Cnf.print_clauses_to_dimacs !output string_of_int;
+        clauses_int |> Cnf.print_clauses_to_dimacs !output print_lit;
       end
       else (* --solve*)
     #ifdef qbf
@@ -348,7 +357,7 @@ let () =
       | Some str -> Printf.fprintf !output "%s\n" str
       | None ->
         (Printf.fprintf stderr ("unsat\n");
-        exit_with SOLVER_UNSAT);
+        ignore @@ exit_with SOLVER_UNSAT);
     #else
       Printf.fprintf stderr
         ("This touist binary has not been compiled with qbf support.");
@@ -376,6 +385,7 @@ let () =
       Printf.eprintf "%s" (Msgs.string_of_msg msg);
       exit_with (match msg with _,Usage,_,_ -> CMD_USAGE | _ -> TOUIST_SYNTAX)
     | Sys_error err ->
-      Printf.eprintf "%s" (Msgs.string_of_msg (Error,Usage,err,None));
+    (* [err] is provided by the system; it doesn't end with a newline. *)
+      Printf.eprintf "%s\n" (Msgs.string_of_msg (Error,Usage,err,None));
       exit_with CMD_USAGE
     | x -> raise x
