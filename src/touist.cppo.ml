@@ -60,6 +60,7 @@ let show = ref false
 let wrap_width = ref 76
 let sat_interactive = ref false
 let debug_dimacs = ref false
+let depqbf_instead_of_quantor = ref false
 
 (* [process_arg_alone] is the function called by the command-line argument
    parser when it finds an argument with no preceeding -flag (-f, -x...).
@@ -109,7 +110,8 @@ let () =
     ("--error-format", Arg.Set_string error_format,"Customize the formatting of error messages");
     ("--wrap-width", Arg.Set_int wrap_width,"Wrapping width for error messages [default: 76]");
     ("--interactive", Arg.Set sat_interactive ,"(--sat mode) Display next model on key press (INPUT must be a file)");
-    ("--debug-dimacs", Arg.Set debug_dimacs, "(--{sat,qbf} modes) Display names instead of integers in DIMACS/QDIMACS")
+    ("--debug-dimacs", Arg.Set debug_dimacs, "(--{sat,qbf} modes) Display names instead of integers in DIMACS/QDIMACS");
+    ("--depqbf", Arg.Set depqbf_instead_of_quantor, "(--qbf --solve) Use DepQBF instead of Quantor");
   ]
   in
   let usage =
@@ -137,7 +139,8 @@ let () =
     print_endline ("Version: " ^ TouistVersion.version);
     if TouistVersion.has_git_tag then print_endline ("Git: "^TouistVersion.git_tag);
     let built_list = ["minisat"] @ (if TouistVersion.has_yices2 then ["yices2"] else [])
-                                 @ (if TouistVersion.has_qbf then ["qbf";"qbf.quantor"] else []) in
+                                 @ (if TouistVersion.has_qbf then ["qbf";"qbf.quantor"] else [])
+                                 @ (if TouistVersion.has_depqbf then ["qbf.depqbf"] else []) in
     print_endline ("Built with: " ^ List.fold_left (fun acc e -> match acc with "" -> e | _ -> acc^", "^e) "" built_list);
     exit_with OK
   );
@@ -350,19 +353,34 @@ let () =
         (* Display the clauses in dimacs way *)
         clauses_int |> TouistCnf.print_clauses !output print_lit;
       end
-      else (* --solve*)
-    #ifdef qbf
-      let qcnf,table = TouistQbfSolve.qcnf_of_cnf cnf in
-      match TouistQbfSolve.solve ~hidden:!show_hidden_lits (qcnf,table) with
-      | Some str -> Printf.fprintf !output "%s\n" str
-      | None ->
-        (Printf.fprintf stderr ("unsat\n");
-        ignore @@ exit_with SOLVER_UNSAT);
-    #else
-      Printf.fprintf stderr
-        ("This touist binary has not been compiled with qbf support.");
-      exit_with CMD_UNSUPPORTED
-    #endif
+      else (* --solve *)
+        #ifdef qbf
+          (* --depqbf not set: we solve with Quantor *)
+          if not !depqbf_instead_of_quantor then
+            let qcnf,table = TouistQbfSolve.qcnf_of_cnf cnf in
+              match TouistQbfSolve.solve ~hidden:!show_hidden_lits (qcnf,table) with
+              | Some str -> Printf.fprintf !output "%s\n" str
+              | None ->
+                (Printf.fprintf stderr ("unsat\n");
+                ignore @@ exit_with SOLVER_UNSAT);
+          else
+          (* --depqbf is set: we solve with Depqbf *)
+          #ifdef depqbf
+            match TouistQbfSolve.solve_depqbf ~hidden:!show_hidden_lits cnf with
+            | Some str -> Printf.fprintf !output "%s\n" str
+            | None ->
+              (Printf.fprintf stderr ("unsat\n");
+              ignore @@ exit_with SOLVER_UNSAT);
+          #else
+            Printf.fprintf stderr
+            ("This touist binary has not been compiled with qbf.quantor support.");
+            exit_with CMD_UNSUPPORTED |> ignore;
+          #endif
+        #else
+          Printf.fprintf stderr
+            ("This touist binary has not been compiled with qbf.quantor support.");
+          exit_with CMD_UNSUPPORTED
+        #endif
 end;
 
   (* I had to comment these close_out and close_in because it would
