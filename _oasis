@@ -84,9 +84,17 @@ XOCamlbuildExtraArgs: -menhir \"menhir --table --inspection -v -la 2 --explain\"
 #     open TouistParse (or TouistSat, TouistSmt, TouistEval...)
 Library touist
   Path:           src/lib
-  Modules:        TouistParse,TouistEval,TouistCnf,
-                  TouistSat,TouistSmt,TouistQbf,
-                  TouistPprint,TouistLatex,TouistErr,TouistTypes
+  Modules:        TouistParse,
+                  TouistEval,
+                  TouistCnf,
+                  TouistSat,
+                  TouistSmt,
+                  TouistQbf,
+                  TouistPprint,
+                  TouistLatex,
+                  TouistErr,
+                  TouistTypes,
+                  TouistVersion
   InternalModules: Lexer,Parser,Parser_error_report
   BuildTools+:    menhir, cppo
   BuildDepends:   menhirLib (>= 20151023), fileutils (>= 0.4.0), str,
