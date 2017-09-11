@@ -80,5 +80,3 @@ deployment:
         git add reference-manual*.{pdf,html} manual-revision.html
         git commit -m "Generated mdk (modako) documentation for `cd $TRAVIS_BUILD_DIR && git describe --tags`"
         git push origin
-        git remote add sash mvalais@sash.irit.fr:touist.github.io.git
-        git push sash
