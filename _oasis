@@ -76,7 +76,7 @@ Flag lib
 PreBuildCommand: make pre-build HAS_YICES2=$yices2 HAS_QBF=$qbf VERSION=$pkg_version
 PostCleanCommand: make clean-pre-build
 
-XOCamlbuildExtraArgs: -menhir \"menhir --table --inspection -v -la 2 --explain\" -plugin-tags \"package(cppo_ocamlbuild)\"
+XOCamlbuildExtraArgs: -menhir \"menhir --table --inspection -v -la 2 --explain\" -plugin-tags \"package(cppo_ocamlbuild)\" -j 4
 
 # IMPORTANT: the library name is 'touist', so when calling ocamlc we must add
 #     ocamlfind ocamlc -package touist
