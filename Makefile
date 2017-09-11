@@ -151,18 +151,21 @@ manual:
 
 OCAMLDOC=
 
-docfull: #setup.data build
-	#$(SETUP) -doc $(DOCFLAGS)
-	cd _build; ocamlfind ocamldoc -verbose -html -d src/lib/touist.docdir \
-		-load src/lib/touistParse.odoc \
-		-load src/lib/touistEval.odoc \
-		-load src/lib/touistCnf.odoc \
-		-load src/lib/touistSmt.odoc \
-		-load src/lib/touistQbf.odoc \
-		-load src/lib/touistSatSolve.odoc \
-		-load src/lib/touistPprint.odoc \
-		-load src/lib/touistLatex.odoc \
-		-load src/lib/touistErr.odoc \
-		-load src/lib/touistVersion.odoc \
-		-load src/lib/touistTypes.odoc \
-		`find src/lib/*/ -name 'touist*.cmi' | sed 's/\(.*\)\.cmi/-load \1.odoc/'`
+# This is a hack. Because `make doc` will do four directories for documentation,
+# i.e., one per library (touist.docdir, touist_qbf.docdir, ...), we want to
+# regroup them in touist.docdir. This command will:
+# - get the modules names of the form TouistXXXX (WARNING: each module name
+#   beginning with TouistXXXX must be on a different line and must be
+#   preceeded by at least 3 spaces)
+# - only keep the module names that have a .cmi in the _build directory,
+#   which means that they have been successfully compiled
+# - call ocamldoc -d touist.docdir -html -load ... on these modules
+doc-unified: setup.data build
+	$(SETUP) -doc $(DOCFLAGS)
+	cd _build; \
+	cat ../_oasis | grep -wo '    *Touist[A-Z][A-Za-z]*' | sed "s/ //g" | while read f; do \
+		if R=$$(find "src/lib" -iname "*$$f.cmi"); then \
+			echo $$R | sed 's/\(.*\)\.cmi/-load \1.odoc/'; \
+		fi; \
+	done > cmd
+	cd _build; ocamlfind ocamldoc -html -d src/lib/touist.docdir $$(cat cmd)

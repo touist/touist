@@ -1,4 +1,4 @@
-<support/gui/**/*>: not_hygienic
+<*>: not_hygienic
 
 # This is needed to tell ocamlbuild that we are using menhir instead of the
 # venerable ocamlyacc.
