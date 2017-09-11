@@ -76,3 +76,4 @@ src/touistVersion.ml
 support/gui/dist.zip
 
 .vscode
+*.docdir
