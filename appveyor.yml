@@ -36,8 +36,14 @@ os: Windows Server 2012
 
 # Scripts that are called at very beginning, before repo cloning
 init:
+  # With 'core.autocrlf true', all files are checkout out in CRLF mode, so
+  # when menhir re-generates parser.messages (which will be produced with CRLF),
+  # git status won't see any difference. But the thing is that all the shell
+  # scripts (configure, appveyor-script.sh...) need to run under LF endings.
+  # Solution: keep in 'input' (which checkouts in LF) and if a file is
+  # re-generated (e.g., parser.messages) then dos2unix it.
   - git config --global core.autocrlf input
-#  - ps: iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
+#- ps: iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
 
 
 # Clone directory
@@ -66,7 +72,7 @@ install:
   # Opam on Windows: http://fdopen.github.io/opam-repository-mingw
   - javac -version
   - ps: 'Invoke-WebRequest http://cygwin.com/setup-x86.exe -OutFile "$env:CYG_SETUP"'
-  - '%CYG_SETUP% --quiet-mode --no-shortcuts --only-site --root "%CYG_ROOT%" --site "%CYG_MIRROR%" --local-package-dir "%CYG_CACHE%" --packages rsync,patch,diffutils,curl,make,unzip,git,m4,perl,mingw64-i686-gcc-core,mingw64-i686-gmp --upgrade-also'
+  - '%CYG_SETUP% --quiet-mode --no-shortcuts --only-site --root "%CYG_ROOT%" --site "%CYG_MIRROR%" --local-package-dir "%CYG_CACHE%" --packages rsync,patch,diffutils,curl,make,unzip,git,m4,perl,mingw64-i686-gcc-core,mingw64-i686-gmp,binutils --upgrade-also'
 
 build_script:
   - '%CYG_BASH% -lc "cd /cygdrive/c/touist && ./ci/appveyor-script.sh"'

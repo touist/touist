@@ -50,7 +50,7 @@ install:
   - cd $TRAVIS_BUILD_DIR
   - ./configure --bindir support/gui/external --enable-tests --enable-yices2 --enable-qbf
   - make
-  - make install # Only install binary 'touist' as long as --enable-lib is not given
+  - make install # NOTE: installed in support/gui/external, not system-wide
 
   # Build the Java GUI touist.jar (in support/gui)
   - cd $TRAVIS_BUILD_DIR/support/gui
