@@ -168,4 +168,5 @@ doc-unified: setup.data build
 			echo $$R | sed 's/\(.*\)\.cmi/-load \1.odoc/'; \
 		fi; \
 	done > cmd
-	cd _build; ocamlfind ocamldoc -html -d src/lib/touist.docdir $$(cat cmd)
+	cd _build; ocamlfind ocamldoc -html -d src/lib/touist.docdir \
+		-t "API reference for the TouIST library $$(git describe --tags || echo version unknown)" $$(cat cmd)
