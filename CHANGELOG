@@ -1,40 +1,51 @@
 v3.4.0
-  - 'inter', 'union', 'diff' and 'subset' are now infix operators; the prefix
-    versions are still available (but they produce a warning).
-  - interface: 'inter', 'union' and 'subset' are now properly colored
-  - interface: 'save' and 'open' now remember the last file opened; the current
-    file is displayed in the window title. Also, a friendly warning is now
-    displayed when opening or quitting while the current file is unsaved.
-  - interface: drag-and-drop enabled on macOS (dropping on the dock or in the
-    app) and on Windows (only on the exe)
-  - interface: added links to the manual in 'Help' menu
-  - interface: on macOS, a native application is now available; on Windows,
-    a .exe is available (instead of clicking on the .jar). On Linux, a simple
-    script launches the jar.
-  - fixed the extremely slow/laggy scrolling of the latex right-panel when
-    using the mouse wheel.
-  - fixed the 'Solve' button hanging indefinitely in QBF mode
-  - fixed the filtering (regex or true/false) of the results on SMT
-    and QBF modes.
-  - fixed a bug that was preventing the user from filtering when a
-    single result was returned.
-  - added the menu button 'Log' that allows to monitor what is happening
-    under the hood.
-  - interface: the look of the main window has been (kind of) improved with
-    less useless blank spaces. Also, the window can be resized smaller
-    than before.
-  - interface: in the result view, you can now hide all valuations that
-    are not true or false. For example, it allows us to hide all
-    undefined valuations (denoted by '?') that clutter the results.
-  - fixed a bug with --sat & --solve where touist was giving a model
-    although the formula is UNSAT (it was caused by a misuse of minisat).
-  - command-line: in --sat mode, the new option --interactive will enable
-    the display of one model at a time by pressing any key (q/n to stop).
-  - command-line: it is now possible to output QDIMACS using --qbf
-  - (breaking) when displaying DIMACS and QDIMACS with --qbf or --sat,
-    the mapping table (between propositions names and numbers) will
-    be given before the preamble 'p cnf 4 7'.
-  - command-line: fixed --latex that failing without --linter
+  - TouIST language:
+    - 'inter', 'union', 'diff' and 'subset' are now infix operators;
+      the prefix versions are still available (but they produce a warning).
+  - API:
+    - when touist is installed through opam ('opam install touist'), you can
+      use it as a library. The API reference is now published on the website.
+  - GUI (new features):
+    - added the menu button 'Log' that allows to monitor what is happening
+      under the hood.
+    - the look of the main window has been (kind of) improved with
+      less useless blank spaces. Also, the window can be resized smaller
+      than before.
+    - in the result view, you can now hide all valuations that
+      are not true or false. For example, it allows us to hide all
+      undefined valuations (denoted by '?') that clutter the results.
+    - on macOS, a native application is now available; on Windows, a .exe
+      is available (instead of clicking on the .jar). On Linux, a simple
+      script launches the jar.
+    - 'save' and 'open' now remember the last file opened; the current
+      file is displayed in the window title. Also, a friendly warning is now
+      displayed when opening or quitting while the current file is unsaved.
+    - drag-and-drop enabled on macOS in native TouIST.app (dropping on
+      the dock or in the app) and on Windows native TouIST.exe.
+    - added links to the manual in 'Help' menu
+  - GUI (fixes)
+    - fixed 'inter', 'union' and 'subset' that were not properly colored
+    - fixed the extremely slow/laggy scrolling of the latex right-panel when
+      using the mouse wheel.
+    - fixed the 'Solve' button hanging indefinitely in QBF mode
+    - fixed the filtering (regex or true/false) of the results on SMT
+      and QBF modes.
+    - fixed a bug that was preventing the user from filtering when a
+      single result was returned.
+  - Command-line (new features):
+    - in --sat mode, the new option --interactive will enable the
+      display of one model at a time by pressing any key (q/n to stop).
+    - it is now possible to output QDIMACS using --qbf
+    - added --debug-dimacs which displays names instead of numbers in
+      DIMACS (--sat) and QDIMACS (--qbf).
+  - Command-line (fixes):
+    - fixed a bug with --sat --solve where touist was giving a model
+      although the formula is UNSAT (it was caused by a misuse of minisat).
+    - fixed --latex that failing without --linter
+    - (BREAKING) We had not correctly followed the DIMACS specification:
+      any comments had to appear before the preamble 'p cnf 4 7'.
+      Now, the mapping table (between propositions names and numbers)
+      will be given before anything else (with flags --qbf or --sat).
 v3.2.3
   - added an option (--debug) which enable the display of stacktrace
     on exception catched on exit
