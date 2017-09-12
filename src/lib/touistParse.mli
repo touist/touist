@@ -1,7 +1,9 @@
 (** Parse a TouIST string into an Abstract Syntaxic Tree (AST).
 
     After this step, the AST (its type is {!TouistTypes.Ast.t}) can go through
-    different functions: - (1) {!TouistEval.eval} for type-checking and
+    different functions:
+
+    - (1) {!TouistEval.eval} for type-checking and
     evaluation of the expressions (bigor, bigand, variables...):
     - (2) {!TouistCnf.ast_to_cnf} and then {!TouistSatSolve.minisat_clauses_of_cnf}
           to transform the AST into a clause ready to use by Minisat
@@ -13,10 +15,19 @@
 
 (** {2 Parsing TouIST} *)
 
+(** [parse_sat text] parses [text] and outputs the corresponding [ast].
+
+    [~debug:true] enable the display of the automata state number on parser
+    errors.
+
+    [~filename:"foo.touist"] enables the display of a file name in errors.
+*)
 val parse_sat :
   ?debug:bool -> ?filename:string -> string -> TouistTypes.Ast.t
+
 val parse_smt :
   ?debug:bool -> ?filename:string -> string -> TouistTypes.Ast.t
+
 val parse_qbf :
   ?debug:bool -> ?filename:string -> string -> TouistTypes.Ast.t
 
