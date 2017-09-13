@@ -84,7 +84,7 @@ module rec Ast : sig
     | Loc              of t * TouistErr.loc
     (** [Loc] is a clever (or ugly, you pick) way of keeping the locations in
         the text of the Ast.t elements.
-        In parser.mly, each production rule gives its location in the original
+        In touistParser.mly, each production rule gives its location in the original
         text; for example, instead of simply returning
         [Inter (x,y)] the parser will return
         [Loc (Inter (x,y), ($startpos,$endpos))].

@@ -30,7 +30,7 @@ let ast_without_loc (ast:Ast.t) : Ast.t = match ast with
   | ast -> ast
 
 (* [raise_with_loc] takes an ast that may contains a Loc (Loc is added in
-   parser.mly) and raise an exception with the given message.
+   touistParser.mly) and raise an exception with the given message.
    The only purpose of giving 'ast' is to get the Loc thing.
    [ast_without_loc] should not have been previously applied to [ast]
    because ast_without_loc will remove the Loc thing. *)

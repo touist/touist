@@ -71,39 +71,40 @@ list of hand-written error messages. The thing is that there are more than
 180 of these messages...
 
 So developers can improve the error syntax messages by editing
-`parser.messages` and then re-generating `parser_messages.ml`.
+`parser.messages` and then re-generating `touistParserMsgs.ml`.
 
 
-## Re-building `parser_messages.ml` using `parser.messages` ##
+## Re-building `touistParserMsgs.ml` using `parser.messages` ##
 
-I wrote the makefile TopMakefile to do the whole thing. You can just run
+It is actually handled by rules at the end of the Makefile. The only
+rule that is not called during `make` is
 
-    make -f TopMakefile
-    make -f TopMakefile clean
+    make missing
 
-and everything will be compiled. But if you want to do it by hand:
+which checks if no error messages are missing in parser.messages
+(see section below 'Missing error cases')
 
 Most of the time, the only command you want to use is the 3.
 
 1. To generate the `parser.messages` for the first time, use:
 
-        menhir parser.mly --list-errors > parser.messages
+        menhir touistParser.mly --list-errors > parser.messages
 
-2. To update the existing `parser.messages` whenever you modify the `parser.mly`:
+2. To update the existing `parser.messages` whenever you modify the `touistParser.mly`:
 
-        menhir parser.mly --update-errors parser.messages > tmp && mv tmp parser.messages
+        menhir touistParser.mly --update-errors parser.messages > tmp && mv tmp parser.messages
 
-3. To regenerate the final file `parser_messages.ml` whenever you edit the error
+3. To regenerate the final file `touistParserMsgs.ml` whenever you edit the error
 messages in `parser.messages`:
 
-        menhir --compile-errors parser.messages parser.mly > parser_messages.ml
+        menhir --compile-errors parser.messages touistParser.mly > touistParserMsgs.ml
 
-4. And to recompile parser_messages.ml and then touist:
+4. And to recompile touistParserMsgs.ml and then touist:
 
-        menhir --compile-errors parser.messages parser.mly > parser_messages.ml && ocamlbuild -use-ocamlfind -use-menhir -menhir "menhir --trace --table --inspection -v -la 2" -package menhirLib -package fileutils,str touist.byte -tag debug -r
+        menhir --compile-errors parser.messages touistParser.mly > touistParserMsgs.ml && ocamlbuild -use-ocamlfind -use-menhir -menhir "menhir --trace --table --inspection -v -la 2" -package menhirLib -package fileutils,str touist.byte -tag debug -r
 
 ## Missing error cases in parser.messages
-When updating parser.mly, you might sometimes create new error states
+When updating touistParser.mly, you might sometimes create new error states
 that do not appear in your already-written parser.messages.
 This often leads to the error message:
 ```
@@ -111,13 +112,13 @@ This often leads to the error message:
 This is an unknown syntax error (92).
 Please report this problem to the compiler vendor.
 ```
-meaning that the state 92 isn't in parser_messages.ml, and thus not in
-parser.messages. To fix that, anytime you modify parser.mly, check that
+meaning that the state 92 isn't in touistParserMsgs.ml, and thus not in
+parser.messages. To fix that, anytime you modify touistParser.mly, check that
 no new errors have been intruduced:
 
 ```
-menhir --list-errors src/parser.mly > parser.messages_updated
-menhir --compare-errors parser.messages_updated --compare-errors src/parser.messages --list-errors src/parser.mly
+menhir --list-errors src/touistParser.mly > parser.messages_updated
+menhir --compare-errors parser.messages_updated --compare-errors src/parser.messages --list-errors src/touistParser.mly
 ```
 
 ## Testing your hand-written messages ##
@@ -152,7 +153,7 @@ The second way is to focus on tokens (the capital letters words like BEGIN)
 and to ask menhir to see if this sequence of tokens triggers an error:
 
 ```
-menhir --interpret-error parser.mly << eof
+menhir --interpret-error touistParser.mly << eof
 BEGIN FORMULA ATLEAST LPAREN VAR COMMA RPAREN
 eof
 ```

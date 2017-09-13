@@ -95,7 +95,7 @@ Library touist
                   TouistErr,
                   TouistTypes,
                   TouistVersion
-  InternalModules: Lexer,Parser,Parser_error_report,Parser_messages
+  InternalModules: TouistLexer,TouistParser,TouistParserReport,TouistParserMsgs
   BuildTools+:    menhir, cppo
   BuildDepends:   menhirLib (>= 20151023), fileutils (>= 0.4.0), str,
                   minisat, cppo_ocamlbuild (>= 0.9.4)
