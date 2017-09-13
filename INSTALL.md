@@ -48,8 +48,8 @@ the makefile `Makefile` will try to run the command:
 
 	git describe --tags
 
-and use the `cppo` preprocessor on `src/lib/version.cppo.ml` to produce the
-file `_build/src/lib/version.ml` containing the git version.
+and use the `cppo` preprocessor on `src/lib/touistVersion.cppo.ml` to produce the
+file `_build/src/lib/touistVersion.ml` containing the git version.
 
 ----------
 

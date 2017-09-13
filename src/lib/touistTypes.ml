@@ -12,7 +12,7 @@
  * version 2.1 which accompanies this distribution, and is available at
  * http://www.gnu.org/licenses/lgpl-2.1.html *)
 
-open Msgs
+open TouistErr
 
 (* Do you think this file is wierd, with this 'module rec' thing?
    This is because we want the type 'ast' to be used in 'Set' and
@@ -107,7 +107,7 @@ module rec Ast : sig
     | NewlineBefore    of ast
 end = Ast (* see (1) *)
 
-(* From the type [Ast], we create an ordered type [AstOrdered] in order to be able
+(* From the type {!Ast}, we create an ordered type [AstOrdered] in order to be able
    to create a set. *)
 and AstOrdered : Set.OrderedType = struct
   include Ast

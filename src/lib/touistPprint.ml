@@ -1,7 +1,7 @@
 (** Transform any AST (at any stage of transformation) to a string. *)
 
-open Types
-open Types.Ast
+open TouistTypes
+open TouistTypes.Ast
 
 (** [string_of_ast ast] takes an abstract syntaxic tree [ast] and turn it into
     a string using its content.
@@ -110,7 +110,7 @@ let rec string_of_ast ?(utf8=false) ?(show_var=(fun ast -> "")) ?(debug=false) ?
   | Let (v,x,c) -> of_ast v ^ "=" ^ of_ast x ^ ": " ^ of_ast c
   | Affect (v,c) -> of_ast v ^ "=" ^ of_ast c
   | Touist_code (f) -> (of_ast_list "\n" f)
-  | Loc (x,l) -> (if debug then "loc "^ Msgs.string_of_loc l ^":" else "") ^ of_ast x
+  | Loc (x,l) -> (if debug then "loc "^ TouistErr.string_of_loc l ^":" else "") ^ of_ast x
   | Paren x -> of_ast x
   | Exists (v,f) when utf8 -> "∃"^ of_ast v ^"."^ of_ast f
   | Exists (v,f)             -> "exists "^ of_ast v ^": "^ of_ast f

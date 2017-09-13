@@ -24,6 +24,10 @@ problem](docs/images/screenshot.png)](https://github.com/maelvalais/allumettes)
 
        opam install touist
 
+   Or if you want to try the latest changes:
+
+       opam pin add touist --dev-repo
+
    If you want to use the optional solvers, they must be installed first so
    that `touist` knows you want to include them:
 

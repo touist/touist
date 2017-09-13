@@ -1,5 +1,5 @@
 (** Processes the "semantically correct" abstract syntaxic tree given by
-    {!Eval.eval} and produces a string in SMT-LIB2 format.
+    {!TouistEval.eval} and produces a string in SMT-LIB2 format.
 
     {!to_smt2} is the main function. *)
 
@@ -14,7 +14,7 @@
  * version 2.1 which accompanies this distribution, and is available at
  * http://www.gnu.org/licenses/lgpl-2.1.html *)
 
-open Types.Ast
+open TouistTypes.Ast
 open Yices2
 
 let ast_to_yices formula : term * (string,term) Hashtbl.t =
@@ -212,7 +212,7 @@ let ast_to_yices formula : term * (string,term) Hashtbl.t =
     | Implies (x, y) -> process_terms (Type.bool ()) x; process_terms (Type.bool ()) y(*; Implies (x, y)*)
     | Equiv   (x, y) -> process_terms (Type.bool ()) x; process_terms (Type.bool ()) y(*; Equiv (x, y)*)
     | Prop x -> add_term x (Term.new_uninterpreted (Type.bool ()))
-    | x -> failwith ("this cannot be transformed into SMT2: "^(Pprint.string_of_ast ~debug:true x))
+    | x -> failwith ("this cannot be transformed into SMT2: "^(TouistPprint.string_of_ast ~debug:true x))
   in
   let rec write (ast:ast) : term = match ast with
     | Top          -> Term.Bool.true_ ()
@@ -239,7 +239,7 @@ let ast_to_yices formula : term * (string,term) Hashtbl.t =
     | Greater_than     (x,y)    -> Term.Arith.gt (write x) (write y)
     | Greater_or_equal (x,y)    -> Term.Arith.geq (write x) (write y)
     | Loc (x,_) -> write x
-    | x -> failwith ("error smt write: "^(Pprint.string_of_ast ~debug:true x))
+    | x -> failwith ("error smt write: "^(TouistPprint.string_of_ast ~debug:true x))
   in
   parse formula;
   (write formula), vtbl

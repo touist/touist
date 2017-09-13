@@ -1,4 +1,4 @@
-(** Processes the CNF-compliant version of the AST given by {!Cnf.ast_to_cnf}
+(** Processes the CNF-compliant version of the AST given by {!TouistCnf.ast_to_cnf}
     to create Minisat-compatible clauses with [minisat_clauses_of_cnf] and solve
     them with [solve_clauses].
 *)
@@ -14,8 +14,8 @@
  * version 2.1 which accompanies this distribution, and is available at
  * http://www.gnu.org/licenses/lgpl-2.1.html *)
 
-open Types.Ast
-open Pprint
+open TouistTypes.Ast
+open TouistPprint
 open Minisat
 
 (** [minisat_clauses_of_cnf ast] takes a CNF [ast] and outputs
@@ -26,7 +26,7 @@ let minisat_clauses_of_cnf ast =
   let num_lit = ref 1 in
   let fresh_lit () = let lit = !num_lit in (incr num_lit; Minisat.Lit.make lit)
   in
-  let clauses,lit_to_str,_ = Cnf.clauses_of_cnf Minisat.Lit.neg fresh_lit ast
+  let clauses,lit_to_str,_ = TouistCnf.clauses_of_cnf Minisat.Lit.neg fresh_lit ast
   in clauses,lit_to_str
 
 (** [clauses_to_solver] takes a list of clauses (clause = list of literals)
@@ -126,7 +126,7 @@ let print_clauses cls = Printf.fprintf stderr "%s" (string_of_clauses cls)
       found. [N] is the number of the model, it begins at 1.
       It can be useful to print the models as they appear because finding all
       models (if [limit] is large) can be extremely long.
-      Example: [~print:(Sat.Model.pprint table model)]
+      Example: [~print:(TouistSat.Model.pprint table model)]
     [verbose] allows to turn on the verbose mode of minisat; apparently, this
       minisat feature doesn't seem to be working and doesn't display any time
       information.
@@ -161,7 +161,7 @@ let solve_clauses
       || not (Minisat.Raw.solve solver [||])
       then models
       else
-        let model = get_model solver table Cnf.is_dummy (* is_dummy removes &1 lits *)
+        let model = get_model solver table TouistCnf.is_dummy (* is_dummy removes &1 lits *)
         and has_next_model = counter_current_model solver table in
         let is_duplicate = Hashtbl.mem models_hash model in
         match is_duplicate,has_next_model with

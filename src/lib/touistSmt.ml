@@ -1,5 +1,5 @@
 (** Processes the "semantically correct" abstract syntaxic tree given by
-    {!Eval.eval} and produces a string in SMT-LIB2 format. 
+    {!TouistEval.eval} and produces a string in SMT-LIB2 format. 
     
     [to_smt2] is the main function. *)
 
@@ -14,7 +14,7 @@
  * version 2.1 which accompanies this distribution, and is available at
  * http://www.gnu.org/licenses/lgpl-2.1.html *)
 
-open Types.Ast
+open TouistTypes.Ast
 
 let to_smt2 logic formula =
   let vtbl = Hashtbl.create 10 in
@@ -251,7 +251,7 @@ let to_smt2 logic formula =
     | Implies (x, y) -> gen_var "Bool" x; gen_var "Bool" y(*; Implies (x, y)*)
     | Equiv   (x, y) -> gen_var "Bool" x; gen_var "Bool" y(*; Equiv (x, y)*)
     | Prop x -> add_var x "Bool"
-    | x -> failwith ("this cannot be transformed into SMT2: "^(Pprint.string_of_ast ~debug:true x))
+    | x -> failwith ("this cannot be transformed into SMT2: "^(TouistPprint.string_of_ast ~debug:true x))
   in
 
   let rec write = function
@@ -289,7 +289,7 @@ let to_smt2 logic formula =
     | Greater_than     (x,y)    -> decl_bin_op ">" (write x) (write y)
     | Greater_or_equal (x,y)    -> decl_bin_op ">=" (write x) (write y)
     | Loc (x,_) -> write x
-    | x -> failwith ("error smt write: "^(Pprint.string_of_ast ~debug:true x))
+    | x -> failwith ("error smt write: "^(TouistPprint.string_of_ast ~debug:true x))
   in
 
   parse formula;
