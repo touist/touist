@@ -87,9 +87,9 @@ Library touist
   Modules:        TouistParse,
                   TouistEval,
                   TouistCnf,
-                  TouistSat,
                   TouistSmt,
                   TouistQbf,
+                  TouistSatSolve,
                   TouistPprint,
                   TouistLatex,
                   TouistErr,
@@ -105,7 +105,7 @@ Library touist
 
 Library touist_yices2
   Build$:         flag(yices2)
-  Install$:       flag(yices2) && flag(lib)
+  Install$:       flag(yices2)
   Path:           src/lib/yices2
   Modules:        TouistSmtSolve
   BuildDepends:   touist, yices2 (>= 0.0.2)
@@ -114,10 +114,10 @@ Library touist_yices2
 
 Library touist_qbf
   Build$:         flag(qbf)
-  Install$:       flag(qbf) && flag(lib)
+  Install$:       flag(qbf)
   Path:           src/lib/qbf
   Modules:        TouistQbfSolve
-  BuildDepends:   qbf (>= 0.1), qbf.quantor, touist # Conditionnal: qbf.depqbf
+  BuildDepends:   qbf (>= 0.1), qbf.quantor, touist
   FindlibParent:  touist
   FindlibName:    qbf
 
@@ -159,16 +159,33 @@ Test test
   WorkingDirectory: .
   TestTools: test
 
+# For documents only
+XOCamlbuildExtraArgs+: -docflags \"-colorize-code -short-functors -charset utf-8 -dot\"
+
 Document touist
-  Title: API reference for the Touist compiler
+  Title: API reference for the TouIST library
   Type: ocamlbuild (0.4)
   Install: false
   InstallDir: $htmldir/api
   BuildTools+: ocamldoc
   XOCamlbuildPath: src/lib
   XOCamlbuildLibraries: touist
-  XOCamlbuildExtraArgs: -docflags \"-colorize-code -short-functors -charset utf-8\"
-  XOCamlbuildExtraArgs+: -use-menhir -menhir \"menhir --table --inspection -v -la 2\"
+Document touist_yices2
+  Title: API reference for the touist.yices2 subpackage
+  Type: ocamlbuild (0.4)
+  Install: false
+  InstallDir: $htmldir/api
+  BuildTools+: ocamldoc
+  XOCamlbuildPath: src/lib/yices2
+  XOCamlbuildLibraries: touist.yices2
+Document touist_qbf
+  Title: API reference for the touist.qbf subpackage
+  Type: ocamlbuild (0.4)
+  Install: false
+  InstallDir: $htmldir/api
+  BuildTools+: ocamldoc
+  XOCamlbuildPath: src/lib/qbf
+  XOCamlbuildLibraries: touist.qbf
 
 SourceRepository master
   Type:           git

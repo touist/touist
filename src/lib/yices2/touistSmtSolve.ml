@@ -1,19 +1,3 @@
-(** Process an "semantically correct" abstract syntaxic tree given by
-    {!TouistEval.eval} and produces a string in SMT-LIB2 format.
-
-    {!to_smt2} is the main function. *)
-
-(* Project TouIST, 2015. Easily formalize and solve real-world sized problems
- * using propositional logic and linear theory of reals with a nice language and GUI.
- *
- * https://github.com/touist/touist
- *
- * Copyright Institut de Recherche en Informatique de Toulouse, France
- * This program and the accompanying materials are made available
- * under the terms of the GNU Lesser General Public License (LGPL)
- * version 2.1 which accompanies this distribution, and is available at
- * http://www.gnu.org/licenses/lgpl-2.1.html *)
-
 open TouistTypes
 open TouistTypes.Ast
 open Yices2
@@ -94,18 +78,18 @@ let ast_to_yices formula : term * (string,term) Hashtbl.t =
     | Greater_or_equal (Prop x, Prop y)
     | Equal            (Prop x, Prop y)
     | Not_equal        (Prop x, Prop y) ->
-        begin
-          try
-            let x_type = Type.of_term (Hashtbl.find vtbl x) in
-            add_term y (Term.new_uninterpreted (x_type))
-          with Not_found ->
-            try
-              let y_type = Type.of_term (Hashtbl.find vtbl y) in
-              add_term x (Term.new_uninterpreted (y_type))
-            with Not_found ->
-              add_term x (Term.new_uninterpreted (above_type));
-              add_term y (Term.new_uninterpreted (above_type))
-        end
+      begin
+        try
+          let x_type = Type.of_term (Hashtbl.find vtbl x) in
+          add_term y (Term.new_uninterpreted (x_type))
+        with Not_found ->
+        try
+          let y_type = Type.of_term (Hashtbl.find vtbl y) in
+          add_term x (Term.new_uninterpreted (y_type))
+        with Not_found ->
+          add_term x (Term.new_uninterpreted (above_type));
+          add_term y (Term.new_uninterpreted (above_type))
+      end
     | Not x -> process_terms above_type x
     | And     (x,y)
     | Or      (x,y)
@@ -132,15 +116,15 @@ let ast_to_yices formula : term * (string,term) Hashtbl.t =
     | Greater_than     (Int _, x)
     | Greater_or_equal (x, Int _)
     | Greater_or_equal (Int _, x)->
-        let rec go = function
-          | Prop x -> add_term x (Term.new_uninterpreted (Type.int ()))
-          | Add (x,y)
-          | Sub (x,y)
-          | Mul (x,y)
-          | Div (x,y) -> go x; go y
-          | _ -> failwith "not a term exp"
-        in
-        if term_expr x then go x else ()
+      let rec go = function
+        | Prop x -> add_term x (Term.new_uninterpreted (Type.int ()))
+        | Add (x,y)
+        | Sub (x,y)
+        | Mul (x,y)
+        | Div (x,y) -> go x; go y
+        | _ -> failwith "not a term exp"
+      in
+      if term_expr x then go x else ()
     | Add              (x, Float _)
     | Add              (Float _, x)
     | Sub              (x, Float _)
@@ -161,15 +145,15 @@ let ast_to_yices formula : term * (string,term) Hashtbl.t =
     | Greater_than     (Float _, x)
     | Greater_or_equal (x, Float _)
     | Greater_or_equal (Float _, x) ->
-        let rec go = function
-          | Prop x -> add_term x (Term.new_uninterpreted (Type.real ()))
-          | Add (x,y)
-          | Sub (x,y)
-          | Mul (x,y)
-          | Div (x,y) -> go x; go y
-          | _ -> failwith "not a term exp"
-        in
-        if term_expr x then go x else ()
+      let rec go = function
+        | Prop x -> add_term x (Term.new_uninterpreted (Type.real ()))
+        | Add (x,y)
+        | Sub (x,y)
+        | Mul (x,y)
+        | Div (x,y) -> go x; go y
+        | _ -> failwith "not a term exp"
+      in
+      if term_expr x then go x else ()
     | Add              (x, y)
     | Sub              (x, y)
     | Mul              (x, y)
@@ -250,25 +234,27 @@ let string_of_modelterm model term = match term with
   | x when Term.is_int x -> string_of_int (Model.get_int model x)
   | x when Term.is_real x -> string_of_float (Model.get_float model x)
   | x -> failwith "cannot output the value of the term"
-let string_of_model vtbl model =
-  Hashtbl.fold (fun name term acc -> acc ^ (match acc with ""->"" | _->"\n") ^ (string_of_modelterm model term) ^" "^ name) vtbl ""
 
-let model (logic:string) (formula,vtbl : term * (string,term) Hashtbl.t) =
+let string_of_model ?(value_sep="\n") vtbl model =
+  Hashtbl.fold (fun name term acc ->
+      acc ^ (match acc with ""->"" | _->value_sep) ^ (string_of_modelterm model term) ^" "^ name) vtbl ""
+
+let solve (logic: string) (formula: Yices2.term) : Yices2.model option =
   let config = Context.Config.create () in
   Context.Config.default_for_logic config logic;
   let ctx = Context.create ~config () in
   Context.assert_formula ctx formula;
   match Context.check ctx with
-  | SAT -> string_of_model vtbl (Context.get_model ctx)
-  | UNSAT -> ""
+  | SAT -> Some (Context.get_model ctx)
+  | UNSAT -> None
   | s -> failwith ("the status of the yices solver is unexpected: "^string_of_status s)
 
 let logic_supported (logic:string) =
   try Context.Config.default_for_logic (Context.Config.create ()) logic; true
   with YicesError (Error.CTX_UNKNOWN_LOGIC,_) -> false
-    | YicesError (Error.CTX_LOGIC_NOT_SUPPORTED,_) -> false
-    | YicesError (code,report) ->
-      failwith ("[shouldnt happen] instead of returning CTX_UNKNOWN_LOGIC,"^
-                "code returned was "^ report.Error.name)
+     | YicesError (Error.CTX_LOGIC_NOT_SUPPORTED,_) -> false
+     | YicesError (code,report) ->
+       failwith ("[shouldnt happen] instead of returning CTX_UNKNOWN_LOGIC,"^
+                 "code returned was "^ report.Error.name)
 
 let () = Yices2.register_exn ()

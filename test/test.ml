@@ -25,7 +25,7 @@ let test_raise (parse:(string->unit)) (during:TouistErr.during) typ nth_msg (loc
     | true -> () (* OK *)
     | false -> OUnit2.assert_failure ("this test didn't give a message at location '"^loc_expected^"' as expected. Instead, got:\n"^TouistErr.string_of_msg msg)
 
-let sat text = let _ = TouistParse.parse_sat text |> TouistEval.eval |> TouistCnf.ast_to_cnf |> TouistSat.minisat_clauses_of_cnf in ()
+let sat text = let _ = TouistParse.parse_sat text |> TouistEval.eval |> TouistCnf.ast_to_cnf |> TouistSatSolve.minisat_clauses_of_cnf in ()
 let smt logic text = let _ = TouistParse.parse_smt text |> TouistEval.eval ~smt:true |> TouistSmt.to_smt2 logic in ()
 let qbf text = let _ = TouistParse.parse_qbf text |> TouistEval.eval ~smt:true |> TouistQbf.prenex in ()
 
@@ -56,9 +56,9 @@ let test_qbf_raise ?(during=TouistErr.Eval) ?(typ=TouistErr.Error) ?(nth=0) ?(lo
 let sat_models_are text expected _ =
   OUnit2.assert_equal ~printer:(fun s -> s)
     expected
-    (let ast = TouistParse.parse_sat text |> TouistEval.eval in let cl,tbl = TouistCnf.ast_to_cnf ast |> TouistSat.minisat_clauses_of_cnf in
+    (let ast = TouistParse.parse_sat text |> TouistEval.eval in let cl,tbl = TouistCnf.ast_to_cnf ast |> TouistSatSolve.minisat_clauses_of_cnf in
       let models_str = ref [] in
-        let _ = TouistSat.solve_clauses ~print:(fun m _ -> models_str := (TouistSat.Model.pprint ~sep:" " tbl m)::!models_str) (cl,tbl)
+        let _ = TouistSatSolve.solve_clauses ~print:(fun m _ -> models_str := (TouistSatSolve.Model.pprint ~sep:" " tbl m)::!models_str) (cl,tbl)
           in List.fold_left (fun acc s -> match acc with "" -> s | _ -> s^" | "^acc) "" !models_str)
 
           (* !models_str

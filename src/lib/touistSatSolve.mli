@@ -1,7 +1,5 @@
-(** Process a CNF AST given by {!TouistCnf.ast_to_cnf}
-    to create Minisat-compatible clauses with {!minisat_clauses_of_cnf} and
-    solve them with {!solve_clauses}.
-*)
+(** {b Requires [minisat]} Process a CNF AST to clauses in order to solve
+    them with Minisat. *)
 
 (** {2 CNF to clauses} *)
 
@@ -36,7 +34,7 @@ end
       found. [N] is the number of the model, it begins at 1.
       It can be useful to print the models as they appear because finding all
       models (if [limit] is large) can be extremely long.
-      Example: [~print:(TouistSat.Model.pprint table model)]
+      Example: [~print:(TouistSatSolve.Model.pprint table model)]
 
     [verbose] allows to turn on the verbose mode of minisat; apparently, this
       minisat feature doesn't seem to be working and doesn't display any time
@@ -48,11 +46,11 @@ end
       models or not.
 *)
 val solve_clauses :
-?verbose:bool ->
-?print:(Model.t -> int -> unit) ->
-?continue:(Model.t -> int -> bool) ->
-Minisat.Lit.t list list * (Minisat.Lit.t, string) Hashtbl.t ->
-ModelSet.t ref
+  ?verbose:bool ->
+  ?print:(Model.t -> int -> unit) ->
+  ?continue:(Model.t -> int -> bool) ->
+  Minisat.Lit.t list list * (Minisat.Lit.t, string) Hashtbl.t ->
+  ModelSet.t ref
 
 (* [string_of_clause] dumps the clause in its literal-number form:
    e.g., 1 -5 3 9 -2 -7 *)

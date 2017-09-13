@@ -222,27 +222,27 @@ let () =
       if !equiv_file_path <> "" then begin
         let solve input =
           let ast = TouistParse.parse_sat ~debug:!debug_syntax ~filename:!input_file_path (string_of_chan input) |> TouistEval.eval
-          in let models = TouistCnf.ast_to_cnf ~debug:!debug_cnf ast |> TouistSat.minisat_clauses_of_cnf |> TouistSat.solve_clauses ~verbose:!debug
+          in let models = TouistCnf.ast_to_cnf ~debug:!debug_cnf ast |> TouistSatSolve.minisat_clauses_of_cnf |> TouistSatSolve.solve_clauses ~verbose:!debug
           in models
         in
         let models = solve !input
         and models2 = solve !input_equiv
-        in match TouistSat.ModelSet.equal !models !models2 with
+        in match TouistSatSolve.ModelSet.equal !models !models2 with
         | true -> Printf.fprintf !output "Equivalent\n"; exit_with OK
         | false -> Printf.fprintf !output "Not equivalent\n"; exit_with SOLVER_UNSAT
       end
       else
         let ast = TouistParse.parse_sat ~debug:!debug_syntax ~filename:!input_file_path input_text |> TouistEval.eval in
-        let clauses,table = TouistCnf.ast_to_cnf ~debug:!debug_cnf ast |> TouistSat.minisat_clauses_of_cnf
+        let clauses,table = TouistCnf.ast_to_cnf ~debug:!debug_cnf ast |> TouistSatSolve.minisat_clauses_of_cnf
         in
         let models =
           begin
-          if !only_count then TouistSat.solve_clauses ~verbose:!debug (clauses,table)
+          if !only_count then TouistSatSolve.solve_clauses ~verbose:!debug (clauses,table)
           else
             let print_model model i =
               if !limit != 1
-              then Printf.fprintf !output "==== model %d\n%s\n" i (TouistSat.Model.pprint ~sep:"\n" table model)
-              else Printf.fprintf !output "%s\n" (TouistSat.Model.pprint ~sep:"\n" table model)
+              then Printf.fprintf !output "==== model %d\n%s\n" i (TouistSatSolve.Model.pprint ~sep:"\n" table model)
+              else Printf.fprintf !output "%s\n" (TouistSatSolve.Model.pprint ~sep:"\n" table model)
             (* Notes:
               1) print_endline vs. printf: print_endline is a printf with
               'flush stdout' at the end. If we don't put 'flush', the user
@@ -263,12 +263,12 @@ let () =
                reaches [limit]. *)
             and continue_limit _ i = i < !limit
             in
-            TouistSat.solve_clauses ~verbose:!debug ~print:print_model
+            TouistSatSolve.solve_clauses ~verbose:!debug ~print:print_model
               ~continue:(if !sat_interactive then continue_asking else continue_limit)
               (clauses,table)
           end
         in
-        match TouistSat.ModelSet.cardinal !models with
+        match TouistSatSolve.ModelSet.cardinal !models with
         | i when !only_count -> Printf.fprintf !output "%d\n" i; exit_with OK
         | 0 -> Printf.fprintf stderr "unsat\n"; exit_with SOLVER_UNSAT
         | 1 -> (* case where we already printed models in [solve_clause] *)
@@ -278,7 +278,7 @@ let () =
     else
       (* B. solve not asked: print the Sat file *)
       let ast = TouistParse.parse_sat ~debug:!debug_syntax ~filename:!input_file_path input_text |> TouistEval.eval in
-      let clauses,tbl = TouistCnf.ast_to_cnf ~debug:!debug_cnf ast |> TouistSat.minisat_clauses_of_cnf
+      let clauses,tbl = TouistCnf.ast_to_cnf ~debug:!debug_cnf ast |> TouistSatSolve.minisat_clauses_of_cnf
       in
       (* Display the mapping table. *)
       tbl |> TouistCnf.print_table (Minisat.Lit.to_int) !output_table ~prefix:(if !output = !output_table then "c " else "");
@@ -307,10 +307,10 @@ let () =
     #ifdef yices2
       let ast = TouistParse.parse_smt ~debug:!debug_syntax ~filename:!input_file_path input_text
           |> TouistEval.eval ~smt:(!mode = Smt) in
-      let str = TouistSmtSolve.ast_to_yices ast |> TouistSmtSolve.model !smt_flag in
-      if str = ""
-      then (Printf.fprintf stderr "unsat\n"; exit_with SOLVER_UNSAT |> ignore)
-      else (Printf.fprintf !output "%s\n" str; exit_with OK);
+      let yices_form,tbl = TouistSmtSolve.ast_to_yices ast in
+      match TouistSmtSolve.solve !smt_flag yices_form with
+      | None -> (Printf.fprintf stderr "unsat\n"; exit_with SOLVER_UNSAT |> ignore)
+      | Some m -> (Printf.fprintf !output "%s\n" (TouistSmtSolve.string_of_model tbl m); exit_with OK |> ignore);
     #else
       Printf.fprintf stderr
         ("This touist binary has not been compiled with yices2 support.");
