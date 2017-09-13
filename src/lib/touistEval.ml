@@ -1,20 +1,3 @@
-(** Evaluate an AST produced by {!TouistParse.parse} so it becomes a semantically
-    correct formula.
-
-    [eval] is the main function. *)
-
-(* Project TouIST, 2015. Easily formalize and solve real-world sized problems
- * using propositional logic and linear theory of reals with a nice language and GUI.
- *
- * https://github.com/touist/touist
- *
- * Copyright Institut de Recherche en Informatique de Toulouse, France
- * This program and the accompanying materials are made available
- * under the terms of the GNU Lesser General Public License (LGPL)
- * version 2.1 which accompanies this distribution, and is available at
- * http://www.gnu.org/licenses/lgpl-2.1.html 
- *)
-
 open TouistTypes.Ast
 open TouistTypes
 open TouistPprint
@@ -27,37 +10,33 @@ open TouistErr
    It is a simple list [(name,description),...] passed as recursive argument.
    The name is the variable name (e.g., '$var' or '$var(a,1,c)').
    The description is a couple (content, location) *)
-type env = (string * (ast * loc)) list
+type env = (string * (Ast.t * loc)) list
 
 (* [extenv] is for global variables (defined after 'data'). It is a hashtable
    accessible from anywhere where the elements are (name, description):
    The name is the variable name (e.g., '$var' or '$var(a,1,c)').
    The description is a couple (content, location) *)
-type extenv = (string, (ast * loc)) Hashtbl.t
+type extenv = (string, (Ast.t * loc)) Hashtbl.t
 
-let get_loc (ast:ast) : loc option = match ast with 
+let get_loc (ast:Ast.t) : loc option = match ast with
     | Loc (_,loc) -> Some loc
     | _ -> None
 
-let warning (ast:ast) (message:string) =
-  add_msg (Warning,Eval,message,get_loc ast)
+let warning (ast:Ast.t) (message:string) =
+  warn (Warning,Eval,message,get_loc ast)
 
-(* [ast_whithout_loc] removes the location attached by the parser to the ast
-   node. This location 'Loc (ast,loc)' allows to give the location in error 
-   messages. [ast_whithout_loc] must be called before any 
-        match ast with | Inter (x,y) -> ... *)
-let ast_whithout_loc (ast:ast) : ast = match ast with
+let ast_without_loc (ast:Ast.t) : Ast.t = match ast with
   | Loc (ast,_) -> ast
   | ast -> ast
 
 (* [raise_with_loc] takes an ast that may contains a Loc (Loc is added in
    parser.mly) and raise an exception with the given message.
    The only purpose of giving 'ast' is to get the Loc thing.
-   [ast_whithout_loc] should not have been previously applied to [ast]
-   because ast_whithout_loc will remove the Loc thing. *)
-let raise_with_loc (ast:ast) (message:string) = match ast with
-  | Loc (ast,loc) -> add_fatal (Error,Eval,message,Some loc)
-  | _ -> add_fatal (Error,Eval,message,None)
+   [ast_without_loc] should not have been previously applied to [ast]
+   because ast_without_loc will remove the Loc thing. *)
+let raise_with_loc (ast:Ast.t) (message:string) = match ast with
+  | Loc (ast,loc) -> fatal (Error,Eval,message,Some loc)
+  | _ -> fatal (Error,Eval,message,None)
 
 (* [raise_type_error] raises the errors that come from one-parameter functions.
    operator is the non-expanded (expand = eval_ast) operator.
@@ -66,7 +45,7 @@ let raise_with_loc (ast:ast) (message:string) = match ast with
    Expanded means that eval_ast has been applied to x.
    [expected_types] contain a string that explain what is expected, e.g.,
    'an integer or a float'. *)
-let raise_type_error operator operand expanded (expected_types:string) = 
+let raise_type_error operator operand expanded (expected_types:string) =
   raise_with_loc operator (
     "'"^(string_of_ast_type operator)^"' expects "^expected_types^". "^
     "The operand:\n"^
@@ -103,14 +82,14 @@ let raise_set_decl ast elmt elmt_expanded set set_expanded (expected_types:strin
     "    "^(string_of_ast set_expanded)^"\n")
 
 
-let check_nb_vars_same_as_nb_sets (ast:ast) (vars:ast list) (sets:ast list) : unit =
+let check_nb_vars_same_as_nb_sets (ast:Ast.t) (vars:Ast.t list) (sets:Ast.t list) : unit =
   let loc = match (List.nth vars 0), List.nth sets ((List.length sets)-1) with
-    | Loc (_,(startpos,_)), Loc (_,(_,endpos)) -> startpos,endpos 
+    | Loc (_,(startpos,_)), Loc (_,(_,endpos)) -> startpos,endpos
     | _-> failwith "[shouldn't happen] missing locations in vars/sets"
   in
   match (List.length vars) = (List.length sets) with
   | true -> ()
-  | false -> add_fatal (Error,Eval,
+  | false -> fatal (Error,Eval,
     "Ill-formed '"^(string_of_ast_type ast)^"'. The number of variables and sets must be the same. "^
     "You defined "^(string_of_int (List.length vars))^" variables:\n"^
     "    "^(string_of_ast_list "," vars)^"\n"^
@@ -131,24 +110,14 @@ let check_only = ref false
    (formulas can be 'int' or 'float' for example). *)
 let smt = ref false
 
-(** Main function for checking the types and evaluating the touistl expressions
-    (variables, bigand, bigor, let...).
-
-    @param ast is the AST given by {!TouistParse.parse}
-    @param onlychecktypes will limit the evaluation to its minimum in
-           order to get type errors as fast as possible.
-    @param smt enables the SMT mode. By default, the SAT mode is used.
-
-    @raise TouistErr.Fatal msg where {!TouistErr.msg} contains the error that could not be
-           recovered upon. *)
-let rec eval ?smt:(smt_mode=false) ?(onlychecktypes=false) ast : ast =
+let rec eval ?smt:(smt_mode=false) ?(onlychecktypes=false) ast : Ast.t =
   check_only := onlychecktypes;
   smt := smt_mode;
   extenv := Hashtbl.create 50; (* extenv must be re-init between two calls to [eval] *)
   eval_touist_code [] ast
 
-and eval_touist_code (env:env) ast :ast =
-  
+and eval_touist_code (env:env) ast :Ast.t =
+
   let rec affect_vars = function
     | [] -> []
     | Loc (Affect (Loc (Var (p,i),var_loc),y),affect_loc)::xs ->
@@ -161,7 +130,7 @@ and eval_touist_code (env:env) ast :ast =
     | x::[] -> x
     | x::xs -> And (x, process_formulas xs)
   in
-  match ast_whithout_loc ast with
+  match ast_without_loc ast with
   | Touist_code (formulas) ->
     eval_ast_formula env (process_formulas (affect_vars formulas))
   | e -> raise_with_loc ast ("this does not seem to be a touist code structure: " ^ string_of_ast e ^"\n")
@@ -169,9 +138,9 @@ and eval_touist_code (env:env) ast :ast =
 (* [eval_ast] evaluates (= expands) numerical, boolean and set expresions that
    are not directly in formulas. For example, in 'when $a!=a' or 'if 3>4',
    the boolean values must be computed: eval_ast will do exactly that.*)
-and eval_ast (env:env) (ast:ast) :ast =
+and eval_ast (env:env) (ast:Ast.t) : Ast.t =
   let eval_ast = eval_ast env in
-  let expanded = match ast_whithout_loc ast with
+  let expanded = match ast_without_loc ast with
   | Int x   -> Int x
   | Float x -> Float x
   | Bool x  -> Bool x
@@ -349,8 +318,8 @@ and eval_ast (env:env) (ast:ast) :ast =
   | e -> failwith ("[shouldnt happen] this expression cannot be expanded: " ^ string_of_ast e ^"\n")
   in expanded
 
-and eval_set_decl (env:env) (set_decl:ast) =
-  let sets = (match ast_whithout_loc set_decl with Set_decl sets -> sets | _ -> failwith "shoulnt happen: non-Set_decl in eval_set_decl") in
+and eval_set_decl (env:env) (set_decl:Ast.t) =
+  let sets = (match ast_without_loc set_decl with Set_decl sets -> sets | _ -> failwith "shoulnt happen: non-Set_decl in eval_set_decl") in
   let sets_expanded = List.map (fun x -> eval_ast env x) sets in
   let unwrap_set first_elmt elmt elmt_expanded = match first_elmt, elmt_expanded with
     | Int _  , Int x   -> Int x
@@ -365,7 +334,7 @@ and eval_set_decl (env:env) (set_decl:ast) =
   match sets, sets_expanded with
   | [],[] -> Set AstSet.empty
   | x::_,first::_ -> begin
-      match first with 
+      match first with
       | Int _ | Float _ | Prop _ | Set _ -> Set (AstSet.of_list (List.map2 (unwrap_set first) sets sets_expanded))
       | _ -> raise_set_decl set_decl x first
                     (Set_decl sets) (Set_decl sets_expanded)
@@ -376,11 +345,11 @@ and eval_set_decl (env:env) (set_decl:ast) =
 
 (* [eval_ast_formula] evaluates formulas; nothing in formulas should be
    expanded, except for variables, bigand, bigor, let, exact, atleast,atmost. *)
-and eval_ast_formula (env:env) (ast:ast) : ast =
+and eval_ast_formula (env:env) (ast:Ast.t) : Ast.t =
   let eval_ast_formula = eval_ast_formula env
   and eval_ast_formula_env = eval_ast_formula
   and eval_ast = eval_ast env in
-  match ast_whithout_loc ast with
+  match ast_without_loc ast with
   | Int x   -> Int x
   | Float x -> Float x
   | Neg x ->
@@ -437,7 +406,7 @@ and eval_ast_formula (env:env) (ast:ast) : ast =
   | UnexpProp (p,i) -> Prop (expand_var_name env (p,i))
   | Prop x -> Prop x
   | Var (p,i) -> (* p,i = prefix,indices *)
-    (* name = prefix + indices. 
+    (* name = prefix + indices.
        Example with $v(a,b,c):
        name is '$v(a,b,c)', prefix is '$v' and indices are '(a,b,c)' *)
     let name = expand_var_name env (p,i) in
@@ -497,7 +466,7 @@ and eval_ast_formula (env:env) (ast:ast) : ast =
           let (content,loc_affect) = List.assoc prefix env in
           let term = match content with
             | Prop x -> Prop x
-            | wrong -> add_fatal (Error,Eval,
+            | wrong -> fatal (Error,Eval,
                 "the proposition '" ^ name ^ "' cannot be expanded because '"^prefix^"' is of type '"^(string_of_ast_type wrong)^"'. " ^
                 "In order to produce an expanded proposition of this kind, '"^prefix^"' must be a proposition. "^
                 "Why? Because this variable is part of a formula, and thus is expected "^
@@ -561,7 +530,7 @@ and eval_ast_formula (env:env) (ast:ast) : ast =
       match vars,sets with
       | [],[] | _,[] | [],_ -> failwith "shouln't happen: non-variable in big construct"
       | [Loc (Var (name,_),loc)],[set] -> (* we don't need the indices because bigand's vars are 'simple' *)
-        let rec process_list_set env (set_list:ast list) =
+        let rec process_list_set env (set_list:Ast.t list) =
           match set_list with
           | []   -> Top (*  what if bigand in a or? We give a warning (see below) *)
           | x::xs ->
@@ -589,7 +558,7 @@ and eval_ast_formula (env:env) (ast:ast) : ast =
       match vars,sets with
       | [],[] | _,[] | [],_ -> failwith "shouln't happen: non-variable in big construct"
       | [Loc (Var (name,_),loc)],[set] ->
-        let rec process_list_set env (set_list:ast list) =
+        let rec process_list_set env (set_list:Ast.t list) =
           match set_list with
           | []    -> Bottom
           | x::xs ->
@@ -658,10 +627,10 @@ and and_of_term_list =
   List.fold_left (fun acc t -> And (acc, t)) Top
 
 (* [expand_prop] will expand a proposition containing a set as index, e.g.,
-   time([1,2],[a,b]) will become [time(1,a),time(1,b)...time(b,2)]. This is useful when 
+   time([1,2],[a,b]) will become [time(1,a),time(1,b)...time(b,2)]. This is useful when
    generating sets. *)
 and expand_prop_with_set env name indices_optional =
-  let rec eval_indices env (l:ast list) :ast list = match l with
+  let rec eval_indices env (l:Ast.t list) :Ast.t list = match l with
     | [] -> []
     | x::xs -> (eval_ast env x)::(eval_indices env xs)
   in
@@ -676,7 +645,7 @@ and expand_prop_with_set env name indices_optional =
     | Some x -> let indices = eval_indices env x in
             indices, expand_prop_with_set' [UnexpProp (name,None)] indices env
   in
-  let eval_unexpprop acc cur = match cur with 
+  let eval_unexpprop acc cur = match cur with
     | UnexpProp (p,i) -> (Prop (expand_var_name env (p,i)))::acc | _->failwith "shouldnt happen"
   in let props_evaluated = List.fold_left eval_unexpprop [] generated_props in
   if (let x = has_nonempty_set indices in x) then Set (AstSet.of_list props_evaluated)
@@ -685,7 +654,7 @@ and expand_prop_with_set env name indices_optional =
 and expand_prop_with_set' proplist indices env =
   match indices with (* at this point, indice is either a Prop or a Set *)
   | [] -> proplist
-  | i::next -> 
+  | i::next ->
     match i with
     | Set s when AstSet.is_empty s -> expand_prop_with_set' proplist next env
     | Set s -> let new_proplist = (expand_proplist proplist (set_to_ast_list env (Set s))) in
@@ -698,7 +667,7 @@ and expand_prop prop ind = match prop with
   | UnexpProp (name, None) -> List.fold_left (fun acc i -> (UnexpProp (name,Some ([i])))::acc) [] ind
   | UnexpProp (name, Some cur) -> List.fold_left (fun acc i -> (UnexpProp (name,Some (cur @ [i])))::acc) [] ind
   | x -> failwith ("[shouldnt happen] proplist contains smth that is not UnexpProp: "^string_of_ast_type x)
-and expand_var_name (env:env) (prefix,indices:string * ast list option) =
+and expand_var_name (env:env) (prefix,indices:string * Ast.t list option) =
   match (prefix,indices) with
   | (x,None)   -> x
   | (x,Some y) ->
@@ -707,17 +676,17 @@ and expand_var_name (env:env) (prefix,indices:string * ast list option) =
     ^ ")"
 
 (* [set_to_ast_list] evaluates one element  of the list of things after
-   the 'in' of bigand/bigor. 
+   the 'in' of bigand/bigor.
    If this element is a set, it turns this Set (.) into a list of Int,
    Float or Prop.
-   
+
    WARNING: this function reverses the order of the elements of the set;
-   we could use fold_right in order to keep the original order, but 
-   it would mean that it is not tail recursion anymore (= uses much more heap) 
-   
+   we could use fold_right in order to keep the original order, but
+   it would mean that it is not tail recursion anymore (= uses much more heap)
+
    If [!check_only] is true, then the lists *)
-and set_to_ast_list (env:env) (ast:ast) :ast list =
-  let lst = match ast_whithout_loc (eval_ast env ast) with
+and set_to_ast_list (env:env) (ast:Ast.t) :Ast.t list =
+  let lst = match ast_without_loc (eval_ast env ast) with
   | Set s -> AstSet.elements s
   | ast' -> raise_with_loc ast (
       "after 'in', only sets are allowed, but got '"^(string_of_ast_type ast')^"':\n"^
@@ -730,11 +699,11 @@ and set_to_ast_list (env:env) (ast:ast) :ast list =
           | true,        x::xs -> [x]
 
   (* [ast_to_bool] evaluates the 'when' condition when returns 'true' or 'false'
-     depending on the result. 
+     depending on the result.
      This function is used in Bigand and Bigor statements. *)
-  and ast_to_bool env (ast:ast) : bool =
-    match eval_ast env ast with 
-    | Bool b -> b 
+  and ast_to_bool env (ast:Ast.t) : bool =
+    match eval_ast env ast with
+    | Bool b -> b
     | ast' -> raise_with_loc ast (
       "'when' expects a 'bool' but got '"^(string_of_ast_type ast')^"':\n"^
       "    "^(string_of_ast ast')^"\n"^
@@ -742,7 +711,7 @@ and set_to_ast_list (env:env) (ast:ast) :ast list =
       "    "^(string_of_ast ast')^"\n")
   (* To_int, To_float, Var, Int... all these cannot contain ToRemove because
      ToRemove can only be generated by exact, atleast, atmost, bigand and bigor.
-     I only need to match the items that can potentially be produced by the 
+     I only need to match the items that can potentially be produced by the
      above mentionned. And because "produced" means that everything has already
      been evaluated, all If, Var... have already disapeared. *)
   and has_top_or_bot = function

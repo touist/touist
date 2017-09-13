@@ -1,9 +1,5 @@
-(** Transform a semantically correct (=returned by {!TouistEval.eval}) ast into Prenex
-    form, CNF and QDIMACS.
 
-    To transform into QDIMACS, you should call {!prenex}, [cnf] and finally
-    [print_qdimacs].
-*)
+open TouistTypes
 open TouistTypes.Ast
 
 let add_suffix name =
@@ -13,10 +9,8 @@ let add_suffix name =
       (fun str -> ((str |> matched_string |> int_of_string)+1) |> string_of_int)
   with Not_found -> name ^ "_1"
 
-(** [to_prenex] applies the 'transformation rules' listed on wikipedia (fr) in
-    order to transform a valid (= output of {!TouistEval.eval}) AST into Prenex
-    Normal Form (PNF). Because we do not know any to transform 'xor' and '<=>',
-    these two connectors will be re-written using the other connectors.
+(** [to_prenex] is used over and over by {!prenex} as long as the formula
+    is not in prenex form.
 
     [quant_l] is the list of previously quantified propositions. We need this
     to rename any overlapping quantor scope when transforming to prenex form.
@@ -27,7 +21,7 @@ let add_suffix name =
     only want one exists/forall transformation per to_prenex full recursion
     because of the variable renaming.
 *)
-let rec to_prenex debug quant_l conflict_l only_rename ast : ast =
+let rec to_prenex debug quant_l conflict_l only_rename ast : Ast.t =
   let string_of_prop prop = match prop with
     | Prop name -> name
     | e -> failwith ("[shouldnt happen] a quantor must be a proposition, not a '"^TouistPprint.string_of_ast_type e^"' in " ^ TouistPprint.string_of_ast e)
@@ -37,7 +31,7 @@ let rec to_prenex debug quant_l conflict_l only_rename ast : ast =
      an error is raised. *)
   let to_prenex_new prop ast_inner =
     if List.exists (fun y -> y=(string_of_prop prop)) quant_l
-    then TouistErr.add_fatal (TouistErr.Error,TouistErr.Prenex,
+    then TouistErr.fatal (TouistErr.Error,TouistErr.Prenex,
       "the prop '"^TouistPprint.string_of_ast prop^"' has been quantified twice. \
       For all the quantifiers quantifying on '"^TouistPprint.string_of_ast prop^"' \
       in the following code, you should rename their variables:\n    "^TouistPprint.string_of_ast ast^"\n",None)
@@ -104,7 +98,6 @@ let rec to_prenex debug quant_l conflict_l only_rename ast : ast =
     (TouistPprint.string_of_ast ~utf8:true ast);
   new_ast
 
-(** [is_unquant] checks that the given formula does not contain any quantors. *)
 let rec is_unquant = function
   | Exists (_,_) | Forall (_,_) -> false
   | Prop _ | Top | Bottom -> true
@@ -120,7 +113,8 @@ let rec is_prenex = function
   | f -> is_unquant f
 
 (* [quantify_free_variables] takes a prenex form and quantifies existentially
-   any free variable in the innermost way possible. *)
+   any free variable in the innermost way possible.
+   It is mainly used by {!cnf}. *)
 let rec quantify_free_variables env ast =
   let rec search_free env ast =
     match ast with
@@ -143,9 +137,7 @@ let rec quantify_free_variables env ast =
   | other -> let free = search_free env other in
     free |> remove_dups |> List.fold_left (fun acc x -> Exists (Prop x,acc)) other
 
-(** [prenex ast] loops over {!to_prenex} as long as the formula is not in
-    prenex form. *)
-let prenex ?(debug=false) ast : ast =
+let prenex ?(debug=false) ast : Ast.t =
   let rec to_prenex_loop ast =
     if debug then Printf.printf "step: %s\n" (TouistPprint.string_of_ast ~utf8:true ast);
     if is_prenex ast then ast else ast |> to_prenex debug [] [] false |> to_prenex_loop
@@ -154,8 +146,6 @@ let prenex ?(debug=false) ast : ast =
   let final = intermediate |> quantify_free_variables [] in
   final
 
-(** [cnf ast] calls {!TouistCnf.cnf} on the inner formula (with no quantifiers) and
-    existentially quantifies any tseitlin variable in an innermost way. *)
 let cnf ?(debug=false) ast =
   let rec process = function
   | Forall (x,f) -> Forall (x, process f)
@@ -165,16 +155,8 @@ let cnf ?(debug=false) ast =
 
   type 'a quantlist = A of 'a list | E of 'a list
 
-(** [regroup_quantors] gathers all succeeding Forall and Exists to a list
-    of list such that each sublist only contains one type of quantor.
-    Example:   {[
-       Forall ("a",Forall ("b",Exists ("c", Forall ("d",_)))
-    ]}  becomes  {[
-       [A of ["a";"b"]; E of ["c"]; A of ["d"]]
-    ]}
-
-    NOTE: I had to reverse the lists each time because the lists were
-    constructed the wrong way around. *)
+(* NOTE: I had to reverse the lists each time because the lists were
+   constructed the wrong way around. *)
 let rec regroup_quantors ast quantlist = match ast with
   | Forall (Prop x,f) ->
     let rec process_forall ast l = match ast with
@@ -192,18 +174,9 @@ let rec regroup_quantors ast quantlist = match ast with
     regroup_quantors inner (E (List.rev exists) :: quantlist)
   | inner -> (List.rev quantlist,inner)
 
-(** [qbfclauses_of_cnf] translates an AST (which is in CNF) to three
-    structures:
-    - 1) a list of quantlist which reprensents the grouped quantifiers in the
-         Prenex Normal Form.
-    - 2) a list of lists of integers which represents the CNF formula embedded
-         in the Prenex Normal Form.
-    - 3) a correspondance table 'int -> litteral names'
-
-    NOTE: I use [fold_right] (which is non-tail recursive, thus less
+(* NOTE: I use [fold_right] (which is non-tail recursive, thus less
     performant) to avoid the mess yielded by the reversing of the lists with
-    [fold_left].
-*)
+    [fold_left]. *)
 let qbfclauses_of_cnf ast =
   let quants, inner = regroup_quantors ast [] in
   let num_lit = ref 1 in
@@ -217,14 +190,6 @@ let qbfclauses_of_cnf ast =
   ) []
   in List.rev quantlist_int, clauses_int, int_to_str
 
-(** [print_qdimacs out out_table ast] takes a Prenex-CNF formula
-    {!TouistTypes.Ast.ast} and prints the following:
-    - 1) the mapping table (litterals int to name)
-    - 2) dimacs header line ('p cnf 3 2')
-    - 3) the quantifiers lines grouped (one quantifier per line, beginning with
-    'e' or 'a' and ending by 0)
-    - 4) the clauses (one conjunction per line, one line is a disjunction,
-    minus means 'not'). *)
 let print_qdimacs out out_table ast =
   let quantlist_int,clauses_int,int_to_str = qbfclauses_of_cnf ast in
   (* Display the mapping table (propositional names -> int) in dimacs comments *)
@@ -239,4 +204,4 @@ let print_qdimacs out out_table ast =
       | E l -> fprintf out "e%s 0\n" (l |> fold_left (fun acc s -> acc^" "^ string_of_int s) "")
     );
   (* Display the clauses in dimacs way *)
-  clauses_int |> TouistCnf.print_clauses_to_dimacs out string_of_int;
+  clauses_int |> TouistCnf.print_clauses out string_of_int;

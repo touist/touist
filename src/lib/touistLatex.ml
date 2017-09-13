@@ -1,28 +1,5 @@
-(** Transform any AST (at any stage of transformation) to latex.
-
-    Note that the headers are not included; if you want to compile
-    the resulting latex text in a real latex document, you would need
-    to add (fr example):
-    {[
-      \documentclass[11pt]{report}
-      \usepackage{mathtools}
-      \begin{document}
-        % thing produced by latex_of_ast
-      \end{document}
-    ]}
-
-    Some details on the latex code produced:
-    - tuple-propositions [p(a,b,c)] turn into p_{a,b,c}
-    - variables are displayed in bold font and '$' is removed
-    - we use [\mathbf{}] for setting bold font on variables.
-      We could use [\bm{}] (which is a more appropriate way
-      of using bold-font in the math env as it keeps the 'italic'
-      way of displaying math) but [\usepackage{bm}] does not work
-      with most tools: MathJax (javascript), jlatexmath (java).
-*)
-
-open TouistTypes.Ast
 open TouistTypes
+open TouistTypes.Ast
 open TouistPprint
 
 let rm_dollar x = String.sub x 1 (String.length x - 1)
@@ -47,10 +24,6 @@ let rm_dollar x = String.sub x 1 (String.length x - 1)
     ]}
 *)
 
-(** [latex_of_ast] turns an AST into latex. Two latex variants are targeted:
-    - for light latex processors (mathjax, jlatexmath), you should use
-      [~full:false]
-    - for fully-featured latex processors, you can use [~full:true]. *)
 let rec latex_of_ast ~full ast =
   let latex_of_ast ast = latex_of_ast ~full ast in
   let latex_of_commalist = latex_of_commalist ~full in
@@ -109,12 +82,12 @@ let rec latex_of_ast ~full ast =
       "\\bigwedge\\limits_{\\substack{" ^ (latex_of_commalist "," x) ^
       "\\in " ^ (latex_of_commalist "," y) ^
       (match b with None -> "" | Some b -> "\\\\" ^ (latex_of_ast b)) ^ "}}" ^
-      latex_of_ast (if z |> TouistEval.ast_whithout_loc |> is_binary_op then (Paren z) else z)
+      latex_of_ast (if z |> TouistEval.ast_without_loc |> is_binary_op then (Paren z) else z)
   | Bigor (x,y,b,z) ->
       "\\bigvee\\limits_{\\substack{" ^ (latex_of_commalist "," x) ^
        "\\in " ^ (latex_of_commalist "," y) ^
        (match b with None -> "" | Some b -> "\\\\" ^ (latex_of_ast b)) ^ "}}" ^
-       latex_of_ast (if z |> TouistEval.ast_whithout_loc |> is_binary_op then (Paren z) else z)
+       latex_of_ast (if z |> TouistEval.ast_without_loc |> is_binary_op then (Paren z) else z)
   | Exact (x,y) -> "\\textrm{exact}(" ^ (latex_of_ast x) ^ "," ^ (latex_of_ast y) ^ ")"
   | Atmost (x,y) -> "\\textrm{atmost}(" ^ (latex_of_ast x) ^ "," ^ (latex_of_ast y) ^ ")"
   | Atleast (x,y) -> "\\textrm{atleast}(" ^ (latex_of_ast x) ^ "," ^ (latex_of_ast y) ^ ")"
@@ -130,7 +103,7 @@ let rec latex_of_ast ~full ast =
   | Exists (v,f) -> "\\exists "^(latex_of_ast v) ^". "^ (latex_of_ast f)
   | Forall (v,f) -> "\\forall "^(latex_of_ast v) ^". "^ (latex_of_ast f)
   | For (var,set,above_f) ->
-    let op, prop, f = match TouistEval.ast_whithout_loc above_f with
+    let op, prop, f = match TouistEval.ast_without_loc above_f with
     | Forall (prop,f) -> ("\\forall ", prop, f)
     | Exists (prop,f) -> ("\\exists ", prop, f)
     | f -> failwith ("[shoudlnt happen] only exists and forall allowed with \
@@ -148,7 +121,7 @@ let rec latex_of_ast ~full ast =
 (** [ast_fun] will apply f on all *formula*-related elements of the AST where
     cond is true. The tranversal order should not be considered.
     Whenever a non-formula is given, acc will be immediatly returned. *)
-and ast_fun (f:('a -> ast -> 'a)) (acc:'a) ast : 'a =
+and ast_fun (f:('a -> Ast.t -> 'a)) (acc:'a) ast : 'a =
   let acc = f acc ast in
   let ast_fun' ast acc = ast_fun f acc ast in
   match ast with

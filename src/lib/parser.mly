@@ -135,7 +135,7 @@
 *)
 
 (* The two entry points of our parser *)
-%start <TouistTypes.Ast.ast> touist_simple, touist_smt, touist_qbf
+%start <TouistTypes.Ast.t> touist_simple, touist_smt, touist_qbf
 
 %% (* Everthing below that mark is expected to be a production rule *)
    (* Note that VAR { $0 } is equivalent to v=VAR { v } *)
@@ -226,7 +226,7 @@ expr:
   | s1=expr SUBSET s2=expr {Loc (Subset (s1,s2),($startpos,$endpos))}
   | SUBSET_PR (*LPAREN*) s1=expr COMMA s2=expr RPAREN {
       let loc = ($startpos,$endpos) in
-      add_msg (Warning,Parse,"'subset(A,B)' is deprecated, please use \
+      warn (Warning,Parse,"'subset(A,B)' is deprecated, please use \
         'A subset B' instead.\n",Some loc);
       Loc (Subset (s1,s2),loc)}
   | p=prop {p}
@@ -264,17 +264,17 @@ expr:
   | s1=T DIFF s2=T {Loc (Diff (s1,s2),($startpos,$endpos))}
   | UNION_PR (*LPAREN*) s1=T COMMA s2=T RPAREN {
       let loc = ($startpos,$endpos) in
-      add_msg (Warning,Parse,"'union(A,B)' is deprecated, please use \
+      warn (Warning,Parse,"'union(A,B)' is deprecated, please use \
         'A union B' instead.\n",Some loc);
       Loc (Union (s1,s2),loc)}
   | INTER_PR (*LPAREN*) s1=T COMMA s2=T RPAREN {
       let loc = ($startpos,$endpos) in
-      add_msg (Warning,Parse,"'inter(A,B)' is deprecated, please use \
+      warn (Warning,Parse,"'inter(A,B)' is deprecated, please use \
         'A inter B' instead.\n",Some loc);
       Loc (Inter (s1,s2),loc)}
   | DIFF_PR  (*LPAREN*) s1=T COMMA s2=T RPAREN {
       let loc = ($startpos,$endpos) in
-      add_msg (Warning,Parse,"'diff(A,B)' is deprecated, please use \
+      warn (Warning,Parse,"'diff(A,B)' is deprecated, please use \
         'A diff B' instead.\n",Some loc);
       Loc (Diff (s1,s2),loc)}
   | POWERSET (*LPAREN*) s=T RPAREN {Loc (Powerset s,($startpos,$endpos))}
@@ -292,7 +292,7 @@ let_affect(T,F): LET vars=comma_list(var) AFFECT contents=comma_list(T) COLON fo
     {try List.fold_right2 (fun var content acc ->
       Loc (Let (var,content,acc),($startpos,$endpos))) vars contents form
     with Invalid_argument _ ->
-      single_msg (Error,Parse,
+      fatal (Error,Parse,
         ("'let' statement does not have the same number of variables and values.\n"),
         Some ($startpos,$endpos))
     } %prec low_precedence

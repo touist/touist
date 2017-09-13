@@ -146,14 +146,14 @@ let () =
 
   (* Check (file | -) and open input and output *)
   if (!input_file_path = "/dev/stdin") && not !use_stdin (* NOTE: !var is like *var in C *)
-  then single_msg (Error,Usage,"you must give an input file (use - for reading from stdin).\n",None);
+  then fatal (Error,Usage,"you must give an input file (use - for reading from stdin).\n",None);
 
   if !use_stdin then input := stdin else input := open_in !input_file_path;
 
   let count = List.fold_left (fun acc v -> if v then acc+1 else acc) 0
   in
   if (count [!sat_flag; !smt_flag<>""; !qbf_flag]) > 1 then
-    single_msg (Error,Usage,"only one of --sat, --smt or --qbf must be given.\n",None);
+    fatal (Error,Usage,"only one of --sat, --smt or --qbf must be given.\n",None);
 
   (* Set the mode *)
   if      !sat_flag     then mode := Sat
@@ -165,7 +165,7 @@ let () =
   #ifdef yices2
     (* SMT Mode: check if one of the available QF_? has been given after --smt *)
     if (!mode = Smt) && not (TouistSmtSolve.logic_supported !smt_flag) then
-      single_msg (Error,Usage,"you must give a correct SMT-LIB \
+      fatal (Error,Usage,"you must give a correct SMT-LIB \
       logic after --smt (try --help)\nExample: --smt QF_IDL\n",None);
   #endif
 
@@ -289,7 +289,7 @@ let () =
         (if Minisat.Lit.sign l then "" else "-") ^ (Minisat.Lit.abs l |> Hashtbl.find tbl)
         else Minisat.Lit.to_string l
       in
-      clauses |> TouistCnf.print_clauses_to_dimacs !output print_lit;
+      clauses |> TouistCnf.print_clauses !output print_lit;
       exit_with OK
         (* table_prefix allows to add the 'c' before each line of the table
            display, when and only when everything is outputed in a single
@@ -348,7 +348,7 @@ let () =
             | TouistQbf.E l -> fprintf !output "e%s 0\n" (l |> fold_left (fun acc s -> acc^" "^ print_lit s) "")
           );
         (* Display the clauses in dimacs way *)
-        clauses_int |> TouistCnf.print_clauses_to_dimacs !output print_lit;
+        clauses_int |> TouistCnf.print_clauses !output print_lit;
       end
       else (* --solve*)
     #ifdef qbf

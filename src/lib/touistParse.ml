@@ -1,22 +1,8 @@
-(** TouistParse a TouIST source into an Abstract Syntaxic Tree (AST).
-
-    [parse] is the main function.
-
-    After this step, the AST (its type is {!TouistTypes.Ast.ast}) can go through
-    different functions: - (1) {!TouistEval.eval} for type-checking and
-    evaluation of the expressions (bigor, bigand, variables...):
-    - (2) {!TouistCnf.ast_to_cnf} and then {!TouistSat.minisat_clauses_of_cnf}
-          to transform the AST into a clause ready to use by Minisat
-    - (2') {!TouistSmt.to_smt2} to transform the AST into LIB-SMT2
-    - (2'') {!TouistQbf.prenex} to transform the CNF AST into QDIMACS
-    - (3) {!TouistSat.minisat_clauses_to_solver} and {!TouistSat.solve_clauses}
-          to solve the SAT problem
-*)
-
 open Parser
 open Lexing
 open TouistErr
 
+open TouistTypes
 open TouistTypes.Ast
 
 (** [lexer] is used [parse] in order to get the next token of the input
@@ -49,7 +35,7 @@ let lexer buffer : (Lexing.lexbuf -> Parser.token) =
 
     [parser] is the 'entry point' of the parser that is defined in
     parser.mly, i.e.,   {[
-        %start <TouistTypes.Ast.ast> touist_simple, touist_smt
+        %start <TouistTypes.Ast.t> touist_simple, touist_smt
     ]}
 
     [detailed_err] allows to display absolute positions of the faulty text.
@@ -63,7 +49,7 @@ let lexer buffer : (Lexing.lexbuf -> Parser.token) =
     "foo.touistl"... For now, the name of the input file name is not
     indicated to the user: useless because we only handle a single touistl file
 *)
-let parse (parser) ?debug:(debug=false) filename (text:string) : ast =
+let parse (parser) ?debug:(debug=false) filename (text:string) : Ast.t =
   let buffer = ref Parser_error_report.Zero in
   let lexbuf = Lexing.from_string text in
   lexbuf.lex_curr_p <- {lexbuf.lex_curr_p with pos_fname = filename; pos_lnum = 1};
@@ -73,11 +59,11 @@ let parse (parser) ?debug:(debug=false) filename (text:string) : ast =
   and fail checkpoint =
     let msg = (Parser_error_report.report text !buffer checkpoint debug)
     and loc = Parser_error_report.area_pos !buffer (* area_pos returns (start_pos,end_pos) *)
-    in single_msg (Error,Parse,msg,Some loc)
+    in fatal (Error,Parse,msg,Some loc)
   in
     let ast =
       try Parser.MenhirInterpreter.loop_handle succeed fail supplier checkpoint
-      with Lexer.Error (msg,loc) -> TouistErr.single_msg (Error,Lex,msg,Some loc)
+      with Lexer.Error (msg,loc) -> TouistErr.fatal (Error,Lex,msg,Some loc)
     in ast
 
 (** Directly calls [parser] with [Parser.Incremental.touist_simple] *)

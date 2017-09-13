@@ -1,19 +1,6 @@
-(** Transform any AST (at any stage of transformation) to a string. *)
-
 open TouistTypes
 open TouistTypes.Ast
 
-(** [string_of_ast ast] takes an abstract syntaxic tree [ast] and turn it into
-    a string using its content.
-    [~debug:true] allows to include all user-hidden AST stuff.
-    [~show_var:f] passes [f] each time. (????)
-    [~utf8:true] will output utf-8 symbols instead of plain text, e.g.,
-    ∃, ∈, ⋀ instead of exists, in, and.
-    [~parenthesis:true] will display more parenthesis than usual in order to
-    show the priority on operators.
-
-    NOTE: the [parenthesis] param has not been implemented yet (!!).
-*)
 let rec string_of_ast ?(utf8=false) ?(show_var=(fun ast -> "")) ?(debug=false) ?(parenthesis=debug) ast =
   let of_ast = string_of_ast ~utf8 ~show_var ~parenthesis ~debug in
   let of_ast_list = string_of_ast_list ~utf8 ~show_var ~parenthesis ~debug in
@@ -119,8 +106,7 @@ let rec string_of_ast ?(utf8=false) ?(show_var=(fun ast -> "")) ?(debug=false) ?
   | For (v,c,f)           -> "for "^of_ast v^" in "^of_ast c^":"^ of_ast f
   | NewlineBefore f | NewlineAfter f -> of_ast f
 
-(** [string_of_ast_type] gives the type of an AST. *)
-and string_of_ast_type ?(debug=false) (ast:ast) : string =
+and string_of_ast_type ?(debug=false) (ast:Ast.t) : string =
   let of_ast_type ast = string_of_ast_type ~debug ast in
   match ast with
   | Int    x               -> "int"
