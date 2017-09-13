@@ -41,6 +41,11 @@ cd $TOUIST_BUILD_DIR
 ocamlfind remove touist
 ./configure --bindir support/gui/external --enable-tests --enable-yices2 --enable-qbf
 make
+# Because 'core.autocrlf input' is set, parser.messages is checked-out using
+# LF endings. But menhir re-generates it, thus producing CRLF endings instead.
+# Solution: dos2unix on it each time...
+dos2unix src/lib/parser.messages
+
 make install
 
 # 'make test' and 'make uninstall' are done in appveyor.yml
@@ -57,12 +62,6 @@ for f in $(find build/distributions -name "TouIST*"); do
 done
 ls build/distributions
 cd ../..
-
-
-# Because 'core.autocrlf input' is set, parser.messages is checked-out using
-# LF endings. But menhir re-generates it, thus producing CRLF endings instead.
-# Solution: dos2unix on it each time...
-dos2unix src/lib/parser.messages
 
 git status
 if ! git status 2> /dev/null | tail -n1 | grep "nothing.*clean"; then
