@@ -1,5 +1,5 @@
 # OASIS_START
-# DO NOT EDIT (digest: 6ce38fc66863f746e2b2eb1f9b68b359)
+# DO NOT EDIT (digest: e43753b55d5c4b1023d852624a6f8876)
 TouistParse
 TouistEval
 TouistCnf
@@ -14,4 +14,5 @@ TouistVersion
 Lexer
 Parser
 Parser_error_report
+Parser_messages
 # OASIS_STOP
