@@ -380,7 +380,7 @@ end;
   with
     (* Warning: the [msg] already contains an ending '\n'. No need for adding
        another ending newline after it. *)
-    | Fatal msg ->
+    | TouistFatal msg ->
       if !debug then Printf.eprintf "Stacktrace:\n%s\n" (Printexc.get_backtrace ());
       Printf.eprintf "%s" (TouistErr.string_of_msg msg);
       exit_with (match msg with _,Usage,_,_ -> CMD_USAGE | _ -> TOUIST_SYNTAX)

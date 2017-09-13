@@ -2,7 +2,7 @@
 
     We call a 'message' an error or a warning.
     Two cases for displaying the errors:
-    - either one of the parse/eval/smt/sat function will raise the Fatal exception.
+    - either one of the parse/eval/smt/sat function will raise the TouistFatal exception.
       In this case, after the exception is catched, you can run [print_msgs].
     - or no fatal error has been encoundered; if you want to display the errors,
       you can run [print_msgs].
@@ -22,7 +22,7 @@ type during = Usage | Parse | Lex | Eval | Sat | Cnf | Prenex
 type loc = Lexing.position * Lexing.position
 type msg = msg_type * during * string * loc option
 
-exception Fatal of msg
+exception TouistFatal of msg
 
 (** {2 Print the errors} *)
 

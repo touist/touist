@@ -20,7 +20,7 @@ let test_raise (parse:(string->unit)) (during:TouistErr.during) typ nth_msg (loc
   try parse text;
     if typ == TouistErr.Error then
       OUnit2.assert_failure ("this test didn't raise an error at location '"^loc_expected^"' as expected")
-  with TouistErr.Fatal msg ->
+  with TouistErr.TouistFatal msg ->
     match msg |> is_msg typ during loc_expected with
     | true -> () (* OK *)
     | false -> OUnit2.assert_failure ("this test didn't give a message at location '"^loc_expected^"' as expected. Instead, got:\n"^TouistErr.string_of_msg msg)
@@ -33,20 +33,20 @@ let qbf text = let _ = TouistParse.parse_qbf text |> TouistEval.eval ~smt:true |
    must accept the 'context' thing. *)
 let test_sat text _ =
   try sat text
-  with TouistErr.Fatal msg -> OUnit2.assert_failure
-    ("this test shouldn't have raised a Fatal exception. Here is the exception:\n"^
+  with TouistErr.TouistFatal msg -> OUnit2.assert_failure
+    ("this test shouldn't have raised a TouistFatal exception. Here is the exception:\n"^
       TouistErr.string_of_msg msg)
 
 let test_smt ?(logic="QF_IDL") text _ =
   try (smt logic) text
-  with TouistErr.Fatal msg -> OUnit2.assert_failure
-    ("this test shouldn't have raised a Fatal exception. Here is the exception:\n"^
+  with TouistErr.TouistFatal msg -> OUnit2.assert_failure
+    ("this test shouldn't have raised a TouistFatal exception. Here is the exception:\n"^
       TouistErr.string_of_msg msg)
 
 let test_qbf text _ =
   try qbf text
-  with TouistErr.Fatal msg -> OUnit2.assert_failure
-    ("this test shouldn't have raised a Fatal exception. Here is the exception:\n"^
+  with TouistErr.TouistFatal msg -> OUnit2.assert_failure
+    ("this test shouldn't have raised a TouistFatal exception. Here is the exception:\n"^
       TouistErr.string_of_msg msg)
 
 let test_sat_raise ?(during=TouistErr.Eval) ?(typ=TouistErr.Error) ?(nth=0) loc text _ = test_raise sat during typ nth loc text
