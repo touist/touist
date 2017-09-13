@@ -54,7 +54,7 @@ problem](docs/images/screenshot.png)](https://github.com/maelvalais/allumettes)
    the _Windows Defender SmartScreen_ feature is disabled. You can still use
    the **jar** version.
 
-3. You can also look at the [Touist language reference][ref]
+3. You can also look at the [TouIST reference manual][ref]
    ([pdf version][ref-pdf]).
 
 4. Syntax coloring is also available for **[VSCode][vscode]** (search
@@ -126,12 +126,37 @@ See the [./INSTALL.md][install] file.
 [^2]: yices2 needs the gmp library on the system. On linux and macos, opam
      will install it for you using the command `opam depext conf-gmp`.
 
+## TouIST API
+
+You can also use the `touist` library; it is installed using
+`opam install touist` and requires the version 3.4.0 or above.
+The API reference is [here][api]. For example, you can do:
+
+```ocaml
+let clauses,mapping =
+    TouistParse.parse_sat "a and b and c"
+    |> TouistEval.eval
+    |> TouistCnf.ast_to_cnf
+    |> TouistSatSolve.minisat_clauses_of_cnf
+in TouistSatSolve.solve_clauses (clauses,mapping)
+    ~print:(fun m _ -> TouistSatSolve.Model.pprint mapping m |> prerr_endline);
+```
+
+To compile it, do
+
+    ocamlfind ocamlc -g -linkpkg -package touist example.ml
+
+The API is kind of _spread_ among many modules (which could be gathered in one
+single module), sorry for that! We really hope to have some time to
+put everything in a nice module well organized.
+
+[api]: http://www.irit.fr/touist/api
+
 ## Bugs and feature requests
 You can report bugs by creating a new Github issue. Feature requests can also
 be submitted using the issue system.
 
 You can contribute to the project by forking/pull-requesting.
-
 
 ## References
 
