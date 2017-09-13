@@ -1,9 +1,9 @@
 # Notes by Maël:
 #
-# Did new message appear when I updated parser.mly?
+# Did new message appear when I updated touistParser.mly?
 # =================================================
 # To check if some new states should be present in parser.messages
-# after an update of the grammar (parser.mly), I explained the way to do
+# after an update of the grammar (touistParser.mly), I explained the way to do
 # in HOWTODEBUG.md.
 #
 # How to write the error messages

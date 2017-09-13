@@ -16,22 +16,21 @@
 #require "qbf";;
 
 (* The order of the loads is important *)
-#load "msgs.cmo";;
-#load "types.cmo";;
-#load "pprint.cmo";;
-#load "parser_messages.cmo";;
-#load "lexer.cmo";;
-#load "parser.cmo";;
-#load "parser_error_report.cmo";;
-#load "parse.cmo";;
-#load "eval.cmo";;
-#load "version.cmo";;
-#load "cnf.cmo";;
-#load "sat.cmo";;
-#load "smt.cmo";;
-#load "latex.cmo";;
-(* #load "solveqbf.cmo";; *)
-#load "qbf_of_ast.cmo";;
+#load "touistErr.cmo";;
+#load "touistTypes.cmo";;
+#load "touistPprint.cmo";;
+#load "touistParserMsgs.cmo";;
+#load "touistLexer.cmo";;
+#load "touistParser.cmo";;
+#load "touistParserReport.cmo";;
+#load "touistParse.cmo";;
+#load "touistEval.cmo";;
+#load "touistVersion.cmo";;
+#load "touistCnf.cmo";;
+#load "touistSatSolve.cmo";;
+#load "touistSmt.cmo";;
+#load "touistLatex.cmo";;
+#load "touistQbf.cmo";;
 
 
 (* From 'utop', you can test small pieces of your code. For example,

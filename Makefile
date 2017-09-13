@@ -48,7 +48,7 @@ configure:
 # These targets are here for building everything that is needed before
 # launching the real build process (i.e., compiling the ocaml code):
 # 1. git-produced 'touistVersion.ml' for embedding the version number,
-# 2. menhir-produced 'parser.messages' and 'parser_messages.ml' which are
+# 2. menhir-produced 'parser.messages' and 'touistParserMsgs.ml' which are
 #    the syntax error messages that must be compiled to `.ml`
 #
 # The purpose of this makefile is only to be called (by the oasis-generated
@@ -57,16 +57,16 @@ configure:
 
 .PHONY: missing FORCE pre-build clean-pre-build aadjnzdljah
 
-targets = src/lib/touistVersion.ml src/lib/parser_messages.ml
+targets = src/lib/touistVersion.ml src/lib/touistParserMsgs.ml
 pre-build: $(targets)
 
 # Produced by menhir
-%parser.messages: %parser.mly
+%parser.messages: %touistParser.mly
 	if [ -f $@ ]; then menhir $< --update-errors $@ > tmp && mv tmp $@; fi
 	if [ ! -f $@ ]; then menhir $< --list-errors > $@; fi
 
 # Produced by menhir
-%parser_messages.ml: %parser.messages %parser.mly
+%touistParserMsgs.ml: %parser.messages %touistParser.mly
 	@mkdir -p $(dir $@)
 	menhir --compile-errors $^ > $@
 
@@ -97,10 +97,10 @@ clean-pre-build:
 	rm -Rf $(targets)
 
 # For finding the errors that should be in parser.messages but are not
-# because parser.mly has been updated and some new errors appeared.
+# because touistParser.mly has been updated and some new errors appeared.
 missing:
-	menhir --list-errors src/lib/parser.mly > parser.messages_updated
-	menhir --compare-errors parser.messages_updated --compare-errors src/lib/parser.messages --list-errors src/lib/parser.mly
+	menhir --list-errors src/lib/touistParser.mly > parser.messages_updated
+	menhir --compare-errors parser.messages_updated --compare-errors src/lib/parser.messages --list-errors src/lib/touistParser.mly
 
 #
 # These targets aim to build the java GUI in support/gui/
