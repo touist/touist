@@ -15,7 +15,7 @@
 
     [smt] enables the SMT mode. By default, the SAT/QBF mode is used.
 
-    @raise TouistErr.Fatal msg where {!TouistErr.msg} contains the error. *)
+    @raise TouistErr.TouistFatal msg where {!TouistErr.msg} contains the error. *)
 val eval :
   ?smt:bool ->
   ?onlychecktypes:bool -> TouistTypes.Ast.t -> TouistTypes.Ast.t
