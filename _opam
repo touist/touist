@@ -2,7 +2,9 @@ post-messages: [
 "To install more solvers, see 'opam info touist'" {success}
 "Built without yices2 (SMT solver)" {success & !yices2:installed}
 "Built without qbf (QBF solver)" {success & !qbf:installed}
+"Built without qbf.depqbf (EXPERIMENTAL)" {success & !depqbf:installed}
 
 "Built with yices2 (SMT solver). See 'opam info touist' for license." {success & yices2:installed}
 "Built with qbf (QBF solver)" {success & qbf:installed}
+"Built with qbf.depqbf (EXPERIMENTAL)" {success & depqbf:installed}
 ]
