@@ -11,3 +11,9 @@ formats from a touist file.
 Optionnal solvers:
 - for using Yices2 (--smt --solve), run `opam install yices2`
 - for using Quantor (--qbf --solve), run `opam install qbf`
+- for using Depqbf (--qbf --solve --depqbf), it's less easy;
+  (1) install depqbf (brew install depqbf); on ubuntu, depqbf package does
+      not contain libqdpll.a, so you might have to download+compile+install
+  (2) download ocaml-qbf; uninstall the opam version (opam uninstall qbf)
+  (3) ./configure --enable-depqbf && make && make install
+  (4) opam reinstall touist

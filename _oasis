@@ -28,6 +28,11 @@
 # 3. push all that: `git push --tags`
 # 4. run `oasis2opam https://github.com/touist/touist/archive/v2.4.0.tar.gz`
 # 5. run `opam-publish submit touist.2.4.0`
+#
+#####
+# I just discovered why 'make' is always re-building some stuff. This is
+# because on macOS, the .so is not built even though the command is launched.
+# This means that the 'cache miss' is always happening.
 
 OASISFormat:  0.4
 OcamlVersion: >= 4.01.0
@@ -45,6 +50,12 @@ Description:  The Touist language is a friendly language for writing
    Optionnal solvers:
    - for using Yices2 (--smt --solve), run `opam install yices2`
    - for using Quantor (--qbf --solve), run `opam install qbf`
+   - for using Depqbf (--qbf --solve --depqbf), it's less easy;
+     (1) install depqbf (brew install depqbf); on ubuntu, depqbf package does
+         not contain libqdpll.a, so you might have to download+compile+install
+     (2) download ocaml-qbf; uninstall the opam version (opam uninstall qbf)
+     (3) ./configure --enable-depqbf && make && make install
+     (4) opam reinstall touist
 
 Maintainers:  Maël Valais <mael.valais@gmail.com>
 Authors:      Maël Valais <mael.valais@gmail.com>, Olivier Lezaud
@@ -68,12 +79,15 @@ Flag yices2
   Description: enable yices2 solver (SMT)
 Flag qbf
   Default: false
-  Description: enable quantor  solver (QBF)
+  Description: enable qbf.quantor solver (QBF)
+Flag depqbf
+  Default: false
+  Description: enable qbf.depqbf solver (QBF)
 Flag lib
   Default: false
   Description: enable library install
 
-PreBuildCommand: make pre-build HAS_YICES2=$yices2 HAS_QBF=$qbf VERSION=$pkg_version
+PreBuildCommand: make pre-build HAS_YICES2=$yices2 HAS_QBF=$qbf HAS_DEPQBF=$depqbf VERSION=$pkg_version
 PostCleanCommand: make clean-pre-build
 
 XOCamlbuildExtraArgs: -menhir \"menhir --table --inspection -v -la 2 --explain\" -plugin-tags \"package(cppo_ocamlbuild)\" -j 4
@@ -120,6 +134,15 @@ Library touist_qbf
   BuildDepends:   qbf (>= 0.1), qbf.quantor, touist
   FindlibParent:  touist
   FindlibName:    qbf
+
+Library touist_depqbf
+  Build$:         flag(depqbf)
+  Install$:       flag(depqbf)
+  Path:           src/lib/qbf/depqbf
+  Modules:        TouistDepqbfSolve
+  BuildDepends:   qbf (>= 0.1), qbf.depqbf, touist, touist.qbf
+  FindlibParent:  touist
+  FindlibName:    depqbf
 
 # The 'custom' mode forces the use of static libraries (this is important when
 # using qbf). It allows the binary to be stand-alone.
@@ -188,6 +211,14 @@ Document touist_qbf
   BuildTools+: ocamldoc
   XOCamlbuildPath: src/lib/qbf
   XOCamlbuildLibraries: touist.qbf
+Document touist_depqbf
+  Title: API reference for the touist.depqbf subpackage
+  Type: ocamlbuild (0.4)
+  Install: false
+  InstallDir: $htmldir/api
+  BuildTools+: ocamldoc
+  XOCamlbuildPath: src/lib/qbf/depqbf
+  XOCamlbuildLibraries: touist.depqbf
 
 SourceRepository master
   Type:           git

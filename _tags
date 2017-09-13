@@ -5,7 +5,7 @@
 true: use_menhir
 
 # OASIS_START
-# DO NOT EDIT (digest: 4f4979d0c80240e2220b171e4686035e)
+# DO NOT EDIT (digest: 73aae83557ef0bfab78d0a023a7d1762)
 # Ignore VCS directories, you can use the same kind of rule outside
 # OASIS_START/STOP if you want to exclude directories that contains
 # useless stuff for the build process
@@ -46,6 +46,18 @@ true: annot, bin_annot
 <src/lib/qbf/*.ml{,i,y}>: package(qbf.quantor)
 <src/lib/qbf/*.ml{,i,y}>: package(str)
 <src/lib/qbf/*.ml{,i,y}>: use_touist
+# Library touist_depqbf
+"src/lib/qbf/depqbf/touist_depqbf.cmxs": use_touist_depqbf
+<src/lib/qbf/depqbf/*.ml{,i,y}>: package(cppo_ocamlbuild)
+<src/lib/qbf/depqbf/*.ml{,i,y}>: package(fileutils)
+<src/lib/qbf/depqbf/*.ml{,i,y}>: package(menhirLib)
+<src/lib/qbf/depqbf/*.ml{,i,y}>: package(minisat)
+<src/lib/qbf/depqbf/*.ml{,i,y}>: package(qbf)
+<src/lib/qbf/depqbf/*.ml{,i,y}>: package(qbf.depqbf)
+<src/lib/qbf/depqbf/*.ml{,i,y}>: package(qbf.quantor)
+<src/lib/qbf/depqbf/*.ml{,i,y}>: package(str)
+<src/lib/qbf/depqbf/*.ml{,i,y}>: use_touist
+<src/lib/qbf/depqbf/*.ml{,i,y}>: use_touist_qbf
 # Executable touist
 <src/touist.{native,byte}>: package(cppo_ocamlbuild)
 <src/touist.{native,byte}>: package(fileutils)
