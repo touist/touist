@@ -8,16 +8,6 @@
 # Like with the .travis.yml, this file will be executed
 # by the appveyor servers and will build the project.
 #
-# 1. Why do I download this wodi32.zip instead of installing
-#    ocaml-for-windows?
-#    Actually it's because I couldn't make work the installer given on
-#    protz.github.io/ocaml-installer/. The 64-bits version of the installer
-#    doesn't seem to work properly and most importantly it pops up a window
-#    that asks something to the user... which is impossible to deal in a CI env.
-# 2. What is wodi32.zip and what does it contain?
-#    It is a snapshot of the folder when I had wodi installed. Wodi has been
-#    discontinued, this is why I had to make a "frozen in time" version.
-#    It contains ocaml 4.02.1, fileutils, menhir and oasis.
 #
 # To allow AppVeyor knowing when things are pushed to the github repo,
 # the owner of the repo had to link the repo in the AppVeyor website.
