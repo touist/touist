@@ -41,7 +41,10 @@ cd $TOUIST_BUILD_DIR
 ocamlfind remove touist
 ./configure --bindir support/gui/external --enable-tests --enable-yices2 --enable-qbf
 make
-make install # NOTE: installed in support/gui/external, not system-wide
+make install
+
+# 'make test' and 'make uninstall' are done in appveyor.yml
+
 
 # Build the actual TouIST.exe
 cd support/gui
