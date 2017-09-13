@@ -104,5 +104,6 @@ deploy:
 # - If the commit previously failing now passes, do not send an email.
 # - Do not send an email to anyone else
 
-#on_finish:
+on_finish:
+  - '%CYG_BASH% -lc "cd /cygdrive/c/touist && make uninstall 2>&1"'
 #  - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))

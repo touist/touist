@@ -85,8 +85,8 @@ install:
 
 # This part is meant for unit tests (among others).
 script:
-  - cd $TRAVIS_BUILD_DIR
   - make test
+  - make uninstall
 
 before_deploy:
   - cd $TRAVIS_BUILD_DIR
