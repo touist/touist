@@ -1,5 +1,5 @@
 # OASIS_START
-# DO NOT EDIT (digest: 723a19886023a85ec28152a7c0fec8c6)
+# DO NOT EDIT (digest: e347665d249b18f2bda13b4fc6ce9bd1)
 version = "3.4.0"
 description = "The solver for the Touist language"
 requires = "menhirLib fileutils str minisat cppo_ocamlbuild"
@@ -28,6 +28,17 @@ package "qbf" (
  archive(native) = "touist_qbf.cmxa"
  archive(native, plugin) = "touist_qbf.cmxs"
  exists_if = "touist_qbf.cma"
+)
+
+package "depqbf" (
+ version = "3.4.0"
+ description = "The solver for the Touist language"
+ requires = "qbf qbf.depqbf touist touist.qbf"
+ archive(byte) = "touist_depqbf.cma"
+ archive(byte, plugin) = "touist_depqbf.cma"
+ archive(native) = "touist_depqbf.cmxa"
+ archive(native, plugin) = "touist_depqbf.cmxs"
+ exists_if = "touist_depqbf.cma"
 )
 # OASIS_STOP
 

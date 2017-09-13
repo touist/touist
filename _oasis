@@ -50,6 +50,12 @@ Description:  The Touist language is a friendly language for writing
    Optionnal solvers:
    - for using Yices2 (--smt --solve), run `opam install yices2`
    - for using Quantor (--qbf --solve), run `opam install qbf`
+   - for using Depqbf (--qbf --solve --depqbf), it's less easy;
+     (1) install depqbf (brew install depqbf); on ubuntu, depqbf package does
+         not contain libqdpll.a, so you might have to download+compile+install
+     (2) download ocaml-qbf; uninstall the opam version (opam uninstall qbf)
+     (3) ./configure --enable-depqbf && make && make install
+     (4) opam reinstall touist
 
 Maintainers:  Maël Valais <mael.valais@gmail.com>
 Authors:      Maël Valais <mael.valais@gmail.com>, Olivier Lezaud
@@ -129,6 +135,15 @@ Library touist_qbf
   FindlibParent:  touist
   FindlibName:    qbf
 
+Library touist_depqbf
+  Build$:         flag(depqbf)
+  Install$:       flag(depqbf)
+  Path:           src/lib/qbf/depqbf
+  Modules:        TouistDepqbfSolve
+  BuildDepends:   qbf (>= 0.1), qbf.depqbf, touist, touist.qbf
+  FindlibParent:  touist
+  FindlibName:    depqbf
+
 # The 'custom' mode forces the use of static libraries (this is important when
 # using qbf). It allows the binary to be stand-alone.
 Executable touist
@@ -196,6 +211,14 @@ Document touist_qbf
   BuildTools+: ocamldoc
   XOCamlbuildPath: src/lib/qbf
   XOCamlbuildLibraries: touist.qbf
+Document touist_depqbf
+  Title: API reference for the touist.depqbf subpackage
+  Type: ocamlbuild (0.4)
+  Install: false
+  InstallDir: $htmldir/api
+  BuildTools+: ocamldoc
+  XOCamlbuildPath: src/lib/qbf/depqbf
+  XOCamlbuildLibraries: touist.depqbf
 
 SourceRepository master
   Type:           git

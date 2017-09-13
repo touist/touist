@@ -1,5 +1,5 @@
 (* OASIS_START *)
-(* DO NOT EDIT (digest: 03f504f68aaddd37343d2df26bda1ece) *)
+(* DO NOT EDIT (digest: 8e453b06d49c4dec09684f298a7ee514) *)
 module OASISGettext = struct
 (* # 22 "src/oasis/OASISGettext.ml" *)
 
@@ -883,7 +883,8 @@ let package_default =
        [
           ("touist", ["src/lib"], []);
           ("touist_yices2", ["src/lib/yices2"], []);
-          ("touist_qbf", ["src/lib/qbf"], [])
+          ("touist_qbf", ["src/lib/qbf"], []);
+          ("touist_depqbf", ["src/lib/qbf/depqbf"], [])
        ];
      lib_c = [];
      flags = [];
@@ -891,6 +892,7 @@ let package_default =
        [
           ("test", ["src/lib"]);
           ("src/lib/yices2", ["src/lib"]);
+          ("src/lib/qbf/depqbf", ["src/lib"; "src/lib/qbf"]);
           ("src/lib/qbf", ["src/lib"]);
           ("src", ["src/lib"])
        ]
@@ -901,7 +903,7 @@ let conf = {MyOCamlbuildFindlib.no_automatic_syntax = false}
 
 let dispatch_default = MyOCamlbuildBase.dispatch_default conf package_default;;
 
-# 905 "myocamlbuild.ml"
+# 907 "myocamlbuild.ml"
 (* OASIS_STOP *)
 
 (* [add_include_mapping_to] returns an new package_default with updated
