@@ -28,6 +28,11 @@
 # 3. push all that: `git push --tags`
 # 4. run `oasis2opam https://github.com/touist/touist/archive/v2.4.0.tar.gz`
 # 5. run `opam-publish submit touist.2.4.0`
+#
+#####
+# I just discovered why 'make' is always re-building some stuff. This is
+# because on macOS, the .so is not built even though the command is launched.
+# This means that the 'cache miss' is always happening.
 
 OASISFormat:  0.4
 OcamlVersion: >= 4.01.0
@@ -68,12 +73,15 @@ Flag yices2
   Description: enable yices2 solver (SMT)
 Flag qbf
   Default: false
-  Description: enable quantor  solver (QBF)
+  Description: enable qbf.quantor solver (QBF)
+Flag depqbf
+  Default: false
+  Description: enable qbf.depqbf solver (QBF)
 Flag lib
   Default: false
   Description: enable library install
 
-PreBuildCommand: make pre-build HAS_YICES2=$yices2 HAS_QBF=$qbf VERSION=$pkg_version
+PreBuildCommand: make pre-build HAS_YICES2=$yices2 HAS_QBF=$qbf HAS_DEPQBF=$depqbf VERSION=$pkg_version
 PostCleanCommand: make clean-pre-build
 
 XOCamlbuildExtraArgs: -menhir \"menhir --table --inspection -v -la 2 --explain\" -plugin-tags \"package(cppo_ocamlbuild)\" -j 4

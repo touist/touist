@@ -945,14 +945,14 @@ let flag_enabled flag =
       - link any binary against 'touist_yices2' and 'yices2'
       - add the includes 'src/lib/yices2' for places where executables are:
         src and test. *)
-let flag_cond (flag:string) (include_path:string) ?(pkgs=[flag]) package_default =
+let flag_cond (flag:string) (include_path:string) ?(touist_pkg=flag) ?(pkgs=[flag]) package_default =
   let cartesian l l' = List.concat (List.map (fun e -> List.map (fun e' -> (e,e')) l') l) in
   let bin = ["src/touist.native";"src/touist.byte";"test/test.native";"test/test.byte"] in
   if flag_enabled flag then begin
     (* Add the tags for the '-D yices2' and linking tags *)
-    tag_file "src/touist.ml" [ "use_touist_"^flag ; "cppo_D("^flag^")" ];
+    tag_file "src/touist.ml" [ "use_touist_"^touist_pkg ; "cppo_D("^flag^")" ];
     pkgs |> List.iter (fun pkg -> tag_file "src/touist.ml" ["package("^pkg^")"]);
-    bin |> List.iter (fun bin -> tag_file bin ["use_touist_"^flag]);
+    bin |> List.iter (fun bin -> tag_file bin ["use_touist_"^touist_pkg]);
     cartesian bin pkgs |> List.iter (fun (bin,pkg) -> tag_file bin ["package("^pkg^")"]);
     (* Add the needed includes to package_default *)
     package_default
@@ -966,6 +966,7 @@ let () =
     let package_default = package_default
       |> flag_cond "yices2" "src/lib/yices2" ~pkgs:["yices2"]
       |> flag_cond "qbf" "src/lib/qbf" ~pkgs:["qbf";"qbf.quantor"]
+      |> flag_cond "depqbf" "src/lib/qbf/depqbf" ~pkgs:["qbf";"qbf.depqbf"] ~touist_pkg:"depqbf"
     in
     MyOCamlbuildBase.dispatch_default conf package_default hook;
     Ocamlbuild_cppo.dispatcher hook;

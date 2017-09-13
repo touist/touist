@@ -12,3 +12,4 @@ let git_tag = GIT_TAG
 
 let has_yices2 = HAS_YICES2
 let has_qbf = HAS_QBF
+let has_depqbf = HAS_DEPQBF
