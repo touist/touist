@@ -9,7 +9,5 @@ Touist is also able to generate the latex, DIMACS, SMT-LIB and QDIMACS
 formats from a touist file.
 
 Optionnal solvers:
-- for using the embeded SMT solver, run `opam install yices2` and then do
-  `opam reinstall touist`
-- for using the embeded QBF solver, run `opam install qbf` and then do
-  `opam reinstall touist`
+- for using Yices2 (--smt --solve), run `opam install yices2`
+- for using Quantor (--qbf --solve), run `opam install qbf`
