@@ -1,4 +1,4 @@
-(** Processes the "semantically correct" abstract syntax tree (ast) given by {!Eval.eval}
+(** Processes the "semantically correct" abstract syntax tree (ast) given by {!TouistEval.eval}
     to produce a CNF-compliant version of the abstract syntax tree.
 
     [ast_to_cnf] is the main function.
@@ -22,7 +22,7 @@
         - [ a and b and not and not d    ]    is a conjunction
 
     }{- AST:
-      abstract syntax tree; it is homogenous to Types.Ast.ast
+      abstract syntax tree; it is homogenous to TouistTypes.Ast.ast
       and is a recursive tree representing a formula, using Or, And, Implies...
       Example: the formula (1) has the abstract syntax tree (2):
         - [ (a or b) and not c    ]                  (1) natural language
@@ -48,9 +48,9 @@
  * version 2.1 which accompanies this distribution, and is available at
  * http://www.gnu.org/licenses/lgpl-2.1.html *)
 
-open Types.Ast
-open Pprint
-open Msgs
+open TouistTypes.Ast
+open TouistPprint
+open TouistErr
 
 (* [is_clause] checks that the given AST is a clause. This function can only
    be called on an AST containing Or, And or Not. No Equiv or Implies! *)
@@ -213,7 +213,7 @@ and to_cnf depth (stop:stop) (ast:ast) : ast =
     in
     if !debug then print_debug "out: " depth [cnf];
     (* Last important thing: make sure no more Bot/Top are in the formula. *)
-    if depth=0 && Eval.has_top_or_bot cnf then to_cnf cnf else cnf
+    if depth=0 && TouistEval.has_top_or_bot cnf then to_cnf cnf else cnf
 
 
 (** The following functions are for displaying dimacs/qdimacs format.

@@ -7,7 +7,7 @@
 
 parser.mli
 parser_messages.ml
-version.ml
+touistVersion.ml
 *.annot
 *.cmo
 *.cma
@@ -71,7 +71,7 @@ support/gui/touist-*
 
 support/gui/resources/version.properties
 
-src/version.ml
+src/touistVersion.ml
 
 support/gui/dist.zip
 

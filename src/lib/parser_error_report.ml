@@ -1,4 +1,4 @@
-(** Handles errors in {!Parse.parse} produced by the menhir in 
+(** Handles errors in {!TouistParse.parse} produced by the menhir in 
     incremental parser.
     [report] is the main function. *)
  

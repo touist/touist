@@ -1,4 +1,4 @@
-(** Evaluate an AST produced by {!Parse.parse} so it becomes a semantically
+(** Evaluate an AST produced by {!TouistParse.parse} so it becomes a semantically
     correct formula.
 
     [eval] is the main function. *)
@@ -15,10 +15,10 @@
  * http://www.gnu.org/licenses/lgpl-2.1.html 
  *)
 
-open Types.Ast
-open Types
-open Pprint
-open Msgs
+open TouistTypes.Ast
+open TouistTypes
+open TouistPprint
+open TouistErr
 
 
 (* Variables are stored in two data structures (global and local scopes). *)
@@ -134,12 +134,12 @@ let smt = ref false
 (** Main function for checking the types and evaluating the touistl expressions
     (variables, bigand, bigor, let...).
 
-    @param ast is the AST given by {!Parse.parse}
+    @param ast is the AST given by {!TouistParse.parse}
     @param onlychecktypes will limit the evaluation to its minimum in
            order to get type errors as fast as possible.
     @param smt enables the SMT mode. By default, the SAT mode is used.
 
-    @raise Msgs.Fatal msg where {!Msgs.msg} contains the error that could not be
+    @raise TouistErr.Fatal msg where {!TouistErr.msg} contains the error that could not be
            recovered upon. *)
 let rec eval ?smt:(smt_mode=false) ?(onlychecktypes=false) ast : ast =
   check_only := onlychecktypes;
@@ -283,7 +283,7 @@ and eval_ast (env:env) (ast:ast) :ast =
     end
   | Empty x -> begin
       match eval_ast x with
-      | Set x -> Bool (Types.AstSet.is_empty x)
+      | Set x -> Bool (AstSet.is_empty x)
       | x' -> raise_type_error ast x x' "a 'float-set', 'int-set' or 'prop-set'"
     end
   | Card x -> begin

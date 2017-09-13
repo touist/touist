@@ -17,7 +17,7 @@
 ###############
 # To distribute to OPAM,
 # - modify the 'Version:' field; this field will be used for creating
-#   the version.ml instead of using 'git describe --tags' because git
+#   the touistVersion.ml instead of using 'git describe --tags' because git
 #   information is not available in archive tar.gz from github.
 # - 1. `oasis setup`
 #       `oasis2opam --local -y`
@@ -83,11 +83,12 @@ XOCamlbuildExtraArgs: -menhir \"menhir --table --inspection -v -la 2 --explain\"
 # IMPORTANT: the library name is 'touist', so when calling ocamlc we must add
 #     ocamlfind ocamlc -package touist
 # but inside of the .ml files that use the functions, you just have to do:
-#     open Parse (or Sat, Smt, Eval...)
+#     open TouistParse (or TouistSat, TouistSmt, TouistEval...)
 Library touist
-  Install$:       flag(lib)
   Path:           src/lib
-  Modules:        Parse,Eval,Cnf,Sat,Smt,Qbf_of_ast,Pprint,Latex,Msgs,Types
+  Modules:        TouistParse,TouistEval,TouistCnf,
+                  TouistSat,TouistSmt,TouistQbf,
+                  TouistPprint,TouistLatex,TouistErr,TouistTypes
   InternalModules: Lexer,Parser,Parser_error_report
   BuildTools+:    menhir, cppo
   BuildDepends:   menhirLib (>= 20151023), fileutils (>= 0.4.0), str,
@@ -100,7 +101,7 @@ Library touist_yices2
   Build$:         flag(yices2)
   Install$:       flag(yices2) && flag(lib)
   Path:           src/lib/yices2
-  Modules:        Solvesmt
+  Modules:        TouistSmtSolve
   BuildDepends:   touist, yices2 (>= 0.0.2)
   FindlibParent:  touist
   FindlibName:    yices2
@@ -109,8 +110,8 @@ Library touist_qbf
   Build$:         flag(qbf)
   Install$:       flag(qbf) && flag(lib)
   Path:           src/lib/qbf
-  Modules:        Solveqbf
-  BuildDepends:   qbf (>= 0.1), qbf.quantor, touist
+  Modules:        TouistQbfSolve
+  BuildDepends:   qbf (>= 0.1), qbf.quantor, touist # Conditionnal: qbf.depqbf
   FindlibParent:  touist
   FindlibName:    qbf
 

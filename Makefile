@@ -47,7 +47,7 @@ configure:
 #
 # These targets are here for building everything that is needed before
 # launching the real build process (i.e., compiling the ocaml code):
-# 1. git-produced 'version.ml' for embedding the version number,
+# 1. git-produced 'touistVersion.ml' for embedding the version number,
 # 2. menhir-produced 'parser.messages' and 'parser_messages.ml' which are
 #    the syntax error messages that must be compiled to `.ml`
 #
@@ -57,7 +57,7 @@ configure:
 
 .PHONY: missing FORCE pre-build clean-pre-build aadjnzdljah
 
-targets = src/lib/version.ml src/lib/parser_messages.ml
+targets = src/lib/touistVersion.ml src/lib/parser_messages.ml
 pre-build: $(targets)
 
 # Produced by menhir
@@ -70,15 +70,15 @@ pre-build: $(targets)
 	@mkdir -p $(dir $@)
 	menhir --compile-errors $^ > $@
 
-# Generate _build/src/version.ml that contains the version number;
+# Generate _build/src/touistVersion.ml that contains the version number;
 # If we are in a git repo, use `git describe --tags`
 # If we aren't, use `Version:` in _oasis
 ifeq ($(shell test -d .git && echo yes),yes)
 # If we are in a git repo, whenever the content of
-# .git/ changes, we want to run the rule %version.ml.
-src/lib/version.ml: .git/HEAD .git/refs/heads/
+# .git/ changes, we want to run the rule %touistVersion.ml.
+src/lib/touistVersion.ml: .git/HEAD .git/refs/heads/
 endif
-src/lib/version.ml: src/lib/version.cppo.ml
+src/lib/touistVersion.ml: src/lib/touistVersion.cppo.ml
 	@mkdir -p $(dir $@)
 	@[ $(HAS_YICES2) ] || (echo "Please set the HAS_YICES2 var, e.g., 'make $@ HAS_YICES2=true'" && exit 1)
 	@[ $(HAS_QBF) ] || (echo "Please set the HAS_QBF var, e.g., 'make $@ HAS_QBF=true'" && exit 1)

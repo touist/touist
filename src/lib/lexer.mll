@@ -32,7 +32,7 @@
 {
   open Lexing
   open Parser
-  open Msgs
+  open TouistErr
 
   exception Error of string * loc
 

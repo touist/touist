@@ -1,23 +1,23 @@
-(** Parse a TouIST source into an Abstract Syntaxic Tree (AST).
+(** TouistParse a TouIST source into an Abstract Syntaxic Tree (AST).
 
     [parse] is the main function.
 
-    After this step, the AST (its type is [Types.Ast.ast]) can go through
-    different functions:
-    - (1) {!Eval.eval} for type-checking and evaluation of the expressions
-        (bigor, bigand, variables...)
-    - (2) {!Cnf.ast_to_cnf} and then {!Sat.minisat_clauses_of_cnf} to transform
-        the AST into a clause ready to use by Minisat
-    - (2') {!Smt.to_smt2} to transform the AST into LIB-SMT2
-    - (2'') {!Qbf_of_sat.prenex} to transform the CNF AST into QDIMACS
-    - (3) {!Sat.minisat_clauses_to_solver} and {!Sat.solve_clauses} to solve the
-          SAT problem
+    After this step, the AST (its type is {!TouistTypes.Ast.ast}) can go through
+    different functions: - (1) {!TouistEval.eval} for type-checking and
+    evaluation of the expressions (bigor, bigand, variables...):
+    - (2) {!TouistCnf.ast_to_cnf} and then {!TouistSat.minisat_clauses_of_cnf}
+          to transform the AST into a clause ready to use by Minisat
+    - (2') {!TouistSmt.to_smt2} to transform the AST into LIB-SMT2
+    - (2'') {!TouistQbf.prenex} to transform the CNF AST into QDIMACS
+    - (3) {!TouistSat.minisat_clauses_to_solver} and {!TouistSat.solve_clauses}
+          to solve the SAT problem
 *)
 
 open Parser
-open Types.Ast
 open Lexing
-open Msgs
+open TouistErr
+
+open TouistTypes.Ast
 
 (** [lexer] is used [parse] in order to get the next token of the input
     stream. It is an intermediate to the {!Lexer.token} function (in lexer.mll);
@@ -49,7 +49,7 @@ let lexer buffer : (Lexing.lexbuf -> Parser.token) =
 
     [parser] is the 'entry point' of the parser that is defined in
     parser.mly, i.e.,   {[
-        %start <Types.Ast.ast> touist_simple, touist_smt
+        %start <TouistTypes.Ast.ast> touist_simple, touist_smt
     ]}
 
     [detailed_err] allows to display absolute positions of the faulty text.
@@ -77,7 +77,7 @@ let parse (parser) ?debug:(debug=false) filename (text:string) : ast =
   in
     let ast =
       try Parser.MenhirInterpreter.loop_handle succeed fail supplier checkpoint
-      with Lexer.Error (msg,loc) -> Msgs.single_msg (Error,Lex,msg,Some loc)
+      with Lexer.Error (msg,loc) -> TouistErr.single_msg (Error,Lex,msg,Some loc)
     in ast
 
 (** Directly calls [parser] with [Parser.Incremental.touist_simple] *)
