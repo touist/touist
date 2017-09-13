@@ -1,8 +1,6 @@
 (** Definition of types {!Ast.t} and {!AstSet.t} constituting the
-    Abstract Syntaxic Tree
+    Abstract Syntaxic Tree (AST)
 *)
-
-open TouistErr
 
 (*  Do you think this file is wierd, with this 'module rec' thing?
     This is because we want the type 'Ast.t' to be used in 'Set' and
@@ -16,7 +14,11 @@ open TouistErr
     (2) I don't know why but Set.elt wouldn't be Ast.t... So
        I tried this and now it works...
 *)
-module rec Ast : sig
+
+open TouistErr
+
+module rec Ast :
+sig
   type var = string * t list option
   and t =
     | Touist_code      of t list
@@ -72,14 +74,14 @@ module rec Ast : sig
     (** [UnexpProp] is a proposition that contains unexpanded variables; we
         cannot tranform [UnexpProp] into [Prop] before knowing what is the
         content of the variables. Examples: {v
-          abcd(1,$d,$i,a)       <- not a full-string yet                   v}
+            abcd(1,$d,$i,a)       <- not a full-string yet                   v}
     *)
     | Prop             of string
     (** [Prop] contains the actual proposition after the evaluation has been
         run.
         Example: if $d=foo and $i=123, then the [Prop] is: {v
-          abcd(1,foo,123,a)     <- an actual string that represents an actual
-                                  logical proposition                      v}
+            abcd(1,foo,123,a)     <- an actual string that represents an actual
+                                    logical proposition                      v}
     *)
     | Loc              of t * TouistErr.loc
     (** [Loc] is a clever (or ugly, you pick) way of keeping the locations in
@@ -99,67 +101,25 @@ module rec Ast : sig
     | For              of t * t * t
     | NewlineAfter     of t
     | NewlineBefore    of t
-end = Ast (* see (1) *)
-
-and AstSet : sig
-  include Set.S with type elt = Ast.t (* see (2) *)
-
-  (** Return the different ways to choose k elements among a set of n
-      elements *)
-  val combinations : int -> t -> elt list list
-
-  (** Return a list of tuples. The first member is a combination of k
-      elements in the set and the second member is the list of every other
-      set elements not in the combination *)
-  val exact: int -> t -> (elt list * elt list) list
-
-  (** Actually an alias for the combinations function:
-      combinations k set *)
-  val atleast: int -> t -> elt list list
-
-  (** Equivalent to:
-      combinations (n-k) set, where n = card(set)  *)
-  val atmost: int -> t -> elt list list
-
 end
-=
-struct
-  (* From the type {!Ast}, we add the [compare] function so that
-     it can be used in Set.OrderedType. *)
-  include Set.Make (
-    struct
-      include Ast
-      let compare t t2 = match t,t2 with
-        | Int x, Int y -> Pervasives.compare x y
-        | Float x, Float y -> Pervasives.compare x y
-        | Prop x, Prop y -> Pervasives.compare x y
-        | Set x, Set y -> Pervasives.compare x y
-        | _ -> failwith "cannot compare"
-    end)
+and AstSet :
+sig
+  include Set.S with type elt = Ast.t
 
-  (* Inefficient implementation - Found on Rosetta Code ^_^ *)
-  let combinations k set =
-    let rec comb k lst =
-      match k,lst with
-      | 0,_     -> [[]]
-      | _,[]    -> []
-      | k,x::xs -> List.map (fun y -> x::y) (comb (pred k) xs) @ comb k xs
-    in comb k (elements set)
+    (** Return the different ways to choose k elements among a set of n
+        elements *)
+    val combinations : int -> t -> elt list list
 
-  let exact k set =
-    let rec go k l =
-      match k,l with
-      | 0,_     -> [([],l)] (* exact 0 -> all terms in the list must be 'not' *)
-      | _,[]    -> []       (* exact on empty set -> no couple at all *)
-      | k,x::xs ->
-        List.map (fun (comb,rest) ->
-            (x::comb, elements (diff set (of_list (x::comb)))))
-          (go (pred k) xs) @ go k xs
-    in go k (elements set)
+    (** Return a list of tuples. The first member is a combination of k
+        elements in the set and the second member is the list of every other
+        set elements not in the combination *)
+    val exact: int -> t -> (elt list * elt list) list
 
-  let atleast = combinations
+    (** Actually an alias for the combinations function:
+        combinations k set *)
+    val atleast: int -> t -> elt list list
 
-  let atmost k set =
-    let n = cardinal set in
-    combinations (n-k) set
+    (** Equivalent to:
+        combinations (n-k) set, where n = card(set)  *)
+    val atmost: int -> t -> elt list list
 end

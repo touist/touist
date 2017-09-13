@@ -1,4 +1,4 @@
-(** Processes the "semantically correct" abstract syntaxic tree given by
+(** Process an "semantically correct" abstract syntaxic tree given by
     {!TouistEval.eval} and produces a string in SMT-LIB2 format.
 
     {!to_smt2} is the main function. *)
@@ -14,6 +14,7 @@
  * version 2.1 which accompanies this distribution, and is available at
  * http://www.gnu.org/licenses/lgpl-2.1.html *)
 
+open TouistTypes
 open TouistTypes.Ast
 open Yices2
 
@@ -214,7 +215,7 @@ let ast_to_yices formula : term * (string,term) Hashtbl.t =
     | Prop x -> add_term x (Term.new_uninterpreted (Type.bool ()))
     | x -> failwith ("this cannot be transformed into SMT2: "^(TouistPprint.string_of_ast ~debug:true x))
   in
-  let rec write (ast:ast) : term = match ast with
+  let rec write (ast:Ast.t) : term = match ast with
     | Top          -> Term.Bool.true_ ()
     | Bottom       -> Term.Bool.false_ ()
     | Prop x       -> Hashtbl.find vtbl x

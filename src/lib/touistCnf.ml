@@ -1,60 +1,11 @@
-(** Processes the "semantically correct" abstract syntax tree (ast) given by {!TouistEval.eval}
-    to produce a CNF-compliant version of the abstract syntax tree.
-
-    [ast_to_cnf] is the main function.
-
-    {2 Vocabulary}
-
-    {ul{- Literal:
-      a possibly negated proposition; we denote them as a, b... and
-      their type is homogenous to [Prop _] or [Not(Prop _)] or [Top] or [Bottom].
-      Exples:
-        - [ a        ]                        is a literal,
-        - [ not b    ]                        is a literal.
-
-    }{- Clause:
-      a disjunction (= separated by "or") of possibly negated literals.
-      Example of clause:
-        - [ a or not b or c or d   ]          is a clause
-
-    }{- Conjunction:
-      literals separated by "and"; example:
-        - [ a and b and not and not d    ]    is a conjunction
-
-    }{- AST:
-      abstract syntax tree; it is homogenous to TouistTypes.Ast.ast
-      and is a recursive tree representing a formula, using Or, And, Implies...
-      Example: the formula (1) has the abstract syntax tree (2):
-        - [ (a or b) and not c    ]                  (1) natural language
-        - [ And (Or (Prop x, Prop x),Not (Prop x))  ](2) abstract syntax tree
-
-    }{- CNF:
-      a Conjunctive Normal Form is an AST that has a special structure with
-      is a conjunction of disjunctions of literals. For example:
-        - [ (a or not b) and (not c and d)   ]    is a CNF form
-        - [ (a and b) or not (c or d)        ]    is not a CNF form
-
-    }}
-*)
-
-(* Project TouIST, 2015. Easily formalize and solve real-world sized problems
- * using propositional logic and linear theory of reals with a nice language and GUI.
- *
- * https://github.com/touist/touist
- *
- * Copyright Institut de Recherche en Informatique de Toulouse, France
- * This program and the accompanying materials are made available
- * under the terms of the GNU Lesser General Public License (LGPL)
- * version 2.1 which accompanies this distribution, and is available at
- * http://www.gnu.org/licenses/lgpl-2.1.html *)
-
+open TouistTypes
 open TouistTypes.Ast
 open TouistPprint
 open TouistErr
 
 (* [is_clause] checks that the given AST is a clause. This function can only
    be called on an AST containing Or, And or Not. No Equiv or Implies! *)
-let rec is_clause (ast: ast) : bool = match ast with
+let rec is_clause (ast:Ast.t) : bool = match ast with
   | Top | Bottom | Prop _ | Not (Prop _) -> true
   | Or (x,y) -> is_clause x && is_clause y
   | And _ -> false
@@ -72,7 +23,7 @@ let rec is_clause (ast: ast) : bool = match ast with
     form) is not a CNF form and must be modified. Conversely, the form
           [d  and  ((a or not b) and (not c))]
     doesn't need to be modified because it is already in CNF.  *)
-let rec push_lit (lit:ast) (cnf:ast) : ast =
+let rec push_lit (lit:Ast.t) (cnf:Ast.t) : Ast.t =
   let push_lit = push_lit in
   match cnf with
   | Top              -> Top
@@ -94,15 +45,12 @@ let dummy_term_count = ref 0
 let fresh_dummy () =
   incr dummy_term_count; Prop ("&" ^ (string_of_int !dummy_term_count))
 
-(** [is_dummy name] tells (using the [name] of a litteral) is a 'dummy' literal
-    that was introduced during cnf conversion; these literals are identified
-    by their prefix '&'. *)
 let is_dummy (name:string) : bool = (name).[0] = '&'
 
 let debug = ref false (* The debug flag activated by --debug-cnf *)
 
 (** [print_debug] is just printing debug info in [to_cnf] *)
-let print_debug (prefix:string) depth (formulas:ast list) : unit =
+let print_debug (prefix:string) depth (formulas:Ast.t list) : unit =
   (* [indent] creates a string that contains N indentations *)
   let rec indent = function 0 -> "" | i -> (indent (i-1))^"\t"
   and string_of_asts = function
@@ -116,19 +64,7 @@ let print_debug (prefix:string) depth (formulas:ast list) : unit =
    recursions. See (1) below *)
 type stop = No | Yes of int
 
-(** [ast_to_cnf] translates the syntaxic tree made of Or, And, Implies, Equiv...
-    Or, And and Not; moreover, it can only be in a conjunction of formulas
-    (see a reminder of their definition above).
-    For example (instead of And, Or we use "and" and "or" and "not"):
-    {v
-        (a or not b or c) and (not a or b or d) and (d)
-    v}
-    The matching abstract syntax tree (ast) is
-    {v
-        And (Or a,(Cor (Not b),c)), (And (Or (Or (Not a),b),d), d)
-    v}
- *)
-let rec ast_to_cnf ?debug:(d=false) (ast:ast) : ast =
+let rec ast_to_cnf ?debug:(d=false) (ast:Ast.t) : Ast.t =
   debug := d;
   to_cnf 0 No ast
 
@@ -148,7 +84,7 @@ let rec ast_to_cnf ?debug:(d=false) (ast:ast) : ast =
         [to_cnf] from recursing more than once.
     - (2) All bottom and top must disappear for the CNF transformation; we use
         the standard transformation to remove them (a and not a, b or not b) *)
-and to_cnf depth (stop:stop) (ast:ast) : ast =
+and to_cnf depth (stop:stop) (ast:Ast.t) : Ast.t =
   if !debug then print_debug "in:  " depth [ast];
   if (match stop with Yes 0 -> true | _ -> false) then ast else (* See (1) above*)
     let to_cnf_once = to_cnf (depth+1) (match stop with Yes i->Yes (i-1) | No->Yes 1) in
@@ -216,34 +152,7 @@ and to_cnf depth (stop:stop) (ast:ast) : ast =
     if depth=0 && TouistEval.has_top_or_bot cnf then to_cnf cnf else cnf
 
 
-(** The following functions are for displaying dimacs/qdimacs format.
-    Example for the formula
-    {v
-         rain=>wet and rain and not wet
-    v}
-    we get the dimacs file:
-    {v
-        c CNF format file                 <-- by hand
-        p cnf 2 3                         <-- by hand (nb_lits, nb_clauses)
-        -2 1 0                            <-- [print_clauses_to_dimacs]
-        -2 2 0
-        -2 -1 0
-        c wet 1                           <-- (optionnal) [print_table]
-        c rain 2
-    v}
-*)
-
-(** [clauses_of_cnf] translates the cnf ast (Not, And, Or, Prop; no Bot/Top)
-    into a CNF formula that takes the form of a list of lists of litterals
-    (conjunctions of disjunctions of possibly negated proprositions).
-    [neg lit] returns the negation of the litteral (not)
-    [fresh ()] returns a newly generated litteral
-    Returns:
-    - the list of lists of litterals
-    - the table literal-to-name
-    Note that the total number of literals is exactly equal to the table size;
-    this size includes the special propositions beginning with '&' (e.g., '&4'). *)
-let clauses_of_cnf (neg:'a->'a) (fresh:unit->'a) (ast:ast)
+let clauses_of_cnf (neg:'a->'a) (fresh:unit->'a) (ast:Ast.t)
   : 'a list list * ('a, string) Hashtbl.t * (string, 'a) Hashtbl.t =
   (* num = a number that will serve to identify a literal
       lit = a literal that has a number inside it to identify it *)
@@ -253,7 +162,7 @@ let clauses_of_cnf (neg:'a->'a) (fresh:unit->'a) (ast:ast)
     | And  (x,y) -> (process_cnf x) @ (process_cnf y)
     | x when is_clause x -> [process_clause x]
     | _ -> failwith ("CNF: was expecting a conjunction of clauses but got '" ^ (string_of_ast ~debug:true ast) ^ "'")
-  and process_clause (ast:ast) : 'a list = match ast with
+  and process_clause (ast:Ast.t) : 'a list = match ast with
     | Prop str        -> (gen_lit str)::[]
     | Not (Prop str) -> (neg (gen_lit str))::[]
     | Or (x,y) -> process_clause x @ process_clause y
@@ -267,34 +176,11 @@ let clauses_of_cnf (neg:'a->'a) (fresh:unit->'a) (ast:ast)
        lit)
   in let clauses = process_cnf ast in clauses, lit_to_str, str_to_lit
 
-(** [print_table] prints the correspondance table between literals (= numbers)
-    and user-defined proposition names, e.g.,
-
-        'p(1,2) 98'
-
-    where 98 is the literal id number (given automatically) and 'p(1,2)' is the
-    name of this proposition.
-
-    NOTE: you can add a prefix to 'p(1,2) 98', e.g.
-      [string_of_table ~prefix:"c " table]
-    in order to have all lines beginning by 'c' (= comment) in order to comply to
-    the DIMACS format. *)
 let print_table (int_of_lit: 'a->int) (out:out_channel) ?(prefix="") (table:('a,string) Hashtbl.t) =
   let print_lit_and_name lit name = Printf.fprintf out "%s%s %d\n" prefix name (int_of_lit lit)
   in Hashtbl.iter print_lit_and_name table
 
-(** [print_clauses_to_dimacs] prints one disjunction per line ended by 0:
-    {v
-       -2 1 0
-       -2 2 0
-    v}
-    IMPORTANT: prints ONLY the clauses. You must print the dimacs/qdimacs
-    header yourself, e.g.:
-    {v
-       p cnf <nb_lits> <nb_clauses>      with <nb_lits> = Hashtbl.length table
-                                              <nb_clauses> = List.length clauses
-    v} *)
-let print_clauses_to_dimacs (out:out_channel) (str_of_lit: 'a->string) (clauses:'a list list) : unit =
+let print_clauses (out:out_channel) (str_of_lit: 'a->string) (clauses:'a list list) : unit =
   let rec string_of_clause (cl:'a list) = match cl with
     | [] -> "0"
     | cur::next -> (str_of_lit cur) ^" "^ (string_of_clause next)

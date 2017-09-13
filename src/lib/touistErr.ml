@@ -1,34 +1,8 @@
-(** This is where the compiler errors are managed.
-
-    We call a 'message' an error or a warning.
-    Two cases for displaying the errors:
-    - either one of the parse/eval/smt/sat function will raise the Fatal exception.
-      In this case, after the exception is catched, you can run [print_msgs].
-    - or no fatal error has been encoundered; if you want to display the errors,
-      you can run [print_msgs].
-
-   Rules for good error or warning messages:
-    - a message must always end with a newline
-    - use a new line (\n) only when the line break is mandatory for
-      understanding. The text will be wrapped automatically.
-    - use indentations for pieces of code you want to show: the indentation
-      will be kept when wrapping as long as no \n is encountered.
-      Indented text is colored.
-    - the text in simple quote '...' or backquotes `...` is colored
-
-    Why do I need to keep all error messages?
-    =========================================
-    This is because sometimes, the same error will be found multiple times
-    at the same place; to avoid duplicates, we compare the current error to
-    all previous found errors. Duplicates happen on bigand/bigor expensions
-
-*)
-
 open Lexing (* for Lexing.position *)
 
 type msg_type = Error | Warning
-type loc = Lexing.position * Lexing.position
 type during = Usage | Parse | Lex | Eval | Sat | Cnf | Prenex
+type loc = Lexing.position * Lexing.position
 type msg = msg_type * during * string * loc option
 
 exception Fatal of msg
@@ -131,8 +105,7 @@ let rec string_of_msg ?(width=(!wrap_width)) ?(color=(!color)) ?(fmt=(!format)) 
   let typ,_,text,loc = message in
     replace (all_placeholders loc typ color text) fmt |> format_width color width |> color_all
 
-let add_msg msg = if !discard_warnings then () else Printf.fprintf stderr "%s" (string_of_msg msg)
-let add_fatal msg = raise (Fatal msg)
-let single_msg msg = raise (Fatal msg)
+let warn msg = if !discard_warnings then () else Printf.fprintf stderr "%s" (string_of_msg msg)
+let fatal msg = raise @@ Fatal msg
 
 let _ = Printexc.register_printer (fun ex -> match ex with Fatal msg -> Some (string_of_msg msg) | _ -> None)

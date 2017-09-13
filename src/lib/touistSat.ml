@@ -1,27 +1,7 @@
-(** Processes the CNF-compliant version of the AST given by {!TouistCnf.ast_to_cnf}
-    to create Minisat-compatible clauses with [minisat_clauses_of_cnf] and solve
-    them with [solve_clauses].
-*)
-
-(* Project TouIST, 2015. Easily formalize and solve real-world sized problems
- * using propositional logic and linear theory of reals with a nice language and GUI.
- *
- * https://github.com/touist/touist
- *
- * Copyright Institut de Recherche en Informatique de Toulouse, France
- * This program and the accompanying materials are made available
- * under the terms of the GNU Lesser General Public License (LGPL)
- * version 2.1 which accompanies this distribution, and is available at
- * http://www.gnu.org/licenses/lgpl-2.1.html *)
-
 open TouistTypes.Ast
 open TouistPprint
 open Minisat
 
-(** [minisat_clauses_of_cnf ast] takes a CNF [ast] and outputs
-    - a list of lists of Minisat litterals,
-    - a mapping table (Minisat litterals -> name of the proposition)
-*)
 let minisat_clauses_of_cnf ast =
   let num_lit = ref 1 in
   let fresh_lit () = let lit = !num_lit in (incr num_lit; Minisat.Lit.make lit)
@@ -29,11 +9,7 @@ let minisat_clauses_of_cnf ast =
   let clauses,lit_to_str,_ = TouistCnf.clauses_of_cnf Minisat.Lit.neg fresh_lit ast
   in clauses,lit_to_str
 
-(** [clauses_to_solver] takes a list of clauses (clause = list of literals)
-    and generates an intance of minisat solver.
-    If, at any moment during the adding of the clauses, the formula becomes
-    unsat, [clauses_to_solver] will return None. If we continued to add the
-    other clauses, they would be discarded (not added) by minisat anyway. *)
+
 let clauses_to_solver ?(verbose=false) (clauses:Lit.t list list) : Minisat.t option =
   let solver = Minisat.create () in
   if verbose then set_verbose solver 10;
@@ -87,7 +63,6 @@ let get_model solver (table:(Lit.t,string) Hashtbl.t) (discard:string->bool): Mo
 let string_of_clause (clause:Lit.t list) : string =
   List.fold_left (fun acc lit -> (Lit.to_string lit) ^" "^ acc) "" clause
 let string_of_clauses = List.fold_left (fun acc v -> (if acc="" then "" else acc^"\n")^(string_of_clause v)) ""
-let print_clauses cls = Printf.fprintf stderr "%s" (string_of_clauses cls)
 
 (* 1. Prevent current model from reappearing
    =========================================
@@ -121,20 +96,7 @@ let print_clauses cls = Printf.fprintf stderr "%s" (string_of_clauses cls)
     (4) go on with (1)
 *)
 
-(** [solve_clauses] finds the models for the given clauses.
-    [print model N ] is a function that will print a model as soon as it is
-      found. [N] is the number of the model, it begins at 1.
-      It can be useful to print the models as they appear because finding all
-      models (if [limit] is large) can be extremely long.
-      Example: [~print:(TouistSat.Model.pprint table model)]
-    [verbose] allows to turn on the verbose mode of minisat; apparently, this
-      minisat feature doesn't seem to be working and doesn't display any time
-      information.
-    [continue model nth] is a function called after every model that has been
-      found. [model] contains the found model and [N] says that this model was
-      the nth model found. This function tells [solve_clauses] to go on searching
-      models or not.
-  *)
+
 let solve_clauses
     ?(verbose=false)
     ?(print: Model.t -> int -> unit = fun m i ->())
@@ -175,22 +137,3 @@ let solve_clauses
           models := ModelSet.add model !models; print model i;
           models
     in solve_loop 1
-
-(** [print_solve] outputs the result of the solver. But it is much more
-    recommanded to use the parameter [solve_clauses ~print_model:print...] in
-    order to output the models as soon as they are found; if looking for a
-    large number of models, [print_solve] will have to wait [solve_clauses]
-    is done.
-
-    [output] is the [out_channel] you want to solutions to be written
-    into.
-    [show_hidden] indicates that the hidden literals introduced during
-    [ast_to_cnf].
-
-    CNF conversion should be shown. *)
-let print_solve ?(show_hidden=false) output (solver:Minisat.t) (table:(string, Minisat.Lit.t) Hashtbl.t) =
-  let string_of_value solver (lit:Minisat.Lit.t) = match Minisat.value solver lit with
-    | V_true -> "1" | V_false -> "0" | V_undef -> "?"
-  in let print_value_and_name name lit = if show_hidden || name.[0] != '&'
-       then Printf.fprintf output "%s %s\n" (string_of_value solver lit) name
-  in Hashtbl.iter print_value_and_name table
