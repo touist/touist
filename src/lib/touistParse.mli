@@ -3,11 +3,11 @@
     After this step, the AST (its type is {!TouistTypes.Ast.t}) can go through
     different functions: - (1) {!TouistEval.eval} for type-checking and
     evaluation of the expressions (bigor, bigand, variables...):
-    - (2) {!TouistCnf.ast_to_cnf} and then {!TouistSat.minisat_clauses_of_cnf}
+    - (2) {!TouistCnf.ast_to_cnf} and then {!TouistSatSolve.minisat_clauses_of_cnf}
           to transform the AST into a clause ready to use by Minisat
     - (2') {!TouistSmt.to_smt2} to transform the AST into LIB-SMT2
     - (2'') {!TouistQbf.prenex} to transform the CNF AST into QDIMACS
-    - (3) {!TouistSat.minisat_clauses_of_cnf} and {!TouistSat.solve_clauses}
+    - (3) {!TouistSatSolve.minisat_clauses_of_cnf} and {!TouistSatSolve.solve_clauses}
           to solve the SAT problem
 *)
 

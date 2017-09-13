@@ -148,3 +148,21 @@ check-opam-packages:
 
 manual:
 	make -C docs
+
+OCAMLDOC=
+
+docfull: #setup.data build
+	#$(SETUP) -doc $(DOCFLAGS)
+	cd _build; ocamlfind ocamldoc -verbose -html -d src/lib/touist.docdir \
+		-load src/lib/touistParse.odoc \
+		-load src/lib/touistEval.odoc \
+		-load src/lib/touistCnf.odoc \
+		-load src/lib/touistSmt.odoc \
+		-load src/lib/touistQbf.odoc \
+		-load src/lib/touistSatSolve.odoc \
+		-load src/lib/touistPprint.odoc \
+		-load src/lib/touistLatex.odoc \
+		-load src/lib/touistErr.odoc \
+		-load src/lib/touistVersion.odoc \
+		-load src/lib/touistTypes.odoc \
+		`find src/lib/*/ -name 'touist*.cmi' | sed 's/\(.*\)\.cmi/-load \1.odoc/'`

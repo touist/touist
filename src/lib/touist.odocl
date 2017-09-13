@@ -1,11 +1,11 @@
 # OASIS_START
-# DO NOT EDIT (digest: 56ba60e130ad653f7ac66ff5b9c29e77)
+# DO NOT EDIT (digest: 8d585d218f19c2a89957c5719f3baddf)
 TouistParse
 TouistEval
 TouistCnf
-TouistSat
 TouistSmt
 TouistQbf
+TouistSatSolve
 TouistPprint
 TouistLatex
 TouistErr
