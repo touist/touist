@@ -65,12 +65,12 @@ BetaFeatures: section_object
 
 Flag yices2
   Default: false
-  Description: enable yices2 solver (SMT)
+  Description: enable yices2 solver
 Flag qbf
   Default: false
-  Description: enable quantor  solver (QBF)
+  Description: enable quantor  solver
 Flag lib
-  Default: false
+  Default: true
   Description: enable library install
 
 PreBuildCommand: make pre-build HAS_YICES2=$yices2 HAS_QBF=$qbf VERSION=$pkg_version
@@ -96,6 +96,7 @@ Library touist
                   TouistTypes,
                   TouistVersion
   InternalModules: TouistLexer,TouistParser,TouistParserReport,TouistParserMsgs
+  Install$:       flag(lib)
   BuildTools+:    menhir, cppo
   BuildDepends:   menhirLib (>= 20151023), fileutils (>= 0.4.0), str,
                   minisat, cppo_ocamlbuild (>= 0.9.4)
@@ -105,7 +106,7 @@ Library touist
 
 Library touist_yices2
   Build$:         flag(yices2)
-  Install$:       flag(yices2)
+  Install$:       flag(yices2) && flag(lib)
   Path:           src/lib/yices2
   Modules:        TouistSmtSolve
   BuildDepends:   touist, yices2 (>= 0.0.2)
@@ -114,7 +115,7 @@ Library touist_yices2
 
 Library touist_qbf
   Build$:         flag(qbf)
-  Install$:       flag(qbf)
+  Install$:       flag(qbf) && flag(lib)
   Path:           src/lib/qbf
   Modules:        TouistQbfSolve
   BuildDepends:   qbf (>= 0.1), qbf.quantor, touist
