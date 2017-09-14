@@ -89,21 +89,19 @@ script:
   - make uninstall
 
 before_deploy:
-  - cd $TRAVIS_BUILD_DIR
-  # We only build the API doc on 'vX.Y.Z' tags, not on 'vX.Y.Z-betaX'
   - |
-    if [ $TRAVIS_OS_NAME = linux ] && git describe --tags | grep "^v\d\.\d\.\d$" ; then
-      git clone https://${TOK}@github.com/touist/touist.github.io.git
-      mkdir -p touist.github.io/api/v/$(git describe --tags)
-      cp -rL touist.docdir/* touist.github.io/api
-      cp -rL touist.docdir/* touist.github.io/api/v/$(git describe --tags)
-      cd touist.github.io
-      git config user.name "Travis-ci"
-      git config user.email "robot@travis-ci.org"
-      git add api*/*
-      git commit -m "Generated API documentation for `cd $TRAVIS_BUILD_DIR && git describe --tags`"
-      git push
-    fi
+    set -e # exit if one of the following commands fail
+    cd $TRAVIS_BUILD_DIR
+    git clone https://${TOK}@github.com/touist/touist.github.io.git
+    mkdir -p touist.github.io/api/v/$(git describe --tags)
+    cp -rL touist.docdir/* touist.github.io/api
+    cp -rL touist.docdir/* touist.github.io/api/v/$(git describe --tags)
+    cd touist.github.io
+    git config user.name "Travis-ci"
+    git config user.email "robot@travis-ci.org"
+    git add api/*
+    git commit -m "Generated API documentation for $(cd .. && git describe --tags)" || true
+    git push
   - cd $TRAVIS_BUILD_DIR
 
 # This is the part where the touist.zip is pushed to the Github
