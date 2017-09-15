@@ -1,4 +1,4 @@
-Title: &touist; reference manual
+Title: TouIST Reference Manual
 Author: Olivier Gasquet
 Author: Frédéric Maris
 Author: Maël Valais
@@ -446,6 +446,7 @@ Here is the full grammar rule for booleans:
     | "true"
     | "false"
     | (<int>|<float>|<prop>|<bool>) "in" <set>
+    | <set> "subset" <set>                     <- TouIST >= 3.4.0
     | "subset(" <set> "," <set> ")"
     | "empty(" <set> ")"
     | <equality(<int>|<float>|<prop>)>
@@ -531,8 +532,8 @@ The priority on operators is:
 ~
 
 ~ Note
-Up to &touist; v3.2.2, the operators ``inter``, ``union``, ``diff`` and
-``subset`` were prefix operators (e.g., ``inter($A,$B)``). From v3.2.3
+Up to &touist; v3.2.3, the operators ``inter``, ``union``, ``diff`` and
+``subset`` were prefix operators (e.g., ``inter($A,$B)``). From v3.4.0
 and later, these prefix operators are deprecated (but still usable).
 Instead, we provide more human-friendly infix operators (e.g.,
 ``$A inter $B``).
@@ -1028,6 +1029,9 @@ TERM      = [_0-9]*[a-zA-Z][a-zA-Z_0-9]*
     | "[" <comma-list(<expr>)> "]"
     | "[ <int> ".." <int> "]"      <- step is 1
     | "[ <float> ".." <float> "]"  <- step is 1.0
+    | <set> "inter" <set>          <- TouIST >= 3.4.0
+    | <set> "union" <set>          <- TouIST >= 3.4.0
+    | <set> "diff" <set>           <- TouIST >= 3.4.0
     | "union(" <set> "," <set> ")"
     | "inter(" <set> "," <set> ")"
     | "diff(" <set> "," <set> ")"
@@ -1294,7 +1298,7 @@ option; in SAT and QBF modes, it prints the successive recursive
 transformations that produce the CNF formula.
 
 **`--debug`** is a development option that displays the status of the
-minisat solver, the callstack in case of unexpected errors and also
+Minisat solver, the call stack in case of unexpected errors and also
 displays errors with more AST context (`(loc)` for example).
 
 ### Usage for Satisfiability Modulo Theory (SMT mode) {#usage-smt}
