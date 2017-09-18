@@ -37,7 +37,7 @@ val cnf : ?debug:bool -> TouistTypes.Ast.t -> TouistTypes.AstSet.elt
     'e' or 'a' and ending by 0)
     - 4) the clauses (one conjunction per line, one line is a disjunction,
     minus means 'not'). *)
-val print_qdimacs : out_channel -> out_channel -> TouistTypes.Ast.t -> unit
+val print_qdimacs : ?debug_dimacs:bool -> out_channel -> out_channel option -> TouistTypes.Ast.t -> (int, string) Hashtbl.t
 
 (** {2 CNF to clauses} *)
 

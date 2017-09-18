@@ -60,6 +60,7 @@ let show = ref false
 let wrap_width = ref 76
 let sat_interactive = ref false
 let debug_dimacs = ref false
+let solver_ext = ref None
 
 (* [process_arg_alone] is the function called by the command-line argument
    parser when it finds an argument with no preceeding -flag (-f, -x...).
@@ -109,7 +110,8 @@ let () =
     ("--error-format", Arg.Set_string error_format,"Customize the formatting of error messages");
     ("--wrap-width", Arg.Set_int wrap_width,"Wrapping width for error messages [default: 76]");
     ("--interactive", Arg.Set sat_interactive ,"(--sat mode) Display next model on key press (INPUT must be a file)");
-    ("--debug-dimacs", Arg.Set debug_dimacs, "(--{sat,qbf} modes) Display names instead of integers in DIMACS/QDIMACS")
+    ("--debug-dimacs", Arg.Set debug_dimacs, "(--{sat,qbf} modes) Display names instead of integers in DIMACS/QDIMACS");
+    ("--solver", Arg.String (fun s -> solver_ext := Some s), "CMD (--{sat,qbf} modes) Use CMD instead of embedded solver (feeds (Q)DIMACS to stdin, expects QDIMACS in stdout");
   ]
   in
   let usage =
@@ -317,7 +319,8 @@ let () =
       exit_with CMD_UNSUPPORTED
     #endif
   end
-  else if !mode = Qbf then begin
+  else if !mode = Qbf then
+    begin
       let ast = TouistParse.parse_qbf ~debug:!debug_syntax ~filename:!input_file_path input_text
         |> TouistEval.eval ~smt:(!mode = Smt) in
       let prenex = TouistQbf.prenex ast in
@@ -327,43 +330,51 @@ let () =
         Printf.fprintf stderr " prenex: %s\n" (TouistPprint.string_of_ast ~utf8:true prenex);
         Printf.fprintf stderr "    cnf: %s\n" (TouistPprint.string_of_ast ~utf8:true cnf)
       end;
+      match !solver_ext with
+      | Some cmd ->
+        begin
+          let proc_stdout, proc_stdin = Unix.open_process cmd in
+          let tbl = TouistQbf.print_qdimacs proc_stdin (None) cnf in
+          flush proc_stdin; close_out proc_stdin;
+          let ints_of_string s = List.map int_of_string (Str.split (Str.regexp " +") s) in
+          let rec process in_chan =
+            try let line = input_line in_chan in
+            let line_lst =
+              match String.get line 0 with
+              | 'V' | 'v' -> String.sub line 2 (String.length line -2) |> ints_of_string
+              | _ -> []
+            in line_lst @ (process in_chan)
+            with End_of_file -> close_in in_chan; []
+          in
+          let valuated_lits = process proc_stdout in
+          match Unix.close_process (proc_stdout, proc_stdin) with
+          | Unix.WEXITED _ when List.length valuated_lits > 0 ->
+            tbl |> Hashtbl.iter (fun lit_num lit_name ->
+              if lit_name.[0] <> '&' || !show_hidden_lits then
+              let valuation = (try valuated_lits |> List.find (fun l -> lit_num = (abs l)) |> fun v -> if v>0 then "1" else "0" with Not_found -> "?") in
+              Printf.fprintf !output "%s %s\n" valuation lit_name);
+          | Unix.WEXITED c -> Printf.eprintf "Command '%s' returned code %d and no lines beginning with 'v'\n"
+              (match !solver_ext with Some s -> s | None -> "???") c; exit_with SOLVER_UNKNOWN;
+          | _ -> Printf.eprintf "Error with %s, received signal\n" (match !solver_ext with Some s -> s | None -> "???");
+        end
+      | None ->
       if not !solve_flag then begin
-        let quantlist_int,clauses_int,int_to_str = TouistQbf.qbfclauses_of_cnf cnf in
-        let print_lit = if !debug_dimacs then
-          fun v-> (if v<0 then "-" else "") ^ (abs v |> Hashtbl.find int_to_str)
-          else string_of_int
-        in
-        (* Display the mapping table (propositional names -> int)
-           1) if output = output_table, append 'c' (dimacs comments)
-           2) if output != output_table, print it as-is into output_table *)
-        int_to_str |> TouistCnf.print_table (fun x->x) !output_table
-          ~prefix:(if !output = !output_table then "c " else "");
-        (* Display the dimacs' preamble line. *)
-        Printf.fprintf !output "p cnf %d %d\n" (Hashtbl.length int_to_str) (List.length clauses_int);
-        (* Display the quantifiers lines *)
-        quantlist_int |> List.iter (fun quantlist ->
-            let open List in let open Printf in
-            match quantlist with
-            | TouistQbf.A l -> fprintf !output "a%s 0\n" (l |> fold_left (fun acc s -> acc^" "^ print_lit s) "")
-            | TouistQbf.E l -> fprintf !output "e%s 0\n" (l |> fold_left (fun acc s -> acc^" "^ print_lit s) "")
-          );
-        (* Display the clauses in dimacs way *)
-        clauses_int |> TouistCnf.print_clauses !output print_lit;
+        TouistQbf.print_qdimacs ~debug_dimacs:!debug_dimacs !output (Some !output_table) cnf |> ignore;
       end
       else (* --solve*)
-    #ifdef qbf
-      let qcnf,table = TouistQbfSolve.qcnf_of_cnf cnf in
-      match TouistQbfSolve.solve ~hidden:!show_hidden_lits (qcnf,table) with
-      | Some str -> Printf.fprintf !output "%s\n" str
-      | None ->
-        (Printf.fprintf stderr ("unsat\n");
-        ignore @@ exit_with SOLVER_UNSAT);
-    #else
-      Printf.fprintf stderr
-        ("This touist binary has not been compiled with qbf support.");
-      exit_with CMD_UNSUPPORTED
-    #endif
-end;
+      #ifdef qbf
+        let qcnf,table = TouistQbfSolve.qcnf_of_cnf cnf in
+        match TouistQbfSolve.solve ~hidden:!show_hidden_lits (qcnf,table) with
+        | Some str -> Printf.fprintf !output "%s\n" str
+        | None ->
+          (Printf.fprintf stderr ("unsat\n");
+          ignore @@ exit_with SOLVER_UNSAT);
+      #else
+        Printf.fprintf stderr
+          ("This touist binary has not been compiled with qbf support.");
+        exit_with CMD_UNSUPPORTED
+      #endif
+    end;
 
   (* I had to comment these close_out and close_in because it would
   raise 'bad descriptor file' for some reason. Because the program is always
