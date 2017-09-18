@@ -27,7 +27,7 @@ build-test: [
 ]
 build-doc: [ "ocaml" "setup.ml" "-doc" ]
 depends: [
-  ("cppo" {= "1.5.0"} | "cppo" {= "1.4.1"} | "cppo" {= "1.4.0"} | "cppo" {= "1.3.2"} | "cppo" {= "1.3.1"} | "cppo" {= "1.3.0"} | "cppo" {= "1.2.2"} | "cppo" {= "1.1.2"} | "cppo" {= "1.1.1"} | "cppo" {= "1.1.0"} | "cppo" {= "1.0.1"} | "cppo" {= "1.0.0"} | "cppo" {= "0.9.4"})
+  ("cppo_ocamlbuild" {>= "1.6.0"} | ("cppo" {>= "0.9.4" & <= "1.5.0"}))
   "fileutils" {>= "0.4.0"}
   "menhir" {>= "20151023"}
   "minisat"
