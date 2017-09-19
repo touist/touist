@@ -52,9 +52,29 @@ val solve_clauses :
   Minisat.Lit.t list list * (Minisat.Lit.t, string) Hashtbl.t ->
   ModelSet.t ref
 
-(* [string_of_clause] dumps the clause in its literal-number form:
-   e.g., 1 -5 3 9 -2 -7 *)
+(** [string_of_clause] dumps the clause in its literal-number form:
+    e.g., 1 -5 3 9 -2 -7 *)
 val string_of_clause : Minisat.Lit.t list -> string
 
-(* [string_of_clauses] does {!string_of_clause} with newlines between clauses. *)
+(** [string_of_clauses] does {!string_of_clause} with newlines between clauses. *)
 val string_of_clauses : Minisat.Lit.t list list -> string
+
+(** {2 Print DIMACS} *)
+
+(** [print_dimacs (clauses, table) out] takes the
+    result of {!minisat_clauses_of_cnf} and prints the following:
+    - 1) If [~out_table] is given, print the mapping table from litterals
+         integers to names. If [out] and [out_table] are the same, then the
+         mapping table will be printed in DIMACS comments
+         (e.g., 'c p(a,b) 5').
+    - 2) the DIMACS standard header line ('p cnf 3 2')
+    - 3) the quantifiers lines grouped (one quantifier per line, beginning with
+        'e' or 'a' and ending by 0)
+    - 4) the clauses (one conjunction per line, one line is a disjunction,
+         minus means 'not').
+
+    @see on Google "Satisfiability Suggested Format" (May 8, 1993) *)
+val print_dimacs :
+  ?debug_dimacs:bool ->
+  Minisat.Lit.t list list * (Minisat.Lit.t, string) Hashtbl.t ->
+  ?out_table:out_channel -> out_channel -> unit

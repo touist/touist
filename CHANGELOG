@@ -1,3 +1,8 @@
+v3.4.1 (unreleased)
+  - Command-line (new features)
+    - added option '--solver CMD'; combined with --sat or --qbf, touist
+      will run CMD feeding the (Q)DIMACS into stdin and expecting a
+      DIMACS on stdout; it then prints the model as usual.
 v3.4.0
   - TouIST language:
     - 'inter', 'union', 'diff' and 'subset' are now infix operators;

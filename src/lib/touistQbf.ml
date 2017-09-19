@@ -190,8 +190,7 @@ let qbfclauses_of_cnf ast =
   ) []
   in List.rev quantlist_int, clauses_int, int_to_str
 
-let print_qdimacs ?(debug_dimacs=false) out (out_table:out_channel option) ast_cnf =
-  let quantlist_int,clauses_int,int_to_str = qbfclauses_of_cnf ast_cnf in
+let print_qdimacs ?(debug_dimacs=false) (quantlist_int,clauses_int,int_to_str) ?(out_table) (out:out_channel) =
   let print_lit = if debug_dimacs then
     fun v-> (if v<0 then "-" else "") ^ (abs v |> Hashtbl.find int_to_str)
     else string_of_int
@@ -214,5 +213,4 @@ let print_qdimacs ?(debug_dimacs=false) out (out_table:out_channel option) ast_c
       | E l -> fprintf out "e%s 0\n" (l |> fold_left (fun acc s -> acc^" "^ print_lit s) "")
     );
   (* Display the clauses in dimacs way *)
-  clauses_int |> TouistCnf.print_clauses out print_lit;
-  int_to_str
+  clauses_int |> TouistCnf.print_clauses out print_lit

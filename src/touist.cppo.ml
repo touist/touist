@@ -69,6 +69,34 @@ let process_arg_alone (file_path:string) : unit = input_file_path := file_path
 
 let exit_with (exit_code:error) = exit (get_code exit_code)
 
+let solve_ext lit_tbl lit_abs lit_sign lit_of_int (print_dimacs:out_channel -> unit) cmd =
+  let proc_stdout, proc_stdin = Unix.open_process cmd in
+  print_dimacs proc_stdin; flush proc_stdin; close_out proc_stdin;
+  let ints_of_string s = List.map (fun s -> int_of_string s |> lit_of_int) (Str.split (Str.regexp " +") s) in
+  let rec process in_chan =
+    try let line = input_line in_chan in
+      let line_lst =
+        match String.get line 0 with
+        | 'V' | 'v' -> String.sub line 2 (String.length line -2) |> ints_of_string
+        | _ -> []
+      in line_lst @ (process in_chan)
+    with Invalid_argument _ -> process in_chan
+       | End_of_file -> close_in in_chan; []
+  in
+  let valuated_lits = process proc_stdout in
+  match Unix.close_process (proc_stdout, proc_stdin) with
+  | Unix.WEXITED _ when List.length valuated_lits > 0 ->
+    lit_tbl |> Hashtbl.iter (fun lit lit_name ->
+        if lit_name.[0] <> '&' || !show_hidden_lits then
+          let valuation = (
+            try valuated_lits |> List.find (fun l -> lit = (lit_abs l)) |> fun v ->
+                if lit_sign v then "1" else "0"
+            with Not_found -> "?")
+          in Printf.fprintf !output "%s %s\n" valuation lit_name);
+  | Unix.WEXITED c -> Printf.eprintf "Command '%s' returned code %d and no lines beginning with 'V'\n"
+                        (match !solver_ext with Some s -> s | None -> "???") c; exit_with SOLVER_UNKNOWN;
+  | _ -> Printf.eprintf "Error with %s, received signal\n" (cmd)
+
 (* The main program *)
 let () =
   let cmd = (FilePath.basename Sys.argv.(0)) in (* ./touistl exec. name *)
@@ -79,9 +107,9 @@ let () =
      "TABLE (--sat only) The output file that contains the literals table.
       By default, prints to stdout.");
     ("--sat", Arg.Set sat_flag,
-        "Select the SAT solver (enabled by default when --smt or --qbf not selected)");
+     "Select the SAT solver (enabled by default when --smt or --qbf not selected)");
     ("--qbf", Arg.Set qbf_flag,
-        "Select the QBF solver");
+     "Select the QBF solver");
     ("--smt", Arg.Set_string (smt_flag), (
         "LOGIC Select the SMT solver with the specified LOGIC from the
         SMT2-LIB specification:
@@ -139,7 +167,7 @@ let () =
     print_endline ("Version: " ^ TouistVersion.version);
     if TouistVersion.has_git_tag then print_endline ("Git: "^TouistVersion.git_tag);
     let built_list = ["minisat"] @ (if TouistVersion.has_yices2 then ["yices2"] else [])
-                                 @ (if TouistVersion.has_qbf then ["qbf";"qbf.quantor"] else []) in
+                     @ (if TouistVersion.has_qbf then ["qbf";"qbf.quantor"] else []) in
     print_endline ("Built with: " ^ List.fold_left (fun acc e -> match acc with "" -> e | _ -> acc^", "^e) "" built_list);
     exit_with OK
   );
@@ -168,7 +196,7 @@ let () =
     (* SMT Mode: check if one of the available QF_? has been given after --smt *)
     if (!mode = Smt) && not (TouistSmtSolve.logic_supported !smt_flag) then
       fatal (Error,Usage,"you must give a correct SMT-LIB \
-      logic after --smt (try --help)\nExample: --smt QF_IDL\n",None);
+                          logic after --smt (try --help)\nExample: --smt QF_IDL\n",None);
   #endif
 
   if !output_file_path <> ""
@@ -207,38 +235,38 @@ let () =
 
   if !show then begin
     let ast = match !mode with
-    | Sat -> TouistParse.parse_sat ~debug:!debug_syntax ~filename:!input_file_path input_text
-        |> TouistEval.eval ~smt:(!mode = Smt)
-    | Smt -> TouistParse.parse_smt ~debug:!debug_syntax ~filename:!input_file_path input_text
-        |> TouistEval.eval ~smt:(!mode = Smt)
-    | Qbf -> TouistParse.parse_qbf ~debug:!debug_syntax ~filename:!input_file_path input_text
-        |> TouistEval.eval ~smt:(!mode = Smt)
+      | Sat -> TouistParse.parse_sat ~debug:!debug_syntax ~filename:!input_file_path input_text
+               |> TouistEval.eval ~smt:(!mode = Smt)
+      | Smt -> TouistParse.parse_smt ~debug:!debug_syntax ~filename:!input_file_path input_text
+               |> TouistEval.eval ~smt:(!mode = Smt)
+      | Qbf -> TouistParse.parse_qbf ~debug:!debug_syntax ~filename:!input_file_path input_text
+               |> TouistEval.eval ~smt:(!mode = Smt)
     in (Printf.fprintf !output "%s\n" (TouistPprint.string_of_ast ~utf8:true ast);
-       exit_with OK)
-    end;
+        exit_with OK)
+  end;
 
   (* Step 3: translation *)
-  if !mode = Sat then
-    (* A. solve has been asked *)
-    if !solve_flag then
-      if !equiv_file_path <> "" then begin
-        let solve input =
-          let ast = TouistParse.parse_sat ~debug:!debug_syntax ~filename:!input_file_path (string_of_chan input) |> TouistEval.eval
-          in let models = TouistCnf.ast_to_cnf ~debug:!debug_cnf ast |> TouistSatSolve.minisat_clauses_of_cnf |> TouistSatSolve.solve_clauses ~verbose:!debug
-          in models
-        in
-        let models = solve !input
-        and models2 = solve !input_equiv
-        in match TouistSatSolve.ModelSet.equal !models !models2 with
-        | true -> Printf.fprintf !output "Equivalent\n"; exit_with OK
-        | false -> Printf.fprintf !output "Not equivalent\n"; exit_with SOLVER_UNSAT
-      end
-      else
-        let ast = TouistParse.parse_sat ~debug:!debug_syntax ~filename:!input_file_path input_text |> TouistEval.eval in
-        let clauses,table = TouistCnf.ast_to_cnf ~debug:!debug_cnf ast |> TouistSatSolve.minisat_clauses_of_cnf
-        in
-        let models =
-          begin
+  match !mode, !solve_flag, !solver_ext with
+  (* A. solve has been asked *)
+  | Sat, true, None ->
+    if !equiv_file_path <> "" then begin
+      let solve input =
+        let ast = TouistParse.parse_sat ~debug:!debug_syntax ~filename:!input_file_path (string_of_chan input) |> TouistEval.eval
+        in let models = TouistCnf.ast_to_cnf ~debug:!debug_cnf ast |> TouistSatSolve.minisat_clauses_of_cnf |> TouistSatSolve.solve_clauses ~verbose:!debug
+        in models
+      in
+      let models = solve !input
+      and models2 = solve !input_equiv
+      in match TouistSatSolve.ModelSet.equal !models !models2 with
+      | true -> Printf.fprintf !output "Equivalent\n"; exit_with OK
+      | false -> Printf.fprintf !output "Not equivalent\n"; exit_with SOLVER_UNSAT
+    end
+    else
+      let ast = TouistParse.parse_sat ~debug:!debug_syntax ~filename:!input_file_path input_text |> TouistEval.eval in
+      let clauses,table = TouistCnf.ast_to_cnf ~debug:!debug_cnf ast |> TouistSatSolve.minisat_clauses_of_cnf
+      in
+      let models =
+        begin
           if !only_count then TouistSatSolve.solve_clauses ~verbose:!debug (clauses,table)
           else
             let print_model model i =
@@ -246,20 +274,20 @@ let () =
               then Printf.fprintf !output "==== model %d\n%s\n" i (TouistSatSolve.Model.pprint ~sep:"\n" table model)
               else Printf.fprintf !output "%s\n" (TouistSatSolve.Model.pprint ~sep:"\n" table model)
             (* Notes:
-              1) print_endline vs. printf: print_endline is a printf with
-              'flush stdout' at the end. If we don't put 'flush', the user
-              won't see the output before scanf asks for some input.
-              2) scanf: I don't know!!! *)
+               1) print_endline vs. printf: print_endline is a printf with
+               'flush stdout' at the end. If we don't put 'flush', the user
+               won't see the output before scanf asks for some input.
+               2) scanf: I don't know!!! *)
             (* [continue_asking] is needed by [solve_clauses]; it simply
                asks after displaying each model if it should continue
                displaying the next one. *)
             and continue_asking _ i =
               Printf.fprintf !output "=== count: %d; continue? (y/n) " i; flush stdout;
               try Scanf.scanf "%s\n" (fun c -> not (c="q" || c="n"))
-              with End_of_file -> Printf.eprintf "%s"
-                "error: could not enter interactive mode as stdin unexpectedly closed\n";
+              with End_of_file -> Printf.eprintf "error: could not enter \
+                          interactive mode as stdin unexpectedly closed\n";
                 exit_with UNKNOWN
-                   (* stdin unexpectedly closed (e.g., piped cmd) *)
+            (* stdin unexpectedly closed (e.g., piped cmd) *)
             (* [continue_limit] is also needed by [solve_clauses]. It stops
                the display of models as soon as the number of models displayed
                reaches [limit]. *)
@@ -268,135 +296,99 @@ let () =
             TouistSatSolve.solve_clauses ~verbose:!debug ~print:print_model
               ~continue:(if !sat_interactive then continue_asking else continue_limit)
               (clauses,table)
-          end
-        in
-        match TouistSatSolve.ModelSet.cardinal !models with
-        | i when !only_count -> Printf.fprintf !output "%d\n" i; exit_with OK
-        | 0 -> Printf.fprintf stderr "unsat\n"; exit_with SOLVER_UNSAT
-        | 1 -> (* case where we already printed models in [solve_clause] *)
-          exit_with OK
-        | i -> (* case where we already printed models in [solve_clause] *)
-          Printf.fprintf !output "==== found %d models, limit is %d (--limit N for more models)\n" i !limit; exit_with OK
-    else
-      (* B. solve not asked: print the Sat file *)
-      let ast = TouistParse.parse_sat ~debug:!debug_syntax ~filename:!input_file_path input_text |> TouistEval.eval in
-      let clauses,tbl = TouistCnf.ast_to_cnf ~debug:!debug_cnf ast |> TouistSatSolve.minisat_clauses_of_cnf
+        end
       in
-      (* Display the mapping table. *)
-      tbl |> TouistCnf.print_table (Minisat.Lit.to_int) !output_table ~prefix:(if !output = !output_table then "c " else "");
-      (* Display the dimacs' preamble line. *)
-      Printf.fprintf !output "p cnf %d %d\n" (Hashtbl.length tbl) (List.length clauses);
-      (* Display the dimacs clauses. *)
-      let print_lit l = if !debug_dimacs then
-        (if Minisat.Lit.sign l then "" else "-") ^ (Minisat.Lit.abs l |> Hashtbl.find tbl)
-        else Minisat.Lit.to_string l
-      in
-      clauses |> TouistCnf.print_clauses !output print_lit;
-      exit_with OK
-        (* table_prefix allows to add the 'c' before each line of the table
-           display, when and only when everything is outputed in a single
-           file. Example:
-              c 98 p(1,2,3)     -> c means 'comment' in any Sat file   *)
-
-  else if !mode = Smt && not !solve_flag then begin
+      (match TouistSatSolve.ModelSet.cardinal !models with
+       | i when !only_count -> Printf.fprintf !output "%d\n" i; exit_with OK
+       | 0 -> Printf.fprintf stderr "unsat\n"; exit_with SOLVER_UNSAT
+       | 1 -> (* case where we already printed models in [solve_clause] *)
+         exit_with OK
+       | i -> (* case where we already printed models in [solve_clause] *)
+         Printf.fprintf !output "==== found %d models, limit is %d (--limit N for more models)\n" i !limit; exit_with OK)
+  | Sat, false, None -> (* B. solve not asked: print the Sat file *)
+    let ast = TouistParse.parse_sat ~debug:!debug_syntax ~filename:!input_file_path input_text |> TouistEval.eval in
+    let clauses,tbl = TouistCnf.ast_to_cnf ~debug:!debug_cnf ast |> TouistSatSolve.minisat_clauses_of_cnf
+    in TouistSatSolve.print_dimacs ~debug_dimacs:!debug_dimacs (clauses,tbl)
+      ~out_table:!output_table !output;
+    exit_with OK
+  | Sat, _, Some cmd ->
+    let ast = TouistParse.parse_sat ~debug:!debug_syntax ~filename:!input_file_path input_text |> TouistEval.eval in
+    let clauses,tbl = TouistCnf.ast_to_cnf ~debug:!debug_cnf ast |> TouistSatSolve.minisat_clauses_of_cnf
+    in cmd |> solve_ext tbl (Minisat.Lit.abs) (Minisat.Lit.sign) (Minisat.Lit.make)
+      (TouistSatSolve.print_dimacs (clauses,tbl))
+  | Smt, false, _ ->
     let ast = TouistParse.parse_smt ~debug:!debug_syntax ~filename:!input_file_path input_text
-        |> TouistEval.eval ~smt:(!mode = Smt) in
+              |> TouistEval.eval ~smt:(!mode = Smt) in
     let smt = TouistSmt.to_smt2 !smt_flag ast in
     Buffer.output_buffer !output smt;
     exit_with OK
-  end
-  else if !mode = Smt && !solve_flag then begin
+  | Smt, true, _ ->
     #ifdef yices2
       let ast = TouistParse.parse_smt ~debug:!debug_syntax ~filename:!input_file_path input_text
-          |> TouistEval.eval ~smt:(!mode = Smt) in
+                |> TouistEval.eval ~smt:(!mode = Smt) in
       let yices_form,tbl = TouistSmtSolve.ast_to_yices ast in
-      match TouistSmtSolve.solve !smt_flag yices_form with
-      | None -> (Printf.fprintf stderr "unsat\n"; exit_with SOLVER_UNSAT |> ignore)
-      | Some m -> (Printf.fprintf !output "%s\n" (TouistSmtSolve.string_of_model tbl m); exit_with OK |> ignore);
+      (match TouistSmtSolve.solve !smt_flag yices_form with
+      | None -> Printf.fprintf stderr "unsat\n"; exit_with SOLVER_UNSAT |> ignore
+      | Some m -> Printf.fprintf !output "%s\n" (TouistSmtSolve.string_of_model tbl m); exit_with OK |> ignore);
     #else
       Printf.fprintf stderr
-        ("This touist binary has not been compiled with yices2 support.");
-      exit_with CMD_UNSUPPORTED
+        "This touist binary has not been compiled with yices2 support.";
+      exit_with CMD_UNSUPPORTED;
     #endif
-  end
-  else if !mode = Qbf then
-    begin
-      let ast = TouistParse.parse_qbf ~debug:!debug_syntax ~filename:!input_file_path input_text
-        |> TouistEval.eval ~smt:(!mode = Smt) in
-      let prenex = TouistQbf.prenex ast in
-      let cnf = TouistQbf.cnf prenex in
-      if !debug_cnf then begin
-        Printf.fprintf stderr "formula: %s\n" (TouistPprint.string_of_ast ~utf8:true ast);
-        Printf.fprintf stderr " prenex: %s\n" (TouistPprint.string_of_ast ~utf8:true prenex);
-        Printf.fprintf stderr "    cnf: %s\n" (TouistPprint.string_of_ast ~utf8:true cnf)
-      end;
-      match !solver_ext with
-      | Some cmd ->
-        begin
-          let proc_stdout, proc_stdin = Unix.open_process cmd in
-          let tbl = TouistQbf.print_qdimacs proc_stdin (None) cnf in
-          flush proc_stdin; close_out proc_stdin;
-          let ints_of_string s = List.map int_of_string (Str.split (Str.regexp " +") s) in
-          let rec process in_chan =
-            try let line = input_line in_chan in
-            let line_lst =
-              match String.get line 0 with
-              | 'V' | 'v' -> String.sub line 2 (String.length line -2) |> ints_of_string
-              | _ -> []
-            in line_lst @ (process in_chan)
-            with End_of_file -> close_in in_chan; []
-          in
-          let valuated_lits = process proc_stdout in
-          match Unix.close_process (proc_stdout, proc_stdin) with
-          | Unix.WEXITED _ when List.length valuated_lits > 0 ->
-            tbl |> Hashtbl.iter (fun lit_num lit_name ->
-              if lit_name.[0] <> '&' || !show_hidden_lits then
-              let valuation = (try valuated_lits |> List.find (fun l -> lit_num = (abs l)) |> fun v -> if v>0 then "1" else "0" with Not_found -> "?") in
-              Printf.fprintf !output "%s %s\n" valuation lit_name);
-          | Unix.WEXITED c -> Printf.eprintf "Command '%s' returned code %d and no lines beginning with 'v'\n"
-              (match !solver_ext with Some s -> s | None -> "???") c; exit_with SOLVER_UNKNOWN;
-          | _ -> Printf.eprintf "Error with %s, received signal\n" (match !solver_ext with Some s -> s | None -> "???");
-        end
-      | None ->
-      if not !solve_flag then begin
-        TouistQbf.print_qdimacs ~debug_dimacs:!debug_dimacs !output (Some !output_table) cnf |> ignore;
-      end
-      else (* --solve*)
+  | Qbf, _, _ -> begin
+    let ast = TouistParse.parse_qbf ~debug:!debug_syntax ~filename:!input_file_path input_text
+              |> TouistEval.eval ~smt:(!mode = Smt) in
+    let prenex = TouistQbf.prenex ast in
+    let cnf = TouistQbf.cnf prenex in
+    if !debug_cnf then begin
+      Printf.fprintf stderr "formula: %s\nprenex: %s\ncnf: %s\n"
+        (TouistPprint.string_of_ast ~utf8:true ast)
+        (TouistPprint.string_of_ast ~utf8:true prenex)
+        (TouistPprint.string_of_ast ~utf8:true cnf)
+    end;
+    match !solver_ext, !solve_flag with
+    | Some cmd, _ -> (* --qbf + --solver CMD: use external solver *)
+      let quants,int_clauses,int_tbl = TouistQbf.qbfclauses_of_cnf cnf
+      in cmd |> solve_ext int_tbl (abs) (fun v -> v>0) (fun v -> v)
+        (TouistQbf.print_qdimacs (quants,int_clauses,int_tbl))
+    | None, false -> (* --qbf: we print QDIMACS *)
+      let quants,int_clauses,int_tbl = TouistQbf.qbfclauses_of_cnf cnf in
+      TouistQbf.print_qdimacs ~debug_dimacs:!debug_dimacs
+        (quants,int_clauses,int_tbl) ~out_table:!output_table !output
+    | None, true -> (* --qbf + --solve: we solve using Quantor *)
       #ifdef qbf
         let qcnf,table = TouistQbfSolve.qcnf_of_cnf cnf in
         match TouistQbfSolve.solve ~hidden:!show_hidden_lits (qcnf,table) with
         | Some str -> Printf.fprintf !output "%s\n" str
-        | None ->
-          (Printf.fprintf stderr ("unsat\n");
-          ignore @@ exit_with SOLVER_UNSAT);
+        | None -> (Printf.fprintf stderr "unsat\n"; exit_with SOLVER_UNSAT |> ignore);
       #else
-        Printf.fprintf stderr
-          ("This touist binary has not been compiled with qbf support.");
-        exit_with CMD_UNSUPPORTED
+          Printf.fprintf stderr
+            ("This touist binary has not been compiled with qbf support.");
+            exit_with CMD_UNSUPPORTED
       #endif
     end;
 
-  (* I had to comment these close_out and close_in because it would
-  raise 'bad descriptor file' for some reason. Because the program is always
-  going to shut at this point, we can rely on the operating system for closing
-  opened files.
+(* I had to comment these close_out and close_in because it would
+   raise 'bad descriptor file' for some reason. Because the program is always
+   going to shut at this point, we can rely on the operating system for closing
+   opened files.
 
-  close_out !output;
-  close_out !output_table;
-  close_in !input;
-  *)
+   close_out !output;
+   close_out !output_table;
+   close_in !input;
+*)
 
-  exit_with OK
+exit_with OK
 
-  with
-    (* Warning: the [msg] already contains an ending '\n'. No need for adding
-       another ending newline after it. *)
-    | TouistFatal msg ->
-      if !debug then Printf.eprintf "Stacktrace:\n%s\n" (Printexc.get_backtrace ());
-      Printf.eprintf "%s" (TouistErr.string_of_msg msg);
-      exit_with (match msg with _,Usage,_,_ -> CMD_USAGE | _ -> TOUIST_SYNTAX)
-    | Sys_error err ->
+with
+  (* Warning: the [msg] already contains an ending '\n'. No need for adding
+    another ending newline after it. *)
+  | TouistFatal msg ->
+    if !debug then Printf.eprintf "Stacktrace:\n%s\n" (Printexc.get_backtrace ());
+    Printf.eprintf "%s" (TouistErr.string_of_msg msg);
+    exit_with (match msg with _,Usage,_,_ -> CMD_USAGE | _ -> TOUIST_SYNTAX)
+  | Sys_error err ->
     (* [err] is provided by the system; it doesn't end with a newline. *)
-      Printf.eprintf "%s\n" (TouistErr.string_of_msg (Error,Usage,err,None));
-      exit_with CMD_USAGE
-    | x -> raise x
+    Printf.eprintf "%s\n" (TouistErr.string_of_msg (Error,Usage,err,None));
+    exit_with CMD_USAGE
+  | x -> raise x

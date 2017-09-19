@@ -29,32 +29,41 @@ val prenex : ?debug:bool -> TouistTypes.AstSet.elt -> TouistTypes.Ast.t
     [ast] must be in Prenex Normal Form. *)
 val cnf : ?debug:bool -> TouistTypes.Ast.t -> TouistTypes.AstSet.elt
 
-(** [print_qdimacs out out_table ast] takes a Prenex-CNF formula
-    {!TouistTypes.Ast.t} and prints the following:
-    - 1) the mapping table (litterals int to name)
-    - 2) dimacs header line ('p cnf 3 2')
-    - 3) the quantifiers lines grouped (one quantifier per line, beginning with
-    'e' or 'a' and ending by 0)
-    - 4) the clauses (one conjunction per line, one line is a disjunction,
-    minus means 'not'). *)
-val print_qdimacs : ?debug_dimacs:bool -> out_channel -> out_channel option -> TouistTypes.Ast.t -> (int, string) Hashtbl.t
-
 (** {2 CNF to clauses} *)
 
 (** [A] means 'forall', [E] means 'exists' *)
 type 'a quantlist = A of 'a list | E of 'a list
 
-(** [qbfclauses_of_cnf] translates an AST (which is in CNF) to three
-    structures:
-    - 1) a list of quantlist which reprensents the grouped quantifiers in the
-         Prenex Normal Form.
-    - 2) a list of lists of integers which represents the CNF formula embedded
-         in the Prenex Normal Form.
-    - 3) a correspondance table 'int -> litteral names'
+(** [qbfclauses_of_cnf] translates an AST (which is in CNF) to the tuple
+    [(quants, int_clauses, int_table)]:
+    - 1) [quants] is a list of quantlist which reprensents the grouped
+         quantifiers in the Prenex Normal Form.
+    - 2) [int_clauses] a list of lists of integers which represents the
+         CNF formula embedded in the Prenex Normal Form.
+    - 3) [int_table] is the mapping table from litteral integers to names.
 *)
 val qbfclauses_of_cnf :
   TouistTypes.Ast.t ->
   int quantlist list * int list list * (int, string) Hashtbl.t
+
+
+(** [print_qdimacs (quants, int_clauses, int_table) out] takes the
+    result of {!qbfclauses_of_cnf} and prints the following:
+    - 1) If [~out_table] is given, print the mapping table from litterals
+         integers to names. If [out] and [out_table] are the same, then the
+         mapping table will be printed in DIMACS comments
+         (e.g., 'c p(a,b) 5').
+    - 2) the DIMACS standard header line ('p cnf 3 2')
+    - 3) the quantifiers lines grouped (one quantifier per line, beginning with
+        'e' or 'a' and ending by 0)
+    - 4) the clauses (one conjunction per line, one line is a disjunction,
+         minus means 'not').
+
+    @see <http://www.qbflib.org/qdimacs.html> QDIMACS standard *)
+val print_qdimacs :
+  ?debug_dimacs:bool ->
+  int quantlist list * int list list * (int, string) Hashtbl.t ->
+  ?out_table:out_channel -> out_channel -> unit
 
 (** {2 Utility functions} *)
 
