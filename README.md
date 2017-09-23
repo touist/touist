@@ -139,7 +139,7 @@ let clauses,mapping =
     |> TouistCnf.ast_to_cnf
     |> TouistSatSolve.minisat_clauses_of_cnf
 in TouistSatSolve.solve_clauses (clauses,mapping)
-    ~print:(fun m _ -> TouistSatSolve.Model.pprint mapping m |> prerr_endline);
+    ~print:(fun m _ -> TouistSatSolve.Model.pprint mapping m |> print_endline);
 ```
 
 To compile it, do

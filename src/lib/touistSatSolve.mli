@@ -73,7 +73,7 @@ val string_of_clauses : Minisat.Lit.t list list -> string
     - 4) the clauses (one conjunction per line, one line is a disjunction,
          minus means 'not').
 
-    @see on Google "Satisfiability Suggested Format" (May 8, 1993) *)
+    See on Google "Satisfiability Suggested Format" (May 8, 1993) *)
 val print_dimacs :
   ?debug_dimacs:bool ->
   Minisat.Lit.t list list * (Minisat.Lit.t, string) Hashtbl.t ->
