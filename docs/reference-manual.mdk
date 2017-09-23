@@ -3,7 +3,7 @@ Author: Olivier Gasquet
 Author: Frédéric Maris
 Author: Maël Valais
 Title Note: &date; (touist &version;)
-Bib: bibliography.bib
+Bibliography: bibliography.bib
 Colorizer: touist
 Colorizer: grammar
 <!--Math Mode: mathjax-->
@@ -31,11 +31,12 @@ Touist: [TouIST]{font-variant: small-caps}
 ## What is &touist;?
 
 &touist;[^touist-meaning] is a language that allows us to express
-propositional logic [@Ben_Slimane_IAF_2015;@SlimaneCGHLMV15]. You are
-provided with two programs: a graphical interface, refered as `touist.jar`
-(as it is written in Java) and `touist`, a command-line program written in
-OCaml that compiles and solves &touist; problems (see [#touist-program] for
-usage).
+propositional
+logic [@SlimaneCGHLMV15;@Ben_Slimane_IAF_2015;@Gasquet_et_al_IAF_2017].
+You are provided with two programs: a graphical interface, refered as
+`touist.jar` (as it is written in Java) and `touist`, a command-line
+program written in OCaml that compiles and solves &touist; problems
+(see [#touist-program] for usage).
 
 [^touist-meaning]: _**Tou**louse **I**ntegrated **S**atisfiability **T**ool_.
                    It is prononced _twist_. We were looking for a memorable and

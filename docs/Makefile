@@ -5,23 +5,25 @@
 
 all: html
 
-out/%.html: %.mdk
+out/%.html: %.mdk bibliography.bib
 	madoko $^ -mversion:$$(git describe --tags)
 
-out/%.pdf: %.mdk
+out/%.pdf: %.mdk bibliography.bib
 	madoko $^ -mversion:$$(git describe --tags) --pdf
 
 html: out/reference-manual.html
 pdf: out/reference-manual.pdf
 
-open-html: html
+html-open: html
 ifeq ($(shell uname -s),Darwin)
 	open out/reference-manual.html -g
 endif
-open-pdf: pdf
+pdf-open: pdf
 ifeq ($(shell uname -s),Darwin)
 	open out/reference-manual.pdf -g
 endif
 
+clean:
+	rm -Rf out/
 # vim:ft=make
 #
