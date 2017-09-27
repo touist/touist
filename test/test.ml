@@ -250,6 +250,7 @@ run_test_tt_main (
   "">::(test_smt "a < 1");
   "">::(test_smt "a == 3");
   "">::(test_smt "a != 3");
+  "">::(test_smt ~logic:"QF_LRA" "(a == b)");
   "for now, one of the two terms must be a float or int">::(test_smt "(a+1) > 3");
   "takuzu4x4.touist">:: (test_smt (Touist.Parse.string_of_file "smt/takuzu4x4.touist"))
 ];
