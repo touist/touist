@@ -21,9 +21,9 @@ let to_smt2 logic formula =
 
   let sanitize_var name =
     String.map (fun c ->
-      if (c = '(') ||
-         (c = ')') ||
-         (c = ',') || (c = ' ') then '_' else c) name
+        if (c = '(') ||
+           (c = ')') ||
+           (c = ',') || (c = ' ') then '_' else c) name
   in
 
   let rec term_expr = function
@@ -43,46 +43,28 @@ let to_smt2 logic formula =
 
   let rec gen_var typ = function
     | Prop x -> add_var x typ
-    | Add              (Prop x, Int _)
-    | Add              (Int _, Prop x)
-    | Sub              (Prop x, Int _)
-    | Sub              (Int _, Prop x)
-    | Mul              (Prop x, Int _)
-    | Mul              (Int _, Prop x)
-    | Div              (Prop x, Int _)
-    | Div              (Int _, Prop x)
-    | Lesser_than      (Prop x, Int _)
-    | Lesser_than      (Int _, Prop x)
-    | Lesser_or_equal  (Prop x, Int _)
-    | Lesser_or_equal  (Int _, Prop x)
-    | Greater_than     (Prop x, Int _)
-    | Greater_than     (Int _, Prop x)
-    | Greater_or_equal (Int _, Prop x)
-    | Greater_or_equal (Prop x, Int _)
-    | Equal            (Prop x, Int _)
-    | Equal            (Int _, Prop x)
-    | Not_equal        (Prop x, Int _)
-    | Not_equal        (Int _, Prop x) -> add_var x "Int"
-    | Add              (Prop x, Float _)
-    | Add              (Float _, Prop x)
-    | Sub              (Prop x, Float _)
-    | Sub              (Float _, Prop x)
-    | Mul              (Prop x, Float _)
-    | Mul              (Float _, Prop x)
-    | Div              (Prop x, Float _)
-    | Div              (Float _, Prop x)
-    | Lesser_than      (Prop x, Float _)
-    | Lesser_than      (Float _, Prop x)
-    | Lesser_or_equal  (Prop x, Float _)
-    | Lesser_or_equal  (Float _, Prop x)
-    | Greater_than     (Prop x, Float _)
-    | Greater_than     (Float _, Prop x)
-    | Greater_or_equal (Prop x, Float _)
-    | Greater_or_equal (Float _, Prop x)
-    | Equal            (Prop x, Float _)
-    | Equal            (Float _, Prop x)
-    | Not_equal        (Prop x, Float _)
-    | Not_equal        (Float _, Prop x) -> add_var x "Real"
+    | Add              (Prop x, Int _) | Add              (Int _, Prop x)
+    | Sub              (Prop x, Int _) | Sub              (Int _, Prop x)
+    | Mul              (Prop x, Int _) | Mul              (Int _, Prop x)
+    | Div              (Prop x, Int _) | Div              (Int _, Prop x)
+    | Lesser_than      (Prop x, Int _) | Lesser_than      (Int _, Prop x)
+    | Lesser_or_equal  (Prop x, Int _) | Lesser_or_equal  (Int _, Prop x)
+    | Greater_than     (Prop x, Int _) | Greater_than     (Int _, Prop x)
+    | Greater_or_equal (Prop x, Int _) | Greater_or_equal (Int _, Prop x)
+    | Equal            (Prop x, Int _) | Equal            (Int _, Prop x)
+    | Not_equal        (Prop x, Int _) | Not_equal        (Int _, Prop x)
+      -> add_var x "Int"
+    | Add              (Prop x, Float _) | Add              (Float _, Prop x)
+    | Sub              (Prop x, Float _) | Sub              (Float _, Prop x)
+    | Mul              (Prop x, Float _) | Mul              (Float _, Prop x)
+    | Div              (Prop x, Float _) | Div              (Float _, Prop x)
+    | Lesser_than      (Prop x, Float _) | Lesser_than      (Float _, Prop x)
+    | Lesser_or_equal  (Prop x, Float _) | Lesser_or_equal  (Float _, Prop x)
+    | Greater_than     (Prop x, Float _) | Greater_than     (Float _, Prop x)
+    | Greater_or_equal (Prop x, Float _) | Greater_or_equal (Float _, Prop x)
+    | Equal            (Prop x, Float _) | Equal            (Float _, Prop x)
+    | Not_equal        (Prop x, Float _) | Not_equal        (Float _, Prop x)
+      -> add_var x "Real"
     | Add              (Prop x, Prop y)
     | Sub              (Prop x, Prop y)
     | Mul              (Prop x, Prop y)
@@ -93,82 +75,64 @@ let to_smt2 logic formula =
     | Greater_or_equal (Prop x, Prop y)
     | Equal            (Prop x, Prop y)
     | Not_equal        (Prop x, Prop y) ->
-        begin
-          try
-            let x_type = Hashtbl.find vtbl x in
-            add_var y x_type
-          with Not_found ->
-            try
-              let y_type = Hashtbl.find vtbl y in
-              add_var x y_type
-            with Not_found ->
-              add_var x typ;
-              add_var y typ
-        end
+      begin
+        try
+          let x_type = Hashtbl.find vtbl x in
+          add_var y x_type
+        with Not_found ->
+        try
+          let y_type = Hashtbl.find vtbl y in
+          add_var x y_type
+        with Not_found ->
+          add_var x typ;
+          add_var y typ
+      end
     | Not x -> gen_var typ x
     | And     (x,y)
     | Or      (x,y)
     | Xor     (x,y)
     | Implies (x,y)
     | Equiv   (x,y) -> gen_var "Bool" x; gen_var "Bool" y
-    | Add              (x, Int _)
-    | Add              (Int _, x)
-    | Sub              (x, Int _)
-    | Sub              (Int _, x)
-    | Mul              (x, Int _)
-    | Mul              (Int _, x)
-    | Div              (x, Int _)
-    | Div              (Int _, x)
-    | Equal            (x, Int _)
-    | Equal            (Int _, x)
-    | Not_equal        (x, Int _)
-    | Not_equal        (Int _, x)
-    | Lesser_than      (x, Int _)
-    | Lesser_than      (Int _, x)
-    | Lesser_or_equal  (x, Int _)
-    | Lesser_or_equal  (Int _, x)
-    | Greater_than     (x, Int _)
-    | Greater_than     (Int _, x)
-    | Greater_or_equal (x, Int _)
-    | Greater_or_equal (Int _, x)->
-        let rec go = function
-          | Prop x -> add_var x "Int"
-          | Add (x,y)
-          | Sub (x,y)
-          | Mul (x,y)
-          | Div (x,y) -> go x; go y
-          | _ -> failwith "not a term exp"
-        in
-        if term_expr x then go x else ()
-    | Add              (x, Float _)
-    | Add              (Float _, x)
-    | Sub              (x, Float _)
-    | Sub              (Float _, x)
-    | Mul              (x, Float _)
-    | Mul              (Float _, x)
-    | Div              (x, Float _)
-    | Div              (Float _, x)
-    | Equal            (x, Float _)
-    | Equal            (Float _, x)
-    | Not_equal        (x, Float _)
-    | Not_equal        (Float _, x)
-    | Lesser_than      (x, Float _)
-    | Lesser_than      (Float _, x)
-    | Lesser_or_equal  (x, Float _)
-    | Lesser_or_equal  (Float _, x)
-    | Greater_than     (x, Float _)
-    | Greater_than     (Float _, x)
-    | Greater_or_equal (x, Float _)
-    | Greater_or_equal (Float _, x) ->
-        let rec go = function
-          | Prop x -> add_var x "Real"
-          | Add (x,y)
-          | Sub (x,y)
-          | Mul (x,y)
-          | Div (x,y) -> go x; go y
-          | _ -> failwith "not a term exp"
-        in
-        if term_expr x then go x else ()
+    | Add              (x, Int _) | Add              (Int _, x)
+    | Sub              (x, Int _) | Sub              (Int _, x)
+    | Mul              (x, Int _) | Mul              (Int _, x)
+    | Div              (x, Int _) | Div              (Int _, x)
+    | Equal            (x, Int _) | Equal            (Int _, x)
+    | Not_equal        (x, Int _) | Not_equal        (Int _, x)
+    | Lesser_than      (x, Int _) | Lesser_than      (Int _, x)
+    | Lesser_or_equal  (x, Int _) | Lesser_or_equal  (Int _, x)
+    | Greater_than     (x, Int _) | Greater_than     (Int _, x)
+    | Greater_or_equal (x, Int _) | Greater_or_equal (Int _, x)
+      ->
+      let rec go = function
+        | Prop x -> add_var x "Int"
+        | Add (x,y)
+        | Sub (x,y)
+        | Mul (x,y)
+        | Div (x,y) -> go x; go y
+        | _ -> failwith "not a term exp"
+      in
+      if term_expr x then go x else ()
+    | Add              (x, Float _) | Add              (Float _, x)
+    | Sub              (x, Float _) | Sub              (Float _, x)
+    | Mul              (x, Float _) | Mul              (Float _, x)
+    | Div              (x, Float _) | Div              (Float _, x)
+    | Equal            (x, Float _) | Equal            (Float _, x)
+    | Not_equal        (x, Float _) | Not_equal        (Float _, x)
+    | Lesser_than      (x, Float _) | Lesser_than      (Float _, x)
+    | Lesser_or_equal  (x, Float _) | Lesser_or_equal  (Float _, x)
+    | Greater_than     (x, Float _) | Greater_than     (Float _, x)
+    | Greater_or_equal (x, Float _) | Greater_or_equal (Float _, x)
+      ->
+      let rec go = function
+        | Prop x -> add_var x "Real"
+        | Add (x,y)
+        | Sub (x,y)
+        | Mul (x,y)
+        | Div (x,y) -> go x; go y
+        | _ -> failwith "not a term exp"
+      in
+      if term_expr x then go x else ()
     | Add              (x, y)
     | Sub              (x, y)
     | Mul              (x, y)
@@ -182,58 +146,30 @@ let to_smt2 logic formula =
     | _ -> ()
   in
 
+  (* [parse] will 'infer' the right type. If both operands are propositions,
+     1) we check if these propositions have already been used somewhere; if
+        yes, we use their type
+     2) if these propositions have not been already seen, then
+        use the "most general" type:
+        - in QF_LRA (or any real-based coding), Real is going to be used;
+        - in QF_LIA (or any integer-based codings), Int will be used. *)
   let rec parse = function
-    | Equal            (x, Int y) -> gen_var "Int" x(*; Equal (x, Int y)*)
-    | Equal            (Int x, y) -> gen_var "Int" y(*; Equal (Int x, y)*)
-    | Not_equal        (x, Int y) -> gen_var "Int" x(*; Not_equal (x, Int
-    y)*)
-    | Not_equal        (Int x, y) -> gen_var "Int" y(*; Not_equal (Int x,
-    y)*)
-    | Lesser_than      (x, Int y) -> gen_var "Int" x(*; Lesser_than (x, Int
-    y)*)
-    | Lesser_than      (Int x, y) -> gen_var "Int" y(*; Lesser_than (Int x,
-    y)*)
-    | Lesser_or_equal  (x, Int y) -> gen_var "Int" x(*; Lesser_or_equal (x,
-    Int y)*)
-    | Lesser_or_equal  (Int x, y) -> gen_var "Int" y(*; Lesser_or_equal (Int
-    x, y)*)
-    | Greater_than     (x, Int y) -> gen_var "Int" x(*; Greater_than (x, Int
-    y)*)
-    | Greater_than     (Int x, y) -> gen_var "Int" y(*; Greater_than (Int x,
-    y)*)
-    | Greater_or_equal (x, Int y) -> gen_var "Int" x(*; Greater_or_equal (x,
-    Int y)*)
-    | Greater_or_equal (Int x, y) -> gen_var "Int" y(*; Greater_or_equal
-    (Int x, y)*)
-    | Equal            (x, Float y) -> gen_var "Real" x(*; Equal (x, Float
-    y)*)
-    | Equal            (Float x, y) -> gen_var "Real" y(*; Equal (Float x,
-    y)*)
-    | Not_equal        (x, Float y) -> gen_var "Real" x(*; Not_equal (x,
-    Float y)*)
-    | Not_equal        (Float x, y) -> gen_var "Real" y(*; Not_equal (Float
-    x, y)*)
-    | Lesser_than      (x, Float y) -> gen_var "Real" x(*; Lesser_than (x,
-    Float y)*)
-    | Lesser_than      (Float x, y) -> gen_var "Real" y(*; Lesser_than
-    (Float x, y)*)
-    | Lesser_or_equal  (x, Float y) -> gen_var "Real" x(*; Lesser_or_equal
-    (x, Float y)*)
-    | Lesser_or_equal  (Float x, y) -> gen_var "Real" y(*; Lesser_or_equal
-    (Float x, y)*)
-    | Greater_than     (x, Float y) -> gen_var "Real" x(*; Greater_than (x,
-    Float y)*)
-    | Greater_than     (Float x, y) -> gen_var "Real" y(*; Greater_than
-    (Float x, y)*)
-    | Greater_or_equal (x, Float y) -> gen_var "Real" x(*; Greater_or_equal
-    (x, Float y)*)
-    | Greater_or_equal (Float x, y) -> gen_var "Real" y(*; Greater_or_equal
-    (Float x, y)*)
-    | And     (x, y) -> gen_var "Bool" x; gen_var "Bool" y(*; And (x, y)*)
-    | Or      (x, y) -> gen_var "Bool" x; gen_var "Bool" y(*; Or  (x, y)*)
-    | Xor     (x, y) -> gen_var "Bool" x; gen_var "Bool" y(*; Xor (x, y)*)
-    | Implies (x, y) -> gen_var "Bool" x; gen_var "Bool" y(*; Implies (x, y)*)
-    | Equiv   (x, y) -> gen_var "Bool" x; gen_var "Bool" y(*; Equiv (x, y)*)
+    | Equal            (x, Int _) | Equal            (Int _, x)
+    | Not_equal        (x, Int _) | Not_equal        (Int _, x)
+    | Lesser_than      (x, Int _) | Lesser_than      (Int _, x)
+    | Lesser_or_equal  (x, Int _) | Lesser_or_equal  (Int _, x)
+    | Greater_than     (x, Int _) | Greater_than     (Int _, x)
+    | Greater_or_equal (x, Int _) | Greater_or_equal (Int _, x)
+      -> gen_var "Int" x
+    | Equal            (x, Float _) | Equal            (Float _, x)
+    | Not_equal        (x, Float _) | Not_equal        (Float _, x)
+    | Lesser_than      (x, Float _) | Lesser_than      (Float _, x)
+    | Lesser_or_equal  (x, Float _) | Lesser_or_equal  (Float _, x)
+    | Greater_than     (x, Float _) | Greater_than     (Float _, x)
+    | Greater_or_equal (x, Float _) | Greater_or_equal (Float _, x)
+      -> gen_var "Real" x
+    | And (x, y) | Or (x, y) | Xor (x, y) | Implies (x, y) | Equiv (x, y)
+      -> gen_var "Bool" x; gen_var "Bool" y
     | Prop x -> add_var x "Bool"
     | x -> failwith ("this cannot be transformed into SMT2: "^(Pprint.string_of_ast ~debug:true x))
   in
@@ -243,17 +179,17 @@ let to_smt2 logic formula =
     | Bottom                     -> "false"
     | Prop              x -> sanitize_var x
     | Int x ->
-        if x < 0 then
-          "(- " ^ string_of_int (-x) ^ ")"
-        else
-          string_of_int   x
+      if x < 0 then
+        "(- " ^ string_of_int (-x) ^ ")"
+      else
+        string_of_int   x
     | Float x ->
-        let x'  = string_of_float x in
-        let x'' = if x'.[String.length x' - 1] = '.' then x' ^ "0" else x' in
-        if x''.[0] = '-' then
-          "(- " ^ String.sub x'' 1 (String.length x'' - 1) ^ ")"
-        else
-          x''
+      let x'  = string_of_float x in
+      let x'' = if x'.[String.length x' - 1] = '.' then x' ^ "0" else x' in
+      if x''.[0] = '-' then
+        "(- " ^ String.sub x'' 1 (String.length x'' - 1) ^ ")"
+      else
+        x''
     | Not              x        -> decl_un_op  "not" (write x)
     | And              (x,y)    -> decl_bin_op "and" (write x) (write y)
     | Or               (x,y)    -> decl_bin_op "or"  (write x) (write y)
