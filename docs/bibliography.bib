@@ -1,23 +1,32 @@
 @InProceedings{Gasquet_et_al_IAF_2017,
 author = {Gasquet, Olivier and Herzig, Andreas and Longin, Dominique and Maris, Frédéric and Valais, Maël},
 title = "{TouIST again... (Formalisez et résolvez facilement des problèmes avec des solveurs SAT, SMT et QBF)}",
-booktitle =    {Actes des 10es Journ\'ees d'Intelligence Artificielle Fondamentale (IAF~2017)},
+booktitle =    {Actes des 10es Journées d'Intelligence Artificielle Fondamentale (IAF~2017)},
 year = {2017},
 URL = {https://www.irit.fr/publis/LILAC/Conf_sans_actes/2017_Gasquet_et_al_IAF.pdf},
 abstract = {Depuis 2010, nous développons TouIST (qui est, historiquement, le successeur de SatToulouse, présenté pour la première fois lors de la conférence ICTTL'2011), un logiciel dédié à la logique propositionnelle dont les principales fonctionnalités sont (1) d'offrir un langage logique de haut niveau pour exprimer succinctement des formules complexes et (2) de trouver des modèles à ces formules en utilisant un solveur SAT performant. Dans ce qui suit, nous présentons une extension de TouIST à QBF (Quantified Boolean Formulas) au travers d'un exemple : le jeu de Nim. Tout d'abord, nous survolons succinctement les principales caractéristiques de TouIST et montrons comment modéliser le jeu de Nim dans le langage d'entrée de TouIST. Enfin, après une brève présentation de QBF nous montrons comment modéliser la recherche d'une stratégie gagnante dans TouIST pour ce jeu.},
 language = {francais}
 }
 
+@Unpublished{ Ga2017.3,
+author = {Gasquet, Olivier and Herzig, Andreas and Longin, Dominique and Maris, Frédéric and Valais, Maël},
+title = "{La logique facile avec TouIST (poster) (Démonstrations des Journées Francophones sur la Planification, la Décision et l'Apprentissage pour la conduite de systèmes, Caen, 06/07/2017-07/07/2017)}",
+year = {2017},
+language = {francais},
+URL = {https://www.irit.fr/publis/LILAC/Conf_sans_actes/2017_Gasquet_et_al_JFPDA-demonstrations.pdf}
+}
+
 @InProceedings{Ben_Slimane_IAF_2015,
   author =       {{Khaled Skander} {Ben Slimane} and Alexis Comte and Olivier Gasquet and Abdelwahab Heba and Olivier Lezaud and Frédéric Maris and Maël Valais},
   title =        {La logique facile avec TouIST (formalisez et résolvez facilement des problèmes du monde réel)},
-  booktitle =    {Actes des 9es Journ\'ees d'Intelligence Artificielle Fondamentale (IAF~2015)},
+  booktitle =    {Actes des 9es Journées d'Intelligence Artificielle Fondamentale (IAF~2015)},
   year =         {2015},
   url =          {http://pfia2015.inria.fr/actes/download.php?conf=IAF&file=Ben_Slimane_IAF_2015.pdf},
+  abstract = {Les solveurs SAT sont des outils puissants pour résoudre des problèmes logiques de taille réelle, mais leur utilisation nécessite des connaissances solides. Elle peut être vue par rapport à la logique comme l’utilisation d’un langage d’assemblage par rapport à la programmation. Il manque un langage de haut niveau pour permettre à des utilisateurs divers de tirer facilement profit de ces outils. TouIST vise à combler cette lacune. Il est dédié à la logique propositionnelle et ses principales fonctions sont (1) d’offrir un langage logique de haut niveau pour exprimer succictement des formules complexes (par exemple des formules décrivant les règles du Sudoku, des problèmes de planification...) et (2) de trouver des modèles à ces formules en utilisant un solveur adéquat et performant, que l’utilisateur n’a pas besoin de connaître. Il consiste en une interface conviviale qui propose plusieurs facilités syntaxiques et qui fait appel à des solveurs suffisamment puissants pour permettre de résoudre automatiquement de grandes instances de problèmes difficiles (emplois du temps, Sudokus...). Il peut interagir avec différents démonstrateurs : solveurs SAT pur mais également solveurs SMT (SAT modulo théories - comme la théorie linéaire sur les réels, etc). Il peut donc être utilisé aussi bien par des débutants pour des problèmes purement propositionnels, que par des étudiants de cycles supérieurs ou même des chercheurs et ingénieurs, par exemple pour résoudre des problèmes de planification impliquant de grands ensembles d’actions et des contraintes numériques.},
   language =     {francais}
 }
 
-@article{SlimaneCGHLMV15,
+@inproceedings{ttl2015touist,
   author    = {{Khaled Skander} {Ben Slimane} and
                Alexis Comte and
                Olivier Gasquet and
@@ -26,13 +35,19 @@ language = {francais}
                Frederic Maris and
                Mael Valais},
   title     = {Twist your logic with TouIST},
-  journal   = {CoRR},
-  volume    = {abs/1507.03663},
+  booktitle = {Fourth International Conference on Tools for Teaching Logic, {TTL}
+               2015, Rennes, France, June 9-12, 2015. Proceedings},
+  pages     = {01--08},
   year      = {2015},
+  crossref  = {ttl2015proceedings},
+  editor    = {Antonia Huertas and João Marcos and
+               María Manzano and
+               Sophie Pinchinat and
+               François Schwarzentruber},
+  organization    = {Institut de Recherche en Informatique et Systèmes Aléatoires (IRISA)},
+  publisher = {Université de Rennes 1},
   url       = {http://arxiv.org/abs/1507.03663},
-  timestamp = {Sun, 02 Aug 2015 18:42:02 +0200},
-  biburl    = {http://dblp.uni-trier.de/rec/bib/journals/corr/SlimaneCGHLMV15},
-  bibsource = {dblp computer science bibliography, http://dblp.org}
+  abstract = {SAT provers are powerful tools for solving real-sized logic problems, but using them requires solid programming knowledge and may be seen w.r.t. logic like assembly language w.r.t. programming. Something like a high level language was missing to ease various users to take benefit of these tools. TouIST aims at filling this gap. It is devoted to propositional logic and its main features are 1) to offer a high-level logic langage for expressing succintly complex formulas (e.g. formulas describing Sudoku rules, planification problems, ...) and 2) to find models to these formulas by using the adequate powerful prover, which the user has no need to know about. It consists in a friendly interface that offers several syntactic facilities and which is connected with some sufficiently powerful provers allowing to automatically solve big instances of difficult problems (such as time-tables or Sudokus). It can interact with various provers: pure SAT solver but also SMT provers (SAT modulo theories - like linear theory of reals, etc) and thus may also be used by beginners for experiencing with pure propositional problems up to graduate students or even researchers for solving planification problems involving big sets of fluents and numerical constraints on them.}
 }
 
 @inproceedings{Biere2004,

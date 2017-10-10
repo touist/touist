@@ -32,7 +32,7 @@ Touist: [TouIST]{font-variant: small-caps}
 
 &touist;[^touist-meaning] is a language that allows us to express
 propositional
-logic [@SlimaneCGHLMV15;@Ben_Slimane_IAF_2015;@Gasquet_et_al_IAF_2017].
+logic [@ttl2015touist;@Ben_Slimane_IAF_2015;@Gasquet_et_al_IAF_2017].
 You are provided with two programs: a graphical interface, refered as
 `touist.jar` (as it is written in Java) and `touist`, a command-line
 program written in OCaml that compiles and solves &touist; problems
