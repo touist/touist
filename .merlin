@@ -19,3 +19,4 @@ PKG qbf
 
 # This last one if just when I am tweaking myocamlbuild.ml
 PKG cppo_ocamlbuild
+SUFFIX .cppo.ml
