@@ -18,29 +18,9 @@ TouIST, the language for propositional logic
 [![Screenshot of the graphical interface with a QBF
 problem](docs/images/screenshot.png)](https://github.com/maelvalais/allumettes)
 
-## Try it
+## Install
 
-1. The main command-line program, `touist`, can be installed using opam:
-
-       opam install touist
-
-   Or if you want to try the latest changes:
-
-       opam pin add touist --dev-repo
-
-   If you want to use the optional solvers, they must be installed first so
-   that `touist` knows you want to include them:
-
-   * SMT solver: `opam install yices2`
-   * QBF solver: `opam install qbf`
-
-   and then `opam reinstall/install touist`.
-
-   Now, if we want to know if `a ⋀ b ⇒ c` is satisfiable:
-
-       echo 'a and b => c' | touist - --solve
-
-2. TouIST also has a java-based graphical interface (which embeds the
+1. TouIST has a java-based graphical interface (which embeds the
    command-line tool). It be downloaded in the [releases] page and is available
    for Linux, Windows and macOS. Two options are available: the plain **jar**
    for any platform or the non-signed **native** version for macOS and
@@ -53,6 +33,24 @@ problem](docs/images/screenshot.png)](https://github.com/maelvalais/allumettes)
    ⚠ WARNING ⚠ On Windows 10, the native `TouIST.exe` can't be opened unless
    the _Windows Defender SmartScreen_ feature is disabled. You can still use
    the **jar** version.
+
+2. If you only want the command-line program `touist`, it can be installed
+   using either brew ([linux](http://linuxbrew.sh/)/[mac](http://brew.sh),
+   **recommended**) or [opam]:
+
+       brew install https://raw.githubusercontent.com/touist/touist/master/touist.rb
+       opam install yices2 qbf touist
+
+   If you want to have the development version (may be unstable):
+
+       brew install --HEAD https://raw.githubusercontent.com/touist/touist/master/touist.rb
+       opam pin add touist --dev-repo
+
+   Now, if we want to know if `a ⋀ b ⇒ c` is satisfiable:
+
+       echo 'a and b => c' | touist - --solve
+
+[opam]: https://opam.ocaml.org/doc/Install.html#Using-your-distribution-39-s-package-system
 
 3. You can also look at the [TouIST reference manual][ref]
    ([pdf version][ref-pdf]).

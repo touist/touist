@@ -1,6 +1,6 @@
 # This file allows you to install the command-line `touist` through
 # homebrew/linuxbrew. To install from brew (fill the <path>):
-#     brew install https://github.com/touist/touist/<path>/touist.rb
+#     brew install https://<path>/touist.rb
 class Touist < Formula
   desc "The solver for the TouIST language"
   homepage "https://www.irit.fr/touist"
