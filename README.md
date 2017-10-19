@@ -35,16 +35,19 @@ problem](docs/images/screenshot.png)](https://github.com/maelvalais/allumettes)
    the **jar** version.
 
 2. If you only want the command-line program `touist`, it can be installed
-   using either brew ([linux](http://linuxbrew.sh/)/[mac](http://brew.sh),
-   **recommended**) or [opam]:
+   using either `brew` ([linux](http://linuxbrew.sh/)/[mac](http://brew.sh))
+   or [`opam`][opam].
 
-       brew install https://raw.githubusercontent.com/touist/touist/master/touist.rb
-       opam install yices2 qbf touist
+   Using `brew` (**recommended**):
 
-   If you want to have the development version (may be unstable):
+       brew install https://raw.githubusercontent.com/touist/touist/master/touist.rb         # stable version
+       brew install https://raw.githubusercontent.com/touist/touist/master/touist.rb --HEAD  # git-master version
 
-       brew install --HEAD https://raw.githubusercontent.com/touist/touist/master/touist.rb
-       opam pin add touist --dev-repo
+   Using [`opam`][opam] (`yices2` and `qbf` are optionnal, you can skip them if
+   you don't need the embedded SMT/QBF solvers):
+
+       opam install yices2 qbf touist          # stable version
+       opam pin add touist --dev-repo          # git-master version
 
    Now, if we want to know if `a ⋀ b ⇒ c` is satisfiable:
 
