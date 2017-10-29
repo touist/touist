@@ -1,0 +1,8 @@
+(library
+ ((name        touist_qbf)
+  (public_name touist.qbf)
+  (optional)
+  (libraries (qbf qbf.quantor touist))
+  (wrapped false)
+ )
+)

@@ -7,7 +7,6 @@
 
 parser.mli
 touistParserMsgs.ml
-touistVersion.ml
 *.annot
 *.cmo
 *.cma

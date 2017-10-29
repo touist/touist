@@ -1,5 +1,105 @@
-etc: [
-  "setup.ml"
-  "setup.data"
-  "setup.log"
+lib: [
+  "_build/install/default/lib/touist/META" {"META"}
+  "_build/install/default/lib/touist/opam" {"opam"}
+  "_build/install/default/lib/touist/touistCnf.cmi"
+  "_build/install/default/lib/touist/touistCnf.cmx"
+  "_build/install/default/lib/touist/touistCnf.cmt"
+  "_build/install/default/lib/touist/touistCnf.cmti"
+  "_build/install/default/lib/touist/touistCnf.mli"
+  "_build/install/default/lib/touist/touistErr.cmi"
+  "_build/install/default/lib/touist/touistErr.cmx"
+  "_build/install/default/lib/touist/touistErr.cmt"
+  "_build/install/default/lib/touist/touistErr.cmti"
+  "_build/install/default/lib/touist/touistErr.mli"
+  "_build/install/default/lib/touist/touistEval.cmi"
+  "_build/install/default/lib/touist/touistEval.cmx"
+  "_build/install/default/lib/touist/touistEval.cmt"
+  "_build/install/default/lib/touist/touistEval.cmti"
+  "_build/install/default/lib/touist/touistEval.mli"
+  "_build/install/default/lib/touist/touistLatex.cmi"
+  "_build/install/default/lib/touist/touistLatex.cmx"
+  "_build/install/default/lib/touist/touistLatex.cmt"
+  "_build/install/default/lib/touist/touistLatex.cmti"
+  "_build/install/default/lib/touist/touistLatex.mli"
+  "_build/install/default/lib/touist/touistLexer.cmi"
+  "_build/install/default/lib/touist/touistLexer.cmx"
+  "_build/install/default/lib/touist/touistLexer.cmt"
+  "_build/install/default/lib/touist/touistLexer.ml"
+  "_build/install/default/lib/touist/touistParse.cmi"
+  "_build/install/default/lib/touist/touistParse.cmx"
+  "_build/install/default/lib/touist/touistParse.cmt"
+  "_build/install/default/lib/touist/touistParse.cmti"
+  "_build/install/default/lib/touist/touistParse.mli"
+  "_build/install/default/lib/touist/touistParser.cmi"
+  "_build/install/default/lib/touist/touistParser.cmx"
+  "_build/install/default/lib/touist/touistParser.cmt"
+  "_build/install/default/lib/touist/touistParser.cmti"
+  "_build/install/default/lib/touist/touistParser.mli"
+  "_build/install/default/lib/touist/touistParserMsgs.cmi"
+  "_build/install/default/lib/touist/touistParserMsgs.cmx"
+  "_build/install/default/lib/touist/touistParserMsgs.cmt"
+  "_build/install/default/lib/touist/touistParserMsgs.ml"
+  "_build/install/default/lib/touist/touistParserReport.cmi"
+  "_build/install/default/lib/touist/touistParserReport.cmx"
+  "_build/install/default/lib/touist/touistParserReport.cmt"
+  "_build/install/default/lib/touist/touistParserReport.ml"
+  "_build/install/default/lib/touist/touistPprint.cmi"
+  "_build/install/default/lib/touist/touistPprint.cmx"
+  "_build/install/default/lib/touist/touistPprint.cmt"
+  "_build/install/default/lib/touist/touistPprint.cmti"
+  "_build/install/default/lib/touist/touistPprint.mli"
+  "_build/install/default/lib/touist/touistQbf.cmi"
+  "_build/install/default/lib/touist/touistQbf.cmx"
+  "_build/install/default/lib/touist/touistQbf.cmt"
+  "_build/install/default/lib/touist/touistQbf.cmti"
+  "_build/install/default/lib/touist/touistQbf.mli"
+  "_build/install/default/lib/touist/touistSatSolve.cmi"
+  "_build/install/default/lib/touist/touistSatSolve.cmx"
+  "_build/install/default/lib/touist/touistSatSolve.cmt"
+  "_build/install/default/lib/touist/touistSatSolve.cmti"
+  "_build/install/default/lib/touist/touistSatSolve.mli"
+  "_build/install/default/lib/touist/touistSmt.cmi"
+  "_build/install/default/lib/touist/touistSmt.cmx"
+  "_build/install/default/lib/touist/touistSmt.cmt"
+  "_build/install/default/lib/touist/touistSmt.cmti"
+  "_build/install/default/lib/touist/touistSmt.mli"
+  "_build/install/default/lib/touist/touistTypes.cmi"
+  "_build/install/default/lib/touist/touistTypes.cmx"
+  "_build/install/default/lib/touist/touistTypes.cmt"
+  "_build/install/default/lib/touist/touistTypes.cmti"
+  "_build/install/default/lib/touist/touistTypes.mli"
+  "_build/install/default/lib/touist/touistVersion.cmi"
+  "_build/install/default/lib/touist/touistVersion.cmx"
+  "_build/install/default/lib/touist/touistVersion.cmt"
+  "_build/install/default/lib/touist/touistVersion.ml"
+  "_build/install/default/lib/touist/touist.cma"
+  "_build/install/default/lib/touist/touist.cmxa"
+  "_build/install/default/lib/touist/touist.a"
+  "_build/install/default/lib/touist/touist.cmxs"
+  "_build/install/default/lib/touist/qbf/touistQbfSolve.cmi" {"qbf/touistQbfSolve.cmi"}
+  "_build/install/default/lib/touist/qbf/touistQbfSolve.cmx" {"qbf/touistQbfSolve.cmx"}
+  "_build/install/default/lib/touist/qbf/touistQbfSolve.cmt" {"qbf/touistQbfSolve.cmt"}
+  "_build/install/default/lib/touist/qbf/touistQbfSolve.cmti" {"qbf/touistQbfSolve.cmti"}
+  "_build/install/default/lib/touist/qbf/touistQbfSolve.mli" {"qbf/touistQbfSolve.mli"}
+  "_build/install/default/lib/touist/qbf/touist_qbf.cma" {"qbf/touist_qbf.cma"}
+  "_build/install/default/lib/touist/qbf/touist_qbf.cmxa" {"qbf/touist_qbf.cmxa"}
+  "_build/install/default/lib/touist/qbf/touist_qbf.a" {"qbf/touist_qbf.a"}
+  "_build/install/default/lib/touist/qbf/touist_qbf.cmxs" {"qbf/touist_qbf.cmxs"}
+  "_build/install/default/lib/touist/yices2/touistSmtSolve.cmi" {"yices2/touistSmtSolve.cmi"}
+  "_build/install/default/lib/touist/yices2/touistSmtSolve.cmx" {"yices2/touistSmtSolve.cmx"}
+  "_build/install/default/lib/touist/yices2/touistSmtSolve.cmt" {"yices2/touistSmtSolve.cmt"}
+  "_build/install/default/lib/touist/yices2/touistSmtSolve.cmti" {"yices2/touistSmtSolve.cmti"}
+  "_build/install/default/lib/touist/yices2/touistSmtSolve.mli" {"yices2/touistSmtSolve.mli"}
+  "_build/install/default/lib/touist/yices2/touist_yices2.cma" {"yices2/touist_yices2.cma"}
+  "_build/install/default/lib/touist/yices2/touist_yices2.cmxa" {"yices2/touist_yices2.cmxa"}
+  "_build/install/default/lib/touist/yices2/touist_yices2.a" {"yices2/touist_yices2.a"}
+  "_build/install/default/lib/touist/yices2/touist_yices2.cmxs" {"yices2/touist_yices2.cmxs"}
+]
+bin: [
+  "_build/install/default/bin/touist" {"touist"}
+]
+doc: [
+  "_build/install/default/doc/touist/README.md"
+  "_build/install/default/doc/touist/LICENSE"
+  "_build/install/default/doc/touist/CHANGELOG"
 ]
