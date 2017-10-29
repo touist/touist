@@ -1,0 +1,36 @@
+(jbuild_version 1)
+
+(ocamllex (touistLexer))
+(menhir
+    ((modules (touistParser))
+     (flags (--table ))))
+     ; (flags (--table --infer))
+
+(library
+ ((name        touist)
+  (public_name touist)
+  (libraries (menhirLib fileutils str minisat cppo_ocamlbuild))
+  (virtual_deps (cppo menhir))
+  (wrapped false)
+  (preprocess (per_module
+    ((action (run ${bin:cppo}
+        -D "HAS_GIT_TAG false"
+        -D "VERSION \"${version:touist}\""
+        -D "GIT_TAG \"N/A\""
+        -D "HAS_YICES2 ${lib-available:yices2}"
+        -D "HAS_QBF ${lib-available:qbf}" ${<})) (touistVersion))))
+ )
+)
+
+(rule
+    ((targets (touistParserMsgs.ml))
+     (deps    (parser.messages touistParser.mly))
+     (action  (with-stdout-to ${@}
+                (run menhir --compile-errors ${<} touistParser.mly)))))
+
+
+#|
+missing:
+menhir --list-errors src/lib/touistParser.mly > parser.messages_updated
+menhir --compare-errors parser.messages_updated --compare-errors src/lib/parser.messages --list-errors src/lib/touistParser.mly
+|#

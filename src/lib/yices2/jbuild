@@ -1,0 +1,8 @@
+(library
+ ((name        touist_yices2)
+  (public_name touist.yices2)
+  (optional)
+  (libraries (yices2 touist))
+  (wrapped false)
+ )
+)
