@@ -123,16 +123,18 @@ esac
 
 echo -e "${I} Parsing the changelog for version '\033[92mBump to $VERSION\033[0m'..."
 parse_changelog CHANGELOG "$VERSION" > tag_content
-echo -e "${Q} Do you want to create a signed tag '\033[92mBump to $VERSION\033[0m' using the following message: [Y/n]"
+echo -e "${Q} Do you want to create a signed tag '\033[92mBump to $VERSION\033[0m' using the following message (u for unsigned tag; y for signed tag): [Y/n/u]"
 while IFS= read line; do
     echo -e "\033[90m${line}\033[0m"
 done < tag_content
 
 read ans
 case "$ans" in
-    y|Y)
+    y|Y|u)
         echo -e "${I} Creating the tag..."
-        git tag -s "$VERSION" --file tag_content
+        SIGN=-s
+        if [ "$ans" = "u" ]; then SIGN=; echo -e "${I} (unsigned tag)"; fi
+        git tag $SIGN "$VERSION" --file tag_content
         ;;
     *) echo -e "${I} No tag created.";;
 esac
