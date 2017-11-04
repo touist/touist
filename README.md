@@ -38,10 +38,10 @@ problem](docs/images/screenshot.png)](https://github.com/maelvalais/allumettes)
    using either `brew` ([linux](http://linuxbrew.sh/)/[mac](http://brew.sh))
    or [`opam`][opam].
 
-   Using `brew` (**recommended**):
+   Using `brew` (**recommended**, provides pre-built binaries):
 
-       brew install https://raw.githubusercontent.com/touist/touist/master/touist.rb         # stable version
-       brew install https://raw.githubusercontent.com/touist/touist/master/touist.rb --HEAD  # git-master version
+       brew install touist/touist/touist          # stable version
+       brew install touist/touist/touist --HEAD   # git-master version
 
    Using [`opam`][opam] (`yices2` and `qbf` are optionnal, you can skip them if
    you don't need the embedded SMT/QBF solvers):
