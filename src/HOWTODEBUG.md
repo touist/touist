@@ -46,7 +46,7 @@ has generated (`make`). You also need to add to the ocamlbuild command:
 Here is the full command (you must be in `src/`):
 
     ocamlbuild -use-ocamlfind -use-menhir -menhir "menhir --trace --table --inspection \
-    -v -la 2" -package fileutils,str,menhirLib touist.byte -tag debug
+    -v -la 2" -package str,menhirLib touist.byte -tag debug
 
 Now with the debugger. Note that I installed `rlwrap` to be able to use the
 arrows to go through the command history.
@@ -101,7 +101,7 @@ messages in `parser.messages`:
 
 4. And to recompile touistParserMsgs.ml and then touist:
 
-        menhir --compile-errors parser.messages touistParser.mly > touistParserMsgs.ml && ocamlbuild -use-ocamlfind -use-menhir -menhir "menhir --trace --table --inspection -v -la 2" -package menhirLib -package fileutils,str touist.byte -tag debug -r
+        menhir --compile-errors parser.messages touistParser.mly > touistParserMsgs.ml && ocamlbuild -use-ocamlfind -use-menhir -menhir "menhir --trace --table --inspection -v -la 2" -package menhirLib -package str touist.byte -tag debug -r
 
 ## Missing error cases in parser.messages
 When updating touistParser.mly, you might sometimes create new error states

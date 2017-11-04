@@ -14,7 +14,7 @@ Before you go, make sure you have OCaml installed. To install it:
 Afterwards, install the OPAM (OCaml package manager) dependencies:
 
     opam init
-    opam install menhir fileutils minisat
+    opam install menhir minisat cppo_ocamlbuild
 
 ## Build on Linux & MacOS
 

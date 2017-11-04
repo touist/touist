@@ -137,11 +137,11 @@ opam m4 git madoko madoko-local:
 
 
 check-opam-packages:
-	@ocamlfind query menhirLib fileutils minisat \
+	@ocamlfind query menhirLib minisat \
 		|| (echo \
 	    'Install opam packages with:\n\n'\
 		'  opam init && eval `opam config env`\n'\
-		'  opam install -y menhir fileutils\n'\
+		'  opam install -y menhir\n'\
 		'  opam pin add -y minisat'\
 	    ''\''https://github.com/maelvalais/ocaml-minisat.git#v0.0.2'\''\n'\
 	&& exit 6)
