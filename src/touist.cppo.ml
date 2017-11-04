@@ -99,7 +99,7 @@ let solve_ext lit_tbl lit_abs lit_sign lit_of_int (print_dimacs:out_channel -> u
 
 (* The main program *)
 let () =
-  let cmd = (FilePath.basename Sys.argv.(0)) in (* ./touistl exec. name *)
+  let cmd = (Filename.basename Sys.argv.(0)) in (* ./touistl exec. name *)
   let argspecs = [ (* This list enumerates the different flags (-x,-f...)*)
     (* "-flag", Arg.toSomething (ref var), "Usage for this flag"*)
     ("-o", Arg.Set_string (output_file_path), "OUTPUT is the translated file");

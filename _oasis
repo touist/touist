@@ -7,8 +7,8 @@
 ###############
 # To install oasis:
 #     opam install oasis
-# To install menhir, fileutils, minisat and yices2:
-#     opam install menhir fileutils minisat yices2
+# To install menhir, minisat and yices2:
+#     opam install menhir minisat yices2
 ###############
 # To force using 'bytecode' over 'native' binary for debugging with
 # ocamldebug or utop, launch:
@@ -98,7 +98,7 @@ Library touist
   InternalModules: TouistLexer,TouistParser,TouistParserReport,TouistParserMsgs
   Install$:       flag(lib)
   BuildTools+:    menhir, cppo
-  BuildDepends:   menhirLib (>= 20151023), fileutils (>= 0.4.0), str,
+  BuildDepends:   menhirLib (>= 20151023), str,
                   minisat, cppo_ocamlbuild (>= 0.9.4)
 # From version 1.6.0, cppo and cppo_ocamlbuild are in two separate opam
 # packages. Before 0.9.4, cppo_ocamlbuild did not exist. Also, I only use the

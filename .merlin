@@ -11,7 +11,6 @@ B _build/src/lib/yices2
 B _build/src/lib/qbf
 PKG menhirLib
 PKG str
-PKG fileutils
 PKG minisat
 PKG ounit
 PKG yices2

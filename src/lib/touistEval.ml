@@ -41,7 +41,7 @@ let raise_with_loc (ast:Ast.t) (message:string) = match ast with
 (* [raise_type_error] raises the errors that come from one-parameter functions.
    operator is the non-expanded (expand = eval_ast) operator.
    Example: in 'To_int x', 'operand' is the non-expanded parameter 'x',
-   'expanded' is the expanded parameter 'x'.
+   'expanded' iXs the expanded parameter 'x'.
    Expanded means that eval_ast has been applied to x.
    [expected_types] contain a string that explain what is expected, e.g.,
    'an integer or a float'. *)
