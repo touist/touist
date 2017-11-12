@@ -69,12 +69,29 @@ let process_arg_alone (file_path:string) : unit = input_file_path := file_path
 
 let exit_with (exit_code:error) = exit (get_code exit_code)
 
+(* WARNING: lit_of_int should be capable of handling as input
+   - non-zero negative integers -> should be transformed into a negative literal
+   - non-zero positive integers -> transformed into a positive literal
+   - zero will never be passed. *)
 let solve_ext lit_tbl lit_abs lit_sign lit_of_int (print_dimacs:out_channel -> unit) cmd =
-  let proc_stdout, proc_stdin = Unix.open_process cmd in
+  let prog, opts = match cmd |> Str.split (Str.regexp " +") with
+    | v::next -> v, Array.of_list next
+    | _ -> failwith "error with --solver 'command'" in
+  if !debug then Printf.eprintf "== cmd: '%s %s'\n" prog (opts |> Array.fold_left (fun acc v-> if acc = "" then v else v^" "^acc) "");
+  let proc_stdout, proc_stdin, proc_stderr = Unix.open_process_full cmd [||] in
   print_dimacs proc_stdin; flush proc_stdin; close_out proc_stdin;
-  let ints_of_string s = List.map (fun s -> int_of_string s |> lit_of_int) (Str.split (Str.regexp " +") s) in
+  if !debug then (Printf.eprintf "== stdin given to '%s':\n" cmd; print_dimacs stderr);
+  let ints_of_string s = s |> Str.split (Str.regexp " +") |> List.fold_left
+    (fun acc s -> print_endline s; match int_of_string s with
+      | v when v!=0 -> lit_of_int v :: acc
+      | exception Failure err ->
+        (Printf.eprintf "DIMACS value line (begin with V or v) contains a non-integer: %s (%s failure)\n" s err;
+        exit_with CMD_USAGE)
+      | _ -> acc (* in DIMACS, '0' are line endings; we skip '0' *)) []
+  in
   let rec process in_chan =
     try let line = input_line in_chan in
+      if !debug then Printf.eprintf "%s\n" line;
       let line_lst =
         match String.get line 0 with
         | 'V' | 'v' -> String.sub line 2 (String.length line -2) |> ints_of_string
@@ -83,18 +100,30 @@ let solve_ext lit_tbl lit_abs lit_sign lit_of_int (print_dimacs:out_channel -> u
     with Invalid_argument _ -> process in_chan
        | End_of_file -> close_in in_chan; []
   in
+  if !debug then Printf.eprintf "== stdout from '%s':\n" cmd;
   let valuated_lits = process proc_stdout in
-  match Unix.close_process (proc_stdout, proc_stdin) with
+  if !debug then Printf.eprintf "== stderr from '%s':\n%s" cmd (TouistParse.string_of_chan proc_stderr);
+  match Unix.close_process_full (proc_stdout, proc_stdin, proc_stderr) with
   | Unix.WEXITED _ when List.length valuated_lits > 0 ->
-    lit_tbl |> Hashtbl.iter (fun lit lit_name ->
+    (lit_tbl |> Hashtbl.iter (fun lit lit_name ->
         if lit_name.[0] <> '&' || !show_hidden_lits then
           let valuation = (
             try valuated_lits |> List.find (fun l -> lit = (lit_abs l)) |> fun v ->
                 if lit_sign v then "1" else "0"
             with Not_found -> "?")
           in Printf.fprintf !output "%s %s\n" valuation lit_name);
-  | Unix.WEXITED c -> Printf.eprintf "Command '%s' returned code %d and no lines beginning with 'V'\n"
-                        (match !solver_ext with Some s -> s | None -> "???") c; exit_with SOLVER_UNKNOWN;
+    exit_with OK)
+  | Unix.WEXITED 127 -> (Printf.eprintf "Command '%s' not found (try with --debug)\n"
+    (match !solver_ext with Some s -> s | None -> "???"); exit_with SOLVER_UNKNOWN)
+  | Unix.WEXITED 10 -> (Printf.eprintf
+    "Command '%s' returned SAT but did not print a model beginning with 'v' or 'V' (try with --debug)\n"
+    (match !solver_ext with Some s -> s | None -> "???"); exit_with SOLVER_UNKNOWN)
+  | Unix.WEXITED 20 -> (Printf.eprintf
+    "Command '%s' returned UNSAT (try with --debug)\n"
+    (match !solver_ext with Some s -> s | None -> "???"); exit_with SOLVER_UNSAT)
+  | Unix.WEXITED c -> Printf.eprintf
+    "Command '%s' returned code %d and no lines beginning with 'V' or 'v' (try with --debug)\n"
+    (match !solver_ext with Some s -> s | None -> "???") c; exit_with SOLVER_UNKNOWN;
   | _ -> Printf.eprintf "Error with %s, received signal\n" (cmd)
 
 (* The main program *)
@@ -314,7 +343,8 @@ let () =
   | Sat, _, Some cmd ->
     let ast = TouistParse.parse_sat ~debug:!debug_syntax ~filename:!input_file_path input_text |> TouistEval.eval in
     let clauses,tbl = TouistCnf.ast_to_cnf ~debug:!debug_cnf ast |> TouistSatSolve.minisat_clauses_of_cnf
-    in cmd |> solve_ext tbl (Minisat.Lit.abs) (Minisat.Lit.sign) (Minisat.Lit.make)
+    in cmd |> solve_ext tbl (Minisat.Lit.abs) (Minisat.Lit.sign)
+    (fun v -> abs v |> Minisat.Lit.make |> fun l -> if v>0 then l else Minisat.Lit.neg l) (* because given integers can be negative *)
       (TouistSatSolve.print_dimacs (clauses,tbl))
   | Smt, false, _ ->
     let ast = TouistParse.parse_smt ~debug:!debug_syntax ~filename:!input_file_path input_text
