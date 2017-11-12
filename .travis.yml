@@ -95,8 +95,8 @@ before_deploy:
     cd $TRAVIS_BUILD_DIR
     git clone https://${TOK}@github.com/touist/touist.github.io.git
     mkdir -p touist.github.io/api/v/$(git describe --tags)
-    cp -rL touist.docdir/* touist.github.io/api
-    cp -rL touist.docdir/* touist.github.io/api/v/$(git describe --tags)
+    cp -LR touist.docdir/* touist.github.io/api
+    cp -LR touist.docdir/* touist.github.io/api/v/$(git describe --tags)
     cd touist.github.io
     git config user.name "Travis-ci"
     git config user.email "robot@travis-ci.org"
