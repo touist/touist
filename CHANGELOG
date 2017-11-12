@@ -1,3 +1,13 @@
+v3.4.2
+  - Command-line (new features)
+    - the option '--solver CMD' can be used with --debug in order to display
+      the stdin, stdout and stderr w.r.t. the external solver.
+  - Command-line (fixes)
+    - the option '--solver CMD' now uses the same error codes as with
+      '--solve'; it expects the external solver to return 10 for SAT and
+      20 for UNSAT (as most minisat-inspired solvers do).
+    - in --sat mode, the option '--solver CMD' will now work properly instead
+      of throwing "assert raised in src/Minisat.ml".
 v3.4.1
   - Command-line (new features)
     - added option '--solver CMD'; combined with --sat or --qbf, touist
