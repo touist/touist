@@ -15,7 +15,7 @@ I='\033[94m+\033[0m' # blue
 Q='\033[93m?\033[0m' # yellow
 E='\033[91m!\033[0m' # red
 
-# Usage: parse_changelog changelog_file_name version
+# Usage: parse_changelog <changelog_file_name> <version>
 # The changelog entry that starts with 'version' will be printed to stdout.
 function parse_changelog() {
     CHANGELOG=$1
@@ -33,6 +33,12 @@ function parse_changelog() {
             echo "$line"
         fi
     done < $CHANGELOG
+}
+
+# get_latest_version <changelog_file_name>
+# will print to stdout the first vX.Y.Z of the <changelog_file_name> file.
+function get_latest_version() {
+    head -1 $1 | sed 's/^\(v[0-9]\.[0-9]\.[0-9][^ ]*\).*$/\1/'
 }
 
 while [ -n "$1" ]; do
@@ -100,11 +106,18 @@ fi
 OPAM_VERSION=$(echo $VERSION | cut -c 2-)
 echo -e "${I} Changing the 'Version:' field in '_oasis' from \033[92m$(oasis query version)\033[0m to \033[92m$OPAM_VERSION\033[0m"
 sed "s/^\(Version: *\)[0-9][0-9\.]*$/\1$OPAM_VERSION/" _oasis > a && mv a _oasis
+echo -e "\033[90m$(git diff -U0 _oasis | grep "^\(\+\|-\)[^+-]")\033[0m"
+
+echo -e "${I} Adding the date to the version: \033[92m  \033[0m"
+sed "s/^\(${VERSION//./\\.}.*$\)/\1 (`date -I`)/" CHANGELOG > a && mv a CHANGELOG
+echo -e "\033[90m$(git diff -U0 CHANGELOG | grep "^\(\+\|-\)[^+-]")\033[0m"
+
 echo -e "${I} Running 'oasis setup' to update setup.ml, src/lib/META\033[0m"
 oasis setup
 
 echo -e "${I} Running 'oasis2opam --local -y' to update opam/opam\033[0m"
 oasis2opam --local -y
+echo -e "\033[90m$(git diff -U0 opam/ | grep "^\(\+\|-\)[^+-]")\033[0m"
 
 echo -e "${I} Changes done."
 echo -e "${Q} Do you want to commit using message '\033[92mBump to $VERSION\033[0m'? [Y/n]"
@@ -140,12 +153,16 @@ case "$ans" in
 esac
 rm tag_content
 
-echo -e "================="
-echo -e "${I} Now, you can do:"
-echo -e "    git push origin $VERSION:$VERSION"
-echo -e "    opam publish prepare"
-echo -e "    opam publish submit touist.$OPAM_VERSION"
-echo -e "${I} or cancel the commit/tag that has been done with:"
-echo -e "    git reset HEAD^"
-echo -e "    git tag -d $VERSION"
-echo -e "    git push origin :$VERSION"
+echo -e "======== Next steps: =========="
+echo -e "${I} (1) push tag:"
+echo -e "git push origin $VERSION:$VERSION"
+echo -e ""
+echo -e "${I} (2) publish (${E} WAIT FOR THE TRAVIS BUILD ${E}):"
+echo -e "opam publish prepare"
+echo -e "opam publish submit touist.$OPAM_VERSION"
+echo -e "brew bump-formula-pr touist/touist/touist --url=https://github.com/touist/touist/archive/${$VERSION}.tar.gz"
+echo -e ""
+echo -e "${I} (1 bis) cancel the commit/tag made in (1):"
+echo -e "git reset @^"
+echo -e "git tag -d $VERSION"
+echo -e "git push origin :$VERSION"
