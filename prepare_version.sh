@@ -126,7 +126,7 @@ echo $answerCommit
 case $answerCommit in
     y | Y)
         echo -e "${I} Running 'git add setup.ml _oasis src/lib/META opam/*'\033[0m"
-        git add setup.ml _oasis opam/*
+        git add setup.ml _oasis opam/* CHANGELOG
         find . -name META -exec git add {} \;
         echo -e "${I} Commiting with message '\033[92mBump to $VERSION\033[0m'"
         git commit -m "Bump to $VERSION"
