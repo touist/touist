@@ -78,9 +78,9 @@ let solve_ext lit_tbl lit_abs lit_sign lit_of_int (print_dimacs:out_channel -> u
     | v::next -> v, Array.of_list next
     | _ -> failwith "error with --solver 'command'" in
   if !debug then Printf.eprintf "== cmd: '%s %s'\n" prog (opts |> Array.fold_left (fun acc v-> if acc = "" then v else v^" "^acc) "");
-  let proc_stdout, proc_stdin, proc_stderr = Unix.open_process_full cmd [||] in
-  print_dimacs proc_stdin; flush proc_stdin; close_out proc_stdin;
   if !debug then (Printf.eprintf "== stdin given to '%s':\n" cmd; print_dimacs stderr);
+  let proc_stdout, proc_stdin, proc_stderr = Unix.open_process_full cmd [||] in
+  print_dimacs proc_stdin; close_out proc_stdin;
   let ints_of_string s = s |> Str.split (Str.regexp " +") |> List.fold_left
     (fun acc s -> match int_of_string s with
       | v when v!=0 -> lit_of_int v :: acc
@@ -96,9 +96,9 @@ let solve_ext lit_tbl lit_abs lit_sign lit_of_int (print_dimacs:out_channel -> u
         match String.get line 0 with
         | 'V' | 'v' -> String.sub line 2 (String.length line -2) |> ints_of_string
         | _ -> []
+        | exception Invalid_argument _ (* index out of bounds *) -> []
       in line_lst @ (process in_chan)
-    with Invalid_argument _ -> process in_chan
-       | End_of_file -> close_in in_chan; []
+    with End_of_file -> []
   in
   if !debug then Printf.eprintf "== stdout from '%s':\n" cmd;
   let valuated_lits = process proc_stdout in
@@ -344,8 +344,9 @@ let () =
     let ast = TouistParse.parse_sat ~debug:!debug_syntax ~filename:!input_file_path input_text |> TouistEval.eval in
     let clauses,tbl = TouistCnf.ast_to_cnf ~debug:!debug_cnf ast |> TouistSatSolve.minisat_clauses_of_cnf
     in cmd |> solve_ext tbl (Minisat.Lit.abs) (Minisat.Lit.sign)
-    (fun v -> abs v |> Minisat.Lit.make |> fun l -> if v>0 then l else Minisat.Lit.neg l) (* because given integers can be negative *)
-      (TouistSatSolve.print_dimacs (clauses,tbl))
+      (* because given integers can be negative: *)
+      (fun v -> abs v |> Minisat.Lit.make |> fun l -> if v>0 then l else Minisat.Lit.neg l)
+      (TouistSatSolve.print_dimacs ~debug_dimacs:!debug_dimacs (clauses,tbl))
   | Smt, false, _ ->
     let ast = TouistParse.parse_smt ~debug:!debug_syntax ~filename:!input_file_path input_text
               |> TouistEval.eval ~smt:(!mode = Smt) in
