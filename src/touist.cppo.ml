@@ -84,9 +84,7 @@ let solve_ext lit_tbl lit_abs lit_sign lit_of_int (print_dimacs:out_channel -> u
   let ints_of_string s = s |> Str.split (Str.regexp " +") |> List.fold_left
     (fun acc s -> match int_of_string s with
       | v when v!=0 -> lit_of_int v :: acc
-      | exception Failure err ->
-        (Printf.eprintf "DIMACS value line (begin with V or v) contains a non-integer: %s (%s failure)\n" s err;
-        exit_with CMD_USAGE)
+      | exception Failure err -> []
       | _ -> acc (* in DIMACS, '0' are line endings; we skip '0' *)) []
   in
   let rec process in_chan =
@@ -95,8 +93,8 @@ let solve_ext lit_tbl lit_abs lit_sign lit_of_int (print_dimacs:out_channel -> u
       let line_lst =
         match String.get line 0 with
         | 'V' | 'v' -> String.sub line 2 (String.length line -2) |> ints_of_string
-        | _ -> []
-        | exception Invalid_argument _ (* index out of bounds *) -> []
+        | _ -> ints_of_string line
+        | exception Invalid_argument _ (* index out of bounds, if line empty *) -> []
       in line_lst @ (process in_chan)
     with End_of_file -> []
   in
@@ -104,7 +102,7 @@ let solve_ext lit_tbl lit_abs lit_sign lit_of_int (print_dimacs:out_channel -> u
   let valuated_lits = process proc_stdout in
   if !debug then Printf.eprintf "== stderr from '%s':\n%s" cmd (TouistParse.string_of_chan proc_stderr);
   match Unix.close_process_full (proc_stdout, proc_stdin, proc_stderr) with
-  | Unix.WEXITED _ when List.length valuated_lits > 0 ->
+  | Unix.WEXITED 10 when List.length valuated_lits > 0 ->
     (lit_tbl |> Hashtbl.iter (fun lit lit_name ->
         if lit_name.[0] <> '&' || !show_hidden_lits then
           let valuation = (
@@ -116,13 +114,15 @@ let solve_ext lit_tbl lit_abs lit_sign lit_of_int (print_dimacs:out_channel -> u
   | Unix.WEXITED 127 -> (Printf.eprintf "Command '%s' not found (try with --debug)\n"
     (match !solver_ext with Some s -> s | None -> "???"); exit_with SOLVER_UNKNOWN)
   | Unix.WEXITED 10 -> (Printf.eprintf
-    "Command '%s' returned SAT but did not print a model beginning with 'v' or 'V' (try with --debug)\n"
-    (match !solver_ext with Some s -> s | None -> "???"); exit_with SOLVER_UNKNOWN)
+      "Command '%s' returned SAT but did not print a model (try with --debug)\n\
+      A DIMACS model line must be integers optionally beginning with v or V\n\
+      and optionally ending with 0.\n"
+      (match !solver_ext with Some s -> s | None -> "???"); exit_with SOLVER_UNKNOWN)
   | Unix.WEXITED 20 -> (Printf.eprintf
     "Command '%s' returned UNSAT (try with --debug)\n"
     (match !solver_ext with Some s -> s | None -> "???"); exit_with SOLVER_UNSAT)
   | Unix.WEXITED c -> Printf.eprintf
-    "Command '%s' returned code %d and no lines beginning with 'V' or 'v' (try with --debug)\n"
+    "Command '%s' returned unknown code %d (try with --debug)\nExpected codes are 10 for SAT and 20 for UNSAT\n"
     (match !solver_ext with Some s -> s | None -> "???") c; exit_with SOLVER_UNKNOWN;
   | _ -> Printf.eprintf "Error with %s, received signal\n" (cmd)
 
