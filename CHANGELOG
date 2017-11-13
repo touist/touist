@@ -1,3 +1,7 @@
+v3.4.3
+  - Command-line
+    - fix the option --solver with --sat solvers, once for all.
+    - option --solver now supports Minisat output.
 v3.4.2 (2017-11-12)
   - Command-line (new features)
     - the option '--solver CMD' can be used with --debug in order to display
