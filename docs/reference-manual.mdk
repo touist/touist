@@ -1429,17 +1429,41 @@ the argument `--solver`:
 For debugging purposes, you can add `--debug` to see the stdin/stdout/stderr.
 The return code of `touist` is the same as with `--solve`.
 
-The external solvers must use the following minisat + (Q)DIMACS conventions:
+The external solvers must use the following Minisat + (Q)DIMACS conventions:
 - should accept DIMACS or QDIMACS on standard input;
-- should print a model (or a partial model) in DIMACS on standard output,
-  of the form:
+- should print a model (or a partial model) in DIMACS on standard output; the
+  model can span on multiple lines, each line begins with `v`, `V`
+  or nothing (for Minisat compatibility), and each line is optionally ended
+  with 0.
 
       v -1 2 -3 4 0
+      v 5 -6 0
 
-  (`v` and `V` are both supported; 0 is optionnal);
+  (`v` and `V` are both supported; 0 is optional);
 - should return 10 (as error code) if problem is SAT, 20 if UNSAT.
 
-Tested QBF solvers (`brew` is available on [linux][Linuxbrew] and [mac][Homebrew]):
+Tested SAT solvers (`brew` is available on [linux][Linuxbrew] and [mac][Homebrew]):
+
+- [minisat]
+
+      brew install minisat
+      touist test/sat/sudoku.touist --solver "minisat /dev/stdin /dev/stdout"
+
+- [picosat] (2015, version 965, SAT Race'15)
+
+      brew install touist/touist/picosat
+      touist test/sat/sudoku.touist --solver "picosat --partial"
+
+- [glucose] (2016, version 4.1, syrup is the parallel version)
+
+      brew install touist/touist/glucose
+      touist test/sat/sudoku.touist --solver="glucose -model"
+      touist test/sat/sudoku.touist --solver="glucose-syrup -model"
+
+[picosat]: http://fmv.jku.at/picosat
+[glucose]: https://www.labri.fr/perso/lsimon/glucose "lsimon"
+
+Tested QBF solvers:
 
 - [caqe] (2017-07-19, CAQE qbfeval 2017, binary release without certification).
   Download the version _CAQE qbfeval 2017 (2017-07-19) binary release without certification_
@@ -1455,7 +1479,7 @@ Tested QBF solvers (`brew` is available on [linux][Linuxbrew] and [mac][Homebrew
       brew install touist/touist/qute
       touist test/qbf/allumettes2.touist --qbf --solver="qute --partial-certificate"
 
-- [depqbf] (2017-08-02, DepQBF 6.03, minisat-based QCDCL)
+- [depqbf] (2017-08-02, DepQBF 6.03, Minisat-based QCDCL)
 
       brew install depqbf
       touist test/qbf/allumettes2.touist --qbf --solver="depqbf --qdo --no-dynamic-nenofex"
