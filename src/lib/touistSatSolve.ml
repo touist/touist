@@ -139,11 +139,11 @@ let solve_clauses
     in solve_loop 1
 
 let print_dimacs ?(debug_dimacs=false) (clauses,tbl) ?(out_table) (out:out_channel) =
-  match out_table with
+  (match out_table with
   | None -> ()
   | Some out_table -> (* Display the mapping table. *)
     tbl |> TouistCnf.print_table (Minisat.Lit.to_int) out_table
-      ~prefix:(if out = out_table then "c " else "");
+      ~prefix:(if out = out_table then "c " else ""));
   (* Display the dimacs' preamble line. *)
   Printf.fprintf out "p cnf %d %d\n" (Hashtbl.length tbl) (List.length clauses);
   (* Display the dimacs clauses. *)
