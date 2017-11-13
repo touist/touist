@@ -82,7 +82,7 @@ let solve_ext lit_tbl lit_abs lit_sign lit_of_int (print_dimacs:out_channel -> u
   print_dimacs proc_stdin; flush proc_stdin; close_out proc_stdin;
   if !debug then (Printf.eprintf "== stdin given to '%s':\n" cmd; print_dimacs stderr);
   let ints_of_string s = s |> Str.split (Str.regexp " +") |> List.fold_left
-    (fun acc s -> print_endline s; match int_of_string s with
+    (fun acc s -> match int_of_string s with
       | v when v!=0 -> lit_of_int v :: acc
       | exception Failure err ->
         (Printf.eprintf "DIMACS value line (begin with V or v) contains a non-integer: %s (%s failure)\n" s err;
