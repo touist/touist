@@ -1,4 +1,4 @@
-v3.4.3
+v3.4.3 (2017-11-13)
   - Command-line
     - fix the option --solver with --sat solvers, once for all.
     - option --solver now supports Minisat output.
