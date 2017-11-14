@@ -86,6 +86,12 @@ else
     echo -e "${I} Repo is clean."
 fi
 
+# Also check that we have oasis and oasis
+if ! which oasis oasis2opam >/dev/null 2>&1; then
+    echo -e "${E} oasis or oasis2opam not installed; please install them:"
+    echo -e "opam install oasis oasis2opam"
+fi
+
 if [ "x$VERSION" = x ]; then
     echo -e "${I} No version number given as argument. Looking at CHANGELOG first line..."
     if ! VERSION=$(head -1 CHANGELOG | grep '^v[0-9]\.[0-9]\.[0-9]$'); then
@@ -109,7 +115,7 @@ sed "s/^\(Version: *\)[0-9][0-9\.]*$/\1$OPAM_VERSION/" _oasis > a && mv a _oasis
 echo -e "\033[90m$(git diff -U0 _oasis | grep "^\(\+\|-\)[^+-]")\033[0m"
 
 echo -e "${I} Adding the date to the version: \033[92m  \033[0m"
-sed "s/^\(${VERSION//./\\.}.*$\)/\1 (`date -I`)/" CHANGELOG > a && mv a CHANGELOG
+sed "s/^\(${VERSION//./\\.}[^ ]*\).*$/\1 (`date -I`)/" CHANGELOG > a && mv a CHANGELOG
 echo -e "\033[90m$(git diff -U0 CHANGELOG | grep "^\(\+\|-\)[^+-]")\033[0m"
 
 echo -e "${I} Running 'oasis setup' to update setup.ml, src/lib/META\033[0m"
