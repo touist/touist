@@ -1,6 +1,6 @@
 # OASIS_START
-# DO NOT EDIT (digest: a1da0a6dd03236255c5861037b3e0ec3)
-version = "3.4.1"
+# DO NOT EDIT (digest: c7ca2d4cdf9c31b14850cca54ca67dfa)
+version = "3.4.3"
 description = "The solver for the Touist language"
 requires = "menhirLib str minisat cppo_ocamlbuild"
 archive(byte) = "touist.cma"
@@ -9,7 +9,7 @@ archive(native) = "touist.cmxa"
 archive(native, plugin) = "touist.cmxs"
 exists_if = "touist.cma"
 package "yices2" (
- version = "3.4.1"
+ version = "3.4.3"
  description = "The solver for the Touist language"
  requires = "touist yices2"
  archive(byte) = "touist_yices2.cma"
@@ -20,7 +20,7 @@ package "yices2" (
 )
 
 package "qbf" (
- version = "3.4.1"
+ version = "3.4.3"
  description = "The solver for the Touist language"
  requires = "qbf qbf.quantor touist"
  archive(byte) = "touist_qbf.cma"
