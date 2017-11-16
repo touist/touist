@@ -224,13 +224,10 @@ let () =
     else if !qbf_flag     then mode := Qbf
     else mode := Sat;
 
-
-    #ifdef yices2
       (* SMT Mode: check if one of the available QF_? has been given after --smt *)
-      if (!mode = Smt) && not (TouistSmtSolve.logic_supported !smt_flag) then
+    if TouistVersion.has_yices2 && (!mode = Smt) && not (TouistSmtSolve.logic_supported !smt_flag) then
         fatal (Error,Usage,"you must give a correct SMT-LIB \
                             logic after --smt (try --help)\nExample: --smt QF_IDL\n",None);
-    #endif
 
       if !output_file_path <> ""
       then output := open_out !output_file_path;
@@ -358,18 +355,14 @@ let () =
       Buffer.output_buffer !output smt;
       exit_with OK
     | Smt, true, _ ->
-      #ifdef yices2
+
 let ast = TouistParse.parse_smt ~debug:!debug_syntax ~filename:!input_file_path input_text
           |> TouistEval.eval ~smt:(!mode = Smt) in
 let yices_form,tbl = TouistSmtSolve.ast_to_yices ast in
 (match TouistSmtSolve.solve !smt_flag yices_form with
  | None -> Printf.fprintf stderr "unsat\n"; exit_with SOLVER_UNSAT |> ignore
  | Some m -> Printf.fprintf !output "%s\n" (TouistSmtSolve.string_of_model tbl m); exit_with OK |> ignore);
-#else
-  Printf.fprintf stderr
-    "This touist binary has not been compiled with yices2 support.";
-exit_with CMD_UNSUPPORTED;
-#endif
+
 | Qbf, _, _ -> begin
     let ast = TouistParse.parse_qbf ~debug:!debug_syntax ~filename:!input_file_path input_text
               |> TouistEval.eval ~smt:(!mode = Smt) in
@@ -391,16 +384,10 @@ exit_with CMD_UNSUPPORTED;
       TouistQbf.print_qdimacs ~debug_dimacs:!debug_dimacs
         (quants,int_clauses,int_tbl) ~out_table:!output_table !output
     | None, true -> (* --qbf + --solve: we solve using Quantor *)
-      #ifdef qbf
     let qcnf,table = TouistQbfSolve.qcnf_of_cnf cnf in
     match TouistQbfSolve.solve ~hidden:!show_hidden_lits (qcnf,table) with
     | Some str -> Printf.fprintf !output "%s\n" str
     | None -> (Printf.fprintf stderr "unsat\n"; exit_with SOLVER_UNSAT |> ignore);
-      #else
-  Printf.fprintf stderr
-    ("This touist binary has not been compiled with qbf support.");
-exit_with CMD_UNSUPPORTED
-          #endif
 end;
 
 (* I had to comment these close_out and close_in because it would
