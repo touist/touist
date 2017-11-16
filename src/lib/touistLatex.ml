@@ -116,7 +116,7 @@ let rec latex_of_ast ~full ast =
 
   and latex_of_commalist ~full sep el = String.concat sep (List.map (latex_of_ast ~full) el)
   and escape_underscore txt =
-    Str.global_replace (Str.regexp "_") "\\\\_" txt
+    Re_str.global_replace (Re_str.regexp "_") "\\\\_" txt
 
 (** [ast_fun] will apply f on all *formula*-related elements of the AST where
     cond is true. The tranversal order should not be considered.

@@ -3,9 +3,9 @@ open TouistTypes
 open TouistTypes.Ast
 
 let add_suffix name =
-  let open Str in
-  try let _ = Str.search_backward (Str.regexp "_[0-9]+$") name (String.length name) in ();
-      name |> Str.substitute_first (Str.regexp "[0-9]+$")
+  let open Re_str in
+  try let _ = Re_str.search_backward (Re_str.regexp "_[0-9]+$") name (String.length name) in ();
+      name |> Re_str.substitute_first (Re_str.regexp "[0-9]+$")
       (fun str -> ((str |> matched_string |> int_of_string)+1) |> string_of_int)
   with Not_found -> name ^ "_1"
 
