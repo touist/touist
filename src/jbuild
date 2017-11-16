@@ -1,14 +1,19 @@
+#|
+- to search for missing rules in parser.messages:
+  jbuilder build @src/lib/missing
+- to build bytecode
+  jbuilder build src/touist.bc
+- to build native
+  jbuilder build src/touist.bc
+- to build the js
+  jbuilder build src/lib/touist
+|#
+
 (jbuild_version 1)
 
 (executable
  ((name touist)
-  (libraries (touist touist.qbf touist.yices2))
-  (preprocess (action (run ${bin:cppo}
-    -V OCAML:${ocaml_version}
-    -D "HAS_YICES2 ${lib-available: touist.yices2}"
-    -D "HAS_QBF ${lib-available: touist.yices2}"
-    ${<})))
- )
+  (libraries (re touist touist.qbf touist.yices2)))
 )
 (install
  ((section bin)
