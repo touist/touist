@@ -1,11 +1,14 @@
 (jbuild_version 1)
 
 #|
-opam install js_of_ocaml js_of_ocaml-compiler yojson ppx_deriving_yojson
+opam install js_of_ocaml js_of_ocaml-ppx js_of_ocaml-compiler yojson ppx_deriving_yojson
 |#
 
 (executable
  ((name touistjs)
-  (libraries (yojson js_of_ocaml js_of_ocaml.ppx ppx_deriving_yojson re touist))
-  )
+  (libraries (re re.str touist js_of_ocaml js_of_ocaml.ppx yojson ppx_deriving ppx_deriving_yojson.runtime))
+  (preprocess (pps (js_of_ocaml.ppx ppx_deriving_yojson)))
+  (js_of_ocaml (
+    (flags (:standard "+weak.js" "+nat.js"))
+   )))
 )
