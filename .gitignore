@@ -79,3 +79,4 @@ support/gui/dist.zip
 
 # Jbuilder takes care of generating the .merlin files
 .merlin
+*.install
