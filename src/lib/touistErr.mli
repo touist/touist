@@ -28,6 +28,13 @@ exception TouistFatal of msg
 
 val string_of_loc : ?fmt:string -> loc -> string
 val string_of_msg : ?width:int -> ?color:bool -> ?fmt:string -> msg -> string
+val string_of_type : msg_type -> string
+val string_of_during : during -> string
+
+(** [get_loc] translates a 'loc' to an understandable tuple that contains
+  (num_line, num_col, token_start, token_end). *)
+val get_loc : loc -> int * int * int * int
+
 
 (** {2 Give errors} *)
 

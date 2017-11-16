@@ -74,7 +74,7 @@ let exit_with (exit_code:error) = exit (get_code exit_code)
    - non-zero positive integers -> transformed into a positive literal
    - zero will never be passed. *)
 let solve_ext lit_tbl lit_abs lit_sign lit_of_int (print_dimacs:out_channel -> unit) cmd =
-  let prog, opts = match cmd |> Str.split (Str.regexp " +") with
+  let prog, opts = match cmd |> Re_str.split (Re_str.regexp " +") with
     | v::next -> v, Array.of_list next
     | _ -> failwith "error with --solver 'command'" in
   if !debug then Printf.eprintf "== cmd: '%s %s'\n" prog (opts |> Array.fold_left (fun acc v-> if acc = "" then v else v^" "^acc) "");
@@ -85,7 +85,7 @@ let solve_ext lit_tbl lit_abs lit_sign lit_of_int (print_dimacs:out_channel -> u
      something is not an integer. *)
   let ints_of_string s =
     try begin
-      s |> Str.split (Str.regexp " +") |> List.fold_left
+      s |> Re_str.split (Re_str.regexp " +") |> List.fold_left
         (fun acc s -> match int_of_string s with
            | v when v!=0 -> lit_of_int v :: acc
            | _ -> acc (* in DIMACS, '0' are line endings; we skip '0' *)) []

@@ -134,7 +134,7 @@ let extract text (pos1, pos2) : string =
    with exactly one space character. *)
 
 let compress text =
-  Str.global_replace (Str.regexp "[ \t\n\r]+") " " text
+  Re_str.global_replace (Re_str.regexp "[ \t\n\r]+") " " text
 
 (* -------------------------------------------------------------------------- *)
 
@@ -242,7 +242,7 @@ let range text (e : element) : string =
 
 let fragment text checkpoint message =
   try
-    let i = int_of_string (Str.matched_group 1 message) in
+    let i = int_of_string (Re_str.matched_group 1 message) in
     range text (element checkpoint i)
   with
   | Failure _ ->
@@ -255,8 +255,8 @@ let fragment text checkpoint message =
       if !debug then assert false else "???"
 
 let fragments text checkpoint (message : string) : string =
-  Str.global_substitute
-    (Str.regexp "\\$\\([0-9]+\\)")
+  Re_str.global_substitute
+    (Re_str.regexp "\\$\\([0-9]+\\)")
     (fragment text checkpoint)
     message
 

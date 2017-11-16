@@ -9,7 +9,7 @@
 (library
  ((name        touist)
   (public_name touist)
-  (libraries (menhirLib str minisat cppo_ocamlbuild))
+  (libraries (re re.str menhirLib minisat cppo_ocamlbuild))
   (virtual_deps (cppo menhir))
   (wrapped false)
   (preprocess (per_module
