@@ -76,3 +76,6 @@ support/gui/dist.zip
 
 .vscode
 *.docdir
+
+# Jbuilder takes care of generating the .merlin files
+.merlin
