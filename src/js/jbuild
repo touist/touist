@@ -1,0 +1,11 @@
+(jbuild_version 1)
+
+#|
+opam install js_of_ocaml js_of_ocaml-compiler yojson ppx_deriving_yojson
+|#
+
+(executable
+ ((name touistjs)
+  (libraries (yojson js_of_ocaml js_of_ocaml.ppx ppx_deriving_yojson re touist))
+  )
+)
