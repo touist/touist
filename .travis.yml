@@ -45,16 +45,16 @@ before_install:
   - opam init -y --auto-setup
   - eval `opam config env`
   - opam update
-  - opam install -y ocamlfind menhir minisat cppo_ocamlbuild yices2 qbf ounit
+  - opam install -y ocamlfind menhir minisat cppo_ocamlbuild yices2 qbf ounit jbuilder
 install:
   # Build touist
   - cd $TRAVIS_BUILD_DIR
-  - ./configure --bindir support/gui/external --enable-tests --enable-yices2 --enable-qbf
-  - make
-  - make install # NOTE: installed in support/gui/external, not system-wide
+  - jbuilder build
+  - jbuilder install
 
   # Build the Java GUI touist.jar (in support/gui)
   - cd $TRAVIS_BUILD_DIR/support/gui
+  - cp $(which touist) external/touist
   - chmod ugo+x external/touist
   - |
     set -e # exit if one of the following commands fail
@@ -82,12 +82,12 @@ install:
       git diff
       exit 1
     fi
-  - make doc-unified
+  - jbuilder build @doc
 
 # This part is meant for unit tests (among others).
 script:
-  - make test
-  - make uninstall
+  - jbuilder runtest
+  - jbuilder uninstall
 
 before_deploy:
   - |
@@ -95,8 +95,8 @@ before_deploy:
     cd $TRAVIS_BUILD_DIR
     git clone https://${TOK}@github.com/touist/touist.github.io.git
     mkdir -p touist.github.io/api/v/$(git describe --tags)
-    cp -LR touist.docdir/* touist.github.io/api
-    cp -LR touist.docdir/* touist.github.io/api/v/$(git describe --tags)
+    cp -LR _build/default/_doc/* touist.github.io/api
+    cp -LR _build/default/_doc/* touist.github.io/api/v/$(git describe --tags)
     cd touist.github.io
     git config user.name "Travis-ci"
     git config user.email "robot@travis-ci.org"

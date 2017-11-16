@@ -68,7 +68,11 @@ build_script:
   - '%CYG_BASH% -lc "cd /cygdrive/c/touist && ./ci/appveyor-script.sh"'
 
 test_script:
-  - '%CYG_BASH% -lc "cd /cygdrive/c/touist && make test 2>&1"'
+  - '%CYG_BASH% -lc "cd /cygdrive/c/touist && jbuilder runtest 2>&1"'
+
+on_finish:
+  - '%CYG_BASH% -lc "cd /cygdrive/c/touist && jbuilder uninstall 2>&1"'
+#  - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
 
 # Important: to be able to use the artifact: /touist-.*\.zip/
 # in deploy:, it is mandatory to add every .zip or whatever
@@ -103,7 +107,3 @@ deploy:
 # - If the commit fails, then send an email to the committer only.
 # - If the commit previously failing now passes, do not send an email.
 # - Do not send an email to anyone else
-
-on_finish:
-  - '%CYG_BASH% -lc "cd /cygdrive/c/touist && make uninstall 2>&1"'
-#  - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))

@@ -12,7 +12,7 @@ bash opam32/install.sh
 opam init -y -a mingw https://github.com/fdopen/opam-repository-mingw.git --comp 4.03.0+mingw32c --switch 4.03.0+mingw32c
 eval `opam config env`
 opam update
-opam install -y ocamlfind menhir minisat cppo_ocamlbuild qbf ounit zarith depext-cygwinports
+opam install -y ocamlfind menhir minisat cppo_ocamlbuild qbf ounit zarith depext-cygwinports jbuilder
 
 if ! ocamlfind query yices2; then
     # We want a static libgmp.a. The mingw64-i686-gmp version only contains a
@@ -39,16 +39,17 @@ cd $TOUIST_BUILD_DIR
 # So I abandoned. More info in the issue:
 # https://forge.ocamlcore.org/tracker/?func=detail&group_id=54&aid=758&atid=291
 ocamlfind remove touist
-./configure --bindir support/gui/external --enable-tests --enable-yices2 --enable-qbf
-make
+jbuilder build
+
 # Because 'core.autocrlf input' is set, parser.messages is checked-out using
 # LF endings. But menhir re-generates it, thus producing CRLF endings instead.
 # Solution: dos2unix on it each time...
 dos2unix src/lib/parser.messages
 
-make install
+jbuilder install
+cp $(which touist) support/gui/external
 
-# 'make test' and 'make uninstall' are done in appveyor.yml
+# 'jbuilder runtest' and 'jbuilder uninstall' are done in appveyor.yml
 
 
 # Build the actual TouIST.exe
