@@ -2,7 +2,17 @@
  ((name        touist_qbf)
   (public_name touist.qbf)
   (optional)
-  (libraries (qbf qbf.quantor touist))
+
+  #| Trick to have an optional dep on Qbf;
+     from mirage/ocaml-conduit (async/jbuild) |#
+  (modules (touistQbfSolve))
+  (libraries (touist
+    (select touistQbfSolve.ml from
+      (qbf.quantor  -> touistQbfSolveReal.ml)
+      (!qbf.quantor -> touistQbfSolveDummy.ml))
+    (select touistQbfSolve.mli from
+      (qbf.quantor  -> touistQbfSolveReal.mli)
+      (!qbf.quantor -> touistQbfSolveDummy.mli))))
   (wrapped false)
  )
 )
