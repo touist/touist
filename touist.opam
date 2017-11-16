@@ -2,30 +2,16 @@ opam-version: "1.2"
 name: "touist"
 version: "3.4.4"
 maintainer: "Maël Valais <mael.valais@gmail.com>"
-authors: [ "Maël Valais <mael.valais@gmail.com>"
-           "Olivier Lezaud" ]
+authors: [ "Maël Valais <mael.valais@gmail.com>" "Olivier Lezaud" ]
 license: "MIT"
 homepage: "https://www.irit.fr/touist"
 dev-repo: "https://github.com/touist/touist.git"
 bug-reports: "https://github.com/touist/touist/issues"
-build: [
-  ["ocaml" "setup.ml" "-configure" "--prefix" prefix
-    "--%{yices2:enable}%-yices2"
-    "--%{qbf:enable}%-qbf"]
-  ["ocaml" "setup.ml" "-build"]
-]
-install: ["ocaml" "setup.ml" "-install"]
-remove: [
-  ["ocaml" "%{etc}%/touist/setup.ml" "-C" "%{etc}%/touist" "-uninstall"]
-]
-build-test: [
-  ["ocaml" "setup.ml" "-configure" "--enable-tests"
-    "--%{yices2:enable}%-yices2"
-    "--%{qbf:enable}%-qbf"]
-  ["ocaml" "setup.ml" "-build"]
-  ["ocaml" "setup.ml" "-test"]
-]
-build-doc: [ "ocaml" "setup.ml" "-doc" ]
+build: [["jbuilder" "build" "-p" name "-j" jobs]]
+install: [["jbuilder" "install"]]
+remove: [["jbuilder" "uninstall"]]
+build-test: [["jbuilder" "runtest" "-p" name "-j" jobs]]
+build-doc: [["jbuilder" "build" "@doc" "-j" jobs]]
 depends: [
   ("cppo_ocamlbuild" {build & >= "1.6.0"} |
   "cppo" {build & >= "0.9.4" & <= "1.5.0"})
@@ -34,6 +20,7 @@ depends: [
   "ocamlbuild" {build}
   "ocamlfind" {build}
   "ounit" {test}
+  "jbuilder" {build}
 ]
 depopts: [
   "qbf"
