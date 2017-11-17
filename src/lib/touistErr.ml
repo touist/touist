@@ -11,7 +11,7 @@ exception TouistFatal of msg
 let wrap_width = ref 76
 let format = ref "%l:%c: %t: %m"
 let loc_format = ref "%l:%c"
-let color = ref (Unix.isatty Unix.stderr)
+let color = ref false (* advice: use Unix.isatty to set it *)
 let discard_warnings = ref false
 
 let string_of_type = function
