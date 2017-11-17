@@ -31,15 +31,7 @@ if ! ocamlfind query yices2; then
 fi
 
 cd $TOUIST_BUILD_DIR
-# Build touist. I do not install it because --prefix + 'make install' seems
-# to be buggy with oasis...
-# I also totally removed the 'make install' because each time there would be an
-# error: 'touist' is already installed. First, I was doing 'make uninstall'
-# before 'make install' but even though, it is not working (this is because
-# make install must be run first, the setup.log info is needed...).
-# So I abandoned. More info in the issue:
-# https://forge.ocamlcore.org/tracker/?func=detail&group_id=54&aid=758&atid=291
-ocamlfind remove touist
+# Build touist
 jbuilder build
 
 # Because 'core.autocrlf input' is set, parser.messages is checked-out using
@@ -48,7 +40,6 @@ jbuilder build
 dos2unix src/lib/parser.messages
 
 jbuilder install
-cp $(which touist) support/gui/external
 
 # 'jbuilder runtest' and 'jbuilder uninstall' are done in appveyor.yml
 
