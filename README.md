@@ -53,6 +53,8 @@ problem](docs/images/screenshot.png)](https://github.com/maelvalais/allumettes)
 
        echo 'a and b => c' | touist - --solve
 
+   To build `touist` from source, see `src/HOWTODEBUG.md`.
+
 [opam]: https://opam.ocaml.org/doc/Install.html#Using-your-distribution-39-s-package-system
 
 3. You can also look at the [TouIST reference manual][ref]
