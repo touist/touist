@@ -258,3 +258,5 @@ let logic_supported (logic:string) =
                  "code returned was "^ report.Error.name)
 
 let () = Yices2.register_exn ()
+
+let enabled = true

@@ -290,13 +290,13 @@ run_test_tt_main (
   "with --smt --solve">:::[
   "sat/sodoku.touist (using SMT QF_BV solver)">:: (fun ctx ->
         OUnit2.skip_if (Sys.os_type = "Win32") "won't work on windows (unix-only??)";
-        OUnit2.skip_if (not TouistVersion.has_yices2) "touist built without yices2";
+        OUnit2.skip_if (not TouistSmtSolve.enabled) "touist built without yices2";
         OUnit2.assert_command ~use_stderr:false ~ctxt:ctx
         ~foutput:(check_solution "sat/sudoku_solution.txt")
         "jbuilder" ["exec";"--";"touist";"--solve";"--smt";"QF_BV";"sat/sudoku.touist"]);
   "smt/takuzu4x4.touist">:: (fun ctx ->
       OUnit2.skip_if (Sys.os_type = "Win32") "won't work on windows (unix-only??)";
-      OUnit2.skip_if (not TouistVersion.has_yices2) "touist built without yices2";
+      OUnit2.skip_if (not TouistSmtSolve.enabled) "touist built without yices2";
       OUnit2.assert_command ~use_stderr:false ~ctxt:ctx
       ~foutput:(check_solution "smt/takuzu4x4_solution.txt")
       "jbuilder" ["exec";"--";"touist";"--solve";"--smt";"QF_IDL";"smt/takuzu4x4.touist"]);
@@ -304,13 +304,13 @@ run_test_tt_main (
   "with --qbf --solve">:::[
   "sat/sodoku.touist (using QBF solver)">:: (fun ctx ->
         OUnit2.skip_if (Sys.os_type = "Win32") "won't work on windows (unix-only??)";
-        OUnit2.skip_if (not TouistVersion.has_qbf) "touist built without qbf";
+        OUnit2.skip_if (not TouistQbfSolve.enabled) "touist built without qbf";
         OUnit2.assert_command ~use_stderr:false ~ctxt:ctx
         ~foutput:(check_solution "sat/sudoku_solution.txt")
         "jbuilder" ["exec";"--";"touist";"--solve";"--qbf";"sat/sudoku.touist"]);
   "qbf/allumettes2.touist">:: (fun ctx ->
       OUnit2.skip_if (Sys.os_type = "Win32") "won't work on windows (unix-only??)";
-      OUnit2.skip_if (not TouistVersion.has_qbf) "touist built without qbf";
+      OUnit2.skip_if (not TouistQbfSolve.enabled) "touist built without qbf";
       OUnit2.assert_command ~use_stderr:false ~ctxt:ctx
       ~foutput:(check_solution "qbf/allumettes2.solution")
       "jbuilder" ["exec";"--";"touist";"--solve";"--qbf";"qbf/allumettes2.touist"]);

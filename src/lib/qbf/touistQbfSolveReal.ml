@@ -60,4 +60,6 @@ let solve ?(hidden=false) (f,table:QCNF.t * (Qbf.Lit.t,string) Hashtbl.t) : stri
     Some (Hashtbl.fold
       (fun lit name acc -> if not hidden && (String.get name 0) = '&' then acc
         else (if acc="" then "" else acc^"\n")^(assign lit |> string_of_assign)^" "^ name) table "")
-;
+
+
+let enabled = true

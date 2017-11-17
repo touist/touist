@@ -14,7 +14,7 @@ Before you go, make sure you have OCaml installed. To install it:
 Afterwards, install the OPAM (OCaml package manager) dependencies:
 
     opam init
-    opam install menhir minisat cppo_ocamlbuild jbuilder re
+    opam install menhir minisat jbuilder re
 
 ## Build on Linux & MacOS
 
@@ -38,16 +38,6 @@ contain the instructions so that `jbuilder` can builder everything.
 I know that it is using s-expressions and that people prefer json or yaml (to
 be fair, me too) and that there is no syntax highlighting or anything.
 But `jbuilder` is very nice and more importantly, fast and maintained.
-
-## Notes on version numbers
-
-To be able to have a version number synchronized with the `git` version,
-the makefile `Makefile` will try to run the command:
-
-	git describe --tags
-
-and use the `cppo` preprocessor on `src/lib/touistVersion.cppo.ml` to produce the
-file `_build/src/lib/touistVersion.ml` containing the git version.
 
 ----------
 

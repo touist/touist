@@ -15,3 +15,6 @@ val qcnf_of_cnf :
 
 val solve :
   ?hidden:bool -> 'a * (_, string) Hashtbl.t -> string option
+
+(** Is this library enabled? (requires yices2 to be installed) *)
+val enabled : bool
