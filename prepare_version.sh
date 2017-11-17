@@ -35,12 +35,6 @@ function parse_changelog() {
     done < $CHANGELOG
 }
 
-# get_latest_version <changelog_file_name>
-# will print to stdout the first vX.Y.Z of the <changelog_file_name> file.
-function get_latest_version() {
-    head -1 $1 | sed 's/^\(v[0-9]\.[0-9]\.[0-9][^ ]*\).*$/\1/'
-}
-
 while [ -n "$1" ]; do
     case $1 in
         --help | -h)
@@ -51,8 +45,8 @@ If no vesion number vX.Y.Z is given, the script will pick the first version
 number it finds in CHANGELOG.
 
 This script will help you to successively:
-1. change the _oasis version number
-2. regenerate the related files
+1. change the touist.opam version number
+2. add the date in CHANGELOG
 3. (optional) commit changes with message 'Bump to vX.Z.Y'
 4. (optional) create a tag 'vX.Z.Y' with the content of the last CHANGELOG
    entry
@@ -86,12 +80,6 @@ else
     echo -e "${I} Repo is clean."
 fi
 
-# Also check that we have oasis and oasis
-if ! which oasis oasis2opam >/dev/null 2>&1; then
-    echo -e "${E} oasis or oasis2opam not installed; please install them:"
-    echo -e "opam install oasis oasis2opam"
-fi
-
 if [ "x$VERSION" = x ]; then
     echo -e "${I} No version number given as argument. Looking at CHANGELOG first line..."
     if ! VERSION=$(head -1 CHANGELOG | grep '^v[0-9]\.[0-9]\.[0-9]$'); then
@@ -107,23 +95,18 @@ if [ "x$VERSION" = x ]; then
 fi
 
 # At this point, we know what VERSION we are going to use.
+echo -e "${I} Parsing the changelog for version '\033[92mBump to $VERSION\033[0m'..."
+parse_changelog CHANGELOG "$VERSION" > tag_content
 
 # For the opam version, remove the leading 'v'.
 OPAM_VERSION=$(echo $VERSION | cut -c 2-)
-echo -e "${I} Changing the 'Version:' field in '_oasis' from \033[92m$(oasis query version)\033[0m to \033[92m$OPAM_VERSION\033[0m"
-sed "s/^\(Version: *\)[0-9][0-9\.]*$/\1$OPAM_VERSION/" _oasis > a && mv a _oasis
-echo -e "\033[90m$(git diff -U0 _oasis | grep "^\(\+\|-\)[^+-]")\033[0m"
+echo -e "${I} Changing the 'version:' field in 'touist.opam' from \033[92m$(oasis query version)\033[0m to \033[92m$OPAM_VERSION\033[0m"
+sed "s/^\(version: *\)\"[0-9][0-9\.]*\"$/\1\"$OPAM_VERSION\"/" touist.opam > a && mv a touist.opam
+echo -e "\033[90m$(git diff -U0 touist.opam | grep "^\(\+\|-\)[^+-]")\033[0m"
 
 echo -e "${I} Adding the date to the version: \033[92m  \033[0m"
 sed "s/^\(${VERSION//./\\.}[^ ]*\).*$/\1 (`date -I`)/" CHANGELOG > a && mv a CHANGELOG
 echo -e "\033[90m$(git diff -U0 CHANGELOG | grep "^\(\+\|-\)[^+-]")\033[0m"
-
-echo -e "${I} Running 'oasis setup' to update setup.ml, src/lib/META\033[0m"
-oasis setup
-
-echo -e "${I} Running 'oasis2opam --local -y' to update opam/opam\033[0m"
-oasis2opam --local -y
-echo -e "\033[90m$(git diff -U0 opam/ | grep "^\(\+\|-\)[^+-]")\033[0m"
 
 echo -e "${I} Changes done."
 echo -e "${Q} Do you want to commit using message '\033[92mBump to $VERSION\033[0m'? [Y/n]"
@@ -131,17 +114,14 @@ read answerCommit
 echo $answerCommit
 case $answerCommit in
     y | Y)
-        echo -e "${I} Running 'git add setup.ml _oasis src/lib/META opam/*'\033[0m"
-        git add setup.ml _oasis opam/* CHANGELOG
-        find . -name META -exec git add {} \;
+        echo -e "${I} Running 'git add *.opam *.descr CHANGELOG'\033[0m"
+        git add *.opam *.descr CHANGELOG
         echo -e "${I} Commiting with message '\033[92mBump to $VERSION\033[0m'"
         git commit -m "Bump to $VERSION"
         ;;
     *) echo -e "${I} Doing nothing.";;
 esac
 
-echo -e "${I} Parsing the changelog for version '\033[92mBump to $VERSION\033[0m'..."
-parse_changelog CHANGELOG "$VERSION" > tag_content
 echo -e "${Q} Do you want to create a signed tag '\033[92mBump to $VERSION\033[0m' using the following message (u for unsigned tag; y for signed tag): [Y/n/u]"
 while IFS= read line; do
     echo -e "\033[90m${line}\033[0m"
@@ -166,7 +146,7 @@ echo -e ""
 echo -e "${I} (2) publish (${E} WAIT FOR THE TRAVIS BUILD ${E}):"
 echo -e "opam publish prepare"
 echo -e "opam publish submit touist.$OPAM_VERSION"
-echo -e "brew bump-formula-pr touist/touist/touist --url=https://github.com/touist/touist/archive/${$VERSION}.tar.gz"
+echo -e "brew bump-formula-pr --url=https://github.com/touist/touist/archive/${VERSION}.tar.gz --tap=touist/touist touist"
 echo -e ""
 echo -e "${I} (1 bis) cancel the commit/tag made in (1):"
 echo -e "git reset @^"
