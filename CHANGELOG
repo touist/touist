@@ -1,3 +1,5 @@
+v3.4.5
+  - (internal) use jbuilder instead of oasis
 v3.4.4 (2017-11-14)
   - Command-line
     - fix (AGAIN) the --solver option; when parsing the integers of the model,
