@@ -14,12 +14,13 @@ Before you go, make sure you have OCaml installed. To install it:
 Afterwards, install the OPAM (OCaml package manager) dependencies:
 
     opam init
-    opam install menhir minisat cppo_ocamlbuild
+    opam install menhir minisat cppo_ocamlbuild jbuilder re
 
 ## Build on Linux & MacOS
 
-    ./configure
-    make
+    jbuilder build
+    jbuilder install
+    jbuilder uninstall
 
 ## Build it on windows
 
@@ -30,16 +31,13 @@ windows](http://fdopen.github.io/opam-repository-mingw/installation/)
 windows! After installing cygwin, please refer to `ci/appveyor-script.sh`
 for the different build steps.
 
-## What is `oasis`?
+## What are the `jbuild` files?
 
-As you probably noticed, there is a file named `_oasis`. This file contains
-the instructions to create the build system (`./configure`, `setup.ml` and
-`Makefile`) for the project. It works similarly to the `configure.ac` when
-you use `autoconf`. If you need to change the build behaviour (e.g. add a
-pre-build script, move some file after building...) you must install
-`oasis`:
-
-    opam install oasis
+As you probably noticed, there are many files named `jbuild`. These files
+contain the instructions so that `jbuilder` can builder everything.
+I know that it is using s-expressions and that people prefer json or yaml (to
+be fair, me too) and that there is no syntax highlighting or anything.
+But `jbuilder` is very nice and more importantly, fast and maintained.
 
 ## Notes on version numbers
 
