@@ -42,7 +42,8 @@ before_install:
   # Install packages using brew on osx environment
   - javac -version
   - if [ $TRAVIS_OS_NAME = osx ]; then brew update && brew install opam; fi
-  - opam init -y --auto-setup --switch=4.05.0
+  - opam init -y --auto-setup
+  - opam switch -y 4.05.0
   - eval `opam config env`
   - opam update
   - opam install -y ocamlfind menhir minisat cppo_ocamlbuild yices2 qbf ounit jbuilder odoc
