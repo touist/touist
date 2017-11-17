@@ -197,10 +197,9 @@ let () =
      * NOTE: !version_asked means like in C, *version_asked.
      * It doesn't mean "not version_asked" *)
     if !version_asked then (
-      print_endline ("Version: " ^ TouistVersion.version);
-      if TouistVersion.has_git_tag then print_endline ("Git: "^TouistVersion.git_tag);
-      let built_list = ["minisat"] @ (if TouistVersion.has_yices2 then ["yices2"] else [])
-                       @ (if TouistVersion.has_qbf then ["qbf";"qbf.quantor"] else []) in
+      print_endline ("Version: %%VERSION%%");
+      let built_list = ["minisat"] @ (if TouistSmtSolve.enabled then ["yices2"] else [])
+                       @ (if TouistQbfSolve.enabled then ["qbf";"qbf.quantor"] else []) in
       print_endline ("Built with: " ^ List.fold_left (fun acc e -> match acc with "" -> e | _ -> acc^", "^e) "" built_list);
       exit_with OK
     );
@@ -225,7 +224,7 @@ let () =
     else mode := Sat;
 
       (* SMT Mode: check if one of the available QF_? has been given after --smt *)
-    if TouistVersion.has_yices2 && (!mode = Smt) && not (TouistSmtSolve.logic_supported !smt_flag) then
+    if TouistSmtSolve.enabled && (!mode = Smt) && not (TouistSmtSolve.logic_supported !smt_flag) then
         fatal (Error,Usage,"you must give a correct SMT-LIB \
                             logic after --smt (try --help)\nExample: --smt QF_IDL\n",None);
 

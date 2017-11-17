@@ -9,17 +9,9 @@
 (library
  ((name        touist)
   (public_name touist)
-  (libraries (re re.str menhirLib minisat cppo_ocamlbuild))
-  (virtual_deps (cppo menhir))
-  (wrapped false)
-  (preprocess (per_module
-    ((action (run ${bin:cppo}
-        -D "HAS_GIT_TAG false"
-        -D "VERSION \"${version:touist}\""
-        -D "GIT_TAG \"N/A\""
-        -D "HAS_YICES2 ${lib-available:yices2}"
-        -D "HAS_QBF ${lib-available:qbf}" ${<})) (touistVersion))))
- )
+  (libraries (re re.str menhirLib minisat))
+  (virtual_deps (menhir))
+  (wrapped false))
 )
 
 (rule

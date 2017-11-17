@@ -16,3 +16,6 @@ val qcnf_of_cnf :
 
 val solve :
   ?hidden:bool -> Qbf.QCNF.t * (Qbf.Lit.t, string) Hashtbl.t -> string option
+
+(** Is this library enabled? (requires qbf to be installed) *)
+val enabled : bool

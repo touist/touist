@@ -1,3 +1,5 @@
+(jbuild_version 1)
+
 (alias
  ((name    runtest)
   (deps    (test.exe
@@ -6,9 +8,7 @@
            (glob_files smt/*)))
   (action  (run ${<}))))
 
-(jbuild_version 1)
-
 (executable
  ((name       test)
-  (libraries  (touist touist.qbf touist.yices2 ounit))
+  (libraries  (touist touist.qbf touist.yices2 oUnit))
   (modes      (byte))))
