@@ -34,7 +34,7 @@
    because touistParser.mly has been updated and some new errors appeared. |#
 (rule
     ((targets (parser.messages_fresh))
-     (deps    (touistParser.mly))
+     (deps    (touistParser.mly parser.messages))
      (action  (with-stdout-to ${@}
                 (run ${bin:menhir} --list-errors ${<} touistParser.mly)))
      (fallback) #| fallback = do not rebuild if target already exists |#))
