@@ -23,6 +23,7 @@ depends: [
   "ounit" {test}
   "jbuilder" {build}
   "re" {build}
+  "odoc" {doc}
 ]
 depopts: [
   "qbf"
