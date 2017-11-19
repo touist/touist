@@ -46,7 +46,7 @@ before_install:
   - opam switch -y 4.05.0
   - eval `opam config env`
   - opam update
-  - opam install -y ocamlfind menhir minisat yices2 qbf ounit jbuilder re odoc
+  - opam install -y ocamlfind menhir minisat yices2 qbf ounit jbuilder re odoc cmdliner
 install:
   # Build touist
   - cd $TRAVIS_BUILD_DIR
