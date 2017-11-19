@@ -1,6 +1,6 @@
 open TouistParse
 open TouistErr
-
+open Cmdliner
 type error =
   | OK
   | UNKNOWN
@@ -34,7 +34,6 @@ let sat_flag = ref false
 let qbf_flag = ref false
 let smt_flag = ref ""
 let mode = ref Sat
-let version_asked = ref false
 let input_file_path = ref "/dev/stdin"
 let output_file_path = ref ""
 let output_table_file_path = ref ""
@@ -130,59 +129,186 @@ let solve_ext lit_tbl lit_abs lit_sign lit_of_int (print_dimacs:out_channel -> u
                         (match !solver_ext with Some s -> s | None -> "???") c; exit_with SOLVER_UNKNOWN;
   | _ -> Printf.eprintf "Error with %s, received signal\n" (cmd)
 
-(* The main program *)
-let () =
-  let cmd = (Filename.basename Sys.argv.(0)) in (* ./touistl exec. name *)
-  let argspecs = [ (* This list enumerates the different flags (-x,-f...)*)
-    (* "-flag", Arg.toSomething (ref var), "Usage for this flag"*)
-    ("-o", Arg.Set_string (output_file_path), "OUTPUT is the translated file");
-    ("--table", Arg.Set_string (output_table_file_path),
-     "TABLE (--sat only) The output file that contains the literals table.
-      By default, prints to stdout.");
-    ("--sat", Arg.Set sat_flag,
-     "Select the SAT solver (enabled by default when --smt or --qbf not selected)");
-    ("--qbf", Arg.Set qbf_flag,
-     "Select the QBF solver");
-    ("--smt", Arg.Set_string (smt_flag), (
-        "LOGIC Select the SMT solver with the specified LOGIC from the
-        SMT2-LIB specification:
-        QF_IDL allows to deal with boolean and integer, E.g, x - y < b
-        QF_RDL is the same as QF_IDL but with reals
-        QF_LIA (not documented)
-        QF_LRA (not documented)
-       See http://smtlib.cs.uiowa.edu/logics.shtml for more info."
-      ));
-    ("--version", Arg.Set version_asked, "Display version number");
-    ("-", Arg.Set use_stdin,"reads from stdin instead of file");
-    ("--debug", Arg.Set debug, "Print information for debugging touist");
-    ("--debug-syntax", Arg.Set debug_syntax, "Print information for debugging
-    syntax errors given by parser.messages");
-    ("--debug-cnf", Arg.Set debug_cnf,"Print step by step CNF transformation");
-    ("--show", Arg.Set show,"Show the expanded AST after evaluation (= expansion)");
-    ("--solve", Arg.Set solve_flag,"Solve the problem and print the first model if it exists");
-    ("--limit", Arg.Set_int limit,"(with --solve) Instead of one model, return N models if they exist.
-                                            With 0, return every possible model.");
-    ("--count", Arg.Set only_count,"(with --solve) Instead of displaying models, return the number of models");
-    ("--latex", Arg.Set latex,"Transform to latex for simple processors (e.g., mathjax)");
-    ("--latex-full", Arg.Set latex_full,"Transform to latex for full processors (e.g., pdflatex)");
-    ("--show-hidden", Arg.Set show_hidden_lits,"(with --solve) Show the hidden '&a' literals used when translating to CNF");
-    ("--equiv", Arg.Set_string equiv_file_path,"INPUT2 (with --solve) Check that INPUT2 has the same models as INPUT (equivalency)");
-    ("--linter", Arg.Set linter,"Display syntax and semantic errors and exit");
-    ("--error-format", Arg.Set_string error_format,"Customize the formatting of error messages");
-    ("--wrap-width", Arg.Set_int wrap_width,"Wrapping width for error messages [default: 76]");
-    ("--interactive", Arg.Set sat_interactive ,"(--sat mode) Display next model on key press (INPUT must be a file)");
-    ("--debug-dimacs", Arg.Set debug_dimacs, "(--{sat,qbf} modes) Display names instead of integers in DIMACS/QDIMACS");
-    ("--solver", Arg.String (fun s -> solver_ext := Some s), "CMD (--{sat,qbf} modes) Use CMD instead of embedded solver (feeds (Q)DIMACS to stdin, expects QDIMACS in stdout");
-  ]
+let main _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ = print_endline "ok"
+
+(* Use of Cmdliner has been inspired by:
+   compiler/compileArg.ml in https://github.com/ocsigen/js_of_ocaml,
+   bin/main.ml in https://github.com/janestreet/jbuilder. *)
+let input_t =
+  Arg.(value & pos 0 string "" & info [] ~docv:"INPUT" ~doc:
+    {|The input TouIST file. Use $(b,-) to read from the standard input
+    instead.|})
+let output =
+  Arg.(value & opt (some file) None & info ["o";"output"] ~docv:"OUTPUT" ~doc:
+    {|Select the file $(docv) for printing results. With $(b,--sat), $(b,--smt)
+    or $(b,--qbf), results will be respectively the DIMACS, QDIMACS and SMT-LIB
+    translations of the TouIST given in $(i,INPUT).|})
+let output_table =
+  Arg.(value & (opt file "") & info ["table"] ~docv:"TABLE" ~doc:
+    {|Select the file $(docv) for printing the mapping table. Only useful
+    for $(b,--sat) and $(b,--qbf). With this option, the mapping between
+    the variable names and the DIMACS integers will be printed to $(docv).
+    Without $(b,--table), the table will be displayed as comments at the
+    beginning of the DIMACS output:
+        c <prop-name> <n>
+    where $(b,<n>) is the positive non-zero integer associated with
+    $(b,<prop-name>). |})
+let language =
+  Arg.(value & vflag Sat [
+    Smt, Arg.info ["smt"] ~doc:{|Select SMT TouIST language as input.|};
+    Qbf, Arg.info ["qbf"] ~doc:{|Select QBF TouIST language as input.|};
+    Sat, Arg.info ["sat"] ~doc:{|Select SAT TouIST language as input
+      (enabled by default when $(b,--smt) or $(b,--qbf) not selected)|}])
+let smt_logic =
+  Arg.(value & opt (some string) None ~vopt:(Some "QF_LIA") & info ["logic"] ~docv:"LOGIC" ~doc:
+    {|Select the $(docv) to be used in SMT mode. $(docv) must be a known
+    SMT2-LIB logic; note that the TouIST language can only express these four
+    logics:
+      * QF_IDL allows to deal with boolean and integer, E.g, x - y < b
+      * QF_RDL is the same as QF_IDL but with reals
+      * QF_LIA (not documented)
+      * QF_LRA (not documented)
+    See http://smtlib.cs.uiowa.edu/logics.shtml for more info.|})
+let debug_flag =
+  Arg.(value & flag & info ["debug"] ~doc:{|Print information for debugging
+    touist. More specifically:
+    * with $(b,--solver), prints the stdin, stdout and stderr of the given
+      solver;
+    * print the 'loc' (location) when displaying syntax errors;
+    * when an exception is raised, print the call stack.|})
+let debug_syntax_flag =
+  Arg.(value & flag & info ["debug-syntax"] ~doc:{|When a syntax error is
+    displayed, also give the automaton number; this is useful when trying
+    to fix a wrong error message in `src/lib/parser.messages'.|})
+let debug_cnf_flag =
+  Arg.(value & flag & info ["debug-cnf"] ~doc:{|Print step by step CNF
+    transformation (only with $(b,--sat) and $(b,--qbf)|})
+let show_flag =
+  Arg.(value & flag & info ["show"] ~doc:{|Show the expanded Abstract
+    Syntaxic Tree after evaluation, i.e., after every `bigand', `bigor',
+    variables and such are replaced by actual formulas. This option may
+    be useful to understand why your TouIST input seems to be wrongly
+    interpreted by $(mname).|})
+let solve_flag =
+  Arg.(value & flag & info ["solve"] ~doc:{|Solve the problem and print the
+    first model if it exists. The solver is selected depending on the input
+    language chosen:
+    * with $(b,--sat), solve using MiniSat,
+    * with $(b,--smt), solve using Yices,
+    * with $(b,--qbf), solve using Quantor.|})
+let limit =
+  Arg.(value & opt int 1 & info ["limit"] ~docv:"N" ~doc:{|(with $(b,--solve)) Instead of
+    one model, return $(docv) models if they exist. With $(i,0), return every
+    possible model. WARNING: the number of model can be extremely high;
+    this option is intended for small problems.|})
+let count_flag =
+  Arg.(value & flag & info ["count"] ~doc:{|(with $(b,--solve)) Instead of
+  displaying models, return the number of models.|})
+let latex_flag =
+  Arg.(value & opt (some string) None ~vopt:(Some "mathjax") & info ["latex"] ~docv:"MODE" ~doc:
+    {|Transform the TouIST input to LaTeX. The supported values for $(i,MODE)
+    are `mathjax' and `document'.|})
+let show_hidden_flag =
+  Arg.(value & flag & info ["show-hidden"] ~doc:{|(with $(b,--solve)) Show
+    the hidden '&a' literals used when translating to CNF.|})
+let equiv_second_input =
+  Arg.(value & opt (some file) None & info ["equiv"] ~docv:"INPUT2" ~doc:
+    {|(with $(b,--solve)) Check that $(docv) has the same models as $(i,INPUT)
+    (equivalency). Note that the equivalency is computed 'naively' by
+    retrieiving all models and comparing them. In the future, we will instead
+    combine both $(i,INPUT) $(docv) and check that one entails the other (and
+    conversely).|})
+let linter_flag =
+  Arg.(value & flag & info ["linter"] ~doc:{|Display syntax and semantic errors
+    and exit. With this option, we only do a minimal valuation so that it
+    prints the errors as fast as possible.|})
+let error_format =
+  Arg.(value & opt string "" & info ["error-format"] ~docv:"FMT" ~doc:
+    {|Customize the formatting of error messages.|})
+let wrap_width =
+  Arg.(value & opt int 76 & info ["wrap-width"] ~docv:"N" ~doc:
+    {|Wrapping width for error messages.|})
+let interactive_models =
+  Arg.(value & flag & info ["interactive"] ~doc:
+    {|($(b,--sat) mode) Display next model on key press; $(i,INPUT) must be a
+    file.|})
+let debug_dimacs_flag =
+  Arg.(value & flag & info ["debug-dimacs"] ~doc:{|
+    ($(b,--sat) and $(b,--qbf) modes) Display names instead of integers in
+    DIMACS/QDIMACS|})
+let solver_external =
+  Arg.(value & opt (some string) None & info ["solver"] ~docv:"CMD" ~doc:
+    {|($(b,--sat) and $(b,--qbf) modes) Use $(docv) for solving. $(docv)
+    must expect DIMACS (QDIMACS) on standard input, print a DIMACS model on
+    standard output and return 10 on SAT and 20 for UNSAT.|})
+let cmd =
+  let doc = "translate and solves SAT, QBF and SMT problems written in TouIST"
+  and usage1 = "$(mname) [$(b,--sat)|$(b,--qbf)|$(b,--smt)[=$(i,LOGIC)]] [$(i,OPTION)] $(i,INPUT)"
+  and usage2 = "$(mname) [$(b,--sat)|$(b,--qbf)|$(b,--smt)[=$(i,LOGIC)]] [$(i,OPTION)] $(b,--solve) $(i,INPUT)"
+  and usage3 = "$(mname) [$(b,--sat)|$(b,--qbf)|$(b,--smt)[=$(i,LOGIC)]] [$(i,OPTION)] $(b,--solver)=$(i,CMD) $(i,INPUT)"
+  and usage4 = "$(mname) [$(b,--sat)|$(b,--qbf)|$(b,--smt)[=$(i,LOGIC)]] [$(i,OPTION)] $(b,--latex)[=$(i,MODE)] $(i,INPUT)"
   in
-  let usage =
-    "TouIST solves propositional logic problems written in TouIST language\n"^
-    "and supports conversion to SAT-DIMACS and SMT-LIB2 solver formats.\n"^
-    "Usage: " ^ cmd ^ " [--sat] [-o OUTPUT] [--table TABLE] (INPUT | -)\n"^
-    "Usage: " ^ cmd ^ " --smt (QF_IDL|QF_RDL|QF_LIA|QF_LRA) [-o OUTPUT] (INPUT | -)\n"^
-    "Usage: " ^ cmd ^ " --qbf [-o OUTPUT] (INPUT | -)\n"^
-    "Note: in --sat mode, if TABLE and OUTPUT aren't given, both output will be mixed in stdout."
+  let man = [
+    `S Manpage.s_synopsis;
+    `P usage1; `Noblank;
+    `P usage2; `Noblank;
+    `P usage3; `Noblank;
+    `P usage4;
+    `S Manpage.s_description;
+    `P "$(tname) translates and solves problems written in TouIST language,
+       which is based on propositional logic (SAT) with extensions to SMT and
+       QBF. Output formats for translation include DIMACS, QDIMACS and SMT-LIB.";
+    `P "To select the standard input, use $(b,-) as $(i,INPUT).";
+    `P ("Embedded solvers available: "^"minisat"
+          ^ if TouistSmtSolve.enabled then ", yices2" else ""
+          ^ if TouistQbfSolve.enabled then ", qbf" else "");
+    `S "LANGUAGE";
+    `P "$(mname) accepts three language variants:";
+    `I ("$(b,--sat)", "Propositional logic. It is the language
+            selected by default, you may omit $(b,--sat).");
+    `I ("$(b,--smt)[=$(i,LOGIC)]", "SAT Modulo Theory (SMT). By default,
+            $(i,LOGIC) is set to `QF_LIA' (linear integers algebra).");
+    `I ("$(b,--qbf)","Quantified boolean formulas (QBF).");
+    `S "MODES";
+    `P "$(mname) has multiple modes:";
+    `I (usage1,
+        "translation to solver-compatible formats: DIMACS (with $(b,--sat)),
+          QDIMACS (with $(b,--qbf)) and SMT-LIB (with $(b,--smt)[=$(i,LOGIC)]");
+    `I (usage2,
+        "solving with $(b,--solve) using embedded solvers MiniSat
+        (for $(b,--sat)), Quantor (for $(b,--qbf)) and Yices
+        (for $(b,--smt)[=$(i,LOGIC)])");
+    `I (usage3,
+        "solving using an external solver with $(b,--solver=)$(i,CMD)");
+    `I (usage4,
+        "translation to LaTeX with $(b,--latex)[=$(i,MODE)]");
+    `S Manpage.s_bugs; `P "Report bugs to <mael.valais@gmail.com>.";
+    `S Manpage.s_see_also; `P "" ]
   in
+  Term.(const main $ input_t $ output $ output_table $ language $ smt_logic
+                   $ debug_flag $ debug_syntax_flag $ debug_cnf_flag
+                   $ show_flag $ solve_flag $ limit $ count_flag $ latex_flag
+                   $ show_hidden_flag $ equiv_second_input
+                   $ linter_flag $ error_format $ wrap_width $ interactive_models
+                   $ debug_dimacs_flag $ solver_external),
+  Term.(info "touist" ~version:("%%VERSION%%")
+     ~doc ~man ~exits:(List.map (fun (doc,err) -> exit_info ~doc (get_code err)) [
+    "on success; with $(b,--solve) and $(b,--solver), also means SAT", OK;
+    "unknown error", UNKNOWN;
+    "command-line usage error", CMD_USAGE;
+    "command-line option is unsupported", CMD_UNSUPPORTED;
+    "TouIST syntax error", TOUIST_SYNTAX;
+    "translation timeout", TOUIST_TIMEOUT;
+    "translation memory overflow", TOUIST_MEMORY;
+    "unknown $(tname) error", TOUIST_UNKNOWN;
+    "on UNSAT problem", SOLVER_UNSAT;
+    "unknown solver error", SOLVER_UNKNOWN;
+    "solver timeout", SOLVER_TIMEOUT;
+    "solver returned memory overflow", SOLVER_MEMORY;
+    ]))
+
+let () = Term.exit @@ Term.eval cmd
+(*
   (* Step 1: we parse the args. If an arg. is "alone", we suppose
    * it is the touistl input file (this is handled by [process_arg_alone]) *)
   Arg.parse argspecs process_arg_alone usage; (* parses the arguments *)
@@ -192,17 +318,6 @@ let () =
   TouistErr.color := (Unix.isatty Unix.stderr);
 
   try
-
-    (* Step 1.5: if we are asked the version number
-     * NOTE: !version_asked means like in C, *version_asked.
-     * It doesn't mean "not version_asked" *)
-    if !version_asked then (
-      print_endline ("Version: %%VERSION%%");
-      let built_list = ["minisat"] @ (if TouistSmtSolve.enabled then ["yices2"] else [])
-                       @ (if TouistQbfSolve.enabled then ["qbf";"qbf.quantor"] else []) in
-      print_endline ("Built with: " ^ List.fold_left (fun acc e -> match acc with "" -> e | _ -> acc^", "^e) "" built_list);
-      exit_with OK
-    );
 
     (* Step 2: we see if we got every parameter we need *)
 
@@ -413,3 +528,5 @@ with
   Printf.eprintf "%s\n" (TouistErr.string_of_msg (Error,Usage,err,None));
   exit_with CMD_USAGE
 | x -> raise x
+*)
+
