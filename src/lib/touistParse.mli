@@ -23,13 +23,13 @@
     [~filename:"foo.touist"] enables the display of a file name in errors.
 *)
 val parse_sat :
-  ?debug:bool -> ?filename:string -> string -> TouistTypes.Ast.t
+  ?debug_syntax:bool -> ?filename:string -> string -> TouistTypes.Ast.t
 
 val parse_smt :
-  ?debug:bool -> ?filename:string -> string -> TouistTypes.Ast.t
+  ?debug_syntax:bool -> ?filename:string -> string -> TouistTypes.Ast.t
 
 val parse_qbf :
-  ?debug:bool -> ?filename:string -> string -> TouistTypes.Ast.t
+  ?debug_syntax:bool -> ?filename:string -> string -> TouistTypes.Ast.t
 
 (** {2 Utility functions} *)
 

@@ -27,7 +27,7 @@ val prenex : ?debug:bool -> TouistTypes.AstSet.elt -> TouistTypes.Ast.t
     variable in an innermost way.
 
     [ast] must be in Prenex Normal Form. *)
-val cnf : ?debug:bool -> TouistTypes.Ast.t -> TouistTypes.AstSet.elt
+val cnf : ?debug_cnf:bool -> TouistTypes.Ast.t -> TouistTypes.AstSet.elt
 
 (** {2 CNF to clauses} *)
 
