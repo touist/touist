@@ -67,13 +67,13 @@ let parse (parser) ?debug:(debug=false) filename (text:string) : Ast.t =
     in ast
 
 (** Directly calls [parser] with [TouistParser.Incremental.touist_simple] *)
-let parse_sat ?debug:(d=false) ?(filename="foo.touistl") text = parse TouistParser.Incremental.touist_simple ~debug:d filename text
+let parse_sat ?debug_syntax:(d=false) ?(filename="foo.touistl") text = parse TouistParser.Incremental.touist_simple ~debug:d filename text
 
 (** Same for [TouistParser.Incremental.touist_simple] *)
-let parse_smt ?debug:(d=false) ?(filename="foo.touistl") text = parse TouistParser.Incremental.touist_smt ~debug:d filename text
+let parse_smt ?debug_syntax:(d=false) ?(filename="foo.touistl") text = parse TouistParser.Incremental.touist_smt ~debug:d filename text
 
 (** Same for [TouistParser.Incremental.touist_qbf] *)
-let parse_qbf ?debug:(d=false) ?(filename="foo.touistl") text = parse TouistParser.Incremental.touist_qbf ~debug:d filename text
+let parse_qbf ?debug_syntax:(d=false) ?(filename="foo.touistl") text = parse TouistParser.Incremental.touist_qbf ~debug:d filename text
 
 
 (** [string_of_channel] takes an opened file and returns a string of its content. *)

@@ -146,11 +146,11 @@ let prenex ?(debug=false) ast : Ast.t =
   let final = intermediate |> quantify_free_variables [] in
   final
 
-let cnf ?(debug=false) ast =
+let cnf ?(debug_cnf=false) ast =
   let rec process = function
   | Forall (x,f) -> Forall (x, process f)
   | Exists (x,f) -> Exists (x, process f)
-  | inner -> TouistCnf.ast_to_cnf ~debug inner
+  | inner -> TouistCnf.ast_to_cnf ~debug_cnf inner
   in ast |> process |> quantify_free_variables []
 
   type 'a quantlist = A of 'a list | E of 'a list
