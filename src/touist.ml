@@ -29,7 +29,8 @@ let get_code (e : error) : int = match e with
   | SOLVER_TIMEOUT  -> 10
   | SOLVER_MEMORY   -> 11
 
-type language = Sat | Smt | Qbf
+type language = Sat | Smt of string | Qbf
+type mode = Solve | SolveExt of string | Translate | Latex of string
 let sat_flag = ref false
 let qbf_flag = ref false
 let smt_flag = ref ""
@@ -73,7 +74,7 @@ let exit_with (exit_code:error) = exit (get_code exit_code)
    - non-zero positive integers -> transformed into a positive literal
    - zero will never be passed. *)
 let solve_ext lit_tbl lit_abs lit_sign lit_of_int (print_dimacs:out_channel -> unit) cmd =
-  let prog, opts = match cmd |> Re_str.split (Re_str.regexp " +") with
+  let prog, opts = match cmd |> Re_str.(split (regexp " +")) with
     | v::next -> v, Array.of_list next
     | _ -> failwith "error with --solver 'command'" in
   if !debug then Printf.eprintf "== cmd: '%s %s'\n" prog (opts |> Array.fold_left (fun acc v-> if acc = "" then v else v^" "^acc) "");
@@ -84,7 +85,7 @@ let solve_ext lit_tbl lit_abs lit_sign lit_of_int (print_dimacs:out_channel -> u
      something is not an integer. *)
   let ints_of_string s =
     try begin
-      s |> Re_str.split (Re_str.regexp " +") |> List.fold_left
+      s |> Re_str.(split (regexp " +")) |> List.fold_left
         (fun acc s -> match int_of_string s with
            | v when v!=0 -> lit_of_int v :: acc
            | _ -> acc (* in DIMACS, '0' are line endings; we skip '0' *)) []
@@ -129,15 +130,17 @@ let solve_ext lit_tbl lit_abs lit_sign lit_of_int (print_dimacs:out_channel -> u
                         (match !solver_ext with Some s -> s | None -> "???") c; exit_with SOLVER_UNKNOWN;
   | _ -> Printf.eprintf "Error with %s, received signal\n" (cmd)
 
-let main _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ = print_endline "ok"
+let main _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ = print_endline "ok"
 
 (* Use of Cmdliner has been inspired by:
    compiler/compileArg.ml in https://github.com/ocsigen/js_of_ocaml,
    bin/main.ml in https://github.com/janestreet/jbuilder. *)
 let input_t =
-  Arg.(value & pos 0 string "" & info [] ~docv:"INPUT" ~doc:
-    {|The input TouIST file. Use $(b,-) to read from the standard input
-    instead.|})
+  let input =
+    Arg.(value & pos 0 string "" & info [] ~docv:"INPUT" ~doc:
+      {|The input TouIST file. Use $(b,-) to read from the standard input
+      instead.|})
+  in Term.(const (function "-"->"/dev/stdin"|v->v) $ input)
 let output =
   Arg.(value & opt (some file) None & info ["o";"output"] ~docv:"OUTPUT" ~doc:
     {|Select the file $(docv) for printing results. With $(b,--sat), $(b,--smt)
@@ -153,22 +156,24 @@ let output_table =
         c <prop-name> <n>
     where $(b,<n>) is the positive non-zero integer associated with
     $(b,<prop-name>). |})
+
 let language =
-  Arg.(value & vflag Sat [
-    Smt, Arg.info ["smt"] ~doc:{|Select SMT TouIST language as input.|};
-    Qbf, Arg.info ["qbf"] ~doc:{|Select QBF TouIST language as input.|};
-    Sat, Arg.info ["sat"] ~doc:{|Select SAT TouIST language as input
-      (enabled by default when $(b,--smt) or $(b,--qbf) not selected)|}])
-let smt_logic =
-  Arg.(value & opt (some string) None ~vopt:(Some "QF_LIA") & info ["logic"] ~docv:"LOGIC" ~doc:
-    {|Select the $(docv) to be used in SMT mode. $(docv) must be a known
-    SMT2-LIB logic; note that the TouIST language can only express these four
-    logics:
-      * QF_IDL allows to deal with boolean and integer, E.g, x - y < b
-      * QF_RDL is the same as QF_IDL but with reals
-      * QF_LIA (not documented)
-      * QF_LRA (not documented)
-    See http://smtlib.cs.uiowa.edu/logics.shtml for more info.|})
+  let select_sat =
+    Arg.(value & flag & info ["sat"] ~doc:{|Propositional logic. It is the language
+      selected by default, you may omit $(b,--sat).|} ~docs:"LANGUAGES")
+  and select_qbf =
+    Arg.(value & flag & info ["qbf"] ~doc:{|Quantified boolean formulas (QBF).|} ~docs:"LANGUAGES")
+  and select_smt =
+    Arg.(value & opt (some string) None ~vopt:(Some "QF_LIA") & info ["smt"] ~docv:"LOGIC" ~docs:"LANGUAGES" ~doc:
+      {|Select the SAT Modulo Theory (SMT) input. By default, $(docv) is set to
+      `QF_LIA' (linear integers algebra).|})
+  and one_of sat smt qbf = match sat,smt,qbf with
+    | false,Some logic,false -> `Ok (Smt logic)
+    | false,None,true        -> `Ok Qbf
+    | _,None,false           -> `Ok Sat (* default *)
+    | _ -> `Error (true,"only one of {--sat,--smt,--qbf} is allowed")
+  in Term.(ret (const one_of $ select_sat $ select_smt $ select_qbf))
+
 let debug_flag =
   Arg.(value & flag & info ["debug"] ~doc:{|Print information for debugging
     touist. More specifically:
@@ -190,12 +195,8 @@ let show_flag =
     be useful to understand why your TouIST input seems to be wrongly
     interpreted by $(mname).|})
 let solve_flag =
-  Arg.(value & flag & info ["solve"] ~doc:{|Solve the problem and print the
-    first model if it exists. The solver is selected depending on the input
-    language chosen:
-    * with $(b,--sat), solve using MiniSat,
-    * with $(b,--smt), solve using Yices,
-    * with $(b,--qbf), solve using Quantor.|})
+  Arg.(value & flag & info ["solve"] ~docs:"SOLVING" ~doc:{|Solve the problem and print the
+    first model if it exists. The solver is selected depending on the input language.|})
 let limit =
   Arg.(value & opt int 1 & info ["limit"] ~docv:"N" ~doc:{|(with $(b,--solve)) Instead of
     one model, return $(docv) models if they exist. With $(i,0), return every
@@ -242,7 +243,7 @@ let solver_external =
     must expect DIMACS (QDIMACS) on standard input, print a DIMACS model on
     standard output and return 10 on SAT and 20 for UNSAT.|})
 let cmd =
-  let doc = "translate and solves SAT, QBF and SMT problems written in TouIST"
+  let doc = "translate and solves SAT, QBF and SMT problems written in TouIST."
   and usage1 = "$(mname) [$(b,--sat)|$(b,--qbf)|$(b,--smt)[=$(i,LOGIC)]] [$(i,OPTION)] $(i,INPUT)"
   and usage2 = "$(mname) [$(b,--sat)|$(b,--qbf)|$(b,--smt)[=$(i,LOGIC)]] [$(i,OPTION)] $(b,--solve) $(i,INPUT)"
   and usage3 = "$(mname) [$(b,--sat)|$(b,--qbf)|$(b,--smt)[=$(i,LOGIC)]] [$(i,OPTION)] $(b,--solver)=$(i,CMD) $(i,INPUT)"
@@ -262,38 +263,54 @@ let cmd =
     `P ("Embedded solvers available: "^"minisat"
           ^ if TouistSmtSolve.enabled then ", yices2" else ""
           ^ if TouistQbfSolve.enabled then ", qbf" else "");
-    `S "LANGUAGE";
+
+    `S "LANGUAGES";
     `P "$(mname) accepts three language variants:";
-    `I ("$(b,--sat)", "Propositional logic. It is the language
-            selected by default, you may omit $(b,--sat).");
-    `I ("$(b,--smt)[=$(i,LOGIC)]", "SAT Modulo Theory (SMT). By default,
-            $(i,LOGIC) is set to `QF_LIA' (linear integers algebra).");
-    `I ("$(b,--qbf)","Quantified boolean formulas (QBF).");
+
+    `P "$(i,LOGIC) can take the following values:";`Noblank;
+    `P "- `QF_IDL' allows to deal with boolean and integer, e.g, `x - y < b'"; `Noblank;
+    `P "- `QF_RDL' is the same as `QF_IDL' but with reals"; `Noblank;
+    `P "- `QF_LIA' (not documented)"; `Noblank;
+    `P "- `QF_LRA' (not documented)"; `Noblank;
+    `P "See http://smtlib.cs.uiowa.edu/logics.shtml for more info.";
+
     `S "MODES";
-    `P "$(mname) has multiple modes:";
-    `I (usage1,
+    `P "$(mname) has four modes depending on the flags $(b,--solve),
+        $(b,--solver) and $(b,--latex). Without these three flags, $(mname)
+        will default to the DIMACS translation.";
+    `I ("default",
         "translation to solver-compatible formats: DIMACS (with $(b,--sat)),
           QDIMACS (with $(b,--qbf)) and SMT-LIB (with $(b,--smt)[=$(i,LOGIC)]");
-    `I (usage2,
+    `I ("$(b,--solve)",
         "solving with $(b,--solve) using embedded solvers MiniSat
         (for $(b,--sat)), Quantor (for $(b,--qbf)) and Yices
         (for $(b,--smt)[=$(i,LOGIC)])");
-    `I (usage3,
+    `I ("$(b,--solver)",
         "solving using an external solver with $(b,--solver=)$(i,CMD)");
-    `I (usage4,
+    `I ("$(b,--latex)",
         "translation to LaTeX with $(b,--latex)[=$(i,MODE)]");
+    `S "SOLVING";
+    `P "With $(b,--solve), the internal solver used depends on the input language
+        chosen:";`Noblank;
+    `P "* with $(b,--sat), solve using MiniSat,";`Noblank;
+    `P "* with $(b,--smt), solve using Yices,";`Noblank;
+    `P "* with $(b,--qbf), solve using Quantor.";
     `S Manpage.s_bugs; `P "Report bugs to <mael.valais@gmail.com>.";
     `S Manpage.s_see_also; `P "" ]
   in
-  Term.(const main $ input_t $ output $ output_table $ language $ smt_logic
-                   $ debug_flag $ debug_syntax_flag $ debug_cnf_flag
-                   $ show_flag $ solve_flag $ limit $ count_flag $ latex_flag
-                   $ show_hidden_flag $ equiv_second_input
-                   $ linter_flag $ error_format $ wrap_width $ interactive_models
-                   $ debug_dimacs_flag $ solver_external),
+  Term.(const main $ input_t $ output $ output_table
+                   $ language
+                   $ debug_flag $ debug_syntax_flag $ debug_cnf_flag $ debug_dimacs_flag
+                   $ show_flag $ show_hidden_flag
+                   $ solve_flag $ limit $ count_flag $ interactive_models
+                   $ solver_external
+                   $ equiv_second_input
+                   $ latex_flag
+                   $ linter_flag
+                   $ error_format $ wrap_width),
   Term.(info "touist" ~version:("%%VERSION%%")
      ~doc ~man ~exits:(List.map (fun (doc,err) -> exit_info ~doc (get_code err)) [
-    "on success; with $(b,--solve) and $(b,--solver), also means SAT", OK;
+    "on success; with $(b,--solve) and $(b,--solver), means SAT", OK;
     "unknown error", UNKNOWN;
     "command-line usage error", CMD_USAGE;
     "command-line option is unsupported", CMD_UNSUPPORTED;
@@ -301,7 +318,7 @@ let cmd =
     "translation timeout", TOUIST_TIMEOUT;
     "translation memory overflow", TOUIST_MEMORY;
     "unknown $(tname) error", TOUIST_UNKNOWN;
-    "on UNSAT problem", SOLVER_UNSAT;
+    "on UNSAT problem (with $(b,--solve) and $(b,--solver))", SOLVER_UNSAT;
     "unknown solver error", SOLVER_UNKNOWN;
     "solver timeout", SOLVER_TIMEOUT;
     "solver returned memory overflow", SOLVER_MEMORY;
