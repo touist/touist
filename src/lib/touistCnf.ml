@@ -64,7 +64,7 @@ let print_debug (prefix:string) depth (formulas:Ast.t list) : unit =
    recursions. See (1) below *)
 type stop = No | Yes of int
 
-let rec ast_to_cnf ?debug:(d=false) (ast:Ast.t) : Ast.t =
+let rec ast_to_cnf ?debug_cnf:(d=false) (ast:Ast.t) : Ast.t =
   debug := d;
   to_cnf 0 No ast
 

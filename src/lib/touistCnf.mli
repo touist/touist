@@ -52,7 +52,7 @@
         And (Or a,(Cor (Not b),c)), (And (Or (Or (Not a),b),d), d)
     v}
 *)
-val ast_to_cnf : ?debug:bool -> TouistTypes.Ast.t -> TouistTypes.Ast.t
+val ast_to_cnf : ?debug_cnf:bool -> TouistTypes.Ast.t -> TouistTypes.Ast.t
 
 
 (** {2 Clauses transformation} *)
