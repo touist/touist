@@ -20,5 +20,5 @@ val solve : string -> Yices2.term -> Yices2.model option
 (** Tell if this logic string (e.g., QF_LIA) is supported by Yices2. *)
 val logic_supported : string -> bool
 
-(** Is this library enabled? (requires yices2 to be installed) *)
+(** Is this library enabled? (requires [yices2] to be installed) *)
 val enabled : bool
