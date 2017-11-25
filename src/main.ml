@@ -464,17 +464,16 @@ let solve_flags =
 let latex_section = "LATEX"
 let latex_flag =
   Arg.(value & opt (some (enum [("mathjax",Mathjax);("document",Document)])) None
-         ~vopt:(Some Mathjax) & info ["latex"] ~docs:latex_section ~doc:"\
-    Transform the TouIST input to LaTeX. The supported values
-    for $(docv) are `mathjax' and `document'.")
+         ~vopt:(Some Mathjax) & info ["latex"] ~docv:"TEX" ~docs:latex_section ~doc:"\
+    Transform the TouIST input to LaTeX.")
 
-let mode_section = "MODES"
+
 let linter_flag =
-  Arg.(value & flag & info ["linter"] ~docs:mode_section ~doc:"\
+  Arg.(value & flag & info ["linter"] ~doc:"\
     Display syntax and semantic errors and exit. With this option, we only
     do a minimal valuation so that it prints the errors as fast as
     possible.")
-
+let mode_section = "MODES"
 let translation_section = "TRANSLATE"
 let table =
   Arg.(value & opt (some output_conv) None & info ["table"]
@@ -543,7 +542,7 @@ let cmd =
   and usage1 = "$(mname) [$(b,--sat)|$(b,--qbf)|$(b,--smt)[=$(i,LOGIC)]] [$(i,OPTION)] $(i,INPUT)"
   and usage2 = "$(mname) [$(b,--sat)|$(b,--qbf)|$(b,--smt)[=$(i,LOGIC)]] [$(i,OPTION)] $(b,--solve) $(i,INPUT)"
   and usage3 = "$(mname) [$(b,--sat)|$(b,--qbf)|$(b,--smt)[=$(i,LOGIC)]] [$(i,OPTION)] $(b,--solver)=$(i,CMD) $(i,INPUT)"
-  and usage4 = "$(mname) [$(b,--sat)|$(b,--qbf)|$(b,--smt)[=$(i,LOGIC)]] [$(i,OPTION)] $(b,--latex)[=$(i,VAL)] $(i,INPUT)"
+  and usage4 = "$(mname) [$(b,--sat)|$(b,--qbf)|$(b,--smt)[=$(i,LOGIC)]] [$(i,OPTION)] $(b,--latex)[=$(i,TEX)] $(i,INPUT)"
   and usage5 = "$(mname) [$(b,--sat)|$(b,--qbf)|$(b,--smt)[=$(i,LOGIC)]] [$(i,OPTION)] $(b,--show)[=$(i,AST)] $(i,INPUT)"
   in
   let man = [
@@ -559,17 +558,21 @@ let cmd =
        QBF. Output formats for translation include DIMACS, QDIMACS and SMT-LIB.";
     `P "In some cases, e.g., $(b,--smt) or $(b,--latex) which can take an
         optional argument, you might want to use $(b,--) in order to
-        disambiguate.
-        See $(i,http://erratique.ch/software/cmdliner/doc/Cmdliner.html#optargs)";
+        disambiguate. Example:"; `Noblank;
+    `Pre "    $(mname) --smt test/smt/takuzu4x4.touist"; `Noblank;
+    `P "should be written"; `Noblank;
+    `Pre "    $(mname) --smt -- test/smt/takuzu4x4.touist";
     `P ("Embedded solvers compiled in $(mname): minisat"
         ^ (if Touist_yices2.SmtSolve.enabled then ", yices2" else "")
         ^ (if Touist_qbf.QbfSolve.enabled then ", qbf" else "")^".");
     `S Manpage.s_arguments;
     `S language_section;
-    `P "$(mname) accepts three language variants: $(b,--sat),  $(b,--qbf) and  $(b,--smt)[=$(i,LOGIC)].";
+    `P "$(mname) accepts three language variants: $(b,--sat),  $(b,--qbf) and 
+       $(b,--smt)[=$(i,LOGIC)]. To learn more on the associated TouIST grammars,
+       see $(i,https://www.irit.fr/touist/doc/reference-manual.html).";
 
     `P "By default, $(i,LOGIC) is `QF_LRA'. $(i,LOGIC) can one of:";`Noblank;
-    `P "- `QF_IDL' allows to deal with boolean and integer, e.g, `x - y < b'"; `Noblank;
+    `P "- `QF_IDL' allows you to deal with boolean and integer, e.g, `x - y < b'"; `Noblank;
     `P "- `QF_RDL' is the same as `QF_IDL' but with reals"; `Noblank;
     `P "- `QF_LIA' (not documented)"; `Noblank;
     `P "- `QF_LRA' (not documented)"; `Noblank;
@@ -583,7 +586,7 @@ let cmd =
     `P ("- by default, translate into DIMACS, QDIMACS or SMT-LIB (see $(b,"^translation_section^"));");`Noblank;
     `P ("- with $(b,--solve), solve using internal solver (see $(b,"^solve_section^"));");`Noblank;
     `P ("- with $(b,--solver), solve using external solver (see $(b,"^solve_section^"));");`Noblank;
-    `P ("- with $(b,--latex), produce LaTeX output (see $(b,"^latex_section^")).");`Noblank;
+    `P ("- with $(b,--latex), produce LaTeX output (see $(b,"^latex_section^"));");`Noblank;
     `P ("- with $(b,--show), dump the internal AST (see $(b,"^show_section^")).");
 
     `S translation_section;
@@ -607,7 +610,7 @@ let cmd =
     `P "- with $(b,--qbf), solve using Quantor.";
 
     `S latex_section;
-    `P "$(mname) can produce LaTeX from any TouIST file. $(i,MODE) allows you
+    `P "$(mname) can produce LaTeX from any TouIST file. $(i,TEX) allows you
         to select what kind of LaTeX you want:";
     `P "- `mathjax' for a equation-only LaTeX output compatible with Mathjax"; `Noblank;
     `P "- `document' for a complete LaTeX file (including `\\\\begin{document})
