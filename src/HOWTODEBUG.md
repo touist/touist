@@ -12,14 +12,14 @@ The build products are in `_build/default`.
     jbuilder install
     jbuilder uninstall
 
-For example, `touist` is in `_build/default/src/touist.exe`
+For example, `touist` is in `_build/default/src/main.exe`
 
 ## Running touist in development ##
 
-Either use `jbuild exec` or `_build/default/src/touist.exe`:
+Either use `jbuild exec` or `_build/default/src/main.exe`:
 
-    echo '$a' | _build/default/src/touist.exe - --sat
     echo '$a' | jbuilder exec touist -- - --sat
+    echo '$a' | _build/default/src/main.exe - --sat
 
 
 ## Edit how the build is made ##
@@ -30,16 +30,16 @@ The build is handled by jbuilder; see the jbuild in each lib/src dir.
 If you want to run ocamldebug, you must build touist as a .bc (bytecode)
 instead of .exe (native).
 
-To build one the bytecode version in `_build/default/src/touist.bc`:
+To build one the bytecode version in `_build/default/src/main.bc`:
 
-    jbuilder build src/touist.bc
+    jbuilder build src/main.bc
 
 Note: the option `-menhir "--trace"` -> will show what the automaton does.
 
 Now with the debugger. Note that I installed `rlwrap` to be able to use the
 arrows to go through the command history.
 
-    rlwrap ocamldebug _build/default/src/touist.bc --sat test/atleast.touistl
+    rlwrap ocamldebug _build/default/src/main.bc --sat test/atleast.touistl
 
 The commands I used:
 - `r` to run, `f` to finish and be able to re-run
@@ -151,7 +151,7 @@ Prototyping ocaml functions using toplevel
 Just launch utop. I wrote a .ocamlinit that should load everything fine.
 Just make sure touist has also been compiled in bytecode mode:
 
-    jbuilder build src/touist.bc
+    jbuilder build src/main.bc
 
 Unexpected exception: where does it come from?
 =============================================
