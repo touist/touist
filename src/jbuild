@@ -16,6 +16,15 @@
   (libraries (re re.str touist touist.qbf touist.yices2 unix cmdliner)))
 )
 
+(rule
+ ((targets (touist.1))
+  (action  (with-stdout-to ${@}
+            (run ${bin:touist} --help=groff)))))
+
 (install
  ((section bin)
   (files ((main.exe as touist)))))
+
+(install
+ ((section man)
+  (files (touist.1))))
