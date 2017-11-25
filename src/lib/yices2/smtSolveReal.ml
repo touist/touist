@@ -1,5 +1,5 @@
-open TouistTypes
-open TouistTypes.Ast
+open Touist.Types
+open Touist.Types.Ast
 open Yices2
 
 let ast_to_yices formula : term * (string,term) Hashtbl.t =
@@ -197,7 +197,7 @@ let ast_to_yices formula : term * (string,term) Hashtbl.t =
     | Implies (x, y) -> process_terms (Type.bool ()) x; process_terms (Type.bool ()) y(*; Implies (x, y)*)
     | Equiv   (x, y) -> process_terms (Type.bool ()) x; process_terms (Type.bool ()) y(*; Equiv (x, y)*)
     | Prop x -> add_term x (Term.new_uninterpreted (Type.bool ()))
-    | x -> failwith ("this cannot be transformed into SMT2: "^(TouistPprint.string_of_ast ~debug:true x))
+    | x -> failwith ("this cannot be transformed into SMT2: "^(Touist.Pprint.string_of_ast ~debug:true x))
   in
   let rec write (ast:Ast.t) : term = match ast with
     | Top          -> Term.Bool.true_ ()
@@ -224,7 +224,7 @@ let ast_to_yices formula : term * (string,term) Hashtbl.t =
     | Greater_than     (x,y)    -> Term.Arith.gt (write x) (write y)
     | Greater_or_equal (x,y)    -> Term.Arith.geq (write x) (write y)
     | Loc (x,_) -> write x
-    | x -> failwith ("error smt write: "^(TouistPprint.string_of_ast ~debug:true x))
+    | x -> failwith ("error smt write: "^(Touist.Pprint.string_of_ast ~debug:true x))
   in
   parse formula;
   (write formula), vtbl

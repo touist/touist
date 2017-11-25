@@ -11,24 +11,24 @@
   (public_name touist)
   (libraries (re re.str menhirLib minisat))
   (virtual_deps (menhir))
-  (wrapped false))
+  (wrapped true) #| All modules wil have the prefix 'Touist.' |#)
 )
 
 (rule
-    ((targets (touistParserMsgs.ml))
-     (deps    (parser.messages touistParser.mly))
+    ((targets (parserMsgs.ml))
+     (deps    (parser.messages parser.mly))
      (action  (with-stdout-to ${@}
-                (run ${bin:menhir} --compile-errors ${<} touistParser.mly)))
+                (run ${bin:menhir} --compile-errors ${<} parser.mly)))
      (fallback) #| fallback = do not rebuild if target already exists |#))
 
 
 #| For finding the errors that should be in parser.messages but are not
-   because touistParser.mly has been updated and some new errors appeared. |#
+   because parser.mly has been updated and some new errors appeared. |#
 (rule
     ((targets (parser.messages_fresh))
-     (deps    (touistParser.mly parser.messages))
+     (deps    (parser.mly parser.messages))
      (action  (with-stdout-to ${@}
-                (run ${bin:menhir} --list-errors ${<} touistParser.mly)))
+                (run ${bin:menhir} --list-errors ${<} parser.mly)))
      (fallback) #| fallback = do not rebuild if target already exists |#))
 (alias
     ((name     missing)
@@ -36,4 +36,4 @@
      (action  (run ${bin:menhir}
                      --compare-errors ${<}
                      --compare-errors parser.messages
-                     --list-errors touistParser.mly))))
+                     --list-errors parser.mly))))

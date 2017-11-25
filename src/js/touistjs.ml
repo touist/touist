@@ -35,8 +35,8 @@ type latex_ret =
 
 (* WARNING: because 'warnings' are outputed to stderr directly,
    we only get (for now) the latest error. *)
-let to_msg (msg: TouistErr.msg) : msg =
-  let open TouistErr in begin
+let to_msg (msg: Touist.Err.msg) : msg =
+  let open Touist.Err in begin
     let typ,_,msg,pos = msg in
     let l,c,s,e = (match pos with None -> 0,0,0,0 | Some l -> get_loc l)  in
     let loc = {line=l;col=c;start_abs=s;end_abs=e} in
@@ -47,17 +47,17 @@ let _ =
   Js.export_all (object%js
     method linter (txt:Js.js_string Js.t) : Js.js_string Js.t =
       let ret =
-      try let _ = TouistParse.parse_sat (Js.to_string txt) |> TouistEval.eval ~onlychecktypes:true in
+      try let _ = Touist.Parse.parse_sat (Js.to_string txt) |> Touist.Eval.eval ~onlychecktypes:true in
         Lint_Succ ({messages=[]})
-      with TouistErr.TouistFatal msgs ->
+      with Touist.Err.Touist.Fatal msgs ->
         Lint_Error ({messages=[to_msg msgs]})
       in linter_ret_to_yojson ret |> Yojson.Safe.to_string ~std:true |> Js.string
 
     method latex (txt:Js.js_string Js.t) : Js.js_string Js.t =
       let ret =
-      try let ast = TouistParse.parse_sat (Js.to_string txt) in let latex = TouistLatex.latex_of_ast ast in
+      try let ast = Touist.Parse.parse_sat (Js.to_string txt) in let latex = Touist.Latex.latex_of_ast ast in
         Latex_Succ (latex ~full:false, {messages=[]})
-      with TouistErr.TouistFatal msgs ->
+      with Touist.Err.Touist.Fatal msgs ->
         Latex_Error ({messages=[to_msg msgs]})
       in latex_ret_to_yojson ret |> Yojson.Safe.to_string ~std:true |> Js.string
   end)

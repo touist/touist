@@ -13,6 +13,6 @@
     (select touistQbfSolve.mli from
       (qbf.quantor  -> touistQbfSolveReal.mli)
       (!qbf.quantor -> touistQbfSolveDummy.mli))))
-  (wrapped false)
+  (wrapped true)
  )
 )
