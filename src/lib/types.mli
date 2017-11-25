@@ -15,7 +15,7 @@
        I tried this and now it works...
 *)
 
-open Touist.Err
+open Err
 
 module rec Ast :
 sig
@@ -83,7 +83,7 @@ sig
             abcd(1,foo,123,a)     <- an actual string that represents an actual
                                     logical proposition                      v}
     *)
-    | Loc              of t * Touist.Err.loc
+    | Loc              of t * Err.loc
     (** [Loc] is a clever (or ugly, you pick) way of keeping the locations in
         the text of the Ast.t elements.
         In parser.mly, each production rule gives its location in the original

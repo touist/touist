@@ -1,4 +1,4 @@
-(** Handles errors in {!Touist.Parse.parse} produced by the menhir in
+(** Handles errors in {!Parse.parse} produced by the menhir in
     incremental parser.
     [report] is the main function. *)
 
@@ -36,7 +36,7 @@
  * under the terms of the INRIA Non-Commercial License Agreement. *)
 
 open Lexing
-open Touist.Parser.MenhirInterpreter
+open Parser.MenhirInterpreter
 module S = MenhirLib.General (* Streams *)
 
 (* -------------------------------------------------------------------------- *)
@@ -280,7 +280,7 @@ let report text buffer checkpoint debug' : string =
   (* Choose an error message, based on the state number [s].
      Then, customize it, based on dynamic information. *)
   let message = try
-    Touist.ParserMsgs.message s |>
+    ParserMsgs.message s |>
     fragments text checkpoint
   with Not_found ->
     (* If the state number cannot be found -- which, in principle,

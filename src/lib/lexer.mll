@@ -31,8 +31,8 @@
 
 {
   open Lexing
-  open Touist.Parser
-  open Touist.Err
+  open Parser
+  open Err
 
   exception Error of string * loc
 
@@ -103,15 +103,15 @@ let double     = digit+ '.' digit+
 
 (* [token] is the function called by the parser for getting the next token.
    [token] returns a list of tokens instead of a single token, i.e., is of type
-       (Lexing.lexbuf -> Touist.Parser.token list)                       (1)
+       (Lexing.lexbuf -> Parser.token list)                       (1)
    - Why: because of the case (ident as i)'(', we need to return two tokens;
      for example, with 'not(', we must return NOT and LPAREN.
    - Consequence: the parser cannot accept [token] directly; it needs a function
-       (Lexing.lexbuf -> Touist.Parser.token)                            (2)
+       (Lexing.lexbuf -> Parser.token)                            (2)
      This forces us to write another function ('lexer' in touist.ml) that
      transforms the function (1) to correct function type (2).
 *)
-rule token = parse (* is a function (Lexing.lexbuf -> Touist.Parser.token list) *)
+rule token = parse (* is a function (Lexing.lexbuf -> Parser.token list) *)
   | eof               {[ EOF          ]}
   | empty+            {  token lexbuf  }
   | "["               {[ LBRACK       ]}

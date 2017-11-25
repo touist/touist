@@ -5,7 +5,7 @@ type during = Usage | Parse | Lex | Eval | Sat | Cnf | Prenex
 type loc = Lexing.position * Lexing.position
 type msg = msg_type * during * string * loc option
 
-exception Touist.Fatal of msg
+exception TouistFatal of msg
 
 (* Parameters that can be set globally *)
 let wrap_width = ref 76
@@ -124,6 +124,6 @@ let rec string_of_msg ?(width=(!wrap_width)) ?(color=(!color)) ?(fmt=(!format)) 
   replace (all_placeholders loc typ color text) fmt |> format_width color width |> color_all
 
 let warn msg = if !discard_warnings then () else Printf.fprintf stderr "%s" (string_of_msg msg)
-let fatal msg = raise @@ Touist.Fatal msg
+let fatal msg = raise @@ TouistFatal msg
 
-let _ = Printexc.register_printer (fun ex -> match ex with Touist.Fatal msg -> Some (string_of_msg msg) | _ -> None)
+let _ = Printexc.register_printer (fun ex -> match ex with TouistFatal msg -> Some (string_of_msg msg) | _ -> None)

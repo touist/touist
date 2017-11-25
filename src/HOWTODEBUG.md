@@ -59,10 +59,10 @@ list of hand-written error messages. The thing is that there are more than
 180 of these messages...
 
 So developers can improve the error syntax messages by editing
-`parser.messages` and then re-generating `touistParserMsgs.ml`.
+`parser.messages` and then re-generating `parserMsgs.ml`.
 
 
-## Re-building `touistParserMsgs.ml` using `parser.messages` ##
+## Re-building `parserMsgs.ml` using `parser.messages` ##
 
 Rebuilding this file is automatic.
 
@@ -77,19 +77,19 @@ Most of the time, the only command you want to use is the 3.
 
 1. To generate the `parser.messages` for the first time, use:
 
-        menhir touistParser.mly --list-errors > parser.messages
+        menhir parser.mly --list-errors > parser.messages
 
-2. To update the existing `parser.messages` whenever you modify the `touistParser.mly`:
+2. To update the existing `parser.messages` whenever you modify the `parser.mly`:
 
-        menhir touistParser.mly --update-errors parser.messages > tmp && mv tmp parser.messages
+        menhir parser.mly --update-errors parser.messages > tmp && mv tmp parser.messages
 
-3. To regenerate the final file `touistParserMsgs.ml` whenever you edit the error
+3. To regenerate the final file `parserMsgs.ml` whenever you edit the error
 messages in `parser.messages`:
 
-        menhir --compile-errors parser.messages touistParser.mly > touistParserMsgs.ml
+        menhir --compile-errors parser.messages parser.mly > parserMsgs.ml
 
 ## Missing error cases in parser.messages
-When updating touistParser.mly, you might sometimes create new error states
+When updating parser.mly, you might sometimes create new error states
 that do not appear in your already-written parser.messages.
 This often leads to the error message:
 ```
@@ -97,13 +97,13 @@ This often leads to the error message:
 This is an unknown syntax error (92).
 Please report this problem to the compiler vendor.
 ```
-meaning that the state 92 isn't in touistParserMsgs.ml, and thus not in
-parser.messages. To fix that, anytime you modify touistParser.mly, check that
+meaning that the state 92 isn't in parserMsgs.ml, and thus not in
+parser.messages. To fix that, anytime you modify parser.mly, check that
 no new errors have been intruduced:
 
 ```
-menhir --list-errors src/touistParser.mly > parser.messages_fresh
-menhir --compare-errors parser.messages_fresh --compare-errors src/lib/parser.messages--list-errors src/touistParser.mly
+menhir --list-errors src/parser.mly > parser.messages_fresh
+menhir --compare-errors parser.messages_fresh --compare-errors src/lib/parser.messages--list-errors src/parser.mly
 ```
 
 ## Testing your hand-written messages ##
@@ -138,7 +138,7 @@ The second way is to focus on tokens (the capital letters words like BEGIN)
 and to ask menhir to see if this sequence of tokens triggers an error:
 
 ```
-menhir --interpret-error touistParser.mly << eof
+menhir --interpret-error parser.mly << eof
 BEGIN FORMULA ATLEAST LPAREN VAR COMMA RPAREN
 eof
 ```
