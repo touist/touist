@@ -20,14 +20,14 @@
     @see <https://fr.wikipedia.org/wiki/Forme_prénexe> Transformation
          rules on Wikipedia (FR)
 *)
-val prenex : ?debug:bool -> Touist.Types.AstSet.elt -> Touist.Types.Ast.t
+val prenex : ?debug:bool -> Types.AstSet.elt -> Types.Ast.t
 
-(** [cnf ast] calls {!Touist.Cnf.ast_to_cnf} on the inner formula
+(** [cnf ast] calls {!Cnf.ast_to_cnf} on the inner formula
     (with no quantifiers) and existentially quantifies any Tseitlin
     variable in an innermost way.
 
     [ast] must be in Prenex Normal Form. *)
-val cnf : ?debug_cnf:bool -> Touist.Types.Ast.t -> Touist.Types.AstSet.elt
+val cnf : ?debug_cnf:bool -> Types.Ast.t -> Types.AstSet.elt
 
 (** {2 CNF to clauses} *)
 
@@ -43,7 +43,7 @@ type 'a quantlist = A of 'a list | E of 'a list
     - 3) [int_table] is the mapping table from litteral integers to names.
 *)
 val qbfclauses_of_cnf :
-  Touist.Types.Ast.t ->
+  Types.Ast.t ->
   int quantlist list * int list list * (int, string) Hashtbl.t
 
 
@@ -68,8 +68,8 @@ val print_qdimacs :
 (** {2 Utility functions} *)
 
 (** [is_unquant] checks that the given formula does not contain any quantors. *)
-val is_unquant : Touist.Types.AstSet.elt -> bool
-val is_prenex : Touist.Types.AstSet.elt -> bool
+val is_unquant : Types.AstSet.elt -> bool
+val is_prenex : Types.AstSet.elt -> bool
 
 (** [regroup_quantors] gathers all succeeding Forall and Exists to a list
     of list such that each sublist only contains one type of quantor.
@@ -80,5 +80,5 @@ val is_prenex : Touist.Types.AstSet.elt -> bool
     ]}
 *)
 val regroup_quantors :
-  Touist.Types.Ast.t ->
-  string quantlist list -> string quantlist list * Touist.Types.Ast.t
+  Types.Ast.t ->
+  string quantlist list -> string quantlist list * Types.Ast.t

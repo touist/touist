@@ -1,4 +1,4 @@
-(** Process an evaluated AST given by {!Touist.Eval.eval}
+(** Process an evaluated AST given by {!Eval.eval}
     to produce a CNF AST and output DIMACS
 
     [ast_to_cnf] is the main function.
@@ -23,7 +23,7 @@
         - [ a and b and not and not d    ]    is a conjunction
 
     }{- {b AST}:
-      abstract syntax tree; it is homogenous to Touist.Types.Ast.t
+      abstract syntax tree; it is homogenous to {!Types.Ast.t}
       and is a recursive tree representing a formula, using Or, And, Implies...
       Example: the formula (1) has the abstract syntax tree (2):
         - [ (a or b) and not c    ]                  (1) natural language
@@ -52,7 +52,7 @@
         And (Or a,(Cor (Not b),c)), (And (Or (Or (Not a),b),d), d)
     v}
 *)
-val ast_to_cnf : ?debug_cnf:bool -> Touist.Types.Ast.t -> Touist.Types.Ast.t
+val ast_to_cnf : ?debug_cnf:bool -> Types.Ast.t -> Types.Ast.t
 
 
 (** {2 Clauses transformation} *)
@@ -71,7 +71,7 @@ val ast_to_cnf : ?debug_cnf:bool -> Touist.Types.Ast.t -> Touist.Types.Ast.t
 val clauses_of_cnf :
   ('a -> 'a) ->
   (unit -> 'a) ->
-  Touist.Types.Ast.t ->
+  Types.Ast.t ->
   'a list list * ('a, string) Hashtbl.t * (string, 'a) Hashtbl.t
 
 (** {2 DIMACS output}

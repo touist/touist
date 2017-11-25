@@ -12,8 +12,8 @@
  * http://www.gnu.org/licenses/lgpl-2.1.html *)
 
 %{
-  open Touist.Types.Ast
-  open Touist.Err
+  open Types.Ast
+  open Err
 %}
 
 %token <int> INT
@@ -135,7 +135,7 @@
 *)
 
 (* The two entry points of our parser *)
-%start <Touist.Types.Ast.t> touist_simple, touist_smt, touist_qbf
+%start <Types.Ast.t> touist_simple, touist_smt, touist_qbf
 
 %% (* Everthing below that mark is expected to be a production rule *)
    (* Note that VAR { $0 } is equivalent to v=VAR { v } *)

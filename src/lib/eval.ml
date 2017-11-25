@@ -1,7 +1,7 @@
-open Touist.Types.Ast
-open Touist.Types
-open Touist.Pprint
-open Touist.Err
+open Types.Ast
+open Types
+open Pprint
+open Err
 
 
 (* Variables are stored in two data structures (global and local scopes). *)
