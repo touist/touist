@@ -20,7 +20,7 @@ let test_raise (parse:(string->unit)) (during:Touist.Err.during) typ nth_msg (lo
   try parse text;
     if typ == Touist.Err.Error then
       OUnit2.assert_failure ("this test didn't raise an error at location '"^loc_expected^"' as expected")
-  with Touist.Err.Touist.Fatal msg ->
+  with Touist.Err.TouistFatal msg ->
     match msg |> is_msg typ during loc_expected with
     | true -> () (* OK *)
     | false -> OUnit2.assert_failure ("this test didn't give a message at location '"^loc_expected^"' as expected. Instead, got:\n"^Touist.Err.string_of_msg msg)
@@ -33,20 +33,20 @@ let qbf text = let _ = Touist.Parse.parse_qbf text |> Touist.Eval.eval ~smt:true
    must accept the 'context' thing. *)
 let test_sat text _ =
   try sat text
-  with Touist.Err.Touist.Fatal msg -> OUnit2.assert_failure
-    ("this test shouldn't have raised a Touist.Fatal exception. Here is the exception:\n"^
+  with Touist.Err.TouistFatal msg -> OUnit2.assert_failure
+    ("this test shouldn't have raised a TouistFatal exception. Here is the exception:\n"^
       Touist.Err.string_of_msg msg)
 
 let test_smt ?(logic="QF_IDL") text _ =
   try (smt logic) text
-  with Touist.Err.Touist.Fatal msg -> OUnit2.assert_failure
-    ("this test shouldn't have raised a Touist.Fatal exception. Here is the exception:\n"^
+  with Touist.Err.TouistFatal msg -> OUnit2.assert_failure
+    ("this test shouldn't have raised a TouistFatal exception. Here is the exception:\n"^
       Touist.Err.string_of_msg msg)
 
 let test_qbf text _ =
   try qbf text
-  with Touist.Err.Touist.Fatal msg -> OUnit2.assert_failure
-    ("this test shouldn't have raised a Touist.Fatal exception. Here is the exception:\n"^
+  with Touist.Err.TouistFatal msg -> OUnit2.assert_failure
+    ("this test shouldn't have raised a TouistFatal exception. Here is the exception:\n"^
       Touist.Err.string_of_msg msg)
 
 let test_sat_raise ?(during=Touist.Err.Eval) ?(typ=Touist.Err.Error) ?(nth=0) loc text _ = test_raise sat during typ nth loc text
@@ -290,13 +290,13 @@ run_test_tt_main (
   "with --smt --solve">:::[
   "sat/sodoku.touist (using SMT QF_BV solver)">:: (fun ctx ->
         OUnit2.skip_if (Sys.os_type = "Win32") "won't work on windows (unix-only??)";
-        OUnit2.skip_if (not Touist.SmtSolve.enabled) "touist built without yices2";
+        OUnit2.skip_if (not Touist_yices2.SmtSolve.enabled) "touist built without yices2";
         OUnit2.assert_command ~use_stderr:false ~ctxt:ctx
         ~foutput:(check_solution "sat/sudoku_solution.txt")
         "jbuilder" ["exec";"--";"touist";"--solve";"--smt";"QF_BV";"sat/sudoku.touist"]);
   "smt/takuzu4x4.touist">:: (fun ctx ->
       OUnit2.skip_if (Sys.os_type = "Win32") "won't work on windows (unix-only??)";
-      OUnit2.skip_if (not Touist.SmtSolve.enabled) "touist built without yices2";
+      OUnit2.skip_if (not Touist_yices2.SmtSolve.enabled) "touist built without yices2";
       OUnit2.assert_command ~use_stderr:false ~ctxt:ctx
       ~foutput:(check_solution "smt/takuzu4x4_solution.txt")
       "jbuilder" ["exec";"--";"touist";"--solve";"--smt";"QF_IDL";"smt/takuzu4x4.touist"]);
@@ -304,13 +304,13 @@ run_test_tt_main (
   "with --qbf --solve">:::[
   "sat/sodoku.touist (using QBF solver)">:: (fun ctx ->
         OUnit2.skip_if (Sys.os_type = "Win32") "won't work on windows (unix-only??)";
-        OUnit2.skip_if (not Touist.QbfSolve.enabled) "touist built without qbf";
+        OUnit2.skip_if (not Touist_qbf.QbfSolve.enabled) "touist built without qbf";
         OUnit2.assert_command ~use_stderr:false ~ctxt:ctx
         ~foutput:(check_solution "sat/sudoku_solution.txt")
         "jbuilder" ["exec";"--";"touist";"--solve";"--qbf";"sat/sudoku.touist"]);
   "qbf/allumettes2.touist">:: (fun ctx ->
       OUnit2.skip_if (Sys.os_type = "Win32") "won't work on windows (unix-only??)";
-      OUnit2.skip_if (not Touist.QbfSolve.enabled) "touist built without qbf";
+      OUnit2.skip_if (not Touist_qbf.QbfSolve.enabled) "touist built without qbf";
       OUnit2.assert_command ~use_stderr:false ~ctxt:ctx
       ~foutput:(check_solution "qbf/allumettes2.solution")
       "jbuilder" ["exec";"--";"touist";"--solve";"--qbf";"qbf/allumettes2.touist"]);
