@@ -49,7 +49,10 @@ type latex_opt = {
   mode: latex_mode;
   linter: bool;
 }
-type show = Form | Cnf | Prenex
+type show =
+  | Form
+  | Cnf | CnfDuring (* print info during the expansion of the cnf *)
+  | Prenex | PrenexDuring
 type mode =
   | Solve of solve_opts
   | SolveExt of solve_ext_opt
@@ -134,7 +137,7 @@ let solve_ext common_opt show_hidden output lit_tbl lit_abs lit_sign lit_of_int 
 
 (* Step 1: we parse the args. If an arg. is "alone", we suppose
  * it is the touistl input file (this is handled by [process_arg_alone]) *)
-let main (input,input_f) (output,output_f: string * out_channel) (lang,mode) common_opt =
+let main (lang,mode) (input,input_f) (output,output_f: string * out_channel) common_opt =
   (* if common_opt.verbose then Printexc.record_backtrace true; *)
   Err.wrap_width := common_opt.wrap_width;
   Err.format := common_opt.error_format;
@@ -169,18 +172,39 @@ let main (input,input_f) (output,output_f: string * out_channel) (lang,mode) com
               \\end{document}\n" (Latex.latex_of_ast ~full:true ast_plain));
       | _, Translate {linter=true} ->
         (ast_plain input_text |> Eval.eval ~smt ~onlychecktypes:true |> ignore; exit_with OK)
-      | _,Show _ -> let ast = match lang with
+      | _, Show Form -> let ast = match lang with
           | Sat   -> Parse.parse_sat ~debug_syntax ~filename:input input_text |> Eval.eval ~smt
           | Smt _ -> Parse.parse_smt ~debug_syntax ~filename:input input_text |> Eval.eval ~smt
           | Qbf   -> Parse.parse_qbf ~debug_syntax ~filename:input input_text |> Eval.eval ~smt
-          (*
-          if common_opt.verbose_cnf then begin
-            Pprint.(Printf.fprintf stderr "formula: %s\nprenex: %s\ncnf: %s\n"
-                      (string_of_ast ~utf8:true ast) (string_of_ast ~utf8:true prenex)
-                      (string_of_ast ~utf8:true cnf))
-          end;
-          *)
         in (Printf.fprintf output_f "%s\n" (Pprint.string_of_ast ~utf8:true ast); exit_with OK)
+      | _, Show Cnf -> let ast = (match lang with
+          | Sat   -> Parse.parse_sat ~debug_syntax ~filename:input input_text |> Eval.eval ~smt |> Cnf.ast_to_cnf
+          | Qbf   -> Parse.parse_qbf ~debug_syntax ~filename:input input_text |> Eval.eval ~smt |> Qbf.cnf
+          | Smt _ -> failwith "no --show=form with --smt")
+        in (Printf.fprintf output_f "%s\n" (Pprint.string_of_ast ~utf8:true ast); exit_with OK)
+      | _, Show CnfDuring -> (match lang with
+          | Sat   -> Parse.parse_sat ~debug_syntax ~filename:input input_text |> Eval.eval ~smt |> Cnf.ast_to_cnf ~debug_cnf:true
+          | Qbf   -> Parse.parse_qbf ~debug_syntax ~filename:input input_text |> Eval.eval ~smt |> Qbf.cnf ~debug_cnf:true
+          | Smt _ -> failwith "no --show=duringcnf with --smt") |> ignore
+      | _, Show Prenex -> let ast = match lang with
+          | Sat   -> failwith "no --show=prenex with --smt"
+          | Qbf   -> Parse.parse_qbf ~debug_syntax ~filename:input input_text
+                     |> Eval.eval ~smt |> Qbf.cnf |>Qbf.prenex
+          | Smt _ -> failwith "no --show=prenex with --smt"
+        in (Printf.fprintf output_f "%s\n" (Pprint.string_of_ast ~utf8:true ast); exit_with OK)
+      | _, Show PrenexDuring -> let ast = match lang with
+          | Sat   -> failwith "no --show=duringprenex with --smt"
+          | Qbf   -> Parse.parse_qbf ~debug_syntax ~filename:input input_text
+                     |> Eval.eval ~smt |> Qbf.cnf |>Qbf.prenex ~debug:true
+          | Smt _ -> failwith "no --show=duringprenex with --smt"
+        in (Printf.fprintf output_f "%s\n" (Pprint.string_of_ast ~utf8:true ast); exit_with OK)
+        (*
+        if common_opt.verbose_cnf then begin
+          Pprint.(Printf.fprintf stderr "formula: %s\nprenex: %s\ncnf: %s\n"
+                    (string_of_ast ~utf8:true ast) (string_of_ast ~utf8:true prenex)
+                    (string_of_ast ~utf8:true cnf))
+        end;
+        *)
       (* A. solve has been asked *)
       | Sat, Solve {equiv=Some (input2,input2_f)} ->
         let solve inputchan =
@@ -368,7 +392,7 @@ let language =
     let smt_logic_conv =
       (fun logic ->
          if Re.(execp (compile (str "QF_")) logic) then `Ok logic
-         else `Error ("LOGIC '"^logic^"' should begin with 'QF_'")),
+         else `Error ("logic name '"^logic^"' should begin with 'QF_'")),
       (fun fmt logic -> Format.fprintf fmt "%s" logic) in
     Arg.(value & opt (some smt_logic_conv) None ~vopt:(Some "QF_LIA") & info ["smt"]
            ~docv:"LOGIC" ~docs ~doc:"\
@@ -465,8 +489,10 @@ let debug_dimacs_flag =
 
 let show_section = "SHOW"
 let show_flag =
-  Arg.(value & opt (some (enum ["form",Form;"cnf",Cnf;"prenex",Prenex])) None
-         ~vopt:(Some Form) & info ["show"] ~docs:show_section ~doc:"\
+  Arg.(value & opt (some (enum [
+      "form",Form;"cnf",Cnf;"prenex",Prenex;
+      "duringcnf",CnfDuring;"duringprenex",PrenexDuring
+    ])) None ~vopt:(Some Form) & info ["show"] ~docs:show_section ~doc:"\
     Show a step of the evaluation of the TouIST input. By default,
     show the expanded formula (`form').")
 
@@ -480,11 +506,10 @@ let lang_and_mode =
     | Smt _ ,_     ,_     ,Some _ -> `Error (false, "--show does not support --smt")
     | Smt _ ,_     ,_     ,_ when is_some table -> `Error (false, "--table has no meaning with --smt")
     | _     ,None  ,None  ,None   -> `Ok (lang, Translate {linter; table; debug_dimacs})
-    | _     ,_     ,_     ,_ when debug_dimacs -> `Error (false,"--debug_dimacs only available in translation mode (see help)")
-    | Qbf   ,_     ,_     ,Some _ -> `Error (false, "--qbf and --show are not compatible for now")
+    | _     ,_     ,_     ,_ when debug_dimacs -> `Error (false,"--debug-dimacs only available in translation mode (see help)")
     | _     ,_     ,_     ,Some m -> `Ok (lang, Show m)
     | Smt _ ,Some (SolveExt _),_,_  -> `Error (false,"--solver only supports --sat and --qbf")
-    | _     ,Some _,_     ,_ when linter -> `Error (false,"cannot use {--solve or --solver} and --linter at the same time")
+    | _     ,Some _,_     ,_ when linter -> `Error (false,"cannot use {--solve,--solver} and --linter at the same time")
     | Smt _ ,Some (Solve _),_,_ when not Touist_yices2.SmtSolve.enabled -> `Error (false,"not compiled with yices2 support: --solver cannot be used with --smt")
     | Qbf   ,Some (Solve _),_,_ when not Touist_qbf.QbfSolve.enabled -> `Error (false,"not compiled with qbf support: --solver cannot be used with --qbf.")
     | _     ,Some s, _     , _      -> `Ok (lang, s) (* lint not useful for --solve/--solver *)
@@ -598,7 +623,7 @@ let cmd =
   ]
   in
   Term.(
-    ret (const main $ input $ output $ lang_and_mode $ common_opt),
+    ret (const main $ lang_and_mode $ input $ output $ common_opt),
     info "touist" ~version:("%%VERSION%%")
       ~doc ~man ~exits:(code_msgs |> List.map (fun (doc,err) -> exit_info ~doc (get_code err))))
 
