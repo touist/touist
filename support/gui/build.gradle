@@ -30,8 +30,8 @@ repositories{
 }
 
 task prepareExternal(type: Copy) {
-    from ("../../_build/default/src/touist.exe") {
-        rename 'touist.exe','touist'
+    from ("../../_build/default/src/main.exe") {
+        rename 'main.exe','touist'
     }
     from ('external') {
         include 'minisat.jar'
