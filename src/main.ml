@@ -569,6 +569,7 @@ let cmd =
           "on success (or SAT with $(b,--solve) and $(b,--solver)).", OK;
           "on UNSAT (with $(b,--solve) and $(b,--solver)).", UNSAT;
           "on TouIST syntax error or translation error.", TRANSL_ERROR;
+          "on solver error (with $(b,--solve) and $(b,--solver)).", SOLVER_ERROR;
           "on command line parsing errors.", CLI_ERROR;
           "on unexpected internal errors (bugs).", BUG;
         ]))
