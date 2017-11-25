@@ -1,6 +1,6 @@
 
-open TouistTypes
-open TouistTypes.Ast
+open Touist.Types
+open Touist.Types.Ast
 
 let add_suffix name =
   let open Re_str in
@@ -24,17 +24,17 @@ let add_suffix name =
 let rec to_prenex debug quant_l conflict_l only_rename ast : Ast.t =
   let string_of_prop prop = match prop with
     | Prop name -> name
-    | e -> failwith ("[shouldnt happen] a quantor must be a proposition, not a '"^TouistPprint.string_of_ast_type e^"' in " ^ TouistPprint.string_of_ast e)
+    | e -> failwith ("[shouldnt happen] a quantor must be a proposition, not a '"^Touist.Pprint.string_of_ast_type e^"' in " ^ Touist.Pprint.string_of_ast e)
   in
   (* [to_prenew_new] is just going to add a newly quantified variable to the
      list. But if the newly quantified variable is already in quant_l, then
      an error is raised. *)
   let to_prenex_new prop ast_inner =
     if List.exists (fun y -> y=(string_of_prop prop)) quant_l
-    then TouistErr.fatal (TouistErr.Error,TouistErr.Prenex,
-      "the prop '"^TouistPprint.string_of_ast prop^"' has been quantified twice. \
-      For all the quantifiers quantifying on '"^TouistPprint.string_of_ast prop^"' \
-      in the following code, you should rename their variables:\n    "^TouistPprint.string_of_ast ast^"\n",None)
+    then Touist.Err.fatal (Touist.Err.Error,Touist.Err.Prenex,
+      "the prop '"^Touist.Pprint.string_of_ast prop^"' has been quantified twice. \
+      For all the quantifiers quantifying on '"^Touist.Pprint.string_of_ast prop^"' \
+      in the following code, you should rename their variables:\n    "^Touist.Pprint.string_of_ast ast^"\n",None)
     else ast_inner |> to_prenex debug ((string_of_prop prop)::quant_l) conflict_l only_rename in
   (* [to_prenex_rn] will recursively launch a prenex where all propositions that
      have the same name as 'prop' will be renamed by adding a suffix
@@ -46,7 +46,7 @@ let rec to_prenex debug quant_l conflict_l only_rename ast : Ast.t =
   let to_prenex ast = ast |> to_prenex debug quant_l conflict_l only_rename in
   if debug then Printf.printf "to_prenex_in  (%s): %s\n"
     (if only_rename then "traversing  " else "transforming")
-    (TouistPprint.string_of_ast ~utf8:true ast);
+    (Touist.Pprint.string_of_ast ~utf8:true ast);
 
   (** To transform into prenex, I want to traverse recursively the AST so that
      in every traversal of each branch, only ONE transformation can happen.
@@ -84,7 +84,7 @@ let rec to_prenex debug quant_l conflict_l only_rename ast : Ast.t =
      twice. *)
   | Equiv (x,y) -> to_prenex (And (Implies (x,y),Implies (y,x)))
   | Prop x -> if List.exists (fun y -> y=x) conflict_l then Prop (add_suffix x) else Prop x
-  | e -> failwith ("[shouldnt happen] a qbf formula shouldn't contain '"^TouistPprint.string_of_ast_type e^"' in " ^ TouistPprint.string_of_ast ~debug:true e)
+  | e -> failwith ("[shouldnt happen] a qbf formula shouldn't contain '"^Touist.Pprint.string_of_ast_type e^"' in " ^ Touist.Pprint.string_of_ast ~debug:true e)
   in
   let process = function
   | Forall (x,f) -> Forall (to_prenex x, to_prenex_new x f)
@@ -95,7 +95,7 @@ let rec to_prenex debug quant_l conflict_l only_rename ast : Ast.t =
   let new_ast = process ast in
   if debug then Printf.printf "to_prenex_out (%s): %s\n"
     (if only_rename then "traversing  " else "transforming")
-    (TouistPprint.string_of_ast ~utf8:true ast);
+    (Touist.Pprint.string_of_ast ~utf8:true ast);
   new_ast
 
 let rec is_unquant = function
@@ -107,7 +107,7 @@ let rec is_unquant = function
   | Xor     (x,y)          -> is_unquant x && is_unquant y
   | Implies (x,y)          -> is_unquant x && is_unquant y
   | Equiv   (x,y)          -> is_unquant x && is_unquant y
-  | e -> failwith ("[shouldnt happen] a qbf formula shouldn't contain '"^TouistPprint.string_of_ast_type e^"' in " ^ TouistPprint.string_of_ast ~debug:true e)
+  | e -> failwith ("[shouldnt happen] a qbf formula shouldn't contain '"^Touist.Pprint.string_of_ast_type e^"' in " ^ Touist.Pprint.string_of_ast ~debug:true e)
 let rec is_prenex = function
   | Exists (_,f) | Forall (_,f) -> is_prenex f
   | f -> is_unquant f
@@ -127,7 +127,7 @@ let rec quantify_free_variables env ast =
     | Implies (x,y) -> search_free env x @ search_free env y
     | Equiv   (x,y) -> search_free env x @ search_free env y
     | e -> failwith ("quantify_free_variables(): a qbf formula shouldn't \
-      contain '"^TouistPprint.string_of_ast_type e^"' in " ^ TouistPprint.string_of_ast ~debug:true e) in
+      contain '"^Touist.Pprint.string_of_ast_type e^"' in " ^ Touist.Pprint.string_of_ast ~debug:true e) in
   let rec remove_dups = function
     | [] -> []
     | h::t -> h::(remove_dups (List.filter (fun x -> x<>h) t))
@@ -139,10 +139,10 @@ let rec quantify_free_variables env ast =
 
 let prenex ?(debug=false) ast : Ast.t =
   let rec to_prenex_loop ast =
-    if debug then Printf.printf "step: %s\n" (TouistPprint.string_of_ast ~utf8:true ast);
+    if debug then Printf.printf "step: %s\n" (Touist.Pprint.string_of_ast ~utf8:true ast);
     if is_prenex ast then ast else ast |> to_prenex debug [] [] false |> to_prenex_loop
   in let intermediate = to_prenex_loop ast in
-   if debug then Printf.printf "before bounding free vars: %s\n" (TouistPprint.string_of_ast ~utf8:true intermediate);
+   if debug then Printf.printf "before bounding free vars: %s\n" (Touist.Pprint.string_of_ast ~utf8:true intermediate);
   let final = intermediate |> quantify_free_variables [] in
   final
 
@@ -150,7 +150,7 @@ let cnf ?(debug_cnf=false) ast =
   let rec process = function
   | Forall (x,f) -> Forall (x, process f)
   | Exists (x,f) -> Exists (x, process f)
-  | inner -> TouistCnf.ast_to_cnf ~debug_cnf inner
+  | inner -> Touist.Cnf.ast_to_cnf ~debug_cnf inner
   in ast |> process |> quantify_free_variables []
 
   type 'a quantlist = A of 'a list | E of 'a list
@@ -181,7 +181,7 @@ let qbfclauses_of_cnf ast =
   let quants, inner = regroup_quantors ast [] in
   let num_lit = ref 1 in
   let fresh_lit () = let lit = !num_lit in incr num_lit; lit in
-  let clauses_int,int_to_str,str_to_int = TouistCnf.clauses_of_cnf (fun v -> -v) fresh_lit inner in
+  let clauses_int,int_to_str,str_to_int = Touist.Cnf.clauses_of_cnf (fun v -> -v) fresh_lit inner in
   let quantlist_int = quants |> List.fold_left (fun acc lst ->
     let res = match lst with
     | A l -> A (List.fold_right (fun p acc -> Hashtbl.find str_to_int p :: acc) l [])
@@ -199,7 +199,7 @@ let print_qdimacs ?(debug_dimacs=false) (quantlist_int,clauses_int,int_to_str) ?
      1) if out = out_table, append 'c' (dimacs comments)
      2) if out != out_table, print it as-is into out_table *)
   let _ = match out_table with
-  | Some out_tbl -> int_to_str |> TouistCnf.print_table (fun x->x) out_tbl
+  | Some out_tbl -> int_to_str |> Touist.Cnf.print_table (fun x->x) out_tbl
     ~prefix:(if out = out_tbl then "c " else "");
   | None -> ()
   in
@@ -213,4 +213,4 @@ let print_qdimacs ?(debug_dimacs=false) (quantlist_int,clauses_int,int_to_str) ?
       | E l -> fprintf out "e%s 0\n" (l |> fold_left (fun acc s -> acc^" "^ print_lit s) "")
     );
   (* Display the clauses in dimacs way *)
-  clauses_int |> TouistCnf.print_clauses out print_lit
+  clauses_int |> Touist.Cnf.print_clauses out print_lit

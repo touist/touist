@@ -13,17 +13,17 @@
 *)
 val string_of_ast :
   ?utf8:bool ->
-  ?show_var:(TouistTypes.AstSet.elt -> string) ->
-  ?debug:bool -> ?parenthesis:bool -> TouistTypes.AstSet.elt -> string
+  ?show_var:(Touist.Types.AstSet.elt -> string) ->
+  ?debug:bool -> ?parenthesis:bool -> Touist.Types.AstSet.elt -> string
 
 (** [string_of_ast_list sep ast_list] does the same as {!string_of_ast} except
     that it prints a list of ast separated by the string [sep]. *)
 val string_of_ast_list :
   ?utf8:bool ->
-  ?show_var:(TouistTypes.AstSet.elt -> string) ->
+  ?show_var:(Touist.Types.AstSet.elt -> string) ->
   ?debug:bool ->
-  ?parenthesis:bool -> string -> TouistTypes.AstSet.elt list -> string
+  ?parenthesis:bool -> string -> Touist.Types.AstSet.elt list -> string
 
 (** [string_of_ast_type] gives the type of an AST. *)
-val string_of_ast_type : ?debug:bool -> TouistTypes.Ast.t -> string
+val string_of_ast_type : ?debug:bool -> Touist.Types.Ast.t -> string
 

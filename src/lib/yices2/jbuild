@@ -13,6 +13,6 @@
     (select touistSmtSolve.mli from
       (yices2  -> touistSmtSolveReal.mli)
       (!yices2 -> touistSmtSolveDummy.mli))))
-  (wrapped false)
+  (wrapped true)
  )
 )

@@ -6,7 +6,7 @@
 # OCaml
 
 parser.mli
-touistParserMsgs.ml
+parserMsgs.ml
 *.annot
 *.cmo
 *.cma
@@ -69,8 +69,6 @@ support/gui/touist-*
 
 
 support/gui/resources/version.properties
-
-src/touistVersion.ml
 
 support/gui/dist.zip
 

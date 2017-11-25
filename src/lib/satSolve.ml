@@ -1,12 +1,12 @@
-open TouistTypes.Ast
-open TouistPprint
+open Touist.Types.Ast
+open Touist.Pprint
 open Minisat
 
 let minisat_clauses_of_cnf ast =
   let num_lit = ref 1 in
   let fresh_lit () = let lit = !num_lit in (incr num_lit; Minisat.Lit.make lit)
   in
-  let clauses,lit_to_str,_ = TouistCnf.clauses_of_cnf Minisat.Lit.neg fresh_lit ast
+  let clauses,lit_to_str,_ = Touist.Cnf.clauses_of_cnf Minisat.Lit.neg fresh_lit ast
   in clauses,lit_to_str
 
 
@@ -123,7 +123,7 @@ let solve_clauses
       || not (Minisat.Raw.solve solver [||])
       then models
       else
-        let model = get_model solver table TouistCnf.is_dummy (* is_dummy removes &1 lits *)
+        let model = get_model solver table Touist.Cnf.is_dummy (* is_dummy removes &1 lits *)
         and has_next_model = counter_current_model solver table in
         let is_duplicate = Hashtbl.mem models_hash model in
         match is_duplicate,has_next_model with
@@ -142,7 +142,7 @@ let print_dimacs ?(debug_dimacs=false) (clauses,tbl) ?(out_table) (out:out_chann
   (match out_table with
   | None -> ()
   | Some out_table -> (* Display the mapping table. *)
-    tbl |> TouistCnf.print_table (Minisat.Lit.to_int) out_table
+    tbl |> Touist.Cnf.print_table (Minisat.Lit.to_int) out_table
       ~prefix:(if out = out_table then "c " else ""));
   (* Display the dimacs' preamble line. *)
   Printf.fprintf out "p cnf %d %d\n" (Hashtbl.length tbl) (List.length clauses);
@@ -151,4 +151,4 @@ let print_dimacs ?(debug_dimacs=false) (clauses,tbl) ?(out_table) (out:out_chann
       (if Minisat.Lit.sign l then "" else "-") ^ (Minisat.Lit.abs l |> Hashtbl.find tbl)
     else Minisat.Lit.to_string l
   in
-  clauses |> TouistCnf.print_clauses out print_lit;
+  clauses |> Touist.Cnf.print_clauses out print_lit;

@@ -15,7 +15,7 @@
        I tried this and now it works...
 *)
 
-open TouistErr
+open Touist.Err
 
 module rec Ast :
 sig
@@ -83,10 +83,10 @@ sig
             abcd(1,foo,123,a)     <- an actual string that represents an actual
                                     logical proposition                      v}
     *)
-    | Loc              of t * TouistErr.loc
+    | Loc              of t * Touist.Err.loc
     (** [Loc] is a clever (or ugly, you pick) way of keeping the locations in
         the text of the Ast.t elements.
-        In touistParser.mly, each production rule gives its location in the original
+        In parser.mly, each production rule gives its location in the original
         text; for example, instead of simply returning
         [Inter (x,y)] the parser will return
         [Loc (Inter (x,y), ($startpos,$endpos))].

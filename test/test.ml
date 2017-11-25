@@ -1,14 +1,14 @@
 open OUnit2;;
 
 (* We redirect every warnings to /dev/null *)
-TouistErr.discard_warnings := true;;
+Touist.Err.discard_warnings := true;;
 
 (* To check that the error has occured curreclty, we only check
    that the place where the error was found is the right one.  *)
 
 let is_msg typ during loc_str msg =
   match msg with
-  | t,d,_,Some l when String.compare (TouistErr.string_of_loc l) loc_str = 0
+  | t,d,_,Some l when String.compare (Touist.Err.string_of_loc l) loc_str = 0
         && t == typ
         && d == during -> true
   | t,d,_,None when loc_str = ""
@@ -16,49 +16,49 @@ let is_msg typ during loc_str msg =
         && d == during -> true
   | _ -> false
 
-let test_raise (parse:(string->unit)) (during:TouistErr.during) typ nth_msg (loc_expected:string) text =
+let test_raise (parse:(string->unit)) (during:Touist.Err.during) typ nth_msg (loc_expected:string) text =
   try parse text;
-    if typ == TouistErr.Error then
+    if typ == Touist.Err.Error then
       OUnit2.assert_failure ("this test didn't raise an error at location '"^loc_expected^"' as expected")
-  with TouistErr.TouistFatal msg ->
+  with Touist.Err.Touist.Fatal msg ->
     match msg |> is_msg typ during loc_expected with
     | true -> () (* OK *)
-    | false -> OUnit2.assert_failure ("this test didn't give a message at location '"^loc_expected^"' as expected. Instead, got:\n"^TouistErr.string_of_msg msg)
+    | false -> OUnit2.assert_failure ("this test didn't give a message at location '"^loc_expected^"' as expected. Instead, got:\n"^Touist.Err.string_of_msg msg)
 
-let sat text = let _ = TouistParse.parse_sat text |> TouistEval.eval |> TouistCnf.ast_to_cnf |> TouistSatSolve.minisat_clauses_of_cnf in ()
-let smt logic text = let _ = TouistParse.parse_smt text |> TouistEval.eval ~smt:true |> TouistSmt.to_smt2 logic in ()
-let qbf text = let _ = TouistParse.parse_qbf text |> TouistEval.eval ~smt:true |> TouistQbf.prenex in ()
+let sat text = let _ = Touist.Parse.parse_sat text |> Touist.Eval.eval |> Touist.Cnf.ast_to_cnf |> Touist.SatSolve.minisat_clauses_of_cnf in ()
+let smt logic text = let _ = Touist.Parse.parse_smt text |> Touist.Eval.eval ~smt:true |> Touist.Smt.to_smt2 logic in ()
+let qbf text = let _ = Touist.Parse.parse_qbf text |> Touist.Eval.eval ~smt:true |> Touist.Qbf.prenex in ()
 
 (* The ending _ is necessary because the testing function
    must accept the 'context' thing. *)
 let test_sat text _ =
   try sat text
-  with TouistErr.TouistFatal msg -> OUnit2.assert_failure
-    ("this test shouldn't have raised a TouistFatal exception. Here is the exception:\n"^
-      TouistErr.string_of_msg msg)
+  with Touist.Err.Touist.Fatal msg -> OUnit2.assert_failure
+    ("this test shouldn't have raised a Touist.Fatal exception. Here is the exception:\n"^
+      Touist.Err.string_of_msg msg)
 
 let test_smt ?(logic="QF_IDL") text _ =
   try (smt logic) text
-  with TouistErr.TouistFatal msg -> OUnit2.assert_failure
-    ("this test shouldn't have raised a TouistFatal exception. Here is the exception:\n"^
-      TouistErr.string_of_msg msg)
+  with Touist.Err.Touist.Fatal msg -> OUnit2.assert_failure
+    ("this test shouldn't have raised a Touist.Fatal exception. Here is the exception:\n"^
+      Touist.Err.string_of_msg msg)
 
 let test_qbf text _ =
   try qbf text
-  with TouistErr.TouistFatal msg -> OUnit2.assert_failure
-    ("this test shouldn't have raised a TouistFatal exception. Here is the exception:\n"^
-      TouistErr.string_of_msg msg)
+  with Touist.Err.Touist.Fatal msg -> OUnit2.assert_failure
+    ("this test shouldn't have raised a Touist.Fatal exception. Here is the exception:\n"^
+      Touist.Err.string_of_msg msg)
 
-let test_sat_raise ?(during=TouistErr.Eval) ?(typ=TouistErr.Error) ?(nth=0) loc text _ = test_raise sat during typ nth loc text
-let test_smt_raise ?(during=TouistErr.Eval) ?(typ=TouistErr.Error) ?(nth=0) ?(logic="QF_IDL") loc text _ = test_raise (smt logic) during typ nth loc text
-let test_qbf_raise ?(during=TouistErr.Eval) ?(typ=TouistErr.Error) ?(nth=0) ?(logic="QF_IDL") loc text _ = test_raise qbf during typ nth loc text
+let test_sat_raise ?(during=Touist.Err.Eval) ?(typ=Touist.Err.Error) ?(nth=0) loc text _ = test_raise sat during typ nth loc text
+let test_smt_raise ?(during=Touist.Err.Eval) ?(typ=Touist.Err.Error) ?(nth=0) ?(logic="QF_IDL") loc text _ = test_raise (smt logic) during typ nth loc text
+let test_qbf_raise ?(during=Touist.Err.Eval) ?(typ=Touist.Err.Error) ?(nth=0) ?(logic="QF_IDL") loc text _ = test_raise qbf during typ nth loc text
 
 let sat_models_are text expected _ =
   OUnit2.assert_equal ~printer:(fun s -> s)
     expected
-    (let ast = TouistParse.parse_sat text |> TouistEval.eval in let cl,tbl = TouistCnf.ast_to_cnf ast |> TouistSatSolve.minisat_clauses_of_cnf in
+    (let ast = Touist.Parse.parse_sat text |> Touist.Eval.eval in let cl,tbl = Touist.Cnf.ast_to_cnf ast |> Touist.SatSolve.minisat_clauses_of_cnf in
       let models_str = ref [] in
-        let _ = TouistSatSolve.solve_clauses ~print:(fun m _ -> models_str := (TouistSatSolve.Model.pprint ~sep:" " tbl m)::!models_str) (cl,tbl)
+        let _ = Touist.SatSolve.solve_clauses ~print:(fun m _ -> models_str := (Touist.SatSolve.Model.pprint ~sep:" " tbl m)::!models_str) (cl,tbl)
           in List.fold_left (fun acc s -> match acc with "" -> s | _ -> s^" | "^acc) "" !models_str)
 
           (* !models_str
@@ -71,11 +71,11 @@ let sat_models_are text expected _ =
    text. *)
 let sat_expands_to text expected _ =
   OUnit2.assert_equal ~printer:(fun s -> s)
-    expected (let ast = TouistParse.parse_sat text |> TouistEval.eval in TouistPprint.string_of_ast ast)
+    expected (let ast = Touist.Parse.parse_sat text |> Touist.Eval.eval in Touist.Pprint.string_of_ast ast)
 
 let qbf_expands_to text expected _ =
   OUnit2.assert_equal ~printer:(fun s -> s)
-    expected (let ast = TouistParse.parse_qbf text |> TouistEval.eval |> TouistQbf.prenex in TouistPprint.string_of_ast ast)
+    expected (let ast = Touist.Parse.parse_qbf text |> Touist.Eval.eval |> Touist.Qbf.prenex in Touist.Pprint.string_of_ast ast)
 
 (*  A standard test in oUnit should first define a function
         let test1 context : unit = OUnit2.assert_bool true
@@ -84,7 +84,7 @@ let qbf_expands_to text expected _ =
     but instead, I chose to put these functions directly inside the
     list.
     Example of test checking that the exception is raised:
-      fun c -> OUnit2.assert_raises (TouistEval.Error
+      fun c -> OUnit2.assert_raises (Touist.Eval.Error
       ("incorrect types with '<', which expects a float or int.\n"
        "The content of the variable '$i' has type 'int':\n"
        "    1\n"
@@ -216,7 +216,7 @@ run_test_tt_main (
   "powerset simple test">::(sat_expands_to "f(powerset([a,b]))" "f([[],[a],[a,b],[b]])")
 ];
 
-"samples of code that should raise errors in {!TouistEval.eval}">:::[ (* 'c' is the testing context *)
+"samples of code that should raise errors in {!Touist.Eval.eval}">:::[ (* 'c' is the testing context *)
   "undefined var">::         (test_sat_raise "1:4" "   $a");
   "bigand: too many vars">::(test_sat_raise "1:8" "bigand $i,$j in [1]: p end");
   "bigand: too many sets">::(test_sat_raise "1:8" "bigand $i in [1],[2]: p end");
@@ -247,7 +247,7 @@ run_test_tt_main (
   "">::(test_smt "a == 3");
   "">::(test_smt "a != 3");
   "for now, one of the two terms must be a float or int">::(test_smt "(a+1) > 3");
-  "takuzu4x4.touist">:: (test_smt (TouistParse.string_of_file "smt/takuzu4x4.touist"))
+  "takuzu4x4.touist">:: (test_smt (Touist.Parse.string_of_file "smt/takuzu4x4.touist"))
 ];
 
 "QBF testing">:::[
@@ -257,7 +257,7 @@ run_test_tt_main (
     "">::(test_qbf "exists a,b: a and b");
     "">::(test_qbf "forall a,b: a and b");
     "">::(test_qbf "forall a: exists b: a and b");
-    "allumettes2.touist">:: (test_qbf (TouistParse.string_of_file "qbf/allumettes2.touist"));
+    "allumettes2.touist">:: (test_qbf (Touist.Parse.string_of_file "qbf/allumettes2.touist"));
   ];
   "samples that shouldn't be correct with --qbf">:::[
     "quantified var must be a prop">::(test_qbf_raise "1:13" "$x=1 exists $x: x");
@@ -267,7 +267,7 @@ run_test_tt_main (
   ];
   "prenex tests">:::[ (* 'c' is the testing context *)
     "prenex renaming pbm: cannot rename inner 'a', is it bounded to the outer \
-    exists or the inner exists?">::(test_qbf_raise ~during:TouistErr.Prenex "" "exists a: (a and exists a: a)");
+    exists or the inner exists?">::(test_qbf_raise ~during:Touist.Err.Prenex "" "exists a: (a and exists a: a)");
     "prenex renaming 2">::(qbf_expands_to "(exists a: a) and (exists a: a)" "exists a: exists a_1: (a and a_1)");
     "prenex renaming 2">::(qbf_expands_to "(exists a: a) and (a and exists a: a)" "exists a: exists a_1: exists a_2: (a and (a_2 and a_1))");
   ];
@@ -290,13 +290,13 @@ run_test_tt_main (
   "with --smt --solve">:::[
   "sat/sodoku.touist (using SMT QF_BV solver)">:: (fun ctx ->
         OUnit2.skip_if (Sys.os_type = "Win32") "won't work on windows (unix-only??)";
-        OUnit2.skip_if (not TouistSmtSolve.enabled) "touist built without yices2";
+        OUnit2.skip_if (not Touist.SmtSolve.enabled) "touist built without yices2";
         OUnit2.assert_command ~use_stderr:false ~ctxt:ctx
         ~foutput:(check_solution "sat/sudoku_solution.txt")
         "jbuilder" ["exec";"--";"touist";"--solve";"--smt";"QF_BV";"sat/sudoku.touist"]);
   "smt/takuzu4x4.touist">:: (fun ctx ->
       OUnit2.skip_if (Sys.os_type = "Win32") "won't work on windows (unix-only??)";
-      OUnit2.skip_if (not TouistSmtSolve.enabled) "touist built without yices2";
+      OUnit2.skip_if (not Touist.SmtSolve.enabled) "touist built without yices2";
       OUnit2.assert_command ~use_stderr:false ~ctxt:ctx
       ~foutput:(check_solution "smt/takuzu4x4_solution.txt")
       "jbuilder" ["exec";"--";"touist";"--solve";"--smt";"QF_IDL";"smt/takuzu4x4.touist"]);
@@ -304,13 +304,13 @@ run_test_tt_main (
   "with --qbf --solve">:::[
   "sat/sodoku.touist (using QBF solver)">:: (fun ctx ->
         OUnit2.skip_if (Sys.os_type = "Win32") "won't work on windows (unix-only??)";
-        OUnit2.skip_if (not TouistQbfSolve.enabled) "touist built without qbf";
+        OUnit2.skip_if (not Touist.QbfSolve.enabled) "touist built without qbf";
         OUnit2.assert_command ~use_stderr:false ~ctxt:ctx
         ~foutput:(check_solution "sat/sudoku_solution.txt")
         "jbuilder" ["exec";"--";"touist";"--solve";"--qbf";"sat/sudoku.touist"]);
   "qbf/allumettes2.touist">:: (fun ctx ->
       OUnit2.skip_if (Sys.os_type = "Win32") "won't work on windows (unix-only??)";
-      OUnit2.skip_if (not TouistQbfSolve.enabled) "touist built without qbf";
+      OUnit2.skip_if (not Touist.QbfSolve.enabled) "touist built without qbf";
       OUnit2.assert_command ~use_stderr:false ~ctxt:ctx
       ~foutput:(check_solution "qbf/allumettes2.solution")
       "jbuilder" ["exec";"--";"touist";"--solve";"--qbf";"qbf/allumettes2.touist"]);
