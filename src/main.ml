@@ -9,17 +9,28 @@ type error =
   | BUG
 
 let get_code (e : error) : int = match e with
-  | OK (* also means SAT *) -> 0
+  | OK (* SAT *)    -> 0
   | UNSAT           -> 8
   | TRANSL_ERROR    -> 50
   | SOLVER_ERROR    -> 100
   | CLI_ERROR       -> 124
   | BUG             -> 125
 
-type language =
+let code_msgs = [
+  "on success (or SAT with $(b,--solve) and $(b,--solver)).", OK;
+  "on UNSAT (with $(b,--solve) and $(b,--solver)).", UNSAT;
+  "on TouIST syntax error or translation error.", TRANSL_ERROR;
+  "on solver error (with $(b,--solve) and $(b,--solver)).", SOLVER_ERROR;
+  "on command line parsing errors.", CLI_ERROR;
+  "on unexpected internal errors (bugs).", BUG;
+]
+
+type lang =
   | Sat
   | Qbf
   | Smt of string
+let string_of_lang =
+  function Sat->"--sat" | Qbf->"--qbf" | Smt l->("--smt="^l)
 
 type solve_opts ={
   count: bool;
@@ -33,7 +44,6 @@ type solve_ext_opt = {
   hidden: bool; (* show hidden lits on model display *)
 }
 type transl_opt = { linter: bool; table: (string * out_channel) option }
-type transl_smt_opt = { linter: bool }
 type latex_mode = Mathjax | Document
 type latex_opt = {
   mode: latex_mode;
@@ -43,7 +53,6 @@ type mode =
   | Solve of solve_opts
   | SolveExt of solve_ext_opt
   | Translate of transl_opt
-  | TranslateSmt of transl_smt_opt
   | Latex of latex_opt
   | Show
 type common_opt = {
@@ -128,7 +137,7 @@ let solve_ext common_opt show_hidden output lit_tbl lit_abs lit_sign lit_of_int 
 
 (* Step 1: we parse the args. If an arg. is "alone", we suppose
  * it is the touistl input file (this is handled by [process_arg_alone]) *)
-let main (input,input_f) (output,output_f : string*out_channel) (lang,mode) common_opt =
+let main (input,input_f) (output,output_f: string * out_channel) (lang,mode) common_opt =
   (* if common_opt.debug then Printexc.record_backtrace true; *)
   Err.wrap_width := common_opt.wrap_width;
   Err.format := common_opt.error_format;
@@ -228,12 +237,14 @@ let main (input,input_f) (output,output_f : string*out_channel) (lang,mode) comm
          | 1 -> (* case where we already printed models in [solve_clause] *)
            exit_with OK
          | i -> (* case where we already printed models in [solve_clause] *)
-           Printf.fprintf output_f "==== found %d models, limit is %d (--limit N for more models)\n" i limit; exit_with OK)
-      | Sat, Translate {linter=false; table=Some (table,table_f)} -> (* B. solve not asked: print the Sat file *)
+           Printf.fprintf output_f
+             "==== found %d models, limit is %d (--limit N for more models)\n"
+             i limit; exit_with OK)
+      | Sat, Translate {linter=false;table} -> (* B. solve not asked: print the Sat file *)
         let ast = Parse.parse_sat ~debug_syntax ~filename:input input_text |> Eval.eval in
         let clauses,tbl = Cnf.ast_to_cnf ~debug_cnf ast |> SatSolve.minisat_clauses_of_cnf
         in SatSolve.print_dimacs ~debug_dimacs (clauses,tbl)
-          ~out_table:table_f output_f;
+          ~out_table:(match table with Some (_,f) -> f | None -> output_f) output_f;
         exit_with OK
       | Sat, SolveExt {cmd; hidden} ->
         let ast = Parse.parse_sat ~debug_syntax ~filename:input input_text |> Eval.eval in
@@ -255,35 +266,37 @@ let main (input,input_f) (output,output_f : string*out_channel) (lang,mode) comm
         (match Touist_yices2.SmtSolve.solve logic yices_form with
          | None -> Printf.fprintf stderr "unsat\n"; exit_with UNSAT |> ignore
          | Some m -> Printf.fprintf output_f "%s\n" (Touist_yices2.SmtSolve.string_of_model tbl m); exit_with OK |> ignore);
-      | Qbf, mode -> begin
+      | Qbf, (SolveExt _ | Translate _ | Solve _) -> begin
           let ast = Parse.parse_qbf ~debug_syntax ~filename:input input_text
                     |> Eval.eval ~smt in
           let prenex = Qbf.prenex ast in
           let cnf = Qbf.cnf prenex in
           if common_opt.debug_cnf then begin
             Pprint.(Printf.fprintf stderr "formula: %s\nprenex: %s\ncnf: %s\n"
-                      (string_of_ast ~utf8:true ast)
-                      (Pprint.string_of_ast ~utf8:true prenex)
-                      (Pprint.string_of_ast ~utf8:true cnf))
+                      (string_of_ast ~utf8:true ast) (string_of_ast ~utf8:true prenex)
+                      (string_of_ast ~utf8:true cnf))
           end;
           begin match mode with
             | SolveExt {cmd; hidden} -> (* --qbf + --solver CMD: use external solver *)
               let quants,int_clauses,int_tbl = Qbf.qbfclauses_of_cnf cnf
               in cmd |> solve_ext common_opt hidden output_f int_tbl (abs) (fun v -> v>0) (fun v -> v)
                    (Qbf.print_qdimacs (quants,int_clauses,int_tbl))
-            | Translate {table=Some (table,table_f)} -> (* --qbf: we print QDIMACS *)
+            | Translate {table} -> (* --qbf: we print QDIMACS *)
               let quants,int_clauses,int_tbl = Qbf.qbfclauses_of_cnf cnf in
               (Qbf.print_qdimacs ~debug_dimacs
-                 (quants,int_clauses,int_tbl) ~out_table:table_f output_f)
+                 (quants,int_clauses,int_tbl)
+                 ~out_table:(match table with Some (_,f)->f | None->output_f) output_f)
             | Solve {hidden} -> (* --qbf + --solve: we solve using Quantor *)
               let qcnf,table = Touist_qbf.QbfSolve.qcnf_of_cnf cnf in
               (match Touist_qbf.QbfSolve.solve ~hidden (qcnf,table) with
                | Some str -> Printf.fprintf output_f "%s\n" str
                | None -> (Printf.fprintf stderr "unsat\n"; exit_with UNSAT |> ignore))
-            | _ -> failwith "only --solver, --solve and default translation with --qbf"
+            | Show -> failwith "(bug) --show does not work with --qbf"
+            | Latex _ -> failwith "(bug) at this point, --qbf + --latex should not happen"
           end
         end
-      | lang,mode -> (failwith "" |> ignore)
+      | Smt _, SolveExt _ -> failwith "--solver not compatible with --smt"
+      (* | lang,mode -> (failwith "cannot handle this set of options" |> ignore) *)
     end;
 
     (* I had to comment these close_out and close_in because it would
@@ -332,11 +345,11 @@ let input =
       | None -> `Error (false,"you must give an input file (use - for reading from stdin)")
   in Term.(ret (const check_input $ input_arg))
 
-let output_conv = (function
-    | path when Sys.file_exists path ->
-      (try `Ok (path,open_out path)
-       with Sys_error err -> `Error ("cannot open '"^path^"': "^err))
-    | path -> `Error ("file not found: "^path)), (fun fmt (v,_) -> Format.fprintf fmt "%s" v)
+let output_conv =
+  (fun path ->
+     try `Ok (path,open_out path)
+     with Sys_error err -> `Error ("cannot open '"^path^"': "^err)),
+  (fun fmt (v,_) -> Format.fprintf fmt "%s" v)
 
 let output =
   Arg.(value & opt output_conv ("/dev/stdout",stdout) & info ["o";"output"] ~docv:"OUTPUT" ~doc:"\
@@ -434,8 +447,8 @@ let linter_flag =
 
 let translation_section = "TRANSLATE"
 let table =
-  Arg.(value & opt (some output_conv) None & info ["table"] ~docs:translation_section
-         ~docv:"TABLE" ~doc:"\
+  Arg.(value & opt (some output_conv) None & info ["table"]
+         ~docs:translation_section ~docv:"TABLE" ~doc:"\
     Select the file $(docv) for printing the mapping table. Only
     useful for $(b,--sat) and $(b,--qbf).")
 
@@ -489,7 +502,8 @@ let common_opt =
       DIMACS/QDIMACS")
   in let common_opt error_format wrap_width debug debug_syntax debug_cnf show debug_dimacs =
        {error_format; wrap_width; debug; debug_syntax; debug_cnf; show; debug_dimacs}
-  in Term.(const common_opt $ error_format $ wrap_width $ debug_flag $ debug_syntax_flag $ debug_cnf_flag $ show_flag $ debug_dimacs_flag)
+  in Term.(const common_opt $ error_format $ wrap_width $ debug_flag
+           $ debug_syntax_flag $ debug_cnf_flag $ show_flag $ debug_dimacs_flag)
 
 let cmd =
   let doc = "translate and solves SAT, QBF and SMT problems written in TouIST."
@@ -565,13 +579,6 @@ let cmd =
   Term.(
     const main $ input $ output $ lang_and_mode $ common_opt,
     info "touist" ~version:("%%VERSION%%")
-      ~doc ~man ~exits:(List.map (fun (doc,err) -> exit_info ~doc (get_code err)) [
-          "on success (or SAT with $(b,--solve) and $(b,--solver)).", OK;
-          "on UNSAT (with $(b,--solve) and $(b,--solver)).", UNSAT;
-          "on TouIST syntax error or translation error.", TRANSL_ERROR;
-          "on solver error (with $(b,--solve) and $(b,--solver)).", SOLVER_ERROR;
-          "on command line parsing errors.", CLI_ERROR;
-          "on unexpected internal errors (bugs).", BUG;
-        ]))
+      ~doc ~man ~exits:(code_msgs |> List.map (fun (doc,err) -> exit_info ~doc (get_code err))))
 
 let () = Term.exit @@ Term.eval cmd
