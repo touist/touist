@@ -2,7 +2,7 @@
     it with Yices2. *)
 
 val ast_to_yices :
-  TouistTypes.AstSet.elt -> _ * (string, _) Hashtbl.t
+  Touist.Types.AstSet.elt -> _ * (string, _) Hashtbl.t
 
 (** Turn a model into a string. *)
 val string_of_model :

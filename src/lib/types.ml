@@ -2,7 +2,7 @@
     Abstract Syntaxic Tree
 *)
 
-open TouistErr
+open Touist.Err
 
 (*  Do you think this file is wierd, with this 'module rec' thing?
     This is because we want the type 'Ast.t' to be used in 'Set' and
@@ -81,10 +81,10 @@ module rec Ast : sig
           abcd(1,foo,123,a)     <- an actual string that represents an actual
                                   logical proposition                      v}
     *)
-    | Loc              of t * TouistErr.loc
+    | Loc              of t * Touist.Err.loc
     (** [Loc] is a clever (or ugly, you pick) way of keeping the locations in
         the text of the Ast.t elements.
-        In touistParser.mly, each production rule gives its location in the original
+        In parser.mly, each production rule gives its location in the original
         text; for example, instead of simply returning
         [Inter (x,y)] the parser will return
         [Loc (Inter (x,y), ($startpos,$endpos))].

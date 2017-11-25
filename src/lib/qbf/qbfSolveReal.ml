@@ -1,8 +1,8 @@
 open Qbf
 open Qbf.Formula
 open Qbf.QFormula
-open TouistTypes
-open TouistTypes.Ast
+open Touist.Types
+open Touist.Types.Ast
 
 let rec ocamlqbf_of_ast (ast:Ast.t) : Qbf.QFormula.t * (Qbf.Lit.t,string) Hashtbl.t =
   let str_to_lit = Hashtbl.create 500 in
@@ -15,8 +15,8 @@ let rec ocamlqbf_of_ast (ast:Ast.t) : Qbf.QFormula.t * (Qbf.Lit.t,string) Hashtb
     lit
   in
   let rec of_quant_ast (ast:Ast.t) : QFormula.t = match ast with
-    | Exists (Prop name, f) -> exists [add_lit name] (if TouistQbf.is_unquant f then prop (of_ast f) else of_quant_ast f)
-    | Forall (Prop name, f) -> forall [add_lit name] (if TouistQbf.is_unquant f then prop (of_ast f) else of_quant_ast f)
+    | Exists (Prop name, f) -> exists [add_lit name] (if Touist.Qbf.is_unquant f then prop (of_ast f) else of_quant_ast f)
+    | Forall (Prop name, f) -> forall [add_lit name] (if Touist.Qbf.is_unquant f then prop (of_ast f) else of_quant_ast f)
     | unquant -> prop (of_ast unquant)
   and of_ast = function
     | Prop x        -> atom (add_lit x)
@@ -28,7 +28,7 @@ let rec ocamlqbf_of_ast (ast:Ast.t) : Qbf.QFormula.t * (Qbf.Lit.t,string) Hashtb
     | Xor     (f,g) -> xor_l [of_ast f; of_ast g]
     | Implies (f,g) -> imply (of_ast f) (of_ast g)
     | Equiv   (f,g) -> equiv_l [of_ast f; of_ast g]
-    | wrong -> failwith ("[shouldnt happen] when applying 'of_ast', formula still had quantors: "^TouistPprint.string_of_ast ~debug:true wrong)
+    | wrong -> failwith ("[shouldnt happen] when applying 'of_ast', formula still had quantors: "^Touist.Pprint.string_of_ast ~debug:true wrong)
   in let ocamlqbf = of_quant_ast ast
   in (simplify ocamlqbf,lit_to_str)
 

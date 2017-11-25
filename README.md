@@ -137,12 +137,12 @@ The API reference is [here][api]. For example, you can do:
 
 ```ocaml
 let clauses,mapping =
-    TouistParse.parse_sat "a and b and c"
-    |> TouistEval.eval
-    |> TouistCnf.ast_to_cnf
-    |> TouistSatSolve.minisat_clauses_of_cnf
-in TouistSatSolve.solve_clauses (clauses,mapping)
-    ~print:(fun m _ -> TouistSatSolve.Model.pprint mapping m |> print_endline);
+    Touist.Parse.parse_sat "a and b and c"
+    |> Touist.Eval.eval
+    |> Touist.Cnf.ast_to_cnf
+    |> Touist.SatSolve.minisat_clauses_of_cnf
+in Touist.SatSolve.solve_clauses (clauses,mapping)
+    ~print:(fun m _ -> Touist.SatSolve.Model.pprint mapping m |> print_endline);
 ```
 
 To compile it, do

@@ -1,5 +1,5 @@
-open TouistParse
-open TouistErr
+open Touist.Parse
+open Touist.Err
 open Cmdliner
 type error =
   | OK
@@ -106,7 +106,7 @@ let solve_ext common_opt show_hidden output lit_tbl lit_abs lit_sign lit_of_int 
   in
   if common_opt.debug then Printf.eprintf "== stdout from '%s':\n" cmd;
   let valuated_lits = process proc_stdout in
-  if common_opt.debug then Printf.eprintf "== stderr from '%s':\n%s" cmd (TouistParse.string_of_chan proc_stderr);
+  if common_opt.debug then Printf.eprintf "== stderr from '%s':\n%s" cmd (Touist.Parse.string_of_chan proc_stderr);
   match Unix.close_process_full (proc_stdout, proc_stdin, proc_stderr) with
   | Unix.WEXITED 10 when List.length valuated_lits > 0 ->
     (lit_tbl |> Hashtbl.iter (fun lit lit_name ->
@@ -138,14 +138,14 @@ let solve_ext common_opt show_hidden output lit_tbl lit_abs lit_sign lit_of_int 
  * it is the touistl input file (this is handled by [process_arg_alone]) *)
 let main (input,input_f) (output,output_f : string*out_channel) (lang,mode) common_opt =
   (* if common_opt.debug then Printexc.record_backtrace true; *)
-  TouistErr.wrap_width := common_opt.wrap_width;
-  TouistErr.format := common_opt.error_format;
-  TouistErr.color := (Unix.isatty Unix.stderr);
+  Touist.Err.wrap_width := common_opt.wrap_width;
+  Touist.Err.format := common_opt.error_format;
+  Touist.Err.color := (Unix.isatty Unix.stderr);
   try
     let input_f = if input="/dev/stdin" then stdin else open_in input in
 
     (* SMT Mode: check if one of the available QF_? has been given after --smt *)
-    if (match lang with Smt l -> TouistSmtSolve.enabled && not (TouistSmtSolve.logic_supported l) | _->false)
+    if (match lang with Smt l -> Touist.SmtSolve.enabled && not (Touist.SmtSolve.logic_supported l) | _->false)
     then Printf.eprintf "you must give a correct SMT-LIB logic after --smt. Example: --smt=QF_IDL";
     let input_text = string_of_chan input_f in
     let smt = match lang with Smt _ -> true | _-> false in
@@ -155,16 +155,16 @@ let main (input,input_f) (output,output_f : string*out_channel) (lang,mode) comm
 
     let ast_plain text =
       match lang with
-      | Sat -> TouistParse.parse_sat ~debug_syntax ~filename:input text
-      | Smt _ -> TouistParse.parse_smt ~debug_syntax ~filename:input text
-      | Qbf -> TouistParse.parse_qbf ~debug_syntax ~filename:input text
+      | Sat -> Touist.Parse.parse_sat ~debug_syntax ~filename:input text
+      | Smt _ -> Touist.Parse.parse_smt ~debug_syntax ~filename:input text
+      | Qbf -> Touist.Parse.parse_qbf ~debug_syntax ~filename:input text
     in begin
       (* latex = parse and transform with latex_of_ast *)
       (* linter = only show syntax and semantic errors *)
       match lang,mode with
       | _, Latex {mode;linter} -> let ast_plain = ast_plain input_text in
-        (if linter then ast_plain |> TouistEval.eval ~smt ~onlychecktypes:true |>ignore);
-        (if mode=Mathjax then Printf.fprintf output_f "%s\n" (TouistLatex.latex_of_ast ~full:false ast_plain));
+        (if linter then ast_plain |> Touist.Eval.eval ~smt ~onlychecktypes:true |>ignore);
+        (if mode=Mathjax then Printf.fprintf output_f "%s\n" (Touist.Latex.latex_of_ast ~full:false ast_plain));
         (if mode=Document then Printf.fprintf output_f
              "\\documentclass[fleqn]{article}\n\
               \\usepackage{mathtools}\n\
@@ -173,37 +173,37 @@ let main (input,input_f) (output,output_f : string*out_channel) (lang,mode) comm
               \\begin{multline*}\n\
               %s\n\
               \\end{multline*}\n\
-              \\end{document}\n" (TouistLatex.latex_of_ast ~full:true ast_plain));
+              \\end{document}\n" (Touist.Latex.latex_of_ast ~full:true ast_plain));
       | _, Translate {linter=true} ->
-        (ast_plain input_text |> TouistEval.eval ~smt ~onlychecktypes:true |> ignore; exit_with OK)
+        (ast_plain input_text |> Touist.Eval.eval ~smt ~onlychecktypes:true |> ignore; exit_with OK)
       | _,Show -> let ast = match lang with
-          | Sat   -> TouistParse.parse_sat ~debug_syntax ~filename:input input_text |> TouistEval.eval ~smt
-          | Smt _ -> TouistParse.parse_smt ~debug_syntax ~filename:input input_text |> TouistEval.eval ~smt
-          | Qbf   -> TouistParse.parse_qbf ~debug_syntax ~filename:input input_text |> TouistEval.eval ~smt
-        in (Printf.fprintf output_f "%s\n" (TouistPprint.string_of_ast ~utf8:true ast); exit_with OK)
+          | Sat   -> Touist.Parse.parse_sat ~debug_syntax ~filename:input input_text |> Touist.Eval.eval ~smt
+          | Smt _ -> Touist.Parse.parse_smt ~debug_syntax ~filename:input input_text |> Touist.Eval.eval ~smt
+          | Qbf   -> Touist.Parse.parse_qbf ~debug_syntax ~filename:input input_text |> Touist.Eval.eval ~smt
+        in (Printf.fprintf output_f "%s\n" (Touist.Pprint.string_of_ast ~utf8:true ast); exit_with OK)
       (* A. solve has been asked *)
       | Sat, Solve {equiv=Some (input2,input2_f)} ->
         let solve inputchan =
-          let ast = TouistParse.parse_sat ~debug_syntax ~filename:input (string_of_chan inputchan) |> TouistEval.eval in
-          let models = TouistCnf.ast_to_cnf ~debug_cnf ast |> TouistSatSolve.minisat_clauses_of_cnf |> TouistSatSolve.solve_clauses ~verbose:common_opt.debug
+          let ast = Touist.Parse.parse_sat ~debug_syntax ~filename:input (string_of_chan inputchan) |> Touist.Eval.eval in
+          let models = Touist.Cnf.ast_to_cnf ~debug_cnf ast |> Touist.SatSolve.minisat_clauses_of_cnf |> Touist.SatSolve.solve_clauses ~verbose:common_opt.debug
           in models
         in
         let models = solve input_f and models2 = solve input2_f in
-        (match TouistSatSolve.ModelSet.equal !models !models2 with
+        (match Touist.SatSolve.ModelSet.equal !models !models2 with
          | true -> Printf.fprintf output_f "Equivalent\n"; exit_with OK
          | false -> Printf.fprintf output_f "Not equivalent\n"; exit_with SOLVER_UNSAT)
       | Sat, Solve {equiv=None; limit; count; interactive} ->
-        let ast = TouistParse.parse_sat ~debug_syntax ~filename:input input_text |> TouistEval.eval in
-        let clauses,table = TouistCnf.ast_to_cnf ~debug_cnf ast |> TouistSatSolve.minisat_clauses_of_cnf
+        let ast = Touist.Parse.parse_sat ~debug_syntax ~filename:input input_text |> Touist.Eval.eval in
+        let clauses,table = Touist.Cnf.ast_to_cnf ~debug_cnf ast |> Touist.SatSolve.minisat_clauses_of_cnf
         in
         let models =
           begin
-            if count then TouistSatSolve.solve_clauses ~verbose:common_opt.debug (clauses,table)
+            if count then Touist.SatSolve.solve_clauses ~verbose:common_opt.debug (clauses,table)
             else
               let print_model model i =
                 if limit != 1
-                then Printf.fprintf output_f "==== model %d\n%s\n" i (TouistSatSolve.Model.pprint ~sep:"\n" table model)
-                else Printf.fprintf output_f "%s\n" (TouistSatSolve.Model.pprint ~sep:"\n" table model)
+                then Printf.fprintf output_f "==== model %d\n%s\n" i (Touist.SatSolve.Model.pprint ~sep:"\n" table model)
+                else Printf.fprintf output_f "%s\n" (Touist.SatSolve.Model.pprint ~sep:"\n" table model)
               (* Notes:
                  1) print_endline vs. printf: print_endline is a printf with
                  'flush stdout' at the end. If we don't put 'flush', the user
@@ -224,12 +224,12 @@ let main (input,input_f) (output,output_f : string*out_channel) (lang,mode) comm
                  reaches [limit]. *)
               and continue_limit _ i = i < limit
               in
-              TouistSatSolve.solve_clauses ~verbose:common_opt.debug ~print:print_model
+              Touist.SatSolve.solve_clauses ~verbose:common_opt.debug ~print:print_model
                 ~continue:(if interactive then continue_asking else continue_limit)
                 (clauses,table)
           end
         in
-        (match TouistSatSolve.ModelSet.cardinal !models with
+        (match Touist.SatSolve.ModelSet.cardinal !models with
          | i when count -> Printf.fprintf output_f "%d\n" i; exit_with OK
          | 0 -> Printf.fprintf stderr "unsat\n"; exit_with SOLVER_UNSAT
          | 1 -> (* case where we already printed models in [solve_clause] *)
@@ -237,54 +237,54 @@ let main (input,input_f) (output,output_f : string*out_channel) (lang,mode) comm
          | i -> (* case where we already printed models in [solve_clause] *)
            Printf.fprintf output_f "==== found %d models, limit is %d (--limit N for more models)\n" i limit; exit_with OK)
       | Sat, Translate {linter=false; table=Some (table,table_f)} -> (* B. solve not asked: print the Sat file *)
-        let ast = TouistParse.parse_sat ~debug_syntax ~filename:input input_text |> TouistEval.eval in
-        let clauses,tbl = TouistCnf.ast_to_cnf ~debug_cnf ast |> TouistSatSolve.minisat_clauses_of_cnf
-        in TouistSatSolve.print_dimacs ~debug_dimacs (clauses,tbl)
+        let ast = Touist.Parse.parse_sat ~debug_syntax ~filename:input input_text |> Touist.Eval.eval in
+        let clauses,tbl = Touist.Cnf.ast_to_cnf ~debug_cnf ast |> Touist.SatSolve.minisat_clauses_of_cnf
+        in Touist.SatSolve.print_dimacs ~debug_dimacs (clauses,tbl)
           ~out_table:table_f output_f;
         exit_with OK
       | Sat, SolveExt {cmd; hidden} ->
-        let ast = TouistParse.parse_sat ~debug_syntax ~filename:input input_text |> TouistEval.eval in
-        let clauses,tbl = TouistCnf.ast_to_cnf ~debug_cnf ast |> TouistSatSolve.minisat_clauses_of_cnf
+        let ast = Touist.Parse.parse_sat ~debug_syntax ~filename:input input_text |> Touist.Eval.eval in
+        let clauses,tbl = Touist.Cnf.ast_to_cnf ~debug_cnf ast |> Touist.SatSolve.minisat_clauses_of_cnf
         in cmd |> solve_ext common_opt hidden output_f tbl (Minisat.Lit.abs) (Minisat.Lit.sign)
              (* because given integers can be negative: *)
              (fun v -> abs v |> Minisat.Lit.make |> fun l -> if v>0 then l else Minisat.Lit.neg l)
-             (TouistSatSolve.print_dimacs ~debug_dimacs (clauses,tbl))
+             (Touist.SatSolve.print_dimacs ~debug_dimacs (clauses,tbl))
       | Smt logic, Translate _ ->
-        let ast = TouistParse.parse_smt ~debug_syntax ~filename:input input_text
-                  |> TouistEval.eval ~smt in
-        ast |> TouistSmt.to_smt2 logic  |> Buffer.output_buffer output_f;
+        let ast = Touist.Parse.parse_smt ~debug_syntax ~filename:input input_text
+                  |> Touist.Eval.eval ~smt in
+        ast |> Touist.Smt.to_smt2 logic  |> Buffer.output_buffer output_f;
         exit_with OK
       | Smt logic, Solve _ ->
 
-        let ast = TouistParse.parse_smt ~debug_syntax ~filename:input input_text
-                  |> TouistEval.eval ~smt in
-        let yices_form,tbl = TouistSmtSolve.ast_to_yices ast in
-        (match TouistSmtSolve.solve logic yices_form with
+        let ast = Touist.Parse.parse_smt ~debug_syntax ~filename:input input_text
+                  |> Touist.Eval.eval ~smt in
+        let yices_form,tbl = Touist.SmtSolve.ast_to_yices ast in
+        (match Touist.SmtSolve.solve logic yices_form with
          | None -> Printf.fprintf stderr "unsat\n"; exit_with SOLVER_UNSAT |> ignore
-         | Some m -> Printf.fprintf output_f "%s\n" (TouistSmtSolve.string_of_model tbl m); exit_with OK |> ignore);
+         | Some m -> Printf.fprintf output_f "%s\n" (Touist.SmtSolve.string_of_model tbl m); exit_with OK |> ignore);
       | Qbf, mode -> begin
-          let ast = TouistParse.parse_qbf ~debug_syntax ~filename:input input_text
-                    |> TouistEval.eval ~smt in
-          let prenex = TouistQbf.prenex ast in
-          let cnf = TouistQbf.cnf prenex in
+          let ast = Touist.Parse.parse_qbf ~debug_syntax ~filename:input input_text
+                    |> Touist.Eval.eval ~smt in
+          let prenex = Touist.Qbf.prenex ast in
+          let cnf = Touist.Qbf.cnf prenex in
           if common_opt.debug_cnf then begin
             Printf.fprintf stderr "formula: %s\nprenex: %s\ncnf: %s\n"
-              (TouistPprint.string_of_ast ~utf8:true ast)
-              (TouistPprint.string_of_ast ~utf8:true prenex)
-              (TouistPprint.string_of_ast ~utf8:true cnf)
+              (Touist.Pprint.string_of_ast ~utf8:true ast)
+              (Touist.Pprint.string_of_ast ~utf8:true prenex)
+              (Touist.Pprint.string_of_ast ~utf8:true cnf)
           end;
           begin match mode with
             | SolveExt {cmd; hidden} -> (* --qbf + --solver CMD: use external solver *)
-              let quants,int_clauses,int_tbl = TouistQbf.qbfclauses_of_cnf cnf
+              let quants,int_clauses,int_tbl = Touist.Qbf.qbfclauses_of_cnf cnf
               in cmd |> solve_ext common_opt hidden output_f int_tbl (abs) (fun v -> v>0) (fun v -> v)
-                   (TouistQbf.print_qdimacs (quants,int_clauses,int_tbl))
+                   (Touist.Qbf.print_qdimacs (quants,int_clauses,int_tbl))
             | Translate {table=Some (table,table_f)} -> (* --qbf: we print QDIMACS *)
-              let quants,int_clauses,int_tbl = TouistQbf.qbfclauses_of_cnf cnf in
-              (TouistQbf.print_qdimacs ~debug_dimacs
+              let quants,int_clauses,int_tbl = Touist.Qbf.qbfclauses_of_cnf cnf in
+              (Touist.Qbf.print_qdimacs ~debug_dimacs
                  (quants,int_clauses,int_tbl) ~out_table:table_f output_f)
             | Solve {hidden} -> (* --qbf + --solve: we solve using Quantor *)
-              let qcnf,table = TouistQbfSolve.qcnf_of_cnf cnf in
-              (match TouistQbfSolve.solve ~hidden (qcnf,table) with
+              let qcnf,table = Touist.QbfSolve.qcnf_of_cnf cnf in
+              (match Touist.QbfSolve.solve ~hidden (qcnf,table) with
                | Some str -> Printf.fprintf output_f "%s\n" str
                | None -> (Printf.fprintf stderr "unsat\n"; exit_with SOLVER_UNSAT |> ignore))
             | _ -> failwith "only --solver, --solve and default translation with --qbf"
@@ -308,13 +308,13 @@ let main (input,input_f) (output,output_f : string*out_channel) (lang,mode) comm
   with
   (* Warning: the [msg] already contains an ending '\n'. No need for adding
      another ending newline after it. *)
-  | TouistFatal msg ->
+  | Touist.Fatal msg ->
     if common_opt.debug then Printf.eprintf "Stacktrace:\n%s\n" (Printexc.get_backtrace ());
-    Printf.eprintf "%s" (TouistErr.string_of_msg msg);
+    Printf.eprintf "%s" (Touist.Err.string_of_msg msg);
     exit_with (match msg with _,Usage,_,_ -> CMD_USAGE | _ -> TOUIST_SYNTAX)
   | Sys_error err ->
     (* [err] is provided by the system; it doesn't end with a newline. *)
-    Printf.eprintf "%s\n" (TouistErr.string_of_msg (Error,Usage,err,None));
+    Printf.eprintf "%s\n" (Touist.Err.string_of_msg (Error,Usage,err,None));
     exit_with CMD_USAGE
   | x -> raise x
 
@@ -516,8 +516,8 @@ let cmd =
        QBF. Output formats for translation include DIMACS, QDIMACS and SMT-LIB.";
     `P "To select the standard input, use $(b,-) as $(i,INPUT).";
     `P ("Embedded solvers available: "^"minisat"
-        ^ if TouistSmtSolve.enabled then ", yices2" else ""
-                                                         ^ if TouistQbfSolve.enabled then ", qbf" else "");
+        ^ if Touist.SmtSolve.enabled then ", yices2" else ""
+                                                         ^ if Touist.QbfSolve.enabled then ", qbf" else "");
     `S Manpage.s_arguments;
     `S language_section;
     `P "$(mname) accepts three language variants: $(b,--sat),  $(b,--qbf) and  $(b,--smt)[=$(i,LOGIC)].";
