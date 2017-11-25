@@ -492,7 +492,7 @@ let show_flag =
   Arg.(value & opt (some (enum [
       "form",Form;"cnf",Cnf;"prenex",Prenex;
       "duringcnf",CnfDuring;"duringprenex",PrenexDuring
-    ])) None ~vopt:(Some Form) & info ["show"] ~docs:show_section ~doc:"\
+    ])) None ~vopt:(Some Form) & info ["show"] ~docv:"AST" ~docs:show_section ~doc:"\
     Show a step of the evaluation of the TouIST input. By default,
     show the expanded formula (`form').")
 
@@ -543,21 +543,27 @@ let cmd =
   and usage1 = "$(mname) [$(b,--sat)|$(b,--qbf)|$(b,--smt)[=$(i,LOGIC)]] [$(i,OPTION)] $(i,INPUT)"
   and usage2 = "$(mname) [$(b,--sat)|$(b,--qbf)|$(b,--smt)[=$(i,LOGIC)]] [$(i,OPTION)] $(b,--solve) $(i,INPUT)"
   and usage3 = "$(mname) [$(b,--sat)|$(b,--qbf)|$(b,--smt)[=$(i,LOGIC)]] [$(i,OPTION)] $(b,--solver)=$(i,CMD) $(i,INPUT)"
-  and usage4 = "$(mname) [$(b,--sat)|$(b,--qbf)|$(b,--smt)[=$(i,LOGIC)]] [$(i,OPTION)] $(b,--latex)[=$(i,MODE)] $(i,INPUT)"
+  and usage4 = "$(mname) [$(b,--sat)|$(b,--qbf)|$(b,--smt)[=$(i,LOGIC)]] [$(i,OPTION)] $(b,--latex)[=$(i,VAL)] $(i,INPUT)"
+  and usage5 = "$(mname) [$(b,--sat)|$(b,--qbf)|$(b,--smt)[=$(i,LOGIC)]] [$(i,OPTION)] $(b,--show)[=$(i,AST)] $(i,INPUT)"
   in
   let man = [
     `S Manpage.s_synopsis;
     `P usage1; `Noblank;
     `P usage2; `Noblank;
     `P usage3; `Noblank;
-    `P usage4;
+    `P usage4; `Noblank;
+    `P usage5;
     `S Manpage.s_description;
     `P "$(tname) translates and solves problems written in TouIST language,
        which is based on propositional logic (SAT) with extensions to SMT and
        QBF. Output formats for translation include DIMACS, QDIMACS and SMT-LIB.";
+    `P "In some cases, e.g., $(b,--smt) or $(b,--latex) which can take an
+        optional argument, you might want to use $(b,--) in order to
+        disambiguate.
+        See $(i,http://erratique.ch/software/cmdliner/doc/Cmdliner.html#optargs)";
     `P ("Embedded solvers compiled in $(mname): minisat"
         ^ (if Touist_yices2.SmtSolve.enabled then ", yices2" else "")
-        ^ (if Touist_qbf.QbfSolve.enabled then ", qbf" else ""));
+        ^ (if Touist_qbf.QbfSolve.enabled then ", qbf" else "")^".");
     `S Manpage.s_arguments;
     `S language_section;
     `P "$(mname) accepts three language variants: $(b,--sat),  $(b,--qbf) and  $(b,--smt)[=$(i,LOGIC)].";
@@ -568,7 +574,7 @@ let cmd =
     `P "- `QF_LIA' (not documented)"; `Noblank;
     `P "- `QF_LRA' (not documented)"; `Noblank;
     `P "Other QF_* exist by cannot be expressed in TouIST. For more information
-        on QF_* logics, see http://smtlib.cs.uiowa.edu/logics.shtml";
+        on QF_* logics, see $(i,http://smtlib.cs.uiowa.edu/logics.shtml)";
 
     `S mode_section;
     `P "$(mname) has four modes depending on the flags $(b,--solve),
@@ -577,7 +583,7 @@ let cmd =
     `P ("- by default, translate into DIMACS, QDIMACS or SMT-LIB (see $(b,"^translation_section^"));");`Noblank;
     `P ("- with $(b,--solve), solve using internal solver (see $(b,"^solve_section^"));");`Noblank;
     `P ("- with $(b,--solver), solve using external solver (see $(b,"^solve_section^"));");`Noblank;
-    `P ("- with $(b,--latex), produce LaTeX output (see $(b,"^latex_section^")).");
+    `P ("- with $(b,--latex), produce LaTeX output (see $(b,"^latex_section^")).");`Noblank;
     `P ("- with $(b,--show), dump the internal AST (see $(b,"^show_section^")).");
 
     `S translation_section;
@@ -617,7 +623,9 @@ let cmd =
           to understand why your TouIST input seems to be wrongly
           interpreted."; `Noblank;
     `P "- `cnf' dumps the AST after the CNF transformation is done."; `Noblank;
-    `P "- `prenex' ($(b,--qbf) only) dumps the AST after the Prenew transformation.";
+    `P "- `prenex' ($(b,--qbf) only) dumps the AST after the Prenew transformation."; `Noblank;
+    `P "- `duringcnf' ($(b,--{qbf,sat}) only) prints the steps during the CNF transformation."; `Noblank;
+    `P "- `duringprenex' ($(b,--qbf) only) prints the steps during the Prenex transformation.";
     `S Manpage.s_bugs; `P "Report bugs to <mael.valais@gmail.com>.";
     `S Manpage.s_see_also;
   ]
