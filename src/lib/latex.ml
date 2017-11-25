@@ -1,6 +1,6 @@
-open Touist.Types
-open Touist.Types.Ast
-open Touist.Pprint
+open Types
+open Types.Ast
+open Pprint
 
 let rm_dollar x = String.sub x 1 (String.length x - 1)
 
@@ -82,12 +82,12 @@ let rec latex_of_ast ~full ast =
       "\\bigwedge\\limits_{\\substack{" ^ (latex_of_commalist "," x) ^
       "\\in " ^ (latex_of_commalist "," y) ^
       (match b with None -> "" | Some b -> "\\\\" ^ (latex_of_ast b)) ^ "}}" ^
-      latex_of_ast (if z |> Touist.Eval.ast_without_loc |> is_binary_op then (Paren z) else z)
+      latex_of_ast (if z |> Eval.ast_without_loc |> is_binary_op then (Paren z) else z)
   | Bigor (x,y,b,z) ->
       "\\bigvee\\limits_{\\substack{" ^ (latex_of_commalist "," x) ^
        "\\in " ^ (latex_of_commalist "," y) ^
        (match b with None -> "" | Some b -> "\\\\" ^ (latex_of_ast b)) ^ "}}" ^
-       latex_of_ast (if z |> Touist.Eval.ast_without_loc |> is_binary_op then (Paren z) else z)
+       latex_of_ast (if z |> Eval.ast_without_loc |> is_binary_op then (Paren z) else z)
   | Exact (x,y) -> "\\textrm{exact}(" ^ (latex_of_ast x) ^ "," ^ (latex_of_ast y) ^ ")"
   | Atmost (x,y) -> "\\textrm{atmost}(" ^ (latex_of_ast x) ^ "," ^ (latex_of_ast y) ^ ")"
   | Atleast (x,y) -> "\\textrm{atleast}(" ^ (latex_of_ast x) ^ "," ^ (latex_of_ast y) ^ ")"
@@ -103,11 +103,11 @@ let rec latex_of_ast ~full ast =
   | Exists (v,f) -> "\\exists "^(latex_of_ast v) ^". "^ (latex_of_ast f)
   | Forall (v,f) -> "\\forall "^(latex_of_ast v) ^". "^ (latex_of_ast f)
   | For (var,set,above_f) ->
-    let op, prop, f = match Touist.Eval.ast_without_loc above_f with
+    let op, prop, f = match Eval.ast_without_loc above_f with
     | Forall (prop,f) -> ("\\forall ", prop, f)
     | Exists (prop,f) -> ("\\exists ", prop, f)
     | f -> failwith ("[shoudlnt happen] only exists and forall allowed with \
-    'for' statement. This is an '"^Touist.Pprint.string_of_ast_type f^"': "^Touist.Pprint.string_of_ast ~debug:true above_f)
+    'for' statement. This is an '"^Pprint.string_of_ast_type f^"': "^Pprint.string_of_ast ~debug:true above_f)
     in
         "\\displaystyle\\mathop{"^ op ^ latex_of_ast prop ^"}_{"
         ^ (latex_of_ast var)^ "\\in "^latex_of_ast set ^"} ."^ latex_of_ast f

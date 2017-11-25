@@ -1,8 +1,8 @@
 (jbuild_version 1)
 
-(ocamllex (touistLexer))
+(ocamllex (lexer))
 (menhir
-    ((modules (touistParser))
+    ((modules (parser))
      (flags (--table ))))
      ; (flags (--table --infer))
 

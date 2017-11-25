@@ -1,7 +1,7 @@
-open Touist.Types
-open Touist.Types.Ast
-open Touist.Pprint
-open Touist.Err
+open Types
+open Types.Ast
+open Pprint
+open Err
 
 (* [is_clause] checks that the given AST is a clause. This function can only
    be called on an AST containing Or, And or Not. No Equiv or Implies! *)
@@ -149,7 +149,7 @@ and to_cnf depth (stop:stop) (ast:Ast.t) : Ast.t =
     in
     if !debug then print_debug "out: " depth [cnf];
     (* Last important thing: make sure no more Bot/Top are in the formula. *)
-    if depth=0 && Touist.Eval.has_top_or_bot cnf then to_cnf cnf else cnf
+    if depth=0 && Eval.has_top_or_bot cnf then to_cnf cnf else cnf
 
 
 let clauses_of_cnf (neg:'a->'a) (fresh:unit->'a) (ast:Ast.t)

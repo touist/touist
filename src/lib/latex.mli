@@ -25,7 +25,7 @@
     - for light latex processors (mathjax, jlatexmath), you should use
       [~full:false]
     - for fully-featured latex processors, you can use [~full:true]. *)
-val latex_of_ast : full:bool -> Touist.Types.AstSet.elt -> string
+val latex_of_ast : full:bool -> Types.AstSet.elt -> string
 
 (** {2 Utility} *)
 
@@ -33,9 +33,9 @@ val latex_of_ast : full:bool -> Touist.Types.AstSet.elt -> string
     cond is true. The tranversal order should not be considered.
     Whenever a non-formula is given, acc will be immediatly returned. *)
 val ast_fun :
-  (bool -> Touist.Types.Ast.t -> bool) ->
-  bool -> Touist.Types.Ast.t -> bool
+  (bool -> Types.Ast.t -> bool) ->
+  bool -> Types.Ast.t -> bool
 
-  val contains_newline : Touist.Types.Ast.t -> bool
-val is_binary_op : Touist.Types.Ast.t -> bool
-val contains_binary_op : Touist.Types.Ast.t -> bool
+  val contains_newline : Types.Ast.t -> bool
+val is_binary_op : Types.Ast.t -> bool
+val contains_binary_op : Types.Ast.t -> bool

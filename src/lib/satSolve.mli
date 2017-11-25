@@ -8,7 +8,7 @@
     - a mapping table (Minisat litterals -> name of the proposition)
 *)
 val minisat_clauses_of_cnf :
-  Touist.Types.Ast.t ->
+  Types.Ast.t ->
   Minisat.Lit.t list list * (Minisat.Lit.t, string) Hashtbl.t
 
 (** {2 Solving clauses (using Minisat)} *)
@@ -34,7 +34,7 @@ end
       found. [N] is the number of the model, it begins at 1.
       It can be useful to print the models as they appear because finding all
       models (if [limit] is large) can be extremely long.
-      Example: [~print:(Touist.SatSolve.Model.pprint table model)]
+      Example: [~print:(SatSolve.Model.pprint table model)]
 
     [verbose] allows to turn on the verbose mode of minisat; apparently, this
       minisat feature doesn't seem to be working and doesn't display any time

@@ -5,14 +5,14 @@
 
   #| Trick to have an optional dep on Qbf;
      from mirage/ocaml-conduit (async/jbuild) |#
-  (modules (touistSmtSolve))
+  (modules (smtSolve))
   (libraries (touist
-    (select touistSmtSolve.ml from
-      (yices2  -> touistSmtSolveReal.ml)
-      (!yices2 -> touistSmtSolveDummy.ml))
-    (select touistSmtSolve.mli from
-      (yices2  -> touistSmtSolveReal.mli)
-      (!yices2 -> touistSmtSolveDummy.mli))))
+    (select smtSolve.ml from
+      (yices2  -> smtSolveReal.ml)
+      (!yices2 -> smtSolveDummy.ml))
+    (select smtSolve.mli from
+      (yices2  -> smtSolveReal.mli)
+      (!yices2 -> smtSolveDummy.mli))))
   (wrapped true)
  )
 )
