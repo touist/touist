@@ -1,32 +1,20 @@
 open Touist
 open Cmdliner
 type error =
-  | OK
-  | UNKNOWN
-  | CMD_USAGE
-  | CMD_UNSUPPORTED
-  | TOUIST_SYNTAX
-  | TOUIST_TIMEOUT
-  | TOUIST_MEMORY
-  | TOUIST_UNKNOWN
-  | SOLVER_UNSAT
-  | SOLVER_UNKNOWN
-  | SOLVER_TIMEOUT
-  | SOLVER_MEMORY
+  | OK (* also means SAT *)
+  | UNSAT
+  | TRANSL_ERROR
+  | SOLVER_ERROR
+  | CLI_ERROR
+  | BUG
 
 let get_code (e : error) : int = match e with
-  | OK              -> 0
-  | UNKNOWN         -> 1
-  | CMD_USAGE       -> 2
-  | CMD_UNSUPPORTED -> 3
-  | TOUIST_SYNTAX   -> 4
-  | TOUIST_TIMEOUT  -> 5
-  | TOUIST_MEMORY   -> 6
-  | TOUIST_UNKNOWN  -> 7
-  | SOLVER_UNSAT    -> 8
-  | SOLVER_UNKNOWN  -> 9
-  | SOLVER_TIMEOUT  -> 10
-  | SOLVER_MEMORY   -> 11
+  | OK (* also means SAT *) -> 0
+  | UNSAT           -> 8
+  | TRANSL_ERROR    -> 50
+  | SOLVER_ERROR    -> 100
+  | CLI_ERROR       -> 124
+  | BUG             -> 125
 
 type language =
   | Sat
@@ -116,20 +104,25 @@ let solve_ext common_opt show_hidden output lit_tbl lit_abs lit_sign lit_of_int 
              with Not_found -> "?")
            in Printf.fprintf output "%s %s\n" valuation lit_name);
      exit_with OK)
-  | Unix.WEXITED 127 -> (Printf.eprintf
-                           "Command '%s' not found (try with --debug)\n" cmd;
-                         exit_with SOLVER_UNKNOWN)
-  | Unix.WEXITED 10 -> (Printf.eprintf
-                          "Command '%s' returned SAT but did not print a model (try with --debug)\n\
-                           A DIMACS model line must be integers optionally beginning with v or V\n\
-                           and optionally ending with 0.\n" cmd;
-                        exit_with SOLVER_UNKNOWN)
-  | Unix.WEXITED 20 -> (Printf.eprintf
-                          "Command '%s' returned UNSAT (try with --debug)\n" cmd;
-                        exit_with SOLVER_UNSAT)
-  | Unix.WEXITED c -> Printf.eprintf
-                        "Command '%s' returned unknown code %d (try with --debug)\nExpected codes are 10 for SAT and 20 for UNSAT\n"
-                        cmd c; exit_with SOLVER_UNKNOWN;
+  | Unix.WEXITED 127 ->
+    (Printf.eprintf
+       "Command '%s' not found (try with --debug)\n" cmd;
+     exit_with CLI_ERROR)
+  | Unix.WEXITED 10 ->
+    (Printf.eprintf
+       "Command '%s' returned SAT but did not print a model (try with --debug)\n\
+        A DIMACS model line must be integers optionally beginning with v or V\n\
+        and optionally ending with 0.\n" cmd;
+     exit_with SOLVER_ERROR)
+  | Unix.WEXITED 20 ->
+    (Printf.eprintf
+       "Command '%s' returned UNSAT (try with --debug)\n" cmd;
+     exit_with UNSAT)
+  | Unix.WEXITED c ->
+    Printf.eprintf
+      "Command '%s' returned unknown code %d (try with --debug)\n\
+       Expected codes are 10 for SAT and 20 for UNSAT\n"
+      cmd c; exit_with SOLVER_ERROR;
   | _ -> Printf.eprintf "Error with %s, received signal\n" (cmd)
 
 
@@ -190,7 +183,7 @@ let main (input,input_f) (output,output_f : string*out_channel) (lang,mode) comm
         let models = solve input_f and models2 = solve input2_f in
         (match SatSolve.ModelSet.equal !models !models2 with
          | true -> Printf.fprintf output_f "Equivalent\n"; exit_with OK
-         | false -> Printf.fprintf output_f "Not equivalent\n"; exit_with SOLVER_UNSAT)
+         | false -> Printf.fprintf output_f "Not equivalent\n"; exit_with UNSAT)
       | Sat, Solve {equiv=None; limit; count; interactive} ->
         let ast = Parse.parse_sat ~debug_syntax ~filename:input input_text |> Eval.eval in
         let clauses,table = Cnf.ast_to_cnf ~debug_cnf ast |> SatSolve.minisat_clauses_of_cnf
@@ -214,9 +207,10 @@ let main (input,input_f) (output,output_f : string*out_channel) (lang,mode) comm
               and continue_asking _ i =
                 Printf.fprintf output_f "=== count: %d; continue? (y/n) " i; flush stdout;
                 try Scanf.scanf "%s\n" (fun c -> not (c="q" || c="n"))
-                with End_of_file -> Printf.eprintf "error: could not enter \
-                                                    interactive mode as stdin unexpectedly closed\n";
-                  exit_with UNKNOWN
+                with End_of_file ->
+                  Printf.eprintf "error: could not enter \
+                                  interactive mode as stdin unexpectedly closed\n";
+                  exit_with BUG
               (* stdin unexpectedly closed (e.g., piped cmd) *)
               (* [continue_limit] is also needed by [solve_clauses]. It stops
                  the display of models as soon as the number of models displayed
@@ -230,7 +224,7 @@ let main (input,input_f) (output,output_f : string*out_channel) (lang,mode) comm
         in
         (match SatSolve.ModelSet.cardinal !models with
          | i when count -> Printf.fprintf output_f "%d\n" i; exit_with OK
-         | 0 -> Printf.fprintf stderr "unsat\n"; exit_with SOLVER_UNSAT
+         | 0 -> Printf.fprintf stderr "unsat\n"; exit_with UNSAT
          | 1 -> (* case where we already printed models in [solve_clause] *)
            exit_with OK
          | i -> (* case where we already printed models in [solve_clause] *)
@@ -259,7 +253,7 @@ let main (input,input_f) (output,output_f : string*out_channel) (lang,mode) comm
                   |> Eval.eval ~smt in
         let yices_form,tbl = Touist_yices2.SmtSolve.ast_to_yices ast in
         (match Touist_yices2.SmtSolve.solve logic yices_form with
-         | None -> Printf.fprintf stderr "unsat\n"; exit_with SOLVER_UNSAT |> ignore
+         | None -> Printf.fprintf stderr "unsat\n"; exit_with UNSAT |> ignore
          | Some m -> Printf.fprintf output_f "%s\n" (Touist_yices2.SmtSolve.string_of_model tbl m); exit_with OK |> ignore);
       | Qbf, mode -> begin
           let ast = Parse.parse_qbf ~debug_syntax ~filename:input input_text
@@ -285,7 +279,7 @@ let main (input,input_f) (output,output_f : string*out_channel) (lang,mode) comm
               let qcnf,table = Touist_qbf.QbfSolve.qcnf_of_cnf cnf in
               (match Touist_qbf.QbfSolve.solve ~hidden (qcnf,table) with
                | Some str -> Printf.fprintf output_f "%s\n" str
-               | None -> (Printf.fprintf stderr "unsat\n"; exit_with SOLVER_UNSAT |> ignore))
+               | None -> (Printf.fprintf stderr "unsat\n"; exit_with UNSAT |> ignore))
             | _ -> failwith "only --solver, --solve and default translation with --qbf"
           end
         end
@@ -310,11 +304,11 @@ let main (input,input_f) (output,output_f : string*out_channel) (lang,mode) comm
   | Err.TouistFatal msg ->
     if common_opt.debug then Printf.eprintf "Stacktrace:\n%s\n" (Printexc.get_backtrace ());
     Printf.eprintf "%s" (Err.string_of_msg msg);
-    exit_with (match msg with _,Usage,_,_ -> CMD_USAGE | _ -> TOUIST_SYNTAX)
+    exit_with (match msg with _,Usage,_,_ -> CLI_ERROR | _ -> TRANSL_ERROR)
   | Sys_error err ->
     (* [err] is provided by the system; it doesn't end with a newline. *)
     Printf.eprintf "%s\n" (Err.string_of_msg (Error,Usage,err,None));
-    exit_with CMD_USAGE
+    exit_with CLI_ERROR
   | x -> raise x
 
 
@@ -330,9 +324,9 @@ let input_conv = (function
 
 let input =
   let input_arg =
-    Arg.(value & pos 0 (some input_conv) None & info [] ~docv:"INPUT" ~doc:{|
-    The input TouIST file. Use $(b,-) to read from the standard
-    input instead.|})
+    Arg.(value & pos 0 (some input_conv) None & info [] ~docv:"INPUT" ~doc:
+           "The input TouIST file. Use $(b,-) to read from the standard
+             input instead.")
   in let check_input = function
       | Some (input,input_t) -> `Ok (input,input_t)
       | None -> `Error (false,"you must give an input file (use - for reading from stdin)")
@@ -345,27 +339,27 @@ let output_conv = (function
     | path -> `Error ("file not found: "^path)), (fun fmt (v,_) -> Format.fprintf fmt "%s" v)
 
 let output =
-  Arg.(value & opt output_conv ("/dev/stdout",stdout) & info ["o";"output"] ~docv:"OUTPUT" ~doc:{|
+  Arg.(value & opt output_conv ("/dev/stdout",stdout) & info ["o";"output"] ~docv:"OUTPUT" ~doc:"\
     Select the file $(docv) for printing results. With $(b,--sat), $(b,--smt)
     or $(b,--qbf), results will be respectively the DIMACS, QDIMACS and SMT-LIB
-    translations of the TouIST given in $(i,INPUT).|})
+    translations of the TouIST given in $(i,INPUT).")
 
 
 let language_section = "LANGUAGES"
 let language =
   let docs = language_section in
   let sat =
-    Arg.(value & flag & info ["sat"] ~docs ~doc:{|
+    Arg.(value & flag & info ["sat"] ~docs ~doc:"\
       Propositional logic. It is the language selected by default,
-      you may omit $(b,--sat).|})
+      you may omit $(b,--sat).")
   and qbf =
-    Arg.(value & flag & info ["qbf"] ~docs ~doc:{|
-      Quantified boolean formulas (QBF).|})
+    Arg.(value & flag & info ["qbf"] ~docs ~doc:"\
+      Quantified boolean formulas (QBF).")
   and smt =
     Arg.(value & opt (some string) None ~vopt:(Some "QF_LIA") & info ["smt"]
-           ~docv:"LOGIC" ~docs ~doc:{|
+           ~docv:"LOGIC" ~docs ~doc:"\
       Select the SAT Modulo Theory (SMT) input. By default, $(docv) is set to
-      `QF_LIA' (linear integers algebra).|})
+      `QF_LIA' (linear integers algebra).")
   and one_of sat qbf smt =
     match sat, qbf   , smt   with
     | false  , false , Some l -> `Ok (Smt l)
@@ -378,40 +372,41 @@ let solve_section = "SOLVE"
 let solve_flags =
   let docs = solve_section in
   let solve_flag =
-    Arg.(value & flag & info ["solve"] ~docs ~doc:{|
+    Arg.(value & flag & info ["solve"] ~docs ~doc:"\
       Solve the problem
       and print the first model if it exists. The solver is selected
-      depending on the input language.|})
+      depending on the input language.")
   and solvext_flag =
-    Arg.(value & opt (some string) None & info ["solver"] ~docs ~docv:"CMD" ~doc:{|
-      ($(b,--sat) and $(b,--qbf) modes) Use $(docv) for solving. $(docv)
+    Arg.(value & opt (some string) None & info ["solver"] ~docs ~docv:"CMD" ~doc:"\
+      (with {$(b,--sat),$(b,--qbf)}) Use $(docv) for solving. $(docv)
       must expect DIMACS (QDIMACS) on standard input, print a DIMACS model on
-      standard output and return 10 on SAT and 20 for UNSAT.|})
+      standard output and return 10 on SAT and 20 for UNSAT. You can display
+      the stdin, stdout and stderr of $(docv) using $(b,--debug).")
   and limit =
-    Arg.(value & opt int 1 & info ["limit"] ~docs ~docv:"N" ~doc:{|
+    Arg.(value & opt int 1 & info ["limit"] ~docs ~docv:"N" ~doc:"\
       (with $(b,--solve)) Instead of one model, return $(docv) models if they
       exist. With $(i,0), return every possible model. WARNING: the number
       of model can be extremely high; this option is intended for small
-      problems.|})
+      problems.")
   and count_flag =
-    Arg.(value & flag & info ["count"] ~docs ~doc:{|
+    Arg.(value & flag & info ["count"] ~docs ~doc:"\
       (with $(b,--solve))
-      Instead of displaying models, return the number of models.|})
+      Instead of displaying models, return the number of models.")
   and interactive =
-    Arg.(value & flag & info ["interactive"] ~docs ~doc:{|
+    Arg.(value & flag & info ["interactive"] ~docs ~doc:"\
       ($(b,--sat) mode) Display next model on key press; $(i,INPUT) must be a
-      file.|})
+      file.")
   and equiv =
-    Arg.(value & opt (some input_conv) None & info ["equiv"] ~docs ~docv:"INPUT2" ~doc:{|
+    Arg.(value & opt (some input_conv) None & info ["equiv"] ~docs ~docv:"INPUT2" ~doc:"\
       (with $(b,--solve)) Check that $(docv) has the same models as $(i,INPUT)
       (equivalency). Note that the equivalency is computed 'naively' by
       retrieiving all models and comparing them. In the future, we will instead
       combine both $(i,INPUT) $(docv) and check that one entails the other (and
-      conversely).|})
+      conversely).")
   and hidden =
-    Arg.(value & flag & info ["show-hidden"] ~docs ~doc:{|
+    Arg.(value & flag & info ["show-hidden"] ~docs ~doc:"\
     (with $(b,--solve)) Show the hidden '&a' literals used when translating to
-    CNF.|})
+    CNF.")
   in let check_solve_opts solv solvext limit count interac (equiv:(string * in_channel) option) hidden =
        match solv,solvext,limit,count,interac,equiv,hidden with
        | false   ,None   ,_    ,_    ,_      ,_    ,true  -> `Error (false,"--show-hidden only compatible with --solve or --solver")
@@ -426,23 +421,23 @@ let solve_flags =
 let latex_section = "LATEX"
 let latex_flag =
   Arg.(value & opt (some (enum [("mathjax",Mathjax);("document",Document)])) None
-         ~vopt:(Some Mathjax) & info ["latex"] ~docs:latex_section ~doc: {|
+         ~vopt:(Some Mathjax) & info ["latex"] ~docs:latex_section ~doc:"\
     Transform the TouIST input to LaTeX. The supported values
-    for $(i,MODE) are `mathjax' and `document'.|})
+    for $(docv) are `mathjax' and `document'.")
 
 let mode_section = "MODES"
 let linter_flag =
-  Arg.(value & flag & info ["linter"] ~docs:mode_section ~doc:{|
+  Arg.(value & flag & info ["linter"] ~docs:mode_section ~doc:"\
     Display syntax and semantic errors
     and exit. With this option, we only do a minimal valuation so that it
-    prints the errors as fast as possible.|})
+    prints the errors as fast as possible.")
 
 let translation_section = "TRANSLATE"
 let table =
   Arg.(value & opt (some output_conv) None & info ["table"] ~docs:translation_section
-         ~docv:"TABLE" ~doc: {|
+         ~docv:"TABLE" ~doc:"\
     Select the file $(docv) for printing the mapping table. Only
-    useful for $(b,--sat) and $(b,--qbf).|})
+    useful for $(b,--sat) and $(b,--qbf).")
 
 let lang_and_mode =
   let choose_mode lang solv latex lint table =
@@ -459,39 +454,39 @@ let common_opt =
   let docs = Manpage.s_options in
   let error_format =
     Arg.(value & opt string "%f: line %l, col %c-%C: %t: %m"
-         & info ["error-format"] ~docs ~docv:"FMT" ~doc:{|
-        Customize the formatting of error messages.|})
+         & info ["error-format"] ~docs ~docv:"FMT" ~doc:"\
+        Customize the formatting of error messages.")
   and wrap_width =
-    Arg.(value & opt int 76 & info ["wrap-width"] ~docs ~docv:"N" ~doc:{|
-      Wrapping width for error messages.|})
+    Arg.(value & opt int 76 & info ["wrap-width"] ~docs ~docv:"N" ~doc:"\
+      Wrapping width for error messages.")
   and debug_flag =
-    Arg.(value & flag & info ["debug"] ~docs ~doc:{|
+    Arg.(value & flag & info ["debug"] ~docs ~doc:"\
       Print information for debugging
       touist. More specifically:
       * with $(b,--solver), prints the stdin, stdout and stderr of the given
       solver;
       * print the 'loc' (location) when displaying syntax errors;
-      * when an exception is raised, print the call stack.|})
+      * when an exception is raised, print the call stack.")
   and debug_syntax_flag =
-    Arg.(value & flag & info ["debug-syntax"] ~docs ~doc:{|
+    Arg.(value & flag & info ["debug-syntax"] ~docs ~doc:"\
       When a syntax error is displayed, also give the automaton
       number; this is useful when trying to fix a wrong error message
-      in `src/lib/parser.messages'.|})
+      in `src/lib/parser.messages'.")
   and debug_cnf_flag =
-    Arg.(value & flag & info ["debug-cnf"] ~docs ~doc:{|
+    Arg.(value & flag & info ["debug-cnf"] ~docs ~doc:"\
       Print step by step CNF
-      transformation (only with $(b,--sat) and $(b,--qbf)|})
+      transformation (only with $(b,--sat) and $(b,--qbf)")
   and show_flag =
-    Arg.(value & flag & info ["show"] ~docs ~doc:{|
+    Arg.(value & flag & info ["show"] ~docs ~doc:"\
       Show the expanded Abstract
       Syntaxic Tree after evaluation, i.e., after every `bigand', `bigor',
       variables and such are replaced by actual formulas. This option may
       be useful to understand why your TouIST input seems to be wrongly
-      interpreted by $(mname).|})
+      interpreted by $(mname).")
   and debug_dimacs_flag =
-    Arg.(value & flag & info ["debug-dimacs"] ~docs ~doc:{|
+    Arg.(value & flag & info ["debug-dimacs"] ~docs ~doc:"\
       ($(b,--sat) and $(b,--qbf) modes) Display names instead of integers in
-      DIMACS/QDIMACS|})
+      DIMACS/QDIMACS")
   in let common_opt error_format wrap_width debug debug_syntax debug_cnf show debug_dimacs =
        {error_format; wrap_width; debug; debug_syntax; debug_cnf; show; debug_dimacs}
   in Term.(const common_opt $ error_format $ wrap_width $ debug_flag $ debug_syntax_flag $ debug_cnf_flag $ show_flag $ debug_dimacs_flag)
@@ -513,7 +508,6 @@ let cmd =
     `P "$(tname) translates and solves problems written in TouIST language,
        which is based on propositional logic (SAT) with extensions to SMT and
        QBF. Output formats for translation include DIMACS, QDIMACS and SMT-LIB.";
-    `P "To select the standard input, use $(b,-) as $(i,INPUT).";
     `P ("Embedded solvers available: "^"minisat"
         ^ if Touist_yices2.SmtSolve.enabled then ", yices2" else ""
                                                                  ^ if Touist_qbf.QbfSolve.enabled then ", qbf" else "");
@@ -533,10 +527,10 @@ let cmd =
     `P "$(mname) has four modes depending on the flags $(b,--solve),
         $(b,--solver) and $(b,--latex). Without these three flags, $(mname)
         will default to the DIMACS translation.";`Noblank;
-    `P ("- by default, translate into DIMACS, QDIMACS or SMT-LIB (see $(b,"^translation_section^"))");`Noblank;
-    `P ("- with $(b,--solve), solve using internal solver (see $(b,"^solve_section^"))");`Noblank;
-    `P ("- with $(b,--solver), solve using external solver (see $(b,"^solve_section^"))");`Noblank;
-    `P ("- with $(b,--latex), produce LaTeX output (see $(b,"^latex_section^")");
+    `P ("- by default, translate into DIMACS, QDIMACS or SMT-LIB (see $(b,"^translation_section^"));");`Noblank;
+    `P ("- with $(b,--solve), solve using internal solver (see $(b,"^solve_section^"));");`Noblank;
+    `P ("- with $(b,--solver), solve using external solver (see $(b,"^solve_section^"));");`Noblank;
+    `P ("- with $(b,--latex), produce LaTeX output (see $(b,"^latex_section^")).");
 
     `S translation_section;
     `P "You can translate the TouIST language into the following formats:"; `Noblank;
@@ -565,23 +559,17 @@ let cmd =
     `P "- `document' for a complete LaTeX file (including `\\\\begin{document})
         that you can directly give to pdfLaTeX.";
     `S Manpage.s_bugs; `P "Report bugs to <mael.valais@gmail.com>.";
-    `S Manpage.s_see_also; `P "" ]
+    `S Manpage.s_see_also;
+  ]
   in
   Term.(const main $ input $ output $ lang_and_mode $ common_opt),
   Term.(info "touist" ~version:("%%VERSION%%")
           ~doc ~man ~exits:(List.map (fun (doc,err) -> exit_info ~doc (get_code err)) [
-              "on success; with $(b,--solve) and $(b,--solver), means SAT", OK;
-              "unknown error", UNKNOWN;
-              "command-line usage error", CMD_USAGE;
-              "command-line option is unsupported", CMD_UNSUPPORTED;
-              "TouIST syntax error", TOUIST_SYNTAX;
-              "translation timeout", TOUIST_TIMEOUT;
-              "translation memory overflow", TOUIST_MEMORY;
-              "unknown $(tname) error", TOUIST_UNKNOWN;
-              "on UNSAT problem (with $(b,--solve) and $(b,--solver))", SOLVER_UNSAT;
-              "unknown solver error", SOLVER_UNKNOWN;
-              "solver timeout", SOLVER_TIMEOUT;
-              "solver returned memory overflow", SOLVER_MEMORY;
+              "on success (or SAT with $(b,--solve) and $(b,--solver)).", OK;
+              "on UNSAT (with $(b,--solve) and $(b,--solver)).", UNSAT;
+              "on TouIST syntax error or translation error.", TRANSL_ERROR;
+              "on command line parsing errors.", CLI_ERROR;
+              "on unexpected internal errors (bugs).", BUG;
             ]))
 
 let () = Term.exit @@ Term.eval cmd
