@@ -562,14 +562,15 @@ let cmd =
     `S Manpage.s_see_also;
   ]
   in
-  Term.(const main $ input $ output $ lang_and_mode $ common_opt),
-  Term.(info "touist" ~version:("%%VERSION%%")
-          ~doc ~man ~exits:(List.map (fun (doc,err) -> exit_info ~doc (get_code err)) [
-              "on success (or SAT with $(b,--solve) and $(b,--solver)).", OK;
-              "on UNSAT (with $(b,--solve) and $(b,--solver)).", UNSAT;
-              "on TouIST syntax error or translation error.", TRANSL_ERROR;
-              "on command line parsing errors.", CLI_ERROR;
-              "on unexpected internal errors (bugs).", BUG;
-            ]))
+  Term.(
+    const main $ input $ output $ lang_and_mode $ common_opt,
+    info "touist" ~version:("%%VERSION%%")
+      ~doc ~man ~exits:(List.map (fun (doc,err) -> exit_info ~doc (get_code err)) [
+          "on success (or SAT with $(b,--solve) and $(b,--solver)).", OK;
+          "on UNSAT (with $(b,--solve) and $(b,--solver)).", UNSAT;
+          "on TouIST syntax error or translation error.", TRANSL_ERROR;
+          "on command line parsing errors.", CLI_ERROR;
+          "on unexpected internal errors (bugs).", BUG;
+        ]))
 
 let () = Term.exit @@ Term.eval cmd
