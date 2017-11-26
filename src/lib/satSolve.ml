@@ -99,10 +99,10 @@ let string_of_clauses = List.fold_left (fun acc v -> (if acc="" then "" else acc
 
 let solve_clauses
     ?(verbose=false)
-    ?(print: Model.t -> int -> unit = fun m i ->())
+    ?(print: (Lit.t,string) Hashtbl.t -> Model.t -> int -> unit = fun t m i -> ())
     ?(continue: Model.t -> int -> bool = fun _ _ -> true)
     (clauses,table : Lit.t list list * (Lit.t,string) Hashtbl.t)
-  : (ModelSet.t ref) =
+  : (ModelSet.t) =
   let counter_current_model solver (table:(Lit.t,string) Hashtbl.t) : bool =
     let counter_clause (l:Lit.t) _ acc = match Minisat.value solver l with
       | V_true -> (Minisat.Lit.neg l)::acc | V_false -> l::acc | _ -> acc
@@ -110,7 +110,7 @@ let solve_clauses
     in Minisat.Raw.add_clause_a solver (Array.of_list counter_clause)
   in (* already_unsat means that during the adding of clauses, the formula
         was found unsat. So we don't even need to solve it. *)
-  let models = ref ModelSet.empty in
+  let models = ModelSet.empty in
   match clauses_to_solver ~verbose clauses with
   | None -> models
   | Some solver ->
@@ -130,20 +130,20 @@ let solve_clauses
         | true,false -> models (* is duplicate and no next model *)
         | true,true  -> solve_loop i (* is duplicate but has next *)
         | false,true ->  (* both not duplicate and has next *)
-          models := ModelSet.add model !models; print model i;
-          Hashtbl.add models_hash model ();
-          if continue model i then solve_loop (i+1) else models
+          let models = ModelSet.add model models in
+          (print table model i; Hashtbl.add models_hash model ();
+           if continue model i then solve_loop (i+1) else models)
         | false, false -> (* is not duplicate and no next model *)
-          models := ModelSet.add model !models; print model i;
-          models
+          let models = ModelSet.add model models in
+          (print table model i; models)
     in solve_loop 1
 
 let print_dimacs ?(debug_dimacs=false) (clauses,tbl) ?(out_table) (out:out_channel) =
   (match out_table with
-  | None -> ()
-  | Some out_table -> (* Display the mapping table. *)
-    tbl |> Cnf.print_table (Minisat.Lit.to_int) out_table
-      ~prefix:(if out = out_table then "c " else ""));
+   | None -> ()
+   | Some out_table -> (* Display the mapping table. *)
+     tbl |> Cnf.print_table (Minisat.Lit.to_int) out_table
+       ~prefix:(if out = out_table then "c " else ""));
   (* Display the dimacs' preamble line. *)
   Printf.fprintf out "p cnf %d %d\n" (Hashtbl.length tbl) (List.length clauses);
   (* Display the dimacs clauses. *)
