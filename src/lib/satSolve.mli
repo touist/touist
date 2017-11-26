@@ -47,10 +47,10 @@ end
 *)
 val solve_clauses :
   ?verbose:bool ->
-  ?print:(Model.t -> int -> unit) ->
+  ?print:((Minisat.Lit.t, string) Hashtbl.t -> Model.t -> int -> unit) ->
   ?continue:(Model.t -> int -> bool) ->
   Minisat.Lit.t list list * (Minisat.Lit.t, string) Hashtbl.t ->
-  ModelSet.t ref
+  ModelSet.t
 
 (** [string_of_clause] dumps the clause in its literal-number form:
     e.g., 1 -5 3 9 -2 -7 *)

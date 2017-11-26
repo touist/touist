@@ -207,55 +207,51 @@ let main (lang,mode) (input,input_f) (output,output_f: string * out_channel) com
         *)
       (* A. solve has been asked *)
       | Sat, Solve {equiv=Some (input2,input2_f)} ->
-        let solve inputchan =
-          let ast = Parse.parse_sat ~debug_syntax ~filename:input (Parse.string_of_chan inputchan) |> Eval.eval in
-          let models = Cnf.ast_to_cnf ast |> SatSolve.minisat_clauses_of_cnf |> SatSolve.solve_clauses ~verbose:common_opt.verbose
-          in models
+        let solve (filename,inputchan) =
+          Parse.(parse_sat ~debug_syntax ~filename (string_of_chan inputchan))
+          |> Eval.eval |> Cnf.ast_to_cnf |> SatSolve.minisat_clauses_of_cnf
+          |> SatSolve.solve_clauses ~verbose:common_opt.verbose
         in
-        let models = solve input_f and models2 = solve input2_f in
-        (match SatSolve.ModelSet.equal !models !models2 with
+        let models = solve (input,input_f) and models2 = solve (input2,input2_f) in
+        (match SatSolve.ModelSet.equal models models2 with
          | true -> Printf.fprintf output_f "Equivalent\n"; exit_with OK
          | false -> Printf.fprintf output_f "Not equivalent\n"; exit_with UNSAT)
-      | Sat, Solve {equiv=None; limit; count; interactive} ->
-        let ast = Parse.parse_sat ~debug_syntax ~filename:input input_text |> Eval.eval in
-        let clauses,table = Cnf.ast_to_cnf ast |> SatSolve.minisat_clauses_of_cnf
+      | Sat, Solve {equiv=None; count=true} ->
+        SatSolve.(Parse.parse_sat ~debug_syntax ~filename:input input_text
+                  |> Eval.eval |> Cnf.ast_to_cnf |> minisat_clauses_of_cnf
+                  |> solve_clauses ~verbose:common_opt.verbose |> ModelSet.cardinal
+                  |>  Printf.fprintf output_f "%d\n"; exit_with OK)
+      | Sat, Solve {equiv=None; limit; count=false; interactive} ->
+        let print_model table model i =
+          if limit != 1
+          then Printf.fprintf output_f "==== model %d\n%s\n" i (SatSolve.Model.pprint ~sep:"\n" table model)
+          else Printf.fprintf output_f "%s\n" (SatSolve.Model.pprint ~sep:"\n" table model)
+        (* Notes:
+           1) print_endline vs. printf: print_endline is a printf with
+           'flush stdout' at the end. If we don't put 'flush', the user
+           won't see the output before scanf asks for some input.
+           2) scanf: I don't know!!! *)
+        (* [continue_asking] is needed by [solve_clauses]; it simply
+           asks after displaying each model if it should continue
+           displaying the next one. *)
+        and continue_asking _ i =
+          Printf.fprintf output_f "=== count: %d; continue? (y/n) " i; flush stdout;
+          try Scanf.scanf "%s\n" (fun c -> not (c="q" || c="n"))
+          with End_of_file -> (* stdin unexpectedly closed (e.g., piped cmd) *)
+            (Printf.eprintf "touist: interactive mode stopped as stdin unexpectedly closed\n";
+             exit_with BUG)
+        (* [continue_limit] is also needed by [solve_clauses]. It stops
+           the display of models as soon as the number of models displayed
+           reaches [limit]. *)
+        and continue_limit _ i = i < limit
         in
         let models =
-          begin
-            if count then SatSolve.solve_clauses ~verbose:common_opt.verbose (clauses,table)
-            else
-              let print_model model i =
-                if limit != 1
-                then Printf.fprintf output_f "==== model %d\n%s\n" i (SatSolve.Model.pprint ~sep:"\n" table model)
-                else Printf.fprintf output_f "%s\n" (SatSolve.Model.pprint ~sep:"\n" table model)
-              (* Notes:
-                 1) print_endline vs. printf: print_endline is a printf with
-                 'flush stdout' at the end. If we don't put 'flush', the user
-                 won't see the output before scanf asks for some input.
-                 2) scanf: I don't know!!! *)
-              (* [continue_asking] is needed by [solve_clauses]; it simply
-                 asks after displaying each model if it should continue
-                 displaying the next one. *)
-              and continue_asking _ i =
-                Printf.fprintf output_f "=== count: %d; continue? (y/n) " i; flush stdout;
-                try Scanf.scanf "%s\n" (fun c -> not (c="q" || c="n"))
-                with End_of_file ->
-                  Printf.eprintf "touist: could not enter \
-                                  interactive mode as stdin unexpectedly closed\n";
-                  exit_with BUG
-              (* stdin unexpectedly closed (e.g., piped cmd) *)
-              (* [continue_limit] is also needed by [solve_clauses]. It stops
-                 the display of models as soon as the number of models displayed
-                 reaches [limit]. *)
-              and continue_limit _ i = i < limit
-              in
-              SatSolve.solve_clauses ~verbose:common_opt.verbose ~print:print_model
-                ~continue:(if interactive then continue_asking else continue_limit)
-                (clauses,table)
-          end
+          SatSolve.(Parse.parse_sat ~debug_syntax ~filename:input input_text
+                    |> Eval.eval |> Cnf.ast_to_cnf |> minisat_clauses_of_cnf
+                    |> solve_clauses ~verbose:common_opt.verbose ~print:print_model
+                      ~continue:(if interactive then continue_asking else continue_limit))
         in
-        (match SatSolve.ModelSet.cardinal !models with
-         | i when count -> Printf.fprintf output_f "%d\n" i; exit_with OK
+        (match SatSolve.ModelSet.cardinal models with
          | 0 -> Printf.fprintf stderr "unsat\n"; exit_with UNSAT
          | 1 -> (* case where we already printed models in [solve_clause] *)
            exit_with OK
@@ -282,39 +278,34 @@ let main (lang,mode) (input,input_f) (output,output_f: string * out_channel) com
         ast |> Smt.to_smt2 logic  |> Buffer.output_buffer output_f;
         exit_with OK
       | Smt logic, Solve _ ->
-
-        let ast = Parse.parse_smt ~debug_syntax ~filename:input input_text
-                  |> Eval.eval ~smt in
-        let yices_form,tbl = Touist_yices2.SmtSolve.ast_to_yices ast in
+        let yices_form,tbl =
+          Parse.parse_smt ~debug_syntax ~filename:input input_text
+          |> Eval.eval ~smt |> Touist_yices2.SmtSolve.ast_to_yices in
         (match Touist_yices2.SmtSolve.solve logic yices_form with
          | None -> Printf.fprintf stderr "unsat\n"; exit_with UNSAT |> ignore
          | Some m -> Printf.fprintf output_f "%s\n" (Touist_yices2.SmtSolve.string_of_model tbl m); exit_with OK |> ignore);
-      | Qbf, (SolveExt _ | Translate _ | Solve _) -> begin
-          let ast = Parse.parse_qbf ~debug_syntax ~filename:input input_text
-                    |> Eval.eval ~smt in
-          let prenex = Qbf.prenex ast in
-          let cnf = Qbf.cnf prenex in
-          begin match mode with
-            | SolveExt {cmd; hidden} -> (* --qbf + --solver CMD: use external solver *)
-              let quants,int_clauses,int_tbl = Qbf.qbfclauses_of_cnf cnf
-              in cmd |> solve_ext common_opt hidden output_f int_tbl (abs) (fun v -> v>0) (fun v -> v)
-                   (Qbf.print_qdimacs (quants,int_clauses,int_tbl))
-            | Translate {table; debug_dimacs} -> (* --qbf: we print QDIMACS *)
-              let quants,int_clauses,int_tbl = Qbf.qbfclauses_of_cnf cnf in
-              (Qbf.print_qdimacs ~debug_dimacs
-                 (quants,int_clauses,int_tbl)
-                 ~out_table:(match table with Some (_,f)->f | None->output_f) output_f)
-            | Solve {hidden} -> (* --qbf + --solve: we solve using Quantor *)
-              let qcnf,table = Touist_qbf.QbfSolve.qcnf_of_cnf cnf in
-              (match Touist_qbf.QbfSolve.solve ~hidden (qcnf,table) with
-               | Some str -> Printf.fprintf output_f "%s\n" str
-               | None -> (Printf.fprintf stderr "unsat\n"; exit_with UNSAT |> ignore))
-            | Show _ -> failwith "(bug) --show does not work with --qbf"
-            | Latex _ -> failwith "(bug) at this point, --qbf + --latex should not happen"
-          end
-        end
+      | Qbf, SolveExt {cmd; hidden} -> (* --qbf + --solver CMD: use external solver *)
+        let quants,int_clauses,int_tbl =
+          Parse.parse_qbf ~debug_syntax ~filename:input input_text
+          |> Eval.eval ~smt |> Qbf.prenex |> Qbf.cnf |> Qbf.qbfclauses_of_cnf
+        in cmd |> solve_ext common_opt hidden output_f int_tbl
+             (abs) (fun v -> v>0) (fun v -> v)
+             (Qbf.print_qdimacs (quants,int_clauses,int_tbl))
+      | Qbf, Translate {table; debug_dimacs} -> (* --qbf: we print QDIMACS *)
+        let quants,int_clauses,int_tbl =
+          Parse.parse_qbf ~debug_syntax ~filename:input input_text
+          |> Eval.eval ~smt |> Qbf.prenex |> Qbf.cnf |> Qbf.qbfclauses_of_cnf in
+        (Qbf.print_qdimacs ~debug_dimacs (quants,int_clauses,int_tbl)
+           ~out_table:(match table with Some (_,f)->f | None->output_f) output_f)
+      | Qbf, Solve {hidden} -> (* --qbf + --solve: we solve using Quantor *)
+        let qcnf,table =
+          Parse.parse_qbf ~debug_syntax ~filename:input input_text
+          |> Eval.eval ~smt |> Qbf.prenex |> Qbf.cnf
+          |> Touist_qbf.QbfSolve.qcnf_of_cnf in
+        (match Touist_qbf.QbfSolve.solve ~hidden (qcnf,table) with
+         | Some str -> Printf.fprintf output_f "%s\n" str
+         | None -> (Printf.fprintf stderr "unsat\n"; exit_with UNSAT |> ignore))
       | Smt _, SolveExt _ -> failwith "--solver not compatible with --smt"
-      (* | lang,mode -> (failwith "cannot handle this set of options" |> ignore) *)
     end;
 
     (* I had to comment these close_out and close_in because it would
