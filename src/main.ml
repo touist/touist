@@ -115,21 +115,21 @@ let solve_ext common_opt show_hidden output lit_tbl lit_abs lit_sign lit_of_int 
      exit_with OK)
   | Unix.WEXITED 127 ->
     (Printf.eprintf
-       "Command '%s' not found (try with --debug)\n" cmd;
+       "Command '%s' not found (try with --verbose)\n" cmd;
      exit_with CLI_ERROR)
   | Unix.WEXITED 10 ->
     (Printf.eprintf
-       "Command '%s' returned SAT but did not print a model (try with --debug)\n\
+       "Command '%s' returned SAT but did not print a model (try with --verbose)\n\
         A DIMACS model line must be integers optionally beginning with v or V\n\
         and optionally ending with 0.\n" cmd;
      exit_with SOLVER_ERROR)
   | Unix.WEXITED 20 ->
     (Printf.eprintf
-       "Command '%s' returned UNSAT (try with --debug)\n" cmd;
+       "Command '%s' returned UNSAT (try with --verbose)\n" cmd;
      exit_with UNSAT)
   | Unix.WEXITED c ->
     Printf.eprintf
-      "Command '%s' returned unknown code %d (try with --debug)\n\
+      "Command '%s' returned unknown code %d (try with --verbose)\n\
        Expected codes are 10 for SAT and 20 for UNSAT\n"
       cmd c; exit_with SOLVER_ERROR;
   | _ -> Printf.eprintf "Error with %s, received signal\n" (cmd)
@@ -257,7 +257,7 @@ let main (lang,mode) (input,input_f) (output,output_f: string * out_channel) com
            exit_with OK
          | i -> (* case where we already printed models in [solve_clause] *)
            Printf.fprintf output_f
-             "==== found %d models, limit is %d (--limit N for more models)\n"
+             "==== found %d models, limit is %d (--limit=N for more models)\n"
              i limit; exit_with OK)
       | Sat, Translate {linter=false; table; debug_dimacs} -> (* B. solve not asked: print the Sat file *)
         let ast = Parse.parse_sat ~debug_syntax ~filename:input input_text |> Eval.eval in
@@ -385,10 +385,10 @@ let language =
          if Re.(execp (compile (str "QF_")) logic) then `Ok logic
          else `Error ("logic name '"^logic^"' should begin with 'QF_'")),
       (fun fmt logic -> Format.fprintf fmt "%s" logic) in
-    Arg.(value & opt (some smt_logic_conv) None ~vopt:(Some "QF_LIA") & info ["smt"]
+    Arg.(value & opt (some smt_logic_conv) None ~vopt:(Some "QF_LRA") & info ["smt"]
            ~docv:"LOGIC" ~docs ~doc:"\
       Select the SAT Modulo Theory (SMT) input. By default, $(docv) is set to
-      `QF_LIA' (linear integers algebra).")
+      `QF_LRA' (Linear Real Arithmetic).")
   and one_of sat qbf smt =
     match sat, qbf   , smt   with
     | false  , false , Some l ->
@@ -396,7 +396,7 @@ let language =
          --smt is Yices2 is available. *)
       (match Touist_yices2.SmtSolve.(enabled, logic_supported l) with
        | true, true | false, _ -> `Ok (Smt l)
-       | true, false -> `Error (false,("given --smt LOGIC '"^l^"' is not known (e.g., --smt=QF_IDL, see --help)")))
+       | true, false -> `Error (false,("given --smt=LOGIC '"^l^"' is not known (e.g., --smt=QF_IDL, see --help)")))
     | false  , true  , None   -> `Ok Qbf
     | _      , false , None   -> `Ok Sat (* default to sat *)
     | _      , _     , _      -> `Error (false,"only one of {--sat,--smt,--qbf} is allowed")
@@ -415,7 +415,7 @@ let solve_flags =
       (with {$(b,--sat),$(b,--qbf)}) Use $(docv) for solving. $(docv) must
       expect DIMACS (QDIMACS) on standard input, print a DIMACS model on
       standard output and return 10 on SAT and 20 for UNSAT. You can
-      display the stdin, stdout and stderr of $(docv) using $(b,--debug).")
+      display the stdin, stdout and stderr of $(docv) using $(b,--verbose).")
   and limit =
     Arg.(value & opt int 1 & info ["limit"] ~docs ~docv:"N" ~doc:"\
       (with $(b,--solve)) Instead of one model, return $(docv) models if
@@ -424,12 +424,14 @@ let solve_flags =
       small problems.")
   and count_flag =
     Arg.(value & flag & info ["count"] ~docs ~doc:"\
-      (with $(b,--solve))
-      Instead of displaying models, return the number of models.")
+      (with $(b,--solve)) Try to return the count of models instead of
+      returning the models. This option will only work for small problems:
+      the number of models explodes when the number of propositions is big.")
   and interactive =
     Arg.(value & flag & info ["interactive"] ~docs ~doc:"\
-      ($(b,--sat) mode) Display next model on key press; $(i,INPUT) must be a
-      file.")
+      ($(b,--sat) mode) Display the models one after
+      the other. Press enter or any other key to continue and `q' or `n'
+      to stop. $(i,INPUT) must be a file.")
   and equiv =
     Arg.(value & opt (some input_conv) None & info ["equiv"] ~docs ~docv:"INPUT2" ~doc:"\
       (with $(b,--solve)) Check that $(docv) has the same models as
@@ -439,8 +441,9 @@ let solve_flags =
       that one entails the other (and conversely).")
   and hidden =
     Arg.(value & flag & info ["show-hidden"] ~docs ~doc:"\
-    (with $(b,--solve)) Show the hidden '&a' literals used when translating to
-    CNF.")
+    (with $(b,--solve)) Show the valuation of usually hidden '&a' literals.
+    These literals are caused by the Tseitin transformation when translating
+    the formula into CNF. Only useful for $(b,--sat) and $(b,--qbf).")
   in let check_solve_opts solv solvext limit count interac (equiv:(string * in_channel) option) hidden =
        match solv,solvext,limit,count,interac,equiv,hidden with
        | false   ,None   ,_    ,_    ,_      ,_    ,true  -> `Error (false,"--show-hidden only compatible with --solve or --solver")
@@ -462,7 +465,8 @@ let latex_flag =
 let linter_flag =
   Arg.(value & flag & info ["linter"] ~doc:"\
     Display syntax and semantic errors and exit. With this option, we only
-    do a minimal valuation so that it prints the errors as fast as
+    do a minimal valuation by bypassing the expansive `bigand', `exact',
+    `powerset'... constructs so that it prints the errors as fast as
     possible.")
 let mode_section = "MODES"
 let translation_section = "TRANSLATE"
@@ -496,7 +500,7 @@ let lang_and_mode =
     | Smt _ ,_     ,_     ,Some _ -> `Error (false, "--show does not support --smt")
     | Smt _ ,_     ,_     ,_ when is_some table -> `Error (false, "--table has no meaning with --smt")
     | _     ,None  ,None  ,None   -> `Ok (lang, Translate {linter; table; debug_dimacs})
-    | _     ,_     ,_     ,_ when debug_dimacs -> `Error (false,"--debug-dimacs only available in translation mode (see help)")
+    | _     ,_     ,_     ,_ when debug_dimacs -> `Error (false,"--verbose-dimacs only available in translation mode (see help)")
     | _     ,_     ,_     ,Some m -> `Ok (lang, Show m)
     | Smt _ ,Some (SolveExt _),_,_  -> `Error (false,"--solver only supports --sat and --qbf")
     | _     ,Some _,_     ,_ when linter -> `Error (false,"cannot use {--solve,--solver} and --linter at the same time")
@@ -511,10 +515,15 @@ let common_opt =
   let error_format =
     Arg.(value & opt string "%f: line %l, col %c-%C: %t: %m"
          & info ["error-format"] ~docs ~docv:"FMT" ~doc:"\
-        Customize the formatting of error messages.")
+      Customize the formatting of error messages. The placeholders are
+      `%f' (file name), `%l'-`%L' (line number start-end), `%c'-`%C'
+      (column number start-end), `%b'-`%B' (buffer offset start-end),
+      `%t' (error type: warning, error), `%m' (error message) and
+      `\\\\n' (new line).")
   and wrap_width =
     Arg.(value & opt int 76 & info ["wrap-width"] ~docs ~docv:"N" ~doc:"\
-      Wrapping width for error messages.")
+      Choose the width of the messages (errors, warnings).
+      With $(docv) set to 0, you can disable the wrapping.")
   and verbose_flag =
     Arg.(value & flag & info ["verbose";"v"] ~docs ~doc:"\
       Print information for debugging touist. ($(i,1)) With $(b,--solver),
@@ -549,10 +558,9 @@ let cmd =
        QBF. Output formats for translation include DIMACS, QDIMACS and SMT-LIB.";
     `P "In some cases, e.g., $(b,--smt) or $(b,--latex) which can take an
         optional argument, you might want to use $(b,--) in order to
-        disambiguate. Example:"; `Noblank;
-    `Pre "    $(mname) --smt test/smt/takuzu4x4.touist"; `Noblank;
-    `P "should be written"; `Noblank;
-    `Pre "    $(mname) --smt -- test/smt/takuzu4x4.touist";
+        disambiguate, i.e, "; `Noblank;
+    `Pre "    $(mname) --smt file.touist         <- wrong"; `Noblank;
+    `Pre "    $(mname) --smt -- file.touist      <- ok";
     `P ("Embedded solvers compiled in $(mname): minisat"
         ^ (if Touist_yices2.SmtSolve.enabled then ", yices2" else "")
         ^ (if Touist_qbf.QbfSolve.enabled then ", qbf" else "")^".");
@@ -562,13 +570,16 @@ let cmd =
        $(b,--smt)[=$(i,LOGIC)]. To learn more on the associated TouIST grammars,
        see $(i,https://www.irit.fr/touist/doc/reference-manual.html).";
 
-    `P "By default, $(i,LOGIC) is `QF_LRA'. $(i,LOGIC) can one of:";`Noblank;
-    `P "- `QF_IDL' allows you to deal with boolean and integer, e.g, `x - y < b'"; `Noblank;
-    `P "- `QF_RDL' is the same as `QF_IDL' but with reals"; `Noblank;
-    `P "- `QF_LIA' (not documented)"; `Noblank;
-    `P "- `QF_LRA' (not documented)"; `Noblank;
+    `P "By default, $(i,LOGIC) is `QF_LRA' (QF stands for Quantifier Free).
+     $(i,LOGIC) can one of:"; `Noblank;
+    `I ("`QF_IDL'", "allows you to deal with boolean and integer, e.g, `x - y < b'
+        (Integer Difference Logic)"); `Noblank;
+    `I ("`QF_RDL'","is the same as `QF_IDL' but with reals (Real Difference Logic)"); `Noblank;
+    `I ("`QF_LIA'","(Linear Integer Arithmetic)"); `Noblank;
+    `I ("`QF_LRA'","(Linear Real Arithmetic)"); `Noblank;
     `P "Other QF_* exist by cannot be expressed in TouIST. For more information
         on QF_* logics, see $(i,http://smtlib.cs.uiowa.edu/logics.shtml)";
+    `P "Detail of the language flags:";
 
     `S mode_section;
     `P "$(mname) has four modes depending on the flags $(b,--solve),
@@ -581,45 +592,101 @@ let cmd =
     `P ("- with $(b,--show), dump the internal AST (see $(b,"^show_section^")).");
 
     `S translation_section;
-    `P "You can translate the TouIST language into the following formats:"; `Noblank;
-    `P "- DIMACS when using $(b,--sat)"; `Noblank;
-    `P "- QDIMACS when using $(b,--qbf)"; `Noblank;
-    `P "- SMT-LIB when using $(b,--smt)";
+    `P "You can translate the TouIST syntax into DIMACS ($(b,--sat)),
+    QDIMACS ($(b,--qbf)) and SMT-LIB ($(b,--smt)).";
     `P "By default, when translating to DIMACS or QDIMACS, the mapping table
-        (i.e., the link between proposition names and (Q)DIMACS integers) is
-        displayed as comments before the prelude, e.g.,"; `Noblank;
-    `Pre "    c rain 1";`Noblank;
-    `Pre "    c road 2";`Noblank;
-    `Pre "    p cnf 2 2";`Noblank;
+    (i.e., the link between proposition names and (Q)DIMACS integers) is
+    displayed as comments before the prelude. For example, with the command"; `Noblank;
+    `Pre "    echo 'rain => wet_road rain not wet_road' | touist -";
+    `P "we get the following DIMACS output:";
+    `Pre "    c wet_road 1      <- mapping between names DIMACS integers"; `Noblank;
+    `Pre "    c rain 2"; `Noblank;
+    `Pre "    p cnf 2 3         <- prelude of the DIMACS file"; `Noblank;
+    `Pre "    1 -2 0"; `Noblank;
+    `Pre "    2 0"; `Noblank;
+    `Pre "    -1 0";
     `P "With the $(b,--table) option, you can redirect these mapping lines to
         the file $(i,TABLE) (comments `c' are then not displayed).";
+    `P "The following options are available in translation mode:";
+
     `S solve_section;
-    `P "With $(b,--solve), the internal solver used depends on the input language
-        chosen:";`Noblank;
-    `P "- with $(b,--sat), solve using MiniSat,";`Noblank;
-    `P "- with $(b,--smt), solve using Yices,";`Noblank;
-    `P "- with $(b,--qbf), solve using Quantor.";
+    `P "The $(b,--solve) option asks $(mname) to solve the problem. Depending
+    on the input language ($(b,--sat), $(b,--smt), $(b,--qbf)), the
+    corresponding internal solver is picked (MiniSat, Yices, Quantor). By
+    default, the first model is displayed; you can ask for more models
+    using the $(b,--limit)=$(i,N)` option. With $(i,N)>1, the models are
+    separated by lines beginning with `====` and for one model, each line
+    contains a valuation followed by the corresponding proposition.
+    For example:";
+    `Pre "    echo 'a and b' | touist - --solve";
+    `P "will return a single model (and in this case, there is only one
+    single model):";
+    `Pre "    1 a"; `Noblank;
+    `Pre "    1 b";
+    `P "Each line corresponds to a valuation, and each valuation should
+    be read `value proposition`. In the example, `a' takes the value
+    `true'. With this format, you can easily filter the results. For
+    example, the following command will only show the propositions that
+    are `true':";
+    `Pre "    echo 'a and b' | touist - --solve | grep ^1";
+    `P "Using $(b,--limit)=$(i,N) allows to display multiple models. With this
+    option, the models are separated by lines beginning with `====` and for
+    one model, each line contains a valuation followed by the corresponding
+    proposition. For example, with $(i,N)=0' displays an unlimited
+    number of models (numbering of models begins at 0):";
+    `Pre "    echo 'a or b' | touist - --solve --limit 0";
+    `P "will display";
+    `Pre "    ==== model 0"; `Noblank;
+    `Pre "    1 a"; `Noblank;
+    `Pre "    0 b"; `Noblank;
+    `Pre "    ==== model 1"; `Noblank;
+    `Pre "    0 a"; `Noblank;
+    `Pre "    1 b"; `Noblank;
+    `Pre "    ==== model 2"; `Noblank;
+    `Pre "    1 a"; `Noblank;
+    `Pre "    1 b"; `Noblank;
+    `Pre "    ==== found 3 models, limit is 0 (--limit=N for more models)";
+
+    `P "Using $(b,--solve) with $(b,--smt), the valuations will be integers
+    or reals instead of 0 and 1. For example,";
+    `Pre "    echo 'x > 3' | touist --solve --smt=QF_IDL -";
+    `P "will give you the model:";
+    `Pre "    4 x";
+    `P "which should be read 'the proposition x takes the value 4'.";
+
+    `P "Using $(b,--solve) with $(b,--qbf), the valuations will be 0, 1 or
+    `?'. `?' means that this proposition has an undefined valuation (often
+    because the variable is existentially quantified or under an existential
+    quantifier.";
+    `Pre "echo 'forall x: x or (exists y: y)' | touist --solve --qbf -";
+    `Pre "? x"; `Noblank;
+    `Pre "? y"; `Noblank;
+    `P "Detail of the options related to solving:";
 
     `S latex_section;
     `P "$(mname) can produce LaTeX from any TouIST file. $(i,TEX) allows you
         to select what kind of LaTeX you want:";
-    `P "- `mathjax' for a equation-only LaTeX output compatible with Mathjax"; `Noblank;
-    `P "- `document' for a complete LaTeX file (including `\\\\begin{document})
-        that you can directly give to pdfLaTeX.";
+    `I ("`mathjax'","for a equation-only LaTeX output compatible with Mathjax"); `Noblank;
+    `I ("`document'","for a complete LaTeX file (including `\\\\begin{document})
+        that you can directly give to pdfLaTeX. The `mathtools' package is
+        necessary for `\\\\begin{pmatrix*}'.");
+    `P "Detail of the options related to LaTeX output:";
 
     `S show_section;
     `P "Sometimes, you want to know what are the different internal
         translations that $(mname) is doing. Using $(b,--show), you can
         dump the AST (Abstract Syntaxic Tree) after different steps selected
-        using `STEP' which takes the following values:"; `Noblank;
-    `P "- `form' dumps the AST after evualuation, i.e., when every `bigand',
+        using $(i,AST)' which takes the following values:"; `Noblank;
+    `I ("`form'","dump the AST after evualuation, i.e., when every `bigand',
           `bigor', variables and such are expanded. This option may be useful
           to understand why your TouIST input seems to be wrongly
-          interpreted."; `Noblank;
-    `P "- `cnf' dumps the AST after the CNF transformation is done."; `Noblank;
-    `P "- `prenex' ($(b,--qbf) only) dumps the AST after the Prenew transformation."; `Noblank;
-    `P "- `duringcnf' ($(b,--{qbf,sat}) only) prints the steps during the CNF transformation."; `Noblank;
-    `P "- `duringprenex' ($(b,--qbf) only) prints the steps during the Prenex transformation.";
+          interpreted."); `Noblank;
+    `I ("`cnf'","dump the AST after the CNF transformation is done."); `Noblank;
+    `I ("`prenex'","($(b,--qbf) only) dump the AST after the Prenew transformation."); `Noblank;
+    `I ("`duringcnf'","($(b,--{qbf,sat}) only) print the steps during the CNF transformation."); `Noblank;
+    `I ("`duringprenex'","($(b,--qbf) only) print the steps during the Prenex transformation.");
+    `P "Detail of the options related to showing AST:";
+
     `S Manpage.s_bugs; `P "Report bugs to <mael.valais@gmail.com>.";
     `S Manpage.s_see_also;
   ]
