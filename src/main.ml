@@ -402,6 +402,16 @@ let language =
     | _      , _     , _      -> `Error (false,"only one of {--sat,--smt,--qbf} is allowed")
   in Term.(ret (const one_of $ sat $ qbf $ smt))
 
+
+let external_solv_section = "EXTERNAL SOLVER"
+let solvext_flag =
+  Arg.(value & opt (some string) None & info ["solver"] ~docs:external_solv_section
+          ~docv:"CMD" ~doc:"\
+    (with {$(b,--sat),$(b,--qbf)}) Use $(docv) for solving. $(docv) must
+    expect DIMACS (QDIMACS) on standard input, print a DIMACS model on
+    standard output and return 10 on SAT and 20 for UNSAT. You can
+    display the stdin, stdout and stderr of $(docv) using $(b,--verbose).")
+
 let solve_section = "SOLVE"
 let solve_flags =
   let docs = solve_section in
@@ -410,12 +420,6 @@ let solve_flags =
       Solve the problem
       and print the first model if it exists. The solver is selected
       depending on the input language.")
-  and solvext_flag =
-    Arg.(value & opt (some string) None & info ["solver"] ~docs ~docv:"CMD" ~doc:"\
-      (with {$(b,--sat),$(b,--qbf)}) Use $(docv) for solving. $(docv) must
-      expect DIMACS (QDIMACS) on standard input, print a DIMACS model on
-      standard output and return 10 on SAT and 20 for UNSAT. You can
-      display the stdin, stdout and stderr of $(docv) using $(b,--verbose).")
   and limit =
     Arg.(value & opt int 1 & info ["limit"] ~docs ~docv:"N" ~doc:"\
       (with $(b,--solve)) Instead of one model, return $(docv) models if
@@ -444,11 +448,11 @@ let solve_flags =
     (with $(b,--solve)) Show the valuation of usually hidden '&a' literals.
     These literals are caused by the Tseitin transformation when translating
     the formula into CNF. Only useful for $(b,--sat) and $(b,--qbf).")
-  in let check_solve_opts solv solvext limit count interac (equiv:(string * in_channel) option) hidden =
-       match solv,solvext,limit,count,interac,equiv,hidden with
-       | false   ,None   ,_    ,_    ,_      ,_    ,true  -> `Error (false,"--show-hidden only compatible with --solve or --solver")
+  in let check_solve_opts solv extsolv limit count interac equiv hidden =
+       match solv,extsolv,limit,count,interac,equiv,hidden with
+       | false   ,_      ,_    ,_    ,_      ,_    ,true  -> `Error (false,"--show-hidden only compatible with --solve or --solver")
        | true    ,Some _ ,_    ,_    ,_      ,_    ,_     -> `Error (false,"--solve and --solver cannot be used simultaneously")
-       | false   ,_      ,1    ,false,false  ,None ,false -> `Ok None
+       | false   ,None   ,1    ,false,false  ,None ,false -> `Ok None
        | false   ,Some c ,1    ,false,false  ,None ,hidden-> `Ok (Some (SolveExt {cmd=c;hidden}))
        | false   ,_      ,_    ,_    ,_      ,_    ,_     -> `Error (false,"the args {--limit,--count,--interactive,--equiv} can only be used with --solve")
        | true    ,_      ,limit,count,interac,equiv,hidden-> `Ok (Some (Solve {limit; count; interactive=interac; equiv; hidden}))
@@ -502,7 +506,6 @@ let lang_and_mode =
     | _     ,None  ,None  ,None   -> `Ok (lang, Translate {linter; table; debug_dimacs})
     | _     ,_     ,_     ,_ when debug_dimacs -> `Error (false,"--verbose-dimacs only available in translation mode (see help)")
     | _     ,_     ,_     ,Some m -> `Ok (lang, Show m)
-    | Smt _ ,Some (SolveExt _),_,_  -> `Error (false,"--solver only supports --sat and --qbf")
     | _     ,Some _,_     ,_ when linter -> `Error (false,"cannot use {--solve,--solver} and --linter at the same time")
     | Smt _ ,Some (Solve _),_,_ when not Touist_yices2.SmtSolve.enabled -> `Error (false,"not compiled with yices2 support: --solver cannot be used with --smt")
     | Qbf   ,Some (Solve _),_,_ when not Touist_qbf.QbfSolve.enabled -> `Error (false,"not compiled with qbf support: --solver cannot be used with --qbf.")
@@ -585,11 +588,11 @@ let cmd =
     `P "$(mname) has four modes depending on the flags $(b,--solve),
         $(b,--solver) and $(b,--latex). Without these three flags, $(mname)
         will default to the DIMACS translation.";`Noblank;
-    `P ("- by default, translate into DIMACS, QDIMACS or SMT-LIB (see $(b,"^translation_section^"));");`Noblank;
-    `P ("- with $(b,--solve), solve using internal solver (see $(b,"^solve_section^"));");`Noblank;
-    `P ("- with $(b,--solver), solve using external solver (see $(b,"^solve_section^"));");`Noblank;
-    `P ("- with $(b,--latex), produce LaTeX output (see $(b,"^latex_section^"));");`Noblank;
-    `P ("- with $(b,--show), dump the internal AST (see $(b,"^show_section^")).");
+    `I ("-","by default, translate into DIMACS, QDIMACS or SMT-LIB (see $(b,"^translation_section^"));");`Noblank;
+    `I ("-","with $(b,--solve), solve using internal solver (see $(b,"^solve_section^"));");`Noblank;
+    `I ("-","with $(b,--solver), solve using external solver (see $(b,"^solve_section^"));");`Noblank;
+    `I ("-","with $(b,--latex), produce LaTeX output (see $(b,"^latex_section^"));");`Noblank;
+    `I ("-","with $(b,--show), dump the internal AST (see $(b,"^show_section^")).");
 
     `S translation_section;
     `P "You can translate the TouIST syntax into DIMACS ($(b,--sat)),
@@ -657,11 +660,41 @@ let cmd =
     `P "Using $(b,--solve) with $(b,--qbf), the valuations will be 0, 1 or
     `?'. `?' means that this proposition has an undefined valuation (often
     because the variable is existentially quantified or under an existential
-    quantifier.";
+    quantifier. For example:";
     `Pre "echo 'forall x: x or (exists y: y)' | touist --solve --qbf -";
-    `Pre "? x"; `Noblank;
-    `Pre "? y"; `Noblank;
+    `P "which will give you a partial model:";
+    `Pre "    ? x"; `Noblank;
+    `Pre "    ? y";
     `P "Detail of the options related to solving:";
+
+    `S external_solv_section;
+    `P "$(mname) can use an external solver using $(b,--solver)=$(i,CMD).
+    The command $(i,CMD) can take arguments. It must have the Minisat
+    behaviour:";
+    `I ("1.","it should accept DIMACS or QDIMACS on standard input");
+    `I ("2.","it should print a model (or a partial model) in DIMACS on
+    standard output; the model can span on multiple lines, each line begins
+    with `v`, `V` or nothing (for Minisat compatibility), and each line
+    is optionally ended with 0.");
+    `P "Here is an example of expected output of the command $(i,CMD):";
+    `Pre"    v -1 2 -3 4 0"; `Noblank;
+    `Pre"    v 5 -6 0";
+
+    `P "The return codes is the same as with $(b,--solve). For debugging
+    purposes, you can add $(b,--verbose) to see the stdin/stdout/stderr
+    of $(i,CMD). You can also use $(b,--show-hidden).";
+    `P "Here are some examples of use:";
+    `Pre {|    touist --sat sat.touist --solver="minisat /dev/stdin /dev/stdout"|}; `Noblank;
+    `Pre {|    touist --sat sat.touist --solver="picosat --partial"|}; `Noblank;
+    `Pre {|    touist --sat sat.touist --solver="glucose -model"|}; `Noblank;
+    `Pre {|    touist --sat sat.touist --solver="glucose-syrup -model"|}; `Noblank;
+    `Pre {|    touist --qbf qbf.touist --solver="./caqe-mac --partial-assignments"|}; `Noblank;
+    `Pre {|    touist --qbf qbf.touist --solver="qute --partial-certificate"|}; `Noblank;
+    `Pre {|    touist --qbf qbf.touist --solver="depqbf --qdo --no-dynamic-nenofex"|}; `Noblank;
+    `Pre {|    touist --qbf qbf.touist --solver="quantor"|}; `Noblank;
+    `Pre {|    touist --qbf qbf.touist --solver="rareqs"|}; `Noblank;
+
+    `P "Detail on the options for external solving:";
 
     `S latex_section;
     `P "$(mname) can produce LaTeX from any TouIST file. $(i,TEX) allows you
