@@ -163,17 +163,22 @@ You can contribute to the project by forking/pull-requesting.
 
 ## References
 
-1. Khaled Skander Ben Slimane, Alexis Comte, Olivier Gasquet, Abdelwahab Heba,
+1. Olivier Gasquet, Andreas Herzig, Dominique Longin, Frédéric Maris, and
+   Maël Valais. [TouIST Again… (Formalisez et Résolvez Facilement Des
+   Problèmes Avec Des Solveurs SAT, SMT et QBF).][pfia_touist2017] In Actes Des 10es
+   Journées d’Intelligence Artificielle Fondamentale (IAF 2017). 2017.
+
+2. Khaled Skander Ben Slimane, Alexis Comte, Olivier Gasquet, Abdelwahab Heba,
   Olivier Lezaud, Frédéric Maris, and Maël Valais [La Logique Facile Avec
   TouIST (formalisez et Résolvez Facilement Des Problèmes Du Monde Réel
   )][pfia_touist2015]. In Actes Des 9es Journées d’Intelligence Artificielle
   Fondamentale (IAF 2015). 2015.
 
-2. Khaled Skander Ben Slimane, Alexis Comte, Olivier Gasquet, Abdelwahab Heba,
+3. Khaled Skander Ben Slimane, Alexis Comte, Olivier Gasquet, Abdelwahab Heba,
   Olivier Lezaud, Frederic Maris, and Mael Valais. [Twist Your Logic with
   TouIST][ttl_touist2015]. CoRR abs/1507.03663. 2015.
 
-3. Gasquet O., Schwarzentruber F., Strecker M. [Satoulouse: The Computational
+4. Gasquet O., Schwarzentruber F., Strecker M. [Satoulouse: The Computational
   Power of Propositional Logic Shown to Beginners][ttl_satoulouse2011]. In:
   Blackburn P., van Ditmarsch H., Manzano M., Soler-Toscano F. (eds) Tools
   for Teaching Logic. Lecture Notes in Computer Science, vol 6680. Springer,
@@ -181,4 +186,5 @@ You can contribute to the project by forking/pull-requesting.
 
 [ttl_satoulouse2011]: https://www.irit.fr/~Martin.Strecker/Publications/ticttl_satoulouse2011.pdf
 [ttl_touist2015]: https://arxiv.org/abs/1507.03663
-[pfia_touist2015]: http://​pfia2015.​inria.​fr/​actes/​download.​php?​conf=​IAF&​file=​Ben_​Slimane_​IAF_​2015.​pdf
+[pfia_touist2015]: http://pfia2015.inria.fr/actes/download.php?conf=IAF&file=Ben_Slimane_IAF_2015.pdf
+[pfia_touist2017]: https://www.irit.fr/publis/LILAC/Conf_sans_actes/2017_Gasquet_et_al_IAF.pdf
