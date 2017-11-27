@@ -58,7 +58,7 @@ let sat_models_are text expected _ =
     expected
     (let ast = Touist.Parse.parse_sat text |> Touist.Eval.eval in let cl,tbl = Touist.Cnf.ast_to_cnf ast |> Touist.SatSolve.minisat_clauses_of_cnf in
       let models_str = ref [] in
-        let _ = Touist.SatSolve.solve_clauses ~print:(fun m _ -> models_str := (Touist.SatSolve.Model.pprint ~sep:" " tbl m)::!models_str) (cl,tbl)
+        let _ = Touist.SatSolve.solve_clauses ~print:(fun tbl m _ -> models_str := (Touist.SatSolve.Model.pprint ~sep:" " tbl m)::!models_str) (cl,tbl)
           in List.fold_left (fun acc s -> match acc with "" -> s | _ -> s^" | "^acc) "" !models_str)
 
           (* !models_str
