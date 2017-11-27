@@ -133,21 +133,26 @@ See the [./INSTALL.md][install] file.
 
 You can also use the `touist` library; it is installed using
 `opam install touist` and requires the version 3.4.0 or above.
-The API reference is [here][api]. For example, you can do:
+The API reference is [here][api]. For example, in `utop`:
 
 ```ocaml
-let clauses,mapping =
-    Touist.Parse.parse_sat "a and b and c"
-    |> Touist.Eval.eval
-    |> Touist.Cnf.ast_to_cnf
-    |> Touist.SatSolve.minisat_clauses_of_cnf
-in Touist.SatSolve.solve_clauses (clauses,mapping)
-    ~print:(fun m _ -> Touist.SatSolve.Model.pprint mapping m |> print_endline);
+#require "touist";;
+open Touist;;
+"a and b and c"
+    |> Parse.parse_sat
+    |> Eval.eval
+    |> Cnf.ast_to_cnf
+    |> SatSolve.minisat_clauses_of_cnf
+    |> SatSolve.solve_clauses
+        ~print:(fun tbl model _ -> SatSolve.Model.pprint tbl model |> print_endline);;
 ```
-
-To compile it, do
-
-    ocamlfind ocamlc -g -linkpkg -package touist example.ml
+will return
+```
+1 c
+1 b
+1 a
+- : SatSolve.ModelSet.t = <abstr>
+```
 
 The API is kind of _spread_ among many modules (which could be gathered in one
 single module), sorry for that! We really hope to have some time to

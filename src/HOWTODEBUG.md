@@ -21,9 +21,13 @@ Either use `jbuild exec` or `_build/default/src/main.exe`:
     echo '$a' | jbuilder exec touist -- - --sat
     echo '$a' | _build/default/src/main.exe - --sat
 
+## Using utop during developement ##
+
+    jbuilder utop src/lib        # Touist.* available
+    jbuilder utop src/lib/smt    # Touist.* and Touist_smt available
 
 ## Edit how the build is made ##
-The build is handled by jbuilder; see the jbuild in each lib/src dir.
+The build is handled by jbuilder; see the `jbuild` in each lib/src dir.
 
 ## Run the debugger ##
 
