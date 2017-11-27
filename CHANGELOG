@@ -1,5 +1,24 @@
-v3.4.5
-  - (internal) use jbuilder instead of oasis
+v3.5.0
+  - Command-line
+    - touist has (finally) a proper man page. To open it, use `touist --help'
+    or `man touist'.
+    - Command-line arguments can either be used as (for example)
+      `--smt QF_LIA' or `--smt=QF_LIA'.
+    - (BREAKING) `--smt' can be used without a logic; by default, QF_LRA is used.
+    - (BREAKING) `--debug' renamed to `--verbose'
+    - (BREAKING) removed `--debug-cnf' (replaced by `--show=cnf')
+    - (BREAKING) removed `--debug-syntax' (replaced by `--verbose')
+    - (BREAKING) removed `--latex-full (replaced by `--latex=document)
+    - `--show' now takes an optional parameter (can be form, cnf, prenex).
+      `--show' keeps the same behaviour but `--debug-cnf' is now `--show=cnf'.
+    - `--latex' now takes an optional argument (mathjax or document).
+      `--latex' stays the same and refers to `--latex=mathjax', `--latex-full'
+      is removed and becomes `--latex=document'.
+  - API
+    - (BREAKING) Modules renamed (again, sorry!) from `TouistParse'
+      to `Touist.Parse'. Function 'SatSolve.Model.pprint' takes 'table' as first
+      argument.
+    - (internal) use jbuilder instead of oasis.
 v3.4.4 (2017-11-14)
   - Command-line
     - fix (AGAIN) the --solver option; when parsing the integers of the model,
