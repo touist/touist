@@ -692,14 +692,14 @@ let cmd =
     `Pre {|    touist --qbf qbf.touist --solver="qute --partial-certificate"|}; `Noblank;
     `Pre {|    touist --qbf qbf.touist --solver="depqbf --qdo --no-dynamic-nenofex"|}; `Noblank;
     `Pre {|    touist --qbf qbf.touist --solver="quantor"|}; `Noblank;
-    `Pre {|    touist --qbf qbf.touist --solver="rareqs"|}; `Noblank;
+    `Pre {|    touist --qbf qbf.touist --solver="rareqs"|};
 
     `P "Detail on the options for external solving:";
 
     `S latex_section;
     `P "$(mname) can produce LaTeX from any TouIST file. $(i,TEX) allows you
         to select what kind of LaTeX you want:";
-    `I ("`mathjax'","for a equation-only LaTeX output compatible with Mathjax"); `Noblank;
+    `I ("`mathjax'","for a equation-only LaTeX output compatible with Mathjax."); `Noblank;
     `I ("`document'","for a complete LaTeX file (including `\\\\begin{document})
         that you can directly give to pdfLaTeX. The `mathtools' package is
         necessary for `\\\\begin{pmatrix*}'.");
