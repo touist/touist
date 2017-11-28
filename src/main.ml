@@ -604,15 +604,15 @@ let cmd =
 
     `P "By default, when translating to DIMACS or QDIMACS, the mapping table
     (i.e., the link between proposition names and (Q)DIMACS integers) is
-    displayed as comments before the prelude. For example, with the command"; `Noblank;
+    displayed as comments before the prelude. For example, with the command";
     `Pre "    echo 'rain => wet_road rain not wet_road' | touist -";
     `P "we get the following DIMACS output:";
-    `Pre "    c wet_road 1      <- mapping between names DIMACS integers"; `Noblank;
-    `Pre "    c rain 2"; `Noblank;
-    `Pre "    p cnf 2 3         <- prelude of the DIMACS file"; `Noblank;
-    `Pre "    1 -2 0"; `Noblank;
-    `Pre "    2 0"; `Noblank;
-    `Pre "    -1 0";
+    `Pre {|    c wet_road 1      <- mapping between names DIMACS integers
+    c rain 2
+    p cnf 2 3         <- prelude of the DIMACS file
+    1 -2 0
+    2 0
+    -1 0|};
     `P "With the $(b,--table) option, you can redirect these mapping lines to
         the file $(i,TABLE) (comments `c' are then not displayed).";
     `P "The following options are available in translation mode:";
@@ -634,8 +634,7 @@ let cmd =
     `Pre "    echo 'a and b' | touist - --solve";
     `P "will return a single model (and in this case, there is only one
     single model):";
-    `Pre "    1 a"; `Noblank;
-    `Pre "    1 b";
+    `Pre "    1 a\n    1 b";
     `P "Each line corresponds to a valuation, and each valuation should
     be read `value proposition`. In the example, `a' takes the value
     `true'. With this format, you can easily filter the results. For
@@ -649,16 +648,16 @@ let cmd =
     number of models (numbering of models begins at 0):";
     `Pre "    echo 'a or b' | touist - --solve --limit 0";
     `P "will display";
-    `Pre "    ==== model 0"; `Noblank;
-    `Pre "    1 a"; `Noblank;
-    `Pre "    0 b"; `Noblank;
-    `Pre "    ==== model 1"; `Noblank;
-    `Pre "    0 a"; `Noblank;
-    `Pre "    1 b"; `Noblank;
-    `Pre "    ==== model 2"; `Noblank;
-    `Pre "    1 a"; `Noblank;
-    `Pre "    1 b"; `Noblank;
-    `Pre "    ==== found 3 models, limit is 0 (--limit=N for more models)";
+    `Pre {|    ==== model 0
+    1 a
+    0 b
+    ==== model 1
+    0 a
+    1 b
+    ==== model 2
+    1 a
+    1 b
+    ==== found 3 models, limit is 0 (--limit=N for more models)|};
 
     `P "Using $(b,--solve) with $(b,--smt), the valuations will be integers
     or reals instead of 0 and 1. For example,";
@@ -671,7 +670,7 @@ let cmd =
     `?'. `?' means that this proposition has an undefined valuation (often
     because the variable is existentially quantified or under an existential
     quantifier. For example:";
-    `Pre "echo 'forall x: x or (exists y: y)' | touist --solve --qbf -";
+    `Pre "    echo 'forall x: x or (exists y: y)' | touist --solve --qbf -";
     `P "which will give you a partial model:";
     `Pre "    ? x"; `Noblank;
     `Pre "    ? y";
