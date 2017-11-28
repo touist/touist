@@ -1129,6 +1129,9 @@ The flags can be given in any order. You can use the standard input
 (`stdin`) instead of using an input file by setting the `-` argument.
 With no `-o` flag, `touist` will output to the standard output (`stdout`).
 
+The man page of `touist` is available through `man touist` or `touist --help`.
+It contains almost everything you need to know its features and arguments.
+
 ### Return codes
 
 |-----|--------------------|--------------------------------------------------------|
