@@ -21,7 +21,7 @@ depends: [
   "ocamlbuild" {build}
   "ocamlfind" {build}
   "ounit" {test}
-  "jbuilder" {build}
+  "jbuilder" {build & >= "1.0+beta12"}
   "re" {build}
   "cmdliner" {build}
   "odoc" {doc}
