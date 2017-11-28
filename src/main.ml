@@ -685,7 +685,7 @@ let cmd =
 
     `P "The external solver $(i,CMD) must have the Minisat
     behaviour:";
-    `I ("1.","it should accept DIMACS or QDIMACS on standard input");
+    `I ("1.","it should accept DIMACS or QDIMACS on standard input"); `Noblank;
     `I ("2.","it should print a model (or a partial model) in DIMACS on
     standard output; the model can span on multiple lines, each line begins
     with `v`, `V` or nothing (for Minisat compatibility), and each line
