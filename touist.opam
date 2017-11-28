@@ -23,7 +23,7 @@ depends: [
   "ounit" {test}
   "jbuilder" {build & >= "1.0+beta12"}
   "re" {build}
-  "cmdliner" {build}
+  "cmdliner" {>= "0.9.8"}
   "odoc" {doc}
 ]
 depopts: [
