@@ -102,17 +102,20 @@ if [ "x$VERSION" = x ]; then
 fi
 
 # At this point, we know what VERSION we are going to use.
-echo -e "${I} Parsing the changelog for version '\033[92m$VERSION\033[0m'..."
+echo -e "${I} Parsing the changelog for version '\033[92m${VERSION}\033[0m'..."
 parse_changelog CHANGELOG "$VERSION" > tag_content
+# In case the date has already been added to CHANGELOG, remove it for the tag
+sed 's/\(v[0-9]\.[0-9]\.[0-9][^ ]*\).*/\1/' tag_content > temp && mv temp tag_content
 
 # For the opam version, remove the leading 'v'.
 OPAM_VERSION=$(echo "$VERSION$SUFFIX" | cut -c 2-)
-echo -e "${I} Changing the 'version:' field in 'touist.opam' to \033[92m$OPAM_VERSION\033[0m"
-sed "s/^\(version: *\)\"[0-9][0-9\.]*\"$/\1\"$OPAM_VERSION\"/" touist.opam > a && mv a touist.opam
+PREV_OPAM_VERSION=$(grep "^version:" touist.opam | sed "s/^version: *\"\(.*\)\"$/\1/")
+echo -e "${I} Changing the 'version:' field in 'touist.opam' from \033[95m${PREV_OPAM_VERSION}\033[0m to \033[92m${OPAM_VERSION}\033[0m"
+sed "s/^\(version: *\)\"[0-9][0-9\.]*[^ ]*\"$/\1\"${OPAM_VERSION}\"/" touist.opam > a && mv a touist.opam
 echo -e "\033[90m$(git diff -U0 touist.opam | grep "^\(\+\|-\)[^+-]")\033[0m"
 
 if [ -z "$SUFFIX" ]; then # If 'beta', then no date change
-    echo -e "${I} Adding the date to the version:"
+    echo -e "${I} Change version line in CHANGELOG from \033[95m${OPAM_VERSION}\033[0m to \033[92m${OPAM_VERSION} ($(date -I))\033[0m:"
     sed "s/^\(${VERSION//./\\.}[^ ]*\).*$/\1 (`date -I`)/" CHANGELOG > a && mv a CHANGELOG
     echo -e "\033[90m$(git diff -U0 CHANGELOG | grep "^\(\+\|-\)[^+-]")\033[0m"
 else
