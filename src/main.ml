@@ -626,11 +626,12 @@ let cmd =
     `Pre "    $(mname) $(b,--solve) [$(b,--sat)|$(b,--qbf)] [--show-hidden|--table] $(i,INPUT)"; `Noblank;
     `Pre "    $(mname) $(b,--solve) $(b,--smt)[=$(i,LOGIC)] $(i,INPUT)";
 
-    `P "By default, the first model is displayed; you can ask for more models
-    using the $(b,--limit)=$(i,N)` option. With $(i,N)>1, the models are
-    separated by lines beginning with `====` and for one model, each line
-    contains a valuation followed by the corresponding proposition.
-    For example:";
+    `P ("Exit codes are "^string_of_int (get_code OK)^" on SAT and
+    "^string_of_int (get_code UNSAT)^" on UNSAT. By default, the first
+    model is displayed; you can ask for more models using the
+    $(b,--limit)=$(i,N)` option. With $(i,N)>1, the models are separated by
+    lines beginning with `====` and for one model, each line contains a
+    valuation followed by the corresponding proposition. For example:");
     `Pre "    echo 'a and b' | touist - --solve";
     `P "will return a single model (and in this case, there is only one
     single model):";
