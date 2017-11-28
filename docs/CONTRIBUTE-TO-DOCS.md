@@ -5,8 +5,10 @@ is called Madoko, it is close to markdown (so very readable) and there
 is an online editor (madoko.net/editor.html).
 
 If you want to edit the .mdk file, you have multiple choices:
-
-- **A. Online madoko GUI and Github account**
+- **A. the easy way**
+  Just [click here](https://www.madoko.net/editor.html#tab=3&url=https://raw.githubusercontent.com/touist/touist/master/docs/reference-manual.mdk); it is going to open `reference-manual.mdk` using the online Madoko editor.
+  Note that the styling may be broken this way; also, images, syntax highlighting of TouIST snippets may not appear correctly. But it gives you an idea of what madoko files look like!
+- **B. Online madoko GUI and Github account**
   1. You first have to fork the touist project using your Github account:
       https://github.com/touist/touist/fork
   2. Then, go to the [madoko editor](https://www.madoko.net/editor.html)
@@ -23,14 +25,14 @@ If you want to edit the .mdk file, you have multiple choices:
   and [open a new pull request](https://github.com/maelvalais/touist/pull/new/master)
   against the [TouIST](https://github.com/touist/touist) repo.
 
-- **B. madoko GUI locally**  
+- **C. madoko GUI locally**  
   Install madoko-local with `npm install -g madoko-local` and you run the madoko
   webserver with `madoko-local --port 8080 --run -l .` from the `docs` directory
   and you Open... Local Disk... and you select the .mdk file.
   To get your changes reviewed and accepted, fork the project, commit your changes
   and submit a pull request.
 
-- **C. no GUI**  
+- **D. no GUI**  
   Install madoko (not madoko-local): `npm install -g madoko`.
   Edit the `.mdk` file; you can then render the HTML with `make html` or PDF
   with `make pdf`.
