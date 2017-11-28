@@ -1,9 +1,8 @@
-v3.5.0
+v3.5.0 (2017-11-28)
   - Command-line
-    - touist has (finally) a proper man page. To open it, use `touist --help'
-    or `man touist'.
-    - Command-line arguments can either be used as (for example)
-      `--smt QF_LIA' or `--smt=QF_LIA'.
+    - touist finally has a proper man page. To open it, use `touist --help'
+      or `man touist'.
+    - you can now pass arguemnts both using `--flag PARAM' or `--flag=PARAM'.
     - (BREAKING) `--smt' can be used without a logic; by default, QF_LRA is used.
     - (BREAKING) `--debug' renamed to `--verbose'
     - (BREAKING) removed `--debug-cnf' (replaced by `--show=cnf')
@@ -18,7 +17,7 @@ v3.5.0
     - (BREAKING) Modules renamed (again, sorry!) from `TouistParse'
       to `Touist.Parse'. Function 'SatSolve.Model.pprint' takes 'table' as first
       argument.
-    - (internal) use jbuilder instead of oasis.
+    - (internal) use jbuilder instead of oasis, cmdliner instead of Arg.Parse.
 v3.4.4 (2017-11-14)
   - Command-line
     - fix (AGAIN) the --solver option; when parsing the integers of the model,
