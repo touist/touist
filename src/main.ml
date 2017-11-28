@@ -585,18 +585,23 @@ let cmd =
     `P "Detail of the language flags:";
 
     `S mode_section;
-    `P "$(mname) has four modes depending on the flags $(b,--solve),
-        $(b,--solver) and $(b,--latex). Without these three flags, $(mname)
-        will default to the DIMACS translation.";`Noblank;
-    `I ("-","by default, translate into DIMACS, QDIMACS or SMT-LIB (see $(b,"^translation_section^"));");`Noblank;
-    `I ("-","with $(b,--solve), solve using internal solver (see $(b,"^solve_section^"));");`Noblank;
-    `I ("-","with $(b,--solver), solve using external solver (see $(b,"^solve_section^"));");`Noblank;
-    `I ("-","with $(b,--latex), produce LaTeX output (see $(b,"^latex_section^"));");`Noblank;
-    `I ("-","with $(b,--show), dump the internal AST (see $(b,"^show_section^")).");
+    `P "$(mname) has four modes depending on {$(b,--solve),
+        $(b,--solver), $(b,--latex)}. With none of these flags, $(mname)
+        will default to the DIMACS translation. To see more on the different
+        modes, look at their respective sections:";
+    `I ("$(b,"^translation_section^")","by default, translate into DIMACS, QDIMACS or SMT-LIB.");`Noblank;
+    `I ("$(b,"^solve_section^")","with $(b,--solve), solve using internal solver.");`Noblank;
+    `I ("$(b,"^external_solv_section^")","with $(b,--solver), solve using external solver.");`Noblank;
+    `I ("$(b,"^latex_section^")","with $(b,--latex), produce LaTeX output.");`Noblank;
+    `I ("$(b,"^show_section^")","with $(b,--show), dump the internal AST.");
 
     `S translation_section;
     `P "You can translate the TouIST syntax into DIMACS ($(b,--sat)),
-    QDIMACS ($(b,--qbf)) and SMT-LIB ($(b,--smt)).";
+    QDIMACS ($(b,--qbf)) and SMT-LIB ($(b,--smt)). The syntax is:";
+
+    `Pre "    $(mname) [$(b,--sat)|$(b,--qbf)] [--debug-dimacs] $(i,INPUT)"; `Noblank;
+    `Pre "    $(mname) $(b,--smt)[=$(i,LOGIC)] $(i,INPUT)";
+
     `P "By default, when translating to DIMACS or QDIMACS, the mapping table
     (i.e., the link between proposition names and (Q)DIMACS integers) is
     displayed as comments before the prelude. For example, with the command"; `Noblank;
@@ -615,8 +620,13 @@ let cmd =
     `S solve_section;
     `P "The $(b,--solve) option asks $(mname) to solve the problem. Depending
     on the input language ($(b,--sat), $(b,--smt), $(b,--qbf)), the
-    corresponding internal solver is picked (MiniSat, Yices, Quantor). By
-    default, the first model is displayed; you can ask for more models
+    corresponding internal solver is picked (MiniSat, Yices, Quantor).
+    Syntax is:";
+
+    `Pre "    $(mname) $(b,--solve) [$(b,--sat)|$(b,--qbf)] [--show-hidden|--table] $(i,INPUT)"; `Noblank;
+    `Pre "    $(mname) $(b,--solve) $(b,--smt)[=$(i,LOGIC)] $(i,INPUT)";
+
+    `P "By default, the first model is displayed; you can ask for more models
     using the $(b,--limit)=$(i,N)` option. With $(i,N)>1, the models are
     separated by lines beginning with `====` and for one model, each line
     contains a valuation followed by the corresponding proposition.
@@ -668,8 +678,13 @@ let cmd =
     `P "Detail of the options related to solving:";
 
     `S external_solv_section;
-    `P "$(mname) can use an external solver using $(b,--solver)=$(i,CMD).
-    The command $(i,CMD) can take arguments. It must have the Minisat
+    `P {|$(mname) can use an external solver using $(b,--solver)=$(i,CMD).
+    The command $(i,CMD) can take arguments, i.e., `--solver="cmd arg1 arg2"'.
+    Syntax is:|};
+
+    `Pre "    $(mname) $(b,--solver)=$(b,CMD) [$(b,--sat)|$(b,--qbf)] [--show-hidden|--verbose] $(i,INPUT)";
+
+    `P "The external solver $(i,CMD) must have the Minisat
     behaviour:";
     `I ("1.","it should accept DIMACS or QDIMACS on standard input");
     `I ("2.","it should print a model (or a partial model) in DIMACS on
@@ -697,8 +712,9 @@ let cmd =
     `P "Detail on the options for external solving:";
 
     `S latex_section;
-    `P "$(mname) can produce LaTeX from any TouIST file. $(i,TEX) allows you
-        to select what kind of LaTeX you want:";
+    `P "$(mname) can produce LaTeX from any TouIST file. The syntax is:";
+    `Pre "    $(mname) $(b,--latex)[=$(i,TEX)] [$(b,--smt),$(b,--sat)|$(b,--qbf)] $(i,INPUT)";
+    `P "$(i,TEX) allows you to select what kind of LaTeX you want:";
     `I ("`mathjax'","for a equation-only LaTeX output compatible with Mathjax."); `Noblank;
     `I ("`document'","for a complete LaTeX file (including `\\\\begin{document})
         that you can directly give to pdfLaTeX. The `mathtools' package is
@@ -708,8 +724,10 @@ let cmd =
     `S show_section;
     `P "Sometimes, you want to know what are the different internal
         translations that $(mname) is doing. Using $(b,--show), you can
-        dump the AST (Abstract Syntaxic Tree) after different steps selected
-        using $(i,AST)' which takes the following values:"; `Noblank;
+        dump the AST (Abstract Syntaxic Tree) after or during different steps.
+        Syntax is:";
+        `Pre "    $(mname) $(b,--show)[=$(i,AST)] [$(b,--sat)|$(b,--qbf)|$(b,--smt)] $(i,INPUT)";
+    `P "$(b,AST) can take the following values:"; `Noblank;
     `I ("`form'","dump the AST after evualuation, i.e., when every `bigand',
           `bigor', variables and such are expanded. This option may be useful
           to understand why your TouIST input seems to be wrongly
