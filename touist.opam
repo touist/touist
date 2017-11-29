@@ -16,14 +16,12 @@ remove: [["jbuilder" "uninstall"]]
 build-test: [["jbuilder" "runtest" "-p" name "-j" jobs]]
 build-doc: [["jbuilder" "build" "@doc" "-j" jobs]]
 depends: [
-  "menhir" {>= "20151023"}
-  "minisat" {build}
-  "ocamlbuild" {build}
-  "ocamlfind" {build}
-  "ounit" {test}
   "jbuilder" {build & >= "1.0+beta12"}
-  "re" {build}
+  "menhir" {>= "20151023"}
+  "minisat"
+  "re"
   "cmdliner" {>= "0.9.8"}
+  "ounit" {test}
   "odoc" {doc}
 ]
 depopts: [
