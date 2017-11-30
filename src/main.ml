@@ -744,7 +744,7 @@ let cmd =
   in
   Term.(
     ret (const main $ lang_and_mode $ input $ output $ common_opt),
-    info "touist" ~version:("%%VERSION%%")
+    info "touist" ~version:Version.v
       ~doc ~man ~exits:(code_msgs |> List.map (fun (doc,err) -> exit_info ~doc (get_code err))))
 
 let () = Term.exit ~term_err:(get_code CLI_ERROR) @@ Term.eval cmd
