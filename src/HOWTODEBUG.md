@@ -72,7 +72,7 @@ Rebuilding this file is automatic.
 
 You can see what rules are missing from `parser.messages`:
 
-    jbuilder build @src/lib/missing
+    make missing
 
 which checks if no error messages are missing in parser.messages
 (see section below 'Missing error cases')
