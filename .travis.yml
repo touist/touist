@@ -48,6 +48,9 @@ before_install:
   - opam update
   - opam install -y ocamlfind menhir minisat yices2 qbf ounit jbuilder re odoc cmdliner
 install:
+  # Rvm overrides cd with a function so that it can hook into it to run
+  # some scripts, see https://github.com/travis-ci/travis-ci/issues/8703
+  - unset -f cd
   # Build touist
   - cd $TRAVIS_BUILD_DIR
   - jbuilder build
