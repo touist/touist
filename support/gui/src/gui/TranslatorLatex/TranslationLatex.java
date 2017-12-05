@@ -86,7 +86,6 @@ public class TranslationLatex {
 			cmd.add("--sat");
 		} else if (language == "smt") {
 			cmd.add("--smt");
-			cmd.add("QF_IDL");
 		}
 		cmd.add("--error-format");
 		cmd.add("%l:%c:%b:%B: %t: %m");
