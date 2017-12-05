@@ -1146,8 +1146,8 @@ It contains almost everything you need to know its features and arguments.
 | 9   |`SOLVER_UNKNOWN `   |                                                        |
 |-----|--------------------|--------------------------------------------------------|
 
-Note that the `SOLVER_UNSAT` is not really an error, but we choose to return
-a non-zero return code anyway.
+Note that the `UNSAT` is not really an error, but we choose to return a
+non-zero return code anyway.
 
 ### Usage for propositional logic (SAT mode) {#usage-sat}
 
