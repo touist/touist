@@ -409,7 +409,7 @@ let solvext_flag =
           ~docv:"CMD" ~doc:"\
     (with {$(b,--sat),$(b,--qbf)}) Use $(docv) for solving. $(docv) must
     expect DIMACS (QDIMACS) on standard input, print a DIMACS model on
-    standard output and return 10 on SAT and 20 for UNSAT. You can
+    standard output and exits with 10 on SAT and 20 for UNSAT. You can
     display the stdin, stdout and stderr of $(docv) using $(b,--verbose).")
 
 let solve_section = "SOLVE"
@@ -695,7 +695,7 @@ let cmd =
     `Pre"    v -1 2 -3 4 0"; `Noblank;
     `Pre"    v 5 -6 0";
 
-    `P "The return codes is the same as with $(b,--solve). For debugging
+    `P "The exit status is the same as with $(b,--solve). For debugging
     purposes, you can add $(b,--verbose) to see the stdin/stdout/stderr
     of $(i,CMD). You can also use $(b,--show-hidden).";
     `P "Here are some examples of use:";

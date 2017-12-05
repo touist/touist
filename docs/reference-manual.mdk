@@ -1132,7 +1132,7 @@ With no `-o` flag, `touist` will output to the standard output (`stdout`).
 The man page of `touist` is available through `man touist` or `touist --help`.
 It contains almost everything you need to know its features and arguments.
 
-### Return codes
+### Exit status
 
 |-----|--------------------|--------------------------------------------------------|
 |Code |Label               | Description                                            |
@@ -1147,7 +1147,7 @@ It contains almost everything you need to know its features and arguments.
 |-----|--------------------|--------------------------------------------------------|
 
 Note that the `UNSAT` is not really an error, but we choose to return a
-non-zero return code anyway.
+non-zero exit status anyway.
 
 ### Usage for propositional logic (SAT mode) {#usage-sat}
 
@@ -1427,7 +1427,7 @@ the argument `--solver`:
 ```
 
 For debugging purposes, you can add `--verbose` to see the stdin/stdout/stderr.
-The return code of `touist` is the same as with `--solve`.
+The exit code of `touist` is the same as with `--solve`.
 
 The external solvers must use the following Minisat + (Q)DIMACS conventions:
 - should accept DIMACS or QDIMACS on standard input;
