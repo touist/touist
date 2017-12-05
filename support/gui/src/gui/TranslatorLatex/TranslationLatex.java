@@ -89,7 +89,7 @@ public class TranslationLatex {
 			cmd.add("QF_IDL");
 		}
 		cmd.add("--error-format");
-		cmd.add("%l:%L:%b:%B: %t: %m");
+		cmd.add("%l:%c:%b:%B: %t: %m");
 		
         System.out.println("latexify(): cmd executed: "+cmd.toString());
 		

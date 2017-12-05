@@ -102,7 +102,7 @@ public class SolverQBF extends Solver {
 		cmd.add("-");
 		cmd.add("--solve");
 		cmd.add("--error-format");
-		cmd.add("%l:%L:%b:%B: %t: %m");
+		cmd.add("%l:%c:%b:%B: %t: %m");
 		cmd.addAll(options);
 		
         System.out.println("translate_solve(): cmd executed: "+cmd.toString());
