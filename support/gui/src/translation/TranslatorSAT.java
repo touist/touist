@@ -93,16 +93,9 @@ public class TranslatorSAT {
 	 * @throws InterruptedException
 	 */
 	public boolean translate(BufferedReader reader) throws IOException, InterruptedException {
-		/* return_code from the Touistl translator (see touist.ml):
-  		| OK -> 0
-  		| COMPILE_WITH_LINE_NUMBER_ERROR -> 1
-  		| COMPILE_NO_LINE_NUMBER_ERROR -> 2
-  		| OTHER -> 3
-		 */
+		/* return_code from the Touistl translator (see touist.ml): */
 		final int OK = 0;
-		final int COMPILE_WITH_LINE_NUMBER_ERROR = 1;
-		final int COMPILE_NO_LINE_NUMBER_ERROR = 2;
-		final int OTHER = 3;
+
 		/*
 		 * Syntax of errors COMPILE_WITH_LINE_NUMBER_ERROR:
 		 * num_row:num_col: message

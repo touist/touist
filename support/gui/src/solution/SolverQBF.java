@@ -135,17 +135,11 @@ public class SolverQBF extends Solver {
 	}
 
 	public final static int OK              = 0;
-	public final static int UNKNOWN         = 1;
-	public final static int CMD_USAGE       = 2;
-	public final static int CMD_UNSUPPORTED = 3;
-	public final static int TOUIST_SYNTAX   = 4;
-	public final static int TOUIST_TIMEOUT  = 5;
-	public final static int TOUIST_MEMORY   = 6;
-	public final static int TOUIST_UNKNOWN  = 7;
-	public final static int SOLVER_UNSAT    = 8;
-	public final static int SOLVER_UNKNOWN  = 9;
-	public final static int SOLVER_TIMEOUT  = 10;
-	public final static int SOLVER_MEMORY   = 11;
+	public final static int UNSAT           = 8;
+	public final static int TRANSL_ERROR    = 50;
+	public final static int SOLVER_ERROR    = 100;
+	public final static int CLI_ERROR       = 124;
+	public final static int BUG             = 125;
 
 	@Override
 	protected Model nextModel() throws IOException, SolverExecutionException {
@@ -169,7 +163,7 @@ public class SolverQBF extends Solver {
 					+Integer.toString(WAIT_FOR_MODEL_TIMEOUT)+"ms)");
 		}
 		
-		if(p.exitValue() == SOLVER_UNSAT)
+		if(p.exitValue() == UNSAT)
 			return modelParsed;
 		else if(p.exitValue() != OK) {
 			throw new SolverExecutionException("nextModel(): touist returned error code "+Integer.toString(p.exitValue())+"\n"+errors.toString());

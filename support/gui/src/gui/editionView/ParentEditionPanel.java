@@ -723,7 +723,7 @@ public class ParentEditionPanel extends AbstractComponentPanel {
 
                 ListIterator<Model> iter = getFrame().getSolver().getModelList().iterator();
                 if(!iter.hasNext()) {
-                    if(s.getReturnCode() == SolverSMT.SOLVER_UNSAT) {
+                    if(s.getReturnCode() == SolverSMT.UNSAT) {
                         System.out.println("This problem is unsatisfiable");
                         errorMessage = "There is no solution";
                         showErrorMessage(errorMessage, "Solver error");
@@ -789,7 +789,7 @@ public class ParentEditionPanel extends AbstractComponentPanel {
                 
                 ListIterator<Model> iter = getFrame().getSolver().getModelList().iterator();
                 if(!iter.hasNext()) {
-                	if(s.getReturnCode() == SolverQBF.SOLVER_UNSAT) {
+                	if(s.getReturnCode() == SolverQBF.UNSAT) {
 	                    System.out.println("This problem is unsatisfiable");
 	                    errorMessage = "There is no solution";
 	                    showErrorMessage(errorMessage, "Solver error");
