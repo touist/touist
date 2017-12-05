@@ -1,3 +1,6 @@
+v3.5.1
+  - GUI (fixes):
+    - fixed wrong line numbers displayed in error messages in QBF and SMT modes
 v3.5.0 (2017-11-28)
   - Command-line
     - touist finally has a proper man page. To open it, use `touist --help'
