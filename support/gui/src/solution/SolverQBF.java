@@ -114,7 +114,7 @@ public class SolverQBF extends Solver {
         stdin = new PrintWriter(new OutputStreamWriter(p.getOutputStream()));
         String s = "";
         while ((s = reader.readLine())!=null) {
-        	stdin.println(s + "\n");
+        	stdin.write(s + "\n");
         }
         stdin.flush();
         stdin.close();

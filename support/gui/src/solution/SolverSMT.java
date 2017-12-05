@@ -123,7 +123,7 @@ public class SolverSMT extends Solver {
         stdin = new PrintWriter(new OutputStreamWriter(p.getOutputStream()));
         String s = "";
         while ((s = reader.readLine())!=null) {
-            stdin.println(s + "\n");
+            stdin.write(s + "\n");
         }
         stdin.flush();
         stdin.close();
@@ -230,6 +230,9 @@ public class SolverSMT extends Solver {
             String linesStdErr = "";
             while (stderr.ready())
                 linesStdErr += stderr.readLine() + "\n";
+            System.err.println("====== cmd executed: begin stderr  =======");
+            System.err.print(linesStdErr);
+            System.err.println("====== end stderr =======");
             errors = TranslationError.parse(linesStdErr);
         }
         return true;
