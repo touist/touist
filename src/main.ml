@@ -77,7 +77,7 @@ let solve_ext common_opt show_hidden output lit_tbl lit_abs lit_sign lit_of_int 
     | _ -> failwith "error with --solver 'command'" in
   if common_opt.verbose then Printf.eprintf "== cmd: '%s %s'\n" prog (opts |> Array.fold_left (fun acc v-> if acc = "" then v else v^" "^acc) "");
   if common_opt.verbose then (Printf.eprintf "== stdin given to '%s':\n" cmd; print_dimacs stderr);
-  let proc_stdout, proc_stdin, proc_stderr = Unix.open_process_full cmd [||] in
+  let proc_stdout, proc_stdin, proc_stderr = Unix.open_process_full cmd (Unix.environment ()) in
   print_dimacs proc_stdin; close_out proc_stdin;
   (* Try to parse a space-separated list of integers; returns empty list if
      something is not an integer. *)
