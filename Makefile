@@ -20,6 +20,8 @@ test:
 missing:
 	@jbuilder build @src/lib/missing
 
+doc:
+	@jbuilder build @doc
 #
 # These targets aim to build the java GUI in support/gui/
 # It basically calls `./gradlew` (which is like `make` but for java)
