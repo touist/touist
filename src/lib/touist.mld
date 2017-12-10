@@ -1,0 +1,46 @@
+{1 Touist: Parse, transform & solve TouIST files}
+
+Touist works as a flow beginning with a TouIST string ([text]) and where
+each step transform the {{!Touist.Types.Ast.t}[ast]}. For example:
+
+{C
+{{!Touist.Parse.parse_sat}[parse]} ▷ {{!Touist.Eval.eval}[eval]}
+▷ {{!Touist.Cnf.ast_to_cnf}[ast_to_cnf]}
+▷ {{!Touist.SatSolve}[sat_solve]}
+}
+
+where ▷ is the an {{!Touist.Types.Ast.t}[ast]}.
+
+The {b input steps} in this "flow" are:
+
+- {!Touist.Parse} turns a text written in TouIST into an Abstract Syntaxic
+  Tree (AST).
+
+The {b intermediate steps} are:
+
+- {!Touist.Eval} evaluates an AST produced by {!Touist.Parse.parse_sat}
+  (or any other parse function) so it becomes a semantically correct
+  formula.
+- {!Touist.Cnf} processes an evaluated AST given by {!Touist.Eval.eval} to
+  produce a CNF AST and output DIMACS
+- {!Touist.Smt} processes an evaluated AST given by {!Touist.Eval.eval} and
+  produces a string in SMT-LIB2 format.
+- {!Touist.Qbf} transforms an evaluated AST into prenex form, CNF and QDIMACS.
+
+The {b output} steps are:
+- {!Touist.SatSolve} (requires minisat) Process a CNF AST to clauses in order
+  to solve them with Minisat.
+- {!Touist.Pprint} transforms any AST (at any stage of transformation) to a
+  string.
+- {!Touist.Latex} transforms any AST (at any stage of transformation) to latex.
+
+The helper modules are:
+- {!Touist.Err} manages the compiler errors.
+- {!Touist.Types} contains the {{!Touist.Types.Ast.t}[Ast.t]} type (Abstract
+  Syntaxic Tree).
+
+Also, the optional {b output} steps are:
+- {!Touist_smt.SmtSolve} Requires yices2 Process an evaluated AST in order to
+  solve it with Yices2.
+- {!Touist_qbf.QbfSolve} Requires qbf Process a CNF AST to clauses in order to
+  solve them with Quantor.
