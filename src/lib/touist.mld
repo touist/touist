@@ -9,7 +9,7 @@ each step transform the {{!Touist.Types.Ast.t}[ast]}. For example:
 ▷ {{!Touist.SatSolve}[sat_solve]}
 }
 
-where ▷ is the an {{!Touist.Types.Ast.t}[ast]}.
+where ▷ is an {{!Touist.Types.Ast.t}[ast]}.
 
 The {b input steps} in this "flow" are:
 
