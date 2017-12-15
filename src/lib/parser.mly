@@ -43,7 +43,7 @@
 %token EOF
 %token FORALL EXISTS
 %token FOR NEWLINE
-
+%token QUOTE
 
 (* The following lines define in which order the tokens should
  * be reduced, e.g. it tells the parser to reduce * before +.
@@ -60,7 +60,6 @@
  * %noassoc, e.g. NOT(a)
  *   The precedence rule has no direction; this often
  *   applies for unary oparators *)
-
 %left NEWLINE
 %left newlineBefore
 %nonassoc affect_before_exprsmt
@@ -235,6 +234,7 @@ expr:
   | x=set_empty
   | x=set_decl_explicit(expr)
   | x=set_operation(expr) {x}
+  | QUOTE f=formula_simple QUOTE {Loc (Formula f,($startpos,$endpos))}
 
 %inline equality(T):
   | x=T  EQUAL    y=T   {Loc (Equal (x,y),($startpos,$endpos)) }

@@ -99,6 +99,7 @@ module rec Ast : sig
     | For              of t * t * t
     | NewlineAfter     of t
     | NewlineBefore    of t
+    | Formula          of t
 end = Ast (* see (1) *)
 
 and AstSet : sig
@@ -134,6 +135,7 @@ struct
         | Float x, Float y -> Pervasives.compare x y
         | Prop x, Prop y -> Pervasives.compare x y
         | Set x, Set y -> Pervasives.compare x y
+        | Formula x, Formula y -> Pervasives.compare x y
         | _ -> failwith "cannot compare"
     end)
 

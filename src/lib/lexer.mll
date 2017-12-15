@@ -112,30 +112,31 @@ let double     = digit+ '.' digit+
      transforms the function (1) to correct function type (2).
 *)
 rule token = parse (* is a function (Lexing.lexbuf -> Parser.token list) *)
-  | eof               {[ EOF          ]}
-  | empty+            {  token lexbuf  }
-  | "["               {[ LBRACK       ]}
-  | "]"               {[ RBRACK       ]}
-  | ".."              {[ RANGE        ]}
-  | ","               {[ COMMA        ]}
-  | "=="              {[ EQUAL        ]}
-  | "!="              {[ NOTEQUAL     ]}
-  | "+"               {[ ADD          ]}
-  | "-"               {[ SUB          ]}
-  | "*"               {[ MUL          ]}
-  | "/"               {[ DIV          ]}
-  | "=>"              {[ IMPLIES      ]}
-  | "<=>"             {[ EQUIV        ]}
-  | "<"               {[ LT           ]}
-  | ">"               {[ GT           ]}
-  | "<="              {[ LE           ]}
-  | ">="              {[ GE           ]}
-  | "="               {[ AFFECT       ]}
-  | ":"               {[ COLON        ]}
-  | ")"               {[ RPAREN       ]}
-  | "\\\\"               {[ NEWLINE       ]}
+  | eof               {[ EOF            ]}
+  | empty+            {  token lexbuf    }
+  | "\""              {[ QUOTE          ]} (* for an formula-expr *)
+  | "["               {[ LBRACK         ]}
+  | "]"               {[ RBRACK         ]}
+  | ".."              {[ RANGE          ]}
+  | ","               {[ COMMA          ]}
+  | "=="              {[ EQUAL          ]}
+  | "!="              {[ NOTEQUAL       ]}
+  | "+"               {[ ADD            ]}
+  | "-"               {[ SUB            ]}
+  | "*"               {[ MUL            ]}
+  | "/"               {[ DIV            ]}
+  | "=>"              {[ IMPLIES        ]}
+  | "<=>"             {[ EQUIV          ]}
+  | "<"               {[ LT             ]}
+  | ">"               {[ GT             ]}
+  | "<="              {[ LE             ]}
+  | ">="              {[ GE             ]}
+  | "="               {[ AFFECT         ]}
+  | ":"               {[ COLON          ]}
+  | ")"               {[ RPAREN         ]}
+  | "\\\\"            {[ NEWLINE        ]}
   | '$'(var as v)'('  {[ VARTUPLE ("$" ^ v)]}
-  | '$'(var as v)     {[ VAR ("$" ^ v)]}
+  | '$'(var as v)     {[ VAR ("$" ^ v)  ]}
     (* This rule is going to take care of both identifiers
      * and every keyword in reserved_keywords *)
   | (ident as i)'('

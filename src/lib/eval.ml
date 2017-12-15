@@ -140,7 +140,7 @@ and eval_touist_code (env:env) ast :Ast.t =
    the boolean values must be computed: eval_ast will do exactly that.*)
 and eval_ast (env:env) (ast:Ast.t) : Ast.t =
   let eval_ast = eval_ast env in
-  let expanded = match ast_without_loc ast with
+  match ast_without_loc ast with
   | Int x   -> Int x
   | Float x -> Float x
   | Bool x  -> Bool x
@@ -315,8 +315,8 @@ and eval_ast (env:env) (ast:Ast.t) : Ast.t =
   | Prop x -> Prop x
   | Loc (x,l) -> eval_ast x
   | Paren x -> eval_ast x
-  | e -> failwith ("[shouldnt happen] this expression cannot be expanded: " ^ string_of_ast e ^"\n")
-  in expanded
+  | Formula x -> Formula (eval_ast_formula env x)
+  | e -> raise_with_loc ast ("[shouldnt happen] this expression cannot be expanded: " ^ string_of_ast e ^"\n")
 
 and eval_set_decl (env:env) (set_decl:Ast.t) =
   let sets = (match ast_without_loc set_decl with Set_decl sets -> sets | _ -> failwith "shoulnt happen: non-Set_decl in eval_set_decl") in
@@ -325,6 +325,7 @@ and eval_set_decl (env:env) (set_decl:Ast.t) =
     | Int _  , Int x   -> Int x
     | Float _, Float x -> Float x
     | Prop _ , Prop x  -> Prop x
+    | Formula _, Formula x -> Formula x
     | Set _  , Set x   -> Set x
     | _ -> raise_set_decl set_decl elmt elmt_expanded
              (Set_decl sets) (Set_decl sets_expanded)
@@ -338,10 +339,10 @@ and eval_set_decl (env:env) (set_decl:Ast.t) =
   | [],[] -> Set AstSet.empty
   | x::_,first::_ -> begin
       match first with
-      | Int _ | Float _ | Prop _ | Set _ -> Set (AstSet.of_list (List.map2 (unwrap_set first) sets sets_expanded))
+      | Int _ | Float _ | Prop _ | Formula _ | Set _ -> Set (AstSet.of_list (List.map2 (unwrap_set first) sets sets_expanded))
       | _ -> raise_set_decl set_decl x first
                     (Set_decl sets) (Set_decl sets_expanded)
-                    "elements of type 'int', 'float', 'prop' or 'set'"
+                    "elements of type 'int', 'float', 'prop', 'set' or 'formula'"
     end
   | [],x::_ | x::_,[] -> failwith "[shouldn't happen] len(sets)!=len(sets_expanded)"
 
@@ -353,8 +354,10 @@ and eval_ast_formula (env:env) (ast:Ast.t) : Ast.t =
   and eval_ast_formula_env = eval_ast_formula
   and eval_ast = eval_ast env in
   match ast_without_loc ast with
-  | Int x   -> Int x
-  | Float x -> Float x
+  | Int x when not !smt -> failwith "Integer allowed only with SMT solver"
+  | Int x when !smt -> Int x
+  | Float x when not !smt -> failwith "Float allowed only with SMT solver"
+  | Float x when !smt -> Float x
   | Neg x ->
     begin
       match eval_ast_formula x with
@@ -422,11 +425,12 @@ and eval_ast_formula (env:env) (ast:Ast.t) : Ast.t =
         | Prop x -> Prop x
         | Int x when !smt -> Int x
         | Float x when !smt -> Float x
+        | Formula x -> x
         | _ -> raise_with_loc ast
             ("local variable '" ^ name ^ "' (defined in bigand, bigor or let) "^
-            "cannot be expanded into a 'prop' because its content "^
+            "cannot be expanded into a 'prop' or 'formula' because its content "^
             "is of type '"^(string_of_ast_type content)^"' instead of "^
-              (if !smt then "'prop', 'int' or 'float'" else "'prop'") ^ ". "^
+            (if !smt then "'int', 'float', " else "")^ "'prop' or 'formula'. "^
             "Why? Because this variable is part of a formula, and thus is expected"^
             "to be a proposition. Here is the content of '" ^name^"':\n"^
             "    "^(string_of_ast content)^"\n")
@@ -439,10 +443,11 @@ and eval_ast_formula (env:env) (ast:Ast.t) : Ast.t =
         | Prop x -> Prop x
         | Int x when !smt -> Int x
         | Float x when !smt -> Float x
+        | Formula x -> x
         | _ -> raise_with_loc ast
-            ("global variable '" ^ name ^ "' cannot be expanded into a 'prop' "^
+            ("global variable '" ^ name ^ "' cannot be expanded into a 'prop' or 'formula' "^
             "because its content is of type '"^(string_of_ast_type content)^"' instead of "^
-               (if !smt then "'prop', 'int' or 'float'" else "'prop'") ^ ". "^
+            (if !smt then "'int', 'float', " else "")^ "'prop' or 'formula'. "^
             "Why? Because this variable is part of a formula, and thus is expected "^
             "to be a proposition. Here is the content of '" ^name^"':\n"^
             "    "^(string_of_ast content)^"\n")
@@ -602,6 +607,7 @@ and eval_ast_formula (env:env) (ast:Ast.t) : Ast.t =
     | _,content' -> raise_type_error ast content content' " 'prop-set'"
   end
   | NewlineBefore f | NewlineAfter f -> eval_ast_formula f
+  | Formula f -> eval_ast_formula f
   | e -> raise_with_loc ast ("this expression is not a formula: " ^ string_of_ast e ^"\n")
 
 and exact_str lst =
