@@ -3,8 +3,8 @@
 (ocamllex (lexer))
 (menhir
     ((modules (parser))
-     (flags (--table ))))
-     ; (flags (--table --infer))
+     (flags (--table --explain))))
+     ; (flags (--table --infer --explain))
 
 (library
  ((name        touist)
@@ -37,3 +37,8 @@
                      --compare-errors ${<}
                      --compare-errors parser.messages
                      --list-errors parser.mly))))
+(rule
+    ((targets (parser.messages))
+     (action (with-stdout-to ${@}
+                (run ${bin:menhir} --list-errors parser.mly)))
+    (fallback) #| fallback = do not rebuild if target already exists |#))

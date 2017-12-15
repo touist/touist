@@ -101,6 +101,7 @@ sig
     | For              of t * t * t
     | NewlineAfter     of t
     | NewlineBefore    of t
+    | Formula          of t
 end
 and AstSet :
 sig
