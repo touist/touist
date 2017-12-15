@@ -608,6 +608,9 @@ and eval_ast_formula (env:env) (ast:Ast.t) : Ast.t =
   end
   | NewlineBefore f | NewlineAfter f -> eval_ast_formula f
   | Formula f -> eval_ast_formula f
+  | Subst (f1,p,f2) ->
+    let f1,p,f2 = eval_ast_formula f1, eval_ast_formula p, eval_ast_formula f2 in
+      map (function Prop x when Prop x = p -> f2 | y->y) f1
   | e -> raise_with_loc ast ("this expression is not a formula: " ^ string_of_ast e ^"\n")
 
 and exact_str lst =
@@ -753,3 +756,28 @@ and set_to_ast_list (env:env) (ast:Ast.t) :Ast.t list =
     if ast != Top && ast != Bottom && has_top_or_bot ast
     then rm_top_bot (eval_ast_formula [] ast)
     else ast
+  (* [map] will apply f to every node of the ast; ast must be an evaluated
+     formula. *)
+  and map f ast = let map = map f in
+  match ast with
+  | Top | Bottom | Prop _ -> ast |> f
+  | Not x -> Not (map x) |> f
+  | Neg x -> Neg (map x) |> f
+  | And      (x,y)   -> And     (map x, map y) |> f
+  | Or       (x,y)   -> Or      (map x, map y) |> f
+  | Xor      (x,y)   -> Xor     (map x, map y) |> f
+  | Implies  (x,y)   -> Implies (map x, map y) |> f
+  | Equiv    (x,y)   -> Equiv   (map x, map y) |> f
+  | Add      (x,y)   -> Add     (map x, map y) |> f
+  | Sub      (x,y)   -> Sub     (map x, map y) |> f
+  | Mul      (x,y)   -> Mul     (map x, map y) |> f
+  | Div      (x,y)   -> Div     (map x, map y) |> f
+  | Equal            (x,y) -> Equal            (map x, map y) |> f
+  | Not_equal        (x,y) -> Not_equal        (map x, map y) |> f
+  | Lesser_than      (x,y) -> Lesser_than      (map x, map y) |> f
+  | Lesser_or_equal  (x,y) -> Lesser_or_equal  (map x, map y) |> f
+  | Greater_than     (x,y) -> Greater_than     (map x, map y) |> f
+  | Greater_or_equal (x,y) -> Greater_or_equal (map x, map y) |> f
+  | Exists (x,y)           -> Exists (map x, map y) |> f
+  | Forall (x,y)           -> Forall (map x, map y) |> f
+  | _ -> failwith ("'map' shouldn't be used on '"^string_of_ast_type ~debug:true ast^"': "^string_of_ast ~utf8:true ~debug:true ast)

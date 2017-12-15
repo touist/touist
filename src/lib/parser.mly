@@ -287,6 +287,7 @@ expr:
   | f=let_affect(expr,F) {f}
   | NEWLINE f=F { NewlineBefore f } %prec newlineBefore
   | f=F NEWLINE { NewlineAfter f }
+  | f=F LBRACK p=prop DIV f2=F RBRACK { Loc (Subst(f,p,f2), ($startpos,$endpos))}
 
 let_affect(T,F): LET vars=comma_list(var) AFFECT contents=comma_list(T) COLON form=F
     {try List.fold_right2 (fun var content acc ->

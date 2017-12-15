@@ -114,6 +114,7 @@ let rec latex_of_ast ~full ast =
   | NewlineBefore f -> "\\\\\n" ^ latex_of_ast f
   | NewlineAfter f -> latex_of_ast f ^ "\\\\\n"
   | Formula f -> latex_of_ast f
+  | Subst (f1,p,f2) -> latex_of_ast f1 ^ " ["^latex_of_ast p^"/"^latex_of_ast f2^"]"
 
   and latex_of_commalist ~full sep el = String.concat sep (List.map (latex_of_ast ~full) el)
   and escape_underscore txt =
@@ -131,7 +132,7 @@ and ast_fun (f:('a -> Ast.t -> 'a)) (acc:'a) ast : 'a =
   | Neg f | Sqrt f | To_int f | To_float f | Abs f | Not f
   | Bigand (_,_,_,f) | Bigor  (_,_,_,f) | Let (_,_,f) | Loc (f,_)
   | Paren f | Exists (_,f) | Forall (_,f) | For (_,_,f)
-  | NewlineBefore f | NewlineAfter  f
+  | NewlineBefore f | NewlineAfter  f | Formula f
       -> acc |> ast_fun' f
   | Add (x,y) | Sub (x,y) | Mul (x,y) | Div (x,y)
   | If (_,x,y) | And (x,y) | Or (x,y) | Xor (x,y) | Implies (x,y) | Equiv (x,y)
@@ -140,7 +141,7 @@ and ast_fun (f:('a -> Ast.t -> 'a)) (acc:'a) ast : 'a =
       -> acc |> ast_fun' x |> ast_fun' y
   | Int _ | Float _ | Bool _ | Top | Bottom | Prop _ | UnexpProp _ | Var _
   | Set _ | Set_decl _ | Card  _ | Exact _ | Atmost _ | Atleast _ | Affect  _
-  | Formula _
+  | Subst _
       -> acc
   (* non-formulas *)
   | Mod _ | Union _ | Inter _ | Diff _ | Range _ | Subset _ | Powerset _

@@ -102,6 +102,7 @@ sig
     | NewlineAfter     of t
     | NewlineBefore    of t
     | Formula          of t
+    | Subst            of t * t * t
 end
 and AstSet :
 sig

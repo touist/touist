@@ -100,6 +100,7 @@ module rec Ast : sig
     | NewlineAfter     of t
     | NewlineBefore    of t
     | Formula          of t
+    | Subst            of t * t * t
 end = Ast (* see (1) *)
 
 and AstSet : sig
