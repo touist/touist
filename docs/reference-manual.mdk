@@ -188,22 +188,24 @@ variables (with global or local affectations).
 ### Syntax of a variable
 
 ``` Grammar
-<expr> ::= <int>|<float>|<prop>|<bool>|<set>
+<expr> ::= <int>|<float>|<prop>|<bool>|"""<formula-simple>"""|<set>
 <var> ::= "$" TERM                           <- simple-var
     | "$" TERM "(" <comma-list(<expr>)> ")"   <- tuple-var
 ```
 
 * Simple variable ("simple-var")
   : A simple variable is of the form ``$my_var``. In a formula, a simple
-    variable is always expected to be a proposition. In an expression, a simple
+    variable is always expected to be a proposition or a
+    [quoted formula][#quoted-formulas]. In an expression, a simple
     variable can contain an integer, a floating-point, a proposition, a boolean
     or a set.
 * Tuple variable (can be seen as a _predicate_)
   : A tuple variable is a simple variable followed by a comma-separated list of
     indexes in braces, e.g., ``$var($i,a,4)``. The leading variable (``$var``)
-    must always contain a proposition. The nested indexes (e.g., ``$i``) can be
-    integers, floats, propositions or booleans.
-  : A tuple variable will always be expanded to a proposition. For example, if
+    must always contain a proposition. The nested indexes (e.g., ``$i``)
+    can be integers, floats, propositions or booleans.
+  : A tuple variable will always be expanded to a proposition or a
+    [quoted formula][#quoted-formulas]. For example, if
     ``$var=p`` and ``$i=q``, then it will expand to ``p(q,a,4)``
   : Tuple variables are not (yet) compatible with the set-builder construct (in
     [#set-builder]). If one of the indexes is a set, the set will stay
@@ -227,7 +229,7 @@ formula (meaning that global variables cannot be nested in other
 formulas) using the following affectation syntax:
 ``` Grammar
 <affect> ::= <var> "=" (<expr>)      <-- global affectation
-<expr> ::= <int>|<float>|<prop>|<bool>|<set>
+<expr> ::= <int>|<float>|<prop>|<bool>|"""<formula-simple>"""|<set>
 ```
 
 Global variables apply for the whole code, even if the affectation is
@@ -460,14 +462,23 @@ Here is the full grammar rule for booleans:
 
 ## Sets
 
-Sets can contain anything (propositions, integers, floats, booleans
-or even other sets) as long as all elements have the same type. There
-exists three ways of creating a set:
+Sets can contain anything (propositions, integers, floats,
+booleans, [quoted formulas][#quoted-formulas] or even other sets) as long
+as all elements have the same type. There exists three ways of creating a
+set:
 
 ### Sets defined by enumeration
-$\{1,3,8,10\}$ can be written ``[1,2,3]``. Elements can be integers, floats,
-propositions, booleans or sets (or a variable of these five types).
-The empty set $\emptyset$ is denoted by ``[]``.
+$\{1,3,8,10\}$ can be written ``[1,2,3]``. Elements can be integers,
+floats, propositions, booleans, [quoted formulas][#quoted-formulas] or
+sets (or a variable of these six types). The empty set $\emptyset$ is
+denoted by ``[]``. Examples:
+
+```Touist
+    [1,2,3+1]
+    [a,b,p(1,v)]
+    [[1,2],[3,4,5]]
+    ["a or b", "c => d"]
+```
 
 ### Sets defined by a range
 $\{i~|~i=1,\dots,10\}$ can be written ``[1..10]``. Ranges can
@@ -839,7 +850,7 @@ the "always true" and "always false". Here is the complete grammar:
     | <let-affect(<T>)>
 
 ```
-## SMT formulas
+### SMT formulas
 
 The &touist; language also accepts formulas of the Satisfiability Modulo Theory (SMT).
 To use the `touist` program with SMT formulas, see [#usage-smt] 
@@ -848,7 +859,7 @@ To use the `touist` program with SMT formulas, see [#usage-smt]
 Describe the SMT language
 ~
 
-## QBF formulas
+### QBF formulas
 
 The &touist; language accepts Quantified Boolean Formulas (QBF). Using
 the `--qbf` and `--solve` flags (in `touist`) or the QBF selector (in the
@@ -873,13 +884,13 @@ One quantifier can quantify over multiple propositions. For example:
 \forall e. \forall d. (\exists a. \exists b. (a \Rightarrow b)) \Rightarrow (e \wedge \forall c. (e \Rightarrow c))
 ~
 
-### Free variables
+#### Free variables
 
 Any free variable (i.e., not quantified) will be existentially quantified
 in an inner-most way. For example, $\forall a. a \wedge b$ will become
 $\forall a. \forall b. (a \wedge b)$.
 
-### Renaming during the prenex transformation
+#### Renaming during the prenex transformation
 
 Using the rules for transforming an arbitrary formula into prenex form
 requires sometimes some renaming. For example, $(\forall a. a) \wedge a$
@@ -913,7 +924,7 @@ is to continue the formula with a ``and`` instead of using a new line:
     and (x => y)
 ```
 
-### Multiple ``exists`` or ``forall``
+#### Multiple ``exists`` or ``forall``
 
 The keyword ``for`` used in ``exists`` or ``forall`` allow us to generate
 multiple quantifiers using sets. Imagine that you want to write
@@ -925,6 +936,23 @@ You can use one of the two notations:
     exists a: exists b: exists c: exists d: phi ;; (1)
     exists $p for $p in [a,b,c,d]: phi          ;; equivalent to (1)
 ```
+
+### Quoted formulas (formulas as expressions) {#quoted-formulas}
+
+When you want to use formulas in sets, you must use double quotes `""` to
+"protect" the formula from being evaluated as a normal expression. For
+example:
+
+```Touist
+    bigand $f in ["a or b", "c or d", "e"]:
+        $f
+    end
+```
+
+will give the formula
+~ Math
+(a \vee b) \wedge (c \vee d) \wedge e
+~
 
 ## Formal grammar
 
@@ -952,7 +980,7 @@ TERM      = [_0-9]*[a-zA-Z][a-zA-Z_0-9]*
                  | <formula> <touist-file>
                  | EOF
 
-<expr> ::= <int>|<float>|<prop>|<bool>|<set>
+<expr> ::= <int>|<float>|<prop>|<bool>|<set>|"""<formula-simple>"""
 <var> ::= "$" TERM
     | "$" TERM "(" <comma-list(<expr>)> ")"
 
