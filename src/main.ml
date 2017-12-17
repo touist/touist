@@ -62,7 +62,7 @@ type mode =
 type common_opt = {
   error_format: string;
   wrap_width: int;
-  verbose: bool;
+  verbose: int; (* 0 = off, 1 = a bit verbose, 0 = more verbose *)
 }
 
 let exit_with (exit_code:error) = exit (get_code exit_code)
@@ -71,12 +71,12 @@ let exit_with (exit_code:error) = exit (get_code exit_code)
    - non-zero negative integers -> should be transformed into a negative literal
    - non-zero positive integers -> transformed into a positive literal
    - zero will never be passed. *)
-let solve_ext common_opt show_hidden output lit_tbl lit_abs lit_sign lit_of_int (print_dimacs:out_channel -> unit) cmd =
+let solve_ext common_opt show_hidden output lit_tbl lit_abs lit_sign lit_of_int (print_dimacs:?line_begin:string -> out_channel -> unit) cmd =
   let prog, opts = match cmd |> Re_str.(split (regexp " +")) with
     | v::next -> v, Array.of_list next
-    | _ -> failwith "error with --solver 'command'" in
-  if common_opt.verbose then Printf.eprintf "== cmd: '%s %s'\n" prog (opts |> Array.fold_left (fun acc v-> if acc = "" then v else v^" "^acc) "");
-  if common_opt.verbose then (Printf.eprintf "== stdin given to '%s':\n" cmd; print_dimacs stderr);
+    | _ -> failwith ("error with --solver=cmd") in
+  if common_opt.verbose>1 then Printf.eprintf "== cmd: '%s %s'\n" prog (opts |> Array.fold_left (fun acc v-> if acc = "" then v else v^" "^acc) "");
+  if common_opt.verbose>1 then (print_dimacs ~line_begin:"== stdin: " stderr);
   let proc_stdout, proc_stdin, proc_stderr = Unix.open_process_full cmd (Unix.environment ()) in
   print_dimacs proc_stdin; close_out proc_stdin;
   (* Try to parse a space-separated list of integers; returns empty list if
@@ -91,7 +91,7 @@ let solve_ext common_opt show_hidden output lit_tbl lit_abs lit_sign lit_of_int 
   in
   let rec process in_chan =
     try let line = input_line in_chan in
-      if common_opt.verbose then Printf.eprintf "%s\n" line;
+      if common_opt.verbose>1 then Printf.eprintf "== stdout: %s\n" line;
       let line_lst =
         match String.get line 0 with
         | 'V' | 'v' -> String.sub line 2 (String.length line -2) |> ints_of_string
@@ -100,9 +100,12 @@ let solve_ext common_opt show_hidden output lit_tbl lit_abs lit_sign lit_of_int 
       in line_lst @ (process in_chan)
     with End_of_file -> []
   in
-  if common_opt.verbose then Printf.eprintf "== stdout from '%s':\n" cmd;
   let valuated_lits = process proc_stdout in
-  if common_opt.verbose then Printf.eprintf "== stderr from '%s':\n%s" cmd (Parse.string_of_chan proc_stderr);
+  let rec string_of_chan chan prefix = match input_line chan with
+    | t -> prefix ^ t ^ "\n" ^ string_of_chan chan prefix
+    | exception End_of_file -> ""
+  in
+  if common_opt.verbose>1 then Printf.eprintf "%s" (string_of_chan proc_stderr "== stderr: ");
   match Unix.close_process_full (proc_stdout, proc_stdin, proc_stderr) with
   | Unix.WEXITED 10 when List.length valuated_lits > 0 ->
     (lit_tbl |> Hashtbl.iter (fun lit lit_name ->
@@ -115,21 +118,21 @@ let solve_ext common_opt show_hidden output lit_tbl lit_abs lit_sign lit_of_int 
      exit_with OK)
   | Unix.WEXITED 127 ->
     (Printf.eprintf
-       "Command '%s' not found (try with --verbose)\n" cmd;
+       "Command '%s' not found (try with -v2)\n" cmd;
      exit_with CLI_ERROR)
   | Unix.WEXITED 10 ->
     (Printf.eprintf
-       "Command '%s' returned SAT but did not print a model (try with --verbose)\n\
+       "Command '%s' returned SAT but did not print a model (try with -v2)\n\
         A DIMACS model line must be integers optionally beginning with v or V\n\
         and optionally ending with 0.\n" cmd;
      exit_with SOLVER_ERROR)
   | Unix.WEXITED 20 ->
     (Printf.eprintf
-       "Command '%s' returned UNSAT (try with --verbose)\n" cmd;
+       "Command '%s' returned UNSAT (try with -v2)\n" cmd;
      exit_with UNSAT)
   | Unix.WEXITED c ->
     Printf.eprintf
-      "Command '%s' returned unknown code %d (try with --verbose)\n\
+      "Command '%s' returned unknown code %d (try with -v2)\n\
        Expected codes are 10 for SAT and 20 for UNSAT\n"
       cmd c; exit_with SOLVER_ERROR;
   | _ -> Printf.eprintf "Error with %s, received signal\n" (cmd)
@@ -147,7 +150,7 @@ let main (lang,mode) (input,input_f) (output,output_f: string * out_channel) com
 
     let input_text = Parse.string_of_chan input_f in
     let smt = match lang with Smt _ -> true | _-> false in
-    let debug_syntax = common_opt.verbose in
+    let debug_syntax = common_opt.verbose>0 in
 
     let ast_plain text =
       match lang with
@@ -210,7 +213,7 @@ let main (lang,mode) (input,input_f) (output,output_f: string * out_channel) com
         let solve (filename,inputchan) =
           Parse.(parse_sat ~debug_syntax ~filename (string_of_chan inputchan))
           |> Eval.eval |> Cnf.ast_to_cnf |> SatSolve.minisat_clauses_of_cnf
-          |> SatSolve.solve_clauses ~verbose:common_opt.verbose
+          |> SatSolve.solve_clauses ~verbose:(common_opt.verbose>0)
         in
         let models = solve (input,input_f) and models2 = solve (input2,input2_f) in
         (match SatSolve.ModelSet.equal models models2 with
@@ -219,7 +222,7 @@ let main (lang,mode) (input,input_f) (output,output_f: string * out_channel) com
       | Sat, Solve {equiv=None; count=true} ->
         SatSolve.(Parse.parse_sat ~debug_syntax ~filename:input input_text
                   |> Eval.eval |> Cnf.ast_to_cnf |> minisat_clauses_of_cnf
-                  |> solve_clauses ~verbose:common_opt.verbose |> ModelSet.cardinal
+                  |> solve_clauses ~verbose:(common_opt.verbose>0) |> ModelSet.cardinal
                   |>  Printf.fprintf output_f "%d\n"; exit_with OK)
       | Sat, Solve {equiv=None; limit; count=false; interactive} ->
         let print_model table model i =
@@ -248,7 +251,7 @@ let main (lang,mode) (input,input_f) (output,output_f: string * out_channel) com
         let models =
           SatSolve.(Parse.parse_sat ~debug_syntax ~filename:input input_text
                     |> Eval.eval |> Cnf.ast_to_cnf |> minisat_clauses_of_cnf
-                    |> solve_clauses ~verbose:common_opt.verbose ~print:print_model
+                    |> solve_clauses ~verbose:(common_opt.verbose>0) ~print:print_model
                       ~continue:(if interactive then continue_asking else continue_limit))
         in
         (match SatSolve.ModelSet.cardinal models with
@@ -267,11 +270,13 @@ let main (lang,mode) (input,input_f) (output,output_f: string * out_channel) com
         exit_with OK
       | Sat, SolveExt {cmd; hidden} ->
         let ast = Parse.parse_sat ~debug_syntax ~filename:input input_text |> Eval.eval in
-        let clauses,tbl = Cnf.ast_to_cnf ast |> SatSolve.minisat_clauses_of_cnf
-        in cmd |> solve_ext common_opt hidden output_f tbl (Minisat.Lit.abs) (Minisat.Lit.sign)
-             (* because given integers can be negative: *)
-             (fun v -> abs v |> Minisat.Lit.make |> fun l -> if v>0 then l else Minisat.Lit.neg l)
-             (SatSolve.print_dimacs (clauses,tbl))
+        let clauses,tbl = Cnf.ast_to_cnf ast |> SatSolve.minisat_clauses_of_cnf in
+        if common_opt.verbose>0 then (Printf.eprintf "== variables: %d\n== clauses: %d\n"
+                                      (Hashtbl.length tbl) (List.length clauses));
+        cmd |> solve_ext common_opt hidden output_f tbl (Minisat.Lit.abs) (Minisat.Lit.sign)
+          (* because given integers can be negative: *)
+          (fun v -> abs v |> Minisat.Lit.make |> fun l -> if v>0 then l else Minisat.Lit.neg l)
+          (fun ?(line_begin="") out -> SatSolve.print_dimacs ~line_begin (clauses,tbl) out)
       | Smt logic, Translate _ ->
         let ast = Parse.parse_smt ~debug_syntax ~filename:input input_text
                   |> Eval.eval ~smt in
@@ -288,9 +293,14 @@ let main (lang,mode) (input,input_f) (output,output_f: string * out_channel) com
         let quants,int_clauses,int_tbl =
           Parse.parse_qbf ~debug_syntax ~filename:input input_text
           |> Eval.eval ~smt |> Qbf.prenex |> Qbf.cnf |> Qbf.qbfclauses_of_cnf
-        in cmd |> solve_ext common_opt hidden output_f int_tbl
-             (abs) (fun v -> v>0) (fun v -> v)
-             (Qbf.print_qdimacs (quants,int_clauses,int_tbl))
+        in
+        (if common_opt.verbose>0 then
+           (Printf.eprintf "== variables: %d\n== clauses: %d\n"
+              (Hashtbl.length int_tbl) (List.length int_clauses));
+         cmd |> solve_ext common_opt hidden output_f int_tbl
+           (abs) (fun v -> v>0) (fun v -> v)
+           (fun ?(line_begin="") out -> Qbf.print_qdimacs ~line_begin (quants,int_clauses,int_tbl) out)
+        )
       | Qbf, Translate {table; debug_dimacs} -> (* --qbf: we print QDIMACS *)
         let quants,int_clauses,int_tbl =
           Parse.parse_qbf ~debug_syntax ~filename:input input_text
@@ -324,7 +334,7 @@ let main (lang,mode) (input,input_f) (output,output_f: string * out_channel) com
   (* Warning: the [msg] already contains an ending '\n'. No need for adding
      another ending newline after it. *)
   | Err.TouistFatal msg ->
-    if common_opt.verbose then Printf.eprintf "Stacktrace:\n%s\n" (Printexc.get_backtrace ());
+    if common_opt.verbose>0 then Printf.eprintf "Stacktrace:\n%s\n" (Printexc.get_backtrace ());
     Printf.eprintf "%s" (Err.string_of_msg msg);
     exit_with (match msg with _,Usage,_,_ -> CLI_ERROR | _ -> TRANSL_ERROR)
   | Sys_error err ->
@@ -406,11 +416,11 @@ let language =
 let external_solv_section = "EXTERNAL SOLVER"
 let solvext_flag =
   Arg.(value & opt (some string) None & info ["solver"] ~docs:external_solv_section
-          ~docv:"CMD" ~doc:"\
+         ~docv:"CMD" ~doc:"\
     (with {$(b,--sat),$(b,--qbf)}) Use $(docv) for solving. $(docv) must
     expect DIMACS (QDIMACS) on standard input, print a DIMACS model on
     standard output and exits with 10 on SAT and 20 for UNSAT. You can
-    display the stdin, stdout and stderr of $(docv) using $(b,--verbose).")
+    display the stdin, stdout and stderr of $(docv) using $(b,-v2).")
 
 let solve_section = "SOLVE"
 let solve_flags =
@@ -528,13 +538,15 @@ let common_opt =
       Choose the width of the messages (errors, warnings).
       With $(docv) set to 0, you can disable the wrapping.")
   and verbose_flag =
-    Arg.(value & flag & info ["verbose";"v"] ~docs ~doc:"\
-      Print information for debugging touist. ($(i,1)) With $(b,--solver),
-      prints the stdin, stdout and stderr of the given solver. ($(i,2))
-      print 'loc' (location) when displaying syntax errors. ($(i,3)) when
-      an exception is raised, print the call stack. ($(i,4)) when a syntax
-      error is displayed, also give the automaton number; this is useful
-      when trying to fix a wrong error message in
+    Arg.(value & opt int 0 ~vopt:1 & info ["verbose";"v"] ~docv:"LVL" ~docs ~doc:"\
+      Print information for debugging touist. $(i,LVL) controls the verbosity;
+      with 1, it is a bit verbose; with 2 and upper, it is more verbose.
+      ($(i,1)) With $(b,--solver), prints the stdin, stdout and stderr of
+      the given solver. ($(i,2)) print 'loc' (location) when displaying
+      syntax errors.
+      ($(i,3)) when an exception is raised, print the call stack.
+      ($(i,4)) when a syntax error is displayed, also give the automaton
+      number; this is useful when trying to fix a wrong error message in
       `src/lib/parser.messages'.")
   in let common_opt error_format wrap_width verbose =
        {error_format; wrap_width; verbose}
@@ -608,11 +620,11 @@ let cmd =
     `Pre "    echo 'rain => wet_road rain not wet_road' | touist -";
     `P "we get the following DIMACS output:";
     `Pre {|    c wet_road 1      <- mapping between names DIMACS integers
-    c rain 2
-    p cnf 2 3         <- prelude of the DIMACS file
-    1 -2 0
-    2 0
-    -1 0|};
+               c rain 2
+               p cnf 2 3         <- prelude of the DIMACS file
+               1 -2 0
+               2 0
+               -1 0|};
     `P "With the $(b,--table) option, you can redirect these mapping lines to
         the file $(i,TABLE) (comments `c' are then not displayed).";
     `P "The following options are available in translation mode:";
@@ -650,15 +662,15 @@ let cmd =
     `Pre "    echo 'a or b' | touist - --solve --limit 0";
     `P "will display";
     `Pre {|    ==== model 0
-    1 a
-    0 b
-    ==== model 1
-    0 a
-    1 b
-    ==== model 2
-    1 a
-    1 b
-    ==== found 3 models, limit is 0 (--limit=N for more models)|};
+               1 a
+               0 b
+               ==== model 1
+               0 a
+               1 b
+               ==== model 2
+               1 a
+               1 b
+               ==== found 3 models, limit is 0 (--limit=N for more models)|};
 
     `P "Using $(b,--solve) with $(b,--smt), the valuations will be integers
     or reals instead of 0 and 1. For example,";
@@ -679,8 +691,8 @@ let cmd =
 
     `S external_solv_section;
     `P {|$(mname) can use an external solver using $(b,--solver)=$(i,CMD).
-    The command $(i,CMD) can take arguments, i.e., `--solver="cmd arg1 arg2"'.
-    Syntax is:|};
+         The command $(i,CMD) can take arguments, i.e., `--solver="cmd arg1 arg2"'.
+         Syntax is:|};
 
     `Pre "    $(mname) $(b,--solver)=$(b,CMD) [$(b,--sat)|$(b,--qbf)] [--show-hidden|--verbose] $(i,INPUT)";
 
@@ -696,8 +708,8 @@ let cmd =
     `Pre"    v 5 -6 0";
 
     `P "The exit status is the same as with $(b,--solve). For debugging
-    purposes, you can add $(b,--verbose) to see the stdin/stdout/stderr
-    of $(i,CMD). You can also use $(b,--show-hidden).";
+    purposes, you can add $(b,--verbose=2) or $(b,-v2) to see the
+    stdin/stdout/stderr of $(i,CMD). You can also use $(b,--show-hidden).";
     `P "Here are some examples of use:";
     `Pre {|    touist --sat sat.touist --solver="minisat /dev/stdin /dev/stdout"|}; `Noblank;
     `Pre {|    touist --sat sat.touist --solver="picosat --partial"|}; `Noblank;
@@ -726,7 +738,7 @@ let cmd =
         translations that $(mname) is doing. Using $(b,--show), you can
         dump the AST (Abstract Syntaxic Tree) after or during different steps.
         Syntax is:";
-        `Pre "    $(mname) $(b,--show)[=$(i,AST)] [$(b,--sat)|$(b,--qbf)|$(b,--smt)] $(i,INPUT)";
+    `Pre "    $(mname) $(b,--show)[=$(i,AST)] [$(b,--sat)|$(b,--qbf)|$(b,--smt)] $(i,INPUT)";
     `P "$(b,AST) can take the following values:"; `Noblank;
     `I ("`form'","dump the AST after evualuation, i.e., when every `bigand',
           `bigor', variables and such are expanded. This option may be useful

@@ -122,7 +122,7 @@ val print_table :
                                               <nb_clauses> = List.length clauses
     v} *)
 val print_clauses :
-  out_channel -> ('a -> string) -> 'a list list -> unit
+  out_channel -> ?prefix:string -> ('a -> string) -> 'a list list -> unit
 
 (** {2 Other functions} *)
 

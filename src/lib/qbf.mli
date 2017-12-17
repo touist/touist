@@ -61,6 +61,7 @@ val qbfclauses_of_cnf :
 
     @see <http://www.qbflib.org/qdimacs.html> QDIMACS standard *)
 val print_qdimacs :
+  ?line_begin:string ->
   ?debug_dimacs:bool ->
   int quantlist list * int list list * (int, string) Hashtbl.t ->
   ?out_table:out_channel -> out_channel -> unit

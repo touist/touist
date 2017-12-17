@@ -180,12 +180,12 @@ let print_table (int_of_lit: 'a->int) (out:out_channel) ?(prefix="") (table:('a,
   let print_lit_and_name lit name = Printf.fprintf out "%s%s %d\n" prefix name (int_of_lit lit)
   in Hashtbl.iter print_lit_and_name table
 
-let print_clauses (out:out_channel) (str_of_lit: 'a->string) (clauses:'a list list) : unit =
+let print_clauses (out:out_channel) ?(prefix="") (str_of_lit: 'a->string) (clauses:'a list list) : unit =
   let rec string_of_clause (cl:'a list) = match cl with
     | [] -> "0"
     | cur::next -> (str_of_lit cur) ^" "^ (string_of_clause next)
   and print_listclause (cl:'a list list) = match cl with
     | [] -> ()
-    | cur::next -> Printf.fprintf out "%s\n" (string_of_clause cur); print_listclause next
+    | cur::next -> Printf.fprintf out "%s%s\n" prefix (string_of_clause cur); print_listclause next
   in
   print_listclause clauses

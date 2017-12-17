@@ -190,7 +190,7 @@ let qbfclauses_of_cnf ast =
   ) []
   in List.rev quantlist_int, clauses_int, int_to_str
 
-let print_qdimacs ?(debug_dimacs=false) (quantlist_int,clauses_int,int_to_str) ?(out_table) (out:out_channel) =
+let print_qdimacs ?(line_begin="") ?(debug_dimacs=false) (quantlist_int,clauses_int,int_to_str) ?(out_table) (out:out_channel) =
   let print_lit = if debug_dimacs then
     fun v-> (if v<0 then "-" else "") ^ (abs v |> Hashtbl.find int_to_str)
     else string_of_int
@@ -200,17 +200,18 @@ let print_qdimacs ?(debug_dimacs=false) (quantlist_int,clauses_int,int_to_str) ?
      2) if out != out_table, print it as-is into out_table *)
   let _ = match out_table with
   | Some out_tbl -> int_to_str |> Cnf.print_table (fun x->x) out_tbl
-    ~prefix:(if out = out_tbl then "c " else "");
+    ~prefix:(if out = out_tbl then line_begin^"c " else line_begin);
   | None -> ()
   in
   (* Display the dimacs' preamble line. *)
-  Printf.fprintf out "p cnf %d %d\n" (Hashtbl.length int_to_str) (List.length clauses_int);
+  Printf.fprintf out "%sp cnf %d %d\n"
+    line_begin (Hashtbl.length int_to_str) (List.length clauses_int);
   (* Display the quantifiers lines *)
   quantlist_int |> List.iter (fun quantlist ->
       let open List in let open Printf in
       match quantlist with
-      | A l -> fprintf out "a%s 0\n" (l |> fold_left (fun acc s -> acc^" "^ print_lit s) "")
-      | E l -> fprintf out "e%s 0\n" (l |> fold_left (fun acc s -> acc^" "^ print_lit s) "")
+      | A l -> fprintf out "%sa%s 0\n" line_begin (l |> fold_left (fun acc s -> acc^" "^ print_lit s) "")
+      | E l -> fprintf out "%se%s 0\n" line_begin (l |> fold_left (fun acc s -> acc^" "^ print_lit s) "")
     );
   (* Display the clauses in dimacs way *)
   clauses_int |> Cnf.print_clauses out print_lit

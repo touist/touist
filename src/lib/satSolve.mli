@@ -62,7 +62,7 @@ val string_of_clauses : Minisat.Lit.t list list -> string
 (** {2 Print DIMACS} *)
 
 (** [print_dimacs (clauses, table) out] takes the
-    result of {!minisat_clauses_of_cnf} and prints the following:
+    result of {!minisat_clauses_of_cnf} and prints the following to [out]:
     - 1) If [~out_table] is given, print the mapping table from litterals
          integers to names. If [out] and [out_table] are the same, then the
          mapping table will be printed in DIMACS comments
@@ -73,8 +73,14 @@ val string_of_clauses : Minisat.Lit.t list list -> string
     - 4) the clauses (one conjunction per line, one line is a disjunction,
          minus means 'not').
 
-    See on Google "Satisfiability Suggested Format" (May 8, 1993) *)
+    See on Google "Satisfiability Suggested Format" (May 8, 1993)
+
+    [line_begin] allows to add a prefix to all outputed lines; it has nothing
+    to do with the 'table' prefix (i.e., 'c '). This prefix allows me to print
+    debug information, i.e., add 'debug:' to every printed line.
+*)
 val print_dimacs :
+  ?line_begin:string ->
   ?debug_dimacs:bool ->
   Minisat.Lit.t list list * (Minisat.Lit.t, string) Hashtbl.t ->
   ?out_table:out_channel -> out_channel -> unit

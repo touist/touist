@@ -36,7 +36,7 @@ struct
   (* [pprint] gives a string under the form
      1 prop(1,2,9)
      O prop(1,4,2)... *)
-  let pprint ?(sep="\n") table model = List.fold_left 
+  let pprint ?(sep="\n") table model = List.fold_left
       (fun acc (n,v) -> let str = (string_of_value v)^" "^(Hashtbl.find table n)
         in match acc with "" -> str | _ -> str ^ sep ^ acc)
       "" model
@@ -138,17 +138,17 @@ let solve_clauses
           (print table model i; models)
     in solve_loop 1
 
-let print_dimacs ?(debug_dimacs=false) (clauses,tbl) ?(out_table) (out:out_channel) =
+let print_dimacs ?(line_begin="") ?(debug_dimacs=false) (clauses,tbl) ?(out_table) (out:out_channel) =
   (match out_table with
    | None -> ()
    | Some out_table -> (* Display the mapping table. *)
      tbl |> Cnf.print_table (Minisat.Lit.to_int) out_table
-       ~prefix:(if out = out_table then "c " else ""));
+       ~prefix:(if out = out_table then line_begin^"c " else line_begin));
   (* Display the dimacs' preamble line. *)
-  Printf.fprintf out "p cnf %d %d\n" (Hashtbl.length tbl) (List.length clauses);
+  Printf.fprintf out "%sp cnf %d %d\n" line_begin (Hashtbl.length tbl) (List.length clauses);
   (* Display the dimacs clauses. *)
   let print_lit l = if debug_dimacs then
       (if Minisat.Lit.sign l then "" else "-") ^ (Minisat.Lit.abs l |> Hashtbl.find tbl)
     else Minisat.Lit.to_string l
   in
-  clauses |> Cnf.print_clauses out print_lit;
+  clauses |> Cnf.print_clauses out ~prefix:line_begin print_lit;
