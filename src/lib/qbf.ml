@@ -214,4 +214,4 @@ let print_qdimacs ?(line_begin="") ?(debug_dimacs=false) (quantlist_int,clauses_
       | E l -> fprintf out "%se%s 0\n" line_begin (l |> fold_left (fun acc s -> acc^" "^ print_lit s) "")
     );
   (* Display the clauses in dimacs way *)
-  clauses_int |> Cnf.print_clauses out print_lit
+  clauses_int |> Cnf.print_clauses ~prefix:line_begin out print_lit

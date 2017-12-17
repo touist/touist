@@ -248,11 +248,16 @@ let main (lang,mode) (input,input_f) (output,output_f: string * out_channel) com
            reaches [limit]. *)
         and continue_limit _ i = i < limit
         in
+        let cls,tbl = Parse.parse_sat ~debug_syntax ~filename:input input_text
+                      |> Eval.eval |> Cnf.ast_to_cnf |> SatSolve.minisat_clauses_of_cnf
+        in
+        if common_opt.verbose>0 then
+          (Printf.eprintf "== literals: %d\n== clauses: %d\n"
+             (Hashtbl.length tbl) (List.length cls));
         let models =
-          SatSolve.(Parse.parse_sat ~debug_syntax ~filename:input input_text
-                    |> Eval.eval |> Cnf.ast_to_cnf |> minisat_clauses_of_cnf
-                    |> solve_clauses ~verbose:(common_opt.verbose>0) ~print:print_model
-                      ~continue:(if interactive then continue_asking else continue_limit))
+          (cls,tbl) |> SatSolve.solve_clauses ~verbose:(common_opt.verbose>0)
+            ~print:print_model
+            ~continue:(if interactive then continue_asking else continue_limit)
         in
         (match SatSolve.ModelSet.cardinal models with
          | 0 -> Printf.fprintf stderr "unsat\n"; exit_with UNSAT
@@ -271,8 +276,8 @@ let main (lang,mode) (input,input_f) (output,output_f: string * out_channel) com
       | Sat, SolveExt {cmd; hidden} ->
         let ast = Parse.parse_sat ~debug_syntax ~filename:input input_text |> Eval.eval in
         let clauses,tbl = Cnf.ast_to_cnf ast |> SatSolve.minisat_clauses_of_cnf in
-        if common_opt.verbose>0 then (Printf.eprintf "== variables: %d\n== clauses: %d\n"
-                                      (Hashtbl.length tbl) (List.length clauses));
+        if common_opt.verbose>0 then (Printf.eprintf "== literals %d\n== clauses: %d\n"
+                                        (Hashtbl.length tbl) (List.length clauses));
         cmd |> solve_ext common_opt hidden output_f tbl (Minisat.Lit.abs) (Minisat.Lit.sign)
           (* because given integers can be negative: *)
           (fun v -> abs v |> Minisat.Lit.make |> fun l -> if v>0 then l else Minisat.Lit.neg l)
@@ -295,7 +300,7 @@ let main (lang,mode) (input,input_f) (output,output_f: string * out_channel) com
           |> Eval.eval ~smt |> Qbf.prenex |> Qbf.cnf |> Qbf.qbfclauses_of_cnf
         in
         (if common_opt.verbose>0 then
-           (Printf.eprintf "== variables: %d\n== clauses: %d\n"
+           (Printf.eprintf "== literals: %d\n== clauses: %d\n"
               (Hashtbl.length int_tbl) (List.length int_clauses));
          cmd |> solve_ext common_opt hidden output_f int_tbl
            (abs) (fun v -> v>0) (fun v -> v)
@@ -311,7 +316,8 @@ let main (lang,mode) (input,input_f) (output,output_f: string * out_channel) com
         let qcnf,table =
           Parse.parse_qbf ~debug_syntax ~filename:input input_text
           |> Eval.eval ~smt |> Qbf.prenex |> Qbf.cnf
-          |> Touist_qbf.QbfSolve.qcnf_of_cnf in
+          |> Touist_qbf.QbfSolve.qcnf_of_cnf
+        in
         (match Touist_qbf.QbfSolve.solve ~hidden (qcnf,table) with
          | Some str -> Printf.fprintf output_f "%s\n" str
          | None -> (Printf.fprintf stderr "unsat\n"; exit_with UNSAT |> ignore))
