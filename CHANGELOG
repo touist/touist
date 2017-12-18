@@ -5,7 +5,11 @@ v3.5.1
     - sets and variables (and any other expression) can now be a formula;
       in order for these formulas not be evaluated as a normal boolean
       expression, they must be double quoted (e.g., "a and b => c").
-  - Command-line (fixes)
+  - Command-line
+    - the --verbose flag now takes a number (1 for the lightest verbosity,
+      2 and more for more verbosity).
+    - with --solver, in order to show stdin/stdout/stderr you now have
+      to use -v2 (or --verbose=2). -v only shows the count of literals/clauses.
     - fixed the empty enviroment that was given to the --solver command. Now,
       the solver command is launched using the same env as its parent.
 v3.5.0 (2017-11-28)
