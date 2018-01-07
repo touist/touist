@@ -50,7 +50,7 @@ before_install:
 install:
   # Rvm overrides cd with a function so that it can hook into it to run
   # some scripts, see https://github.com/travis-ci/travis-ci/issues/8703
-  - unset -f cd
+  - unset -f cd popd pushd
   # Build touist
   - cd $TRAVIS_BUILD_DIR
   - jbuilder build
@@ -94,6 +94,7 @@ script:
   - jbuilder uninstall
 
 before_deploy:
+  - unset -f cd popd pushd # again. They seem to be re-defined during deploy
   - |
     set -e # exit if one of the following commands fail
     cd $TRAVIS_BUILD_DIR
