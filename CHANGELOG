@@ -1,4 +1,4 @@
-v3.5.1
+v3.5.1 (2018-01-07)
   - GUI (fixes):
     - fixed wrong line numbers displayed in error messages in QBF and SMT modes
   - Language:
