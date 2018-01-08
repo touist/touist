@@ -49,8 +49,13 @@ before_install:
   - opam install -y ocamlfind menhir minisat yices2 qbf ounit jbuilder re odoc cmdliner
 install:
   # Rvm overrides cd with a function so that it can hook into it to run
-  # some scripts, see https://github.com/travis-ci/travis-ci/issues/8703
+  # some scripts, and this seems to trigger a 'shell_session_update' error.
+  # See https://github.com/travis-ci/travis-ci/issues/8703
   - unset -f cd popd pushd
+  # Second attempt to fix the 'shell_session_update' problem in the 'deploy'
+  # stage: https://github.com/travis-ci/travis-ci/issues/6307
+  - command curl -sSL https://rvm.io/mpapis.asc | gpg --import -
+  - rvm get stable
   # Build touist
   - cd $TRAVIS_BUILD_DIR
   - jbuilder build
