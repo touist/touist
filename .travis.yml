@@ -17,11 +17,8 @@
 #
 # vim:set et sw=2 ts=2:
 
-
 language: java
-os:
-  - linux
-  - osx
+
 # Install packages using apt-get on linux environment
 addons:
   apt:
@@ -38,6 +35,13 @@ cache:
     - $HOME/.opam
     - $HOME/.gradle
 
+jobs:
+  include:
+    - os: osx
+      env: ARCH=mac-x86_64
+    - os: linux
+      env: ARCH=linux-x86_64
+
 before_install:
   # Install packages using brew on osx environment
   - javac -version
@@ -47,35 +51,20 @@ before_install:
   - eval `opam config env`
   - opam update
   - opam install -y ocamlfind menhir minisat yices2 qbf ounit jbuilder re odoc cmdliner
+
 install:
-  # Rvm overrides cd with a function so that it can hook into it to run
-  # some scripts, see https://github.com/travis-ci/travis-ci/issues/8703
-  - unset -f cd popd pushd
-  # Build touist
-  - cd $TRAVIS_BUILD_DIR
   - jbuilder build
   - jbuilder install
-
   # Build the Java GUI touist.jar (in support/gui)
   - cd $TRAVIS_BUILD_DIR/support/gui
   - cp $(which touist) external/touist
   - chmod ugo+x external/touist
+  - if [ $TRAVIS_OS_NAME = linux ]; then TERM=dumb ./gradlew createJarZip; fi
+  - if [ $TRAVIS_OS_NAME = osx ]; then   TERM=dumb ./gradlew createMacAppZip createJarZip; fi
+  # Add $ARCH to the end of the .zip filename
   - |
-    set -e # exit if one of the following commands fail
-    case $TRAVIS_OS_NAME in
-    linux)
-      TERM=dumb ./gradlew createJarZip
-      ARCH=linux-x86_64
-      ;;
-    osx)
-      TERM=dumb ./gradlew createMacAppZip createJarZip
-      ARCH=mac-x86_64
-      ;;
-    esac
-  - |
-    # Add $ARCH to the end of the .zip filename
     for f in $(find build/distributions -name "TouIST*"); do
-      mv $f $(echo $f | sed "s/\(.*\)\.zip$/\1-${ARCH}.zip/")
+      mv $f ${f/\.zip/.${ARCH}.zip}
     done
   - ls build/distributions
   - cd $TRAVIS_BUILD_DIR
@@ -89,25 +78,21 @@ install:
   - jbuilder build @doc
 
 # This part is meant for unit tests (among others).
-script:
-  - jbuilder runtest
-  - jbuilder uninstall
+script: jbuilder runtest
+after_script: jbuilder uninstall
 
 before_deploy:
-  - unset -f cd popd pushd # again. They seem to be re-defined during deploy
-  - |
-    set -e # exit if one of the following commands fail
-    cd $TRAVIS_BUILD_DIR
-    git clone https://${TOK}@github.com/touist/touist.github.io.git
-    mkdir -p touist.github.io/api/v/$(git describe --tags)
-    cp -LR _build/default/_doc/* touist.github.io/api
-    cp -LR _build/default/_doc/* touist.github.io/api/v/$(git describe --tags)
-    cd touist.github.io
-    git config user.name "Travis-ci"
-    git config user.email "robot@travis-ci.org"
-    git add api/*
-    git commit -m "Generated API documentation for $(cd .. && git describe --tags)" || true
-    git push
+  - cd $TRAVIS_BUILD_DIR
+  - git clone https://${TOK}@github.com/touist/touist.github.io.git
+  - mkdir -p touist.github.io/api/v/$(git describe --tags)
+  - cp -LR _build/default/_doc/* touist.github.io/api
+  - cp -LR _build/default/_doc/* touist.github.io/api/v/$(git describe --tags)
+  - cd touist.github.io
+  - git config user.name "Travis-ci"
+  - git config user.email "robot@travis-ci.org"
+  - git add api/*
+  - git commit -m "Generated API documentation for $(cd .. && git describe --tags)" || true
+  - git push
   - cd $TRAVIS_BUILD_DIR
 
 # This is the part where the touist.zip is pushed to the Github
@@ -127,7 +112,7 @@ deploy:
 
 # The commiter will be informed that one of his commits
 # broke the build. I didn't want us to receive an email
-# each time we did a new branch, so I changed to 
+# each time we did a new branch, so I changed to
 #     on_success: never
 notifications:
   email:
