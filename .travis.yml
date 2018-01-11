@@ -39,6 +39,8 @@ cache:
     - $HOME/.gradle
 
 before_install:
+  # Fix travis log truncated (https://github.com/travis-ci/travis-ci/issues/8920)
+  - python -c "import fcntl; fcntl.fcntl(1, fcntl.F_SETFL, 0)"
   # Install packages using brew on osx environment
   - javac -version
   - if [ $TRAVIS_OS_NAME = osx ]; then brew update && brew install opam; fi
@@ -132,7 +134,7 @@ deploy:
 
 # The commiter will be informed that one of his commits
 # broke the build. I didn't want us to receive an email
-# each time we did a new branch, so I changed to 
+# each time we did a new branch, so I changed to
 #     on_success: never
 notifications:
   email:
