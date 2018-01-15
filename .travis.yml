@@ -101,6 +101,7 @@ script:
   - jbuilder uninstall
 
 before_deploy:
+  - set -v
   - unset -f cd popd pushd # again. They seem to be re-defined during deploy
   - |
     set -e # exit if one of the following commands fail
