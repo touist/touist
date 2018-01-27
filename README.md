@@ -51,10 +51,12 @@ problem](docs/images/screenshot.png)](https://github.com/maelvalais/allumettes)
 
    Now, if we want to know if `a ⋀ b ⇒ c` is satisfiable:
 
-       echo 'a and b => c' | touist - --solve
+       touist - --solve <<< "a and b => c"
 
-   The manual (`man touist` or `touist --help`) comes very handy, take a look
-   at it!
+   where `-` tells touist to expect a formula on stdin and `<<<` gives the right-hand string to stdin.
+
+   The manual (`man touist` or `touist --help`) comes very handy, take a
+   look at it!
 
    To build `touist` from source, see `src/HOWTODEBUG.md`.
 
