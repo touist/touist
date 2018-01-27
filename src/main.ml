@@ -77,7 +77,9 @@ let solve_ext common_opt show_hidden output lit_tbl lit_abs lit_sign lit_of_int 
     | _ -> failwith ("error with --solver=cmd") in
   if common_opt.verbose>1 then Printf.eprintf "== cmd: '%s %s'\n" prog (opts |> Array.fold_left (fun acc v-> if acc = "" then v else v^" "^acc) "");
   if common_opt.verbose>1 then (print_dimacs ~line_begin:"== stdin: " stderr);
+  let start = Unix.gettimeofday () in
   let proc_stdout, proc_stdin, proc_stderr = Unix.open_process_full cmd (Unix.environment ()) in
+  if common_opt.verbose>0 then Printf.eprintf "== solve time: %f sec\n" ((Unix.gettimeofday ()) -. start);
   print_dimacs proc_stdin; close_out proc_stdin;
   (* Try to parse a space-separated list of integers; returns empty list if
      something is not an integer. *)
@@ -238,7 +240,7 @@ let main (lang,mode) (input,input_f) (output,output_f: string * out_channel) com
            asks after displaying each model if it should continue
            displaying the next one. *)
         and continue_asking _ i =
-          Printf.fprintf output_f "=== count: %d; continue? (y/n) " i; flush stdout;
+          Printf.fprintf output_f "== count: %d; continue? (y/n) " i; flush stdout;
           try Scanf.scanf "%s\n" (fun c -> not (c="q" || c="n"))
           with End_of_file -> (* stdin unexpectedly closed (e.g., piped cmd) *)
             (Printf.eprintf "touist: interactive mode stopped as stdin unexpectedly closed\n";
@@ -248,36 +250,42 @@ let main (lang,mode) (input,input_f) (output,output_f: string * out_channel) com
            reaches [limit]. *)
         and continue_limit _ i = i < limit
         in
+        let start = Unix.gettimeofday () in
         let cls,tbl = Parse.parse_sat ~debug_syntax ~filename:input input_text
                       |> Eval.eval |> Cnf.ast_to_cnf |> SatSolve.minisat_clauses_of_cnf
         in
         if common_opt.verbose>0 then
-          (Printf.eprintf "== literals: %d\n== clauses: %d\n"
-             (Hashtbl.length tbl) (List.length cls));
+          (Printf.eprintf "== literals: %d\n== clauses: %d\n== translation time: %f sec\n"
+             (Hashtbl.length tbl) (List.length cls) (Unix.gettimeofday () -. start));
+        let start = Unix.gettimeofday () in
         let models =
           (cls,tbl) |> SatSolve.solve_clauses ~verbose:(common_opt.verbose>0)
             ~print:print_model
             ~continue:(if interactive then continue_asking else continue_limit)
         in
+        (if common_opt.verbose>0 then Printf.eprintf "== solve time: %f sec\n" (Unix.gettimeofday () -. start));
         (match SatSolve.ModelSet.cardinal models with
          | 0 -> Printf.fprintf stderr "unsat\n"; exit_with UNSAT
          | 1 -> (* case where we already printed models in [solve_clause] *)
            exit_with OK
          | i -> (* case where we already printed models in [solve_clause] *)
            Printf.fprintf output_f
-             "==== found %d models, limit is %d (--limit=N for more models)\n"
-             i limit; exit_with OK)
+             "== found %d models, limit is %d (--limit=N for more models)\n" i limit;
+             exit_with OK)
       | Sat, Translate {linter=false; table; debug_dimacs} -> (* B. solve not asked: print the Sat file *)
+        let start = Unix.gettimeofday () in
         let ast = Parse.parse_sat ~debug_syntax ~filename:input input_text |> Eval.eval in
         let clauses,tbl = Cnf.ast_to_cnf ast |> SatSolve.minisat_clauses_of_cnf
         in SatSolve.print_dimacs ~debug_dimacs (clauses,tbl)
           ~out_table:(match table with Some (_,f) -> f | None -> output_f) output_f;
+        (if common_opt.verbose>0 then Printf.eprintf "== translation time: %f sec\n" (Unix.gettimeofday () -. start));
         exit_with OK
       | Sat, SolveExt {cmd; hidden} ->
+        let start = Unix.gettimeofday () in
         let ast = Parse.parse_sat ~debug_syntax ~filename:input input_text |> Eval.eval in
         let clauses,tbl = Cnf.ast_to_cnf ast |> SatSolve.minisat_clauses_of_cnf in
-        if common_opt.verbose>0 then (Printf.eprintf "== literals %d\n== clauses: %d\n"
-                                        (Hashtbl.length tbl) (List.length clauses));
+        if common_opt.verbose>0 then (Printf.eprintf "== literals %d\n== clauses: %d\n== translation time: %f sec\n"
+                                        (Hashtbl.length tbl) (List.length clauses) (Unix.gettimeofday () -. start));
         cmd |> solve_ext common_opt hidden output_f tbl (Minisat.Lit.abs) (Minisat.Lit.sign)
           (* because given integers can be negative: *)
           (fun v -> abs v |> Minisat.Lit.make |> fun l -> if v>0 then l else Minisat.Lit.neg l)
@@ -288,30 +296,38 @@ let main (lang,mode) (input,input_f) (output,output_f: string * out_channel) com
         ast |> Smt.to_smt2 logic  |> Buffer.output_buffer output_f;
         exit_with OK
       | Smt logic, Solve _ ->
+        let start = Unix.gettimeofday () in
         let yices_form,tbl =
           Parse.parse_smt ~debug_syntax ~filename:input input_text
           |> Eval.eval ~smt |> Touist_yices2.SmtSolve.ast_to_yices in
-        (match Touist_yices2.SmtSolve.solve logic yices_form with
+        (if common_opt.verbose>0 then Printf.eprintf "== translation time: %f sec\n" (Unix.gettimeofday () -. start));
+        let start = Unix.gettimeofday () in
+        let res = Touist_yices2.SmtSolve.solve logic yices_form in
+        (if common_opt.verbose>0 then Printf.eprintf "== solve time: %f sec\n" (Unix.gettimeofday () -. start));
+        (match res with
          | None -> Printf.fprintf stderr "unsat\n"; exit_with UNSAT |> ignore
          | Some m -> Printf.fprintf output_f "%s\n" (Touist_yices2.SmtSolve.string_of_model tbl m); exit_with OK |> ignore);
       | Qbf, SolveExt {cmd; hidden} -> (* --qbf + --solver CMD: use external solver *)
+        let start = Unix.gettimeofday () in
         let quants,int_clauses,int_tbl =
           Parse.parse_qbf ~debug_syntax ~filename:input input_text
           |> Eval.eval ~smt |> Qbf.prenex |> Qbf.cnf |> Qbf.qbfclauses_of_cnf
         in
         (if common_opt.verbose>0 then
-           (Printf.eprintf "== literals: %d\n== clauses: %d\n"
-              (Hashtbl.length int_tbl) (List.length int_clauses));
+           (Printf.eprintf "== literals: %d\n== clauses: %d\n== translation time: %f sec\n"
+              (Hashtbl.length int_tbl) (List.length int_clauses) (Unix.gettimeofday () -. start));
          cmd |> solve_ext common_opt hidden output_f int_tbl
            (abs) (fun v -> v>0) (fun v -> v)
-           (fun ?(line_begin="") out -> Qbf.print_qdimacs ~line_begin (quants,int_clauses,int_tbl) out)
+           (fun ?(line_begin="") out -> Qbf.print_qdimacs ~line_begin (quants,int_clauses,int_tbl) out);
         )
       | Qbf, Translate {table; debug_dimacs} -> (* --qbf: we print QDIMACS *)
+        let start = Unix.gettimeofday () in
         let quants,int_clauses,int_tbl =
           Parse.parse_qbf ~debug_syntax ~filename:input input_text
           |> Eval.eval ~smt |> Qbf.prenex |> Qbf.cnf |> Qbf.qbfclauses_of_cnf in
         (Qbf.print_qdimacs ~debug_dimacs (quants,int_clauses,int_tbl)
-           ~out_table:(match table with Some (_,f)->f | None->output_f) output_f)
+           ~out_table:(match table with Some (_,f)->f | None->output_f) output_f);
+        (if common_opt.verbose>0 then Printf.eprintf "== translation time: %f sec\n" (Unix.gettimeofday () -. start));
       | Qbf, Solve {hidden} -> (* --qbf + --solve: we solve using Quantor *)
         let qcnf,table =
           Parse.parse_qbf ~debug_syntax ~filename:input input_text
