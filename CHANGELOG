@@ -2,7 +2,6 @@ v3.5.2
   - Language:
     - added list comprehensions (also named 'set builder notation'). Really
       useful for generating sets! Example: [p($i,$j) for $i,$j in [1..2],[a,b]].
-v3.5.2
   - Command-line
     - it is now possible to display elapsed time (translation time and solve
       time) in --solve and --solver modes. To enable it, use -v/--verbose.
