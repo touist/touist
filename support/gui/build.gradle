@@ -1,3 +1,13 @@
+buildscript {
+    repositories{
+        jcenter()
+        maven { url "https://mini2dx.org/maven/content/repositories/thirdparty" }
+        maven { url "https://mini2dx.org/maven/content/repositories/releases" }
+    }
+    dependencies {
+        classpath group: 'org.mini2Dx', name: 'parcl', version: '1.2.1'
+    }
+}
 plugins {
     id "edu.sc.seis.macAppBundle" version "2.1.6" // For TouIST.app on macOS
     id 'edu.sc.seis.launch4j' version '2.3.0' // For TouIST.exe on Windows
@@ -8,11 +18,13 @@ plugins {
     id 'idea'
 }
 
+
 apply plugin: 'com.github.johnrengelman.shadow'
 apply plugin: 'edu.sc.seis.launch4j'
 apply plugin: 'com.google.osdetector'
 apply plugin: 'java'
 apply plugin: 'application'
+apply plugin: "org.mini2Dx.parcl"
 
 description = 'A friendly language for propositional logic and more'
 group = 'org.irit'
@@ -25,9 +37,7 @@ applicationDefaultJvmArgs = [
         "-Dtouist.saveRelativeDir=../../../"
 ]
 
-repositories{
-    jcenter()
-}
+
 
 task prepareExternal(type: Copy) {
     from ("../../_build/default/src/main.exe") {
@@ -241,6 +251,7 @@ createExe {
     copyConfigurable = shadowJar.outputs.files
     jar = "lib/${shadowJar.archiveName}"
     finalizedBy copyToWindowsBundle
+    // bundledJrePath = '' -> IF I WANT TO BUNDLE THE JRE
 }
 
 task createExeZip(type: Zip) {
@@ -261,6 +272,26 @@ task createJarZip(type: Zip) {
     destinationDir file('build/distributions')
 }
 
+parcl {
+    exe {
+        exeName = "TouIST"
+        // icon = "${project.rootDir}/resources/launch4j/logo.ico"
+        // withJre("%\...")
+    }
+    app {
+        appName = "TouIST"
+        icon = 'resources/macappbundle/logo.icns'
+        applicationCategory = "public.app-category.adventure-games"
+        displayName = 'My Application'
+        identifier = 'com.example.my.apple.identifier'
+        copyright = 'Copyright 2015 Your Name Here'
+        //withJre("")
+    }
+    linux {
+        binName = "TouIST"
+        //withJre("")
+    }
+}
 createDmg.enabled = false
 distTar.enabled = false
 distZip.enabled = false
