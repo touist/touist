@@ -64,7 +64,7 @@ install:
   # Add $ARCH to the end of the .zip filename
   - |
     for f in $(find build/distributions -name "TouIST*"); do
-      mv $f ${f/\.zip/.${ARCH}.zip}
+      mv $f ${f/\.zip/-${ARCH}.zip}
     done
   - ls build/distributions
   - cd $TRAVIS_BUILD_DIR
