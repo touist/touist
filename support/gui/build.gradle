@@ -60,7 +60,6 @@ tasks.withType(JavaCompile) {
 
 task generateVersion {
     inputs.property("version", project.version) // regenerate if project.version changes
-    outputs.dir file("resources")
     doLast {
         def props = new Properties()
         props.setProperty("touist.version", project.version)
