@@ -1,7 +1,14 @@
 #! /usr/bin/env bash
+
+# This script takes a shadowJar (fat-jar) touist.jar
+# and turns it into a module-enabled jar and produce
+# a dist/ folder with embedded JRE using jlink.
+
 set -e
-JARPATH=$1 # relative to current dir
-MOD=$2
+
+./gradlew shadowJar
+JARPATH=build/libs/touist.jar # relative to current dir
+MOD=touist
 ROOT_DIR=$PWD
 
 # copy original jar into place
@@ -14,17 +21,29 @@ mkdir build/classes-extracted
 cd build/classes-extracted
 jar xf "$ROOT_DIR/$JARPATH"
 
-# generate module-info.java
-cd "$ROOT_DIR"
-jdeps --generate-module-info build/work "$1"
 # compile module-info.java
-cd "$ROOT_DIR/build/work/$MOD"
+cd "$ROOT_DIR/resources/jlink/$MOD"
 javac -p "$MOD" -d "$ROOT_DIR"/build/classes-extracted module-info.java
 
 # update output jar
 jar uf "$ROOT_DIR/build/out/$MOD.jar" -C "$ROOT_DIR/build/classes-extracted" module-info.class
 
 cd "$ROOT_DIR"
-echo "Ready."
-echo "now, do:"
-echo "/Library/Java/JavaVirtualMachines/jdk-9.0.4.jdk/Contents/Home/bin/jlink --add-modules touist --limit-modules touist --launcher touist=touist/touist.TouIST --output dist --module-path build/out/touist.jar:/Library/Java/JavaVirtualMachines/jdk-9.0.4.jdk/Contents/Home/jmods --limit-modules touist --no-man-pages --no-header-files --strip-debug --compress 2"
+
+rm -Rf build/dist
+"$(/usr/libexec/java_home)"/bin/jlink --add-modules touist \
+--limit-modules touist --launcher touist=touist/touist.TouIST \
+--module-path build/out/touist.jar:"$(/usr/libexec/java_home)"/jmods \
+--no-man-pages --no-header-files --strip-debug --compress 2 \
+--output build/dist
+
+cat > build/dist/touist <<'EOF'
+#! /bin/sh
+"$(dirname "$0")"/bin/java -Dtouist.dir="$(dirname "$0")" -Dtouist.externalRelativeDir=./external -Dtouist.saveRelativeDir=. -m touist/touist.TouIST
+EOF
+chmod +x build/dist/touist
+
+
+# remind me to generate module-info.java:
+echo "Reminder: don't forget to update if necessary 'modules-info.java':"
+echo "    jdeps --generate-module-info resources/jlink $1"
