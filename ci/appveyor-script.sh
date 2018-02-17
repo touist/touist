@@ -1,3 +1,4 @@
+#! /usr/bin/env bash
 # This script must be launched with 'bash -e' to make the whole script fail if
 # one command fails. Or you can use the command 'set -e' here to do the same.
 # The flag 'set -x' will print a '+' followed by the command that is executed.

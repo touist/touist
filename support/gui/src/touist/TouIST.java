@@ -52,6 +52,7 @@ public class TouIST {
 	 */
 	public static void main(String[] args) throws IOException, InterruptedException, FileNotFoundException, SolverExecutionException {
 		loadProperties();
+		System.out.println(Paths.get(".","build").normalize());
 		textAreaLog = new TextAreaLog();
 		System.out.println("TouIST: running app from folder '"+ System.getProperty("user.dir")+"'");
 		System.out.println("* TouIST dir (configurable with -Dtouist.dir=<path>) is '"+getTouistDir()+"'");
@@ -73,50 +74,48 @@ public class TouIST {
 	 */
 	public static String getTouistDir() {
 		String path = System.getProperty("touist.dir");
-		if (path != null) {
-			return path;
+		if (path == null) {
+			final String resourcePath = ".";
+			try {
+				String pathToJar = ClassLoader.getSystemClassLoader().getResource(resourcePath).toString();
+				// URISyntaxException should ne ever be thrown because we expect getResource(".")
+				// to give a correct URL
+				return Paths.get(new URI(pathToJar)).normalize().toString();
+			} catch (URISyntaxException e) {
+				System.err.println("Something went wrong when trying to get where touist.jar is located:\n" + e.getMessage());
+			} catch (NullPointerException e) {
+				System.err.println("The path '"+resourcePath+"' does not belong to the Class-Path AND touist.dir not given;\n"
+					+"For example, run 'java -jar touist.jar -Dtouist.dir=$PWD'. Remember that\n"
+					+"./external/touist must be in 'touist.dir' (or use touist.externalRelativeDir\n"
+					+"for that).");
+				System.exit(1);
+			}
 		}
-		final String resourcePath = ".";
-		try {
-			String pathToJar = ClassLoader.getSystemClassLoader().getResource(resourcePath).toString();
-			// URISyntaxException should ne ever be thrown because we expect getResource(".")
-			// to give a correct URL
-			path = (new File(new URI(pathToJar))).getAbsolutePath();
-		} catch (URISyntaxException e) {
-			System.err.println("Something went wrong when trying to get where touist.jar is located:\n" + e.getMessage());
-		} catch (NullPointerException e) {
-			System.err.println("The path '"+resourcePath+"' does not belong to the Class-Path AND touist.dir not given;\n"
-				+"For example, run 'java -jar touist.jar -Dtouist.dir=$PWD'. Remember that\n"
-				+"./external/touist must be in 'touist.dir' (or use touist.externalRelativeDir\n"
-				+"for that).");
-			System.exit(1);
-		}
-		return path;
+		return Paths.get(path).normalize().toString();
 	}
 	public static String getTouistExternalDir() {
 		String relativePath = System.getProperty("touist.externalRelativeDir");
 		if(relativePath == null) relativePath = "external";
-		return checkPath(TouIST.getTouistDir() + File.separator + relativePath);
+		return Paths.get(getTouistDir(), relativePath).normalize().toString();
 	}
 	public static String getTouistBin() {
-		return checkPath(TouIST.getTouistExternalDir() + File.separator + "touist"); 
+		return Paths.get(TouIST.getTouistExternalDir(), "touist").normalize().toString();
 	}
 	public static String getWhereToSave() {
 		String relativePath = System.getProperty("touist.saveRelativeDir");
 		if(relativePath == null) relativePath = "..";
-		return checkPath(TouIST.getTouistDir() + File.separator + relativePath);
+		return Paths.get(TouIST.getTouistDir(), relativePath).normalize().toString();
 	}
 	public static String getWhereToSaveTemp() {
 		String relativePath = System.getProperty("touist.tempInHomeRelativeDir");
 		if(relativePath == null) return getWhereToSave();
 		else {
-			String path = checkPath(System.getProperty("user.dir") + File.separator + relativePath);
 			Path p = Paths.get(relativePath);
 			if(!Files.exists(p,LinkOption.NOFOLLOW_LINKS)) {
 				try {
 					Files.createDirectories(p);
 				} catch (IOException e) {
-					System.err.println("Could not create directory '"+path+"'");
+					System.err.println("Could not create directory '"+p+"'");
 					e.printStackTrace();
 					System.exit(1);
 				}

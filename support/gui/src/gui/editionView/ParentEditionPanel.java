@@ -40,6 +40,7 @@ import java.awt.event.WindowEvent;
 import java.io.*;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ListIterator;
 import java.util.Map;
 
@@ -520,7 +521,7 @@ public class ParentEditionPanel extends AbstractComponentPanel {
         	d.setMode(FileDialog.SAVE);
         	d.setVisible(true);
         	if(d.getFile() != null){
-                setOpenedFile(FileSystems.getDefault().getPath(d.getDirectory() + File.separator + d.getFile()));
+                setOpenedFile(FileSystems.getDefault().getPath(d.getDirectory(), d.getFile()));
            }
         }
 
@@ -590,7 +591,7 @@ public class ParentEditionPanel extends AbstractComponentPanel {
         sinon passer à l'état SINGLE_RESULT
         Si aucun model n'existe alors passer a l'état NO_RESULT
         */
-        String path = touist.TouIST.checkPath(touist.TouIST.getWhereToSaveTemp() + File.separator + "temp.touist");
+        String path = Paths.get(touist.TouIST.getWhereToSaveTemp(),"temp.touist").toString();
         File touistFile = new File(path); //TODO se mettre d'accord sur un nom standard ou ajouter a Translator et BaseDeClause des méthode pour s'échange de objets File
         String errorMessage;
         

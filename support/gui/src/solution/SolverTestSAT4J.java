@@ -33,6 +33,7 @@ import java.io.PrintWriter;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Map;
 
@@ -113,7 +114,7 @@ public class SolverTestSAT4J extends Solver {
 		 * 5 = solver timeout
 		 */
 
-		String pathminisat = TouIST.getTouistExternalDir() + File.separator + "minisat.jar";
+		String pathminisat = Paths.get(TouIST.getTouistExternalDir(),"minisat.jar").toString();
 
 		String [] command = { "java", "-jar",pathminisat, this.dimacsFilePath} ;
 		System.out.println("launch(): cmd executed: "+Arrays.toString(command));
