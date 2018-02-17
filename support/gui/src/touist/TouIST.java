@@ -52,7 +52,6 @@ public class TouIST {
 	 */
 	public static void main(String[] args) throws IOException, InterruptedException, FileNotFoundException, SolverExecutionException {
 		loadProperties();
-		System.out.println(Paths.get(".","build").normalize());
 		textAreaLog = new TextAreaLog();
 		System.out.println("TouIST: running app from folder '"+ System.getProperty("user.dir")+"'");
 		System.out.println("* TouIST dir (configurable with -Dtouist.dir=<path>) is '"+getTouistDir()+"'");
