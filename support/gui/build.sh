@@ -44,6 +44,9 @@ cat > build/dist/touist <<'EOF'
 EOF
 chmod +x build/dist/touist
 
+rm -Rf build/dist/{release,legal}
+cp -R build/external build/dist/
+
 cd build
 DIST=TouIST-"$(git describe --tags)"
 mv dist "$DIST"
