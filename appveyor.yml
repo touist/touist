@@ -41,7 +41,7 @@ init:
 clone_folder: c:\touist
 
 environment:
-  JAVA_HOME: 'C:\\Program Files (x86)\\Java\\jdk9'
+  JAVA_HOME: C:\Program Files\Java\jdk9
   CYG_MIRROR: http://cygwin.mirror.constant.com
   CYG_ROOT:  c:\ocaml32
   CYG_BASH:  c:\ocaml32\bin\bash
