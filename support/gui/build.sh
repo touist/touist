@@ -10,7 +10,7 @@ set -e
 JARPATH=build/libs/touist.jar # relative to current dir
 MOD=touist
 ROOT_DIR=$PWD
-JAVA_HOME=$(dirname $(dirname $(readlink -f $(which java))))
+JAVA_HOME=$($(readlink -f $(which java))/../java_home 2>/dev/null || dirname $(dirname $(readlink -f $(which java))))
 
 # copy original jar into place
 mkdir -p "$ROOT_DIR/build/out"
