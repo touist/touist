@@ -6,7 +6,7 @@
 
 set -e
 
-./gradlew shadowJar
+./gradlew prepareExternal shadowJar
 JARPATH=build/libs/touist.jar # relative to current dir
 MOD=touist
 ROOT_DIR=$PWD
