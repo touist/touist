@@ -28,7 +28,7 @@ apply plugin: "org.mini2Dx.parcl"
 
 description = 'A friendly language for propositional logic and more'
 group = 'org.irit'
-sourceCompatibility = 1.7
+sourceCompatibility = 1.9
 version gitVersion()
 mainClassName = 'touist.TouIST'
 applicationName = project.name
@@ -55,7 +55,7 @@ task wrapper(type: Wrapper) {
 }
 
 tasks.withType(JavaCompile) {
-    sourceCompatibility='1.7'
+    sourceCompatibility=project.sourceCompatibility
 }
 
 task generateVersion {
@@ -100,19 +100,19 @@ dependencies {
 
     compile 'com.fifesoft:rsyntaxtextarea:2.6.1'
     compile 'org.scilab.forge:jlatexmath:1.0.6'
-    compile 'com.yuvimasory:orange-extensions:1.3.0'
+    // compile 'com.yuvimasory:orange-extensions:1.3.0'
     compile 'org.kordamp.ikonli:ikonli-swing:1.9.0'
     compile 'org.kordamp.ikonli:ikonli-fontawesome-pack:1.9.0'
 }
 
- jar {
-     baseName = 'touist'
-     manifest {
-         // WARNING: do not remove the '.' from the classpath. If you do,
-         // there will be a nullPointerException because we use getResource(".")
-         attributes 'Class-Path': '.'
-     }
- }
+jar {
+    baseName = 'touist'
+    manifest {
+        // WARNING: do not remove the '.' from the classpath. If you do,
+        // there will be a nullPointerException because we use getResource(".")
+        attributes 'Class-Path': '.'
+    }
+}
 
 shadowJar {
     mergeServiceFiles()
@@ -235,7 +235,7 @@ task copyToWindowsBundle (type: Copy) {
 createExe {
     mainClassName = project.mainClassName
     icon = "${project.rootDir}/resources/launch4j/logo.ico"
-    jreMinVersion = '1.7.0'
+    jreMinVersion = project.sourceCompatibility
     version = version
     textVersion = version
     companyName = 'IRIT'
