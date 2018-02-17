@@ -41,7 +41,7 @@ init:
 clone_folder: c:\touist
 
 environment:
-  JAVA_HOME: 'C:\\Program Files (x86)\\Java\\jdk1.7.0'
+  JAVA_HOME: 'C:\\Program Files (x86)\\jdk9'
   CYG_MIRROR: http://cygwin.mirror.constant.com
   CYG_ROOT:  c:\ocaml32
   CYG_BASH:  c:\ocaml32\bin\bash
@@ -60,6 +60,7 @@ cache:
 
 # Scripts that run after cloning repository. "ps:" means windows PowerShell
 install:
+  - SET PATH=%JAVA_HOME%\bin;%PATH%
   # Opam on Windows: http://fdopen.github.io/opam-repository-mingw
   - javac -version
   - ps: 'Invoke-WebRequest http://cygwin.com/setup-x86.exe -OutFile "$env:CYG_SETUP"'
