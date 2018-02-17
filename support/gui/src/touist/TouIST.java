@@ -24,10 +24,14 @@
 package touist;
 
 import java.io.*;
+import java.lang.module.ModuleFinder;
+import java.lang.module.ModuleReference;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.*;
 import java.util.Properties;
+import java.net.URL;
+import java.net.URLClassLoader;
 
 import javax.swing.*;
 
@@ -41,19 +45,16 @@ import solution.SolverExecutionException;
 public class TouIST {
 	private static MainFrame frame;
 	public static TextAreaLog textAreaLog;
+	
 
 	/**
 	 * @param args the command line arguments
 	 */
 	public static void main(String[] args) throws IOException, InterruptedException, FileNotFoundException, SolverExecutionException {
 		loadProperties();
-		String version = System.getProperty("java.version");
-		if(Float.valueOf(version.substring(0,3)) < 1.7) {
-			JOptionPane.showMessageDialog(null, "Your java version is "+version+" but version higher or equal to 1.7 is required");
-			return;
-		}
 		textAreaLog = new TextAreaLog();
 		System.out.println("TouIST: running app from folder '"+ System.getProperty("user.dir")+"'");
+		System.out.println("* TouIST dir (configurable with -Dtouist.dir=<path>) is '"+getTouistDir()+"'");
 		System.out.println("* External binaries are in '"+getTouistExternalDir()+"'");
 		System.out.println("* Files saved in '"+getWhereToSave()+"', temp in '"+getWhereToSaveTemp()+"'");
 		frame = new MainFrame();
@@ -71,7 +72,10 @@ public class TouIST {
 	 * @return
 	 */
 	public static String getTouistDir() {
-		String path = "";
+		String path = System.getProperty("touist.dir");
+		if (path != null) {
+			return path;
+		}
 		final String resourcePath = ".";
 		try {
 			String pathToJar = ClassLoader.getSystemClassLoader().getResource(resourcePath).toString();
@@ -81,7 +85,10 @@ public class TouIST {
 		} catch (URISyntaxException e) {
 			System.err.println("Something went wrong when trying to get where touist.jar is located:\n" + e.getMessage());
 		} catch (NullPointerException e) {
-			System.err.println("The path '"+resourcePath+"' does not belong to the Class-Path\n");
+			System.err.println("The path '"+resourcePath+"' does not belong to the Class-Path AND touist.dir not given;\n"
+				+"For example, run 'java -jar touist.jar -Dtouist.dir=$PWD'. Remember that\n"
+				+"./external/touist must be in 'touist.dir' (or use touist.externalRelativeDir\n"
+				+"for that).");
 			System.exit(1);
 		}
 		return path;
