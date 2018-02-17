@@ -128,10 +128,10 @@ public class ParentEditionPanel extends AbstractComponentPanel {
 
         // On macOS, handle the drag-and-drop for opening files
         if(System.getProperty("os.name").toLowerCase().contains("mac")) {
-            com.apple.eawt.Application a = com.apple.eawt.Application.getApplication();
-            a.setOpenFileHandler(new com.apple.eawt.OpenFilesHandler() {
+            java.awt.Desktop d = java.awt.Desktop.getDesktop();
+            d.setOpenFileHandler(new java.awt.desktop.OpenFilesHandler() {
                 @Override
-                public void openFiles(com.apple.eawt.AppEvent.OpenFilesEvent e) {
+                public void openFiles(java.awt.desktop.OpenFilesEvent e) {
                     if (e.getFiles().get(0) instanceof File) {
                         if(hasUnsavedChanges()) {
                             int confirmed = JOptionPane.showConfirmDialog(null,
