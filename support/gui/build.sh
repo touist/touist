@@ -6,11 +6,13 @@
 
 set -e
 
-./gradlew prepareExternal shadowJar
 JARPATH=build/libs/touist.jar # relative to current dir
 MOD=touist
 ROOT_DIR=$PWD
-JAVA_HOME=$($(readlink -f $(which java))/../java_home 2>/dev/null || dirname $(dirname $(readlink -f $(which java))))
+JAVA_HOME=$($(dirname $(readlink -f $(which javac)))/java_home || dirname $(dirname $(readlink -f $(which javac))))
+echo "JAVA_HOME: $JAVA_HOME"
+
+./gradlew prepareExternal shadowJar
 
 # copy original jar into place
 mkdir -p "$ROOT_DIR/build/out"
