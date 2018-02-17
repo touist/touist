@@ -10,6 +10,7 @@ set -e
 JARPATH=build/libs/touist.jar # relative to current dir
 MOD=touist
 ROOT_DIR=$PWD
+JAVA_HOME=$(/etc/libexec/java_home 2>/dev/null || dirname $(dirname $(readlink -f $(which java))))
 
 # copy original jar into place
 mkdir -p "$ROOT_DIR/build/out"
@@ -31,9 +32,9 @@ jar uf "$ROOT_DIR/build/out/$MOD.jar" -C "$ROOT_DIR/build/classes-extracted" mod
 cd "$ROOT_DIR"
 
 rm -Rf build/dist
-"$(/usr/libexec/java_home)"/bin/jlink --add-modules touist \
+"$JAVA_HOME"/bin/jlink --add-modules touist \
 --limit-modules touist --launcher touist=touist/touist.TouIST \
---module-path build/out/touist.jar:"$(/usr/libexec/java_home)"/jmods \
+--module-path build/out/touist.jar:"$JAVA_HOME"/jmods \
 --no-man-pages --no-header-files --strip-debug --compress 2 \
 --output build/dist
 
