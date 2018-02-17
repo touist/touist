@@ -44,6 +44,12 @@ cat > build/dist/touist <<'EOF'
 EOF
 chmod +x build/dist/touist
 
+cd build
+DIST=TouIST-"$(git describe --tags)"
+mv dist "$DIST"
+zip "$DIST.zip" -r "$DIST"
+cd "$ROOT_DIR"
+echo "Produced: build/$DIST.zip"
 
 # remind me to generate module-info.java:
 echo "Reminder: don't forget to update if necessary 'modules-info.java':"
