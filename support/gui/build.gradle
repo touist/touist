@@ -53,7 +53,9 @@ final jdk9Home = "${System.getProperty('java.home')}"
 final customJreOutput = file("$buildDir/custom-jre")
 final module = 'touist'
 
-task customJre(dependsOn: shadowJar) {
+task customJre() {
+    dependsOn shadowJar
+    dependsOn prepareExternal
     outputs.dir customJreOutput
     inputs.dir shadowJar.outputs.files
     inputs.dir prepareExternal.outputs.files
@@ -109,9 +111,23 @@ task customJre(dependsOn: shadowJar) {
 task compressCustomJre(type: Exec, dependsOn: customJre) {
     inputs.dir "$buildDir/custom-jre"
     outputs.dir "$buildDir/custom-jre.tar.bz2"
+    exclude 
     executable 'tar'
-    workingDir buildDir
-    args = ['czf', 'custom-jre.tar.gz', 'custom-jre']
+    workingDir buildDi
+}
+
+task compressCustomJre(type: Zip, dependsOn: customJre) {
+    destinationDir file("build/distributions")
+    archiveName "${project.name}-jar-with-jre-${project.version}.zip"
+    from(customJreOutput) {
+        exclude "legal"
+        exclude "release"
+    }
+    from() {
+        include "${project.name}.app/Contents/MacOS/**"
+        fileMode 0777  // octal requires leading zero
+    }
+    from warningMac
 }
 build.dependsOn compressCustomJre
 
@@ -295,7 +311,7 @@ task copyToWindowsBundle (type: Copy) {
 createExe {
     mainClassName = project.mainClassName
     icon = "${project.rootDir}/resources/launch4j/logo.ico"
-    jreMinVersion = project.sourceCompatibility
+    jreMinVersion = "${project.sourceCompatibility}.0"
     version = version
     textVersion = version
     companyName = 'IRIT'
