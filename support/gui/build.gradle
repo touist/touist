@@ -49,6 +49,73 @@ task prepareExternal(type: Copy) {
 }
 run.dependsOn prepareExternal
 
+final jdk9Home = "${System.getProperty('java.home')}"
+final customJreOutput = file("$buildDir/custom-jre")
+final module = 'touist'
+
+task customJre(dependsOn: shadowJar) {
+    outputs.dir customJreOutput
+    inputs.dir shadowJar.outputs.files
+    inputs.dir prepareExternal.outputs.files
+    inputs.dir file("resources/jlink/touist/module-info.java")
+    doFirst {
+        copy {
+            from shadowJar.outputs.files
+            into "$buildDir/shadowjar"
+        }
+        copy {
+            shadowJar.outputs.files.each { from(zipTree(it)) }
+            into "$buildDir/shadowjar-unzipped"
+        }
+        exec {
+            executable = "javac"
+            args = ["-p", module, "-d", "$buildDir/shadowjar-unzipped", "resources/jlink/touist/module-info.java"]
+            logger.lifecycle commandLine.join(' ')
+        }
+        exec {
+            executable = "jar"
+            args = ["uf", "$buildDir/shadowjar/touist.jar", "-C", "$buildDir/shadowjar-unzipped", "module-info.class"]
+            logger.lifecycle commandLine.join(' ')
+        }
+    }
+    doLast {
+        delete customJreOutput
+        exec {
+            executable "${jdk9Home}/bin/jlink"
+            args = ['--module-path', (["$jdk9Home/jmods"] + "$buildDir/shadowjar/touist.jar").grep().join(File.pathSeparator),
+                    '--add-modules', module,
+                    '--output', customJreOutput,
+                    '--compress=2', '--strip-debug', "--no-man-pages", "--no-header-files"
+            ]
+            logger.lifecycle commandLine.join(' ')
+        }
+        if(osdetector.os == 'windows') {
+            def f = file "${customJreOutput}/touist.bat"
+            f.text = '''
+            set DIRNAME=%~dp0
+            if "%DIRNAME%" == "" set DIRNAME=.
+            if not "%DIRNAME:~-1%"=="\\" set "DIRNAME=%DIRNAME%\\"
+            "%DIRNAME%\\bin\\java.exe" -Dtouist.dir="%DIRNAME%" -Dtouist.externalRelativeDir=./external -Dtouist.saveRelativeDir=. -m touist/touist.TouIST %*
+            '''.stripIndent()
+        } else {
+            def f = file "${customJreOutput}/touist"
+            f.text = '''
+            #! /bin/sh
+            "$(dirname "$0")"/bin/java -Dtouist.dir="$(dirname "$0")" -Dtouist.externalRelativeDir=./external -Dtouist.saveRelativeDir=. -m touist/touist.TouIST $@
+            '''.stripIndent()
+        }
+    }
+}
+task compressCustomJre(type: Exec, dependsOn: customJre) {
+    inputs.dir "$buildDir/custom-jre"
+    outputs.dir "$buildDir/custom-jre.tar.bz2"
+    executable 'tar'
+    workingDir buildDir
+    args = ['czf', 'custom-jre.tar.gz', 'custom-jre']
+}
+build.dependsOn compressCustomJre
+
+
 task wrapper(type: Wrapper) {
     gradleVersion = '4.8.1'
 }
