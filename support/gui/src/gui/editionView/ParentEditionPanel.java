@@ -43,7 +43,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ListIterator;
 import java.util.Map;
-
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
@@ -55,6 +55,9 @@ import solution.SolverSMT;
 import solution.SolverTestSAT4J;
 import touist.TouIST;
 import translation.TranslationError;
+import java.awt.Desktop;
+import java.awt.desktop.OpenFilesHandler;
+import java.awt.desktop.OpenFilesEvent;
 
 /**
  *
@@ -127,12 +130,13 @@ public class ParentEditionPanel extends AbstractComponentPanel {
         f.setIconSize(18);
         solveButton.setIcon(f);
 
-        // On macOS, handle the drag-and-drop for opening files
-        if(System.getProperty("os.name").toLowerCase().contains("mac")) {
-            java.awt.Desktop d = java.awt.Desktop.getDesktop();
-            d.setOpenFileHandler(new java.awt.desktop.OpenFilesHandler() {
+        // On macOS and others, handle the drag-and-drop for opening files
+        if(Desktop.isDesktopSupported()) {
+            Desktop d = Desktop.getDesktop();
+            d.setOpenFileHandler(new OpenFilesHandler() {
                 @Override
-                public void openFiles(java.awt.desktop.OpenFilesEvent e) {
+                public void openFiles(OpenFilesEvent e) {
+                    System.out.println("EVENT FIRED");
                     if (e.getFiles().get(0) instanceof File) {
                         if(hasUnsavedChanges()) {
                             int confirmed = JOptionPane.showConfirmDialog(null,

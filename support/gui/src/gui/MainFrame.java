@@ -88,12 +88,6 @@ public class MainFrame extends javax.swing.JFrame {
 
         editorPanel1.updateComboBoxSelectedSolver();
         
-        try {
-            setIconImage(ImageIO.read(this.getClass().getResourceAsStream("/images/logo64.png")));
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
-        
         this.setJMenuBar(editionMenuBar);
         updateLanguage();
     }

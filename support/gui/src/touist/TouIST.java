@@ -24,19 +24,15 @@
 package touist;
 
 import java.io.*;
-import java.lang.module.ModuleFinder;
-import java.lang.module.ModuleReference;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.*;
+import java.util.Enumeration;
 import java.util.Properties;
-import java.net.URL;
-import java.net.URLClassLoader;
-
-import javax.swing.*;
-
+import javax.imageio.ImageIO;
 import gui.MainFrame;
 import solution.SolverExecutionException;
+import java.awt.Taskbar;
 
 /**
  *
@@ -45,13 +41,22 @@ import solution.SolverExecutionException;
 public class TouIST {
 	private static MainFrame frame;
 	public static TextAreaLog textAreaLog;
-	
+
 
 	/**
 	 * @param args the command line arguments
 	 */
 	public static void main(String[] args) throws IOException, InterruptedException, FileNotFoundException, SolverExecutionException {
 		loadProperties();
+
+		if (Taskbar.isTaskbarSupported()) {
+			try {
+				Taskbar.getTaskbar().setIconImage(ImageIO.read(TouIST.class.getResourceAsStream("/images/logo64.png")));
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+
 		textAreaLog = new TextAreaLog();
 		System.out.println("TouIST: running app from folder '"+ System.getProperty("user.dir")+"'");
 		System.out.println("* TouIST dir (configurable with -Dtouist.dir=<path>) is '"+getTouistDir()+"'");
