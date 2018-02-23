@@ -626,11 +626,11 @@ let cmd =
     `Pre "    echo 'rain => wet_road rain not wet_road' | touist -";
     `P "we get the following DIMACS output:";
     `Pre {|    c wet_road 1      <- mapping between names DIMACS integers
-               c rain 2
-               p cnf 2 3         <- prelude of the DIMACS file
-               1 -2 0
-               2 0
-               -1 0|};
+    c rain 2
+    p cnf 2 3         <- prelude of the DIMACS file
+    1 -2 0
+    2 0
+    -1 0|};
     `P "With the $(b,--table) option, you can redirect these mapping lines to
         the file $(i,TABLE) (comments `c' are then not displayed).";
     `P "The following options are available in translation mode:";
@@ -668,15 +668,15 @@ let cmd =
     `Pre "    echo 'a or b' | touist - --solve --limit 0";
     `P "will display";
     `Pre {|    ==== model 0
-               1 a
-               0 b
-               ==== model 1
-               0 a
-               1 b
-               ==== model 2
-               1 a
-               1 b
-               ==== found 3 models, limit is 0 (--limit=N for more models)|};
+    1 a
+    0 b
+    ==== model 1
+    0 a
+    1 b
+    ==== model 2
+    1 a
+    1 b
+    ==== found 3 models, limit is 0 (--limit=N for more models)|};
 
     `P "Using $(b,--solve) with $(b,--smt), the valuations will be integers
     or reals instead of 0 and 1. For example,";
