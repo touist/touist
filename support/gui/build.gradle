@@ -57,8 +57,9 @@ task customJre() {
     def customJreOutput = file("$buildDir/custom-jre")
     def jdk9Home = "${System.getProperty('java.home')}"
     def module = 'touist'
+    def moduleinfo = file("resources/jlink/touist/module-info.java")
     outputs.dir customJreOutput
-    inputs.dir file("resources/jlink/touist/module-info.java")
+    [prepareExternal.outputs.files, shadowJar.outputs.files, moduleinfo].forEach { inputs.dir it }
     doFirst {
         copy {
             from shadowJar.outputs.files
@@ -165,7 +166,7 @@ dependencies {
     compile 'org.scilab.forge:jlatexmath:1.0.6'
     compile 'org.kordamp.ikonli:ikonli-swing:1.9.0'
     compile 'org.kordamp.ikonli:ikonli-fontawesome-pack:1.9.0'
-    runtime files('.')
+    runtime files('.') // fixes 'gradlew run'
 }
 
 jar {
@@ -268,9 +269,10 @@ task generateMacFiles() {
 
 task mac() {
     def app = file("$buildDir/mac/TouIST.app")
-    dependsOn generateMacFiles
-    dependsOn customJre
-    dependsOn prepareExternal
+    [generateMacFiles, customJre, prepareExternal].forEach {dependsOn it}
+    inputs.dir generateMacFiles
+    inputs.dir customJre
+    inputs.dir prepareExternal
     outputs.dir app
     doLast {
         app.mkdirs()
