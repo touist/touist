@@ -9,11 +9,11 @@ buildscript {
     }
 }
 plugins {
-    id "edu.sc.seis.macAppBundle" version "2.1.6" // For TouIST.app on macOS
+    id 'edu.sc.seis.macAppBundle' version '2.2.1' // For TouIST.app on macOS
     id 'edu.sc.seis.launch4j' version '2.3.0' // For TouIST.exe on Windows
     id 'com.palantir.git-version' version '0.8.0'
-    id "com.github.johnrengelman.shadow" version "2.0.1" // For building the 'fat-jar' touist.jar that includes deps
-    id "com.google.osdetector" version "1.4.0"
+    id 'com.github.johnrengelman.shadow' version '2.0.1' // For building the 'fat-jar' touist.jar that includes deps
+    id 'com.google.osdetector' version '1.4.0'
     id 'eclipse'
     id 'idea'
 }
@@ -49,18 +49,15 @@ task prepareExternal(type: Copy) {
 }
 run.dependsOn prepareExternal
 
-final jdk9Home = "${System.getProperty('java.home')}"
-final customJreOutput = file("$buildDir/custom-jre")
-final module = 'touist'
-
 // NOTE: don't forget to update if necessary 'modules-info.java'.
 //     jdeps --generate-module-info resources/jlink touist
 task customJre() {
     dependsOn shadowJar
     dependsOn prepareExternal
+    def customJreOutput = file("$buildDir/custom-jre")
+    def jdk9Home = "${System.getProperty('java.home')}"
+    def module = 'touist'
     outputs.dir customJreOutput
-    inputs.dir shadowJar.outputs.files
-    inputs.dir prepareExternal.outputs.files
     inputs.dir file("resources/jlink/touist/module-info.java")
     doFirst {
         copy {
@@ -114,7 +111,7 @@ task customJre() {
 task compressCustomJre(type: Zip, dependsOn: customJre) {
     destinationDir file("build/distributions")
     archiveName "${project.name}-jar-with-jre-${project.version}.zip"
-    from(customJreOutput) {
+    from(customJre) {
         exclude "legal"
         exclude "release"
     }
@@ -217,30 +214,95 @@ distributions {
 }
 //startScripts.enabled false
 
-macAppBundle {
-    mainClassName = project.mainClassName
-    bundleJRE = false
-    icon = 'resources/macappbundle/logo.icns'
-    javaProperties.put("touist.externalRelativeDir", "../external")
-    javaProperties.put("touist.saveRelativeDir", "../../..")
-    javaProperties.put("touist.tempInHomeRelativeDir",".touist")
-    // The following allows macOS to recognize .touist and .touistl files
-    // WARNING: actually, macOS only seems to accept extensions with 6 chars
-    // at most. Because 'touistl' is 7 characters, it is not recognized.
-    bundleExtras.put("CFBundleDocumentTypes", [ [
-        CFBundleTypeExtensions: [ 'touist','touistl' ],
-        CFBundleTypeIconFile: 'logo.icns',
-        CFBundleTypeName: project.name + ' source file',
-        CFBundleTypeRole: 'Editor',
-        LSHandlerRank: 'Owner'
-    ]])
-    javaExtras.put('-Xdock:name', name)
-    arguments = []
-    highResolutionCapable = true
-    // Using './gradlew -Ddebug=true createApp' we debug remotely TouIST.app
-    if (System.getProperty('debug', 'false') == 'true') {
-        javaExtras.put('-agentlib:jdwp','transport=dt_socket,server=y,suspend=n,address=5005')
-        javaProperties.put("debug", "true")
+// // Using './gradlew -Ddebug=true createApp' we debug remotely TouIST.app
+// if (System.getProperty('debug', 'false') == 'true') {
+//     javaExtras.put('-agentlib:jdwp','transport=dt_socket,server=y,suspend=n,address=5005')
+//     javaProperties.put("debug", "true")
+// }
+
+// See the build.gradle at https://github.com/laccore/coretools
+import groovy.xml.MarkupBuilder
+task generateMacFiles() {
+    file("$buildDir/tmp").mkdirs()
+    def (infoplist, pkginfo) = [file("$buildDir/tmp/Info.plist"), file("$buildDir/tmp/PkgInfo")]
+    [infoplist, pkginfo].each {outputs.dir it}
+    pkginfo.text = "APPL????"
+    def writer = new BufferedWriter(new FileWriter(infoplist))
+    def xml = new MarkupBuilder(writer)
+    def doValue
+    doValue = { value -> switch (value) {
+        case String: xml.string("$value"); break
+        case List: xml.array { value.each { v -> doValue(v) }}; break
+        case Map:xml.dict { value.each { k, v -> key("$k"); doValue(v) }}; break
+        case Object[]: xml.dict { value.each { k, v -> key("$k"); doValue(v) }}; break
+        default: logger.error("unknown type for plist: "+value)
+    }}
+    writer.writeLine('<?xml version="1.0" encoding="UTF-8"?>')
+    writer.writeLine('<!DOCTYPE plist SYSTEM "file://localhost/System/Library/DTDs/PropertyList.dtd">')
+    writer.writeLine('<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">')
+    xml.plist(version:"1.0") {
+        dict {[
+            CFBundleDevelopmentRegion: 'English',
+            CFBundleInfoDictionaryVersion: '6.0',
+            CFBundlePackageType: 'APPL',
+            CFBundleExecutable: 'TouIST',
+            CFBundleIconFile: 'logo.icns',
+            CFBundleIdentifier: 'touist.TouIST',
+            CFBundleName: 'TouIST',
+            CFBundleVersion: project.version,
+            CFBundleShortVersionString: project.version,
+            CFBundleAllowMixedLocalizations: 'false',
+            NSHighResolutionCapable: 'true',
+            CFBundleSignature: '????',
+            CFBundleDocumentTypes: [[
+                CFBundleTypeExtensions: [ 'touist','touistl' ],
+                CFBundleTypeIconFile: 'logo.icns',
+                CFBundleTypeName: project.name + ' source file',
+                CFBundleTypeRole: 'Editor',
+                LSHandlerRank: 'Owner'
+            ]]].each { k,v -> key("$k"); doValue(v) }
+        }
+    }
+    writer.close()
+}
+
+task mac() {
+    def app = file("$buildDir/mac/TouIST.app")
+    dependsOn generateMacFiles
+    dependsOn customJre
+    dependsOn prepareExternal
+    outputs.dir app
+    doLast {
+        app.mkdirs()
+        copy {
+            from(generateMacFiles)
+            into file("$app/Contents")
+        }
+        copy {
+            from(customJre)
+            into file("$app/Contents/Java")
+            exclude "legal", "release"
+        }
+        copy {
+            from prepareExternal
+            into file("$app/Contents/Java")
+        }
+        copy {
+            from("resources/macappbundle/logo.icns")
+            into file("$app/Contents/Resources")
+        }
+        file("$app/Contents/MacOS").mkdirs()
+        def f = file("$app/Contents/MacOS/TouIST")
+        f.text = '''#! /bin/sh
+            "$(dirname "$0")"/../Java/bin/java -Xdock:name=TouIST -Dtouist.dir="$(dirname "$0")/../Java" -Dtouist.externalRelativeDir=./external -Dtouist.saveRelativeDir=../../.. -m touist/touist.TouIST $@
+        '''.stripIndent()
+        exec {
+                commandLine "chmod", "+x", "$f"
+        }
+        exec {
+            commandLine "codesign", "-s", "-", "--force", "$app"
+            logger.lifecycle commandLine.join(' ')
+        }
     }
 }
 
@@ -249,8 +311,8 @@ task warningMac() {
     def f = file "build/tmp/TouIST-OPENING.txt"
     outputs.dir f
     f.text =
-"""On macOS Sierra (10.12.5) and some other previous macOS versions, opening
-TouIST will show the error:
+"""On macOS Sierra (10.12) and later macOS versions, opening TouIST will
+show the error:
 
     TouIST is damaged and can’t be opened. You should move it to the Trash.
 
