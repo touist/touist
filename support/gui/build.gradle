@@ -284,8 +284,8 @@ task mac() {
             exclude "legal", "release"
         }
         copy {
-            from prepareExternal
-            into file("$app/Contents/Java")
+            from(files(prepareExternal))
+            into file("$app/Contents/Java/external")
         }
         copy {
             from("resources/macappbundle/logo.icns")
