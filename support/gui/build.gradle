@@ -53,6 +53,8 @@ final jdk9Home = "${System.getProperty('java.home')}"
 final customJreOutput = file("$buildDir/custom-jre")
 final module = 'touist'
 
+// NOTE: don't forget to update if necessary 'modules-info.java'.
+//     jdeps --generate-module-info resources/jlink touist
 task customJre() {
     dependsOn shadowJar
     dependsOn prepareExternal
@@ -108,13 +110,6 @@ task customJre() {
         }
     }
 }
-task compressCustomJre(type: Exec, dependsOn: customJre) {
-    inputs.dir "$buildDir/custom-jre"
-    outputs.dir "$buildDir/custom-jre.tar.bz2"
-    exclude 
-    executable 'tar'
-    workingDir buildDi
-}
 
 task compressCustomJre(type: Zip, dependsOn: customJre) {
     destinationDir file("build/distributions")
@@ -123,11 +118,6 @@ task compressCustomJre(type: Zip, dependsOn: customJre) {
         exclude "legal"
         exclude "release"
     }
-    from() {
-        include "${project.name}.app/Contents/MacOS/**"
-        fileMode 0777  // octal requires leading zero
-    }
-    from warningMac
 }
 build.dependsOn compressCustomJre
 
