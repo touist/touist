@@ -49,7 +49,7 @@ let _ =
       let ret =
       try let _ = Touist.Parse.parse_sat (Js.to_string txt) |> Touist.Eval.eval ~onlychecktypes:true in
         Lint_Succ ({messages=[]})
-      with Touist.Err.Touist.Fatal msgs ->
+      with Touist.Err.TouistFatal msgs ->
         Lint_Error ({messages=[to_msg msgs]})
       in linter_ret_to_yojson ret |> Yojson.Safe.to_string ~std:true |> Js.string
 
@@ -57,7 +57,7 @@ let _ =
       let ret =
       try let ast = Touist.Parse.parse_sat (Js.to_string txt) in let latex = Touist.Latex.latex_of_ast ast in
         Latex_Succ (latex ~full:false, {messages=[]})
-      with Touist.Err.Touist.Fatal msgs ->
+      with Touist.Err.TouistFatal msgs ->
         Latex_Error ({messages=[to_msg msgs]})
       in latex_ret_to_yojson ret |> Yojson.Safe.to_string ~std:true |> Js.string
   end)
