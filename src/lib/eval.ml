@@ -329,8 +329,8 @@ and eval_set_decl (env:env) (set_decl:Ast.t) =
     | Set _  , Set x   -> Set x
     | _ -> raise_set_decl set_decl elmt elmt_expanded
              (Set_decl sets) (Set_decl sets_expanded)
-             ("at this point a comma-separated list of '"^string_of_ast_type first_elmt^"', \
-             because previous elements of the list had this type"^"\n")
+             ("at this point a comma-separated list of '"^string_of_ast_type first_elmt
+              ^"', because previous elements of the list had this type")
   in
   (* We take the first elmnt of 'sets' and 'sets_expanded' in order to enforce
      what the following elmnts should be. 'x' is only useful for raising the
