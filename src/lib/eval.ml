@@ -658,7 +658,7 @@ and expand_prop_with_set env name indices_optional =
       [], [UnexpProp (name,None)]
     | Some x -> (* case (2): proposition with indices (e.g.: it_rains(day)) *)
       let indices = eval_indices env x in
-      indices, expand_prop_with_set' env indices [UnexpProp (name,None)]
+      indices, expand_prop_with_set' env [UnexpProp (name,None)] indices
   in
   let eval_unexpprop acc cur = match cur with
     | UnexpProp (p,i) -> (Prop (expand_var_name env (p,i)))::acc | _->failwith "shouldnt happen"
@@ -671,33 +671,36 @@ and expand_prop_with_set env name indices_optional =
    where we do the actual hard work.
    [acc_props] is an accumulator of the generated propositions when sets are
    expanded. For example, with the above example (the 'env' param is skipped),
-   here is the evolution of the acc_props when iterating over each elmt of
-   [indices]:
-       [time]  ---[1,2]--->  [time(1), time(2)]
-               ---[a,b]--->  [time(1,a), time(1,b), time(2,a), time(2,b)] *)
+   here is the evolution of the acc_props when iterating i over [indices]:
+         <- i ->       <--------------- acc_props ------------->
+                       [time]
+         [1,2]     ->  [time(1), time(2)]
+         [a,b]     ->  [time(1,a), time(1,b), time(2,a), time(2,b)]       *)
 and expand_prop_with_set' env acc_props indices =
   match indices with (* at this point, indices contain either Props or Sets *)
   | [] -> acc_props
   | i::next ->
-    let acc = match i with
+    let acc_next = match i with
       (* Case (b): the index [x] is a set *)
       | Set s when AstSet.is_empty s -> acc_props
-      | Set s -> Set s |> set_to_ast_list env |> expand_props acc_props
+      | Set s -> expand_props acc_props (Set s |> set_to_ast_list env)
       (* Case (a): the index [x] is a simple proposition *)
       | x -> expand_props acc_props [x]
-    in expand_prop_with_set' env acc next
+    in expand_prop_with_set' env acc_next next
 
 (* [expand_props] does the cartesian product between a set of propositions and
    a set of indices and combines each tuple into a proposition. Example:
        expand_props([a,b], [1,2])   ->   [a(1), a(2), b(1), b(2)]. *)
-and expand_props props ind = match props with
+and expand_props props ind =
+  match props with
   | [] -> []
   | x::xs -> (expand_prop x ind) @ (expand_props xs ind)
 
 (* [expand_prop] creates a list of same lenght as [ind] in which [prop] is
    concatenated with each value in [ind]. Example:
-       expand_prop(a, [1,2])   ->   [a(1), a(2)]  *)
-and expand_prop prop ind = match prop with
+       expand_prop([1,2], a)   ->   [a(1), a(2)] *)
+and expand_prop prop ind =
+  match prop with
   | UnexpProp (name, None) -> List.fold_left (fun acc i -> (UnexpProp (name,Some ([i])))::acc) [] ind
   | UnexpProp (name, Some cur) -> List.fold_left (fun acc i -> (UnexpProp (name,Some (cur @ [i])))::acc) [] ind
   | x -> failwith ("[shouldnt happen] proplist contains smth that is not UnexpProp: "^string_of_ast_type x)
