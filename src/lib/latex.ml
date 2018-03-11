@@ -114,6 +114,10 @@ let rec latex_of_ast ~full ast =
   | NewlineBefore f -> "\\\\\n" ^ latex_of_ast f
   | NewlineAfter f -> latex_of_ast f ^ "\\\\\n"
   | Formula f -> latex_of_ast f
+  | SetBuilder (f, vars, sets, cond) ->
+    "[" ^ latex_of_ast f ^ "~|~" ^ latex_of_commalist "," vars ^ "\\in "
+    ^ latex_of_commalist " \\times " sets
+    ^ (match cond with Some c -> ", "^ latex_of_ast c | _ -> "") ^ "]"
 
   and latex_of_commalist ~full sep el = String.concat sep (List.map (latex_of_ast ~full) el)
   and escape_underscore txt =
@@ -140,7 +144,7 @@ and ast_fun (f:('a -> Ast.t -> 'a)) (acc:'a) ast : 'a =
       -> acc |> ast_fun' x |> ast_fun' y
   | Int _ | Float _ | Bool _ | Top | Bottom | Prop _ | UnexpProp _ | Var _
   | Set _ | Set_decl _ | Card  _ | Exact _ | Atmost _ | Atleast _ | Affect  _
-  | Formula _
+  | Formula _ | SetBuilder _
       -> acc
   (* non-formulas *)
   | Mod _ | Union _ | Inter _ | Diff _ | Range _ | Subset _ | Powerset _

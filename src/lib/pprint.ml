@@ -106,6 +106,10 @@ let rec string_of_ast ?(utf8=false) ?(show_var=(fun ast -> "")) ?(debug=false) ?
   | For (v,c,f)           -> "for "^of_ast v^" in "^of_ast c^":"^ of_ast f
   | NewlineBefore f | NewlineAfter f -> of_ast f
   | Formula f -> "\"" ^ of_ast f ^ "\""
+  | SetBuilder (f, vars, sets, cond)   ->
+    "[" ^ of_ast f ^ " for "
+    ^ of_ast_list "," vars ^ " in " ^ of_ast_list "," sets
+    ^ (match cond with Some c -> " when " ^ of_ast c | None -> "") ^"]"
 
 and string_of_ast_type ?(debug=false) (ast:Ast.t) : string =
   let of_ast_type ast = string_of_ast_type ~debug ast in
@@ -170,6 +174,7 @@ and string_of_ast_type ?(debug=false) (ast:Ast.t) : string =
   | For (_,_,_)            -> "for"
   | NewlineBefore f | NewlineAfter f -> "newline"
   | Formula f              -> "quoted formula"
+  | SetBuilder (_,_,_,_)   -> "set builder"
 
 
 and string_of_ast_list ?(utf8=false) ?(show_var=(fun ast -> "")) ?(debug=false) ?(parenthesis=debug) sep el =

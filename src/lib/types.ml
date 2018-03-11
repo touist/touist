@@ -100,6 +100,7 @@ module rec Ast : sig
     | NewlineAfter     of t
     | NewlineBefore    of t
     | Formula          of t
+    | SetBuilder       of t * t list * t list * t option
 end = Ast (* see (1) *)
 
 and AstSet : sig

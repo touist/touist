@@ -233,6 +233,7 @@ expr:
   | x=set_decl_range(expr)
   | x=set_empty
   | x=set_decl_explicit(expr)
+  | x=set_builder(expr)
   | x=set_operation(expr) {x}
   | QUOTE f=formula_simple QUOTE {Loc (Formula f,($startpos,$endpos))}
 
@@ -257,6 +258,12 @@ expr:
 %inline set_decl_range(T): LBRACK s1=T RANGE s2=T RBRACK {Loc (Range (s1,s2),($startpos,$endpos))}
 %inline set_decl_explicit(T): LBRACK l=comma_list(T) RBRACK {Loc (Set_decl l,($startpos,$endpos))}
 %inline set_empty: LBRACK RBRACK {Loc (Set_decl [],($startpos,$endpos))}
+%inline set_builder(T): LBRACK f=T FOR vars=comma_list(var) IN sets=comma_list(expr) c=when_cond? RBRACK
+  {try List.fold_left2 (fun _ _ _ -> ()) () vars sets;
+      Loc (SetBuilder (f,vars,sets,c), ($startpos,$endpos))
+   with Invalid_argument _ ->
+      fatal (Error,Parse, ("list comprehension must have the same number of variables and sets.\n"),
+        Some ($startpos,$endpos))}
 
 %inline set_operation(T):
   | s1=T UNION s2=T {Loc (Union (s1,s2),($startpos,$endpos))}

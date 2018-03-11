@@ -133,12 +133,13 @@ and eval_touist_code (env:env) ast :Ast.t =
   match ast_without_loc ast with
   | Touist_code (formulas) ->
     eval_ast_formula env (process_formulas (affect_vars formulas))
-  | e -> raise_with_loc ast ("this does not seem to be a touist code structure: " ^ string_of_ast e ^"\n")
+  | e -> raise_with_loc ast ("this does not seem to be a touist code structure: " ^ string_of_ast ~debug:true e ^"\n")
 
 (* [eval_ast] evaluates (= expands) numerical, boolean and set expresions that
    are not directly in formulas. For example, in 'when $a!=a' or 'if 3>4',
    the boolean values must be computed: eval_ast will do exactly that.*)
 and eval_ast (env:env) (ast:Ast.t) : Ast.t =
+  let eval_ast_env = eval_ast in
   let eval_ast = eval_ast env in
   match ast_without_loc ast with
   | Int x   -> Int x
@@ -316,6 +317,23 @@ and eval_ast (env:env) (ast:Ast.t) : Ast.t =
   | Loc (x,l) -> eval_ast x
   | Paren x -> eval_ast x
   | Formula x -> Formula (eval_ast_formula env x)
+  | SetBuilder (f, vars, sets, cond) -> begin
+      let rec treat env vars sets : Ast.t list =
+        match vars, sets with
+        | [],[] ->
+           if (match cond with Some c -> ast_to_bool env c | None -> true)
+           then [eval_ast_formula env f] (* bottom of the recursion: expand f *)
+           else []
+        | (Loc (Var (p,i),loc))::next_vars, (Loc (set, l))::next_sets ->
+          let set = match eval_ast_env env set with Set set -> set | _ -> failwith "" in
+          AstSet.fold (fun value acc ->
+              let name = (expand_var_name env (p,i)) and desc = (value,loc)
+              in (treat ((name,desc)::env) next_vars next_sets) @ acc) set []
+        | e1,e2 -> raise_with_loc ast ("[shouldnt happen] set builder error: "
+                                       ^ string_of_ast_list ~debug:true "," e1^"; "
+                                       ^ string_of_ast_list ~debug:true "," e2^"\n")
+      in Set (treat env vars sets |> AstSet.of_list)
+    end
   | e -> raise_with_loc ast ("[shouldnt happen] this expression cannot be expanded: " ^ string_of_ast e ^"\n")
 
 and eval_set_decl (env:env) (set_decl:Ast.t) =

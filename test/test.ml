@@ -215,6 +215,10 @@ run_test_tt_main (
   "powerset should always return a set containing the empty set">::(sat_expands_to "f(powerset([1]))" "f([[],[1]])");
   "powerset simple test">::(sat_expands_to "f(powerset([a,b]))" "f([[],[a],[a,b],[b]])")
 ];
+"set builder/list comprehension">:::[
+  "should expand to a set of 4 elmts">::(sat_expands_to "f([p($i,$j) for $i,$j in [1,2],[a,b]])" "f([p(1,a),p(1,b),p(2,a),p(2,b)])");
+  "can have a 'when'">::(sat_expands_to "f([p($i) for $i in [1,2,3] when $i>1])" "f([p(2),p(3)])");
+];
 
 "samples of code that should raise errors in {!Touist.Eval.eval}">:::[ (* 'c' is the testing context *)
   "undefined var">::         (test_sat_raise "1:4" "   $a");
