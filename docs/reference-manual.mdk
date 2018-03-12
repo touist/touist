@@ -1342,9 +1342,7 @@ warnings) given by `touist`. By default, `touist` will wrap all messages with
 a 76 characters limit. With N set to 0, you can disable the wrapping.
 
 **`--verbose`**`[=N]` or **`-v`**`[N]` (N defaults to 1) prints more
-information on timing and errors.
-
-With no N given (i.e., N=1):
+information on timing and errors. With no N given (i.e., N=1):
 
 * time spent on translation and solving are displayed (see
   table [#timings]).
@@ -1360,11 +1358,11 @@ With N &ge; 2, `--solver=CMD` displays the stdin, stdout and stderr of
 ~ Note {#timings}
 Availability of timings using `-v`:
 
-|             | `--sat`     | `--smt`             | `--qbf`        |
-|-------------|:-----------:|:-------------------:|:--------------:|
-| `translate` | &checkmark; | (instantaneous)      | &checkmark;    |
-| `--solve`   | &checkmark; | &checkmark;         | &xmark; (todo) |
-| `--solver=` | &checkmark; | (cmd not available) | &checkmark;    |
+|             | `--sat`     | `--smt`             | `--qbf`     |
+|-------------|:-----------:|:-------------------:|:-----------:|
+| `translate` | &checkmark; | (instantaneous)     | &checkmark; |
+| `--solve`   | &checkmark; | &checkmark;         | &checkmark; |
+| `--solver=` | &checkmark; | (cmd not available) | &checkmark; |
 ~
 
 
