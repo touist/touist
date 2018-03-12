@@ -565,15 +565,12 @@ let common_opt =
       With $(docv) set to 0, you can disable the wrapping.")
   and verbose_flag =
     Arg.(value & opt int 0 ~vopt:1 & info ["verbose";"v"] ~docv:"LVL" ~docs ~doc:"\
-      Print information for debugging touist. $(i,LVL) controls the verbosity;
-      with 1, it is a bit verbose; with 2 and upper, it is more verbose.
-      ($(i,1)) With $(b,--solver), prints the stdin, stdout and stderr of
-      the given solver. ($(i,2)) print 'loc' (location) when displaying
-      syntax errors.
-      ($(i,3)) when an exception is raised, print the call stack.
-      ($(i,4)) when a syntax error is displayed, also give the automaton
-      number; this is useful when trying to fix a wrong error message in
-      `src/lib/parser.messages'.")
+      Print information for debugging touist. $(i,LVL) controls the verbosity.
+      With $(i,LVL)>=$(i,1), display stacktrace and display 'loc' (location) and
+      automaton number on syntax error (useful when trying to fix a wrong error
+      message in `src/lib/parser.messages').
+      With $(i,LVL)>=$(i,2), $(b,--solver) prints the stdin, stdout and stderr of
+      the given solver.")
   in let common_opt error_format wrap_width verbose =
        {error_format; wrap_width; verbose}
   in Term.(const common_opt $ error_format $ wrap_width $ verbose_flag)
@@ -602,6 +599,8 @@ let cmd =
         disambiguate, i.e, "; `Noblank;
     `Pre "    $(mname) --smt file.touist         <- wrong"; `Noblank;
     `Pre "    $(mname) --smt -- file.touist      <- ok";
+    `P "You can see the time spent on each step (translation and solving)
+        using $(b,-v).";
     `P ("Embedded solvers compiled in $(mname): minisat"
         ^ (if Touist_yices2.SmtSolve.enabled then ", yices2" else "")
         ^ (if Touist_qbf.QbfSolve.enabled then ", qbf" else "")^".");
