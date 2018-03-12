@@ -145,7 +145,7 @@ esac
 
 echo -e "${Q} Do you want to create a signed tag '${green}Bump to $VERSION$SUFFIX${end}' using the following message:"
 while IFS= read -r line; do
-    echo -e "\${gray}${line}${end}"
+    echo -e "${gray}${line}${end}"
 done < tag_content
 echo -en "${Q} (u for unsigned tag; y for signed tag): [Y/n/u] "
 read -r ans
