@@ -486,7 +486,10 @@ $\{i~|~i=1,\dots,10\}$ can be written ``[1..10]``. Ranges can
 be produced with both integer and float limits. For both integer and float
 limits, the step is 1 (respectively 1.0). It is not possible to change the step for now.
 
-### Set-builder notation {#set-builder}
+### Set-builder notation (list comprehension) {#set-builder}
+
+
+
 $\{p(x_1,...,x_n)~|~(x_1,...,x_n) \in S_1 \times ... \times S_n \}$, which the set
 of tuple propositions based on the cartesian product of the sets $S_1,...,S_n$,
 can be written ``p($S1,$S2,$S3)``. The example ``p([a,b,c])`` will produce
@@ -1054,6 +1057,8 @@ TERM      = [_0-9]*[a-zA-Z][a-zA-Z_0-9]*
     | "[" <comma-list(<expr>)> "]"
     | "[ <int> ".." <int> "]"      <- step is 1
     | "[ <float> ".." <float> "]"  <- step is 1.0
+    | "[ <formula<T>> "for" <comma-list(<var>)>
+       "in" <comma-list(<set>)> ["when" <bool>] "]"  <- TouIST >= 3.5.2
     | <set> "inter" <set>          <- TouIST >= 3.4.0
     | <set> "union" <set>          <- TouIST >= 3.4.0
     | <set> "diff" <set>           <- TouIST >= 3.4.0
@@ -1336,13 +1341,32 @@ automatically added.
 warnings) given by `touist`. By default, `touist` will wrap all messages with
 a 76 characters limit. With N set to 0, you can disable the wrapping.
 
-**`--verbose`** prints more information on output and errors:
-1. on syntax error, print the state number of the LL(1) automaton; each
+**`--verbose`**`[=N]` or **`-v`**`[N]` (N defaults to 1) prints more
+information on timing and errors.
+
+With no N given (i.e., N=1):
+
+* time spent on translation and solving are displayed (see
+  table [#timings]).
+* on syntax error, print more AST context (`(loc)` for example).
+* when an exception is raised, tries to show the stack trace.
+* on syntax error, print the state number of the LL(1) automaton; each
     state number that may trigger a syntax error should have a
     corresponding message in `src/lib/parser.messages`.
-2. on syntax error, print more AST context (`(loc)` for example).
-3. with `--solver`, displays the stdin, stdout and stderr of `CMD`.
-4. when an exception is raised, tries to show the stack trace. 
+
+With N &ge; 2, `--solver=CMD` displays the stdin, stdout and stderr of
+`CMD`.
+
+~ Note {#timings}
+Availability of timings using `-v`:
+
+|             | `--sat`     | `--smt`             | `--qbf`        |
+|-------------|:-----------:|:-------------------:|:--------------:|
+| `translate` | &checkmark; | (instantaneous)      | &checkmark;    |
+| `--solve`   | &checkmark; | &checkmark;         | &xmark; (todo) |
+| `--solver=` | &checkmark; | (cmd not available) | &checkmark;    |
+~
+
 
 ### Usage for Satisfiability Modulo Theory (SMT mode) {#usage-smt}
 
