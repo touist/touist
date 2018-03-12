@@ -189,8 +189,9 @@ variables (with global or local affectations).
 ### Syntax of a variable
 
 ``` Grammar
-<expr> ::= <int>|<float>|<prop>|<bool>|"""<formula-simple>"""|<set>
-<var> ::= "$" TERM                           <- simple-var
+<expr> ::= <int>|<float>|<prop>|<bool>|<set>
+    | """<formula-simple>""" <- quoted formula, since TouIST >= 3.5.1
+<var> ::= "$" TERM                            <- simple-var
     | "$" TERM "(" <comma-list(<expr>)> ")"   <- tuple-var
 ```
 
@@ -230,7 +231,8 @@ formula (meaning that global variables cannot be nested in other
 formulas) using the following affectation syntax:
 ``` Grammar
 <affect> ::= <var> "=" (<expr>)      <-- global affectation
-<expr> ::= <int>|<float>|<prop>|<bool>|"""<formula-simple>"""|<set>
+<expr> ::= <int>|<float>|<prop>|<bool>|<set>
+  | """<formula-simple>""" <-- TouIST >= 3.5.1
 ```
 
 Global variables apply for the whole code, even if the affectation is
@@ -488,20 +490,38 @@ limits, the step is 1 (respectively 1.0). It is not possible to change the step 
 
 ### Set-builder notation (list comprehension) {#set-builder}
 
+A set-builder expression is a set defined as
+$\{p(x_1,...,x_n)~|~(x_1,...,x_n) \in S_1 \times ... \times S_n \}$,
+which is the set of expressions based on the cartesian product of
+the sets $S_1,...,S_n$. You can use the "list comprehension" (since
+version 3.5.2) to do that:
+```Touist
+[p($i,$j,$k) for $i,$j,$k in $S1,$S2,$S3]
+```
 
+List comprehension allows you to generate sets containing any expression:
+numbers, propositions and even formulas. In order to use formulas, you
+must use the quoted notation (see [#quoted-formulas]). The ``when``
+keyword helps filter the generated elements (like in ``bigand`` or
+``bigor``). Examples:
 
-$\{p(x_1,...,x_n)~|~(x_1,...,x_n) \in S_1 \times ... \times S_n \}$, which the set
-of tuple propositions based on the cartesian product of the sets $S_1,...,S_n$,
-can be written ``p($S1,$S2,$S3)``. The example ``p([a,b,c])`` will produce
-``[p(a),p(b),p(c)]``.
-You can mix sets, integers, floats, propositions and booleans in indexes:
+```Touist
+[$i for $i in [1..100] when $i mod 3 == 0] ;; set of integers
+[f($i,$j) for $i,$j in [1..3],[a,b,c]]     ;; set of propositions
+[f(1,$p) for $p in [a,b,c,d] when $j != a] ;; set of propositions
+["$a and $b" for $a,$b in [r,s],[x,y]]     ;; set of quoted formulas
+```
+
+For simple list comprehension (without ``when``), you can use the
+**condensed** syntax: ``f(1,[a,b],[7..8])`` which is equivalent to
+``[f(1,$i,$j) for $i,$j in [a,b],[7..8]]``.
+
 ~Center
-|----------------------|--------------------------|
-| Proposition          | produces the set         |
-|----------------------|:------------------------:|
-|``f(1,[a,b],[7..8])`` |``[f(1,a,7),f(1,a,8),``   |
-|                      | \ ``f(1,b,7),f(1,b,8)]`` |
-|----------------------|--------------------------|
++--------------------+--------------------------------------------+
+| List comprehension | ``[f(1,$i,$j) for $i,$j in [a,b],[7..8]]`` |
+| Condensed syntax   |``f(1,[a,b],[7..8])``                       |
+| Produced set       | `[f(1,a,7),f(1,a,8),f(1,b,7),f(1,b,8)]``   |
+|--------------------|--------------------------------------------|
 ~
 **Important:** the set-builder feature only works in expressions and does
 not work in formulas. In formulas, the proposition ``f([a,b])`` will
@@ -943,9 +963,9 @@ You can use one of the two notations:
 
 ### Quoted formulas (formulas as expressions) {#quoted-formulas}
 
-When you want to use formulas in sets, you must use double quotes `""` to
-"protect" the formula from being evaluated as a normal expression. For
-example:
+When you want to use formulas in sets, you must use double quotes `"..."`
+to "protect" the formula from being evaluated as a normal expression
+(available with **TouIST >= 3.5.1**). For example:
 
 ```Touist
     bigand $f in ["a or b", "c or d", "e"]:
@@ -984,7 +1004,8 @@ TERM      = [_0-9]*[a-zA-Z][a-zA-Z_0-9]*
                  | <formula> <touist-file>
                  | EOF
 
-<expr> ::= <int>|<float>|<prop>|<bool>|<set>|"""<formula-simple>"""
+<expr> ::= <int>|<float>|<prop>|<bool>|<set>
+    | """<formula-simple>"""  <- Touist >= 3.5.1
 <var> ::= "$" TERM
     | "$" TERM "(" <comma-list(<expr>)> ")"
 
@@ -1057,7 +1078,7 @@ TERM      = [_0-9]*[a-zA-Z][a-zA-Z_0-9]*
     | "[" <comma-list(<expr>)> "]"
     | "[ <int> ".." <int> "]"      <- step is 1
     | "[ <float> ".." <float> "]"  <- step is 1.0
-    | "[ <formula<T>> "for" <comma-list(<var>)>
+    | "[ <expr> "for" <comma-list(<var>)>
        "in" <comma-list(<set>)> ["when" <bool>] "]"  <- TouIST >= 3.5.2
     | <set> "inter" <set>          <- TouIST >= 3.4.0
     | <set> "union" <set>          <- TouIST >= 3.4.0
