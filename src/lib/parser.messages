@@ -597,9 +597,88 @@ touist_simple: VARTUPLE LBRACK XOR
 
 Ill-formed set definition. At this point is expected one of the following:
 - a comma-separated of floats, integers or proposition expressions;
-- a float or integer expression followed by '..'.
+- a float or integer expression followed by '..';
+- an expression followed by 'for' (list comprehension).
 Instead, the following statement were read:
     $0
+
+touist_qbf: VARTUPLE LBRACK VAR FOR XOR 
+##
+## Ends in an error in state: 104.
+##
+## expr -> LBRACK expr FOR . comma_list(var) IN comma_list(expr) option(when_cond) RBRACK [ XOR WHEN VARTUPLE VAR UNION TUPLE TOP THEN TERM SUBSET SUB RPAREN RBRACK RANGE OR NOTEQUAL NOT NEWLINE MUL MOD LT LPAREN LET LE INTER INT IN IMPLIES IF GT GE FORALL FOR FLOAT EXISTS EXACT EQUIV EQUAL EOF END ELSE DIV DIFF COMMA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
+##
+## The known suffix of the stack is as follows:
+## LBRACK expr FOR 
+##
+
+Ill-formed set definition. A list comprehension expects a list of variables after 'for'.
+
+touist_qbf: VARTUPLE LBRACK VAR FOR VAR XOR 
+##
+## Ends in an error in state: 105.
+##
+## expr -> LBRACK expr FOR comma_list(var) . IN comma_list(expr) option(when_cond) RBRACK [ XOR WHEN VARTUPLE VAR UNION TUPLE TOP THEN TERM SUBSET SUB RPAREN RBRACK RANGE OR NOTEQUAL NOT NEWLINE MUL MOD LT LPAREN LET LE INTER INT IN IMPLIES IF GT GE FORALL FOR FLOAT EXISTS EXACT EQUIV EQUAL EOF END ELSE DIV DIFF COMMA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
+##
+## The known suffix of the stack is as follows:
+## LBRACK expr FOR comma_list(var) 
+##
+## WARNING: This example involves spurious reductions.
+## This implies that, although the LR(1) items shown above provide an
+## accurate view of the past (what has been recognized so far), they
+## may provide an INCOMPLETE view of the future (what was expected next).
+## In state 17, spurious reduction of production comma_list(var) -> var 
+##
+
+Ill-formed set definition. In a list comprehension, 'in' is expected after the list of variables.
+
+touist_qbf: VARTUPLE LBRACK VAR FOR VAR IN XOR 
+##
+## Ends in an error in state: 106.
+##
+## expr -> LBRACK expr FOR comma_list(var) IN . comma_list(expr) option(when_cond) RBRACK [ XOR WHEN VARTUPLE VAR UNION TUPLE TOP THEN TERM SUBSET SUB RPAREN RBRACK RANGE OR NOTEQUAL NOT NEWLINE MUL MOD LT LPAREN LET LE INTER INT IN IMPLIES IF GT GE FORALL FOR FLOAT EXISTS EXACT EQUIV EQUAL EOF END ELSE DIV DIFF COMMA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
+##
+## The known suffix of the stack is as follows:
+## LBRACK expr FOR comma_list(var) IN 
+##
+
+Ill-formed set definition. In a list comprehension, a comma-separated list of sets is expected after 'in'.
+
+touist_qbf: VARTUPLE LBRACK VAR FOR VAR IN VAR VARTUPLE 
+##
+## Ends in an error in state: 110.
+##
+## expr -> LBRACK expr FOR comma_list(var) IN comma_list(expr) . option(when_cond) RBRACK [ XOR WHEN VARTUPLE VAR UNION TUPLE TOP THEN TERM SUBSET SUB RPAREN RBRACK RANGE OR NOTEQUAL NOT NEWLINE MUL MOD LT LPAREN LET LE INTER INT IN IMPLIES IF GT GE FORALL FOR FLOAT EXISTS EXACT EQUIV EQUAL EOF END ELSE DIV DIFF COMMA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
+##
+## The known suffix of the stack is as follows:
+## LBRACK expr FOR comma_list(var) IN comma_list(expr) 
+##
+## WARNING: This example involves spurious reductions.
+## This implies that, although the LR(1) items shown above provide an
+## accurate view of the past (what has been recognized so far), they
+## may provide an INCOMPLETE view of the future (what was expected next).
+## In state 107, spurious reduction of production comma_list(expr) -> expr 
+##
+
+Ill-formed set definition (list comprehension). Either finish the list of sets with ']' or continue with a conditionnal statement 'when'.
+
+touist_qbf: VARTUPLE LBRACK VAR FOR VAR IN VAR WHEN VAR COLON 
+##
+## Ends in an error in state: 113.
+##
+## expr -> LBRACK expr FOR comma_list(var) IN comma_list(expr) option(when_cond) . RBRACK [ XOR WHEN VARTUPLE VAR UNION TUPLE TOP THEN TERM SUBSET SUB RPAREN RBRACK RANGE OR NOTEQUAL NOT NEWLINE MUL MOD LT LPAREN LET LE INTER INT IN IMPLIES IF GT GE FORALL FOR FLOAT EXISTS EXACT EQUIV EQUAL EOF END ELSE DIV DIFF COMMA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
+##
+## The known suffix of the stack is as follows:
+## LBRACK expr FOR comma_list(var) IN comma_list(expr) option(when_cond) 
+##
+## WARNING: This example involves spurious reductions.
+## This implies that, although the LR(1) items shown above provide an
+## accurate view of the past (what has been recognized so far), they
+## may provide an INCOMPLETE view of the future (what was expected next).
+## In state 112, spurious reduction of production option(when_cond) -> WHEN expr 
+##
+
+Ill-formed set definition (list comprehension). At this point, ']' is expected.
 
 touist_simple: VARTUPLE TOFLOAT XOR 
 ##
@@ -1319,6 +1398,100 @@ touist_qbf: BIGAND VAR IN VAR COLON XOR
 ##
 
 Ill-formed $6. After $1, a formula is expected. Instead, the following statement were read:
+    $0
+
+touist_simple: BIGOR VAR IN VAR WHEN BOOL RBRACK 
+##
+## Ends in an error in state: 137.
+##
+## formula_simple -> BIGOR comma_list(var) IN comma_list(expr) option(when_cond) . COLON formula_simple END [ XOR VARTUPLE VAR TUPLE TOP TERM RPAREN QUOTE OR NOT NEWLINE LPAREN LET IMPLIES IF EXACT EQUIV EOF END ELSE DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ]
+##
+## The known suffix of the stack is as follows:
+## BIGOR comma_list(var) IN comma_list(expr) option(when_cond) 
+##
+## WARNING: This example involves spurious reductions.
+## This implies that, although the LR(1) items shown above provide an
+## accurate view of the past (what has been recognized so far), they
+## may provide an INCOMPLETE view of the future (what was expected next).
+## In state 112, spurious reduction of production option(when_cond) -> WHEN expr 
+##
+touist_simple: BIGAND VAR IN VAR WHEN BOOL RBRACK 
+##
+## Ends in an error in state: 143.
+##
+## formula_simple -> BIGAND comma_list(var) IN comma_list(expr) option(when_cond) . COLON formula_simple END [ XOR VARTUPLE VAR TUPLE TOP TERM RPAREN QUOTE OR NOT NEWLINE LPAREN LET IMPLIES IF EXACT EQUIV EOF END ELSE DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ]
+##
+## The known suffix of the stack is as follows:
+## BIGAND comma_list(var) IN comma_list(expr) option(when_cond) 
+##
+## WARNING: This example involves spurious reductions.
+## This implies that, although the LR(1) items shown above provide an
+## accurate view of the past (what has been recognized so far), they
+## may provide an INCOMPLETE view of the future (what was expected next).
+## In state 112, spurious reduction of production option(when_cond) -> WHEN expr 
+##
+touist_smt: BIGOR VAR IN VAR WHEN BOOL RBRACK 
+##
+## Ends in an error in state: 367.
+##
+## formula_smt -> BIGOR comma_list(var) IN comma_list(expr) option(when_cond) . COLON formula_smt END [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOT NEWLINE LPAREN LET INT IMPLIES IF FLOAT EXACT EQUIV EOF END ELSE DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ]
+##
+## The known suffix of the stack is as follows:
+## BIGOR comma_list(var) IN comma_list(expr) option(when_cond) 
+##
+## WARNING: This example involves spurious reductions.
+## This implies that, although the LR(1) items shown above provide an
+## accurate view of the past (what has been recognized so far), they
+## may provide an INCOMPLETE view of the future (what was expected next).
+## In state 112, spurious reduction of production option(when_cond) -> WHEN expr 
+##
+touist_smt: BIGAND VAR IN VAR WHEN BOOL RBRACK 
+##
+## Ends in an error in state: 373.
+##
+## formula_smt -> BIGAND comma_list(var) IN comma_list(expr) option(when_cond) . COLON formula_smt END [ XOR VARTUPLE VAR TUPLE TOP TERM SUB RPAREN OR NOT NEWLINE LPAREN LET INT IMPLIES IF FLOAT EXACT EQUIV EOF END ELSE DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ]
+##
+## The known suffix of the stack is as follows:
+## BIGAND comma_list(var) IN comma_list(expr) option(when_cond) 
+##
+## WARNING: This example involves spurious reductions.
+## This implies that, although the LR(1) items shown above provide an
+## accurate view of the past (what has been recognized so far), they
+## may provide an INCOMPLETE view of the future (what was expected next).
+## In state 112, spurious reduction of production option(when_cond) -> WHEN expr 
+##
+touist_qbf: BIGOR VAR IN VAR WHEN BOOL RBRACK 
+##
+## Ends in an error in state: 246.
+##
+## formula_qbf -> BIGOR comma_list(var) IN comma_list(expr) option(when_cond) . COLON formula_qbf END [ XOR VARTUPLE VAR TUPLE TOP TERM RPAREN OR NOT NEWLINE LPAREN LET IMPLIES IF FORALL EXISTS EXACT EQUIV EOF END ELSE DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ]
+##
+## The known suffix of the stack is as follows:
+## BIGOR comma_list(var) IN comma_list(expr) option(when_cond) 
+##
+## WARNING: This example involves spurious reductions.
+## This implies that, although the LR(1) items shown above provide an
+## accurate view of the past (what has been recognized so far), they
+## may provide an INCOMPLETE view of the future (what was expected next).
+## In state 112, spurious reduction of production option(when_cond) -> WHEN expr 
+##
+touist_qbf: BIGAND VAR IN VAR WHEN BOOL RBRACK 
+##
+## Ends in an error in state: 252.
+##
+## formula_qbf -> BIGAND comma_list(var) IN comma_list(expr) option(when_cond) . COLON formula_qbf END [ XOR VARTUPLE VAR TUPLE TOP TERM RPAREN OR NOT NEWLINE LPAREN LET IMPLIES IF FORALL EXISTS EXACT EQUIV EOF END ELSE DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ]
+##
+## The known suffix of the stack is as follows:
+## BIGAND comma_list(var) IN comma_list(expr) option(when_cond) 
+##
+## WARNING: This example involves spurious reductions.
+## This implies that, although the LR(1) items shown above provide an
+## accurate view of the past (what has been recognized so far), they
+## may provide an INCOMPLETE view of the future (what was expected next).
+## In state 112, spurious reduction of production option(when_cond) -> WHEN expr 
+##
+
+Ill-formed $5. At this point, ':' is expected. Instead, the following statement were read:
     $0
 
 touist_smt: BIGAND VAR IN VAR VARTUPLE 
