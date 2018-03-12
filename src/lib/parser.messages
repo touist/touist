@@ -2307,36 +2307,6 @@ touist_smt: LET VAR XOR
 ## may provide an INCOMPLETE view of the future (what was expected next).
 ## In state 18, spurious reduction of production comma_list(var) -> var 
 ##
-touist_simple: LET VAR XOR 
-##
-## Ends in an error in state: 21.
-##
-## let_affect(expr,formula_simple) -> LET comma_list(var) . AFFECT comma_list(expr) COLON formula_simple [ XOR WHEN VARTUPLE VAR UNION TUPLE TOP THEN TERM SUBSET SUB RPAREN RBRACK RANGE OR NOTEQUAL NOT NEWLINE MUL MOD LT LPAREN LET LE INTER INT IN IMPLIES IF GT GE FORALL FLOAT EXISTS EXACT EQUIV EQUAL EOF END ELSE DIV DIFF DATA COMMA COLON BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ADD ]
-##
-## The known suffix of the stack is as follows:
-## LET comma_list(var) 
-##
-## WARNING: This example involves spurious reductions.
-## This implies that, although the LR(1) items shown above provide an
-## accurate view of the past (what has been recognized so far), they
-## may provide an INCOMPLETE view of the future (what was expected next).
-## In state 18, spurious reduction of production comma_list(var) -> var 
-##
-touist_qbf: LET VAR XOR 
-##
-## Ends in an error in state: 206.
-##
-## let_affect(expr,formula_qbf) -> LET comma_list(var) . AFFECT comma_list(expr) COLON formula_qbf [ XOR VARTUPLE VAR TUPLE TOP TERM RPAREN OR NOT NEWLINE LPAREN LET IMPLIES IF FORALL EXISTS EXACT EQUIV EOF END ELSE DATA BOTTOM BIGOR BIGAND ATMOST ATLEAST AND ]
-##
-## The known suffix of the stack is as follows:
-## LET comma_list(var) 
-##
-## WARNING: This example involves spurious reductions.
-## This implies that, although the LR(1) items shown above provide an
-## accurate view of the past (what has been recognized so far), they
-## may provide an INCOMPLETE view of the future (what was expected next).
-## In state 18, spurious reduction of production comma_list(var) -> var 
-##
 
 Ill-formed local variable declaration. At this point, '=' is expected. Instead, the following statement were read:
     $0

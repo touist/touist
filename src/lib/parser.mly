@@ -44,6 +44,7 @@
 %token FORALL EXISTS
 %token FOR NEWLINE
 %token QUOTE
+%token ZIP
 
 (* The following lines define in which order the tokens should
  * be reduced, e.g. it tells the parser to reduce * before +.
@@ -186,6 +187,9 @@ var:
   The indices can be either expression or term *)
 %inline global_affect: v=var AFFECT e=expr {Loc (Affect (v,e),($startpos,$endpos))}
 
+tuple_inner(T): LPAREN first=T COMMA next=comma_list(T) RPAREN {first::next}
+tuple(T): t=tuple_inner(T) {Loc (Tuple t,($startpos,$endpos))}
+
 %inline if_statement(T): IF cond=expr THEN v1=T ELSE v2=T END {Loc (If (cond,v1,v2),($startpos,$endpos))}
 
 %inline in_parenthesis(T): LPAREN x=T RPAREN {Loc (Paren x,($startpos,$endpos))}
@@ -211,6 +215,7 @@ expr:
   | TOINT (*LPAREN*) x=expr RPAREN {Loc (To_int x,($startpos,$endpos))}
   | CARD  (*LPAREN*) s=expr RPAREN {Loc (Card s,($startpos,$endpos))}
   | x=float {x}
+  | x=tuple(expr) {x}
   | x=in_parenthesis(expr)
   | x=num_operations_standard(expr)
   | x=num_operations_others(expr)
@@ -285,6 +290,7 @@ expr:
         'A diff B' instead.\n",Some loc);
       Loc (Diff (s1,s2),loc)}
   | POWERSET (*LPAREN*) s=T RPAREN {Loc (Powerset s,($startpos,$endpos))}
+  | ZIP (*LPAREN*) s1=T COMMA s2=T RPAREN {Loc (Zip (s1,s2),($startpos,$endpos))}
 
 %inline formula(F):
   | f=in_parenthesis(F)
@@ -295,14 +301,12 @@ expr:
   | NEWLINE f=F { NewlineBefore f } %prec newlineBefore
   | f=F NEWLINE { NewlineAfter f }
 
-let_affect(T,F): LET vars=comma_list(var) AFFECT contents=comma_list(T) COLON form=F
-    {try List.fold_right2 (fun var content acc ->
-      Loc (Let (var,content,acc),($startpos,$endpos))) vars contents form
-    with Invalid_argument _ ->
-      fatal (Error,Parse,
-        ("'let' statement does not have the same number of variables and values.\n"),
-        Some ($startpos,$endpos))
-    } %prec low_precedence
+%inline tuple_or_list(T): x=comma_list(T) {x} | t=tuple_inner(T) {t}
+
+let_affect(T,F): LET vars=tuple_or_list(var) AFFECT values=comma_list(T) COLON form=F
+  (* we cannot handle the 'not same number of variables and rvalues' here
+     because we can either have ($i,$j,$k) = $x or ($i,$j,$k) = (1,2,3). *)
+  {Loc (Let (vars, values, form), ($startpos,$endpos))} %prec low_precedence
 
 formula_simple:
   | f=var {f}

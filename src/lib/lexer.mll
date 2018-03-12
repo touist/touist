@@ -88,6 +88,7 @@
     "exists",        EXISTS;
     "forall",        FORALL;
     "for",        FOR;
+    "zip(",          ZIP;
     ]
 }
 

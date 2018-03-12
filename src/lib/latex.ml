@@ -91,7 +91,7 @@ let rec latex_of_ast ~full ast =
   | Exact (x,y) -> "\\textrm{exact}(" ^ (latex_of_ast x) ^ "," ^ (latex_of_ast y) ^ ")"
   | Atmost (x,y) -> "\\textrm{atmost}(" ^ (latex_of_ast x) ^ "," ^ (latex_of_ast y) ^ ")"
   | Atleast (x,y) -> "\\textrm{atleast}(" ^ (latex_of_ast x) ^ "," ^ (latex_of_ast y) ^ ")"
-  | Let (v,x,c) -> (latex_of_ast v) ^ " \\leftarrow " ^ (latex_of_ast x) ^ "\\\\" ^ (latex_of_ast c)
+  | Let (v,x,c) -> (latex_of_commalist "," v) ^ " \\leftarrow " ^ (latex_of_commalist "," x) ^ "\\\\" ^ (latex_of_ast c)
   | Affect (v,c) -> (latex_of_ast v) ^ " \\leftarrow " ^ (latex_of_ast c)
   | Loc (x,_) -> latex_of_ast x
   | Paren x -> if full && contains_newline x
@@ -118,6 +118,8 @@ let rec latex_of_ast ~full ast =
     "[" ^ latex_of_ast f ^ "~|~" ^ latex_of_commalist "," vars ^ "\\in "
     ^ latex_of_commalist " \\times " sets
     ^ (match cond with Some c -> ", "^ latex_of_ast c | _ -> "") ^ "]"
+  | Tuple t -> "(" ^ latex_of_commalist "," t ^ ")"
+  | Zip (s1,s2) -> "zip("^ latex_of_ast s1 ^","^ latex_of_ast s1 ^")"
 
   and latex_of_commalist ~full sep el = String.concat sep (List.map (latex_of_ast ~full) el)
   and escape_underscore txt =
@@ -148,7 +150,7 @@ and ast_fun (f:('a -> Ast.t -> 'a)) (acc:'a) ast : 'a =
       -> acc
   (* non-formulas *)
   | Mod _ | Union _ | Inter _ | Diff _ | Range _ | Subset _ | Powerset _
-  | In _ | Empty _ -> acc
+  | In _ | Empty _ | Zip _ | Tuple _ -> acc
 
 and contains_newline ast =
   ast |> ast_fun (fun acc ast -> match ast with

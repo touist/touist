@@ -68,7 +68,7 @@ sig
     | Atmost           of t * t
     | Bigand           of t list * t list * t option * t
     | Bigor            of t list * t list * t option * t
-    | Let              of t * t * t
+    | Let              of t list * t list * t
     | Affect           of t * t
     | UnexpProp        of string * t list option (* Unexp = unexpanded *)
     (** [UnexpProp] is a proposition that contains unexpanded variables; we
@@ -103,6 +103,8 @@ sig
     | NewlineBefore    of t
     | Formula          of t
     | SetBuilder       of t * t list * t list * t option
+    | Tuple            of t list
+    | Zip              of t * t
 end
 and AstSet :
 sig

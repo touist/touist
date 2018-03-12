@@ -94,7 +94,7 @@ let rec string_of_ast ?(utf8=false) ?(show_var=(fun ast -> "")) ?(debug=false) ?
   | Exact (x,y) -> "exact(" ^ of_ast x ^ "," ^ of_ast y ^ ")"
   | Atmost (x,y) -> "atmost(" ^ of_ast x ^ "," ^ of_ast y ^ ")"
   | Atleast (x,y) -> "atleast(" ^ of_ast x ^ "," ^ of_ast y ^ ")"
-  | Let (v,x,c) -> of_ast v ^ "=" ^ of_ast x ^ ": " ^ of_ast c
+  | Let (v,x,c) -> "let "^ of_ast_list "," v ^ "=" ^ of_ast_list "," x ^ ": " ^ of_ast c
   | Affect (v,c) -> of_ast v ^ "=" ^ of_ast c
   | Touist_code (f) -> (of_ast_list "\n" f)
   | Loc (x,l) -> (if debug then "loc "^ Err.string_of_loc l ^":" else "") ^ of_ast x
@@ -110,6 +110,8 @@ let rec string_of_ast ?(utf8=false) ?(show_var=(fun ast -> "")) ?(debug=false) ?
     "[" ^ of_ast f ^ " for "
     ^ of_ast_list "," vars ^ " in " ^ of_ast_list "," sets
     ^ (match cond with Some c -> " when " ^ of_ast c | None -> "") ^"]"
+  | Tuple t -> "(" ^ of_ast_list "," t ^ ")"
+  | Zip (s1,s2) -> "zip("^ of_ast s1 ^","^ of_ast s1 ^")"
 
 and string_of_ast_type ?(debug=false) (ast:Ast.t) : string =
   let of_ast_type ast = string_of_ast_type ~debug ast in
@@ -175,6 +177,8 @@ and string_of_ast_type ?(debug=false) (ast:Ast.t) : string =
   | NewlineBefore f | NewlineAfter f -> "newline"
   | Formula f              -> "quoted formula"
   | SetBuilder (_,_,_,_)   -> "set builder"
+  | Tuple f                -> "tuple"
+  | Zip _                  -> "zip()"
 
 
 and string_of_ast_list ?(utf8=false) ?(show_var=(fun ast -> "")) ?(debug=false) ?(parenthesis=debug) sep el =

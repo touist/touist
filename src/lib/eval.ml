@@ -19,8 +19,8 @@ type env = (string * (Ast.t * loc)) list
 type extenv = (string, (Ast.t * loc)) Hashtbl.t
 
 let get_loc (ast:Ast.t) : loc option = match ast with
-    | Loc (_,loc) -> Some loc
-    | _ -> None
+  | Loc (_,loc) -> Some loc
+  | _ -> None
 
 let warning (ast:Ast.t) (message:string) =
   warn (Warning,Eval,message,get_loc ast)
@@ -60,26 +60,26 @@ let raise_type_error operator operand expanded (expected_types:string) =
 let raise_type_error2 operator op1 exp1 op2 exp2 (expected_types:string) =
   raise_with_loc operator
     ("incorrect types with '"^(string_of_ast_type operator)^"'; expects "^expected_types^". "^
-    "In statement:\n"^
-    "    "^(string_of_ast operator)^"\n"^
-    "Left-hand operand has type '"^(string_of_ast_type exp1)^"':\n"^
-    "    "^(string_of_ast exp1)^"\n"^
-    "Right-hand operand has type '"^(string_of_ast_type exp2)^"':\n"^
-    "    "^(string_of_ast exp2)^"\n")
+     "In statement:\n"^
+     "    "^(string_of_ast operator)^"\n"^
+     "Left-hand operand has type '"^(string_of_ast_type exp1)^"':\n"^
+     "    "^(string_of_ast exp1)^"\n"^
+     "Right-hand operand has type '"^(string_of_ast_type exp2)^"':\n"^
+     "    "^(string_of_ast exp2)^"\n")
 
 (* [raise_set_decl] is the same as [raise_type_error2] but between one element
    and the set this element is supposed to be added to. *)
 let raise_set_decl ast elmt elmt_expanded set set_expanded (expected_types:string) =
   raise_with_loc ast
     ("Ill-formed set declaration. It expects "^expected_types^". "^
-    "One of the elements is of type '"^(string_of_ast_type elmt_expanded)^"':\n"^
-    "    "^(string_of_ast elmt)^"\n"^
-    "This element has been expanded to\n"^
-    "    "^(string_of_ast elmt_expanded)^"\n"^
-    "Up to now, the set declaration\n"^
-    "    "^(string_of_ast set)^"\n"^
-    "has been expanded to:\n"^
-    "    "^(string_of_ast set_expanded)^"\n")
+     "One of the elements is of type '"^(string_of_ast_type elmt_expanded)^"':\n"^
+     "    "^(string_of_ast elmt)^"\n"^
+     "This element has been expanded to\n"^
+     "    "^(string_of_ast elmt_expanded)^"\n"^
+     "Up to now, the set declaration\n"^
+     "    "^(string_of_ast set)^"\n"^
+     "has been expanded to:\n"^
+     "    "^(string_of_ast set_expanded)^"\n")
 
 
 let check_nb_vars_same_as_nb_sets (ast:Ast.t) (vars:Ast.t list) (sets:Ast.t list) : unit =
@@ -90,12 +90,12 @@ let check_nb_vars_same_as_nb_sets (ast:Ast.t) (vars:Ast.t list) (sets:Ast.t list
   match (List.length vars) = (List.length sets) with
   | true -> ()
   | false -> fatal (Error,Eval,
-    "Ill-formed '"^(string_of_ast_type ast)^"'. The number of variables and sets must be the same. "^
-    "You defined "^(string_of_int (List.length vars))^" variables:\n"^
-    "    "^(string_of_ast_list "," vars)^"\n"^
-    "but you gave "^(string_of_int (List.length sets))^" sets:\n"^
-    "    "^(string_of_ast_list "," sets)^"\n"
-    ,Some loc)
+                    "Ill-formed '"^(string_of_ast_type ast)^"'. The number of variables and sets must be the same. "^
+                    "You defined "^(string_of_int (List.length vars))^" variables:\n"^
+                    "    "^(string_of_ast_list "," vars)^"\n"^
+                    "but you gave "^(string_of_int (List.length sets))^" sets:\n"^
+                    "    "^(string_of_ast_list "," sets)^"\n"
+                   ,Some loc)
 
 let extenv = ref (Hashtbl.create 0)
 let check_only = ref false
@@ -122,7 +122,7 @@ and eval_touist_code (env:env) ast :Ast.t =
     | [] -> []
     | Loc (Affect (Loc (Var (p,i),var_loc),y),affect_loc)::xs ->
       Hashtbl.replace !extenv (expand_var_name env (p,i)) (eval_ast env y, var_loc);
-        affect_vars xs
+      affect_vars xs
     | x::xs -> x::(affect_vars xs)
   in
   let rec process_formulas = function
@@ -152,9 +152,9 @@ and eval_ast (env:env) (ast:Ast.t) : Ast.t =
       with Not_found ->
       try let (content,_) = Hashtbl.find !extenv name in content
       with Not_found -> raise_with_loc ast
-          ("variable '" ^ name ^"' does not seem to be known. Either you forgot "^
-          "to declare it globally or it has been previously declared locally "^
-          "(with bigand, bigor or let) and you are out of its scope."^"\n")
+                          ("variable '" ^ name ^"' does not seem to be known. Either you forgot "^
+                           "to declare it globally or it has been previously declared locally "^
+                           "(with bigand, bigor or let) and you are out of its scope."^"\n")
     end
   | Set x -> Set x
   | Set_decl x -> eval_set_decl env ast
@@ -280,7 +280,7 @@ and eval_ast (env:env) (ast:Ast.t) : Ast.t =
       (* !check_only is here to skip the full expansion of powerset(). This
          is useful for linting (=checking types). *)
       | Set s -> if !check_only then Set (AstSet.of_list [AstSet.choose s])
-                 else Set (all_combinations_to_set (AstSet.cardinal s) s)
+        else Set (all_combinations_to_set (AstSet.cardinal s) s)
       | x' -> raise_type_error ast x x' "a 'set'"
     end
   | In (x,y) ->
@@ -321,9 +321,9 @@ and eval_ast (env:env) (ast:Ast.t) : Ast.t =
       let rec treat env vars sets : Ast.t list =
         match vars, sets with
         | [],[] ->
-           if (match cond with Some c -> ast_to_bool env c | None -> true)
-           then [eval_ast_env env expr] (* bottom of the recursion: expand f *)
-           else []
+          if (match cond with Some c -> ast_to_bool env c | None -> true)
+          then [eval_ast_env env expr] (* bottom of the recursion: expand f *)
+          else []
         | (Loc (Var (p,i),loc))::next_vars, (Loc (set, l))::next_sets ->
           let set = match eval_ast_env env set with Set set -> set | _ -> failwith "" in
           AstSet.fold (fun value acc ->
@@ -334,6 +334,7 @@ and eval_ast (env:env) (ast:Ast.t) : Ast.t =
                                        ^ string_of_ast_list ~debug:true "," e2^"\n")
       in Set (treat env vars sets |> AstSet.of_list)
     end
+  | Tuple t -> Tuple (List.map (fun ast -> eval_ast ast) t)
   | e -> raise_with_loc ast ("[shouldnt happen] this expression cannot be expanded: " ^ string_of_ast e ^"\n")
 
 and eval_set_decl (env:env) (set_decl:Ast.t) =
@@ -359,8 +360,8 @@ and eval_set_decl (env:env) (set_decl:Ast.t) =
       match first with
       | Int _ | Float _ | Prop _ | Formula _ | Set _ -> Set (AstSet.of_list (List.map2 (unwrap_set first) sets sets_expanded))
       | _ -> raise_set_decl set_decl x first
-                    (Set_decl sets) (Set_decl sets_expanded)
-                    "elements of type 'int', 'float', 'prop', 'set' or 'formula'"
+               (Set_decl sets) (Set_decl sets_expanded)
+               "elements of type 'int', 'float', 'prop', 'set' or 'formula'"
     end
   | [],x::_ | x::_,[] -> failwith "[shouldn't happen] len(sets)!=len(sets_expanded)"
 
@@ -445,13 +446,13 @@ and eval_ast_formula (env:env) (ast:Ast.t) : Ast.t =
         | Float x when !smt -> Float x
         | Formula x -> x
         | _ -> raise_with_loc ast
-            ("local variable '" ^ name ^ "' (defined in bigand, bigor, let or list comprehension) "^
-            "cannot be expanded into a 'prop' or 'formula' because its content "^
-            "is of type '"^(string_of_ast_type content)^"' instead of "^
-            (if !smt then "'int', 'float', " else "")^ "'prop' or 'formula'. "^
-            "Why? Because this variable is part of a formula, and thus is expected "^
-            "to be a proposition. Here is the content of '" ^name^"':\n"^
-            "    "^(string_of_ast content)^"\n")
+                 ("local variable '" ^ name ^ "' (defined in bigand, bigor, let or list comprehension) "^
+                  "cannot be expanded into a 'prop' or 'formula' because its content "^
+                  "is of type '"^(string_of_ast_type content)^"' instead of "^
+                  (if !smt then "'int', 'float', " else "")^ "'prop' or 'formula'. "^
+                  "Why? Because this variable is part of a formula, and thus is expected "^
+                  "to be a proposition. Here is the content of '" ^name^"':\n"^
+                  "    "^(string_of_ast content)^"\n")
       with Not_found ->
       (* Case 2. Check if this variable name has been affected globally, i.e.,
          in the 'data' section. To be accepted, this variable must contain
@@ -463,12 +464,12 @@ and eval_ast_formula (env:env) (ast:Ast.t) : Ast.t =
         | Float x when !smt -> Float x
         | Formula x -> x
         | _ -> raise_with_loc ast
-            ("global variable '" ^ name ^ "' cannot be expanded into a 'prop' or 'formula' "^
-            "because its content is of type '"^(string_of_ast_type content)^"' instead of "^
-            (if !smt then "'int', 'float', " else "")^ "'prop' or 'formula'. "^
-            "Why? Because this variable is part of a formula, and thus is expected "^
-            "to be a proposition. Here is the content of '" ^name^"':\n"^
-            "    "^(string_of_ast content)^"\n")
+                 ("global variable '" ^ name ^ "' cannot be expanded into a 'prop' or 'formula' "^
+                  "because its content is of type '"^(string_of_ast_type content)^"' instead of "^
+                  (if !smt then "'int', 'float', " else "")^ "'prop' or 'formula'. "^
+                  "Why? Because this variable is part of a formula, and thus is expected "^
+                  "to be a proposition. Here is the content of '" ^name^"':\n"^
+                  "    "^(string_of_ast content)^"\n")
       with Not_found ->
       try
         match (p,i) with
@@ -493,11 +494,11 @@ and eval_ast_formula (env:env) (ast:Ast.t) : Ast.t =
           let term = match content with
             | Prop x -> Prop x
             | wrong -> fatal (Error,Eval,
-                "the proposition '" ^ name ^ "' cannot be expanded because '"^prefix^"' is of type '"^(string_of_ast_type wrong)^"'. " ^
-                "In order to produce an expanded proposition of this kind, '"^prefix^"' must be a proposition. "^
-                "Why? Because this variable is part of a formula, and thus is expected "^
-                "to be a proposition. Here is the content of '" ^prefix^"':\n"^
-                "    "^(string_of_ast content)^"\n",Some loc_affect)
+                              "the proposition '" ^ name ^ "' cannot be expanded because '"^prefix^"' is of type '"^(string_of_ast_type wrong)^"'. " ^
+                              "In order to produce an expanded proposition of this kind, '"^prefix^"' must be a proposition. "^
+                              "Why? Because this variable is part of a formula, and thus is expected "^
+                              "to be a proposition. Here is the content of '" ^prefix^"':\n"^
+                              "    "^(string_of_ast content)^"\n",Some loc_affect)
           in eval_ast_formula (UnexpProp ((string_of_ast term), Some indices))
       (* Case 5. the variable was of the form '$v(1,2,3)' and was not declared
          and '$v' is not either declared, so we can safely guess that this var has not been declared. *)
@@ -603,27 +604,62 @@ and eval_ast_formula (env:env) (ast:Ast.t) : Ast.t =
   | If (c,y,z) ->
     let test = match eval_ast c with Bool c -> c | c' -> raise_type_error ast c c' "boolean"
     in if test then eval_ast_formula y else eval_ast_formula z
-  | Let (Loc (Var (p,i),loc),content,formula) ->
-    let name = (expand_var_name env (p,i)) and desc = (eval_ast content,loc)
-    in eval_ast_formula_env ((name,desc)::env) formula
+  | Let (vars,values,formula) -> begin
+      (* Let '$var(a,b)' be a variable. Then,
+         - [prefix] is the prefix-name of the variable ('var'),
+         - [ind] is the (optional) list of indices '[a,b]',
+         - [loc] is its location. *)
+      let new_env_with env (prefix,ind,loc) value : env =
+        let name = expand_var_name env (prefix,ind)
+        and desc = (value,loc)
+        in (name,desc)::env
+      in
+      let vars, values = match vars, List.map (eval_ast) values with
+        | vars, (Tuple tuple)::[] when List.length vars == List.length tuple ->
+          (* this is the 'unpacking' casen where we unpack a variable that
+             contains a tuple. *)
+          vars, tuple
+        | vars, (Tuple tuple)::[] when List.length vars != List.length tuple ->
+          raise_with_loc ast
+            ("in 'let', unpacking of tuple impossible because the \
+              number of left-variables is not the same as the number of values to be \
+              unpacked from the tuple '"^ string_of_ast (Tuple tuple)^"'.\n")
+        | vars, val_expanded::[] when List.length vars > 1 ->
+          raise_with_loc ast
+            ("'let' requires the same number of variables and values for the \
+              assignment. The assigned value '"^string_of_ast (List.nth values 0)^"\
+              ' has expanded to '"^string_of_ast val_expanded^"'.\n")
+        | vars, values when List.length vars != List.length values ->
+          raise_with_loc ast
+            ("'let' requires the same number of variables and values for the \
+              assignment.\n")
+        | vars, values -> vars, values
+      in
+      let new_env = List.fold_left2 (fun acc_env lvalue rvalue ->
+          match lvalue with
+          | Loc (Var (p,i), l) -> new_env_with acc_env (p,i,l) rvalue
+          | x -> failwith ("[shouldnt happen] non-var on left of 'let': "^string_of_ast_type x)
+        ) env vars values
+      in eval_ast_formula_env new_env formula
+    end
   | Paren x -> eval_ast_formula x
   | Exists (p,f) -> let p = match eval_ast_formula p with
-    | Prop p -> Prop p
-    | wrong -> raise_with_loc p ("'exists' only works on propositions. Instead, got a "
-        ^"'"^string_of_ast_type wrong^"'.\n")
+      | Prop p -> Prop p
+      | wrong -> raise_with_loc p ("'exists' only works on propositions. Instead, got a "
+                                   ^"'"^string_of_ast_type wrong^"'.\n")
     in Exists (p, eval_ast_formula f)
   | Forall (p,f) -> let p = match eval_ast_formula p with
-    | Prop p -> Prop p
-    | wrong -> raise_with_loc p ("'forall' only works on propositions. Instead, got a "
-        ^"'"^string_of_ast_type wrong^"'.\n")
+      | Prop p -> Prop p
+      | wrong -> raise_with_loc p ("'forall' only works on propositions. Instead, got a "
+                                   ^"'"^string_of_ast_type wrong^"'.\n")
     in Forall (p, eval_ast_formula f)
   | For (Loc (Var (p,i),loc), content, Loc (formula,_)) ->
     let name = (expand_var_name env (p,i)) in begin
-    match formula, eval_ast content with
-    | Exists (x,f), Set s -> AstSet.fold (fun content acc -> Exists (eval_ast_formula_env ((name,(content,loc))::env) x, acc)) s (eval_ast_formula f)
-    | Forall (x,f), Set s -> AstSet.fold (fun content acc -> Forall (eval_ast_formula_env ((name,(content,loc))::env) x, acc)) s (eval_ast_formula f)
-    | _,content' -> raise_type_error ast content content' " 'prop-set'"
-  end
+      match formula, eval_ast content with
+      | Exists (x,f), Set s -> AstSet.fold (fun content acc -> Exists (eval_ast_formula_env ((name,(content,loc))::env) x, acc)) s (eval_ast_formula f)
+      | Forall (x,f), Set s -> AstSet.fold (fun content acc -> Forall (eval_ast_formula_env ((name,(content,loc))::env) x, acc)) s (eval_ast_formula f)
+      | _,content' -> raise_type_error ast content content' " 'prop-set'"
+    end
   | NewlineBefore f | NewlineAfter f -> eval_ast_formula f
   | Formula f -> eval_ast_formula f
   | e -> raise_with_loc ast ("this expression is not a formula: " ^ string_of_ast e ^"\n")
@@ -742,60 +778,60 @@ and expand_var_name (env:env) (prefix, indices:string * Ast.t list option) =
    If [!check_only] is true, then the lists *)
 and set_to_ast_list (env:env) (ast:Ast.t) :Ast.t list =
   let lst = match ast_without_loc (eval_ast env ast) with
-  | Set s -> AstSet.elements s
-  | ast' -> raise_with_loc ast (
-      "after 'in', only sets are allowed, but got '"^(string_of_ast_type ast')^"':\n"^
-      "    "^(string_of_ast ast')^"\n"^
-      "This element has been expanded to\n"^
-      "    "^(string_of_ast ast')^"\n")
-  in match !check_only, lst with (* useful when you only want to check types *)
-          | false,      _      -> lst
-          | true,       []     -> []
-          | true,        x::xs -> [x]
-
-  (* [ast_to_bool] evaluates the 'when' condition when returns 'true' or 'false'
-     depending on the result.
-     This function is used in Bigand and Bigor statements. *)
-  and ast_to_bool env (ast:Ast.t) : bool =
-    match eval_ast env ast with
-    | Bool b -> b
+    | Set s -> AstSet.elements s
     | ast' -> raise_with_loc ast (
+        "after 'in', only sets are allowed, but got '"^(string_of_ast_type ast')^"':\n"^
+        "    "^(string_of_ast ast')^"\n"^
+        "This element has been expanded to\n"^
+        "    "^(string_of_ast ast')^"\n")
+  in match !check_only, lst with (* useful when you only want to check types *)
+  | false,      _      -> lst
+  | true,       []     -> []
+  | true,        x::xs -> [x]
+
+(* [ast_to_bool] evaluates the 'when' condition when returns 'true' or 'false'
+   depending on the result.
+   This function is used in Bigand and Bigor statements. *)
+and ast_to_bool env (ast:Ast.t) : bool =
+  match eval_ast env ast with
+  | Bool b -> b
+  | ast' -> raise_with_loc ast (
       "'when' expects a 'bool' but got '"^(string_of_ast_type ast')^"':\n"^
       "    "^(string_of_ast ast')^"\n"^
       "This element has been expanded to\n"^
       "    "^(string_of_ast ast')^"\n")
-  (* To_int, To_float, Var, Int... all these cannot contain ToRemove because
-     ToRemove can only be generated by exact, atleast, atmost, bigand and bigor.
-     I only need to match the items that can potentially be produced by the
-     above mentionned. And because "produced" means that everything has already
-     been evaluated, all If, Var... have already disapeared. *)
-  and has_top_or_bot = function
-    | Top | Bottom -> true
-    | Not x                  -> has_top_or_bot x
-    | And     (x,y)          -> has_top_or_bot x || has_top_or_bot y
-    | Or      (x,y)          -> has_top_or_bot x || has_top_or_bot y
-    | Xor     (x,y)          -> has_top_or_bot x || has_top_or_bot y
-    | Implies (x,y)          -> has_top_or_bot x || has_top_or_bot y
-    | Equiv   (x,y)          -> has_top_or_bot x || has_top_or_bot y
-     (* the following items are just here because of SMT that
-        allows ==, <, >, +, -, *... in formulas. *)
-    | Neg x                  -> has_top_or_bot x
-    | Add (x,y)              -> has_top_or_bot x || has_top_or_bot y
-    | Sub (x,y)              -> has_top_or_bot x || has_top_or_bot y
-    | Mul (x,y)              -> has_top_or_bot x || has_top_or_bot y
-    | Div (x,y)              -> has_top_or_bot x || has_top_or_bot y
-    | Equal            (x,y) -> has_top_or_bot x || has_top_or_bot y
-    | Not_equal        (x,y) -> has_top_or_bot x || has_top_or_bot y
-    | Lesser_than      (x,y) -> has_top_or_bot x || has_top_or_bot y
-    | Lesser_or_equal  (x,y) -> has_top_or_bot x || has_top_or_bot y
-    | Greater_than     (x,y) -> has_top_or_bot x || has_top_or_bot y
-    | Greater_or_equal (x,y) -> has_top_or_bot x || has_top_or_bot y
-    | Exists (_,y)           -> has_top_or_bot y
-    | Forall (_,y)           -> has_top_or_bot y
-    | _ -> false
-  (* Simplify an AST by removing Bot and Top that can be absorbed
-     by And or Or. *)
-  and rm_top_bot ast =
-    if ast != Top && ast != Bottom && has_top_or_bot ast
-    then rm_top_bot (eval_ast_formula [] ast)
-    else ast
+(* To_int, To_float, Var, Int... all these cannot contain ToRemove because
+   ToRemove can only be generated by exact, atleast, atmost, bigand and bigor.
+   I only need to match the items that can potentially be produced by the
+   above mentionned. And because "produced" means that everything has already
+   been evaluated, all If, Var... have already disapeared. *)
+and has_top_or_bot = function
+  | Top | Bottom -> true
+  | Not x                  -> has_top_or_bot x
+  | And     (x,y)          -> has_top_or_bot x || has_top_or_bot y
+  | Or      (x,y)          -> has_top_or_bot x || has_top_or_bot y
+  | Xor     (x,y)          -> has_top_or_bot x || has_top_or_bot y
+  | Implies (x,y)          -> has_top_or_bot x || has_top_or_bot y
+  | Equiv   (x,y)          -> has_top_or_bot x || has_top_or_bot y
+  (* the following items are just here because of SMT that
+     allows ==, <, >, +, -, *... in formulas. *)
+  | Neg x                  -> has_top_or_bot x
+  | Add (x,y)              -> has_top_or_bot x || has_top_or_bot y
+  | Sub (x,y)              -> has_top_or_bot x || has_top_or_bot y
+  | Mul (x,y)              -> has_top_or_bot x || has_top_or_bot y
+  | Div (x,y)              -> has_top_or_bot x || has_top_or_bot y
+  | Equal            (x,y) -> has_top_or_bot x || has_top_or_bot y
+  | Not_equal        (x,y) -> has_top_or_bot x || has_top_or_bot y
+  | Lesser_than      (x,y) -> has_top_or_bot x || has_top_or_bot y
+  | Lesser_or_equal  (x,y) -> has_top_or_bot x || has_top_or_bot y
+  | Greater_than     (x,y) -> has_top_or_bot x || has_top_or_bot y
+  | Greater_or_equal (x,y) -> has_top_or_bot x || has_top_or_bot y
+  | Exists (_,y)           -> has_top_or_bot y
+  | Forall (_,y)           -> has_top_or_bot y
+  | _ -> false
+(* Simplify an AST by removing Bot and Top that can be absorbed
+   by And or Or. *)
+and rm_top_bot ast =
+  if ast != Top && ast != Bottom && has_top_or_bot ast
+  then rm_top_bot (eval_ast_formula [] ast)
+  else ast
