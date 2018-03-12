@@ -360,7 +360,8 @@ let main (lang,mode) (input,input_f) (output,output_f: string * out_channel) com
   (* Warning: the [msg] already contains an ending '\n'. No need for adding
      another ending newline after it. *)
   | Err.TouistFatal msg ->
-    if common_opt.verbose>0 then Printf.eprintf "Stacktrace:\n%s\n" (Printexc.get_backtrace ());
+    if common_opt.verbose>0 && Printexc.backtrace_status ()
+    then Printf.eprintf "Stacktrace:\n%s\n" (Printexc.get_backtrace ());
     Printf.eprintf "%s" (Err.string_of_msg msg);
     exit_with (match msg with _,Usage,_,_ -> CLI_ERROR | _ -> TRANSL_ERROR)
   | Sys_error err ->
