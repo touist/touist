@@ -1,4 +1,4 @@
-v3.5.2
+v3.5.2 (2018-03-12)
   - Language:
     - added list comprehensions (also named 'set builder notation'). Really
       useful for generating sets! Example: [p($i,$j) for $i,$j in [1..2],[a,b]].
