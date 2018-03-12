@@ -329,14 +329,18 @@ let main (lang,mode) (input,input_f) (output,output_f: string * out_channel) com
            ~out_table:(match table with Some (_,f)->f | None->output_f) output_f);
         (if common_opt.verbose>0 then Printf.eprintf "== translation time: %f sec\n" (Unix.gettimeofday () -. start));
       | Qbf, Solve {hidden} -> (* --qbf + --solve: we solve using Quantor *)
+        let start = Unix.gettimeofday () in
         let qcnf,table =
           Parse.parse_qbf ~debug_syntax ~filename:input input_text
           |> Eval.eval ~smt |> Qbf.prenex |> Qbf.cnf
           |> Touist_qbf.QbfSolve.qcnf_of_cnf
         in
+        (if common_opt.verbose>0 then Printf.eprintf "== translation time: %f sec\n" (Unix.gettimeofday () -. start));
+        let start = Unix.gettimeofday () in
         (match Touist_qbf.QbfSolve.solve ~hidden (qcnf,table) with
          | Some str -> Printf.fprintf output_f "%s\n" str
-         | None -> (Printf.fprintf stderr "unsat\n"; exit_with UNSAT |> ignore))
+         | None -> (Printf.fprintf stderr "unsat\n"; exit_with UNSAT |> ignore));
+         (if common_opt.verbose>0 then Printf.eprintf "== solve time: %f sec\n" (Unix.gettimeofday () -. start));
       | Smt _, SolveExt _ -> failwith "--solver not compatible with --smt"
     end;
 
