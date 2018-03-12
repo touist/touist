@@ -317,12 +317,12 @@ and eval_ast (env:env) (ast:Ast.t) : Ast.t =
   | Loc (x,l) -> eval_ast x
   | Paren x -> eval_ast x
   | Formula x -> Formula (eval_ast_formula env x)
-  | SetBuilder (f, vars, sets, cond) -> begin
+  | SetBuilder (expr, vars, sets, cond) -> begin
       let rec treat env vars sets : Ast.t list =
         match vars, sets with
         | [],[] ->
            if (match cond with Some c -> ast_to_bool env c | None -> true)
-           then [eval_ast_formula env f] (* bottom of the recursion: expand f *)
+           then [eval_ast_env env expr] (* bottom of the recursion: expand f *)
            else []
         | (Loc (Var (p,i),loc))::next_vars, (Loc (set, l))::next_sets ->
           let set = match eval_ast_env env set with Set set -> set | _ -> failwith "" in
@@ -445,11 +445,11 @@ and eval_ast_formula (env:env) (ast:Ast.t) : Ast.t =
         | Float x when !smt -> Float x
         | Formula x -> x
         | _ -> raise_with_loc ast
-            ("local variable '" ^ name ^ "' (defined in bigand, bigor or let) "^
+            ("local variable '" ^ name ^ "' (defined in bigand, bigor, let or list comprehension) "^
             "cannot be expanded into a 'prop' or 'formula' because its content "^
             "is of type '"^(string_of_ast_type content)^"' instead of "^
             (if !smt then "'int', 'float', " else "")^ "'prop' or 'formula'. "^
-            "Why? Because this variable is part of a formula, and thus is expected"^
+            "Why? Because this variable is part of a formula, and thus is expected "^
             "to be a proposition. Here is the content of '" ^name^"':\n"^
             "    "^(string_of_ast content)^"\n")
       with Not_found ->
