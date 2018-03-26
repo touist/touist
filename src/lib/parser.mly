@@ -45,6 +45,13 @@
 %token FOR NEWLINE
 %token QUOTE
 
+(* Specific to DL-PA *)
+%token QUESTIONMARK
+%token INV
+%token SEMICOLON
+%token STAR
+%token LEFTARROW
+
 (* The following lines define in which order the tokens should
  * be reduced, e.g. it tells the parser to reduce * before +.
  *
@@ -134,7 +141,7 @@
 *)
 
 (* The two entry points of our parser *)
-%start <Types.Ast.t> touist_simple, touist_smt, touist_qbf
+%start <Types.Ast.t> touist_simple, touist_smt, touist_qbf, touist_dlpa
 
 %% (* Everthing below that mark is expected to be a production rule *)
    (* Note that VAR { $0 } is equivalent to v=VAR { v } *)
@@ -143,7 +150,7 @@ comma_list(T):
   | x=T { x::[] }
   | x=T COMMA l=comma_list(T) { x::l }
 
-(* A touistl code is a blank-separated list of either formulas or 
+(* A touistl code is a blank-separated list of either formulas or
    global variable affectations. Global affectations can only occur
    in this 'top' list ('top' because it is at the top of the ast tree). *)
 affect_or(T):
@@ -160,6 +167,26 @@ touist_smt:
   | f=affect_or(formula_smt)+ EOF {Loc (Touist_code (f),($startpos,$endpos))}
 
 touist_qbf: f=affect_or(formula_qbf)+ EOF {Loc (Touist_code (f),($startpos,$endpos))}
+
+touist_dlpa: f=formula_dlpa EOF {Touist_code [f]}
+
+formula_dlpa:
+  | p=prop {p}
+  | BOTTOM {Bottom}
+  | TOP {Top}
+  | LBRACK p=program RBRACK f=formula_dlpa {Loc (Box (p,f),($startpos,$endpos))}
+  | LT p=program GT f=formula_dlpa {Loc (Diamond (p,f),($startpos,$endpos))}
+  | f=connectors(formula_dlpa) {f}
+
+program:
+  | ADD p=prop {Loc (Add' p, ($startpos,$endpos))}
+  | SUB p=prop {Loc (Remove p, ($startpos,$endpos))}
+  | p1=program SEMICOLON p2=program {Loc (Seq (p1,p2), ($startpos,$endpos))}
+  | p1=program UNION p2=program {Loc (Union' (p1,p2), ($startpos,$endpos))}
+  | p=program STAR {Loc (Star p, ($startpos,$endpos))}
+  | p=program INV {Loc (Inverse p, ($startpos,$endpos))}
+  | p=program QUESTIONMARK {Loc (Test p, ($startpos,$endpos))}
+  | p=prop LEFTARROW f=formula_dlpa {Loc (Affect' (p,f), ($startpos,$endpos))}
 
 (* Used in tuple expression; see tuple_variable and tuple_term *)
 %inline indices: i=expr { i }

@@ -87,7 +87,7 @@
     "powerset(",     POWERSET;
     "exists",        EXISTS;
     "forall",        FORALL;
-    "for",        FOR;
+    "for",           FOR;
     ]
 }
 
@@ -134,6 +134,9 @@ rule token = parse (* is a function (Lexing.lexbuf -> Parser.token list) *)
   | "="               {[ AFFECT         ]}
   | ":"               {[ COLON          ]}
   | ")"               {[ RPAREN         ]}
+  | "^-1"             {[ INV            ]}
+  | "?"               {[ QUESTIONMARK   ]}
+  | "<-"              {[ LEFTARROW      ]}
   | "\\\\"            {[ NEWLINE        ]}
   | '$'(var as v)'('  {[ VARTUPLE ("$" ^ v)]}
   | '$'(var as v)     {[ VAR ("$" ^ v)  ]}

@@ -101,6 +101,16 @@ module rec Ast : sig
     | NewlineBefore    of t
     | Formula          of t
     | SetBuilder       of t * t list * t list * t option
+    | Affect'          of t * t (* x ← φ? *)
+    | Test             of t (* φ? *)
+    | Seq              of t * t
+    | Union'           of t * t (* φ ∪ φ *)
+    | Inverse          of t (* φ^-1 *)
+    | Star             of t (* φ* *)
+    | Diamond          of t * t
+    | Box              of t * t
+    | Add'             of t
+    | Remove           of t
 end = Ast (* see (1) *)
 
 and AstSet : sig

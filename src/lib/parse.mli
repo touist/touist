@@ -31,6 +31,9 @@ val parse_smt :
 val parse_qbf :
   ?debug_syntax:bool -> ?filename:string -> string -> Types.Ast.t
 
+val parse_dlpa :
+  ?debug_syntax:bool -> ?filename:string -> string -> Types.Ast.t
+
 (** {2 Utility functions} *)
 
 val string_of_chan : in_channel -> string

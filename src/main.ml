@@ -29,8 +29,9 @@ type lang =
   | Sat
   | Qbf
   | Smt of string
+  | Dlpa
 let string_of_lang =
-  function Sat->"--sat" | Qbf->"--qbf" | Smt l->("--smt="^l)
+  function Sat->"--sat" | Qbf->"--qbf" | Smt l->("--smt="^l) | Dlpa->"--dlpa"
 
 type solve_opts ={
   count: bool;
@@ -159,6 +160,7 @@ let main (lang,mode) (input,input_f) (output,output_f: string * out_channel) com
       | Sat -> Parse.parse_sat ~debug_syntax ~filename:input text
       | Smt _ -> Parse.parse_smt ~debug_syntax ~filename:input text
       | Qbf -> Parse.parse_qbf ~debug_syntax ~filename:input text
+      | Dlpa -> Parse.parse_dlpa ~debug_syntax ~filename:input text
     in begin
       (* latex = parse and transform with latex_of_ast *)
       (* linter = only show syntax and semantic errors *)
@@ -181,6 +183,7 @@ let main (lang,mode) (input,input_f) (output,output_f: string * out_channel) com
           | Sat   -> Parse.parse_sat ~debug_syntax ~filename:input input_text |> Eval.eval ~smt
           | Smt _ -> Parse.parse_smt ~debug_syntax ~filename:input input_text |> Eval.eval ~smt
           | Qbf   -> Parse.parse_qbf ~debug_syntax ~filename:input input_text |> Eval.eval ~smt
+          | Dlpa  -> Parse.parse_dlpa ~debug_syntax ~filename:input input_text |> Eval.eval ~smt
         in (Printf.fprintf output_f "%s\n" (Pprint.string_of_ast ~utf8:true ast); exit_with OK)
       | _, Show Cnf -> let ast = (match lang with
           | Sat   -> Parse.parse_sat ~debug_syntax ~filename:input input_text |> Eval.eval ~smt |> Cnf.ast_to_cnf
@@ -342,6 +345,10 @@ let main (lang,mode) (input,input_f) (output,output_f: string * out_channel) com
          | None -> (Printf.fprintf stderr "unsat\n"; exit_with UNSAT |> ignore));
          (if common_opt.verbose>0 then Printf.eprintf "== solve time: %f sec\n" (Unix.gettimeofday () -. start));
       | Smt _, SolveExt _ -> failwith "--solver not compatible with --smt"
+      | Dlpa, Translate {table; debug_dimacs} ->
+          failwith "not implemented"
+      | Dlpa, _ ->
+          failwith "not implemented"
     end;
 
     (* I had to comment these close_out and close_in because it would
@@ -415,6 +422,9 @@ let language =
   let qbf =
     Arg.(value & flag & info ["qbf"] ~docs ~doc:"\
       Quantified boolean formulas (QBF).") in
+  let dlpa =
+    Arg.(value & flag & info ["dlpa"] ~docs ~doc:"\
+      Dynamic Logic of Propositional Assignments (PL-PA).") in
   let smt =
     let smt_logic_conv =
       (fun logic ->
@@ -425,18 +435,19 @@ let language =
            ~docv:"LOGIC" ~docs ~doc:"\
       Select the SAT Modulo Theory (SMT) input. By default, $(docv) is set to
       `QF_LRA' (Linear Real Arithmetic).")
-  and one_of sat qbf smt =
-    match sat, qbf   , smt   with
-    | false  , false , Some l ->
+  and one_of sat qbf smt dlpa =
+    match sat, qbf   , smt   , dlpa   with
+    | false  , false , Some l, false ->
       (* SMT Mode: check if one of the available QF_? has been given after
          --smt is Yices2 is available. *)
       (match Touist_yices2.SmtSolve.(enabled, logic_supported l) with
        | true, true | false, _ -> `Ok (Smt l)
        | true, false -> `Error (false,("given --smt=LOGIC '"^l^"' is not known (e.g., --smt=QF_IDL, see --help)")))
-    | false  , true  , None   -> `Ok Qbf
-    | _      , false , None   -> `Ok Sat (* default to sat *)
-    | _      , _     , _      -> `Error (false,"only one of {--sat,--smt,--qbf} is allowed")
-  in Term.(ret (const one_of $ sat $ qbf $ smt))
+    | false  , true  , None , false   -> `Ok Qbf
+    | false  , false , None , true    -> `Ok Dlpa
+    | _      , false , None , false   -> `Ok Sat (* default to sat *)
+    | _      , _     , _    , _  -> `Error (false,"only one of {--sat,--smt,--qbf} is allowed")
+  in Term.(ret (const one_of $ sat $ qbf $ smt $ dlpa))
 
 
 let external_solv_section = "EXTERNAL SOLVER"

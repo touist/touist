@@ -626,7 +626,24 @@ and eval_ast_formula (env:env) (ast:Ast.t) : Ast.t =
   end
   | NewlineBefore f | NewlineAfter f -> eval_ast_formula f
   | Formula f -> eval_ast_formula f
+  | Affect' (_, _) -> failwith "not implemented"
+  | Diamond (prog, f) -> Diamond (eval_ast_prog env prog, eval_ast_formula f)
+  | Box (prog, f) -> Box (eval_ast_prog env prog, eval_ast_formula f)
   | e -> raise_with_loc ast ("this expression is not a formula: " ^ string_of_ast e ^"\n")
+
+(* DL-PA program *)
+and eval_ast_prog (env:env) (ast:Ast.t) : Ast.t =
+  let eval_ast_prog = eval_ast_prog env
+  and eval_ast_prog_env = eval_ast_prog in
+  match ast_without_loc ast with
+  | Test prog -> Test (eval_ast_prog prog)
+  | Seq (pr1, pr2) -> Seq (eval_ast_prog pr1, eval_ast_prog pr2)
+  | Union' (pr1, pr2) -> Union' (eval_ast_prog pr1, eval_ast_prog pr2)
+  | Inverse prog -> Inverse (eval_ast_prog prog)
+  | Star prog -> Star (eval_ast_prog prog)
+  | Add' prop -> Add' (eval_ast_formula env prop)
+  | Remove prop -> Remove (eval_ast_formula env prop)
+  | e -> raise_with_loc ast ("this expression is not a DL-PA program: " ^ string_of_ast e ^"\n")
 
 and exact_str lst =
   let rec go = function
