@@ -95,13 +95,10 @@ let qbf_expands_to text expected _ =
 and read_file (filename:string) : string list =
   let lines = ref [] in
   let chan = open_in filename in
-  try
-    while true; do
-      lines := input_line chan :: !lines
-    done; !lines
-  with End_of_file ->
-    close_in chan;
-    List.rev !lines ;;
+  let rec read_lines chan = match input_line chan with
+    | line -> line :: read_lines chan
+    | exception End_of_file -> (close_in chan; [])
+  in read_lines chan |> List.rev
 
 let open_stream name =
   let chan = open_in name
@@ -112,10 +109,10 @@ let open_stream name =
 
 let check_solution (sorted_solution:string) (stream:char Stream.t) =
   let rec one_line stream : string =
-    try match Stream.next stream with
+    match Stream.next stream with
       | '\n' -> ""
       | c -> (Printf.sprintf "%c" c) ^ one_line stream
-    with Stream.Failure -> ""
+      | exception Stream.Failure -> ""
   in
   let lines_from_stream (stream:char Stream.t) : string list =
     let rec multiple_lines stream = match one_line stream with
