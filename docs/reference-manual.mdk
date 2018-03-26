@@ -62,25 +62,26 @@ examples of formulas:
 |-----------------------|-------------------|
 ~
 
-After typing a formula, you can ask &touist; to find a valuation (true or
-false) of each proposition so that the whole formula is true (such valuation,
-also called _interpretation_, is called _model_). When a model exists, your
-formula is _satisfiable_. For example, a model of $p \vee q$ is $\{p = true,q =
-false\}$. To check the models of this formula using &touist;, you can do
+After typing a formula $\phi$, you can ask &touist; to find a valuation
+(true or false) of each propositional variable so that the whole formula
+is true (such a valuation, also called _interpretation_, is called
+_model_ of $\phi$). When a model exists, your formula is _satisfiable_.
+For example, a model of $p \vee q$ is $\{p = true,q = false\}$. To check
+the models of this formula using &touist;, you have two options:
 
 ~ Center
 |-------------------------------------|------------------------------------------|
 | Graphical Java interface            | Command-line interface (see Sec. [#cli]) |
 |-------------------------------------|------------------------------------------|
 | 1. Type ``p and q``                 | 1. Create a file ``p and q``             |
-| 2. Press "Solve"                    | 2. Type `touist --solve yourfile`        |
+| 2. Press "Solve"                    | 2. Run: `touist --solve <file>`          |
 | 3. Press "Next" to see other models | 3. The first model is displayed          |
 ~
 
 
 ## Check logical consequence
 
-From a wikipedia example:
+From a Wikipedia example:
 
 +-------------:|:---------------------------------+
 |*Premise 1:*  | If it's raining then it's cloudy |
@@ -95,23 +96,23 @@ This inference can be written
 ~
 
 The _infer_ (or _entails_) symbol ($\models$) does not belong to the &touist;
-language (we call it "metalanguage"). This means that we have to transform
-this notation to an actual propositional formula.
+language (it is in the "metalanguage"). This means that we have to transform
+this notation to an actual propositional formula whose satisfiability we can
+check.
 
-~ Theorem
-Let $H$ be a set of formulas (called _hypotheses_ or _premises_) and $C$ a
-formula (called _conclusion_). Then
-  ~~ Center
-  $H \models C$ if and only if $H\cup\{\neg C\}$ is unsatisfiable.
-  ~~
+This can be done using the _deduction theorem_: if $H$ is a set of
+formulas (called _hypotheses_ or _premises_) and $C$ a formula (called
+_conclusion_), then
+~ Center
+$H \models C$ if and only if $H\cup\{\neg C\}$ is unsatisfiable.
 ~
 
-From this theorem, we just have to check that the set of formulas
+Thanks to this theorem, we just have to check that the set of formulas
 ~ Math
 \{ raining \rightarrow cloudy, raining, \neg cloudy \}
 ~
-has no model. We can translate this set to &touist; language (comments begin
-with two semi-colon "`;;`"):
+has no model. We can translate this set to &touist; language (&touist;
+comments start with "``;;``"):
 
 ``` Touist
 raining => cloudy       ;; Premise 1
@@ -131,22 +132,21 @@ bit of &touist; code could be equivalently written
 
 ## Contribute to this document
 
-The [source] of this document is written in [madoko], a markdown dialect.
-This language has been chosen over Latex for its brevity (Pandoc could
-have also been chosen). You can contribute to this [document] through a
-pull-request or by discussing your thoughts in the [issue] tracker. To
+The [source] of this document is written in [madoko], a Markdown dialect.
+This language has been chosen over &logolatex; for its brevity (Pandoc
+could have also been chosen). You can contribute to this document through
+a pull-request or by discussing your thoughts in the [issue] tracker. To
 edit it, you can first take a look at what the Madoko [editor] can do
 (with this link, the images and colorizer will not work), or see how to
 edit properly in `CONTRIBUTE-TO-DOCS.md` (located in [`docs/`][docs]).
 
 ~ Note
-This reference manual still lacks of a step-by-step tutorial as well as
+This reference manual still lacks a step-by-step tutorial as well as
 illustrating examples. Feel free to contribute!
 ~
 
 [madoko]: https://www.madoko.net
 [issue]: https://github.com/touist/touist/issues
-[document]: https://github.com/touist/touist/glob/tree/master/docs/reference-manual.mdk
 [editor]: https://www.madoko.net/editor.html?#tab=2&url=https://raw.githubusercontent.com/touist/touist/master/docs/reference-manual.mdk&options={"delayedUpdate":"true"}
 [docs]: https://github.com/touist/touist/tree/master/docs
 [source]: https://github.com/touist/touist/blob/master/docs/reference-manual.mdk
@@ -162,20 +162,20 @@ illustrating examples. Feel free to contribute!
                 | EOF
 ```
 
-A &touist; file is a whitespace-separated[^whitespace] list of affectations
-and formulas. Affectations are global and can be interlaced with formulas
-as long as they are not nested in formulas (for local variables, you can
-use ``let``, see Sec. [#let-construct]). Comments begin
-with the "``;;``" sequence. Two backslashes (``\\``) in a formula will
-produce a new line in the latex view.
+A &touist; file is a whitespace-separated[^whitespace] list of
+affectations and formulas. Assignments are global and can be interleaved
+with formulas as long as they are not nested in formulas (for local
+variables, you can use ``let``; see Sec. [#let-construct]). Comments begin
+with "``;;``". Two backslashes (``\\``) in a formula will produce a new
+line in the latex view.
 
 [^whitespace]: A whitespace is a space, tab or newline.
 
 ~ Note {#newline-and-note}
 The whitespace-separated list of formulas is actually going to be
 converted to a conjunction; it avoids many intermediate ``and``.
-**Warning:** each formula in this list is going to be put into
-parenthesis:
+**Warning:** each formula in this list is going to be put in
+parentheses:
 ``` Touist
 a or b
 c => a
@@ -220,6 +220,7 @@ variables (with global or local affectations).
 
 Here are some examples of variables:
 
+~ Center
 |-------------|---------------------|
 | Simple-var  | Tuple-var           |
 |:-----------:|:-------------------:|
@@ -228,21 +229,49 @@ Here are some examples of variables:
 |``$SIZE``    |                     |
 |``$is_over`` |                     |
 |-------------|---------------------|
+~
 
 ### Global affectation {#global-var}
 
-We call "global variables" any variable that is affected in the top-level
-formula (meaning that global variables cannot be nested in other
-formulas) using the following affectation syntax:
+We call "global variables" any variable that is affected at the same
+depth as the subformulas of the &touist; formula. A &touist; formula is
+the formula formed by the conjunction of each blank-separated &touist;
+statement (a blank is a newline, a space or a tabulation). For example,
+in the following &touist; formula:
+
+```Touist
+a and (b or c) d e => f    
+g h <=> i
+k or l
+m
+```
+
+the subformulas ``a and (b or c)``, ``d``, ``e or f``, ``h <=> i``,
+``k or l`` are subformulas of the &touist; formula but ``(b or c)`` is not
+(instead, it is a sub-subformula).
+
+It is equivalent to
+
+~ Math
+  (a \wedge (b \vee c)) \wedge (d) \wedge (e \rightarrow f) \wedge (g)
+    \wedge (h \leftrightarrow i) \wedge (k \vee l) \wedge (m)
+~
+
+
+This means that global variables cannot be nested in sub-subformulas;
+they must appear at the same "depth" as the subformulas. We cannot write
+``(a or ($x=b $x))`` for example.
+
+The affectation syntax is the following:
 ``` Grammar
 <affect> ::= <var> "=" (<expr>)      <-- global affectation
 <expr> ::= <int>|<float>|<prop>|<bool>|<set>
-  | """<formula-simple>""" <-- TouIST >= 3.5.1
+    | """<formula-simple>"""         <-- TouIST >= 3.5.1
 ```
 
 Global variables apply for the whole code, even if the affectation is
-located before it is first used. This is because all global affectations
-are evaluated before any formula.
+occurs after the use of the variable. This is because all global
+affectations are evaluated before any formula.
 
 The only case where the order of affectation is important is when you
 want to use a variable in a global affectation expression. Global
