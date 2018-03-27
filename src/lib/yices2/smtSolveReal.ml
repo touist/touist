@@ -260,3 +260,6 @@ let logic_supported (logic:string) =
 let () = Yices2.register_exn ()
 
 let enabled = true
+let _ = Printexc.register_printer (fun ex -> match ex with
+  | Yices2.YicesError (code, {name; line; column; term1; type1; term2; type2; badval}) -> Some name
+  | _ -> None)
