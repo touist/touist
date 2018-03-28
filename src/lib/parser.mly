@@ -49,7 +49,6 @@
 %token QUESTIONMARK
 %token INV
 %token SEMICOLON
-%token STAR
 /* %token LEFTARROW */
 
 (* The following lines define in which order the tokens should
@@ -171,6 +170,7 @@ touist_qbf: f=affect_or(formula_qbf)+ EOF {Loc (Touist_code (f),($startpos,$endp
 touist_dlpa: f=formula_dlpa EOF {Touist_code [f]}
 
 formula_dlpa:
+  | LPAREN f=formula_dlpa RPAREN {f}
   | p=prop {p}
   | BOTTOM {Bottom}
   | TOP {Top}
@@ -179,11 +179,12 @@ formula_dlpa:
   | f=connectors(formula_dlpa) {f}
 
 program:
+  | LPAREN pr=program RPAREN {pr}
   | ADD p=prop {Loc (Add' p, ($startpos,$endpos))}
   | SUB p=prop {Loc (Remove p, ($startpos,$endpos))}
   | p1=program SEMICOLON p2=program {Loc (Seq (p1,p2), ($startpos,$endpos))}
   | p1=program UNION p2=program {Loc (Union' (p1,p2), ($startpos,$endpos))}
-  | p=program STAR {Loc (Star p, ($startpos,$endpos))}
+  | p=program MUL {Loc (Star p, ($startpos,$endpos))}
   | p=program INV {Loc (Inverse p, ($startpos,$endpos))}
   | p=formula_dlpa QUESTIONMARK {Loc (Test p, ($startpos,$endpos))}
   /* | p=prop LEFTARROW f=formula_dlpa {Loc (Affect' (p,f), ($startpos,$endpos))} */

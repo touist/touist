@@ -83,3 +83,7 @@ val is_prenex : Types.AstSet.elt -> bool
 val regroup_quantors :
   Types.Ast.t ->
   string quantlist list -> string quantlist list * Types.Ast.t
+
+(** [add_suffix] (used internally) adds a '_1' to a proposition name; if it
+    already has '_1', replace it with '_2' and so on. **)
+val add_suffix : string -> string

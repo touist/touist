@@ -626,7 +626,7 @@ and eval_ast_formula (env:env) (ast:Ast.t) : Ast.t =
   end
   | NewlineBefore f | NewlineAfter f -> eval_ast_formula f
   | Formula f -> eval_ast_formula f
-  | Affect' (_, _) -> failwith "not implemented"
+  | Assign' (_, _) -> failwith "not implemented"
   | Diamond (prog, f) -> Diamond (eval_ast_prog env prog, eval_ast_formula f)
   | Box (prog, f) -> Box (eval_ast_prog env prog, eval_ast_formula f)
   | e -> raise_with_loc ast ("this expression is not a formula: " ^ string_of_ast e ^"\n")

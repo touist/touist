@@ -118,6 +118,9 @@ let rec latex_of_ast ~full ast =
     "[" ^ latex_of_ast f ^ "~|~" ^ latex_of_commalist "," vars ^ "\\in "
     ^ latex_of_commalist " \\times " sets
     ^ (match cond with Some c -> ", "^ latex_of_ast c | _ -> "") ^ "]"
+  | Test f | Inverse f | Star f |Add' f | Remove f -> failwith "not implemented 2"
+  | Assign' (x,y) | Seq (x,y) | Union' (x,y) | Diamond (x,y) | Box (x,y)
+    -> failwith "not implemented 3"
 
   and latex_of_commalist ~full sep el = String.concat sep (List.map (latex_of_ast ~full) el)
   and escape_underscore txt =
@@ -149,6 +152,10 @@ and ast_fun (f:('a -> Ast.t -> 'a)) (acc:'a) ast : 'a =
   (* non-formulas *)
   | Mod _ | Union _ | Inter _ | Diff _ | Range _ | Subset _ | Powerset _
   | In _ | Empty _ -> acc
+  (* DL-PA specific*)
+  | Test f | Inverse f | Star f |Add' f | Remove f -> acc |> ast_fun' f
+  | Assign' (x,y) | Seq (x,y) | Union' (x,y) | Diamond (x,y) | Box (x,y)
+    -> acc |> ast_fun' x |> ast_fun' y
 
 and contains_newline ast =
   ast |> ast_fun (fun acc ast -> match ast with

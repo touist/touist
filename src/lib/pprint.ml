@@ -188,8 +188,16 @@ and string_of_ast_type ?(debug=false) (ast:Ast.t) : string =
   | NewlineBefore f | NewlineAfter f -> "newline"
   | Formula f              -> "quoted formula"
   | SetBuilder (_,_,_,_)   -> "set builder"
-  | Assign' (_, _)|Test _|Seq (_, _)|Union' (_, _)|Inverse _|Star _|
-    Diamond (_, _)|Box (_, _)|Add' _|Remove _ -> ""
+  | Assign' (_, _) -> "DL-PA assignment '<-'"
+  | Test _ -> "DL-PA test '?'"
+  | Seq (_, _) -> "DL-PA sequence ';'"
+  | Union' (_, _) -> "DL-PA union"
+  | Inverse _ -> "DL-PA inverse"
+  | Star _ -> "DL-PA Kleene-star"
+  | Diamond (_, _) -> "DL-PA diamond"
+  | Box (_, _) -> "DL-PA box"
+  | Add' _ -> "DL-PA true assigment"
+  | Remove _ -> "DL-PA false assigment"
 
 
 and string_of_ast_list ?(utf8=false) ?(show_var=(fun ast -> "")) ?(debug=false) ?(parenthesis=debug) sep el =

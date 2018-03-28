@@ -103,7 +103,7 @@ sig
     | NewlineBefore    of t
     | Formula          of t
     | SetBuilder       of t * t list * t list * t option
-    | Affect'          of t * t (* x ← φ? *)
+    | Assign'          of t * t (* x ← φ? *)
     | Test             of t (* φ? *)
     | Seq              of t * t
     | Union'           of t * t (* φ ∪ φ *)
