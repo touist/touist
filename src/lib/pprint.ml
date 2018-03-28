@@ -110,16 +110,19 @@ let rec string_of_ast ?(utf8=false) ?(show_var=(fun ast -> "")) ?(debug=false) ?
     "[" ^ of_ast f ^ " for "
     ^ of_ast_list "," vars ^ " in " ^ of_ast_list "," sets
     ^ (match cond with Some c -> " when " ^ of_ast c | None -> "") ^"]"
-  | Affect' (x, y) -> of_ast x ^ "←" ^ of_ast y
+  | Assign' (x, y) when utf8 -> of_ast x ^ "←" ^ of_ast y
+  | Assign' (x, y) -> of_ast x ^ "<-" ^ of_ast y
   | Test pr -> of_ast pr ^ "?"
   | Seq (pr1, pr2) -> of_ast pr1 ^ ";" ^ of_ast pr2
-  | Union' (pr1, pr2) -> of_ast pr1 ^ " ∪ " ^ of_ast pr2
-  | Inverse pr -> of_ast pr ^ "⁻¹"
+  | Union' (pr1, pr2) when utf8 -> "("^ of_ast pr1 ^ " ∪ " ^ of_ast pr2 ^")"
+  | Union' (pr1, pr2) -> "("^ of_ast pr1 ^ " union " ^ of_ast pr2 ^")"
+  | Inverse pr when utf8 -> of_ast pr ^"⁻¹"
+  | Inverse pr -> of_ast pr ^"^-1"
   | Star pr -> of_ast pr ^ "*"
   | Box (pr, f) -> "[" ^ of_ast pr ^ "] " ^ of_ast f
-  | Diamond (pr, f) -> "＜" ^ of_ast pr ^ "＞ " ^ of_ast f
-  |Add' p -> "+" ^ of_ast p
-  |Remove p -> "-" ^ of_ast p
+  | Diamond (pr, f) -> "<" ^ of_ast pr ^ "> " ^ of_ast f
+  | Add' p -> "+" ^ of_ast p
+  | Remove p -> "-" ^ of_ast p
 
 and string_of_ast_type ?(debug=false) (ast:Ast.t) : string =
   let of_ast_type ast = string_of_ast_type ~debug ast in
@@ -185,7 +188,7 @@ and string_of_ast_type ?(debug=false) (ast:Ast.t) : string =
   | NewlineBefore f | NewlineAfter f -> "newline"
   | Formula f              -> "quoted formula"
   | SetBuilder (_,_,_,_)   -> "set builder"
-  | Affect' (_, _)|Test _|Seq (_, _)|Union' (_, _)|Inverse _|Star _|
+  | Assign' (_, _)|Test _|Seq (_, _)|Union' (_, _)|Inverse _|Star _|
     Diamond (_, _)|Box (_, _)|Add' _|Remove _ -> ""
 
 
