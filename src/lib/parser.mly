@@ -50,7 +50,7 @@
 %token INV
 %token SEMICOLON
 %token STAR
-%token LEFTARROW
+/* %token LEFTARROW */
 
 (* The following lines define in which order the tokens should
  * be reduced, e.g. it tells the parser to reduce * before +.
@@ -185,8 +185,8 @@ program:
   | p1=program UNION p2=program {Loc (Union' (p1,p2), ($startpos,$endpos))}
   | p=program STAR {Loc (Star p, ($startpos,$endpos))}
   | p=program INV {Loc (Inverse p, ($startpos,$endpos))}
-  | p=program QUESTIONMARK {Loc (Test p, ($startpos,$endpos))}
-  | p=prop LEFTARROW f=formula_dlpa {Loc (Affect' (p,f), ($startpos,$endpos))}
+  | p=formula_dlpa QUESTIONMARK {Loc (Test p, ($startpos,$endpos))}
+  /* | p=prop LEFTARROW f=formula_dlpa {Loc (Affect' (p,f), ($startpos,$endpos))} */
 
 (* Used in tuple expression; see tuple_variable and tuple_term *)
 %inline indices: i=expr { i }

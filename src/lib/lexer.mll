@@ -136,7 +136,6 @@ rule token = parse (* is a function (Lexing.lexbuf -> Parser.token list) *)
   | ")"               {[ RPAREN         ]}
   | "^-1"             {[ INV            ]}
   | "?"               {[ QUESTIONMARK   ]}
-  | "<-"              {[ LEFTARROW      ]}
   | "\\\\"            {[ NEWLINE        ]}
   | '$'(var as v)'('  {[ VARTUPLE ("$" ^ v)]}
   | '$'(var as v)     {[ VAR ("$" ^ v)  ]}

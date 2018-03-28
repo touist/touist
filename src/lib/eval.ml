@@ -636,7 +636,7 @@ and eval_ast_prog (env:env) (ast:Ast.t) : Ast.t =
   let eval_ast_prog = eval_ast_prog env
   and eval_ast_prog_env = eval_ast_prog in
   match ast_without_loc ast with
-  | Test prog -> Test (eval_ast_prog prog)
+  | Test prog -> Test (eval_ast_formula env prog)
   | Seq (pr1, pr2) -> Seq (eval_ast_prog pr1, eval_ast_prog pr2)
   | Union' (pr1, pr2) -> Union' (eval_ast_prog pr1, eval_ast_prog pr2)
   | Inverse prog -> Inverse (eval_ast_prog prog)
