@@ -157,15 +157,15 @@ illustrating examples. Feel free to contribute!
 ## Structure of a &touist; file
 
 ``` Grammar
-<touist-file> ::= <affect> <touist-file>
+<touist-file> ::= <assign> <touist-file>
                 | <formula> <touist-file>
                 | EOF
 ```
 
 A &touist; file is a whitespace-separated[^whitespace] list of
-affectations and formulas. Assignments are global and can be interleaved
+assignments and formulas. Assignments are global and can be interleaved
 with formulas as long as they are not nested in formulas (for local
-variables, you can use ``let``; see Sec. [#let-construct]). Comments begin
+variables, you can use ``let``; see Sec. [#let-binding]). Comments begin
 with "``;;``". Two backslashes (``\\``) in a formula will produce a new
 line in the latex view.
 
@@ -188,8 +188,8 @@ will be translated to
 
 ## Variables
 
-First, we describe what a variable is. Then, we detail how to affect
-variables (with global or local affectations).
+First, we describe what a variable is. Then, we detail how to assign
+variables (with global or local assignments).
 
 ### Syntax of a variable
 
@@ -231,9 +231,9 @@ Here are some examples of variables:
 |-------------|---------------------|
 ~
 
-### Global affectation {#global-var}
+### Global assignment {#global-var}
 
-We call "global variables" any variable that is affected at the same
+We call "global variables" any variable that is assigned at the same
 depth as the subformulas of the &touist; formula. A &touist; formula is
 the formula formed by the conjunction of each blank-separated &touist;
 statement (a blank is a newline, a space or a tabulation). For example,
@@ -262,39 +262,39 @@ This means that global variables cannot be nested in sub-subformulas;
 they must appear at the same "depth" as the subformulas. We cannot write
 ``(a or ($x=b $x))`` for example.
 
-The affectation syntax is the following:
+The assignment syntax is the following:
 ``` Grammar
-<affect> ::= <var> "=" (<expr>)      <-- global affectation
+<assign> ::= <var> "=" (<expr>)      <-- global assignment
 <expr> ::= <int>|<float>|<prop>|<bool>|<set>
     | """<formula-simple>"""         <-- TouIST >= 3.5.1
 ```
 
-Global variables apply for the whole code, even if the affectation is
+Global variables apply for the whole code, even if the assignment is
 occurs after the use of the variable. This is because all global
-affectations are evaluated before any formula.
+assignments are evaluated before any formula.
 
-The only case where the order of affectation is important is when you
-want to use a variable in a global affectation expression. Global
-affectations are sequentially evaluated, so the order of affectation
+The only case where the order of assignment is important is when you
+want to use a variable in a global assignment expression. Global
+assignments are sequentially evaluated, so the order of assignment
 matters. For example:
 ``` Touist
 $N = 10
 $set = [1..$N]    ;; $N must be defined before $set
 ```
 
-### Local affectation (``let`` construct) {#let-construct}
+### Local assignment (``let`` construct) {#let-binding}
 
 Sometimes, you want to use the same result in multiple places and you
 cannot use a global variable (presented in [#global-var]) because of
 nested formulas. The ``let`` construct lets you create temporary
 variables inside formulas:
 ``` Grammar
-<let-affect<T>> ::=
-    | "let" <var> "=" <expr> ":" <formula<T>>     <-- local affectation
+<let-assign<T>> ::=
+    | "let" <var> "=" <expr> ":" <formula<T>>     <-- local assignment
     | "let" <comma-list(<var>)> "=" <comma-list(<expr>)> ":" <formula<T>>
 <expr> ::= <int>|<float>|<prop>|<bool>|<set>
 ```
-The ``let`` affectation can only be used in formulas (detailed
+The ``let`` assignment can only be used in formulas (detailed
 in [#sec-formulas]) and cannot be used in expressions (`<expr>`, i.e.,
 integer, floating-point, boolean or set expressions).
 
@@ -318,7 +318,7 @@ You can also chain multiple variables in a single ``let``:
 ```
 
 ~ Note
-The scope of a variable affected using ``let`` is limited to the formula
+The scope of a variable assigned using ``let`` is limited to the formula
 that follows the colon (`:`). If this formula is followed by a whitespace
 and an other formula, the second formula will not be in the variable
 scope. Example:
@@ -905,7 +905,7 @@ the "always true" and "always false". Here is the complete grammar:
     | "if" <bool> "then" <T> "else" <T> "end"
     | <connectors(<T>)>
     | <generalized-connectors(<T>)>
-    | <let-affect(<T>)>
+    | <let-assign(<T>)>
 
 ```
 ### SMT formulas
@@ -1034,7 +1034,7 @@ TERM      = [_0-9]*[a-zA-Z][a-zA-Z_0-9]*
 ```
 
 ``` Grammar
-<touist-file> ::= <affect> <touist-file>
+<touist-file> ::= <assign> <touist-file>
                  | <formula> <touist-file>
                  | EOF
 
@@ -1048,9 +1048,9 @@ TERM      = [_0-9]*[a-zA-Z][a-zA-Z_0-9]*
     | TERM
     | TERM "(" <comma-list(<expr>)> ")"
 
-<affect> ::= <var> "=" (<expr>)
+<assign> ::= <var> "=" (<expr>)
 
-<let-affect<T>> ::=
+<let-assign<T>> ::=
     | "let" <var> "=" <expr> ":" <formula<T>>
     | "let" <comma-list(<var>)> "=" <comma-list(<expr>)>
                              ":" <formula<T>>
@@ -1147,7 +1147,7 @@ TERM      = [_0-9]*[a-zA-Z][a-zA-Z_0-9]*
     | "if" <bool> "then" <T> "else" <T> "end"
     | <connectors(<T>)>
     | <generalized-connectors(<T>)>
-    | <let-affect(<T>)>
+    | <let-assign(<T>)>
     | <T> ("\n"|" ") <T>   <- newline/whitespace in top-level is an 'and'
 
 <formula-simple> ::=
