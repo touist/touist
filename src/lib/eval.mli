@@ -33,3 +33,4 @@ val ast_without_loc : Types.Ast.t -> Types.Ast.t
 
 (** [has_top_or_bot ast] checks if there is any Bot or Top in [ast]. *)
 val has_top_or_bot : Types.Ast.t -> bool
+val rm_top_bot : Types.Ast.t -> Types.Ast.t

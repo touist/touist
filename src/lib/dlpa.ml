@@ -120,4 +120,4 @@ and h x y prog n =
         )
       ))
 
-let to_dlpa ast n = max_star_recursion := n; f ast (fresh_x ())
+let to_dlpa n ast = max_star_recursion := n; f ast (fresh_x ())

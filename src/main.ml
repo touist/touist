@@ -183,7 +183,8 @@ let main (lang,mode) (input,input_f) (output,output_f: string * out_channel) com
           | Sat   -> Parse.parse_sat ~debug_syntax ~filename:input input_text |> Eval.eval ~smt
           | Smt _ -> Parse.parse_smt ~debug_syntax ~filename:input input_text |> Eval.eval ~smt
           | Qbf   -> Parse.parse_qbf ~debug_syntax ~filename:input input_text |> Eval.eval ~smt
-          | Dlpa _ -> Parse.parse_dlpa ~debug_syntax ~filename:input input_text |> Eval.eval ~smt
+          | Dlpa n -> let ast = Parse.parse_dlpa ~debug_syntax ~filename:input input_text |> Eval.eval ~smt in
+            ("f(φ,x) = " ^ Pprint.string_of_ast ~utf8:true (ast |> Dlpa.to_dlpa n |> Eval.rm_top_bot) |> print_endline; ast)
         in (Printf.fprintf output_f "%s\n" (Pprint.string_of_ast ~utf8:true ast); exit_with OK)
       | _, Show Cnf -> let ast = (match lang with
           | Sat   -> Parse.parse_sat ~debug_syntax ~filename:input input_text |> Eval.eval ~smt |> Cnf.ast_to_cnf
@@ -358,9 +359,22 @@ let main (lang,mode) (input,input_f) (output,output_f: string * out_channel) com
           "Propositions: "
             ^ List.fold_left (fun acc str -> acc ^ (if acc="" then "" else ", ") ^ str ) "" (Dlpa.propositions formula)
             |> print_endline;
-          "f(φ,x) = " ^ Pprint.string_of_ast ~utf8:true (Dlpa.to_dlpa formula n) |> print_endline;
-      | Dlpa _, _ ->
-          failwith "not implemented"
+          "f(φ,x) = " ^ Pprint.string_of_ast ~utf8:true (Dlpa.to_dlpa n formula |> Eval.rm_top_bot) |> print_endline;
+      | Dlpa n, Solve {hidden} ->
+        let start = Unix.gettimeofday () in
+        let qcnf,table =
+          Parse.parse_dlpa ~debug_syntax ~filename:input input_text
+          |> Eval.eval ~smt |> Dlpa.to_dlpa n |> Eval.rm_top_bot |> Qbf.prenex |> Qbf.cnf
+          |> Touist_qbf.QbfSolve.qcnf_of_cnf
+        in
+        (if common_opt.verbose>0 then Printf.eprintf "== translation time: %f sec\n" (Unix.gettimeofday () -. start));
+        let start = Unix.gettimeofday () in
+        (match Touist_qbf.QbfSolve.solve ~hidden (qcnf,table) with
+          | Some str -> Printf.fprintf output_f "%s\n" str
+          | None -> (Printf.fprintf stderr "unsat\n"; exit_with UNSAT |> ignore));
+          (if common_opt.verbose>0 then Printf.eprintf "== solve time: %f sec\n" (Unix.gettimeofday () -. start));
+        | Dlpa _, _ ->
+            failwith "not implemented"
     end;
 
     (* I had to comment these close_out and close_in because it would
