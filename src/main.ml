@@ -358,7 +358,7 @@ let main (lang,mode) (input,input_f) (output,output_f: string * out_channel) com
           "Propositions: "
             ^ List.fold_left (fun acc str -> acc ^ (if acc="" then "" else ", ") ^ str ) "" (Dlpa.propositions formula)
             |> print_endline;
-          "f(φ,x): " ^ Pprint.string_of_ast ~utf8:true (Dlpa.to_dlpa formula n) |> print_endline;
+          "f(φ,x) = " ^ Pprint.string_of_ast ~utf8:true (Dlpa.to_dlpa formula n) |> print_endline;
       | Dlpa _, _ ->
           failwith "not implemented"
     end;
