@@ -1,6 +1,19 @@
 open Types
 open Types.Ast
 
+(* [traverse] for example for 'and' nodes, it will traverse every other embedded
+   'and' and use 'f' on the leaf nodes (a leaf node is a node that is not
+   'and'). The list returned. Example:
+   ((a and (b or c)) and d) becomes list [a; b or c; d]. *)
+type node = AndNode | OrNode
+let rec traverse kind = function
+  | And (And (x,y),z) | And (x,And (y, z)) when kind = AndNode -> traverse kind x @ traverse kind y @ traverse kind z
+  | And (x,y) -> [x;y]
+  | Or (Or (x,y),z) | Or (x,Or (y, z)) when kind = OrNode -> traverse kind x @ traverse kind y @ traverse kind z
+  | Or (x,y) -> [x;y]
+  | x -> [x]
+
+
 let rec string_of_ast ?(utf8=false) ?(show_var=(fun ast -> "")) ?(debug=false) ?(parenthesis=debug) ast =
   let of_ast = string_of_ast ~utf8 ~show_var ~parenthesis ~debug in
   let of_ast_list = string_of_ast_list ~utf8 ~show_var ~parenthesis ~debug in
@@ -30,8 +43,7 @@ let rec string_of_ast ?(utf8=false) ?(show_var=(fun ast -> "")) ?(debug=false) ?
   | To_float x -> "float(" ^ of_ast x ^ ")"
   | Not     x when utf8    -> "¬" ^ of_ast x
   | Not     x     -> "not " ^ of_ast x
-  | And     (x,y) when utf8 -> "(" ^ of_ast x ^ " ⋀ " ^ of_ast y ^ ")"
-  | And     (x,y) -> "(" ^ of_ast x ^ " and " ^ of_ast y ^ ")"
+  | And     (x,y) -> "("^ (traverse AndNode ast |> of_ast_list (if utf8 then " ⋀ " else " and ")) ^")"
   | Or      (x,y) when utf8 -> "(" ^ of_ast x ^ " ⋁ "  ^ of_ast y ^ ")"
   | Or      (x,y) -> "(" ^ of_ast x ^ " or "  ^ of_ast y ^ ")"
   | Xor     (x,y) -> "(" ^ of_ast x ^ " xor " ^ of_ast y ^ ")"
