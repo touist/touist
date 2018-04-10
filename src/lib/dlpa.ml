@@ -71,15 +71,14 @@ let rec f ast x = match ast with
   | Box _ -> failwith ("DL-PA: can't deal with "^string_of_ast_type ast^" yet: '"^string_of_ast ~debug:true ast^ "'")
   | ast -> failwith ("DL-PA: this formula is not yet supported in DL-PA ("^string_of_ast_type ast^"): '" ^ (string_of_ast ~debug:true ast) ^ "'")
 
-(* TODO: instead of creating x,y and z by incrementing, use a global variable
-   instead because it might create conflicting names in the end. *)
+(* g : π -> 2ᴾ -> 2ᴾ -> n -> qbf-formula *)
 and g x y ast = match ast with
   | Add' (Prop p) -> g x y (Assign' (Prop p, Top))
   | Remove (Prop p) -> g x y (Assign' (Prop p, Bottom))
   | Assign' (Prop p, form) ->
     List.fold_left (fun acc q -> if q!=p then And (Equiv (prop q "x" x, prop q "x" x), acc) else acc)
       (Equiv (prop p "x" x, f form x))
-      (propositions ast) (*TODO: cache the props list instead of fetching it each time *)
+      (propositions ast)
   | Test phi ->
     List.fold_left
       (fun acc p -> And (Equiv (prop p "y" y, prop p "x" x), acc))
@@ -87,7 +86,7 @@ and g x y ast = match ast with
       (propositions ast)
   | Seq (prog1, prog2) ->
     let z = fresh_z () in
-    List.fold_left (fun acc p -> Exists (prop p "y" y, acc))
+    List.fold_left (fun acc p -> Exists (prop p "z" z, acc))
       (And (g x z prog1, g z y prog2))
       (propositions ast)
   | Union' (prog1, prog2) -> Or (g x y prog1, g x y prog2)
