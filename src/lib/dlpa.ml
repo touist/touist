@@ -68,7 +68,7 @@ let rec f ast x = match ast with
   | Diamond (prog, form) ->
     let y = fresh_y () in
     List.fold_left (fun acc p -> Exists (prop p "y" y, acc)) (And (g x y prog, f form y)) (propositions ast)
-  | Box _ -> failwith ("DL-PA: can't deal with "^string_of_ast_type ast^" yet: '"^string_of_ast ~debug:true ast^ "'")
+  | Box (prog, form) -> f (Not (Diamond (prog, Not form))) x
   | ast -> failwith ("DL-PA: this formula is not yet supported in DL-PA ("^string_of_ast_type ast^"): '" ^ (string_of_ast ~debug:true ast) ^ "'")
 
 (* g : π -> 2ᴾ -> 2ᴾ -> n -> qbf-formula *)
