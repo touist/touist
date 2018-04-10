@@ -49,15 +49,15 @@ let add_suffix name =
    - phi is a formula
    - pi and prog is are programs *)
 
-let t, x, y, z = ref 1, ref 1, ref 1, ref 1
+let t, x, y, z = ref 0, ref 0, ref 0, ref 0
 let fresh_t () = incr t; !t
-let fresh_x () = incr x; !t
-let fresh_y () = incr y; !t
-let fresh_z () = incr z; !t
+let fresh_x () = incr x; !x
+let fresh_y () = incr y; !y
+let fresh_z () = incr z; !z
 
 let max_star_recursion = ref 0
 let rec f ast x = match ast with
-  | Prop p -> prop p "x" x
+  | Prop p -> (if '_' == (String.get p 0) then Prop (String.sub p 1 (String.length p - 1)) else prop p "x" x)
   | Bottom -> Bottom
   | Top -> Top
   | Not phi -> Not (f phi x)
