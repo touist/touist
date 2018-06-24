@@ -1,3 +1,7 @@
+v3.5.3
+  - Command-line
+      added --latex=katex. As Katex does not support \substack{}, it uses
+      \begin{matrix} instead.
 v3.5.2 (2018-03-12)
   - Language:
     - added list comprehensions (also named 'set builder notation'). Really

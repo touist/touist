@@ -25,7 +25,7 @@
     - for light latex processors (mathjax, jlatexmath), you should use
       [~full:false]
     - for fully-featured latex processors, you can use [~full:true]. *)
-val latex_of_ast : full:bool -> Types.AstSet.elt -> string
+val latex_of_ast : ?matrix_instead_of_substack:bool -> full:bool -> Types.AstSet.elt -> string
 
 (** {2 Utility} *)
 
