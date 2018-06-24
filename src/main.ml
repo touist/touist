@@ -44,7 +44,7 @@ type solve_ext_opt = {
   hidden: bool; (* show hidden lits on model display *)
 }
 type transl_opt = { linter: bool; table: (string * out_channel) option; debug_dimacs: bool}
-type latex_mode = Mathjax | Document
+type latex_mode = Mathjax | Katex | Document
 type latex_opt = {
   mode: latex_mode;
   linter: bool;
@@ -166,6 +166,7 @@ let main (lang,mode) (input,input_f) (output,output_f: string * out_channel) com
       | _, Latex {mode;linter} -> let ast_plain = ast_plain input_text in
         (if linter then ast_plain |> Eval.eval ~smt ~onlychecktypes:true |>ignore);
         (if mode=Mathjax then Printf.fprintf output_f "%s\n" (Latex.latex_of_ast ~full:false ast_plain));
+        (if mode=Katex then Printf.fprintf output_f "%s\n" (Latex.latex_of_ast ~matrix_instead_of_substack:true ~full:false ast_plain));
         (if mode=Document then Printf.fprintf output_f
              "\\documentclass[fleqn]{article}\n\
               \\usepackage{mathtools}\n\
@@ -497,7 +498,7 @@ let solve_flags =
 
 let latex_section = "LATEX"
 let latex_flag =
-  Arg.(value & opt (some (enum [("mathjax",Mathjax);("document",Document)])) None
+  Arg.(value & opt (some (enum [("mathjax",Mathjax);("katex",Katex);("document",Document)])) None
          ~vopt:(Some Mathjax) & info ["latex"] ~docv:"TEX" ~docs:latex_section ~doc:"\
     Transform the TouIST input to LaTeX.")
 
@@ -753,6 +754,8 @@ let cmd =
     `Pre "    $(mname) $(b,--latex)[=$(i,TEX)] [$(b,--smt),$(b,--sat)|$(b,--qbf)] $(i,INPUT)";
     `P "$(i,TEX) allows you to select what kind of LaTeX you want:";
     `I ("`mathjax'","for a equation-only LaTeX output compatible with Mathjax."); `Noblank;
+    `I ("`katex'","for a equation-only LaTeX output compatible with Katex (replaces
+        '\\substack' with '\\begin{matrix}'."); `Noblank;
     `I ("`document'","for a complete LaTeX file (including `\\\\begin{document})
         that you can directly give to pdfLaTeX. The `mathtools' package is
         necessary for `\\\\begin{pmatrix*}'.");

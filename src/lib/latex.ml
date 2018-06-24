@@ -24,9 +24,9 @@ let rm_dollar x = String.sub x 1 (String.length x - 1)
     ]}
 *)
 
-let rec latex_of_ast ~full ast =
-  let latex_of_ast ast = latex_of_ast ~full ast in
-  let latex_of_commalist = latex_of_commalist ~full in
+let rec latex_of_ast ~matrix_instead_of_substack:false ~full ast =
+  let latex_of_ast ast = latex_of_ast ~matrix_instead_of_substack ~full ast in
+  let latex_of_commalist = latex_of_commalist ~matrix_instead_of_substack ~full in
   match ast with
   (* TODO: If a top-formula contains any binary operator that have lesser
      precedence than 'and', then the whole top-formula should be
@@ -79,15 +79,21 @@ let rec latex_of_ast ~full ast =
       ^ "\\;\\textrm{then}\\;" ^ (latex_of_ast y)
       ^ "\\;\\textrm{else}\\;" ^ (latex_of_ast z)
   | Bigand (x,y,b,z) ->
-      "\\bigwedge\\limits_{\\substack{" ^ (latex_of_commalist "," x) ^
-      "\\in " ^ (latex_of_commalist "," y) ^
-      (match b with None -> "" | Some b -> "\\\\" ^ (latex_of_ast b)) ^ "}}" ^
-      latex_of_ast (if z |> Eval.ast_without_loc |> is_binary_op then (Paren z) else z)
+      "\\bigwedge\\limits_{"
+      ^ (if matrix_instead_of_substack then "\\begin{matrix}" else "\\substack{")
+        ^ (latex_of_commalist "," x)
+        ^ "\\in " ^ (latex_of_commalist "," y)
+        ^ (match b with None -> "" | Some b -> "\\\\" ^ (latex_of_ast b))
+      ^ (if matrix_instead_of_substack then "\\end{matrix}" else "}")
+      ^ latex_of_ast (if z |> Eval.ast_without_loc |> is_binary_op then (Paren z) else z)
   | Bigor (x,y,b,z) ->
-      "\\bigvee\\limits_{\\substack{" ^ (latex_of_commalist "," x) ^
-       "\\in " ^ (latex_of_commalist "," y) ^
-       (match b with None -> "" | Some b -> "\\\\" ^ (latex_of_ast b)) ^ "}}" ^
-       latex_of_ast (if z |> Eval.ast_without_loc |> is_binary_op then (Paren z) else z)
+      "\\bigvee\\limits_{"
+      ^ (if matrix_instead_of_substack then "\\begin{matrix}" else "\\substack{")
+        ^ (latex_of_commalist "," x)
+        ^ "\\in " ^ (latex_of_commalist "," y)
+        ^ (match b with None -> "" | Some b -> "\\\\" ^ (latex_of_ast b))
+      ^ (if matrix_instead_of_substack then "\\end{matrix}" else "}")
+      ^ latex_of_ast (if z |> Eval.ast_without_loc |> is_binary_op then (Paren z) else z)
   | Exact (x,y) -> "\\textrm{exact}(" ^ (latex_of_ast x) ^ "," ^ (latex_of_ast y) ^ ")"
   | Atmost (x,y) -> "\\textrm{atmost}(" ^ (latex_of_ast x) ^ "," ^ (latex_of_ast y) ^ ")"
   | Atleast (x,y) -> "\\textrm{atleast}(" ^ (latex_of_ast x) ^ "," ^ (latex_of_ast y) ^ ")"
