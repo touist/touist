@@ -28,7 +28,7 @@ let string_of_during = function
   | Prenex -> "prenex transform"
 
 let replace pattern replacement text =
-  Re_str.(global_replace (regexp pattern) replacement text)
+  Re.Str.(global_replace (regexp pattern) replacement text)
 
 (** [get_loc] translates a 'loc' to an understandable tuple that contains
     (num_line, num_col, token_start, token_end). *)
@@ -60,18 +60,18 @@ let all_placeholders loc typ with_colors msg = function
     non-location placeholder (as well as any trailing whitespaces) will be
     skipped. *)
 let replace (placeholder : char -> string) text =
-  let text = Re_str.global_replace (Re_str.regexp "\\\\n") "\n" text in
-  let text = Re_str.global_replace (Re_str.regexp "\\\\t") "\t" text in
+  let text = Re.Str.global_replace (Re.Str.regexp "\\\\n") "\n" text in
+  let text = Re.Str.global_replace (Re.Str.regexp "\\\\t") "\t" text in
   let rec replace cur_pos =
     try
-      let next_pos = Re_str.search_forward (Re_str.regexp "%[a-zA-Z]") text cur_pos in
+      let next_pos = Re.Str.search_forward (Re.Str.regexp "%[a-zA-Z]") text cur_pos in
       (*Printf.printf "cur=%d next=%d len=%d (%s)\n" cur_pos next_pos (String.length text) text;*)
       String.sub text cur_pos (next_pos-cur_pos)
       ^ (String.get text (next_pos+1) |> placeholder)
       ^ if next_pos+2 <= String.length text-1 then replace (next_pos+2) else ""
     with Not_found -> String.sub text cur_pos (String.length text - cur_pos)
   in replace (if (placeholder 'l')=""
-              then Re_str.search_forward (Re_str.regexp "%[^flcLCbB]") text 0 else 0)
+              then Re.Str.search_forward (Re.Str.regexp "%[^flcLCbB]") text 0 else 0)
 
 let string_of_loc ?(fmt=(!loc_format)) (loc:loc) : string =
   replace (loc_placeholders loc) fmt
@@ -80,11 +80,11 @@ let string_of_loc ?(fmt=(!loc_format)) (loc:loc) : string =
     If width = 0, do not wrap. *)
 let format_width color width text =
   let rec format prev_indent from_pos =
-    let cur_indent = try (Re_str.search_forward (Re_str.regexp "[^ ]") text from_pos)-from_pos
+    let cur_indent = try (Re.Str.search_forward (Re.Str.regexp "[^ ]") text from_pos)-from_pos
       with Not_found -> 0 in
     let wrap_pos =
       let newline_pos =
-        try Re_str.search_forward (Re_str.regexp "\n") text from_pos
+        try Re.Str.search_forward (Re.Str.regexp "\n") text from_pos
         with Not_found -> String.length text
       in if newline_pos > from_pos+width then from_pos+width else newline_pos
     in
@@ -99,7 +99,7 @@ let format_width color width text =
       spaces prev_indent ^ String.sub text from_pos (wrap_pos-from_pos)
       ^"\n"^ format 0 (wrap_pos+1)
     | _ -> (* wrap at any point because width is too large *)
-      let last_space = try Re_str.search_backward (Re_str.regexp "\\( \\|: \\|, \\|. \\)") text wrap_pos with Not_found -> wrap_pos in
+      let last_space = try Re.Str.search_backward (Re.Str.regexp "\\( \\|: \\|, \\|. \\)") text wrap_pos with Not_found -> wrap_pos in
       let last_space_end = last_space + if (String.get text last_space)=' ' then 0 else 1 in
       spaces prev_indent ^ String.sub text from_pos (last_space_end-from_pos)
       ^ "\n" ^ format (cur_indent+prev_indent) (last_space_end+1)
@@ -107,18 +107,18 @@ let format_width color width text =
 
 let rec string_of_msg ?(width=(!wrap_width)) ?(color=(!color)) ?(fmt=(!format)) (message:msg) =
   let color_backquote text = let colorize str = "\x1b[33m" ^ str ^ "\x1b[0m" in
-    Re_str.global_substitute (Re_str.regexp "`\\([^`]+\\)`") (fun s -> "`"^ colorize (Re_str.matched_group 1 s) ^"`") text in
+    Re.Str.global_substitute (Re.Str.regexp "`\\([^`]+\\)`") (fun s -> "`"^ colorize (Re.Str.matched_group 1 s) ^"`") text in
   let color_quoted text = let colorize str = "\x1b[33m" ^ str ^ "\x1b[0m" in
-    Re_str.global_substitute (Re_str.regexp "'\\([^']*\\)'") (fun s ->
-        let s = (Re_str.matched_group 1 s) in
+    Re.Str.global_substitute (Re.Str.regexp "'\\([^']*\\)'") (fun s ->
+        let s = (Re.Str.matched_group 1 s) in
         if (String.length s) = 0 then "''" else "'"^ colorize s ^"'") text in
   let color_code text = let colorize str = "\x1b[37m" ^ str ^ "\x1b[0m" in
-    Re_str.global_substitute (Re_str.regexp "^\\(    +.*\\)$") (fun s -> colorize (Re_str.matched_group 1 s)) text in
+    Re.Str.global_substitute (Re.Str.regexp "^\\(    +.*\\)$") (fun s -> colorize (Re.Str.matched_group 1 s)) text in
   let color_type text = let colorize str = match str with
       | "warning" -> (* yellow bold *) "\x1b[33m\x1b[1m" ^str^ "\x1b[0m"
       | "error" ->   (* red bold    *) "\x1b[31m\x1b[1m" ^str^ "\x1b[0m"
       | str -> str
-    in Re_str.substitute_first (Re_str.regexp "\\(error\\|warning\\)") (fun s -> colorize (Re_str.matched_group 1 s)) text in
+    in Re.Str.substitute_first (Re.Str.regexp "\\(error\\|warning\\)") (fun s -> colorize (Re.Str.matched_group 1 s)) text in
   let color_all text = if color then text |> color_code |> color_backquote |> color_quoted |> color_type else text in
   let typ,_,text,loc = message in
   replace (all_placeholders loc typ color text) fmt |> format_width color width |> color_all

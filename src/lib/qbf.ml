@@ -3,9 +3,9 @@ open Types
 open Types.Ast
 
 let add_suffix name =
-  let open Re_str in
-  try let _ = Re_str.search_backward (Re_str.regexp "_[0-9]+$") name (String.length name) in ();
-      name |> Re_str.substitute_first (Re_str.regexp "[0-9]+$")
+  let open Re.Str in
+  try let _ = Re.Str.search_backward (Re.Str.regexp "_[0-9]+$") name (String.length name) in ();
+      name |> Re.Str.substitute_first (Re.Str.regexp "[0-9]+$")
       (fun str -> ((str |> matched_string |> int_of_string)+1) |> string_of_int)
   with Not_found -> name ^ "_1"
 

@@ -130,7 +130,7 @@ let rec latex_of_ast ?(matrix_instead_of_substack=false) ~full ast =
   and latex_of_commalist ~matrix_instead_of_substack ~full sep el =
     String.concat sep (List.map (latex_of_ast ~matrix_instead_of_substack ~full) el)
   and escape_underscore txt =
-    Re_str.global_replace (Re_str.regexp "_") "\\\\_" txt
+    Re.Str.global_replace (Re.Str.regexp "_") "\\\\_" txt
 
 (** [ast_fun] will apply f on all *formula*-related elements of the AST where
     cond is true. The tranversal order should not be considered.
