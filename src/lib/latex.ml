@@ -104,10 +104,10 @@ let rec latex_of_ast ?(matrix_instead_of_substack=false) ~full ast =
         | Let (v',x',c') -> unwrap ((v',x')::acc) c'
         | Loc (x,_) -> unwrap acc x
         | c' ->
-            "\\left(" ^ latex_of_ast c' ^ "\\right)_\\begin{Bmatrix}" ^
+            "\\left(" ^ latex_of_ast c' ^ "\\right)_{\\begin{Bmatrix}" ^
             (acc |> List.fold_left
             (fun acc (v,x) -> (latex_of_ast v) ^ " \\leftarrow " ^ (latex_of_ast x) ^"\\\\ " ^ acc)
-            "") ^ "\\end{Bmatrix}"
+            "") ^ "\\end{Bmatrix}}"
     in unwrap [(v,x)] c
   | Affect (v,c) -> (latex_of_ast v) ^ " \\leftarrow " ^ (latex_of_ast c)
   | Loc (x,_) -> latex_of_ast x
