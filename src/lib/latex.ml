@@ -83,7 +83,7 @@ let rec latex_of_ast ?(matrix_instead_of_substack=false) ~full ast =
       ^ (if matrix_instead_of_substack then "\\begin{matrix}" else "\\substack{")
         ^ (latex_of_commalist "," x)
         ^ "\\in " ^ (latex_of_commalist "," y)
-        ^ (match b with None -> "" | Some b -> "\\\\" ^ (latex_of_ast b))
+        ^ (match b with None -> "" | Some b -> "\\\\ " ^ (latex_of_ast b))
       ^ (if matrix_instead_of_substack then "\\end{matrix}" else "}")
       ^ "}"
       ^ latex_of_ast (if z |> Eval.ast_without_loc |> is_binary_op then (Paren z) else z)
@@ -92,14 +92,23 @@ let rec latex_of_ast ?(matrix_instead_of_substack=false) ~full ast =
       ^ (if matrix_instead_of_substack then "\\begin{matrix}" else "\\substack{")
         ^ (latex_of_commalist "," x)
         ^ "\\in " ^ (latex_of_commalist "," y)
-        ^ (match b with None -> "" | Some b -> "\\\\" ^ (latex_of_ast b))
+        ^ (match b with None -> "" | Some b -> "\\\\ " ^ (latex_of_ast b))
       ^ (if matrix_instead_of_substack then "\\end{matrix}" else "}")
       ^ "}"
       ^ latex_of_ast (if z |> Eval.ast_without_loc |> is_binary_op then (Paren z) else z)
   | Exact (x,y) -> "\\textrm{exact}(" ^ (latex_of_ast x) ^ "," ^ (latex_of_ast y) ^ ")"
   | Atmost (x,y) -> "\\textrm{atmost}(" ^ (latex_of_ast x) ^ "," ^ (latex_of_ast y) ^ ")"
   | Atleast (x,y) -> "\\textrm{atleast}(" ^ (latex_of_ast x) ^ "," ^ (latex_of_ast y) ^ ")"
-  | Let (v,x,c) -> (latex_of_ast v) ^ " \\leftarrow " ^ (latex_of_ast x) ^ "\\\\" ^ (latex_of_ast c)
+  | Let (v,x,c) ->
+    let rec unwrap acc ast : string = match ast with
+        | Let (v',x',c') -> unwrap ((v',x')::acc) c'
+        | Loc (x,_) -> unwrap acc x
+        | c' ->
+            "\\left(" ^ latex_of_ast c' ^ "\\right)_\\begin{Bmatrix}" ^
+            (acc |> List.fold_left
+            (fun acc (v,x) -> (latex_of_ast v) ^ " \\leftarrow " ^ (latex_of_ast x) ^"\\\\ " ^ acc)
+            "") ^ "\\end{Bmatrix}"
+    in unwrap [(v,x)] c
   | Affect (v,c) -> (latex_of_ast v) ^ " \\leftarrow " ^ (latex_of_ast c)
   | Loc (x,_) -> latex_of_ast x
   | Paren x -> if full && contains_newline x
