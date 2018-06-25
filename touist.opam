@@ -19,7 +19,7 @@ depends: [
   "jbuilder" {build & >= "1.0+beta12"}
   "menhir" {>= "20151023"}
   "minisat"
-  "re"
+  "re" {>= "1.7.2"}
   "cmdliner" {>= "0.9.8"}
   "ounit" {test}
   "odoc" {doc}
