@@ -9,7 +9,7 @@ dev-repo: "https://github.com/touist/touist.git"
 bug-reports: "https://github.com/touist/touist/issues"
 build: [
   ["jbuilder" "subst"] {pinned}
-  ["jbuilder" "build" "-p" name "-j" jobs]
+  ["jbuilder" "build" "@install" "-p" name "-j" jobs]
 ]
 install: [["jbuilder" "install"]]
 remove: [["jbuilder" "uninstall"]]
