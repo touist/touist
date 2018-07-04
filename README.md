@@ -1,6 +1,8 @@
 TouIST, the language for propositional logic
 ===========================================
 
+**July 4th, 2018:** on **macOS**, TouIST.jar only works with Java <= 8 (cf. [issue](https://github.com/touist/touist/issues/308)).
+I am working on [a fix](https://github.com/touist/touist/pull/301). For now, the workaround is to use Java 8 😕.
 
 |      Mac, Linux      |         Windows         | [Reference manual][ref] |    Come and discuss!    |
 |:--------------------:|:-----------------------:|:-----------------------:|:-----------------------:|
