@@ -22,7 +22,8 @@
 
 # Operating system (build VM template)
 # It's a x64 VM. There is no way to force it to x86 apparently.
-os: Windows Server 2012
+image: Visual Studio 2017 # Visual Studio 2017 = Windows Server 2016 x86_64
+
 
 # Scripts that are called at very beginning, before repo cloning
 init:
@@ -55,7 +56,7 @@ environment:
 cache:
   - '%CYG_CACHE% -> appveyor.yml'
   - '%CYG_ROOT%\home\appveyor\.opam -> appveyor.yml'
-  - C:\Users\appveyor\.gradle -> appveyor.yml
+  - C:\Users\appveyor\.gradle -> appveyor.yml # fails because of the 1GB limit
 
 # Scripts that run after cloning repository. "ps:" means windows PowerShell
 install:

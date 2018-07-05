@@ -34,18 +34,23 @@ cache:
   directories:
     - $HOME/.opam
     - $HOME/.gradle
+    - $HOME/Library/Caches/Homebrew
 
 jobs:
   include:
     - os: osx
-      env: ARCH=mac-x86_64
+      env:
+      - ARCH=mac-x86_64
     - os: linux
       env: ARCH=linux-x86_64
 
 before_install:
   # Install packages using brew on osx environment
   - javac -version
-  - if [ $TRAVIS_OS_NAME = osx ]; then brew update && brew install opam; fi
+  - if [ $TRAVIS_OS_NAME = osx ]; then mkdir ~/usr_local && sudo mv /usr/local/* ~/usr_local; fi
+  - if [ $TRAVIS_OS_NAME = osx ]; then /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)" >/dev/null; fi
+  # libyaml and libgmp are needed for Ruby and are missing as I reinstalled brew
+  - if [ $TRAVIS_OS_NAME = osx ]; then brew install libyaml gmp opam; fi
   - opam init -y --auto-setup
   - opam switch -y 4.05.0
   - eval `opam config env`
@@ -95,6 +100,9 @@ before_deploy:
   - git push
   - cd $TRAVIS_BUILD_DIR
 
+before_cache:
+  - brew cleanup -s # scrub cache: only keeps cache for installed formalae
+  - jbuilder uninstall touist
 # This is the part where the touist.zip is pushed to the Github
 # Releases. It will only do so when we create new tags, like v1.1.2.
 deploy:
