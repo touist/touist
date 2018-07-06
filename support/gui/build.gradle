@@ -41,7 +41,7 @@ task prepareExternal(type: Copy) {
 run.dependsOn prepareExternal
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '4.0.1'
+    gradleVersion = '4.8.1'
 }
 
 tasks.withType(JavaCompile) {
@@ -50,7 +50,7 @@ tasks.withType(JavaCompile) {
 
 task generateVersion {
     inputs.property("version", project.version) // regenerate if project.version changes
-    outputs.dir file("resources/version.properties")
+    outputs.dir file("resources")
     doLast {
         def props = new Properties()
         props.setProperty("touist.version", project.version)
