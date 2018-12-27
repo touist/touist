@@ -47,6 +47,7 @@ environment:
   CYG_BASH:  c:\ocaml32\bin\bash
   CYG_SETUP: c:\setup-x86.exe
   CYG_CACHE: c:\ocaml32\var\cache\setup
+  _JAVA_OPTIONS: -Xmx512M
 
 
 # Build cache to preserve files/folders between builds (saves time)
@@ -63,7 +64,7 @@ install:
   # Opam on Windows: http://fdopen.github.io/opam-repository-mingw
   - javac -version
   - ps: 'Invoke-WebRequest http://cygwin.com/setup-x86.exe -OutFile "$env:CYG_SETUP"'
-  - '%CYG_SETUP% --quiet-mode --no-shortcuts --only-site --root "%CYG_ROOT%" --site "%CYG_MIRROR%" --local-package-dir "%CYG_CACHE%" --packages rsync,patch,diffutils,curl,make,unzip,git,m4,perl,mingw64-i686-gcc-core,mingw64-i686-gmp,binutils --upgrade-also'
+  - '%CYG_SETUP% --quiet-mode --no-shortcuts --only-site --root "%CYG_ROOT%" --site "%CYG_MIRROR%" --local-package-dir "%CYG_CACHE%" --packages rsync,patch,diffutils,curl,make,unzip,zip,git,m4,perl,mingw64-i686-gcc-core,mingw64-i686-gmp,binutils --upgrade-also'
 
 build_script:
   - '%CYG_BASH% -lc "cd /cygdrive/c/touist && ./ci/appveyor-script.sh"'
@@ -84,6 +85,7 @@ on_finish:
 # deploy: artifact: thing will do nothing.
 artifacts:
   - path: support/gui/build/distributions/*
+  - path: _build/touist-cli*
 
 skip_tags: false
 
