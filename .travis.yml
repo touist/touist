@@ -25,7 +25,6 @@ addons:
     sources:
       - avsm
     packages:
-      - opam
       - libgmp-dev
       - aspcud
 
@@ -51,7 +50,11 @@ before_install:
   - if [ $TRAVIS_OS_NAME = osx ]; then /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)" >/dev/null; fi
   # libyaml and libgmp are needed for Ruby and are missing as I reinstalled brew
   - if [ $TRAVIS_OS_NAME = osx ]; then brew install libyaml gmp opam; fi
-  - opam init -y --auto-setup --comp 4.07.1
+  # Ubuntu's apt has an old opam 1.2.2. I need opam2. I had to use
+  # --disable-sandboxing as Travis's ubuntu is old and doesn't have bubblewrap.
+  - if [ $TRAVIS_OS_NAME = linux ]; then sudo curl -L https://github.com/ocaml/opam/releases/download/2.0.2/opam-2.0.2-x86_64-linux -o /usr/local/bin/opam && sudo chmod +x /usr/local/bin/opam; fi
+  - opam init -y --auto-setup --reinit --disable-sandboxing --comp ocaml-base-compiler.4.07.1
+  - opam switch create -y ocaml-base-compiler.4.07.1 || opam switch set -y ocaml-base-compiler.4.07.1
   - eval $(opam config env)
   - opam update
   - opam install -y ocamlfind menhir minisat yices2 ounit jbuilder re odoc cmdliner
@@ -126,7 +129,6 @@ deploy:
     - support/gui/build/distributions/*
     - _build/touist-cli*
   on:
-    branch: master
     tags: true
 
 # The commiter will be informed that one of his commits
