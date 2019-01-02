@@ -89,8 +89,7 @@ install:
   # Now that we are done with TouIST-v1.2.3-linux-x86_64, lets create the
   # _build/touist-cli-v1.2.3-linux-x86_64.tar.gz
   - cd _build/default/src/
-  - mv ./*.exe touist
-  - tar czf touist-cli-"$(git describe --tags)"-${ARCH}.tar.gz touist
+  - mv ./*.exe touist-cli-"$(git describe --tags)"-${ARCH}
   - cd $TRAVIS_BUILD_DIR
   - mv _build/default/src/touist-cli* _build/
 

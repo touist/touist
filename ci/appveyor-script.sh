@@ -66,7 +66,6 @@ fi
 # Now that we are done with TouIST-v1.2.3-windows-x86, lets create the
 # touist-cli-v1.2.3-windows-x86.zip
 cd _build/default/src/
-mv ./*.exe touist.exe
-zip touist-cli-"$(git describe --tags)"-${ARCH}.zip touist.exe
+mv ./*.exe touist-cli-"$(git describe --tags)"-${ARCH}.exe
 cd "$TOUIST_BUILD_DIR"
 mv _build/default/src/touist-cli* _build/
