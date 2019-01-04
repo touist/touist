@@ -1,7 +1,6 @@
 open Types
 open Types.Ast
 open Pprint
-open Err
 
 (* [is_clause] checks that the given AST is a clause. This function can only
    be called on an AST containing Or, And or Not. No Equiv or Implies! *)
@@ -9,7 +8,7 @@ let rec is_clause (ast:Ast.t) : bool = match ast with
   | Top | Bottom | Prop _ | Not (Prop _) -> true
   | Or (x,y) -> is_clause x && is_clause y
   | And _ -> false
-  | x -> false
+  | _ -> false
 
 (** [push_lit] allows to translate into CNF the non-CNF disjunction [d or cnf]
     ([d] is the literal we want to add, [cnf] is the existing CNF form).

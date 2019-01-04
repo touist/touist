@@ -1,5 +1,3 @@
-open Types.Ast
-open Pprint
 open Minisat
 
 let minisat_clauses_of_cnf ast =
@@ -99,7 +97,7 @@ let string_of_clauses = List.fold_left (fun acc v -> (if acc="" then "" else acc
 
 let solve_clauses
     ?(verbose=false)
-    ?(print: (Lit.t,string) Hashtbl.t -> Model.t -> int -> unit = fun t m i -> ())
+    ?(print: (Lit.t,string) Hashtbl.t -> Model.t -> int -> unit = fun _ _ _ -> ())
     ?(continue: Model.t -> int -> bool = fun _ _ -> true)
     (clauses,table : Lit.t list list * (Lit.t,string) Hashtbl.t)
   : (ModelSet.t) =

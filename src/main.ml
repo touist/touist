@@ -89,7 +89,7 @@ let solve_ext common_opt show_hidden output lit_tbl lit_abs lit_sign lit_of_int 
         (fun acc s -> match int_of_string s with
            | v when v!=0 -> lit_of_int v :: acc
            | _ -> acc (* in DIMACS, '0' are line endings; we skip '0' *)) []
-    end with Failure err -> []
+    end with Failure _ -> []
   in
   let rec process in_chan =
     try let line = input_line in_chan in
@@ -142,7 +142,7 @@ let solve_ext common_opt show_hidden output lit_tbl lit_abs lit_sign lit_of_int 
 
 (* Step 1: we parse the args. If an arg. is "alone", we suppose
  * it is the touistl input file (this is handled by [process_arg_alone]) *)
-let main (lang,mode) (input,input_f) (output,output_f: string * out_channel) common_opt =
+let main (lang,mode) (input,_input_f) (_output,output_f: string * out_channel) common_opt =
   (* if common_opt.verbose then Printexc.record_backtrace true; *)
   Err.wrap_width := common_opt.wrap_width;
   Err.format := common_opt.error_format;

@@ -12,19 +12,6 @@ open Err
    The description is a couple (content, location) *)
 type env = (string * (Ast.t * loc)) list
 
-(* [extenv] is for global variables (defined after 'data'). It is a hashtable
-   accessible from anywhere where the elements are (name, description):
-   The name is the variable name (e.g., '$var' or '$var(a,1,c)').
-   The description is a couple (content, location) *)
-type extenv = (string, (Ast.t * loc)) Hashtbl.t
-
-let get_loc (ast:Ast.t) : loc option = match ast with
-    | Loc (_,loc) -> Some loc
-    | _ -> None
-
-let warning (ast:Ast.t) (message:string) =
-  warn (Warning,Eval,message,get_loc ast)
-
 let ast_without_loc (ast:Ast.t) : Ast.t = match ast with
   | Loc (ast,_) -> ast
   | ast -> ast
@@ -35,7 +22,7 @@ let ast_without_loc (ast:Ast.t) : Ast.t = match ast with
    [ast_without_loc] should not have been previously applied to [ast]
    because ast_without_loc will remove the Loc thing. *)
 let raise_with_loc (ast:Ast.t) (message:string) = match ast with
-  | Loc (ast,loc) -> fatal (Error,Eval,message,Some loc)
+  | Loc (_ast,loc) -> fatal (Error,Eval,message,Some loc)
   | _ -> fatal (Error,Eval,message,None)
 
 (* [raise_type_error] raises the errors that come from one-parameter functions.
@@ -57,7 +44,7 @@ let raise_type_error operator operand expanded (expected_types:string) =
    operator is And (x,y),
    op1 and op2 are the non-expanded parameters x and y,
    exp1 and exp2 are the expanded parameters x and y. *)
-let raise_type_error2 operator op1 exp1 op2 exp2 (expected_types:string) =
+let raise_type_error2 operator _op1 exp1 _op2 exp2 (expected_types:string) =
   raise_with_loc operator
     ("incorrect types with '"^(string_of_ast_type operator)^"'; expects "^expected_types^". "^
     "In statement:\n"^
@@ -98,7 +85,6 @@ let check_nb_vars_same_as_nb_sets (ast:Ast.t) (vars:Ast.t list) (sets:Ast.t list
     ,Some loc)
 
 let extenv = ref (Hashtbl.create 0)
-let check_only = ref false
 
 (* [check_only] allows to only 'check the types'. It prevents the bigand,
     bigor, exact, atmost, atleast and range to expand completely(as it
@@ -120,7 +106,7 @@ and eval_touist_code (env:env) ast :Ast.t =
 
   let rec affect_vars = function
     | [] -> []
-    | Loc (Affect (Loc (Var (p,i),var_loc),y),affect_loc)::xs ->
+    | Loc (Affect (Loc (Var (p,i),var_loc),y), _)::xs ->
       Hashtbl.replace !extenv (expand_var_name env (p,i)) (eval_ast env y, var_loc);
         affect_vars xs
     | x::xs -> x::(affect_vars xs)
@@ -148,7 +134,7 @@ and eval_ast (env:env) (ast:Ast.t) : Ast.t =
   | Var (p,i) -> (* p,i = prefix, indices *)
     let name = expand_var_name env (p,i) in
     begin
-      try let (content,loc) = List.assoc name env in content
+      try let (content,_loc) = List.assoc name env in content
       with Not_found ->
       try let (content,_) = Hashtbl.find !extenv name in content
       with Not_found -> raise_with_loc ast
@@ -157,7 +143,7 @@ and eval_ast (env:env) (ast:Ast.t) : Ast.t =
           "(with bigand, bigor or let) and you are out of its scope."^"\n")
     end
   | Set x -> Set x
-  | Set_decl x -> eval_set_decl env ast
+  | Set_decl _ -> eval_set_decl env ast
   | Neg x -> (match eval_ast x with
       | Int x'   -> Int   (- x')
       | Float x' -> Float (-. x')
@@ -314,7 +300,7 @@ and eval_ast (env:env) (ast:Ast.t) : Ast.t =
       | x',y' -> raise_type_error2 ast x x' y y' "a 'float' or 'int'")
   | UnexpProp (p,i) -> expand_prop_with_set env  p i
   | Prop x -> Prop x
-  | Loc (x,l) -> eval_ast x
+  | Loc (x,_) -> eval_ast x
   | Paren x -> eval_ast x
   | Formula x -> Formula (eval_ast_formula env x)
   | SetBuilder (expr, vars, sets, cond) -> begin
@@ -324,7 +310,7 @@ and eval_ast (env:env) (ast:Ast.t) : Ast.t =
            if (match cond with Some c -> ast_to_bool env c | None -> true)
            then [eval_ast_env env expr] (* bottom of the recursion: expand f *)
            else []
-        | (Loc (Var (p,i),loc))::next_vars, (Loc (set, l))::next_sets ->
+        | (Loc (Var (p,i),loc))::next_vars, (Loc (set, _))::next_sets ->
           let set = match eval_ast_env env set with Set set -> set | _ -> failwith "" in
           AstSet.fold (fun value acc ->
               let name = (expand_var_name env (p,i)) and desc = (value,loc)
@@ -362,7 +348,7 @@ and eval_set_decl (env:env) (set_decl:Ast.t) =
                     (Set_decl sets) (Set_decl sets_expanded)
                     "elements of type 'int', 'float', 'prop', 'set' or 'formula'"
     end
-  | [],x::_ | x::_,[] -> failwith "[shouldn't happen] len(sets)!=len(sets_expanded)"
+  | [],_::_ | _::_,[] -> failwith "[shouldn't happen] len(sets)!=len(sets_expanded)"
 
 
 (* [eval_ast_formula] evaluates formulas; nothing in formulas should be
@@ -372,9 +358,9 @@ and eval_ast_formula (env:env) (ast:Ast.t) : Ast.t =
   and eval_ast_formula_env = eval_ast_formula
   and eval_ast = eval_ast env in
   match ast_without_loc ast with
-  | Int x when not !smt -> failwith "Integer allowed only with SMT solver"
+  | Int _ when not !smt -> failwith "Integer allowed only with SMT solver"
   | Int x when !smt -> Int x
-  | Float x when not !smt -> failwith "Float allowed only with SMT solver"
+  | Float _ when not !smt -> failwith "Float allowed only with SMT solver"
   | Float x when !smt -> Float x
   | Neg x ->
     begin
@@ -438,7 +424,7 @@ and eval_ast_formula (env:env) (ast:Ast.t) : Ast.t =
       (* Case 1. Check if this variable name has been affected locally
          (recursive-wise) in bigand, bigor or let.
          To be accepted, this variable must contain a proposition. *)
-      try let content,loc_affect = List.assoc name env in
+      try let content,_ = List.assoc name env in
         match content with
         | Prop x -> Prop x
         | Int x when !smt -> Int x
@@ -456,7 +442,7 @@ and eval_ast_formula (env:env) (ast:Ast.t) : Ast.t =
       (* Case 2. Check if this variable name has been affected globally, i.e.,
          in the 'data' section. To be accepted, this variable must contain
          a proposition. *)
-      try let content,loc_affect = Hashtbl.find !extenv name in
+      try let content,_ = Hashtbl.find !extenv name in
         match content with
         | Prop x -> Prop x
         | Int x when !smt -> Int x
@@ -475,7 +461,7 @@ and eval_ast_formula (env:env) (ast:Ast.t) : Ast.t =
         (* Case 3. The variable is a non-tuple of the form '$v' => name=prefix only.
            As it has not been found in the Case 1 or 2, this means that this variable
            has not been declared. *)
-        | prefix, None -> raise Not_found (* trick to go to the Case 5. error *)
+        | _, None -> raise Not_found (* trick to go to the Case 5. error *)
         (* Case 4. The var is a tuple-variable of the form '$v(1,2,3)' and has not
            been declared.
            But maybe we are in the following special case where the parenthesis
@@ -528,7 +514,7 @@ and eval_ast_formula (env:env) (ast:Ast.t) : Ast.t =
   | Exact (x,y) -> rm_top_bot begin (* !check_only simplifies by returning a dummy proposition *)
       match eval_ast x, eval_ast y with
       | Int 0, Set s when AstSet.is_empty s -> Top
-      | Int k, Set s when AstSet.is_empty s -> Bottom
+      | Int _, Set s when AstSet.is_empty s -> Bottom
       | Int x, Set s -> if !check_only then Prop "dummy" else exact_str (AstSet.exact x s)
       | x',y' -> raise_type_error2 ast x x' y y' "'int' (left-hand) and a 'prop-set' (right-hand)"
     end
@@ -650,9 +636,6 @@ and atmost_str lst =
 and formula_of_string_list =
   List.fold_left (fun acc str -> And (acc, str)) Top
 
-and and_of_term_list =
-  List.fold_left (fun acc t -> And (acc, t)) Top
-
 (* [expand_prop_with_set] takes care of expanding all expressions. Two cases:
    (a) all indices are propositions, meaning that it retuns a simple proposition.
    (b) some indices are sets (= set builder), we expand it using a cartesian
@@ -751,7 +734,7 @@ and set_to_ast_list (env:env) (ast:Ast.t) :Ast.t list =
   in match !check_only, lst with (* useful when you only want to check types *)
           | false,      _      -> lst
           | true,       []     -> []
-          | true,        x::xs -> [x]
+          | true,        x::_ -> [x]
 
   (* [ast_to_bool] evaluates the 'when' condition when returns 'true' or 'false'
      depending on the result.

@@ -48,7 +48,7 @@ let rec to_prenex debug quant_l conflict_l only_rename ast : Ast.t =
     (if only_rename then "traversing  " else "transforming")
     (Pprint.string_of_ast ~utf8:true ast);
 
-  (** To transform into prenex, I want to traverse recursively the AST so that
+  (* To transform into prenex, I want to traverse recursively the AST so that
      in every traversal of each branch, only ONE transformation can happen.
      Do do that, we use the variable [only_rename] which is true if one
      transformation has already happened previously in the recursion.

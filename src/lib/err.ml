@@ -27,9 +27,6 @@ let string_of_during = function
   | Cnf -> "cnf transform"
   | Prenex -> "prenex transform"
 
-let replace pattern replacement text =
-  Re.Str.(global_replace (regexp pattern) replacement text)
-
 (** [get_loc] translates a 'loc' to an understandable tuple that contains
     (num_line, num_col, token_start, token_end). *)
 let get_loc loc : int * int * int * int =
@@ -47,7 +44,7 @@ let loc_placeholders loc chr =
   | 'B' -> (string_of_int e.pos_cnum) (* buffer position (end) *)
   | c -> "%" ^ Char.escaped c
 
-let all_placeholders loc typ with_colors msg = function
+let all_placeholders loc typ _ msg = function
   | 'm' -> msg
   | 't' -> string_of_type typ
   | c -> match loc with None -> "" | Some loc -> loc_placeholders loc c
@@ -78,7 +75,7 @@ let string_of_loc ?(fmt=(!loc_format)) (loc:loc) : string =
 
 (** Wraps the text at width. Indendation is kept as long no new line is read.
     If width = 0, do not wrap. *)
-let format_width color width text =
+let format_width _ width text =
   let rec format prev_indent from_pos =
     let cur_indent = try (Re.Str.search_forward (Re.Str.regexp "[^ ]") text from_pos)-from_pos
       with Not_found -> 0 in
@@ -105,7 +102,7 @@ let format_width color width text =
       ^ "\n" ^ format (cur_indent+prev_indent) (last_space_end+1)
   in if width != 0 then format 0 0 else text;;
 
-let rec string_of_msg ?(width=(!wrap_width)) ?(color=(!color)) ?(fmt=(!format)) (message:msg) =
+let string_of_msg ?(width=(!wrap_width)) ?(color=(!color)) ?(fmt=(!format)) (message:msg) =
   let color_backquote text = let colorize str = "\x1b[33m" ^ str ^ "\x1b[0m" in
     Re.Str.global_substitute (Re.Str.regexp "`\\([^`]+\\)`") (fun s -> "`"^ colorize (Re.Str.matched_group 1 s) ^"`") text in
   let color_quoted text = let colorize str = "\x1b[33m" ^ str ^ "\x1b[0m" in

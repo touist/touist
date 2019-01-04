@@ -1,6 +1,5 @@
 open Types
 open Types.Ast
-open Pprint
 
 let rm_dollar x = String.sub x 1 (String.length x - 1)
 

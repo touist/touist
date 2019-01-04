@@ -166,31 +166,31 @@ let ast_to_yices formula : term * (string,term) Hashtbl.t =
     | Greater_or_equal (x, y) -> process_terms above_type x; process_terms above_type y
     | _ -> ()
   in
-  let rec parse = function
-    | Equal            (x, Int y) -> process_terms (Type.int ()) x
-    | Equal            (Int x, y) -> process_terms (Type.int ()) y
-    | Not_equal        (x, Int y) -> process_terms (Type.int ()) x
-    | Not_equal        (Int x, y) -> process_terms (Type.int ()) y
-    | Lesser_than      (x, Int y) -> process_terms (Type.int ()) x
-    | Lesser_than      (Int x, y) -> process_terms (Type.int ()) y
-    | Lesser_or_equal  (x, Int y) -> process_terms (Type.int ()) x
-    | Lesser_or_equal  (Int x, y) -> process_terms (Type.int ()) y
-    | Greater_than     (x, Int y) -> process_terms (Type.int ()) x
-    | Greater_than     (Int x, y) -> process_terms (Type.int ()) y
-    | Greater_or_equal (x, Int y) -> process_terms (Type.int ()) x
-    | Greater_or_equal (Int x, y) -> process_terms (Type.int ()) y
-    | Equal            (x, Float y) -> process_terms (Type.real ()) x
-    | Equal            (Float x, y) -> process_terms (Type.real ()) y
-    | Not_equal        (x, Float y) -> process_terms (Type.real ()) x
-    | Not_equal        (Float x, y) -> process_terms (Type.real ()) y
-    | Lesser_than      (x, Float y) -> process_terms (Type.real ()) x
-    | Lesser_than      (Float x, y) -> process_terms (Type.real ()) y
-    | Lesser_or_equal  (x, Float y) -> process_terms (Type.real ()) x
-    | Lesser_or_equal  (Float x, y) -> process_terms (Type.real ()) y
-    | Greater_than     (x, Float y) -> process_terms (Type.real ()) x
-    | Greater_than     (Float x, y) -> process_terms (Type.real ()) y
-    | Greater_or_equal (x, Float y) -> process_terms (Type.real ()) x
-    | Greater_or_equal (Float x, y) -> process_terms (Type.real ()) y
+  let parse = function
+    | Equal            (x, Int _) -> process_terms (Type.int ()) x
+    | Equal            (Int _, y) -> process_terms (Type.int ()) y
+    | Not_equal        (x, Int _) -> process_terms (Type.int ()) x
+    | Not_equal        (Int _, y) -> process_terms (Type.int ()) y
+    | Lesser_than      (x, Int _) -> process_terms (Type.int ()) x
+    | Lesser_than      (Int _, y) -> process_terms (Type.int ()) y
+    | Lesser_or_equal  (x, Int _) -> process_terms (Type.int ()) x
+    | Lesser_or_equal  (Int _, y) -> process_terms (Type.int ()) y
+    | Greater_than     (x, Int _) -> process_terms (Type.int ()) x
+    | Greater_than     (Int _, y) -> process_terms (Type.int ()) y
+    | Greater_or_equal (x, Int _) -> process_terms (Type.int ()) x
+    | Greater_or_equal (Int _, y) -> process_terms (Type.int ()) y
+    | Equal            (x, Float _) -> process_terms (Type.real ()) x
+    | Equal            (Float _, y) -> process_terms (Type.real ()) y
+    | Not_equal        (x, Float _) -> process_terms (Type.real ()) x
+    | Not_equal        (Float _, y) -> process_terms (Type.real ()) y
+    | Lesser_than      (x, Float _) -> process_terms (Type.real ()) x
+    | Lesser_than      (Float _, y) -> process_terms (Type.real ()) y
+    | Lesser_or_equal  (x, Float _) -> process_terms (Type.real ()) x
+    | Lesser_or_equal  (Float _, y) -> process_terms (Type.real ()) y
+    | Greater_than     (x, Float _) -> process_terms (Type.real ()) x
+    | Greater_than     (Float _, y) -> process_terms (Type.real ()) y
+    | Greater_or_equal (x, Float _) -> process_terms (Type.real ()) x
+    | Greater_or_equal (Float _, y) -> process_terms (Type.real ()) y
     | And     (x, y) -> process_terms (Type.bool ()) x; process_terms (Type.bool ()) y(*; And (x, y)*)
     | Or      (x, y) -> process_terms (Type.bool ()) x; process_terms (Type.bool ()) y(*; Or  (x, y)*)
     | Xor     (x, y) -> process_terms (Type.bool ()) x; process_terms (Type.bool ()) y(*; Xor (x, y)*)
@@ -233,7 +233,7 @@ let string_of_modelterm model term = match term with
   | x when Term.is_bool x -> let b = Model.get_bool model x in if b then "1" else "0"
   | x when Term.is_int x -> string_of_int (Model.get_int model x)
   | x when Term.is_real x -> string_of_float (Model.get_float model x)
-  | x -> failwith "cannot output the value of the term"
+  | _ -> failwith "cannot output the value of the term"
 
 let string_of_model ?(value_sep="\n") vtbl model =
   Hashtbl.fold (fun name term acc ->
@@ -253,7 +253,7 @@ let logic_supported (logic:string) =
   try Context.Config.default_for_logic (Context.Config.create ()) logic; true
   with YicesError (Error.CTX_UNKNOWN_LOGIC,_) -> false
      | YicesError (Error.CTX_LOGIC_NOT_SUPPORTED,_) -> false
-     | YicesError (code,report) ->
+     | YicesError (_code,report) ->
        failwith ("[shouldnt happen] instead of returning CTX_UNKNOWN_LOGIC,"^
                  "code returned was "^ report.Error.name)
 

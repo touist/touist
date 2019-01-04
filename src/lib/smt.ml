@@ -182,52 +182,52 @@ let to_smt2 logic formula =
     | _ -> ()
   in
 
-  let rec parse = function
-    | Equal            (x, Int y) -> gen_var "Int" x(*; Equal (x, Int y)*)
-    | Equal            (Int x, y) -> gen_var "Int" y(*; Equal (Int x, y)*)
-    | Not_equal        (x, Int y) -> gen_var "Int" x(*; Not_equal (x, Int
+  let parse = function
+    | Equal            (x, Int _) -> gen_var "Int" x(*; Equal (x, Int y)*)
+    | Equal            (Int _, y) -> gen_var "Int" y(*; Equal (Int x, y)*)
+    | Not_equal        (x, Int _) -> gen_var "Int" x(*; Not_equal (x, Int
     y)*)
-    | Not_equal        (Int x, y) -> gen_var "Int" y(*; Not_equal (Int x,
+    | Not_equal        (Int _, y) -> gen_var "Int" y(*; Not_equal (Int x,
     y)*)
-    | Lesser_than      (x, Int y) -> gen_var "Int" x(*; Lesser_than (x, Int
+    | Lesser_than      (x, Int _) -> gen_var "Int" x(*; Lesser_than (x, Int
     y)*)
-    | Lesser_than      (Int x, y) -> gen_var "Int" y(*; Lesser_than (Int x,
+    | Lesser_than      (Int _, y) -> gen_var "Int" y(*; Lesser_than (Int x,
     y)*)
-    | Lesser_or_equal  (x, Int y) -> gen_var "Int" x(*; Lesser_or_equal (x,
+    | Lesser_or_equal  (x, Int _) -> gen_var "Int" x(*; Lesser_or_equal (x,
     Int y)*)
-    | Lesser_or_equal  (Int x, y) -> gen_var "Int" y(*; Lesser_or_equal (Int
+    | Lesser_or_equal  (Int _, y) -> gen_var "Int" y(*; Lesser_or_equal (Int
     x, y)*)
-    | Greater_than     (x, Int y) -> gen_var "Int" x(*; Greater_than (x, Int
+    | Greater_than     (x, Int _) -> gen_var "Int" x(*; Greater_than (x, Int
     y)*)
-    | Greater_than     (Int x, y) -> gen_var "Int" y(*; Greater_than (Int x,
+    | Greater_than     (Int _, y) -> gen_var "Int" y(*; Greater_than (Int x,
     y)*)
-    | Greater_or_equal (x, Int y) -> gen_var "Int" x(*; Greater_or_equal (x,
+    | Greater_or_equal (x, Int _) -> gen_var "Int" x(*; Greater_or_equal (x,
     Int y)*)
-    | Greater_or_equal (Int x, y) -> gen_var "Int" y(*; Greater_or_equal
+    | Greater_or_equal (Int _, y) -> gen_var "Int" y(*; Greater_or_equal
     (Int x, y)*)
-    | Equal            (x, Float y) -> gen_var "Real" x(*; Equal (x, Float
+    | Equal            (x, Float _) -> gen_var "Real" x(*; Equal (x, Float
     y)*)
-    | Equal            (Float x, y) -> gen_var "Real" y(*; Equal (Float x,
+    | Equal            (Float _, y) -> gen_var "Real" y(*; Equal (Float x,
     y)*)
-    | Not_equal        (x, Float y) -> gen_var "Real" x(*; Not_equal (x,
+    | Not_equal        (x, Float _) -> gen_var "Real" x(*; Not_equal (x,
     Float y)*)
-    | Not_equal        (Float x, y) -> gen_var "Real" y(*; Not_equal (Float
+    | Not_equal        (Float _, y) -> gen_var "Real" y(*; Not_equal (Float
     x, y)*)
-    | Lesser_than      (x, Float y) -> gen_var "Real" x(*; Lesser_than (x,
+    | Lesser_than      (x, Float _) -> gen_var "Real" x(*; Lesser_than (x,
     Float y)*)
-    | Lesser_than      (Float x, y) -> gen_var "Real" y(*; Lesser_than
+    | Lesser_than      (Float _, y) -> gen_var "Real" y(*; Lesser_than
     (Float x, y)*)
-    | Lesser_or_equal  (x, Float y) -> gen_var "Real" x(*; Lesser_or_equal
+    | Lesser_or_equal  (x, Float _) -> gen_var "Real" x(*; Lesser_or_equal
     (x, Float y)*)
-    | Lesser_or_equal  (Float x, y) -> gen_var "Real" y(*; Lesser_or_equal
+    | Lesser_or_equal  (Float _, y) -> gen_var "Real" y(*; Lesser_or_equal
     (Float x, y)*)
-    | Greater_than     (x, Float y) -> gen_var "Real" x(*; Greater_than (x,
+    | Greater_than     (x, Float _) -> gen_var "Real" x(*; Greater_than (x,
     Float y)*)
-    | Greater_than     (Float x, y) -> gen_var "Real" y(*; Greater_than
+    | Greater_than     (Float _, y) -> gen_var "Real" y(*; Greater_than
     (Float x, y)*)
-    | Greater_or_equal (x, Float y) -> gen_var "Real" x(*; Greater_or_equal
+    | Greater_or_equal (x, Float _) -> gen_var "Real" x(*; Greater_or_equal
     (x, Float y)*)
-    | Greater_or_equal (Float x, y) -> gen_var "Real" y(*; Greater_or_equal
+    | Greater_or_equal (Float _, y) -> gen_var "Real" y(*; Greater_or_equal
     (Float x, y)*)
     | And     (x, y) -> gen_var "Bool" x; gen_var "Bool" y(*; And (x, y)*)
     | Or      (x, y) -> gen_var "Bool" x; gen_var "Bool" y(*; Or  (x, y)*)

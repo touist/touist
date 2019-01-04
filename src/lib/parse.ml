@@ -1,9 +1,7 @@
-open Parser
 open Lexing
 open Err
 
 open Types
-open Types.Ast
 
 (** [lexer] is used [parse] in order to get the next token of the input
     stream. It is an intermediate to the {!Lexer.token} function (in lexer.ml);

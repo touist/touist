@@ -2,8 +2,6 @@
     Abstract Syntaxic Tree
 *)
 
-open Err
-
 (*  Do you think this file is wierd, with this 'module rec' thing?
     This is because we want the type 'Ast.t' to be used in 'Set' and
     also we want 'Set' to be inside an 'Ast.t', I had to come up with
@@ -155,7 +153,7 @@ struct
       | 0,_     -> [([],l)] (* exact 0 -> all terms in the list must be 'not' *)
       | _,[]    -> []       (* exact on empty set -> no couple at all *)
       | k,x::xs ->
-        List.map (fun (comb,rest) ->
+        List.map (fun (comb, _) ->
             (x::comb, elements (diff set (of_list (x::comb)))))
           (go (pred k) xs) @ go k xs
     in go k (elements set)

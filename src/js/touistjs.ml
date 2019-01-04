@@ -42,10 +42,11 @@ let to_msg (msg: Touist.Err.msg) : msg =
     let loc = {line=l;col=c;start_abs=s;end_abs=e} in
     {level = string_of_type typ; message=msg; loc=loc}
   end
+open Js_of_ocaml
 
 let _ =
   Js.export_all (object%js
-    method linter (txt:Js.js_string Js.t) : Js.js_string Js.t =
+    method linter (txt:Js_of_ocaml.Js.js_string Js.t) : Js.js_string Js.t =
       let ret =
       try let _ = Touist.Parse.parse_sat (Js.to_string txt) |> Touist.Eval.eval ~onlychecktypes:true in
         Lint_Succ ({messages=[]})

@@ -15,8 +15,6 @@
        I tried this and now it works...
 *)
 
-open Err
-
 module rec Ast :
 sig
   type var = string * t list option
