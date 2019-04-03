@@ -304,7 +304,7 @@ Example:
 $letters = [a,b,c,d,e]
 bigand $letter,$number in $letters,[1..card($letters)]:
   has($letter,$number) =>
-  let $without_letter = diff($letters,$letter): ;; keep temorary result
+  let $without_letter = diff($letters,[$letter]): ;; keep temorary result
   bigand $l1 in $without_letter:
       p($letter)
   end
