@@ -541,7 +541,7 @@ let lang_and_mode =
     | Smt _ ,_     ,_     ,Some _ -> `Error (false, "--show does not support --smt")
     | Smt _ ,_     ,_     ,_ when is_some table -> `Error (false, "--table has no meaning with --smt")
     | _     ,None  ,None  ,None   -> `Ok (lang, Translate {linter; table; debug_dimacs})
-    | _     ,_     ,_     ,_ when debug_dimacs -> `Error (false,"--verbose-dimacs only available in translation mode (see help)")
+    | _     ,_     ,_     ,_ when debug_dimacs -> `Error (false,"--debug-dimacs only available in translation mode (see help)")
     | _     ,_     ,_     ,Some m -> `Ok (lang, Show m)
     | _     ,Some _,_     ,_ when linter -> `Error (false,"cannot use {--solve,--solver} and --linter at the same time")
     | Smt _ ,Some (Solve _),_,_ when not Touist_yices2.SmtSolve.enabled -> `Error (false,"not compiled with yices2 support: --solver cannot be used with --smt")
