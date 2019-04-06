@@ -340,7 +340,7 @@ TERM = [_0-9]*[a-zA-Z][a-zA-Z_0-9]*
 ```
 
 A simple proposition is a simple word that can contain numbers and the
-underscore symbol ("`_`"). A tuple proposition (we can it as a
+underscore symbol ("`_`"). A tuple proposition (we can see it as a
 _predicate_), of the form ``prop(1,$i,abc)``, must have indexes of type
 integer, float, boolean or set.
 
@@ -505,7 +505,7 @@ as all elements have the same type. There exists three ways of creating a
 set:
 
 ### Sets defined by enumeration
-$\{1,3,8,10\}$ can be written ``[1,2,3]``. Elements can be integers,
+$\{1,3,8,10\}$ can be written ``[1,2,3,10]``. Elements can be integers,
 floats, propositions, booleans, [quoted formulas][#quoted-formulas] or
 sets (or a variable of these six types). The empty set $\emptyset$ is
 denoted by ``[]``. Examples:
@@ -680,9 +680,9 @@ translated into a lesser-priority ``and``. It is expressed in the grammar as:
   | <T> ("\n"|" ") <T>   <- newline/whitespace in top-level is an 'and'
 ```
 
-This notation is related to the idea of a set of formulas (premises). For
-example, a new line would allow to express the separation of these two
-formulas:
+This notation is related to the idea of a set of formulas used when using
+deductive reasoning (a set of premises and a conclusion). For example, a
+new line would allow to express the separation of these two formulas:
 
 ~ Math
   \{a, a \Rightarrow b, \neg c\}
@@ -851,7 +851,7 @@ The notation ``p([1..20])`` is called "set-builder" and is defined
 in [#set-builder]. Using this syntax, the formula ``exact(5,p([1..20])``
 is equivalent to
 ~~ Math
-{<>}_{x\in P}^k p(x)
+{<>}_{x\in \{1,\dots,20\}}^5 p(x)
 ~~
 ~
 
@@ -946,7 +946,7 @@ One quantifier can quantify over multiple propositions. For example:
 
 Any free variable (i.e., not quantified) will be existentially quantified
 in an inner-most way. For example, $\forall a. a \wedge b$ will become
-$\forall a. \forall b. (a \wedge b)$.
+$\forall a. \exists b. (a \wedge b)$.
 
 #### Renaming during the prenex transformation
 
