@@ -1,7 +1,9 @@
 v3.5.3
   - Command-line
-      added --latex=katex. As Katex does not support \substack{}, it uses
+    - added --latex=katex. As Katex does not support \substack{}, it uses
       \begin{matrix} instead.
+    - fixed a bug that was making --limit=0 display only the first model
+      instead of all models (reported by Igor Stéphan).
 v3.5.2 (2018-03-12)
   - Language:
     - added list comprehensions (also named 'set builder notation'). Really

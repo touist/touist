@@ -249,7 +249,7 @@ let main (lang,mode) (input,_input_f) (_output,output_f: string * out_channel) c
         (* [continue_limit] is also needed by [solve_clauses]. It stops
            the display of models as soon as the number of models displayed
            reaches [limit]. *)
-        and continue_limit _ i = i < limit
+        and continue_limit _ i = i < limit || limit = 0
         in
         let start = Unix.gettimeofday () in
         let cls,tbl = Parse.parse_sat ~debug_syntax ~filename:input input_text
