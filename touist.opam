@@ -8,15 +8,15 @@ homepage: "https://www.irit.fr/touist"
 dev-repo: "https://github.com/touist/touist.git"
 bug-reports: "https://github.com/touist/touist/issues"
 build: [
-  ["jbuilder" "subst"] {pinned}
-  ["jbuilder" "build" "@install" "-p" name "-j" jobs]
+  ["dune" "subst"] {pinned}
+  ["dune" "build" "-p" name "-j" jobs]
 ]
-install: [["jbuilder" "install"]]
-remove: [["jbuilder" "uninstall"]]
-build-test: [["jbuilder" "runtest" "-p" name "-j" jobs]]
-build-doc: [["jbuilder" "build" "@doc" "-j" jobs]]
+install: [["dune" "install"]]
+remove: [["dune" "uninstall"]]
+build-test: [["dune" "runtest" "-p" name "-j" jobs]]
+build-doc: [["dune" "build" "-p" name "-j" jobs]]
 depends: [
-  "jbuilder" {build & >= "1.0+beta12"}
+  "dune" {build & >= "1.0"}
   "menhir" {>= "20151023"}
   "minisat"
   "re" {>= "1.7.2"}

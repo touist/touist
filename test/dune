@@ -1,0 +1,14 @@
+(alias
+ (name runtest)
+ (deps
+  (:< test.exe)
+  (glob_files sat/*)
+  (glob_files qbf/*)
+  (glob_files smt/*))
+ (action
+  (run %{<})))
+
+(executable
+ (name test)
+ (libraries touist touist.qbf touist.yices2 oUnit)
+ (modes byte))

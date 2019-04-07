@@ -1,0 +1,21 @@
+; opam install js_of_ocaml js_of_ocaml-ppx js_of_ocaml-compiler yojson ppx_deriving_yojson
+;
+; As for now, ppx_deriving_yojson only works with:
+; opam pin add ppx_deriving_yojson --dev-repo
+;
+; See https://github.com/ocaml-ppx/ppx_deriving_yojson/issues/58
+
+(executable
+ (name touistjs)
+ (libraries re re.str touist js_of_ocaml js_of_ocaml-ppx js_of_ocaml.weak
+   yojson ppx_deriving ppx_deriving_yojson ppx_deriving_yojson.runtime)
+ (js_of_ocaml
+  (flags :standard +weak.js +nat.js +dynlink.js +toplevel.js))
+ (preprocess
+  (pps js_of_ocaml.ppx ppx_deriving_yojson))
+ (link_flags :standard -linkall)
+ (flags :standard -g))
+
+(alias
+ (name js)
+ (deps touistjs.bc.js))

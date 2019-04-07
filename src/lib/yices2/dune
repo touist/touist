@@ -1,0 +1,20 @@
+(library
+ (name touist_yices2)
+ (public_name touist.yices2)
+ (optional)
+ ; Trick to have an optional dep on Qbf;
+ ;     from mirage/ocaml-conduit (async/jbuild) 
+ (modules smtSolve)
+ (libraries
+  touist
+  (select
+   smtSolve.ml
+   from
+   (yices2 -> smtSolveReal.ml)
+   (!yices2 -> smtSolveDummy.ml))
+  (select
+   smtSolve.mli
+   from
+   (yices2 -> smtSolveReal.mli)
+   (!yices2 -> smtSolveDummy.mli)))
+ (wrapped true))

@@ -1,0 +1,37 @@
+;
+;- to search for missing rules in parser.messages:
+;  jbuilder build @src/lib/missing
+;- to build bytecode
+;  jbuilder build src/touist.bc
+;- to build native
+;  jbuilder build src/touist.bc
+;- to build the js
+;  jbuilder build src/lib/touist
+;
+
+(executable
+ (name main)
+ (libraries re re.str touist touist.qbf touist.yices2 unix cmdliner))
+
+(rule
+ (targets touist.1)
+ (action
+  (with-stdout-to
+   %{targets}
+   (run %{bin:touist} --help=groff))))
+
+(rule
+ (targets version.ml)
+ (action
+  (with-stdout-to
+   %{targets}
+   (run echo "let v = \"%{version:touist}\""))))
+
+(install
+ (section bin)
+ (files
+  (main.exe as touist)))
+
+(install
+ (section man)
+ (files touist.1))

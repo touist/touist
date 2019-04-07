@@ -1,0 +1,59 @@
+(ocamllex lexer)
+
+(menhir
+ (modules parser)
+ (flags --table --explain))
+
+; (flags (--table --infer --explain))
+
+(library
+ (name touist)
+ (public_name touist)
+ (libraries re re.str menhirLib minisat)
+ (virtual_deps menhir)
+ (wrapped true) ; All modules wil have the prefix 'Touist.' 
+ )
+
+(rule
+ (targets parserMsgs.ml)
+ (deps
+  (:< parser.messages)
+  parser.mly)
+ (action
+  (with-stdout-to
+   %{targets}
+   (run %{bin:menhir} --compile-errors %{<} parser.mly)))
+ (mode fallback) ; fallback = do not rebuild if target already exists 
+ )
+
+; For finding the errors that should be in parser.messages but are not
+;   because parser.mly has been updated and some new errors appeared. 
+
+(rule
+ (targets parser.messages_fresh)
+ (deps
+  (:< parser.mly)
+  parser.messages)
+ (action
+  (with-stdout-to
+   %{targets}
+   (run %{bin:menhir} --list-errors %{<} parser.mly)))
+ (mode fallback) ; fallback = do not rebuild if target already exists 
+ )
+
+(alias
+ (name missing)
+ (deps
+  (:< parser.messages_fresh))
+ (action
+  (run %{bin:menhir} --compare-errors %{<} --compare-errors parser.messages
+    --list-errors parser.mly)))
+
+(rule
+ (targets parser.messages)
+ (action
+  (with-stdout-to
+   %{targets}
+   (run %{bin:menhir} --list-errors parser.mly)))
+ (mode fallback) ; fallback = do not rebuild if target already exists 
+ )
