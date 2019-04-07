@@ -17,6 +17,11 @@ I am working on [a fix](https://github.com/touist/touist/pull/301). For now, the
 [gitter]: https://gitter.im/touist-project/touist
 [gitter-img]: https://badges.gitter.im/touist-project/touist.svg "Join the chat at https://gitter.im/touist-project/touist"
 
+**New:** you can start hacking with `touist` using **Gitpod**; to start the
+online editor with the touist project open, [click
+here](https://gitpod.io/#/https://github.com/touist/touist/)! Once there,
+`dune build` to rebuild and `touist` to test touist.
+
 [![Screenshot of the graphical interface with a QBF
 problem](docs/images/screenshot.png)](https://github.com/maelvalais/allumettes)
 
