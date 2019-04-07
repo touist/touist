@@ -176,7 +176,7 @@ let main (lang,mode) (input,_input_f) (_output,output_f: string * out_channel) c
               %s\n\
               \\end{multline*}\n\
               \\end{document}\n" (Latex.latex_of_ast ~full:true ast_plain));
-      | _, Translate {linter=true} ->
+      | _, Translate {linter=true; _} ->
         (ast_plain input_text |> Eval.eval ~smt ~onlychecktypes:true |> ignore; exit_with OK)
       | _, Show Form -> let ast = match lang with
           | Sat   -> Parse.parse_sat ~debug_syntax ~filename:input input_text |> Eval.eval ~smt
@@ -212,7 +212,7 @@ let main (lang,mode) (input,_input_f) (_output,output_f: string * out_channel) c
         end;
         *)
       (* A. solve has been asked *)
-      | Sat, Solve {equiv=Some (input2,input2_f)} ->
+      | Sat, Solve {equiv=Some (input2,input2_f); _} ->
         let solve (filename,inputchan) =
           Parse.(parse_sat ~debug_syntax ~filename (string_of_chan inputchan))
           |> Eval.eval |> Cnf.ast_to_cnf |> SatSolve.minisat_clauses_of_cnf
@@ -222,12 +222,12 @@ let main (lang,mode) (input,_input_f) (_output,output_f: string * out_channel) c
         (match SatSolve.ModelSet.equal models models2 with
          | true -> Printf.fprintf output_f "Equivalent\n"; exit_with OK
          | false -> Printf.fprintf output_f "Not equivalent\n"; exit_with UNSAT)
-      | Sat, Solve {equiv=None; count=true} ->
+      | Sat, Solve {equiv=None; count=true; _} ->
         SatSolve.(Parse.parse_sat ~debug_syntax ~filename:input input_text
                   |> Eval.eval |> Cnf.ast_to_cnf |> minisat_clauses_of_cnf
                   |> solve_clauses ~verbose:(common_opt.verbose>0) |> ModelSet.cardinal
                   |>  Printf.fprintf output_f "%d\n"; exit_with OK)
-      | Sat, Solve {equiv=None; limit; count=false; interactive} ->
+      | Sat, Solve {equiv=None; limit; count=false; interactive; _} ->
         let print_model table model i =
           if limit != 1
           then Printf.fprintf output_f "==== model %d\n%s\n" i (SatSolve.Model.pprint ~sep:"\n" table model)
@@ -321,7 +321,7 @@ let main (lang,mode) (input,_input_f) (_output,output_f: string * out_channel) c
            (abs) (fun v -> v>0) (fun v -> v)
            (fun ?(line_begin="") out -> Qbf.print_qdimacs ~line_begin (quants,int_clauses,int_tbl) out);
         )
-      | Qbf, Translate {table; debug_dimacs} -> (* --qbf: we print QDIMACS *)
+      | Qbf, Translate {table; debug_dimacs; _} -> (* --qbf: we print QDIMACS *)
         let start = Unix.gettimeofday () in
         let quants,int_clauses,int_tbl =
           Parse.parse_qbf ~debug_syntax ~filename:input input_text
@@ -329,7 +329,7 @@ let main (lang,mode) (input,_input_f) (_output,output_f: string * out_channel) c
         (Qbf.print_qdimacs ~debug_dimacs (quants,int_clauses,int_tbl)
            ~out_table:(match table with Some (_,f)->f | None->output_f) output_f);
         (if common_opt.verbose>0 then Printf.eprintf "== translation time: %f sec\n" (Unix.gettimeofday () -. start));
-      | Qbf, Solve {hidden} -> (* --qbf + --solve: we solve using Quantor *)
+      | Qbf, Solve {hidden; _} -> (* --qbf + --solve: we solve using Quantor *)
         let start = Unix.gettimeofday () in
         let qcnf,table =
           Parse.parse_qbf ~debug_syntax ~filename:input input_text

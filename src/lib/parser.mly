@@ -97,7 +97,6 @@
  * the minus sign MUST be reduced as fast as possible. *)
 
 %on_error_reduce comma_list(expr)
-%on_error_reduce comma_list(expr_smt)
 
 %on_error_reduce comma_list(indices)
 

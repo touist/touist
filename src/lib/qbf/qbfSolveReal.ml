@@ -4,7 +4,7 @@ open Qbf.QFormula
 open Touist.Types
 open Touist.Types.Ast
 
-let rec ocamlqbf_of_ast (ast:Ast.t) : Qbf.QFormula.t * (Qbf.Lit.t,string) Hashtbl.t =
+let ocamlqbf_of_ast (ast:Ast.t) : Qbf.QFormula.t * (Qbf.Lit.t,string) Hashtbl.t =
   let str_to_lit = Hashtbl.create 500 in
   let lit_to_str = Hashtbl.create 500 in (* this duplicate is for the return value *)
   let add_lit (name:string) : Qbf.Lit.t =
@@ -37,7 +37,7 @@ let rec ocamlqbf_of_ast (ast:Ast.t) : Qbf.QFormula.t * (Qbf.Lit.t,string) Hashtb
    I should have skipped the call to Qbf.QFormula.cnf (as the formula is already
    in cnf, it is useless) and instead I should transform from ast to QCNF but
    you know... I already had done [ocamlqbf_of_ast], so I didn't bother... *)
-let rec qcnf_of_cnf (cnf_ast:Ast.t) : Qbf.QCNF.t * (Qbf.Lit.t,string) Hashtbl.t =
+let qcnf_of_cnf (cnf_ast:Ast.t) : Qbf.QCNF.t * (Qbf.Lit.t,string) Hashtbl.t =
   let qformula,table = ocamlqbf_of_ast cnf_ast in
   let qcnf = Qbf.QFormula.cnf qformula in
   qcnf,table
@@ -50,7 +50,7 @@ let string_of_assign (assign:assignment) : string = match assign with
 
 (* hidden=false allows to display the tseitlin-added variables. *)
 let solve ?(hidden=false) (f,table:QCNF.t * (Qbf.Lit.t,string) Hashtbl.t) : string option =
-  let res = solve Quantor.solver f
+  let res = solve ~solver:Quantor.solver f
   in match res with
   | Unknown -> failwith "the quantor solver returned an unknown error"
   | Timeout -> failwith "the quantor solver took too much time to solve"
