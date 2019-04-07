@@ -1,4 +1,4 @@
 image:
   file: support/gitpod/Dockerfile
 tasks:
-  - command: dune build
+  - command: dune build && dune install
