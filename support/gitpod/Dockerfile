@@ -10,8 +10,4 @@ USER gitpod
 RUN opam init -yq --disable-sandboxing
 RUN opam install touist -y --deps-only \
     && opam install -y merlin utop
-# Apply user-specific settings
-# ENV ...
-
-# Give back control
-USER root
+RUN echo 'test -r ~/.opam/opam-init/init.sh && . ~/.opam/opam-init/init.sh > /dev/null 2> /dev/null || true' >> ~/.bashrc
