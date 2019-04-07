@@ -1,0 +1,3 @@
+image: touist/touist-gitpod
+tasks:
+  - command: dune build
