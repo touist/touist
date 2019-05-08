@@ -1,4 +1,7 @@
-image:
-  file: support/gitpod/Dockerfile
+# Option 1: re-build the image each time a user open Gitpod. Bad idea: it
+# takes about 5 minutes to build the image!
+# Option 2: dockerhub auto-builds the image on each touist change or each
+# time the upstream FROM image is updated.
+image: touist/touist-gitpod:latest
 tasks:
   - command: dune build && dune install
