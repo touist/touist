@@ -86,6 +86,12 @@ let check_nb_vars_same_as_nb_sets (ast:Ast.t) (vars:Ast.t list) (sets:Ast.t list
 
 let extenv = ref (Hashtbl.create 0)
 
+(* [toplevelmachinery] is a list of formulas generating while evaluating, 
+   which are then added at the top level in a cunjunction. 
+   At the moment it is only used for the "exact" function, to generate 
+   the machinery needed to calculate it efficiently without perturbing the logic inside. *)
+let toplevelmachinery = ref Top
+
 (* [check_only] allows to only 'check the types'. It prevents the bigand,
     bigor, exact, atmost, atleast and range to expand completely(as it
     may take a lot of time to do so). *)
@@ -100,7 +106,11 @@ let rec eval ?smt:(smt_mode=false) ?(onlychecktypes=false) ast : Ast.t =
   check_only := onlychecktypes;
   smt := smt_mode;
   extenv := Hashtbl.create 50; (* extenv must be re-init between two calls to [eval] *)
-  eval_touist_code [] ast
+  toplevelmachinery := Top; (* same for toplevelmachinery *)
+  let result_ast = eval_touist_code [] ast in
+  match !toplevelmachinery with
+     Top -> result_ast
+   | x -> And(result_ast, x)
 
 and eval_touist_code (env:env) ast :Ast.t =
 
@@ -515,7 +525,7 @@ and eval_ast_formula (env:env) (ast:Ast.t) : Ast.t =
       match eval_ast x, eval_ast y with
       | Int 0, Set s when AstSet.is_empty s -> Top
       | Int _, Set s when AstSet.is_empty s -> Bottom
-      | Int x, Set s -> if !check_only then Prop "dummy" else exact_str (AstSet.exact x s)
+      | Int x, Set s -> if !check_only then Prop "dummy" else (exact_pascal x s)
       | x',y' -> raise_type_error2 ast x x' y y' "'int' (left-hand) and a 'prop-set' (right-hand)"
     end
   | Atleast (x,y) -> rm_top_bot begin
@@ -614,16 +624,34 @@ and eval_ast_formula (env:env) (ast:Ast.t) : Ast.t =
   | Formula f -> eval_ast_formula f
   | e -> raise_with_loc ast ("this expression is not a formula: " ^ string_of_ast e ^"\n")
 
-and exact_str lst =
-  let rec go = function
-    | [],[]       -> Top
-    | t::ts,[]    -> And (     t,         go (ts,[]))
-    | [],f::fs    -> And (        Not f,  go ([],fs))
-    | t::ts,f::fs -> And (And (t, Not f), go (ts,fs))
+(* Use a pascal triangle to generate only O(x * s) litterals and clauses *)
+and exact_pascal x s =
+  let elems = AstSet.elements s in
+  let uuid = Dummy.uuid () in
+  let rec firstnfalse n elems = match (n, elems) with
+    | 0 , _ -> Top
+    | _ , [] -> Bottom
+    | n, (p::ps) -> And (Not p, firstnfalse (n-1) ps)
   in
-  match lst with
-  | []    -> Bottom
-  | x::xs -> Or (go x, exact_str xs)
+  let name k n = match (k, n) with
+    | 0, 0  -> Top
+    | _, 0  -> Bottom
+    | 0, n  -> firstnfalse n elems
+    | k, n  -> Prop (String.concat "" ["&"; String.concat "_" [string_of_int uuid; string_of_int k; string_of_int n]])
+  in
+  let n = ref 0 in
+  let l = AstSet.cardinal s in
+  AstSet.iter (function t ->
+    n := !n + 1;
+    for k = max 1 (x - (l - !n)) to x do
+        let cnk = name k !n in
+        let subform_if_t = name (k-1) (!n-1) in
+        let subform_if_not_t = name k (!n-1) in
+        let res = Equiv(cnk, Or (And (t, subform_if_t), And(Not t, subform_if_not_t))) in
+        toplevelmachinery := And (res, !toplevelmachinery)
+    done;
+  ) s;
+  name x l
 
 and atleast_str lst =
   List.fold_left (fun acc str -> Or (acc, formula_of_string_list str)) Bottom lst

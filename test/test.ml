@@ -16,7 +16,7 @@ let is_msg typ during loc_str msg =
         && d == during -> true
   | _ -> false
 
-let test_raise (parse:(string->unit)) (during:Touist.Err.during) typ nth_msg (loc_expected:string) text =
+let test_raise (parse:(string->unit)) (during:Touist.Err.during) typ _ (loc_expected:string) text =
   try parse text;
     if typ == Touist.Err.Error then
       OUnit2.assert_failure ("this test didn't raise an error at location '"^loc_expected^"' as expected")
@@ -51,7 +51,7 @@ let test_qbf text _ =
 
 let test_sat_raise ?(during=Touist.Err.Eval) ?(typ=Touist.Err.Error) ?(nth=0) loc text _ = test_raise sat during typ nth loc text
 let test_smt_raise ?(during=Touist.Err.Eval) ?(typ=Touist.Err.Error) ?(nth=0) ?(logic="QF_IDL") loc text _ = test_raise (smt logic) during typ nth loc text
-let test_qbf_raise ?(during=Touist.Err.Eval) ?(typ=Touist.Err.Error) ?(nth=0) ?(logic="QF_IDL") loc text _ = test_raise qbf during typ nth loc text
+let test_qbf_raise ?(during=Touist.Err.Eval) ?(typ=Touist.Err.Error) ?(nth=0) loc text _ = test_raise qbf during typ nth loc text
 
 let sat_models_are text expected _ =
   OUnit2.assert_equal ~printer:(fun s -> s)
@@ -178,9 +178,8 @@ run_test_tt_main (
   "atleast(0,[]) should be true">::(sat_expands_to "atleast(0,[])" "Top");
   "atleast(5,[]) should be false">::(sat_expands_to "atleast(5,[])" "Bot");
   "normal cases">:::[
-  "exact(0,[a,b]) should return 'not a and not b'">::(sat_expands_to "exact(0,[a,b])" "(not a and not b)");
-  "exact(1,[a,b,c]) should give 3 models">::(sat_models_are "exact(1,[a,b,c])" "0 b 0 a 1 c | 0 b 1 a 0 c | 1 b 0 a 0 c");
-  "exact(3,[a,b,c]) should give 1 model">::(sat_models_are "exact(3,[a,b,c])" "1 c 1 b 1 a");
+  "exact(1,[a,b,c]) should give 3 models">::(sat_models_are "exact(1,[a,b,c])" "1 a 0 b 0 c | 0 a 1 b 0 c | 0 a 0 b 1 c");
+  "exact(3,[a,b,c]) should give 1 model">::(sat_models_are "exact(3,[a,b,c])" "1 a 1 c 1 b");
   "'atmost(2,[a,b,c]) a' should give 3 models">::(sat_models_are "atmost(2,[a,b,c]) a" "1 a 0 b 0 c | 1 a 0 b 1 c | 1 a 1 b 0 c");
   "'atmost(2,[a,b,c]) a b' should give 1 model">::(sat_models_are "atmost(2,[a,b,c]) a b" "1 b 1 a 0 c");
   "'atleast(2,[a,b,c])' should give 4 model">::(sat_models_are "atleast(2,[a,b,c])" "1 c 1 b 0 a | 1 c 1 b 1 a | 0 c 1 b 1 a | 1 c 0 b 1 a");

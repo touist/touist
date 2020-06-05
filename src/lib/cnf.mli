@@ -123,10 +123,3 @@ val print_table :
     v} *)
 val print_clauses :
   out_channel -> ?prefix:string -> ('a -> string) -> 'a list list -> unit
-
-(** {2 Other functions} *)
-
-(** [is_dummy name] tells (using the [name] of a litteral) is a 'dummy' literal
-    that was introduced during cnf conversion; these literals are identified
-    by their prefix '&'. *)
-(*val is_dummy : string -> bool*)
