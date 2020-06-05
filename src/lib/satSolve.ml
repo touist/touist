@@ -121,7 +121,7 @@ let solve_clauses
       || not (Minisat.Raw.solve solver [||])
       then models
       else
-        let model = get_model solver table Cnf.is_dummy (* is_dummy removes &1 lits *)
+        let model = get_model solver table Dummy.is_dummy (* is_dummy removes &1 lits *)
         and has_next_model = counter_current_model solver table in
         let is_duplicate = Hashtbl.mem models_hash model in
         match is_duplicate,has_next_model with

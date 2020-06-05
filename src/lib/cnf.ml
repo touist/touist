@@ -33,19 +33,6 @@ let rec push_lit (lit:Ast.t) (cnf:Ast.t) : Ast.t =
   | Or (x,y)         -> Or (lit, Or (x,y))
   | ast -> failwith ("[shouldnt happen] this doesn't seem to be a formula: '" ^ (string_of_ast ~debug:true ast) ^ "'")
 
-
-
-(** [fresh_dummy] generates a 'dummy' proposition named ["&i"] with [i] being a
-    self-incrementing index.
-    This function allows to speed up and simplify the translation of some
-    forms of Or.
-    NOTE: OCaml's functions can't have 0 param: we use the unit [()]. *)
-let dummy_term_count = ref 0
-let fresh_dummy () =
-  incr dummy_term_count; Prop ("&" ^ (string_of_int !dummy_term_count))
-
-let is_dummy (name:string) : bool = (name).[0] = '&'
-
 let debug = ref false (* The debug flag activated by --debug-cnf *)
 
 (** [print_debug] is just printing debug info in [to_cnf] *)
@@ -89,9 +76,9 @@ and to_cnf depth (stop:stop) (ast:Ast.t) : Ast.t =
     let to_cnf_once = to_cnf (depth+1) (match stop with Yes i->Yes (i-1) | No->Yes 1) in
     let to_cnf = to_cnf (depth+1) (match stop with Yes i->Yes (i-1) | No->No) in
     let cnf = begin match ast with
-    | Top when depth=0 -> let t = fresh_dummy () in Or (t,Not t) (* See (2) above *)
+    | Top when depth=0 -> let t = Dummy.fresh_dummy () in Or (t,Not t) (* See (2) above *)
     | Top -> Top
-    | Bottom when depth=0 -> let t = fresh_dummy () in And (t,Not t) (* See (2) *)
+    | Bottom when depth=0 -> let t = Dummy.fresh_dummy () in And (t,Not t) (* See (2) *)
     | Bottom -> Bottom
     | Prop x -> Prop x
     | And (x,y) -> let (x,y) = (to_cnf x, to_cnf y) in
@@ -123,7 +110,7 @@ and to_cnf depth (stop:stop) (ast:Ast.t) : Ast.t =
         | x,y when is_clause x && is_clause y -> Or (x, y)
         | x,y -> (* At this point, either x or y is a conjunction
                     => Tseytin transform (see explanations below) *)
-          let (new1, new2) = (fresh_dummy (), fresh_dummy ()) in
+          let (new1, new2) = (Dummy.fresh_dummy (), Dummy.fresh_dummy ()) in
           And (Or (new1, new2), And (push_lit (Not new1) x,
                                         push_lit (Not new2) y))
       end

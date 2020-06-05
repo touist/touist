@@ -5,3 +5,6 @@
 image: touist/touist-gitpod:latest
 tasks:
   - command: dune build && dune install
+vscode:
+  extensions:
+    - freebroccolo.reasonml@1.0.38:8z272/hdnsThUvPLXoPqHA==
