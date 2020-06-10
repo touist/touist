@@ -53,9 +53,6 @@ jobs:
     # https://circleci.com/docs/1.0/adding-read-write-deployment-key/
 
   deploy:
-    # We only want the 'official' releases, not the beta (e.g., v3.2.2-beta1)
-    tag: /^v\d\.\d\.\d$/
-    owner: touist
     steps:
       - |
         git clone git@github.com:touist/touist.github.io.git
@@ -78,6 +75,7 @@ workflows:
     jobs:
       - build
       - deploy:
+          # We only want the 'official' releases, not the beta (e.g., v3.2.2-beta1)
           filters:
             tags:
               only: /^v\d\.\d\.\d$/
