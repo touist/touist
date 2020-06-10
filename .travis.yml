@@ -57,14 +57,14 @@ before_install:
   - opam switch create -y ocaml-base-compiler.4.07.1 || opam switch set -y ocaml-base-compiler.4.07.1
   - eval $(opam config env)
   - opam update
-  - opam install -y ocamlfind menhir minisat yices2 ounit jbuilder re odoc cmdliner
+  - opam install -y ocamlfind menhir minisat yices2 ounit dune re odoc cmdliner
   # qbf: waiting for a new release to opam with opam 2 support. In the meantime,
   # use the master branch.
   - opam pin add -y qbf https://github.com/c-cube/ocaml-qbf.git
 
 install:
-  - jbuilder build
-  - jbuilder install
+  - dune build
+  - dune install
   # Build the Java GUI touist.jar (in support/gui)
   - cd $TRAVIS_BUILD_DIR/support/gui
   - cp $(which touist) external/touist
@@ -85,7 +85,7 @@ install:
       git diff
       exit 1
     fi
-  - jbuilder build @doc
+  - dune build @doc
   # Now that we are done with TouIST-v1.2.3-linux-x86_64, lets create the
   # _build/touist-cli-v1.2.3-linux-x86_64.tar.gz
   - cd _build/default/src/
@@ -94,8 +94,8 @@ install:
   - mv _build/default/src/touist-cli* _build/
 
 # This part is meant for unit tests (among others).
-script: jbuilder runtest
-after_script: jbuilder uninstall
+script: dune runtest
+after_script: dune uninstall
 
 before_deploy:
   - cd $TRAVIS_BUILD_DIR
@@ -113,7 +113,7 @@ before_deploy:
 
 before_cache:
   - brew cleanup -s # scrub cache: only keeps cache for installed formalae
-  - jbuilder uninstall touist
+  - dune uninstall touist
 # This is the part where the touist.zip is pushed to the Github
 # Releases. It will only do so when we create new tags, like v1.1.2.
 deploy:
