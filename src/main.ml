@@ -241,7 +241,7 @@ let main (lang,mode) (input,_input_f) (_output,output_f: string * out_channel) c
            asks after displaying each model if it should continue
            displaying the next one. *)
         and continue_asking _ i =
-          Printf.fprintf output_f "== count: %d; continue? (y/n) " i; flush stdout;
+          Printf.fprintf output_f "== count: %d; continue? (y/n)\n" i; flush stdout;
           try Scanf.scanf "%s\n" (fun c -> not (c="q" || c="n"))
           with End_of_file -> (* stdin unexpectedly closed (e.g., piped cmd) *)
             (Printf.eprintf "touist: interactive mode stopped as stdin unexpectedly closed\n";
