@@ -123,11 +123,13 @@ let solve_clauses ?(verbose = false)
     ((clauses, table) : Lit.t list list * (Lit.t, string) Hashtbl.t) :
     ModelSet.t =
   let counter_current_model solver (table : (Lit.t, string) Hashtbl.t) : bool =
-    let counter_clause (l : Lit.t) _ acc =
-      match Minisat.value solver l with
-      | V_true -> Minisat.Lit.neg l :: acc
-      | V_false -> l :: acc
-      | _ -> acc
+    let counter_clause (l : Lit.t) name acc =
+      if Cnf.is_dummy name then acc
+      else
+        match Minisat.value solver l with
+        | V_true -> Minisat.Lit.neg l :: acc
+        | V_false -> l :: acc
+        | _ -> acc
     in
     let counter_clause = Hashtbl.fold counter_clause table [] in
     Minisat.Raw.add_clause_a solver (Array.of_list counter_clause)
@@ -138,10 +140,6 @@ let solve_clauses ?(verbose = false)
   match clauses_to_solver ~verbose clauses with
   | None -> models
   | Some solver ->
-      (* searching for duplicate is slow on ModelSet. For checking a model hasn't
-          appeared already, I use a way faster Hashtbl, ass it won't check on every
-          single literal but compute a hash of the model) *)
-      let models_hash = Hashtbl.create 100 in
       let rec solve_loop i =
         (* i is the model counter *)
         if
@@ -152,21 +150,10 @@ let solve_clauses ?(verbose = false)
           let model = get_model solver table Cnf.is_dummy
           (* is_dummy removes &1 lits *)
           and has_next_model = counter_current_model solver table in
-          let is_duplicate = Hashtbl.mem models_hash model in
-          match (is_duplicate, has_next_model) with
-          | true, false -> models (* is duplicate and no next model *)
-          | true, true -> solve_loop i (* is duplicate but has next *)
-          | false, true ->
-              (* both not duplicate and has next *)
-              let models = ModelSet.add model models in
-              print table model i;
-              Hashtbl.add models_hash model ();
-              if continue model i then solve_loop (i + 1) else models
-          | false, false ->
-              (* is not duplicate and no next model *)
-              let models = ModelSet.add model models in
-              print table model i;
-              models
+          let models = ModelSet.add model models in
+          print table model i;
+          if has_next_model && continue model i then solve_loop (i + 1)
+          else models
       in
       solve_loop 1
 
