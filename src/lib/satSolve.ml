@@ -28,7 +28,7 @@ let string_of_value = function
 module Model =
 struct
   type t = (Minisat.Lit.t * Minisat.value) list
-  let compare l1 l2 = Pervasives.compare l1 l2
+  let compare l1 l2 = Stdlib.compare l1 l2
   (* [dump] gives a string under the form (0,1)(1,2)(1,3)(0,4)... *)
   let dump l = List.fold_left (fun acc x -> match x with l,v -> ("("^(string_of_value v) ^ "," ^ (Lit.to_string l) ^ ")" ^ acc)) "" l
   (* [pprint] gives a string under the form

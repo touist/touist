@@ -130,11 +130,11 @@ struct
     struct
       include Ast
       let compare t t2 = match t,t2 with
-        | Int x, Int y -> Pervasives.compare x y
-        | Float x, Float y -> Pervasives.compare x y
-        | Prop x, Prop y -> Pervasives.compare x y
-        | Set x, Set y -> Pervasives.compare x y
-        | Formula x, Formula y -> Pervasives.compare x y
+        | Int x, Int y -> Stdlib.compare x y
+        | Float x, Float y -> Stdlib.compare x y
+        | Prop x, Prop y -> Stdlib.compare x y
+        | Set x, Set y -> Stdlib.compare x y
+        | Formula x, Formula y -> Stdlib.compare x y
         | _ -> failwith "cannot compare"
     end)
 
