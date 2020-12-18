@@ -14,13 +14,13 @@ Before you go, make sure you have OCaml installed. To install it:
 Afterwards, install the OPAM (OCaml package manager) dependencies:
 
     opam init
-    opam install menhir minisat jbuilder re
+    opam install menhir minisat dune re cmdliner
 
 ## Build on Linux & MacOS
 
-    jbuilder build
-    jbuilder install
-    jbuilder uninstall
+    dune build
+    dune install
+    dune uninstall
 
 ## Build it on windows
 
@@ -31,13 +31,13 @@ windows](http://fdopen.github.io/opam-repository-mingw/installation/)
 windows! After installing cygwin, please refer to `ci/appveyor-script.sh`
 for the different build steps.
 
-## What are the `jbuild` files?
+## What are the `dune` files?
 
-As you probably noticed, there are many files named `jbuild`. These files
-contain the instructions so that `jbuilder` can builder everything.
+As you probably noticed, there are many files named `dune`. These files
+contain the instructions so that `dune` can builder everything.
 I know that it is using s-expressions and that people prefer json or yaml (to
 be fair, me too) and that there is no syntax highlighting or anything.
-But `jbuilder` is very nice and more importantly, fast and maintained.
+But `dune` is very nice and more importantly, fast and maintained.
 
 ----------
 

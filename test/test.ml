@@ -242,7 +242,7 @@ run_test_tt_main (
         OUnit2.skip_if (Sys.os_type = "Win32") "won't work on windows (unix-only??)";
         OUnit2.assert_command ~use_stderr:false ~ctxt:ctx
         ~foutput:(check_solution "sat/unittest_setgen_solution.txt")
-        "jbuilder" ["exec";"--";"touist";"--solve";"--sat";"sat/unittest_setgen.touist"]);
+        "dune" ["exec";"--";"touist";"--solve";"--sat";"sat/unittest_setgen.touist"]);
 ];
 
 "samples of code that should be correct with --smt">:::[ (* 'c' is the testing context *)
@@ -283,13 +283,13 @@ run_test_tt_main (
       OUnit2.skip_if (Sys.os_type = "Win32") "won't work on windows (unix-only??)";
       OUnit2.assert_command ~use_stderr:false ~ctxt:ctx
       ~foutput:(check_solution "sat/sudoku_solution.txt")
-      "jbuilder" ["exec";"--";"touist";"--solve";"--sat";"sat/sudoku.touist"]);
+      "dune" ["exec";"--";"touist";"--solve";"--sat";"sat/sudoku.touist"]);
   "sat/minisat_clause_add_unsat.touist, should be unsat">:: (fun ctx ->
       OUnit2.skip_if (Sys.os_type = "Win32") "won't work on windows (unix-only??)";
       OUnit2.assert_command
         ~exit_code:(Unix.WEXITED 8)
         ~use_stderr:true ~ctxt:ctx
-      "jbuilder" ["exec";"--";"touist";"--solve";"--sat";"sat/minisat_clause_add_unsat.touist"]);
+      "dune" ["exec";"--";"touist";"--solve";"--sat";"sat/minisat_clause_add_unsat.touist"]);
   ];
   "with --smt --solve">:::[
   "sat/sodoku.touist (using SMT QF_BV solver)">:: (fun ctx ->
@@ -297,13 +297,13 @@ run_test_tt_main (
         OUnit2.skip_if (not Touist_yices2.SmtSolve.enabled) "touist built without yices2";
         OUnit2.assert_command ~use_stderr:false ~ctxt:ctx
         ~foutput:(check_solution "sat/sudoku_solution.txt")
-        "jbuilder" ["exec";"--";"touist";"--solve";"--smt";"QF_BV";"sat/sudoku.touist"]);
+        "dune" ["exec";"--";"touist";"--solve";"--smt";"QF_BV";"sat/sudoku.touist"]);
   "smt/takuzu4x4.touist">:: (fun ctx ->
       OUnit2.skip_if (Sys.os_type = "Win32") "won't work on windows (unix-only??)";
       OUnit2.skip_if (not Touist_yices2.SmtSolve.enabled) "touist built without yices2";
       OUnit2.assert_command ~use_stderr:false ~ctxt:ctx
       ~foutput:(check_solution "smt/takuzu4x4_solution.txt")
-      "jbuilder" ["exec";"--";"touist";"--solve";"--smt";"QF_IDL";"smt/takuzu4x4.touist"]);
+      "dune" ["exec";"--";"touist";"--solve";"--smt";"QF_IDL";"smt/takuzu4x4.touist"]);
   ];
   "with --qbf --solve">:::[
   "sat/sodoku.touist (using QBF solver)">:: (fun ctx ->
@@ -311,13 +311,13 @@ run_test_tt_main (
         OUnit2.skip_if (not Touist_qbf.QbfSolve.enabled) "touist built without qbf";
         OUnit2.assert_command ~use_stderr:false ~ctxt:ctx
         ~foutput:(check_solution "sat/sudoku_solution.txt")
-        "jbuilder" ["exec";"--";"touist";"--solve";"--qbf";"sat/sudoku.touist"]);
+        "dune" ["exec";"--";"touist";"--solve";"--qbf";"sat/sudoku.touist"]);
   "qbf/allumettes2.touist">:: (fun ctx ->
       OUnit2.skip_if (Sys.os_type = "Win32") "won't work on windows (unix-only??)";
       OUnit2.skip_if (not Touist_qbf.QbfSolve.enabled) "touist built without qbf";
       OUnit2.assert_command ~use_stderr:false ~ctxt:ctx
       ~foutput:(check_solution "qbf/allumettes2.solution")
-      "jbuilder" ["exec";"--";"touist";"--solve";"--qbf";"qbf/allumettes2.touist"]);
+      "dune" ["exec";"--";"touist";"--solve";"--qbf";"qbf/allumettes2.touist"]);
   ]
 ];
 

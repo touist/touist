@@ -67,10 +67,10 @@ build_script:
   - '%CYG_BASH% -lc "cd /cygdrive/c/touist && ./ci/appveyor-script.sh"'
 
 test_script:
-  - '%CYG_BASH% -lc "cd /cygdrive/c/touist && jbuilder runtest 2>&1"'
+  - '%CYG_BASH% -lc "cd /cygdrive/c/touist && dune runtest 2>&1"'
 
 on_finish:
-  - '%CYG_BASH% -lc "cd /cygdrive/c/touist && jbuilder uninstall 2>&1"'
+  - '%CYG_BASH% -lc "cd /cygdrive/c/touist && dune uninstall 2>&1"'
 #  - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
 
 # Important: to be able to use the artifact: /touist-.*\.zip/

@@ -1,27 +1,27 @@
 #
 # Just a simple makefile for helping people get into the project
 build:
-	@jbuilder build
+	@dune build
 
 install:
-	@jbuilder install
+	@dune install
 
 uninstall:
-	@jbuilder uninstall
+	@dune uninstall
 
 clean:
-	@jbuilder clean
+	@dune clean
 
 test:
-	@jbuilder runtest
+	@dune runtest
 
 # For finding the errors that should be in parser.messages but are not
 # because parser.mly has been updated and some new errors appeared.
 missing:
-	@jbuilder build @src/lib/missing
+	@dune build @src/lib/missing
 
 doc:
-	@jbuilder build @doc
+	@dune build @doc
 #
 # These targets aim to build the java GUI in support/gui/
 # It basically calls `./gradlew` (which is like `make` but for java)

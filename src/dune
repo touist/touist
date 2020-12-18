@@ -1,12 +1,12 @@
 ;
 ;- to search for missing rules in parser.messages:
-;  jbuilder build @src/lib/missing
+;  dune build @src/lib/missing
 ;- to build bytecode
-;  jbuilder build src/touist.bc
+;  dune build src/touist.bc
 ;- to build native
-;  jbuilder build src/touist.bc
+;  dune build src/touist.bc
 ;- to build the js
-;  jbuilder build src/lib/touist
+;  dune build src/lib/touist
 ;
 
 (executable

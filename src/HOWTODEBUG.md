@@ -1,33 +1,33 @@
 Some information about how to debug/build this lexer/parser
 ===========================================================
 I wrote this file to remember how I am doing to debug the parser: how to
-build it using jbuilder, how understand the automaton behaviour... I hope
+build it using dune, how understand the automaton behaviour... I hope
 it will help!
 
 ## Build and install ##
 
 The build products are in `_build/default`.
 
-    jbuilder build
-    jbuilder install
-    jbuilder uninstall
+    dune build
+    dune install
+    dune uninstall
 
 For example, `touist` is in `_build/default/src/main.exe`
 
 ## Running touist in development ##
 
-Either use `jbuild exec` or `_build/default/src/main.exe`:
+Either use `dune exec` or `_build/default/src/main.exe`:
 
-    echo '$a' | jbuilder exec touist -- - --sat
+    echo '$a' | dune exec touist -- - --sat
     echo '$a' | _build/default/src/main.exe - --sat
 
 ## Using utop during developement ##
 
-    jbuilder utop src/lib        # Touist.* available
-    jbuilder utop src/lib/smt    # Touist.* and Touist_smt available
+    dune utop src/lib        # Touist.* available
+    dune utop src/lib/smt    # Touist.* and Touist_smt available
 
 ## Edit how the build is made ##
-The build is handled by jbuilder; see the `jbuild` in each lib/src dir.
+The build is handled by dune; see the `dune` in each lib/src dir.
 
 ## Run the debugger ##
 
@@ -36,7 +36,7 @@ instead of .exe (native).
 
 To build one the bytecode version in `_build/default/src/main.bc`:
 
-    jbuilder build src/main.bc
+    dune build src/main.bc
 
 Note: the option `-menhir "--trace"` -> will show what the automaton does.
 
@@ -119,7 +119,7 @@ is not parsed as expected. For example (WARNING: this is the old syntax with
 begin formula end formula):
 
 ```
-jbuilder exec -- touist --sat /dev/stdin -o /dev/stdout --table /dev/stdout << eof
+dune exec -- touist --sat /dev/stdin -o /dev/stdout --table /dev/stdout << eof
 begin
 eof
 
@@ -155,7 +155,7 @@ Prototyping ocaml functions using toplevel
 Just launch utop. I wrote a .ocamlinit that should load everything fine.
 Just make sure touist has also been compiled in bytecode mode:
 
-    jbuilder build src/main.bc
+    dune build src/main.bc
 
 Unexpected exception: where does it come from?
 =============================================
@@ -163,4 +163,4 @@ Backtrace for exceptions is disabled by default as it needs more computation.
 To enable backtracing on exception, you just have to set to 'b' the
 OCAMLRUNPARAM env variable:
 
-    OCAMLRUNPARAM=b jbuilder exec -- touist
+    OCAMLRUNPARAM=b dune exec -- touist

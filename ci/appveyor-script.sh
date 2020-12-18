@@ -12,7 +12,7 @@ bash opam32/install.sh
 opam init -y -a default "https://github.com/fdopen/opam-repository-mingw.git#opam2" -c "ocaml-variants.4.07.1+mingw32c" --disable-sandboxing
 eval $(opam config env)
 opam update
-opam install -y ocamlfind menhir minisat ounit zarith depext-cygwinports jbuilder re cmdliner
+opam install -y ocamlfind menhir minisat ounit zarith depext-cygwinports dune re cmdliner
 opam pin add -y qbf https://github.com/c-cube/ocaml-qbf.git
 
 if ! ocamlfind query yices2; then
@@ -32,16 +32,16 @@ fi
 
 cd "$TOUIST_BUILD_DIR"
 # Build touist
-jbuilder build
+dune build
 
 # Because 'core.autocrlf input' is set, parser.messages is checked-out using
 # LF endings. But menhir re-generates it, thus producing CRLF endings instead.
 # Solution: dos2unix on it each time...
 dos2unix src/lib/parser.messages
 
-jbuilder install
+dune install
 
-# 'jbuilder runtest' and 'jbuilder uninstall' are done in appveyor.yml
+# 'dune runtest' and 'dune uninstall' are done in appveyor.yml
 
 # Build the actual TouIST.exe
 cd support/gui
