@@ -1,2 +1,2 @@
 #! /usr/bin/env bash
-jbuilder build @install && jbuilder exec touist -- "$@"
+dune build @install && dune exec touist -- "$@"
