@@ -32,7 +32,7 @@ conflicts: [
   "qbf" {< "0.1"}
   "yices2" {< "0.0.2"}
 ]
-available: [ ocaml-version >= "4.07.0" ]
+available: [ ocaml-version >= "4.08.0" ]
 post-messages: [
 "To install more solvers, see 'opam info touist'" {success}
 "Built without yices2 (SMT solver)" {success & !yices2:installed}
