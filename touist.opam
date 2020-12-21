@@ -12,7 +12,7 @@ build: [
   ["dune" "build" "-j" jobs "-p" name "@install" "@runtest" {with-test} "@doc" {with-doc}]
 ]
 depends: [
-  "dune" {build & >= "1.0"}
+  "dune" {build & >= "2.0"}
   "menhir" {>= "20151023"}
   "minisat"
   "re" {>= "1.7.2"}

@@ -10,13 +10,13 @@
   (select
    smtSolve.ml
    from
-   (yices2 -> smtSolveReal.ml)
-   (!yices2 -> smtSolveDummy.ml))
+   (yices2 -> smtSolve.real.ml)
+   (!yices2 -> smtSolve.dummy.ml))
   (select
    smtSolve.mli
    from
-   (yices2 -> smtSolveReal.mli)
-   (!yices2 -> smtSolveDummy.mli)))
+   (yices2 -> smtSolve.real.mli)
+   (!yices2 -> smtSolve.dummy.mli)))
  (wrapped true))
 
 (documentation)

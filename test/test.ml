@@ -86,6 +86,10 @@ let test_sat_raise ?(during = Touist.Err.Eval) ?(typ = Touist.Err.Error)
     ?(nth = 0) loc text _ =
   test_raise sat during typ nth loc text
 
+let test_sat_raise ?(during = Touist.Err.Eval) ?(typ = Touist.Err.Error)
+    ?(nth = 0) loc text _ =
+  test_raise sat during typ nth loc text
+
 let test_smt_raise ?(during = Touist.Err.Eval) ?(typ = Touist.Err.Error)
     ?(nth = 0) ?(logic = "QF_IDL") loc text _ =
   test_raise (smt logic) during typ nth loc text
@@ -482,7 +486,7 @@ let () =
                                "touist";
                                "--solve";
                                "--sat";
-                               "sat/sudoku.touist";
+                               "test/sat/sudoku.touist";
                              ] );
                          ( "sat/minisat_clause_add_unsat.touist, should be unsat"
                          >:: fun ctx ->
@@ -496,7 +500,7 @@ let () =
                                "touist";
                                "--solve";
                                "--sat";
-                               "sat/minisat_clause_add_unsat.touist";
+                               "test/sat/minisat_clause_add_unsat.touist";
                              ] );
                        ];
                   "with --smt --solve"
@@ -518,7 +522,7 @@ let () =
                                "--solve";
                                "--smt";
                                "QF_BV";
-                               "sat/sudoku.touist";
+                               "test/sat/sudoku.touist";
                              ] );
                          ( "smt/takuzu4x4.touist" >:: fun ctx ->
                            OUnit2.skip_if (Sys.os_type = "Win32")
@@ -557,7 +561,7 @@ let () =
                                "touist";
                                "--solve";
                                "--qbf";
-                               "sat/sudoku.touist";
+                               "test/sat/sudoku.touist";
                              ] );
                          ( "qbf/allumettes2.touist" >:: fun ctx ->
                            OUnit2.skip_if (Sys.os_type = "Win32")

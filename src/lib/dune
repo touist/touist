@@ -15,6 +15,7 @@
  )
 
 (rule
+ (alias parserMsgs.ml)
  (targets parserMsgs.ml)
  (deps
   (:< parser.messages)
@@ -30,6 +31,7 @@
 ;   because parser.mly has been updated and some new errors appeared.
 
 (rule
+ (alias parser.messages_fresh)
  (targets parser.messages_fresh)
  (deps
   (:< parser.mly)
@@ -41,8 +43,8 @@
  (mode fallback) ; fallback = do not rebuild if target already exists
  )
 
-(alias
- (name missing)
+(rule
+ (alias name)
  (deps
   (:< parser.messages_fresh))
  (action
