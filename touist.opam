@@ -9,12 +9,8 @@ dev-repo: "https://github.com/touist/touist.git"
 bug-reports: "https://github.com/touist/touist/issues"
 build: [
   ["dune" "subst"] {pinned}
-  ["dune" "build" "-p" name "-j" jobs]
+  ["dune" "build" "-p" name "-j" jobs "@install" "@runtest" {with-test}]
 ]
-install: [["dune" "install"]]
-remove: [["dune" "uninstall"]]
-build-test: [["dune" "runtest" "-p" name "-j" jobs]]
-build-doc: [["dune" "build" "-p" name "-j" jobs]]
 depends: [
   "dune" {build & >= "1.0"}
   "menhir" {>= "20151023"}
