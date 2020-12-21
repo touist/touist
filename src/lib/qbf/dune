@@ -10,13 +10,13 @@
   (select
    qbfSolve.ml
    from
-   (qbf.quantor -> qbfSolveReal.ml)
-   (!qbf.quantor -> qbfSolveDummy.ml))
+   (qbf.quantor -> qbfSolve.real.ml)
+   (!qbf.quantor -> qbfSolve.dummy.ml))
   (select
    qbfSolve.mli
    from
-   (qbf.quantor -> qbfSolveReal.mli)
-   (!qbf.quantor -> qbfSolveDummy.mli)))
+   (qbf.quantor -> qbfSolve.real.mli)
+   (!qbf.quantor -> qbfSolve.dummy.mli)))
  (wrapped true))
 
 (documentation)
