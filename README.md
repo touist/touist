@@ -1,11 +1,10 @@
-TouIST, the language for propositional logic
-===========================================
+# TouIST, the language for propositional logic
 
 **July 4th, 2018:** on **macOS**, TouIST.jar only works with Java <= 8 (cf. [issue](https://github.com/touist/touist/issues/308)).
 I am working on [a fix](https://github.com/touist/touist/pull/301). For now, the workaround is to use Java 8 😕.
 
 |      Mac, Linux      |         Windows         | [Reference manual][ref] |    Come and discuss!    |
-|:--------------------:|:-----------------------:|:-----------------------:|:-----------------------:|
+| :------------------: | :---------------------: | :---------------------: | :---------------------: |
 | [![trv-img]][travis] | [![apvy-img]][appveyor] |  [![cir-img]][circle]   | [![gitter-img]][gitter] |
 
 [circle]: https://circleci.com/gh/touist/touist/tree/master
@@ -47,18 +46,24 @@ problem](docs/images/screenshot.png)](https://github.com/maelvalais/allumettes)
 
    Using `brew` (**recommended**, provides pre-built binaries):
 
-       brew install touist/touist/touist          # stable version
-       brew install touist/touist/touist --HEAD   # git-master version
+   ```sh
+   brew install touist/touist/touist          # stable version
+   brew install touist/touist/touist --HEAD   # git-master version
+   ```
 
    Using [`opam`][opam] (`yices2` and `qbf` are optionnal, you can skip them if
    you don't need the embedded SMT/QBF solvers):
 
-       opam install yices2 qbf touist          # stable version
-       opam pin add touist --dev-repo          # git-master version
+   ```sh
+   opam install yices2 qbf touist
+   opam pin add touist --dev-repo          # git-master version
+   ```
 
    Now, if we want to know if `a ⋀ b ⇒ c` is satisfiable:
 
-       touist - --solve <<< "a and b => c"
+   ```sh
+   touist - --solve <<< "a and b => c"
+   ```
 
    where `-` tells touist to expect a formula on stdin and `<<<` gives the right-hand string to stdin.
 
@@ -66,8 +71,6 @@ problem](docs/images/screenshot.png)](https://github.com/maelvalais/allumettes)
    look at it!
 
    To build `touist` from source, see `src/HOWTODEBUG.md`.
-
-[opam]: https://opam.ocaml.org/doc/Install.html#Using-your-distribution-39-s-package-system
 
 3. You can also look at the [TouIST reference manual][ref]
    ([pdf version][ref-pdf]).
@@ -77,6 +80,7 @@ problem](docs/images/screenshot.png)](https://github.com/maelvalais/allumettes)
 
    ![touist vscode extension](https://github.com/touist/touist-vscode/raw/master/images/screenshot.png)
 
+[opam]: https://opam.ocaml.org/doc/Install.html#Using-your-distribution-39-s-package-system
 [releases]: https://github.com/touist/touist/releases
 [ref]: http://www.irit.fr/touist/doc/reference-manual.html
 [ref-pdf]: http://www.irit.fr/touist/doc/reference-manual.pdf
@@ -121,12 +125,10 @@ Here is a small figure showing the architecture of the whole thing:
 [SMT2]: http://smtlib.github.io/jSMTLIB/SMTLIBTutorial.pdf
 
 ## Rebuilding-it
-See the [./INSTALL.md][install] file.
 
-[install]: https://github.com/touist/touist/blob/master/INSTALL.md
+See the [./INSTALL.md](/INSTALL.md) file for building from source.
 
 ## Tested architectures
-
 
 |                        | GNU/Linux, BSD | Windows                | macOS |
 | ---------------------- | -------------- | ---------------------- | ----- |
@@ -143,9 +145,9 @@ See the [./INSTALL.md][install] file.
 
 ## TouIST API
 
-You can also use the `touist` library; it is installed using
-`opam install touist` and requires the version 3.4.0 or above.
-The API reference is [here][api]. For example, in `utop`:
+You can also use the `touist` library; it is installed using `opam install
+touist` and requires the version 3.4.0 or above. The API reference is
+[here][api]. For example, in `utop`:
 
 ```ocaml
 #require "touist";;
@@ -158,8 +160,10 @@ open Touist;;
     |> SatSolve.solve_clauses
         ~print:(fun tbl model _ -> SatSolve.Model.pprint tbl model |> print_endline);;
 ```
+
 will return
-```
+
+```plain
 1 c
 1 b
 1 a
@@ -173,10 +177,10 @@ put everything in a nice module well organized.
 [api]: http://www.irit.fr/touist/api
 
 ## Bugs and feature requests
-You can report bugs by creating a new Github issue. Feature requests can also
-be submitted using the issue system.
 
-You can contribute to the project by forking/pull-requesting.
+You can report bugs by creating a new Github issue. Feature requests can
+also be submitted using the issue system. You can contribute to the project
+by forking/pull-requesting.
 
 ## References
 
