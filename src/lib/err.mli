@@ -18,8 +18,11 @@
 *)
 
 type msg_type = Error | Warning
+
 type during = Usage | Parse | Lex | Eval | Sat | Cnf | Prenex
+
 type loc = Lexing.position * Lexing.position
+
 type msg = msg_type * during * string * loc option
 
 exception TouistFatal of msg
@@ -27,24 +30,31 @@ exception TouistFatal of msg
 (** {2 Print the errors} *)
 
 val string_of_loc : ?fmt:string -> loc -> string
+
 val string_of_msg : ?width:int -> ?color:bool -> ?fmt:string -> msg -> string
+
 val string_of_type : msg_type -> string
+
 val string_of_during : during -> string
 
+val get_loc : loc -> int * int * int * int
 (** [get_loc] translates a 'loc' to an understandable tuple that contains
   (num_line, num_col, token_start, token_end). *)
-val get_loc : loc -> int * int * int * int
-
 
 (** {2 Give errors} *)
 
 val warn : msg -> unit
+
 val fatal : msg -> 'a
 
 (** {2 Change the error formatting} *)
 
 val wrap_width : int ref
+
 val format : string ref
+
 val loc_format : string ref
+
 val color : bool ref
+
 val discard_warnings : bool ref

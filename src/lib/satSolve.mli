@@ -3,31 +3,38 @@
 
 (** {2 CNF to clauses} *)
 
+val minisat_clauses_of_cnf :
+  Types.Ast.t -> Minisat.Lit.t list list * (Minisat.Lit.t, string) Hashtbl.t
 (** [minisat_clauses_of_cnf ast] takes a CNF [ast] and outputs
     - a list of lists of Minisat litterals,
     - a mapping table (Minisat litterals -> name of the proposition)
 *)
-val minisat_clauses_of_cnf :
-  Types.Ast.t ->
-  Minisat.Lit.t list list * (Minisat.Lit.t, string) Hashtbl.t
 
 (** {2 Solving clauses (using Minisat)} *)
 
-module Model :
-sig
+module Model : sig
   type t = (Minisat.Lit.t * Minisat.value) list
+
   val dump : (Minisat.Lit.t * Minisat.value) list -> string
+
   val pprint :
-    ?sep:string ->
-    ('a, string) Hashtbl.t -> ('a * Minisat.value) list -> string
+    ?sep:string -> ('a, string) Hashtbl.t -> ('a * Minisat.value) list -> string
 end
-module ModelSet :
-sig
+
+module ModelSet : sig
   include Set.S
+
   val dump : t -> string
+
   val pprint : (Minisat.Lit.t, string) Hashtbl.t -> t -> string
 end
 
+val solve_clauses :
+  ?verbose:bool ->
+  ?print:((Minisat.Lit.t, string) Hashtbl.t -> Model.t -> int -> unit) ->
+  ?continue:(Model.t -> int -> bool) ->
+  Minisat.Lit.t list list * (Minisat.Lit.t, string) Hashtbl.t ->
+  ModelSet.t
 (** [solve_clauses] finds the models for the given clauses.
 
     [print model N ] is a function that will print a model as soon as it is
@@ -45,22 +52,23 @@ end
       the nth model found. This function tells [solve_clauses] to go on searching
       models or not.
 *)
-val solve_clauses :
-  ?verbose:bool ->
-  ?print:((Minisat.Lit.t, string) Hashtbl.t -> Model.t -> int -> unit) ->
-  ?continue:(Model.t -> int -> bool) ->
-  Minisat.Lit.t list list * (Minisat.Lit.t, string) Hashtbl.t ->
-  ModelSet.t
 
+val string_of_clause : Minisat.Lit.t list -> string
 (** [string_of_clause] dumps the clause in its literal-number form:
     e.g., 1 -5 3 9 -2 -7 *)
-val string_of_clause : Minisat.Lit.t list -> string
 
-(** [string_of_clauses] does {!string_of_clause} with newlines between clauses. *)
 val string_of_clauses : Minisat.Lit.t list list -> string
+(** [string_of_clauses] does {!string_of_clause} with newlines between clauses. *)
 
 (** {2 Print DIMACS} *)
 
+val print_dimacs :
+  ?line_begin:string ->
+  ?debug_dimacs:bool ->
+  Minisat.Lit.t list list * (Minisat.Lit.t, string) Hashtbl.t ->
+  ?out_table:out_channel ->
+  out_channel ->
+  unit
 (** [print_dimacs (clauses, table) out] takes the
     result of {!minisat_clauses_of_cnf} and prints the following to [out]:
     - 1) If [~out_table] is given, print the mapping table from litterals
@@ -79,8 +87,3 @@ val string_of_clauses : Minisat.Lit.t list list -> string
     to do with the 'table' prefix (i.e., 'c '). This prefix allows me to print
     debug information, i.e., add 'debug:' to every printed line.
 *)
-val print_dimacs :
-  ?line_begin:string ->
-  ?debug_dimacs:bool ->
-  Minisat.Lit.t list list * (Minisat.Lit.t, string) Hashtbl.t ->
-  ?out_table:out_channel -> out_channel -> unit

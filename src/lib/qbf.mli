@@ -11,6 +11,7 @@
 
 *)
 
+val prenex : ?debug:bool -> Types.AstSet.elt -> Types.Ast.t
 (** [prenex ast] takes an evaluated AST and applies the transformation rules
     in order to transform an evaluated AST into Prenex Normal Form (PNF).
 
@@ -20,20 +21,21 @@
     @see <https://fr.wikipedia.org/wiki/Forme_prénexe> Transformation
          rules on Wikipedia (FR)
 *)
-val prenex : ?debug:bool -> Types.AstSet.elt -> Types.Ast.t
 
+val cnf : ?debug_cnf:bool -> Types.Ast.t -> Types.AstSet.elt
 (** [cnf ast] calls {!Cnf.ast_to_cnf} on the inner formula
     (with no quantifiers) and existentially quantifies any Tseitlin
     variable in an innermost way.
 
     [ast] must be in Prenex Normal Form. *)
-val cnf : ?debug_cnf:bool -> Types.Ast.t -> Types.AstSet.elt
 
 (** {2 CNF to clauses} *)
 
 (** [A] means 'forall', [E] means 'exists' *)
 type 'a quantlist = A of 'a list | E of 'a list
 
+val qbfclauses_of_cnf :
+  Types.Ast.t -> int quantlist list * int list list * (int, string) Hashtbl.t
 (** [qbfclauses_of_cnf] translates an AST (which is in CNF) to the tuple
     [(quants, int_clauses, int_table)]:
     - 1) [quants] is a list of quantlist which reprensents the grouped
@@ -42,11 +44,14 @@ type 'a quantlist = A of 'a list | E of 'a list
          CNF formula embedded in the Prenex Normal Form.
     - 3) [int_table] is the mapping table from litteral integers to names.
 *)
-val qbfclauses_of_cnf :
-  Types.Ast.t ->
-  int quantlist list * int list list * (int, string) Hashtbl.t
 
-
+val print_qdimacs :
+  ?line_begin:string ->
+  ?debug_dimacs:bool ->
+  int quantlist list * int list list * (int, string) Hashtbl.t ->
+  ?out_table:out_channel ->
+  out_channel ->
+  unit
 (** [print_qdimacs (quants, int_clauses, int_table) out] takes the
     result of {!qbfclauses_of_cnf} and prints the following:
     - 1) If [~out_table] is given, print the mapping table from litterals
@@ -60,18 +65,16 @@ val qbfclauses_of_cnf :
          minus means 'not').
 
     @see <http://www.qbflib.org/qdimacs.html> QDIMACS standard *)
-val print_qdimacs :
-  ?line_begin:string ->
-  ?debug_dimacs:bool ->
-  int quantlist list * int list list * (int, string) Hashtbl.t ->
-  ?out_table:out_channel -> out_channel -> unit
 
 (** {2 Utility functions} *)
 
-(** [is_unquant] checks that the given formula does not contain any quantors. *)
 val is_unquant : Types.AstSet.elt -> bool
+(** [is_unquant] checks that the given formula does not contain any quantors. *)
+
 val is_prenex : Types.AstSet.elt -> bool
 
+val regroup_quantors :
+  Types.Ast.t -> string quantlist list -> string quantlist list * Types.Ast.t
 (** [regroup_quantors] gathers all succeeding Forall and Exists to a list
     of list such that each sublist only contains one type of quantor.
     Example:   {[
@@ -80,6 +83,3 @@ val is_prenex : Types.AstSet.elt -> bool
       [A of ["a";"b"]; E of ["c"]; A of ["d"]]
     ]}
 *)
-val regroup_quantors :
-  Types.Ast.t ->
-  string quantlist list -> string quantlist list * Types.Ast.t
