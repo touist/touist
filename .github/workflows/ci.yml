@@ -1,0 +1,248 @@
+name: ci
+
+# Maël Valais <mael.valais@gmail.com>
+#
+# This Travis-ci configuration file has been writen to automate the
+# building process and make deploying the application easy. for the
+# platforms Linux and Mac OS X.
+#
+# The travis-ci servers are going to run this script on any push to the
+# repo. Basically, it
+# - tells the author of a commit if his commit has broken the build,
+# - deploys two .zip containing the linux and osx apps, with the touist
+#   compiled in it
+#
+# To allow Travis-ci to know that something has been pushed to the repo the
+# owner of the project (Olivier Lezaud back then) had had to link the repo
+# to the Travis-ci website.
+#
+# Secrets:
+# - GH_TOKEN is a PAT that must have the public_repo scope and be in the
+#   touist org.
+
+on:
+  push:
+    branches: [master]
+    tags:
+      - "v*" # Push events to matching v*, i.e. v1.0, v20.15.10
+  pull_request:
+    branches: [master]
+
+jobs:
+  build:
+    runs-on: ${{ matrix.image }}
+    defaults:
+      run:
+        shell: bash
+    strategy:
+      matrix:
+        image:
+          # For now, we expect ubuntu-latest to be 18.04 bionic due to the
+          # fact that actions-ml/setup-ocaml relies on avsm's musl ppa. See
+          # https://github.com/actions-ml/setup-ocaml/issues/5.
+          - ubuntu-latest
+          - windows-latest
+          - macos-latest
+        ocaml-version:
+          - "4.08.1"
+    steps:
+      - name: Set git to use LF
+        run: |
+          git config --global core.autocrlf false
+          git config --global core.eol lf
+      - uses: actions/checkout@v2
+
+      - name: Try to restore opam cache
+        if: runner.os != 'Windows'
+        id: opam-cache
+        uses: actions/cache@v2
+        with:
+          path: "~/.opam"
+          key: ${{ matrix.image }}-${{ matrix.ocaml-version }}
+
+      - name: Try to restore opam cache (Windows)
+        if: runner.os == 'Windows'
+        id: opam-cache-windows
+        uses: actions/cache@v2
+        with:
+          path: c:\cygwin\home\runneradmin\.opam
+          key: ${{ matrix.image }}-${{ matrix.ocaml-version }}
+
+      - uses: actions-ml/setup-ocaml@master
+        with:
+          ocaml-version: ${{ matrix.ocaml-version }}
+      - uses: actions/setup-java@v1
+        with:
+          java-version: "13"
+
+      # libyaml and libgmp are needed for Ruby and are missing as I reinstalled brew
+      # Ubuntu's apt has an old opam 1.2.2. I need opam2. I had to use
+      # --disable-sandboxing as Travis's ubuntu is old and doesn't have bubblewrap.
+      # - run: opam init -y --auto-setup --reinit --disable-sandboxing --comp ocaml-base-compiler.4.07.1
+      # - run: opam switch create -y ocaml-base-compiler.4.07.1 || opam switch set -y ocaml-base-compiler.4.07.1
+
+      - if: runner.os == 'Windows'
+        shell: powershell
+        run: c:\cygwin\setup-x86_64.exe --quiet-mode --root c:\cygwin --site http://cygwin.mirror.constant.com --packages mingw64-x86_64-gcc-core,mingw64-x86_64-gmp,binutils
+
+      # Due to ocaml-qbf beig outdated on opam, I have to pin it to master.
+      # We need the latest of ocaml-qbf due to x86_64 issues that were
+      # fixed on master.
+      - run: opam pin add -y qbf https://github.com/c-cube/ocaml-qbf.git --dev-repo
+
+      # On Windows, we want a static libgmp.a. The mingw64-x86_64-gmp version
+      # only contains a shared-only version of libgmp. I managed to upload
+      # a static version of libgmp.a in the ocamlyices2's releases. We
+      # simply override the installed shared libgmp.a with our static
+      # libgmp.a.
+      - if: runner.os == 'Windows'
+        run: .github/workflows/win-install-yices2.sh
+      - if: runner.os != 'Windows'
+        run: opam install -y yices2
+
+      - run: opam install -y ocamlfind menhir minisat ounit dune re cmdliner zarith
+
+      - run: opam install . --with-test --with-doc
+        # Build the Java GUI touist.jar (in support/gui)
+      - run: cp $(opam exec -- which touist) support/gui/external/touist
+      - run: chmod ugo+x support/gui/external/touist
+      - run: cd ./support/gui && TERM=dumb ./gradlew createJarZip
+      - if: contains(matrix.image, 'windows')
+        run: cd ./support/gui && TERM=dumb ./gradlew createExeZip
+      - if: contains(matrix.image, 'macos')
+        run: cd ./support/gui && TERM=dumb ./gradlew createMacAppZip
+
+      # Set the Github Action variable ${{steps.info.outputs.os}} to
+      # 'linux', 'macos' or 'windows'. This is because runner.os contains
+      # Linux, MacOS and Windows.
+      - id: info
+        run: echo ::set-output name=os::"$(echo ${{runner.os}} | tr '[:upper:]' '[:lower:]')"
+
+      # Add linux/macos/windows to the end of the .zip filename.
+      - run: for f in $(find support/gui/build/distributions -name "TouIST*"); do mv $f ${f/\.zip/-${{steps.info.outputs.os}}.zip}; done
+
+      - run: opam exec -- dune build @doc
+
+      # Now that we are done with TouIST-v1.2.3-linux-x86_64, lets create the
+      # _build/touist-cli-v1.2.3-linux-x86_64.tar.gz
+      - run: cp $(opam exec -- which touist) touist-cli-"$(git describe --tags)"-${{steps.info.outputs.os}}
+
+      # This part is meant for unit and e2e tests.
+      - run: opam exec -- dune runtest
+      - run: opam uninstall .
+      - uses: actions/upload-artifact@v2
+        with:
+          name: cli
+          path: touist-cli-*
+      - uses: actions/upload-artifact@v2
+        with:
+          name: java
+          path: support/gui/build/distributions/*
+      - uses: actions/upload-artifact@v2
+        with:
+          name: doc
+          path: _build/default/_doc/*
+
+  reference-manual:
+    runs-on: ubuntu-latest
+    container: texlive/texlive:latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v2
+        with:
+          node-version: "12"
+      - run: npm install -g madoko madoko-local
+      - run: |
+          cd docs
+          sed -i 's/^Math Mode:.*$/Math Mode: static/' reference-manual.mdk
+          madoko -v -mversion:$(git describe --tags) -mmath-mode:static -mmath-latex:pdflatex reference-manual.mdk
+          madoko -v -mversion:$(git describe --tags) -mmath-mode:static -mmath-latex:pdflatex --pdf reference-manual.mdk
+
+      - uses: actions/upload-artifact@v2
+        with:
+          name: reference-manual
+          path: docs/out/reference-manual.*
+
+  release_binary:
+    runs-on: ubuntu-latest
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/v')
+    steps:
+      - uses: actions/download-artifact@v2
+        with:
+          name: java
+          path: java
+      - uses: actions/download-artifact@v2
+        with:
+          name: cli
+          path: cli
+
+      - id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: ${{ github.ref }}
+          draft: false
+          prerelease: false
+
+      - uses: alexellis/upload-assets@0.2.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          asset_paths: '["./java/*", "./cli/*"]'
+
+  publish_docs:
+    runs-on: ubuntu-latest
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/v')
+    steps:
+      - uses: actions/download-artifact@v2
+        with:
+          name: doc
+          path: doc
+      - run: git clone https://foo:${GITHUB_TOKEN}@github.com/touist/touist.github.io.git
+        env:
+          GITHUB_TOKEN: "${{ secrets.GH_TOKEN }}"
+      - run: mkdir -p touist.github.io/api/v/$(git describe --tags)
+      - run: cp -LR doc/* touist.github.io/api
+      - run: cp -LR doc/* touist.github.io/api/v/$(git describe --tags)
+      - run: |
+          git config user.name "Mael Valais"
+          git config user.email "mael.valais@gmail.com"
+      - run: |
+          git add touist.github.io/api/*
+          git commit -m "Generated API documentation for $(cd .. && git describe --tags)" || true
+          git push origin
+
+  publish_reference_manual:
+    runs-on: ubuntu-latest
+    needs: reference-manual
+    if: startsWith(github.ref, 'refs/tags/v')
+    steps:
+      - uses: actions/download-artifact@v2
+        with:
+          name: referemce-manual
+          path: referemce-manual
+
+      - run: git clone https://foo:${GITHUB_TOKEN}github.com/touist/touist.github.io.git
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+
+      - run: cp docs/out/reference-manual.pdf docs/out/reference-manual-$(git describe --tags).pdf
+      - run: cp docs/out/reference-manual.html docs/out/reference-manual-$(git describe --tags).html
+      - run: cp docs/out/reference-manual*.{pdf,html} touist.github.io/doc
+      - run: |
+          pip install mako
+          cd touist.github.io/doc
+          ../make_index.py . --regex "reference-manual.*" --header "Reference manual revisions" > manual-revision.html
+      - run: |
+          git config user.name "Mael Valais"
+          git config user.email "mael.valais@gmail.com"
+      - run: |
+          git add reference-manual*.{pdf,html} manual-revision.html
+          git commit -m "Generated mdk (modako) documentation for `cd $TRAVIS_BUILD_DIR && git describe --tags`"
+          git push origin
