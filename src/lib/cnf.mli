@@ -40,6 +40,7 @@
 
 (** {2 CNF transformation} *)
 
+val ast_to_cnf : ?debug_cnf:bool -> Types.Ast.t -> Types.Ast.t
 (** [ast_to_cnf] translates the syntaxic tree made of Or, And, Implies, Equiv...
     Or, And and Not; moreover, it can only be in a conjunction of formulas
     (see a reminder of their definition above).
@@ -52,11 +53,14 @@
         And (Or a,(Cor (Not b),c)), (And (Or (Or (Not a),b),d), d)
     v}
 *)
-val ast_to_cnf : ?debug_cnf:bool -> Types.Ast.t -> Types.Ast.t
-
 
 (** {2 Clauses transformation} *)
 
+val clauses_of_cnf :
+  ('a -> 'a) ->
+  (unit -> 'a) ->
+  Types.Ast.t ->
+  'a list list * ('a, string) Hashtbl.t * (string, 'a) Hashtbl.t
 (** [clauses_of_cnf] translates the cnf ast (Not, And, Or, Prop; no Bot/Top)
     into a CNF formula that takes the form of a list of lists of litterals
     (conjunctions of disjunctions of possibly negated proprositions).
@@ -68,11 +72,6 @@ val ast_to_cnf : ?debug_cnf:bool -> Types.Ast.t -> Types.Ast.t
     Note that the total number of literals is exactly equal to the table size;
     this size includes the special propositions beginning with '&' (e.g., '&4').
 *)
-val clauses_of_cnf :
-  ('a -> 'a) ->
-  (unit -> 'a) ->
-  Types.Ast.t ->
-  'a list list * ('a, string) Hashtbl.t * (string, 'a) Hashtbl.t
 
 (** {2 DIMACS output}
 
@@ -93,6 +92,8 @@ val clauses_of_cnf :
     v}
 *)
 
+val print_table :
+  ('a -> int) -> out_channel -> ?prefix:string -> ('a, string) Hashtbl.t -> unit
 (** [print_table] prints the correspondance table between literals (= numbers)
     and user-defined proposition names, e.g.,
     {v
@@ -106,10 +107,9 @@ val clauses_of_cnf :
     ]}
     in order to have all lines beginning by 'c' (= comment) in order to comply to
     the DIMACS format. *)
-val print_table :
-  ('a -> int) ->
-  out_channel -> ?prefix:string -> ('a, string) Hashtbl.t -> unit
 
+val print_clauses :
+  out_channel -> ?prefix:string -> ('a -> string) -> 'a list list -> unit
 (** [print_clauses] prints one disjunction per line ended by 0:
     {v
        -2 1 0
@@ -121,12 +121,10 @@ val print_table :
        p cnf <nb_lits> <nb_clauses>      with <nb_lits> = Hashtbl.length table
                                               <nb_clauses> = List.length clauses
     v} *)
-val print_clauses :
-  out_channel -> ?prefix:string -> ('a -> string) -> 'a list list -> unit
 
 (** {2 Other functions} *)
 
+val is_dummy : string -> bool
 (** [is_dummy name] tells (using the [name] of a litteral) is a 'dummy' literal
     that was introduced during cnf conversion; these literals are identified
     by their prefix '&'. *)
-val is_dummy : string -> bool

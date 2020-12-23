@@ -4,6 +4,7 @@
     [eval] is the main function.
 *)
 
+val eval : ?smt:bool -> ?onlychecktypes:bool -> Types.Ast.t -> Types.Ast.t
 (** [eval] checks the types, evaluates TouIST-specific constructs (variables,
     bigand, bigor, let...) and returns an {b evaluated} formula.
 
@@ -16,11 +17,6 @@
     [smt] enables the SMT mode. By default, the SAT/QBF mode is used.
 
     @raise Err.Fatal msg where {!Err.msg} contains the error. *)
-val eval :
-  ?smt:bool ->
-  ?onlychecktypes:bool -> Types.Ast.t -> Types.Ast.t
-
-
 
 (* [ast_without_loc] removes the location attached by the parser to the ast
    node. This location 'Loc (ast,loc)' allows to give the location in error
@@ -31,5 +27,5 @@ val eval :
    ]} *)
 val ast_without_loc : Types.Ast.t -> Types.Ast.t
 
-(** [has_top_or_bot ast] checks if there is any Bot or Top in [ast]. *)
 val has_top_or_bot : Types.Ast.t -> bool
+(** [has_top_or_bot ast] checks if there is any Bot or Top in [ast]. *)

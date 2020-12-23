@@ -21,21 +21,22 @@
       with most tools: MathJax (javascript), jlatexmath (java).
 *)
 
+val latex_of_ast :
+  ?matrix_instead_of_substack:bool -> full:bool -> Types.AstSet.elt -> string
 (** [latex_of_ast] turns an AST into latex. Two latex variants are targeted:
     - for light latex processors (mathjax, jlatexmath), you should use
       [~full:false]
     - for fully-featured latex processors, you can use [~full:true]. *)
-val latex_of_ast : ?matrix_instead_of_substack:bool -> full:bool -> Types.AstSet.elt -> string
 
 (** {2 Utility} *)
 
+val ast_fun : (bool -> Types.Ast.t -> bool) -> bool -> Types.Ast.t -> bool
 (** [ast_fun] will apply f on all *formula*-related elements of the AST where
     cond is true. The tranversal order should not be considered.
     Whenever a non-formula is given, acc will be immediatly returned. *)
-val ast_fun :
-  (bool -> Types.Ast.t -> bool) ->
-  bool -> Types.Ast.t -> bool
 
-  val contains_newline : Types.Ast.t -> bool
+val contains_newline : Types.Ast.t -> bool
+
 val is_binary_op : Types.Ast.t -> bool
+
 val contains_binary_op : Types.Ast.t -> bool

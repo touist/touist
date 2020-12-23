@@ -13,9 +13,8 @@ val ocamlqbf_of_ast :
 val qcnf_of_cnf :
   Touist.Types.Ast.t -> Qbf.QCNF.t * (Qbf.Lit.t, string) Hashtbl.t
 
-
 val solve :
   ?hidden:bool -> Qbf.QCNF.t * (Qbf.Lit.t, string) Hashtbl.t -> string option
 
-(** Is this library enabled? (requires qbf to be installed) *)
 val enabled : bool
+(** Is this library enabled? (requires qbf to be installed) *)

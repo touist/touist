@@ -15,6 +15,7 @@
 
 (** {2 Parsing TouIST} *)
 
+val parse_sat : ?debug_syntax:bool -> ?filename:string -> string -> Types.Ast.t
 (** [parse_sat text] parses [text] and outputs the corresponding [ast].
 
     [~debug:true] enable the display of the automata state number on parser
@@ -22,16 +23,13 @@
 
     [~filename:"foo.touist"] enables the display of a file name in errors.
 *)
-val parse_sat :
-  ?debug_syntax:bool -> ?filename:string -> string -> Types.Ast.t
 
-val parse_smt :
-  ?debug_syntax:bool -> ?filename:string -> string -> Types.Ast.t
+val parse_smt : ?debug_syntax:bool -> ?filename:string -> string -> Types.Ast.t
 
-val parse_qbf :
-  ?debug_syntax:bool -> ?filename:string -> string -> Types.Ast.t
+val parse_qbf : ?debug_syntax:bool -> ?filename:string -> string -> Types.Ast.t
 
 (** {2 Utility functions} *)
 
 val string_of_chan : in_channel -> string
+
 val string_of_file : string -> string

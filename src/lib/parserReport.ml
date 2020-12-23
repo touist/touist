@@ -46,26 +46,22 @@ module S = MenhirLib.General (* Streams *)
    silently cover up for our internal error. Thus, we typically use an idiom of
    the form [if debug then assert false else <some default value>]. *)
 
-let debug = ref false (* This variable is set when calling the function [report]*)
+let debug = ref false
+
+(* This variable is set when calling the function [report]*)
 
 (* -------------------------------------------------------------------------- *)
 
 (* The parser keeps track of the last two tokens in a two-place buffer. *)
 
-type 'a buffer =
-| Zero
-| One of 'a
-| Two of 'a * (* most recent: *) 'a
+type 'a buffer = Zero | One of 'a | Two of 'a * (* most recent: *) 'a
 
 (* [push buffer x] pushes [x] into [buffer], causing the buffer to slide. *)
 
 let update buffer x : _ buffer =
-  match buffer, x with
-  | Zero, _ ->
-      One x
-  | One x1, x2
-  | Two (_, x1), x2 ->
-      Two (x1, x2)
+  match (buffer, x) with
+  | Zero, _ -> One x
+  | One x1, x2 | Two (_, x1), x2 -> Two (x1, x2)
 
 (* [show f buffer] prints the contents of the buffer. The function [f] is
    used to print an element. *)
@@ -92,8 +88,9 @@ let exact_pos buffer : position =
       (* The buffer cannot be empty. If we have read no tokens, we
          cannot have detected a syntax error. *)
       assert false
-  | One invalid
-  | Two (_, invalid) -> let start_pos,_ = invalid in start_pos
+  | One invalid | Two (_, invalid) ->
+      let start_pos, _ = invalid in
+      start_pos
 
 (* [area_pos] returns the area (= start and end positions) where the error
    was found; this is useful for red-underlying the error in an IDE.
@@ -102,15 +99,18 @@ let exact_pos buffer : position =
    If there is no preceeding token, returns the invalid token twice.
    NOTE: position = Lexing.position *)
 
-let area_pos (buffer : (position*position) buffer) : position * position =
+let area_pos (buffer : (position * position) buffer) : position * position =
   match buffer with
   | Zero ->
       (* The buffer cannot be empty. If we have read no tokens, we
          cannot have detected a syntax error. *)
       assert false
-  | One invalid -> let (startpos,endpos) = invalid in (startpos,endpos)
-  | Two (previous, invalid) -> let (startpos,_),(_,endpos) = previous,invalid
-    in startpos, endpos
+  | One invalid ->
+      let startpos, endpos = invalid in
+      (startpos, endpos)
+  | Two (previous, invalid) ->
+      let (startpos, _), (_, endpos) = (previous, invalid) in
+      (startpos, endpos)
 
 (* -------------------------------------------------------------------------- *)
 
@@ -118,11 +118,9 @@ let area_pos (buffer : (position*position) buffer) : position * position =
    by the positions [pos1] and [pos2]. *)
 
 let extract text (pos1, pos2) : string =
-  let ofs1 = pos1.pos_cnum
-  and ofs2 = pos2.pos_cnum in
+  let ofs1 = pos1.pos_cnum and ofs2 = pos2.pos_cnum in
   let len = ofs2 - ofs1 in
-  try
-    String.sub text ofs1 len
+  try String.sub text ofs1 len
   with Invalid_argument _ ->
     (* In principle, this should not happen, but if it does, let's make this
        a non-fatal error. *)
@@ -133,8 +131,7 @@ let extract text (pos1, pos2) : string =
 (* [compress text] replaces every run of at least one whitespace character
    with exactly one space character. *)
 
-let compress text =
-  Re.Str.global_replace (Re.Str.regexp "[ \t\n\r]+") " " text
+let compress text = Re.Str.global_replace (Re.Str.regexp "[ \t\n\r]+") " " text
 
 (* -------------------------------------------------------------------------- *)
 
@@ -142,9 +139,9 @@ let compress text =
    They are (arbitrarily) replaced with a single dot character. *)
 
 let sanitize text =
-  String.map (fun c ->
-    if Char.code c < 32 || Char.code c >= 127 then '.' else c
-  ) text
+  String.map
+    (fun c -> if Char.code c < 32 || Char.code c >= 127 then '.' else c)
+    text
 
 (* -------------------------------------------------------------------------- *)
 
@@ -153,23 +150,17 @@ let sanitize text =
 
 let shorten k text =
   let n = String.length text in
-  if n <= 2 * k + 3 then
-    text
-  else
-    String.sub text 0 k ^
-    "..." ^
-    String.sub text (n - k) k
+  if n <= (2 * k) + 3 then text
+  else String.sub text 0 k ^ "..." ^ String.sub text (n - k) k
 
 (* -------------------------------------------------------------------------- *)
 
 (* [stack checkpoint] extracts the parser's stack out of a checkpoint. *)
 
 let stack checkpoint =
-  match checkpoint with
-  | HandlingError env ->
-      stack env
-  | _ ->
-      assert false (* this cannot happen, I promise *)
+  match checkpoint with HandlingError env -> stack env | _ -> assert false
+
+(* this cannot happen, I promise *)
 
 (* -------------------------------------------------------------------------- *)
 
@@ -182,20 +173,16 @@ let state checkpoint : int =
       (* Hmm... The parser is in its initial state. Its number is
          usually 0. This is a BIG HACK. TEMPORARY *)
       0
-  | S.Cons (Element (s, _, _, _), _) ->
-      number s
+  | S.Cons (Element (s, _, _, _), _) -> number s
 
 (* -------------------------------------------------------------------------- *)
 
 (* TEMPORARY move to MenhirLib.General *)
 
 let rec drop n (xs : 'a S.stream) : 'a S.stream =
-  match n, xs with
-  | 0, _
-  | _, lazy (S.Nil) ->
-      xs
-  | _, lazy (S.Cons (_, xs)) ->
-      drop (n - 1) xs
+  match (n, xs) with
+  | 0, _ | _, (lazy S.Nil) -> xs
+  | _, (lazy (S.Cons (_, xs))) -> drop (n - 1) xs
 
 (* -------------------------------------------------------------------------- *)
 
@@ -204,18 +191,24 @@ let rec drop n (xs : 'a S.stream) : 'a S.stream =
    if it isn't. *)
 
 let element checkpoint i : element =
-  let i' = if i>0 then (i-1) else i in
+  let i' = if i > 0 then i - 1 else i in
   match Lazy.force (drop i' (stack checkpoint)) with
   | S.Nil ->
       (* [i] is out of range. This could happen if the handwritten error
          messages are out of sync with the grammar, or if a mistake was
          made. We fail in a non-fatal way. *)
       raise Not_found
-  | S.Cons (Element (a, b, p1, p2), _) ->
+  | S.Cons (Element (a, b, p1, p2), _) -> (
       match i with
-      | 0 -> let p1',p2' = (positions (match checkpoint with HandlingError env -> env | _ -> failwith "Shouldnt happen")) in
-        Element (a, b, p1', p2')
-      | _ -> Element (a, b, p1, p2)
+      | 0 ->
+          let p1', p2' =
+            positions
+              (match checkpoint with
+              | HandlingError env -> env
+              | _ -> failwith "Shouldnt happen")
+          in
+          Element (a, b, p1', p2')
+      | _ -> Element (a, b, p1, p2))
 
 (* -------------------------------------------------------------------------- *)
 
@@ -228,7 +221,7 @@ let width = 30
 
 let range text (e : element) : string =
   (* Extract the start and positions of this stack element. *)
-  let Element (_, _, pos1, pos2) = e in
+  let (Element (_, _, pos1, pos2)) = e in
   (* Get the underlying source text fragment. *)
   let fragment = extract text (pos1, pos2) in
   (* Sanitize it and limit its length. Enclose it in single quotes. *)
@@ -257,8 +250,7 @@ let fragment text checkpoint message =
 let fragments text checkpoint (message : string) : string =
   Re.Str.global_substitute
     (Re.Str.regexp "\\$\\([0-9]+\\)")
-    (fragment text checkpoint)
-    message
+    (fragment text checkpoint) message
 
 (* -------------------------------------------------------------------------- *)
 
@@ -273,28 +265,30 @@ let fragments text checkpoint (message : string) : string =
    we need not care about that here. *)
 
 let report text buffer checkpoint debug' : string =
-  debug := debug'; (* Sets the debug flag for the whole ErrorReporting.ml file *)
+  debug := debug';
+  (* Sets the debug flag for the whole ErrorReporting.ml file *)
   let where = show (extract text) buffer in
   (* Find out in which state the parser failed. *)
   let s : int = state checkpoint in
   (* Choose an error message, based on the state number [s].
      Then, customize it, based on dynamic information. *)
-  let message = try
-    ParserMsgs.message s |>
-    fragments text checkpoint
-  with Not_found ->
-    (* If the state number cannot be found -- which, in principle,
-       should not happen, since our list of erroneous states is
-       supposed to be complete! -- produce a generic message. *)
-    Printf.sprintf "This is an unknown syntax error (number %d). This error \
-                   is missing in parser.messages (see HOWTODEBUG.md).\n" s
+  let message =
+    try ParserMsgs.message s |> fragments text checkpoint
+    with Not_found ->
+      (* If the state number cannot be found -- which, in principle,
+         should not happen, since our list of erroneous states is
+         supposed to be complete! -- produce a generic message. *)
+      Printf.sprintf
+        "This is an unknown syntax error (number %d). This error is missing in \
+         parser.messages (see HOWTODEBUG.md).\n"
+        s
   in
   (* Construct the full error message. *)
-  let message = Printf.sprintf "syntax error %s. %s"
-    where
-    message
-  ^
-  if !debug then
+  let message =
+    Printf.sprintf "syntax error %s. %s" where message
+    ^
+    if !debug then
       Printf.sprintf "Debug: Automaton state: %d (see src/parser.messages)\n" s
-  else ""
-in message
+    else ""
+  in
+  message

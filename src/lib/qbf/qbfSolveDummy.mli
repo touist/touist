@@ -7,14 +7,11 @@
    This function had been written before {!Touist.Qbf.cnf} existed, this is why
    I wrote a second function [qcnf_of_cnf] which allows me to use my own
    CNF function (i.e., {!Touist.Qbf.cnf}). *)
-val ocamlqbf_of_ast :
-  Touist.Types.Ast.t -> _ * (_, string) Hashtbl.t
+val ocamlqbf_of_ast : Touist.Types.Ast.t -> _ * (_, string) Hashtbl.t
 
-val qcnf_of_cnf :
-  Touist.Types.Ast.t -> _ * (_, string) Hashtbl.t
+val qcnf_of_cnf : Touist.Types.Ast.t -> _ * (_, string) Hashtbl.t
 
-val solve :
-  ?hidden:bool -> 'a * (_, string) Hashtbl.t -> string option
+val solve : ?hidden:bool -> 'a * (_, string) Hashtbl.t -> string option
 
-(** Is this library enabled? (requires yices2 to be installed) *)
 val enabled : bool
+(** Is this library enabled? (requires yices2 to be installed) *)
