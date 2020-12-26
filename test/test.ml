@@ -17,8 +17,9 @@ let is_msg typ during loc_str msg =
   | t, d, _, None when loc_str = "" && t == typ && d == during -> true
   | _ -> false
 
-let test_raise (parse : string -> unit) (during : Touist.Err.during) typ
-    _nth_msg (loc_expected : string) text =
+let test_raise (parse : string -> unit) (during : Touist.Err.during) typ nth_msg
+    (loc_expected : string) text =
+  ignore nth_msg;
   try
     parse text;
     if typ == Touist.Err.Error then
@@ -86,12 +87,17 @@ let test_sat_raise ?(during = Touist.Err.Eval) ?(typ = Touist.Err.Error)
     ?(nth = 0) loc text _ =
   test_raise sat during typ nth loc text
 
+let test_sat_raise ?(during = Touist.Err.Eval) ?(typ = Touist.Err.Error)
+    ?(nth = 0) loc text _ =
+  test_raise sat during typ nth loc text
+
 let test_smt_raise ?(during = Touist.Err.Eval) ?(typ = Touist.Err.Error)
     ?(nth = 0) ?(logic = "QF_IDL") loc text _ =
   test_raise (smt logic) during typ nth loc text
 
 let test_qbf_raise ?(during = Touist.Err.Eval) ?(typ = Touist.Err.Error)
-    ?(nth = 0) ?(_logic = "QF_IDL") loc text _ =
+    ?(nth = 0) ?(logic = "QF_IDL") loc text _ =
+  ignore logic;
   test_raise qbf during typ nth loc text
 
 let sat_models_are text expected _ =
