@@ -1,6 +1,78 @@
 open Types
 open Types.Ast
 
+let arith_unop u x =
+  match u with
+  | Neg -> "(- " ^ x ^ ")"
+  | Sqrt -> "sqrt(" ^ x ^ ")"
+  | To_int -> "int(" ^ x ^ ")"
+  | Abs -> "abs(" ^ x ^ ")"
+  | To_float -> "float(" ^ x ^ ")"
+
+let arith_binop = function
+  | Add -> "+"
+  | Sub -> "-"
+  | Mul -> "*"
+  | Div -> "/"
+  | Mod -> "mod"
+
+let logic_binop_base = function
+  | And -> "and"
+  | Or -> "or"
+  | Xor -> "xor"
+  | Implies -> "=>"
+  | Equiv -> "<=>"
+
+let logic_binop_utf8 = function
+  | And -> "⋀"
+  | Or -> "⋁"
+  | Xor -> "xor"
+  | Implies -> "⇒"
+  | Equiv -> "⇔"
+
+let logic_binop ?(utf8 = false) =
+  if utf8 then logic_binop_utf8 else logic_binop_base
+
+let set_binop_base = function
+  | Union -> "union"
+  | Inter -> "inter"
+  | Diff -> "diff"
+
+let set_binop_utf8 = function Union -> "∪" | Inter -> "∩" | Diff -> "\\"
+
+let arith_binrel_base = function
+  | Equal -> "=="
+  | Not_equal -> "!="
+  | Lesser_than -> "<"
+  | Lesser_or_equal -> "<="
+  | Greater_than -> ">"
+  | Greater_or_equal -> ">="
+
+let arith_binrel_utf8 = function
+  | Equal -> "=="
+  | Not_equal -> "≠"
+  | Lesser_than -> "<"
+  | Lesser_or_equal -> "≤"
+  | Greater_than -> ">"
+  | Greater_or_equal -> "≥"
+
+let arith_binrel ?(utf8 = false) =
+  if utf8 then arith_binrel_utf8 else arith_binrel_base
+
+let layout ?(debug = false) x = function
+  | Loc l -> (if debug then "loc " ^ Err.string_of_loc l ^ ":" else "") ^ x
+  | Paren | NewlineBefore | NewlineAfter -> x
+
+let layout_type ?(debug = false) x = function
+  | Loc _ -> if debug then "location" else x
+  | Paren -> x
+  | NewlineBefore | NewlineAfter -> "newline"
+
+let cardinality = function
+  | Exact -> "exact"
+  | Atmost -> "atmost"
+  | Atleast -> "atleast"
+
 let rec string_of_ast ?(utf8 = false) ?(show_var = fun _ -> "") ?(debug = false)
     ?(parenthesis = debug) ast =
   let of_ast = string_of_ast ~utf8 ~show_var ~parenthesis ~debug in
@@ -19,42 +91,22 @@ let rec string_of_ast ?(utf8 = false) ?(show_var = fun _ -> "") ?(debug = false)
   | Var (x, Some y) -> x ^ "(" ^ of_ast_list "," y ^ ")" ^ show_var ast
   | Set x -> "[" ^ of_ast_list "," (AstSet.elements x) ^ "]"
   | Set_decl x -> "[" ^ of_ast_list "," x ^ "]"
-  | Neg x -> "(- " ^ of_ast x ^ ")"
-  | Add (x, y) -> "(" ^ of_ast x ^ " + " ^ of_ast y ^ ")"
-  | Sub (x, y) -> "(" ^ of_ast x ^ " - " ^ of_ast y ^ ")"
-  | Mul (x, y) -> "(" ^ of_ast x ^ " * " ^ of_ast y ^ ")"
-  | Div (x, y) -> "(" ^ of_ast x ^ " / " ^ of_ast y ^ ")"
-  | Mod (x, y) -> "(" ^ of_ast x ^ " mod " ^ of_ast y ^ ")"
-  | Sqrt x -> "sqrt(" ^ of_ast x ^ ")"
-  | To_int x -> "int(" ^ of_ast x ^ ")"
-  | Abs x -> "abs(" ^ of_ast x ^ ")"
-  | To_float x -> "float(" ^ of_ast x ^ ")"
+  | ArithUnop (u, x) -> arith_unop u (of_ast x)
+  | ArithBinop (x, b, y) ->
+      "(" ^ of_ast x ^ " " ^ arith_binop b ^ " " ^ of_ast y ^ ")"
   | Not x when utf8 -> "¬" ^ of_ast x
   | Not x -> "not " ^ of_ast x
-  | And (x, y) when utf8 -> "(" ^ of_ast x ^ " ⋀ " ^ of_ast y ^ ")"
-  | And (x, y) -> "(" ^ of_ast x ^ " and " ^ of_ast y ^ ")"
-  | Or (x, y) when utf8 -> "(" ^ of_ast x ^ " ⋁ " ^ of_ast y ^ ")"
-  | Or (x, y) -> "(" ^ of_ast x ^ " or " ^ of_ast y ^ ")"
-  | Xor (x, y) -> "(" ^ of_ast x ^ " xor " ^ of_ast y ^ ")"
-  | Implies (x, y) when utf8 -> "(" ^ of_ast x ^ " ⇒ " ^ of_ast y ^ ")"
-  | Implies (x, y) -> "(" ^ of_ast x ^ " => " ^ of_ast y ^ ")"
-  | Equiv (x, y) when utf8 -> "(" ^ of_ast x ^ " ⇔ " ^ of_ast y ^ ")"
-  | Equiv (x, y) -> "(" ^ of_ast x ^ " <=> " ^ of_ast y ^ ")"
-  | Equal (x, y) -> of_ast x ^ " == " ^ of_ast y
-  | Not_equal (x, y) when utf8 -> of_ast x ^ " ≠ " ^ of_ast y
-  | Not_equal (x, y) -> of_ast x ^ " != " ^ of_ast y
-  | Lesser_than (x, y) -> of_ast x ^ " < " ^ of_ast y
-  | Lesser_or_equal (x, y) when utf8 -> of_ast x ^ " ≤ " ^ of_ast y
-  | Lesser_or_equal (x, y) -> of_ast x ^ " <= " ^ of_ast y
-  | Greater_than (x, y) -> of_ast x ^ " > " ^ of_ast y
-  | Greater_or_equal (x, y) when utf8 -> of_ast x ^ " ≥ " ^ of_ast y
-  | Greater_or_equal (x, y) -> of_ast x ^ " >= " ^ of_ast y
-  | Union (x, y) when utf8 -> of_ast x ^ " ∪ " ^ of_ast y
-  | Union (x, y) -> "union(" ^ of_ast x ^ "," ^ of_ast y
-  | Inter (x, y) when utf8 -> of_ast x ^ " ∩ " ^ of_ast y
-  | Inter (x, y) -> "inter(" ^ of_ast x ^ "," ^ of_ast y
-  | Diff (x, y) when utf8 -> of_ast x ^ "\\" ^ of_ast y
-  | Diff (x, y) -> "diff(" ^ of_ast x ^ "," ^ of_ast y
+  | LogicBinop (x, b, y) ->
+      "(" ^ of_ast x ^ " " ^ logic_binop ~utf8 b ^ " " ^ of_ast y ^ ")"
+  | ArithBinrel (x, b, y) when utf8 ->
+      of_ast x ^ " " ^ arith_binrel_utf8 b ^ " " ^ of_ast y
+  | ArithBinrel (x, b, y) ->
+      of_ast x ^ " " ^ arith_binrel_base b ^ " " ^ of_ast y
+  | SetBinop (x, b, y) when utf8 ->
+      of_ast x ^ " " ^ set_binop_utf8 b ^ " " ^ of_ast y
+  | SetBinop (x, b, y) ->
+      set_binop_base b ^ "(" ^ of_ast x ^ ", " ^ of_ast y ^ ")"
+      (* AS: previously no closing parenthesis. *)
   | Range (x, y) -> "[" ^ of_ast x ^ ".." ^ of_ast y ^ "]"
   | Subset (x, y) when utf8 -> of_ast x ^ " ⊆ " ^ of_ast y
   | Subset (x, y) -> "subset(" ^ of_ast x ^ "," ^ of_ast y
@@ -80,21 +132,17 @@ let rec string_of_ast ?(utf8 = false) ?(show_var = fun _ -> "") ?(debug = false)
   | Bigor (x, y, Some b, z) ->
       "bigor " ^ of_ast_list "," x ^ " in " ^ of_ast_list "," y ^ " when "
       ^ of_ast b ^ ":\n" ^ of_ast z ^ "\nend\n"
-  | Exact (x, y) -> "exact(" ^ of_ast x ^ "," ^ of_ast y ^ ")"
-  | Atmost (x, y) -> "atmost(" ^ of_ast x ^ "," ^ of_ast y ^ ")"
-  | Atleast (x, y) -> "atleast(" ^ of_ast x ^ "," ^ of_ast y ^ ")"
+  | Cardinality (c, x, y) ->
+      cardinality c ^ "(" ^ of_ast x ^ "," ^ of_ast y ^ ")"
   | Let (v, x, c) -> of_ast v ^ "=" ^ of_ast x ^ ": " ^ of_ast c
   | Affect (v, c) -> of_ast v ^ "=" ^ of_ast c
   | Touist_code f -> of_ast_list "\n" f
-  | Loc (x, l) ->
-      (if debug then "loc " ^ Err.string_of_loc l ^ ":" else "") ^ of_ast x
-  | Paren x -> of_ast x
+  | Layout (l, x) -> layout ~debug (of_ast x) l
   | Exists (v, f) when utf8 -> "∃" ^ of_ast v ^ "." ^ of_ast f
   | Exists (v, f) -> "exists " ^ of_ast v ^ ": " ^ of_ast f
   | Forall (v, f) when utf8 -> "∀" ^ of_ast v ^ "." ^ of_ast f
   | Forall (v, f) -> "forall " ^ of_ast v ^ ": " ^ of_ast f
   | For (v, c, f) -> "for " ^ of_ast v ^ " in " ^ of_ast c ^ ":" ^ of_ast f
-  | NewlineBefore f | NewlineAfter f -> of_ast f
   | Formula f -> "\"" ^ of_ast f ^ "\""
   | SetBuilder (f, vars, sets, cond) ->
       "[" ^ of_ast f ^ " for " ^ of_ast_list "," vars ^ " in "
@@ -116,31 +164,16 @@ and string_of_ast_type ?(debug = false) (ast : Ast.t) : string =
   | Var (_, Some _) -> "tuple-variable"
   | Set _ -> "set"
   | Set_decl _ -> "[ ] (set definition)"
-  | Neg _ -> "-"
-  | Add (_, _) -> "+"
-  | Sub (_, _) -> "-"
-  | Mul (_, _) -> "*"
-  | Div (_, _) -> "/"
-  | Mod (_, _) -> "mod"
-  | Sqrt _ -> "sqrt()"
-  | To_int _ -> "int()"
-  | To_float _ -> "float()"
-  | Abs _ -> "abs()"
+  | ArithBinop (_, b, _) -> arith_binop b
+  | ArithUnop (Neg, _) -> "-"
+  | ArithUnop (Sqrt, _) -> "sqrt()"
+  | ArithUnop (To_int, _) -> "int()"
+  | ArithUnop (To_float, _) -> "float()"
+  | ArithUnop (Abs, _) -> "abs()"
   | Not _ -> "not"
-  | And (_, _) -> "and"
-  | Or (_, _) -> "or"
-  | Xor (_, _) -> "xor"
-  | Implies (_, _) -> "=>"
-  | Equiv (_, _) -> "<=>"
-  | Equal (_, _) -> "=="
-  | Not_equal (_, _) -> "!="
-  | Lesser_than (_, _) -> "<"
-  | Lesser_or_equal (_, _) -> "<="
-  | Greater_than (_, _) -> ">"
-  | Greater_or_equal (_, _) -> ">="
-  | Union (_, _) -> "union"
-  | Inter (_, _) -> "inter"
-  | Diff (_, _) -> "diff"
+  | LogicBinop (_, b, _) -> logic_binop b
+  | ArithBinrel (_, b, _) -> arith_binrel_base b
+  | SetBinop (_, b, _) -> set_binop_base b
   | Range (_, _) -> ".."
   | Subset (_, _) -> "subset()"
   | Powerset _ -> "powerset()"
@@ -152,18 +185,14 @@ and string_of_ast_type ?(debug = false) (ast : Ast.t) : string =
   | Bigand (_, _, Some _, _) -> "bigand"
   | Bigor (_, _, None, _) -> "bigor"
   | Bigor (_, _, Some _, _) -> "bigor"
-  | Exact (_, _) -> "exact"
-  | Atmost (_, _) -> "atmost"
-  | Atleast (_, _) -> "atleast"
+  | Cardinality (c, _, _) -> cardinality c
   | Let (_, _, _) -> "let"
   | Affect (_, _) -> "="
   | Touist_code _ -> "(touist code)"
-  | Loc (x, _) -> if debug then "location" else of_ast_type x
-  | Paren x -> of_ast_type x
+  | Layout (l, x) -> layout_type ~debug (of_ast_type x) l
   | Exists (_, _) -> "exists"
   | Forall (_, _) -> "forall"
   | For (_, _, _) -> "for"
-  | NewlineBefore _ | NewlineAfter _ -> "newline"
   | Formula _ -> "quoted formula"
   | SetBuilder (_, _, _, _) -> "set builder"
 

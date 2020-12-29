@@ -25,7 +25,7 @@ val eval : ?smt:bool -> ?onlychecktypes:bool -> Types.Ast.t -> Types.Ast.t
    [ast_without_loc] must be called before any {[
      match ast with | Inter (x,y) -> ...
    ]} *)
-val ast_without_loc : Types.Ast.t -> Types.Ast.t
+val ast_without_layout : Types.Ast.t -> Types.Ast.t
 
 val has_top_or_bot : Types.Ast.t -> bool
 (** [has_top_or_bot ast] checks if there is any Bot or Top in [ast]. *)

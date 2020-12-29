@@ -23,6 +23,59 @@ let rm_dollar x = String.sub x 1 (String.length x - 1)
     ]}
 *)
 
+let arith_unop u x =
+  match u with
+  | Neg -> "-" ^ x
+  | Sqrt -> "\\sqrt{" ^ x ^ "}"
+  | To_int -> "\\textrm{int}(" ^ x ^ ")"
+  | Abs -> "\\|" ^ x ^ "\\|"
+  | To_float -> "\\textrm{float}(" ^ x ^ ")"
+
+let arith_binop = function
+  | Add -> "+"
+  | Sub -> "-"
+  | Mul -> "\\times"
+  | Div -> "\\div"
+  | Mod -> "\\textrm{mod}"
+
+let logic_binop = function
+  | And -> "\\wedge"
+  | Or -> "\\vee"
+  | Xor -> "\\oplus"
+  | Implies -> "\\Rightarrow"
+  | Equiv -> "\\Leftrightarrow"
+
+let set_binop = function
+  | Union -> "\\cup"
+  | Inter -> "\\cap"
+  | Diff -> "\\setminus"
+
+let arith_binrel = function
+  | Equal -> "="
+  | Not_equal -> "\\neq"
+  | Lesser_than -> "<"
+  | Lesser_or_equal -> "\\leq"
+  | Greater_than -> "<"
+  | Greater_or_equal -> "\\geq"
+
+let layout full has_newlines x = function
+  | Loc _ -> x
+  | Paren ->
+      if
+        full && has_newlines
+        (* \left( and \right) must be on the same line in latex.
+            If there is a \\ in latex between two parenthesis, we use
+            a pmatrix instead. *)
+      then "\\begin{pmatrix*}[l]" ^ x ^ "\\end{pmatrix*}"
+      else "\\left(" ^ x ^ "\\right)"
+  | NewlineBefore -> "\\\\\n" ^ x
+  | NewlineAfter -> x ^ "\\\\\n"
+
+let cardinality = function
+  | Exact -> "\\textrm{exact}"
+  | Atmost -> "\\textrm{atmost}"
+  | Atleast -> "\\textrm{atleast}"
+
 let rec latex_of_ast ?(matrix_instead_of_substack = false) ~full ast =
   let latex_of_ast ast = latex_of_ast ~matrix_instead_of_substack ~full ast in
   let latex_of_commalist =
@@ -51,31 +104,18 @@ let rec latex_of_ast ?(matrix_instead_of_substack = false) ~full ast =
       | None -> "")
   | Set x -> "[" ^ latex_of_commalist "," (AstSet.elements x) ^ "]"
   | Set_decl x -> "[" ^ latex_of_commalist "," x ^ "]"
-  | Neg x -> "-" ^ latex_of_ast x
-  | Add (x, y) -> latex_of_ast x ^ " + " ^ latex_of_ast y
-  | Sub (x, y) -> latex_of_ast x ^ " - " ^ latex_of_ast y
-  | Mul (x, y) -> latex_of_ast x ^ " \\times " ^ latex_of_ast y
-  | Div (x, y) -> "\\frac{" ^ latex_of_ast x ^ "}{" ^ latex_of_ast y ^ "}"
-  | Mod (x, y) -> latex_of_ast x ^ " \\textrm{mod} " ^ latex_of_ast y
-  | Sqrt x -> "\\sqrt{" ^ latex_of_ast x ^ "}"
-  | To_int x -> "\\textrm{int}(" ^ latex_of_ast x ^ ")"
-  | Abs x -> "\\|" ^ latex_of_ast x ^ "\\|"
-  | To_float x -> "\\textrm{float}(" ^ latex_of_ast x ^ ")"
+  | ArithUnop (u, y) -> arith_unop u (latex_of_ast y)
+  | ArithBinop (x, Div, y) ->
+      "\\frac{" ^ latex_of_ast x ^ "}{" ^ latex_of_ast y ^ "}"
+      (* AS: I'd prefer to use \\div, but leaving things as they are now. *)
+  | ArithBinop (x, b, y) ->
+      latex_of_ast x ^ " " ^ arith_binop b ^ " " ^ latex_of_ast y
   | Not x -> "\\neg " ^ latex_of_ast x
-  | And (x, y) -> latex_of_ast x ^ " \\wedge " ^ latex_of_ast y
-  | Or (x, y) -> latex_of_ast x ^ " \\vee " ^ latex_of_ast y
-  | Xor (x, y) -> latex_of_ast x ^ " \\oplus " ^ latex_of_ast y
-  | Implies (x, y) -> latex_of_ast x ^ " \\Rightarrow " ^ latex_of_ast y
-  | Equiv (x, y) -> latex_of_ast x ^ " \\Leftrightarrow " ^ latex_of_ast y
-  | Equal (x, y) -> latex_of_ast x ^ " = " ^ latex_of_ast y
-  | Not_equal (x, y) -> latex_of_ast x ^ " \\neq " ^ latex_of_ast y
-  | Lesser_than (x, y) -> latex_of_ast x ^ " < " ^ latex_of_ast y
-  | Lesser_or_equal (x, y) -> latex_of_ast x ^ " \\leq " ^ latex_of_ast y
-  | Greater_than (x, y) -> latex_of_ast x ^ " > " ^ latex_of_ast y
-  | Greater_or_equal (x, y) -> latex_of_ast x ^ " \\geq " ^ latex_of_ast y
-  | Union (x, y) -> latex_of_ast x ^ "\\cup" ^ latex_of_ast y
-  | Inter (x, y) -> latex_of_ast x ^ "\\cap " ^ latex_of_ast y
-  | Diff (x, y) -> latex_of_ast x ^ "\\setminus " ^ latex_of_ast y
+  | LogicBinop (x, b, y) ->
+      latex_of_ast x ^ " " ^ logic_binop b ^ " " ^ latex_of_ast y
+  | ArithBinrel (x, b, y) ->
+      latex_of_ast x ^ " " ^ arith_binrel b ^ " " ^ latex_of_ast y
+  | SetBinop (x, b, y) -> latex_of_ast x ^ set_binop b ^ latex_of_ast y
   | Range (x, y) -> "[" ^ latex_of_ast x ^ ".." ^ latex_of_ast y ^ "]"
   | Subset (x, y) -> latex_of_ast x ^ "\\subseteq " ^ latex_of_ast y
   | Powerset x -> "\\textrm{powerset}(" ^ latex_of_ast x ^ ")"
@@ -94,7 +134,8 @@ let rec latex_of_ast ?(matrix_instead_of_substack = false) ~full ast =
       ^ (if matrix_instead_of_substack then "\\end{matrix}" else "}")
       ^ "}"
       ^ latex_of_ast
-          (if z |> Eval.ast_without_loc |> is_binary_op then Paren z else z)
+          (if z |> Eval.ast_without_layout |> is_binary_op then Layout (Paren, z)
+          else z)
   | Bigor (x, y, b, z) ->
       "\\bigvee\\limits_{"
       ^ (if matrix_instead_of_substack then "\\begin{matrix}"
@@ -104,18 +145,15 @@ let rec latex_of_ast ?(matrix_instead_of_substack = false) ~full ast =
       ^ (if matrix_instead_of_substack then "\\end{matrix}" else "}")
       ^ "}"
       ^ latex_of_ast
-          (if z |> Eval.ast_without_loc |> is_binary_op then Paren z else z)
-  | Exact (x, y) ->
-      "\\textrm{exact}(" ^ latex_of_ast x ^ "," ^ latex_of_ast y ^ ")"
-  | Atmost (x, y) ->
-      "\\textrm{atmost}(" ^ latex_of_ast x ^ "," ^ latex_of_ast y ^ ")"
-  | Atleast (x, y) ->
-      "\\textrm{atleast}(" ^ latex_of_ast x ^ "," ^ latex_of_ast y ^ ")"
+          (if z |> Eval.ast_without_layout |> is_binary_op then Layout (Paren, z)
+          else z)
+  | Cardinality (c, x, y) ->
+      cardinality c ^ "(" ^ latex_of_ast x ^ "," ^ latex_of_ast y ^ ")"
   | Let (v, x, c) ->
       let rec unwrap acc ast : string =
         match ast with
         | Let (v', x', c') -> unwrap ((v', x') :: acc) c'
-        | Loc (x, _) -> unwrap acc x
+        | Layout (Loc _, x) -> unwrap acc x
         | c' ->
             "\\left(" ^ latex_of_ast c' ^ "\\right)_{\\begin{Bmatrix}"
             ^ (acc
@@ -128,20 +166,12 @@ let rec latex_of_ast ?(matrix_instead_of_substack = false) ~full ast =
       in
       unwrap [ (v, x) ] c
   | Affect (v, c) -> latex_of_ast v ^ " \\leftarrow " ^ latex_of_ast c
-  | Loc (x, _) -> latex_of_ast x
-  | Paren x ->
-      if
-        full && contains_newline x
-        (* \left( and \right) must be on the same line in latex.
-            If there is a \\ in latex between two parenthesis, we use
-            a pmatrix instead. *)
-      then "\\begin{pmatrix*}[l]" ^ latex_of_ast x ^ "\\end{pmatrix*}"
-      else "\\left(" ^ latex_of_ast x ^ "\\right)"
+  | Layout (l, x) -> layout full (contains_newline x) (latex_of_ast x) l
   | Exists (v, f) -> "\\exists " ^ latex_of_ast v ^ ". " ^ latex_of_ast f
   | Forall (v, f) -> "\\forall " ^ latex_of_ast v ^ ". " ^ latex_of_ast f
   | For (var, set, above_f) ->
       let op, prop, f =
-        match Eval.ast_without_loc above_f with
+        match Eval.ast_without_layout above_f with
         | Forall (prop, f) -> ("\\forall ", prop, f)
         | Exists (prop, f) -> ("\\exists ", prop, f)
         | f ->
@@ -154,8 +184,6 @@ let rec latex_of_ast ?(matrix_instead_of_substack = false) ~full ast =
       in
       "\\displaystyle\\mathop{" ^ op ^ latex_of_ast prop ^ "}_{"
       ^ latex_of_ast var ^ "\\in " ^ latex_of_ast set ^ "} ." ^ latex_of_ast f
-  | NewlineBefore f -> "\\\\\n" ^ latex_of_ast f
-  | NewlineAfter f -> latex_of_ast f ^ "\\\\\n"
   | Formula f -> latex_of_ast f
   | SetBuilder (f, vars, sets, cond) ->
       "[" ^ latex_of_ast f ^ "~|~"
@@ -181,61 +209,40 @@ and ast_fun (f : 'a -> Ast.t -> 'a) (acc : 'a) ast : 'a =
   match ast with
   | Touist_code listf ->
       listf |> List.fold_left (fun acc f -> acc |> ast_fun' f) acc
-  | Neg f
-  | Sqrt f
-  | To_int f
-  | To_float f
-  | Abs f
+  | ArithUnop (_, f)
   | Not f
   | Bigand (_, _, _, f)
   | Bigor (_, _, _, f)
   | Let (_, _, f)
-  | Loc (f, _)
-  | Paren f
+  | Layout (_, f)
   | Exists (_, f)
   | Forall (_, f)
-  | For (_, _, f)
-  | NewlineBefore f
-  | NewlineAfter f ->
+  | For (_, _, f) ->
       acc |> ast_fun' f
-  | Add (x, y)
-  | Sub (x, y)
-  | Mul (x, y)
-  | Div (x, y)
+  | ArithBinop (_, Mod, _) -> acc
+  | ArithBinop (x, _, y)
   | If (_, x, y)
-  | And (x, y)
-  | Or (x, y)
-  | Xor (x, y)
-  | Implies (x, y)
-  | Equiv (x, y)
-  | Equal (x, y)
-  | Not_equal (x, y)
-  | Lesser_than (x, y)
-  | Lesser_or_equal (x, y)
-  | Greater_than (x, y)
-  | Greater_or_equal (x, y) ->
+  | LogicBinop (x, _, y)
+  | ArithBinrel (x, _, y) ->
       acc |> ast_fun' x |> ast_fun' y
   | Int _ | Float _ | Bool _ | Top | Bottom | Prop _ | UnexpProp _ | Var _
-  | Set _ | Set_decl _ | Card _ | Exact _ | Atmost _ | Atleast _ | Affect _
-  | Formula _ | SetBuilder _ ->
+  | Set _ | Set_decl _ | Card _ | Cardinality _ | Affect _ | Formula _
+  | SetBuilder _ ->
       acc
   (* non-formulas *)
-  | Mod _ | Union _ | Inter _ | Diff _ | Range _ | Subset _ | Powerset _ | In _
-  | Empty _ ->
-      acc
+  | SetBinop _ | Range _ | Subset _ | Powerset _ | In _ | Empty _ -> acc
 
 and contains_newline ast =
   ast
   |> ast_fun
        (fun acc ast ->
-         match ast with NewlineAfter _ | NewlineBefore _ -> true | _ -> acc)
+         match ast with
+         | Layout (NewlineAfter, _) | Layout (NewlineBefore, _) -> true
+         | _ -> acc)
        false
 
 and is_binary_op = function
-  | Add _ | Sub _ | Mul _ | Div _ | And _ | Or _ | Xor _ | Implies _ | Equiv _
-  | Equal _ | Not_equal _ | Lesser_than _ | Lesser_or_equal _ | Greater_than _
-  | Greater_or_equal _ ->
-      true
+  | ArithBinop (_, _, _) | LogicBinop (_, _, _) | ArithBinrel _ -> true
   | _ -> false
 
 and contains_binary_op ast =

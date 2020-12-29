@@ -151,23 +151,23 @@ affect_or(T):
 
 (* [touist_simple] is the entry point of the parser in sat mode *)
 touist_simple:
-  | f=affect_or(formula_simple)+ EOF {Loc (Touist_code (f),($startpos,$endpos))}
+  | f=affect_or(formula_simple)+ EOF { Layout (Loc ($startpos,$endpos), Touist_code (f)) }
 
 
 (* [touist_smt] is the entry point of the parser in smt mode *)
 touist_smt:
-  | f=affect_or(formula_smt)+ EOF {Loc (Touist_code (f),($startpos,$endpos))}
+  | f=affect_or(formula_smt)+ EOF { Layout (Loc ($startpos,$endpos), Touist_code (f)) }
 
-touist_qbf: f=affect_or(formula_qbf)+ EOF {Loc (Touist_code (f),($startpos,$endpos))}
+touist_qbf: f=affect_or(formula_qbf)+ EOF { Layout (Loc ($startpos,$endpos), Touist_code (f)) }
 
 (* Used in tuple expression; see tuple_variable and tuple_term *)
 %inline indices: i=expr { i }
 
 (* a tuple_term is of the form abc(1,d,3): the indices can be *)
 prop:
-  | t=TERM {Loc (Prop t,($startpos,$endpos))} (* simple_term *)
+  | t=TERM { Layout (Loc ($startpos,$endpos), Prop t)} (* simple_term *)
   | t=TUPLE (*LPAREN*) l=comma_list(indices) RPAREN (* tuple_term *)
-    {Loc (UnexpProp (t, Some l),($startpos,$endpos))}
+    { Layout (Loc ($startpos,$endpos), UnexpProp (t, Some l)) }
 
 (* For now, we don't check the type of the variables during the parsing.
    This means that all variables are untyped during parsing.
@@ -175,115 +175,120 @@ prop:
    These two placeholders can only be used in a semantic action, not in the
    %{ %} header. *)
 var:
-  | v=VAR {Loc (Var (v,None),($startpos,$endpos))}
+  | v=VAR { Layout (Loc ($startpos,$endpos), Var (v,None)) }
   | v=VARTUPLE (*LPAREN*) l=comma_list(indices) RPAREN (* tuple_variable *)
-    {Loc (Var (v,Some l),($startpos,$endpos))}
+    { Layout (Loc ($startpos,$endpos), Var (v,Some l)) }
 
 (* a global variable is a variable used in the 'data' block
   for defining sets and constants; it can be of the form of a
   tuple_variable, i.e. with prefix+indices: '$i(1,a,d)'.
   The indices can be either expression or term *)
-%inline global_affect: v=var AFFECT e=expr {Loc (Affect (v,e),($startpos,$endpos))}
+%inline global_affect: v=var AFFECT e=expr { Layout (Loc ($startpos,$endpos), Affect (v,e)) }
 
-%inline if_statement(T): IF cond=expr THEN v1=T ELSE v2=T END {Loc (If (cond,v1,v2),($startpos,$endpos))}
+%inline if_statement(T): IF cond=expr THEN v1=T ELSE v2=T END { Layout (Loc ($startpos,$endpos), If (cond,v1,v2)) }
 
-%inline in_parenthesis(T): LPAREN x=T RPAREN {Loc (Paren x,($startpos,$endpos))}
+%inline in_parenthesis(T): LPAREN x=T RPAREN { Layout (Loc ($startpos,$endpos), Layout (Paren, x)) }
 
+%inline arith_binop:
+  | ADD { Types.Add }
+  | MUL { Types.Mul }
+  | DIV { Types.Div }
 %inline num_operations_standard(T):
-  | x=T    ADD     y=T  {Loc (Add (x,y),($startpos,$endpos))}
-  | x=T    SUB     y=T  {Loc (Sub (x,y),($startpos,$endpos))} %prec sub_prec
-  |        SUB     x=T  {Loc (Neg x,($startpos,$endpos))     } %prec neg_prec
-  | x=T    MUL     y=T  {Loc (Mul (x,y),($startpos,$endpos))}
-  | x=T    DIV     y=T  {Loc (Div (x,y),($startpos,$endpos))}
+  | x=T  b=arith_binop   y=T  { Layout (Loc ($startpos,$endpos), ArithBinop (x,b,y)) }
+  | x=T    SUB     y=T  { Layout (Loc ($startpos,$endpos), ArithBinop (x,Sub,y))} %prec sub_prec
+  |        SUB     x=T  { Layout (Loc ($startpos,$endpos), ArithUnop (Neg, x))  } %prec neg_prec
 
 %inline num_operations_others(T):
-  | x=T    MOD     y=T  {Loc (Mod (x,y),($startpos,$endpos))}
-  | ABS (*LPAREN*) x=T RPAREN {Loc (Abs x,($startpos,$endpos))}
+  | x=T    MOD     y=T  { Layout (Loc ($startpos,$endpos), ArithBinop (x,Mod,y)) }
+  | ABS (*LPAREN*) x=T RPAREN { Layout (Loc ($startpos,$endpos), ArithUnop (Abs, x)) }
 
-%inline int: x=INT {Loc (Int x,($startpos,$endpos))}
-%inline float: x=FLOAT {Loc (Float x,($startpos,$endpos))}
-%inline bool: x=BOOL {Loc (Bool x,($startpos,$endpos))}
+%inline int: x=INT { Layout (Loc ($startpos,$endpos), Int x) }
+%inline float: x=FLOAT { Layout (Loc ($startpos,$endpos), Float x) }
+%inline bool: x=BOOL { Layout (Loc ($startpos,$endpos), Bool x) }
 
 expr:
   | b=var {b}
   | x=int {x}
-  | TOINT (*LPAREN*) x=expr RPAREN {Loc (To_int x,($startpos,$endpos))}
-  | CARD  (*LPAREN*) s=expr RPAREN {Loc (Card s,($startpos,$endpos))}
+  | TOINT (*LPAREN*) x=expr RPAREN { Layout (Loc ($startpos,$endpos), ArithUnop (To_int, x)) }
+  | CARD  (*LPAREN*) s=expr RPAREN { Layout (Loc ($startpos,$endpos), Card s) }
   | x=float {x}
   | x=in_parenthesis(expr)
   | x=num_operations_standard(expr)
   | x=num_operations_others(expr)
   | x=if_statement(expr) { x }
-  | SQRT    (*LPAREN*) x=expr RPAREN {Loc (Sqrt x,($startpos,$endpos))}
-  | TOFLOAT (*LPAREN*) x=expr RPAREN {Loc (To_float x,($startpos,$endpos))}
+  | SQRT    (*LPAREN*) x=expr RPAREN { Layout (Loc ($startpos,$endpos), ArithUnop (Sqrt, x)) }
+  | TOFLOAT (*LPAREN*) x=expr RPAREN { Layout (Loc ($startpos,$endpos), ArithUnop (To_float, x)) }
   | b=bool {b}
   | b=connectors(expr)
-  | b=equality(expr)
-  | b=order(expr) {b}
-  | EMPTY  (*LPAREN*) s=expr RPAREN {Loc (Empty s,($startpos,$endpos))}
-  | s1=expr SUBSET s2=expr {Loc (Subset (s1,s2),($startpos,$endpos))}
+  | b=binrel(expr) {b}
+  | EMPTY  (*LPAREN*) s=expr RPAREN { Layout (Loc ($startpos,$endpos), Empty s) }
+  | s1=expr SUBSET s2=expr { Layout (Loc ($startpos,$endpos), Subset (s1,s2)) }
   | SUBSET_PR (*LPAREN*) s1=expr COMMA s2=expr RPAREN {
       let loc = ($startpos,$endpos) in
       warn (Warning,Parse,"'subset(A,B)' is deprecated, please use \
         'A subset B' instead.\n",Some loc);
-      Loc (Subset (s1,s2),loc)}
+      Layout (Loc loc, Subset (s1,s2)) }
   | p=prop {p}
-  | x=expr   IN s=expr {Loc (In (x,s),($startpos,$endpos))}
+  | x=expr   IN s=expr { Layout (Loc ($startpos,$endpos), In (x,s)) }
   | x=set_decl_range(expr)
   | x=set_empty
   | x=set_decl_explicit(expr)
   | x=set_builder(expr)
   | x=set_operation(expr) {x}
-  | QUOTE f=formula_simple QUOTE {Loc (Formula f,($startpos,$endpos))}
+  | QUOTE f=formula_simple QUOTE { Layout (Loc ($startpos,$endpos), Formula f) }
 
-%inline equality(T):
-  | x=T  EQUAL    y=T   {Loc (Equal (x,y),($startpos,$endpos)) }
-  | x=T  NOTEQUAL y=T   {Loc (Not_equal (x,y),($startpos,$endpos)) }
+%inline arith_binrel:
+  | EQUAL { Types.Equal }
+  | NOTEQUAL { Types.Not_equal }
+  | LT { Types.Lesser_than }
+  | LE { Types.Lesser_or_equal }
+  | GT { Types.Greater_than }
+  | GE { Types.Greater_or_equal }
+%inline binrel(T):
+  | x=T   b=arith_binrel      y=T   { Layout (Loc ($startpos,$endpos), ArithBinrel (x,b,y)) }
 
-%inline order(T):
-  | x=T   LT      y=T   {Loc (Lesser_than (x,y),($startpos,$endpos)) }
-  | x=T   LE      y=T   {Loc (Lesser_or_equal (x,y),($startpos,$endpos)) }
-  | x=T   GT      y=T   {Loc (Greater_than (x,y),($startpos,$endpos)) }
-  | x=T   GE      y=T   {Loc (Greater_or_equal (x,y),($startpos,$endpos)) }
-
+%inline logic_binop:
+  | AND       { Types.And }
+  | OR        { Types.Or }
+  | XOR       { Types.Xor }
+  | IMPLIES   { Types.Implies }
+  | EQUIV     { Types.Equiv }
 %inline connectors(T):
-  | NOT           x=T   {Loc (Not x,($startpos,$endpos))}
-  | x=T  AND      y=T   {Loc (And (x,y),($startpos,$endpos)) }
-  | x=T  OR       y=T   {Loc (Or (x,y),($startpos,$endpos)) }
-  | x=T  XOR      y=T   {Loc (Xor (x,y),($startpos,$endpos)) }
-  | x=T  IMPLIES  y=T   {Loc (Implies (x,y),($startpos,$endpos)) }
-  | x=T  EQUIV    y=T   {Loc (Equiv (x,y),($startpos,$endpos)) }
+  | NOT           x=T   { Layout (Loc ($startpos,$endpos), Not x) }
+  | x=T  b=logic_binop  y=T   { Layout (Loc ($startpos,$endpos), LogicBinop (x,b,y)) }
 
-%inline set_decl_range(T): LBRACK s1=T RANGE s2=T RBRACK {Loc (Range (s1,s2),($startpos,$endpos))}
-%inline set_decl_explicit(T): LBRACK l=comma_list(T) RBRACK {Loc (Set_decl l,($startpos,$endpos))}
-%inline set_empty: LBRACK RBRACK {Loc (Set_decl [],($startpos,$endpos))}
+%inline set_decl_range(T): LBRACK s1=T RANGE s2=T RBRACK { Layout (Loc ($startpos,$endpos), Range (s1,s2)) }
+%inline set_decl_explicit(T): LBRACK l=comma_list(T) RBRACK { Layout (Loc ($startpos,$endpos), Set_decl l) }
+%inline set_empty: LBRACK RBRACK { Layout (Loc ($startpos,$endpos), Set_decl []) }
 %inline set_builder(T): LBRACK f=T FOR vars=comma_list(var) IN sets=comma_list(expr) c=when_cond? RBRACK
   {try List.fold_left2 (fun _ _ _ -> ()) () vars sets;
-      Loc (SetBuilder (f,vars,sets,c), ($startpos,$endpos))
+      Layout (Loc ($startpos,$endpos), SetBuilder (f,vars,sets,c))
    with Invalid_argument _ ->
       fatal (Error,Parse, ("list comprehension must have the same number of variables and sets.\n"),
         Some ($startpos,$endpos))}
 
+%inline set_binop:
+  | UNION      { Types.Union }
+  | INTER      { Types.Inter }
+  | DIFF       { Types.Diff }
 %inline set_operation(T):
-  | s1=T UNION s2=T {Loc (Union (s1,s2),($startpos,$endpos))}
-  | s1=T INTER s2=T {Loc (Inter (s1,s2),($startpos,$endpos))}
-  | s1=T DIFF s2=T {Loc (Diff (s1,s2),($startpos,$endpos))}
+  | s1=T b=set_binop s2=T { Layout (Loc ($startpos,$endpos), SetBinop (s1,b,s2)) }
   | UNION_PR (*LPAREN*) s1=T COMMA s2=T RPAREN {
       let loc = ($startpos,$endpos) in
       warn (Warning,Parse,"'union(A,B)' is deprecated, please use \
         'A union B' instead.\n",Some loc);
-      Loc (Union (s1,s2),loc)}
+      Layout (Loc loc, SetBinop (s1,Union,s2)) }
   | INTER_PR (*LPAREN*) s1=T COMMA s2=T RPAREN {
       let loc = ($startpos,$endpos) in
       warn (Warning,Parse,"'inter(A,B)' is deprecated, please use \
         'A inter B' instead.\n",Some loc);
-      Loc (Inter (s1,s2),loc)}
+      Layout (Loc loc, SetBinop (s1,Inter,s2))}
   | DIFF_PR  (*LPAREN*) s1=T COMMA s2=T RPAREN {
       let loc = ($startpos,$endpos) in
       warn (Warning,Parse,"'diff(A,B)' is deprecated, please use \
         'A diff B' instead.\n",Some loc);
-      Loc (Diff (s1,s2),loc)}
-  | POWERSET (*LPAREN*) s=T RPAREN {Loc (Powerset s,($startpos,$endpos))}
+      Layout (Loc loc, SetBinop (s1,Diff,s2)) }
+  | POWERSET (*LPAREN*) s=T RPAREN { Layout (Loc ($startpos,$endpos), Powerset s) }
 
 %inline formula(F):
   | f=in_parenthesis(F)
@@ -291,12 +296,12 @@ expr:
   | f=connectors(F)
   | f=generalized_connectors(F) (* are only on formulas! No need for parametrization *)
   | f=let_affect(expr,F) {f}
-  | NEWLINE f=F { NewlineBefore f } %prec newlineBefore
-  | f=F NEWLINE { NewlineAfter f }
+  | NEWLINE f=F { Layout (NewlineBefore, f) } %prec newlineBefore
+  | f=F NEWLINE { Layout (NewlineAfter, f) }
 
 let_affect(T,F): LET vars=comma_list(var) AFFECT contents=comma_list(T) COLON form=F
     {try List.fold_right2 (fun var content acc ->
-      Loc (Let (var,content,acc),($startpos,$endpos))) vars contents form
+      Layout (Loc ($startpos,$endpos), Let (var,content,acc))) vars contents form
     with Invalid_argument _ ->
       fatal (Error,Parse,
         ("'let' statement does not have the same number of variables and values.\n"),
@@ -332,35 +337,34 @@ expr_smt:
   | x=var {x}
   | x=int
   | x=float
-  | x=order(expr_smt)
   | x=num_operations_standard(expr_smt)
-  | x=equality(expr_smt) {x}
+  | x=binrel(expr_smt) {x}
   | x=in_parenthesis(expr_smt) {x}
 
 %inline generalized_connectors(F):
   | BIGAND v=comma_list(var) IN s=comma_list(expr) c=when_cond? COLON f=F END 
-    {Loc (Bigand (v,s,c,f),($startpos,$endpos))}
+    { Layout (Loc ($startpos,$endpos), Bigand (v,s,c,f)) }
   | BIGOR  v=comma_list(var) IN s=comma_list(expr) c=when_cond? COLON f=F END 
-    {Loc (Bigor (v,s,c,f),($startpos,$endpos))}
-  | EXACT (*LPAREN*)   x=expr COMMA s=expr RPAREN {Loc (Exact (x,s),($startpos,$endpos))}
-  | ATLEAST (*LPAREN*) x=expr COMMA s=expr RPAREN {Loc (Atleast (x,s),($startpos,$endpos))}
-  | ATMOST (*LPAREN*)  x=expr COMMA s=expr RPAREN {Loc (Atmost (x,s),($startpos,$endpos))}
+    { Layout (Loc ($startpos,$endpos), Bigor (v,s,c,f)) }
+  | EXACT (*LPAREN*)   x=expr COMMA s=expr RPAREN { Layout (Loc ($startpos,$endpos), Cardinality (Exact, x,s)) }
+  | ATLEAST (*LPAREN*) x=expr COMMA s=expr RPAREN { Layout (Loc ($startpos,$endpos), Cardinality (Atleast, x,s)) }
+  | ATMOST (*LPAREN*)  x=expr COMMA s=expr RPAREN { Layout (Loc ($startpos,$endpos), Cardinality (Atmost, x,s)) }
 
 %inline when_cond: WHEN x=expr { x }
 
 %inline prop_or_var: p=prop | p=var {p}
 
 %inline exists(F): EXISTS v=comma_list(prop_or_var) for_opt=for_statement? COLON form=F
-  { let res = form |> List.fold_right (fun v acc -> Loc (Exists (v,acc),($startpos,$endpos))) v in
+  { let res = form |> List.fold_right (fun v acc -> Layout (Loc ($startpos,$endpos), Exists (v,acc))) v in
     match for_opt with
     | None -> res
-    | Some (var,content) -> Loc (For (var,content,res),($startpos,$endpos))
+    | Some (var,content) -> Layout (Loc ($startpos,$endpos), For (var,content,res))
   }
 %inline forall(F): FORALL v=comma_list(prop_or_var) for_opt=for_statement? COLON form=F
-  { let res = form |> List.fold_right (fun v acc -> Loc (Forall (v,acc),($startpos,$endpos))) v in
+  { let res = form |> List.fold_right (fun v acc -> Layout (Loc ($startpos,$endpos), Forall (v,acc))) v in
     match for_opt with
     | None -> res
-    | Some (var,content) -> Loc (For (var,content,res),($startpos,$endpos))
+    | Some (var,content) -> Layout (Loc ($startpos,$endpos), For (var,content,res))
   }
 
 %inline for_statement: FOR v=var IN content=expr { (v,content) }

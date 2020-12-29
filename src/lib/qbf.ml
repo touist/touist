@@ -81,31 +81,43 @@ let rec to_prenex debug quant_l conflict_l only_rename ast : Ast.t =
   let transform = function
     | Not (Forall (x, f)) ->
         Forall (to_prenex x, Not (to_prenex_new x f)) (* 1 *)
-    | And (f, Forall (x, g)) | And (Forall (x, g), f) ->
-        Forall (to_prenex x, And (to_prenex_rn x f, to_prenex_new x g))
+    | LogicBinop (f, And, Forall (x, g)) | LogicBinop (Forall (x, g), And, f) ->
+        Forall
+          (to_prenex x, LogicBinop (to_prenex_rn x f, And, to_prenex_new x g))
         (* 2,5 *)
-    | Or (f, Forall (x, g)) | Or (Forall (x, g), f) ->
-        Forall (to_prenex x, And (to_prenex_rn x f, to_prenex_new x g))
+    | LogicBinop (f, Or, Forall (x, g)) | LogicBinop (Forall (x, g), Or, f) ->
+        Forall
+          (to_prenex x, LogicBinop (to_prenex_rn x f, Or, to_prenex_new x g))
         (* 3,6 *)
-    | Implies (Forall (x, f), g) ->
-        Exists (to_prenex x, Implies (to_prenex_new x f, to_prenex_rn x g))
+    | LogicBinop (Forall (x, f), Implies, g) ->
+        Exists
+          ( to_prenex x,
+            LogicBinop (to_prenex_new x f, Implies, to_prenex_rn x g) )
         (* 4 *)
-    | Implies (f, Forall (x, g)) ->
-        Forall (to_prenex x, Implies (to_prenex_rn x f, to_prenex_new x g))
+    | LogicBinop (f, Implies, Forall (x, g)) ->
+        Forall
+          ( to_prenex x,
+            LogicBinop (to_prenex_rn x f, Implies, to_prenex_new x g) )
         (* 7 *)
     | Not (Exists (x, f)) ->
         Forall (to_prenex x, Not (to_prenex_new x f)) (* 8 *)
-    | And (f, Exists (x, g)) | And (Exists (x, g), f) ->
-        Exists (to_prenex x, And (to_prenex_rn x f, to_prenex_new x g))
+    | LogicBinop (f, And, Exists (x, g)) | LogicBinop (Exists (x, g), And, f) ->
+        Exists
+          (to_prenex x, LogicBinop (to_prenex_rn x f, And, to_prenex_new x g))
         (* 9,12 *)
-    | Or (f, Exists (x, g)) | Or (Exists (x, g), f) ->
-        Exists (to_prenex x, Or (to_prenex_rn x f, to_prenex_new x g))
+    | LogicBinop (f, Or, Exists (x, g)) | LogicBinop (Exists (x, g), Or, f) ->
+        Exists
+          (to_prenex x, LogicBinop (to_prenex_rn x f, Or, to_prenex_new x g))
         (* 10,13 *)
-    | Implies (Exists (x, f), g) ->
-        Forall (to_prenex x, Implies (to_prenex_new x f, to_prenex_rn x g))
+    | LogicBinop (Exists (x, f), Implies, g) ->
+        Forall
+          ( to_prenex x,
+            LogicBinop (to_prenex_new x f, Implies, to_prenex_rn x g) )
         (* 11 *)
-    | Implies (f, Exists (x, g)) ->
-        Exists (to_prenex x, Implies (to_prenex_rn x f, to_prenex_new x g))
+    | LogicBinop (f, Implies, Exists (x, g)) ->
+        Exists
+          ( to_prenex x,
+            LogicBinop (to_prenex_rn x f, Implies, to_prenex_new x g) )
         (* 14 *)
     | _ -> raise Not_found
   in
@@ -113,14 +125,17 @@ let rec to_prenex debug quant_l conflict_l only_rename ast : Ast.t =
     | Top -> Top
     | Bottom -> Bottom
     | Not x -> Not (to_prenex x)
-    | And (x, y) -> And (to_prenex x, to_prenex y)
-    | Or (x, y) -> Or (to_prenex x, to_prenex y)
-    | Xor (x, y) -> to_prenex (And (Or (x, y), Or (Not x, Not y)))
-    | Implies (x, y) -> Implies (to_prenex x, to_prenex y)
+    | LogicBinop (x, Xor, y) ->
+        to_prenex
+          (LogicBinop (LogicBinop (x, Or, y), And, LogicBinop (Not x, Or, Not y)))
     (* ∃x ⇔ y   ≡   (∃x ⇒ y)⋀(y ⇒ ∃x)  ≡  ∀x.(x ⇒ y) ⋀ ∃x1.(y ⇒ x1), and thus
        we cannot translate to prenex and keep the equivalence notation: x is used
        twice. *)
-    | Equiv (x, y) -> to_prenex (And (Implies (x, y), Implies (y, x)))
+    | LogicBinop (x, Equiv, y) ->
+        to_prenex
+          (LogicBinop
+             (LogicBinop (x, Implies, y), And, LogicBinop (y, Implies, x)))
+    | LogicBinop (x, b, y) -> LogicBinop (to_prenex x, b, to_prenex y)
     | Prop x ->
         if List.exists (fun y -> y = x) conflict_l then Prop (add_suffix x)
         else Prop x
@@ -149,11 +164,7 @@ let rec is_unquant = function
   | Exists (_, _) | Forall (_, _) -> false
   | Prop _ | Top | Bottom -> true
   | Not x -> is_unquant x
-  | And (x, y) -> is_unquant x && is_unquant y
-  | Or (x, y) -> is_unquant x && is_unquant y
-  | Xor (x, y) -> is_unquant x && is_unquant y
-  | Implies (x, y) -> is_unquant x && is_unquant y
-  | Equiv (x, y) -> is_unquant x && is_unquant y
+  | LogicBinop (x, _, y) -> is_unquant x && is_unquant y
   | e ->
       failwith
         ("[shouldnt happen] a qbf formula shouldn't contain '"
@@ -174,11 +185,7 @@ let rec quantify_free_variables env ast =
     | Prop x -> if List.exists (fun y -> y = x) env then [] else [ x ]
     | Top | Bottom -> []
     | Not x -> search_free env x
-    | And (x, y) -> search_free env x @ search_free env y
-    | Or (x, y) -> search_free env x @ search_free env y
-    | Xor (x, y) -> search_free env x @ search_free env y
-    | Implies (x, y) -> search_free env x @ search_free env y
-    | Equiv (x, y) -> search_free env x @ search_free env y
+    | LogicBinop (x, _, y) -> search_free env x @ search_free env y
     | e ->
         failwith
           ("quantify_free_variables(): a qbf formula shouldn't contain '"

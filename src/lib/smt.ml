@@ -1,5 +1,19 @@
 open Types.Ast
 
+let write_int x =
+  if x < 0 then "(- " ^ string_of_int (-x) ^ ")" else string_of_int x
+
+let write_float x =
+  let x' = string_of_float x in
+  let x'' = if x'.[String.length x' - 1] = '.' then x' ^ "0" else x' in
+  if x''.[0] = '-' then "(- " ^ String.sub x'' 1 (String.length x'' - 1) ^ ")"
+  else x''
+
+let sanitize_var name =
+  String.map
+    (fun c -> if c = '(' || c = ')' || c = ',' || c = ' ' then '_' else c)
+    name
+
 let to_smt2 logic formula =
   let vtbl = Hashtbl.create 10 in
   let out = Buffer.create 1000 in
@@ -16,80 +30,26 @@ let to_smt2 logic formula =
   let decl_bin_op op x y = "(" ^ op ^ " " ^ x ^ " " ^ y ^ ")" in
   let decl_un_op op x = "(" ^ op ^ " " ^ x ^ ")" in
 
-  let sanitize_var name =
-    String.map
-      (fun c -> if c = '(' || c = ')' || c = ',' || c = ' ' then '_' else c)
-      name
-  in
-
   let rec term_expr = function
-    | Prop _
-    | Neg (Prop _)
-    | Add (Prop _, Prop _)
-    | Sub (Prop _, Prop _)
-    | Mul (Prop _, Prop _)
-    | Div (Prop _, Prop _) ->
-        true
-    | Neg x -> term_expr x
-    | Add (x, y) | Sub (x, y) | Mul (x, y) | Div (x, y) ->
-        term_expr x && term_expr y
+    | Prop _ -> true
+    | ArithUnop (Neg, x) -> term_expr x
+    | ArithBinop (x, _, y) -> term_expr x && term_expr y
     | _ -> false
   in
 
   let rec gen_var typ = function
     | Prop x -> add_var x typ
-    | Add (Prop x, Int _)
-    | Add (Int _, Prop x)
-    | Sub (Prop x, Int _)
-    | Sub (Int _, Prop x)
-    | Mul (Prop x, Int _)
-    | Mul (Int _, Prop x)
-    | Div (Prop x, Int _)
-    | Div (Int _, Prop x)
-    | Lesser_than (Prop x, Int _)
-    | Lesser_than (Int _, Prop x)
-    | Lesser_or_equal (Prop x, Int _)
-    | Lesser_or_equal (Int _, Prop x)
-    | Greater_than (Prop x, Int _)
-    | Greater_than (Int _, Prop x)
-    | Greater_or_equal (Int _, Prop x)
-    | Greater_or_equal (Prop x, Int _)
-    | Equal (Prop x, Int _)
-    | Equal (Int _, Prop x)
-    | Not_equal (Prop x, Int _)
-    | Not_equal (Int _, Prop x) ->
+    | ArithBinop (Prop x, _, Int _)
+    | ArithBinop (Int _, _, Prop x)
+    | ArithBinrel (Prop x, _, Int _)
+    | ArithBinrel (Int _, _, Prop x) ->
         add_var x "Int"
-    | Add (Prop x, Float _)
-    | Add (Float _, Prop x)
-    | Sub (Prop x, Float _)
-    | Sub (Float _, Prop x)
-    | Mul (Prop x, Float _)
-    | Mul (Float _, Prop x)
-    | Div (Prop x, Float _)
-    | Div (Float _, Prop x)
-    | Lesser_than (Prop x, Float _)
-    | Lesser_than (Float _, Prop x)
-    | Lesser_or_equal (Prop x, Float _)
-    | Lesser_or_equal (Float _, Prop x)
-    | Greater_than (Prop x, Float _)
-    | Greater_than (Float _, Prop x)
-    | Greater_or_equal (Prop x, Float _)
-    | Greater_or_equal (Float _, Prop x)
-    | Equal (Prop x, Float _)
-    | Equal (Float _, Prop x)
-    | Not_equal (Prop x, Float _)
-    | Not_equal (Float _, Prop x) ->
+    | ArithBinop (Prop x, _, Float _)
+    | ArithBinop (Float _, _, Prop x)
+    | ArithBinrel (Prop x, _, Float _)
+    | ArithBinrel (Float _, _, Prop x) ->
         add_var x "Real"
-    | Add (Prop x, Prop y)
-    | Sub (Prop x, Prop y)
-    | Mul (Prop x, Prop y)
-    | Div (Prop x, Prop y)
-    | Lesser_than (Prop x, Prop y)
-    | Lesser_or_equal (Prop x, Prop y)
-    | Greater_than (Prop x, Prop y)
-    | Greater_or_equal (Prop x, Prop y)
-    | Equal (Prop x, Prop y)
-    | Not_equal (Prop x, Prop y) -> (
+    | ArithBinop (Prop x, _, Prop y) | ArithBinrel (Prop x, _, Prop y) -> (
         try
           let x_type = Hashtbl.find vtbl x in
           add_var y x_type
@@ -101,186 +61,47 @@ let to_smt2 logic formula =
             add_var x typ;
             add_var y typ))
     | Not x -> gen_var typ x
-    | And (x, y) | Or (x, y) | Xor (x, y) | Implies (x, y) | Equiv (x, y) ->
+    | LogicBinop (x, _, y) ->
         gen_var "Bool" x;
         gen_var "Bool" y
-    | Add (x, Int _)
-    | Add (Int _, x)
-    | Sub (x, Int _)
-    | Sub (Int _, x)
-    | Mul (x, Int _)
-    | Mul (Int _, x)
-    | Div (x, Int _)
-    | Div (Int _, x)
-    | Equal (x, Int _)
-    | Equal (Int _, x)
-    | Not_equal (x, Int _)
-    | Not_equal (Int _, x)
-    | Lesser_than (x, Int _)
-    | Lesser_than (Int _, x)
-    | Lesser_or_equal (x, Int _)
-    | Lesser_or_equal (Int _, x)
-    | Greater_than (x, Int _)
-    | Greater_than (Int _, x)
-    | Greater_or_equal (x, Int _)
-    | Greater_or_equal (Int _, x) ->
+    | ArithBinop (x, _, Int _)
+    | ArithBinop (Int _, _, x)
+    | ArithBinrel (x, _, Int _)
+    | ArithBinrel (Int _, _, x) ->
         let rec go = function
           | Prop x -> add_var x "Int"
-          | Add (x, y) | Sub (x, y) | Mul (x, y) | Div (x, y) ->
+          | ArithBinop (x, _, y) ->
               go x;
               go y
           | _ -> failwith "not a term exp"
         in
         if term_expr x then go x else ()
-    | Add (x, Float _)
-    | Add (Float _, x)
-    | Sub (x, Float _)
-    | Sub (Float _, x)
-    | Mul (x, Float _)
-    | Mul (Float _, x)
-    | Div (x, Float _)
-    | Div (Float _, x)
-    | Equal (x, Float _)
-    | Equal (Float _, x)
-    | Not_equal (x, Float _)
-    | Not_equal (Float _, x)
-    | Lesser_than (x, Float _)
-    | Lesser_than (Float _, x)
-    | Lesser_or_equal (x, Float _)
-    | Lesser_or_equal (Float _, x)
-    | Greater_than (x, Float _)
-    | Greater_than (Float _, x)
-    | Greater_or_equal (x, Float _)
-    | Greater_or_equal (Float _, x) ->
+    | ArithBinop (x, _, Float _)
+    | ArithBinop (Float _, _, x)
+    | ArithBinrel (x, _, Float _)
+    | ArithBinrel (Float _, _, x) ->
         let rec go = function
           | Prop x -> add_var x "Real"
-          | Add (x, y) | Sub (x, y) | Mul (x, y) | Div (x, y) ->
+          | ArithBinop (x, _, y) ->
               go x;
               go y
           | _ -> failwith "not a term exp"
         in
         if term_expr x then go x else ()
-    | Add (x, y)
-    | Sub (x, y)
-    | Mul (x, y)
-    | Div (x, y)
-    | Equal (x, y)
-    | Not_equal (x, y)
-    | Lesser_than (x, y)
-    | Lesser_or_equal (x, y)
-    | Greater_than (x, y)
-    | Greater_or_equal (x, y) ->
+    | ArithBinop (x, _, y) | ArithBinrel (x, _, y) ->
         gen_var typ x;
         gen_var typ y
     | _ -> ()
   in
 
   let parse = function
-    | Equal (x, Int _) -> gen_var "Int" x (*; Equal (x, Int y)*)
-    | Equal (Int _, y) -> gen_var "Int" y (*; Equal (Int x, y)*)
-    | Not_equal (x, Int _) ->
-        gen_var "Int" x
-        (*; Not_equal (x, Int
-          y)*)
-    | Not_equal (Int _, y) ->
-        gen_var "Int" y
-        (*; Not_equal (Int x,
-          y)*)
-    | Lesser_than (x, Int _) ->
-        gen_var "Int" x
-        (*; Lesser_than (x, Int
-          y)*)
-    | Lesser_than (Int _, y) ->
-        gen_var "Int" y
-        (*; Lesser_than (Int x,
-          y)*)
-    | Lesser_or_equal (x, Int _) ->
-        gen_var "Int" x
-        (*; Lesser_or_equal (x,
-          Int y)*)
-    | Lesser_or_equal (Int _, y) ->
-        gen_var "Int" y
-        (*; Lesser_or_equal (Int
-          x, y)*)
-    | Greater_than (x, Int _) ->
-        gen_var "Int" x
-        (*; Greater_than (x, Int
-          y)*)
-    | Greater_than (Int _, y) ->
-        gen_var "Int" y
-        (*; Greater_than (Int x,
-          y)*)
-    | Greater_or_equal (x, Int _) ->
-        gen_var "Int" x
-        (*; Greater_or_equal (x,
-          Int y)*)
-    | Greater_or_equal (Int _, y) ->
-        gen_var "Int" y
-        (*; Greater_or_equal
-          (Int x, y)*)
-    | Equal (x, Float _) ->
-        gen_var "Real" x
-        (*; Equal (x, Float
-          y)*)
-    | Equal (Float _, y) ->
-        gen_var "Real" y
-        (*; Equal (Float x,
-          y)*)
-    | Not_equal (x, Float _) ->
-        gen_var "Real" x
-        (*; Not_equal (x,
-          Float y)*)
-    | Not_equal (Float _, y) ->
-        gen_var "Real" y
-        (*; Not_equal (Float
-          x, y)*)
-    | Lesser_than (x, Float _) ->
-        gen_var "Real" x
-        (*; Lesser_than (x,
-          Float y)*)
-    | Lesser_than (Float _, y) ->
-        gen_var "Real" y
-        (*; Lesser_than
-          (Float x, y)*)
-    | Lesser_or_equal (x, Float _) ->
-        gen_var "Real" x
-        (*; Lesser_or_equal
-          (x, Float y)*)
-    | Lesser_or_equal (Float _, y) ->
-        gen_var "Real" y
-        (*; Lesser_or_equal
-          (Float x, y)*)
-    | Greater_than (x, Float _) ->
-        gen_var "Real" x
-        (*; Greater_than (x,
-          Float y)*)
-    | Greater_than (Float _, y) ->
-        gen_var "Real" y
-        (*; Greater_than
-          (Float x, y)*)
-    | Greater_or_equal (x, Float _) ->
-        gen_var "Real" x
-        (*; Greater_or_equal
-          (x, Float y)*)
-    | Greater_or_equal (Float _, y) ->
-        gen_var "Real" y
-        (*; Greater_or_equal
-          (Float x, y)*)
-    | And (x, y) ->
+    | ArithBinrel (x, _, Int _) | ArithBinrel (Int _, _, x) ->
+        gen_var "Int" x (*; Equal (x, Int y)*)
+    | ArithBinrel (x, _, Float _) | ArithBinrel (Float _, _, x) ->
+        gen_var "Real" x (*; Equal (x, Float y)*)
+    | LogicBinop (x, _, y) ->
         gen_var "Bool" x;
         gen_var "Bool" y (*; And (x, y)*)
-    | Or (x, y) ->
-        gen_var "Bool" x;
-        gen_var "Bool" y (*; Or  (x, y)*)
-    | Xor (x, y) ->
-        gen_var "Bool" x;
-        gen_var "Bool" y (*; Xor (x, y)*)
-    | Implies (x, y) ->
-        gen_var "Bool" x;
-        gen_var "Bool" y (*; Implies (x, y)*)
-    | Equiv (x, y) ->
-        gen_var "Bool" x;
-        gen_var "Bool" y (*; Equiv (x, y)*)
     | Prop x -> add_var x "Bool"
     | x ->
         failwith
@@ -292,33 +113,24 @@ let to_smt2 logic formula =
     | Top -> "true"
     | Bottom -> "false"
     | Prop x -> sanitize_var x
-    | Int x ->
-        if x < 0 then "(- " ^ string_of_int (-x) ^ ")" else string_of_int x
-    | Float x ->
-        let x' = string_of_float x in
-        let x'' = if x'.[String.length x' - 1] = '.' then x' ^ "0" else x' in
-        if x''.[0] = '-' then
-          "(- " ^ String.sub x'' 1 (String.length x'' - 1) ^ ")"
-        else x''
+    | Int x -> write_int x
+    | Float x -> write_float x
     | Not x -> decl_un_op "not" (write x)
-    | And (x, y) -> decl_bin_op "and" (write x) (write y)
-    | Or (x, y) -> decl_bin_op "or" (write x) (write y)
-    | Xor (x, y) -> decl_bin_op "xor" (write x) (write y)
-    | Implies (x, y) -> decl_bin_op "=>" (write x) (write y)
-    | Equiv (x, y) -> write (And (Implies (x, y), Implies (y, x)))
-    | Neg (Int x) -> "(- " ^ string_of_int (-x) ^ ")"
-    | Neg (Float x) -> "(- " ^ string_of_float (-.x) ^ ")"
-    | Add (x, y) -> decl_bin_op "+" (write x) (write y)
-    | Sub (x, y) -> decl_bin_op "-" (write x) (write y)
-    | Mul (x, y) -> decl_bin_op "*" (write x) (write y)
-    | Div (x, y) -> decl_bin_op "/" (write x) (write y)
-    | Equal (x, y) -> decl_bin_op "=" (write x) (write y)
-    | Not_equal (x, y) -> write (Not (Equal (x, y)))
-    | Lesser_than (x, y) -> decl_bin_op "<" (write x) (write y)
-    | Lesser_or_equal (x, y) -> decl_bin_op "<=" (write x) (write y)
-    | Greater_than (x, y) -> decl_bin_op ">" (write x) (write y)
-    | Greater_or_equal (x, y) -> decl_bin_op ">=" (write x) (write y)
-    | Loc (x, _) -> write x
+    | LogicBinop (x, Equiv, y) ->
+        write
+          (LogicBinop
+             (LogicBinop (x, Implies, y), And, LogicBinop (y, Implies, x)))
+    | LogicBinop (x, b, y) ->
+        decl_bin_op (Pprint.logic_binop b) (write x) (write y)
+    | ArithUnop (Neg, Int x) -> "(- " ^ string_of_int (-x) ^ ")"
+    | ArithUnop (Neg, Float x) -> "(- " ^ string_of_float (-.x) ^ ")"
+    | ArithBinop (x, b, y) ->
+        decl_bin_op (Pprint.arith_binop b) (write x) (write y)
+    | ArithBinrel (x, Equal, y) -> decl_bin_op "=" (write x) (write y)
+    | ArithBinrel (x, Not_equal, y) -> write (Not (ArithBinrel (x, Equal, y)))
+    | ArithBinrel (x, b, y) ->
+        decl_bin_op (Pprint.arith_binrel b) (write x) (write y)
+    | Layout (_, x) -> write x
     | x -> failwith ("error smt write: " ^ Pprint.string_of_ast ~debug:true x)
   in
 

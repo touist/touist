@@ -2,6 +2,40 @@
     Abstract Syntaxic Tree (AST)
 *)
 
+type arith_unop = Neg | Sqrt | To_int | To_float | Abs
+
+type arith_binop = Add | Sub | Mul | Div | Mod
+
+type logic_binop = And | Or | Xor | Implies | Equiv
+
+type set_binop = Union | Inter | Diff
+
+type arith_binrel =
+  | Equal
+  | Not_equal
+  | Lesser_than
+  | Lesser_or_equal
+  | Greater_than
+  | Greater_or_equal
+
+type layout =
+  | Loc of Err.loc
+      (** [Loc] is a clever (or ugly, you pick) way of keeping the locations in
+        the text of the Ast.t elements.
+        In parser.mly, each production rule gives its location in the original
+        text; for example, instead of simply returning
+        [Inter (x,y)] the parser will return
+        [Loc (Inter (x,y), ($startpos,$endpos))].
+
+        [Loc] is used in eval.ml when checking the types; it allows to give precise
+        locations. *)
+  | Paren
+      (** [Paren] keeps track of the parenthesis in the AST in order to print latex *)
+  | NewlineAfter
+  | NewlineBefore
+
+type cardinality = Exact | Atleast | Atmost
+
 (*  Do you think this file is wierd, with this 'module rec' thing?
     This is because we want the type 'Ast.t' to be used in 'Set' and
     also we want 'Set' to be inside an 'Ast.t', I had to come up with
@@ -14,7 +48,6 @@
     (2) I don't know why but Set.elt wouldn't be Ast.t... So
        I tried this and now it works...
 *)
-
 module rec Ast : sig
   type var = string * t list option
 
@@ -27,33 +60,14 @@ module rec Ast : sig
     | Var of var
     | Set of AstSet.t
     | Set_decl of t list
-    | Neg of t
-    | Add of t * t
-    | Sub of t * t
-    | Mul of t * t
-    | Div of t * t
-    | Mod of t * t
-    | Sqrt of t
-    | To_int of t
-    | To_float of t
-    | Abs of t
+    | ArithUnop of arith_unop * t
+    | ArithBinop of t * arith_binop * t
     | Top
     | Bottom
     | Not of t
-    | And of t * t
-    | Or of t * t
-    | Xor of t * t
-    | Implies of t * t
-    | Equiv of t * t
-    | Equal of t * t
-    | Not_equal of t * t
-    | Lesser_than of t * t
-    | Lesser_or_equal of t * t
-    | Greater_than of t * t
-    | Greater_or_equal of t * t
-    | Union of t * t
-    | Inter of t * t
-    | Diff of t * t
+    | LogicBinop of t * logic_binop * t
+    | ArithBinrel of t * arith_binrel * t
+    | SetBinop of t * set_binop * t
     | Range of t * t
     | Empty of t
     | Card of t
@@ -61,9 +75,7 @@ module rec Ast : sig
     | Powerset of t
     | In of t * t
     | If of t * t * t
-    | Exact of t * t
-    | Atleast of t * t
-    | Atmost of t * t
+    | Cardinality of cardinality * t * t
     | Bigand of t list * t list * t option * t
     | Bigor of t list * t list * t option * t
     | Let of t * t * t
@@ -82,24 +94,10 @@ module rec Ast : sig
             abcd(1,foo,123,a)     <- an actual string that represents an actual
                                     logical proposition                      v}
     *)
-    | Loc of t * Err.loc
-        (** [Loc] is a clever (or ugly, you pick) way of keeping the locations in
-        the text of the Ast.t elements.
-        In parser.mly, each production rule gives its location in the original
-        text; for example, instead of simply returning
-        [Inter (x,y)] the parser will return
-        [Loc (Inter (x,y), ($startpos,$endpos))].
-
-        [Loc] is used in eval.ml when checking the types; it allows to give precise
-        locations.
-    *)
-    | Paren of t
-        (** [Paren] keeps track of the parenthesis in the AST in order to print latex *)
+    | Layout of layout * t
     | Exists of t * t
     | Forall of t * t
     | For of t * t * t
-    | NewlineAfter of t
-    | NewlineBefore of t
     | Formula of t
     | SetBuilder of t * t list * t list * t option
 end

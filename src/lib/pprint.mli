@@ -1,5 +1,11 @@
 (** Transform any AST (at any stage of transformation) to a string. *)
 
+val arith_binop : Types.arith_binop -> string
+
+val logic_binop : ?utf8:bool -> Types.logic_binop -> string
+
+val arith_binrel : ?utf8:bool -> Types.arith_binrel -> string
+
 val string_of_ast :
   ?utf8:bool ->
   ?show_var:(Types.AstSet.elt -> string) ->

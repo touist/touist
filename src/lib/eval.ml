@@ -11,17 +11,20 @@ open Err
    The description is a couple (content, location) *)
 type env = (string * (Ast.t * loc)) list
 
-let ast_without_loc (ast : Ast.t) : Ast.t =
-  match ast with Loc (ast, _) -> ast | ast -> ast
+let ast_without_layout (ast : Ast.t) : Ast.t =
+  match ast with
+  (* AS: used to be without_loc*)
+  | Layout (Loc _, ast) -> ast
+  | ast -> ast
 
 (* [raise_with_loc] takes an ast that may contains a Loc (Loc is added in
    parser.mly) and raise an exception with the given message.
    The only purpose of giving 'ast' is to get the Loc thing.
-   [ast_without_loc] should not have been previously applied to [ast]
-   because ast_without_loc will remove the Loc thing. *)
+   [ast_without_layout] should not have been previously applied to [ast]
+   because ast_without_layout will remove the Loc thing. *)
 let raise_with_loc (ast : Ast.t) (message : string) =
   match ast with
-  | Loc (_ast, loc) -> fatal (Error, Eval, message, Some loc)
+  | Layout (Loc loc, _) -> fatal (Error, Eval, message, Some loc)
   | _ -> fatal (Error, Eval, message, None)
 
 (* [raise_type_error] raises the errors that come from one-parameter functions.
@@ -73,7 +76,8 @@ let check_nb_vars_same_as_nb_sets (ast : Ast.t) (vars : Ast.t list)
     (sets : Ast.t list) : unit =
   let loc =
     match (List.nth vars 0, List.nth sets (List.length sets - 1)) with
-    | Loc (_, (startpos, _)), Loc (_, (_, endpos)) -> (startpos, endpos)
+    | Layout (Loc (startpos, _), _), Layout (Loc (_, endpos), _) ->
+        (startpos, endpos)
     | _ -> failwith "[shouldn't happen] missing locations in vars/sets"
   in
   match List.length vars = List.length sets with
@@ -107,6 +111,139 @@ let check_only = ref false
    (formulas can be 'int' or 'float' for example). *)
 let smt = ref false
 
+let eval_arith_unop ast u x x' =
+  match (u, x') with
+  | Neg, Int i -> Int (-i)
+  | Neg, Float f -> Float (-.f)
+  | Neg, _ -> raise_type_error ast x x' "'float' or 'int'"
+  | Sqrt, Float f -> Float (sqrt f)
+  | Sqrt, _ -> raise_type_error ast x x' "a float"
+  | To_int, Float f -> Int (int_of_float f)
+  | To_int, Int i -> Int i
+  | To_int, _ -> raise_type_error ast x x' "a 'float' or 'int'"
+  | To_float, Int i -> Float (float_of_int i)
+  | To_float, Float f -> Float f
+  | To_float, _ -> raise_type_error ast x x' "a 'float' or 'int'"
+  | Abs, Int i -> Int (abs i)
+  | Abs, Float f -> Float (abs_float f)
+  | Abs, _ -> raise_type_error ast x x' "a 'float' or 'int'"
+
+let int_binop = function
+  | Add -> ( + )
+  | Sub -> ( - )
+  | Mul -> ( * )
+  | Div -> ( / )
+  | Mod -> ( mod )
+
+let float_binop = function
+  | Add -> Some ( +. )
+  | Sub -> Some ( -. )
+  | Mul -> Some ( *. )
+  | Div -> Some ( /. )
+  | Mod -> None
+
+let eval_arith_binop x b y =
+  match (x, y) with
+  | Int x, Int y -> Some (Int (int_binop b x y))
+  | Float x, Float y -> (
+      match float_binop b with None -> None | Some o -> Some (Float (o x y)))
+  | _, _ -> None
+
+let bool_binop = function
+  | And -> ( && )
+  | Or -> ( || )
+  | Xor -> fun x y -> (x || y) && not (x && y)
+  | Implies -> fun x y -> (not x) || y
+  | Equiv -> fun x y -> ((not x) || y) && ((not x) || y)
+
+let bool_binrel = function
+  | Equal -> ( = )
+  | Not_equal -> ( <> )
+  | Lesser_than -> ( < )
+  | Lesser_or_equal -> ( <= )
+  | Greater_than -> ( > )
+  | Greater_or_equal -> ( >= )
+
+let eval_logic_binop_formula f x b y =
+  match (x, b, y) with
+  | Top, Or, _ | _, Or, Top -> Top
+  | Bottom, And, _ | _, And, Bottom -> Bottom
+  | _, Implies, Top | Bottom, Implies, _ -> Top
+  | Top, And, z
+  | z, And, Top
+  | Bottom, Or, z
+  | z, Or, Bottom
+  | z, Equiv, Top
+  | Top, Equiv, z
+  (* x ⇔ ⊤  ≡  (¬x ⋁ ⊤) ⋀ (¬⊤ ⋁ x)  ≡  ⊤ ⋀ x  ≡  x *)
+  | Top, Implies, z ->
+      z
+  | z, Implies, Bottom
+  | z, Equiv, Bottom
+  (* x ⇔ ⊥  ≡  (¬x ⋁ ⊥) ⋀ (¬⊥ ⋁ x)  ≡  ¬x ⋀ ⊤  ≡  ¬x *)
+  | Bottom, Equiv, z ->
+      f (Not z)
+  | _, _, _ -> LogicBinop (x, b, y)
+
+(* AS: We could simplify the XOR as well: xor(Top, x) = x*)
+
+let set_binop = function
+  | Union -> AstSet.union
+  | Inter -> AstSet.inter
+  | Diff -> AstSet.diff
+
+let rec process_formulas ast = function
+  | [] -> raise_with_loc ast "no formulas" (* AS: return Top instead? *)
+  | [ x ] -> x
+  | x :: xs -> LogicBinop (x, And, process_formulas ast xs)
+
+let rec exact_str lst =
+  let rec go = function
+    | [], [] -> Top
+    | t :: ts, [] -> LogicBinop (t, And, go (ts, []))
+    | [], f :: fs -> LogicBinop (Not f, And, go ([], fs))
+    | t :: ts, f :: fs ->
+        LogicBinop (LogicBinop (t, And, Not f), And, go (ts, fs))
+  in
+  match lst with [] -> Bottom | x :: xs -> LogicBinop (go x, Or, exact_str xs)
+
+and atleast_str lst =
+  List.fold_left
+    (fun acc str -> LogicBinop (acc, Or, formula_of_string_list str))
+    Bottom lst
+
+and atmost_str lst =
+  List.fold_left
+    (fun acc str ->
+      LogicBinop
+        ( acc,
+          Or,
+          List.fold_left
+            (fun acc' str' -> LogicBinop (acc', And, Not str'))
+            Top str ))
+    Bottom lst
+
+and formula_of_string_list =
+  List.fold_left (fun acc str -> LogicBinop (acc, And, str)) Top
+
+let eval_cardinality_formula i s = function
+  (* !check_only simplifies by returning a dummy proposition *)
+  | Exact ->
+      if i = 0 && AstSet.is_empty s then Top
+      else if AstSet.is_empty s then Bottom
+      else if !check_only then Prop "dummy"
+      else exact_str (AstSet.exact i s)
+  | Atleast ->
+      if i = 0 && AstSet.is_empty s then Top
+      else if i > 0 && AstSet.is_empty s then Bottom
+      else if !check_only then Prop "dummy"
+      else atleast_str (AstSet.atleast i s)
+  | Atmost ->
+      if AstSet.is_empty s then Top
+      else if i = 0 then Bottom
+      else if !check_only then Prop "dummy"
+      else atmost_str (AstSet.atmost i s)
+
 let rec eval ?smt:(smt_mode = false) ?(onlychecktypes = false) ast : Ast.t =
   check_only := onlychecktypes;
   smt := smt_mode;
@@ -117,21 +254,16 @@ let rec eval ?smt:(smt_mode = false) ?(onlychecktypes = false) ast : Ast.t =
 and eval_touist_code (env : env) ast : Ast.t =
   let rec affect_vars = function
     | [] -> []
-    | Loc (Affect (Loc (Var (p, i), var_loc), y), _) :: xs ->
+    | Layout (Loc _, Affect (Layout (Loc var_loc, Var (p, i)), y)) :: xs ->
         Hashtbl.replace !extenv
           (expand_var_name env (p, i))
           (eval_ast env y, var_loc);
         affect_vars xs
     | x :: xs -> x :: affect_vars xs
   in
-  let rec process_formulas = function
-    | [] -> raise_with_loc ast "no formulas"
-    | [ x ] -> x
-    | x :: xs -> And (x, process_formulas xs)
-  in
-  match ast_without_loc ast with
+  match ast_without_layout ast with
   | Touist_code formulas ->
-      eval_ast_formula env (process_formulas (affect_vars formulas))
+      eval_ast_formula env (process_formulas ast (affect_vars formulas))
   | e ->
       raise_with_loc ast
         ("this does not seem to be a touist code structure: "
@@ -144,7 +276,7 @@ and eval_touist_code (env : env) ast : Ast.t =
 and eval_ast (env : env) (ast : Ast.t) : Ast.t =
   let eval_ast_env = eval_ast in
   let eval_ast = eval_ast env in
-  match ast_without_loc ast with
+  match ast_without_layout ast with
   | Int x -> Int x
   | Float x -> Float x
   | Bool x -> Bool x
@@ -168,78 +300,21 @@ and eval_ast (env : env) (ast : Ast.t) : Ast.t =
             )))
   | Set x -> Set x
   | Set_decl _ -> eval_set_decl env ast
-  | Neg x -> (
-      match eval_ast x with
-      | Int x' -> Int (-x')
-      | Float x' -> Float (-.x')
-      | x' -> raise_type_error ast x x' "'float' or 'int'")
-  | Add (x, y) -> (
-      match (eval_ast x, eval_ast y) with
-      | Int x, Int y -> Int (x + y)
-      | Float x, Float y -> Float (x +. y)
-      | x', y' -> raise_type_error2 ast x x' y y' "'float' or 'int'")
-  | Sub (x, y) -> (
-      match (eval_ast x, eval_ast y) with
-      | Int x, Int y -> Int (x - y)
-      | Float x, Float y -> Float (x -. y)
-      | x', y' -> raise_type_error2 ast x x' y y' "'float' or 'int'")
-  | Mul (x, y) -> (
-      match (eval_ast x, eval_ast y) with
-      | Int x, Int y -> Int (x * y)
-      | Float x, Float y -> Float (x *. y)
-      | x', y' -> raise_type_error2 ast x x' y y' "a 'float' or 'int'")
-  | Div (x, y) -> (
-      match (eval_ast x, eval_ast y) with
-      | Int x, Int y -> Int (x / y)
-      | Float x, Float y -> Float (x /. y)
-      | x', y' -> raise_type_error2 ast x x' y y' "a 'float' or 'int'")
-  | Mod (x, y) -> (
-      match (eval_ast x, eval_ast y) with
-      | Int x, Int y -> Int (x mod y)
-      | x', y' -> raise_type_error2 ast x x' y y' "a 'float' or 'int'")
-  | Sqrt x -> (
-      match eval_ast x with
-      | Float x -> Float (sqrt x)
-      | x' -> raise_type_error ast x x' "a float")
-  | To_int x -> (
-      match eval_ast x with
-      | Float x -> Int (int_of_float x)
-      | Int x -> Int x
-      | x' -> raise_type_error ast x x' "a 'float' or 'int'")
-  | To_float x -> (
-      match eval_ast x with
-      | Int x -> Float (float_of_int x)
-      | Float x -> Float x
-      | x' -> raise_type_error ast x x' "a 'float' or 'int'")
-  | Abs x -> (
-      match eval_ast x with
-      | Int x -> Int (abs x)
-      | Float x -> Float (abs_float x)
-      | x' -> raise_type_error ast x x' "a 'float' or 'int'")
+  | ArithUnop (u, x) -> eval_arith_unop ast u x (eval_ast x)
+  | ArithBinop (x, b, y) -> (
+      let x', y' = (eval_ast x, eval_ast y) in
+      match eval_arith_binop x' b y' with
+      | Some t -> t
+      | None -> raise_type_error2 ast x x' y y' "'float' or 'int'")
   | Not x -> (
       match eval_ast x with
       | Bool x -> Bool (not x)
       | x' -> raise_type_error ast x x' "a 'bool'")
-  | And (x, y) -> (
-      match (eval_ast x, eval_ast y) with
-      | Bool x, Bool y -> Bool (x && y)
-      | x', y' -> raise_type_error2 ast x x' y y' "a 'bool'")
-  | Or (x, y) -> (
-      match (eval_ast x, eval_ast y) with
-      | Bool x, Bool y -> Bool (x || y)
-      | x', y' -> raise_type_error2 ast x x' y y' "a 'bool'")
-  | Xor (x, y) -> (
-      match (eval_ast x, eval_ast y) with
-      | Bool x, Bool y -> Bool ((x || y) && not (x && y))
-      | x', y' -> raise_type_error2 ast x x' y y' "a 'bool'")
-  | Implies (x, y) -> (
-      match (eval_ast x, eval_ast y) with
-      | Bool x, Bool y -> Bool ((not x) || y)
-      | x', y' -> raise_type_error2 ast x x' y y' "a 'bool'")
-  | Equiv (x, y) -> (
-      match (eval_ast x, eval_ast y) with
-      | Bool x, Bool y -> Bool (((not x) || y) && ((not x) || y))
-      | x', y' -> raise_type_error2 ast x x' y y' "a 'bool'")
+  | LogicBinop (x, b, y) -> (
+      let x', y' = (eval_ast x, eval_ast y) in
+      match (x', y') with
+      | Bool x, Bool y -> Bool (bool_binop b x y)
+      | _, _ -> raise_type_error2 ast x x' y y' "a 'bool'")
   | If (x, y, z) ->
       let test =
         match eval_ast x with
@@ -248,21 +323,9 @@ and eval_ast (env : env) (ast : Ast.t) : Ast.t =
         | x' -> raise_type_error ast x x' "a 'bool'"
       in
       if test then eval_ast y else eval_ast z
-  | Union (x, y) -> (
+  | SetBinop (x, o, y) -> (
       match (eval_ast x, eval_ast y) with
-      | Set a, Set b -> Set (AstSet.union a b)
-      | x', y' ->
-          raise_type_error2 ast x x' y y'
-            "a 'float-set', 'int-set' or 'prop-set'")
-  | Inter (x, y) -> (
-      match (eval_ast x, eval_ast y) with
-      | Set a, Set b -> Set (AstSet.inter a b)
-      | x', y' ->
-          raise_type_error2 ast x x' y y'
-            "a 'float-set', 'int-set' or 'prop-set'")
-  | Diff (x, y) -> (
-      match (eval_ast x, eval_ast y) with
-      | Set a, Set b -> Set (AstSet.diff a b)
+      | Set a, Set b -> Set (set_binop o a b)
       | x', y' ->
           raise_type_error2 ast x x' y y'
             "a 'float-set', 'int-set' or 'prop-set'")
@@ -332,7 +395,7 @@ and eval_ast (env : env) (ast : Ast.t) : Ast.t =
           raise_type_error2 ast x x' y y'
             "an 'int', 'float' or 'prop' on the left-hand and a 'set' on the \
              right-hand")
-  | Equal (x, y) -> (
+  | ArithBinrel (x, Equal, y) -> (
       match (eval_ast x, eval_ast y) with
       | Int x, Int y -> Bool (x = y)
       | Float x, Float y -> Bool (x = y)
@@ -340,31 +403,16 @@ and eval_ast (env : env) (ast : Ast.t) : Ast.t =
       | Set a, Set b -> Bool (AstSet.equal a b)
       | x', y' ->
           raise_type_error2 ast x x' y y' "an 'int', 'float', 'prop' or 'set'")
-  | Not_equal (x, y) -> eval_ast (Not (Equal (x, y)))
-  | Lesser_than (x, y) -> (
-      match (eval_ast x, eval_ast y) with
-      | Int x, Int y -> Bool (x < y)
-      | Float x, Float y -> Bool (x < y)
-      | x', y' -> raise_type_error2 ast x x' y y' "a 'float' or 'int'")
-  | Lesser_or_equal (x, y) -> (
-      match (eval_ast x, eval_ast y) with
-      | Int x, Int y -> Bool (x <= y)
-      | Float x, Float y -> Bool (x <= y)
-      | x', y' -> raise_type_error2 ast x x' y y' "a 'float' or 'int'")
-  | Greater_than (x, y) -> (
-      match (eval_ast x, eval_ast y) with
-      | Int x, Int y -> Bool (x > y)
-      | Float x, Float y -> Bool (x > y)
-      | x', y' -> raise_type_error2 ast x x' y y' "a 'float' or 'int'")
-  | Greater_or_equal (x, y) -> (
-      match (eval_ast x, eval_ast y) with
-      | Int x, Int y -> Bool (x >= y)
-      | Float x, Float y -> Bool (x >= y)
+  | ArithBinrel (x, Not_equal, y) -> eval_ast (Not (ArithBinrel (x, Equal, y)))
+  | ArithBinrel (x, b, y) -> (
+      let x', y' = (eval_ast x, eval_ast y) in
+      match (x', y') with
+      | Int x, Int y -> Bool (bool_binrel b x y)
+      | Float x, Float y -> Bool (bool_binrel b x y)
       | x', y' -> raise_type_error2 ast x x' y y' "a 'float' or 'int'")
   | UnexpProp (p, i) -> expand_prop_with_set env p i
   | Prop x -> Prop x
-  | Loc (x, _) -> eval_ast x
-  | Paren x -> eval_ast x
+  | Layout (_, x) -> eval_ast x
   | Formula x -> Formula (eval_ast_formula env x)
   | SetBuilder (expr, vars, sets, cond) ->
       let rec treat env vars sets : Ast.t list =
@@ -373,7 +421,8 @@ and eval_ast (env : env) (ast : Ast.t) : Ast.t =
             if match cond with Some c -> ast_to_bool env c | None -> true then
               [ eval_ast_env env expr ] (* bottom of the recursion: expand f *)
             else []
-        | Loc (Var (p, i), loc) :: next_vars, Loc (set, _) :: next_sets ->
+        | ( Layout (Loc loc, Var (p, i)) :: next_vars,
+            Layout (Loc _, set) :: next_sets ) ->
             let set =
               match eval_ast_env env set with
               | Set set -> set
@@ -400,7 +449,7 @@ and eval_ast (env : env) (ast : Ast.t) : Ast.t =
 
 and eval_set_decl (env : env) (set_decl : Ast.t) =
   let sets =
-    match ast_without_loc set_decl with
+    match ast_without_layout set_decl with
     | Set_decl sets -> sets
     | _ -> failwith "shoulnt happen: non-Set_decl in eval_set_decl"
   in
@@ -441,46 +490,31 @@ and eval_ast_formula (env : env) (ast : Ast.t) : Ast.t =
   let eval_ast_formula = eval_ast_formula env
   and eval_ast_formula_env = eval_ast_formula
   and eval_ast = eval_ast env in
-  match ast_without_loc ast with
+  match ast_without_layout ast with
   | Int _ when not !smt -> failwith "Integer allowed only with SMT solver"
   | Int x when !smt -> Int x
   | Float _ when not !smt -> failwith "Float allowed only with SMT solver"
   | Float x when !smt -> Float x
-  | Neg x -> (
+  | ArithUnop (Neg, x) -> (
       match eval_ast_formula x with
       | Int x' -> Int (-x')
       | Float x' -> Float (-.x')
-      | x' -> Neg x' (*| _ -> raise (Error (string_of_ast ast))*))
-  | Add (x, y) -> (
+      | x' -> ArithUnop (Neg, x') (*| _ -> raise (Error (string_of_ast ast))*))
+  | ArithBinop (x, Add, y) -> (
       match (eval_ast_formula x, eval_ast_formula y) with
       | Int x', Int y' -> Int (x' + y')
       | Float x', Float y' -> Float (x' +. y')
-      | Int _, Prop _ | Prop _, Int _ -> Add (x, y)
-      | x', y' -> Add (x', y') (*| _,_ -> raise (Error (string_of_ast ast))*))
-  | Sub (x, y) -> (
-      match (eval_ast_formula x, eval_ast_formula y) with
-      | Int x', Int y' -> Int (x' - y')
-      | Float x', Float y' -> Float (x' -. y')
-      (*| Prop x', Prop x' -> Sub (Prop x', Prop x')*)
-      | x', y' -> Sub (x', y') (*| _,_ -> raise (Error (string_of_ast ast))*))
-  | Mul (x, y) -> (
-      match (eval_ast_formula x, eval_ast_formula y) with
-      | Int x', Int y' -> Int (x' * y')
-      | Float x', Float y' -> Float (x' *. y')
-      | x', y' -> Mul (x', y') (*| _,_ -> raise (Error (string_of_ast ast))*))
-  | Div (x, y) -> (
-      match (eval_ast_formula x, eval_ast_formula y) with
-      | Int x', Int y' -> Int (x' / y')
-      | Float x', Float y' -> Float (x' /. y')
-      | x', y' -> Div (x', y') (*| _,_ -> raise (Error (string_of_ast ast))*))
-  | Equal (x, y) -> Equal (eval_ast_formula x, eval_ast_formula y)
-  | Not_equal (x, y) -> Not_equal (eval_ast_formula x, eval_ast_formula y)
-  | Lesser_than (x, y) -> Lesser_than (eval_ast_formula x, eval_ast_formula y)
-  | Lesser_or_equal (x, y) ->
-      Lesser_or_equal (eval_ast_formula x, eval_ast_formula y)
-  | Greater_than (x, y) -> Greater_than (eval_ast_formula x, eval_ast_formula y)
-  | Greater_or_equal (x, y) ->
-      Greater_or_equal (eval_ast_formula x, eval_ast_formula y)
+      | Int _, Prop _ | Prop _, Int _ -> ArithBinop (x, Add, y)
+      | x', y' ->
+          ArithBinop (x', Add, y')
+          (*| _,_ -> raise (Error (string_of_ast ast))*))
+  | ArithBinop (x, b, y) -> (
+      let x', y' = (eval_ast_formula x, eval_ast_formula y) in
+      match eval_arith_binop x' b y' with
+      | Some t -> t
+      | None -> ArithBinop (x', b, y'))
+  | ArithBinrel (x, b, y) ->
+      ArithBinrel (eval_ast_formula x, b, eval_ast_formula y)
   | Top -> Top
   | Bottom -> Bottom
   | UnexpProp (p, i) -> Prop (expand_var_name env (p, i))
@@ -586,58 +620,19 @@ and eval_ast_formula (env : env) (ast : Ast.t) : Ast.t =
   | Not Top -> Bottom
   | Not Bottom -> Top
   | Not x -> Not (eval_ast_formula x)
-  | And (Bottom, _) | And (_, Bottom) -> Bottom
-  | And (Top, x) | And (x, Top) -> eval_ast_formula x
-  | And (x, y) -> And (eval_ast_formula x, eval_ast_formula y)
-  | Or (Top, _) | Or (_, Top) -> Top
-  | Or (Bottom, x) | Or (x, Bottom) -> eval_ast_formula x
-  | Or (x, y) -> Or (eval_ast_formula x, eval_ast_formula y)
-  | Xor (x, y) -> Xor (eval_ast_formula x, eval_ast_formula y)
-  | Implies (_, Top) | Implies (Bottom, _) -> Top
-  | Implies (x, Bottom) -> eval_ast_formula (Not x)
-  | Implies (Top, x) -> eval_ast_formula x
-  | Implies (x, y) -> Implies (eval_ast_formula x, eval_ast_formula y)
-  | Equiv (x, Top)
-  (* x ⇔ ⊤  ≡  (¬x ⋁ ⊤) ⋀ (¬⊤ ⋁ x)  ≡  ⊤ ⋀ x  ≡  x *)
-  | Equiv (Top, x) ->
-      eval_ast_formula x
-  | Equiv (x, Bottom)
-  (* x ⇔ ⊥  ≡  (¬x ⋁ ⊥) ⋀ (¬⊥ ⋁ x)  ≡  ¬x ⋀ ⊤  ≡  ¬x *)
-  | Equiv (Bottom, x) ->
-      eval_ast_formula (Not x)
-  | Equiv (x, y) -> Equiv (eval_ast_formula x, eval_ast_formula y)
-  | Exact (x, y) ->
-      rm_top_bot
-        (* !check_only simplifies by returning a dummy proposition *)
-        (match (eval_ast x, eval_ast y) with
-        | Int 0, Set s when AstSet.is_empty s -> Top
-        | Int _, Set s when AstSet.is_empty s -> Bottom
-        | Int x, Set s ->
-            if !check_only then Prop "dummy" else exact_str (AstSet.exact x s)
-        | x', y' ->
+  | LogicBinop (x, b, y) ->
+      let x', y' = (eval_ast_formula x, eval_ast_formula y) in
+      eval_logic_binop_formula eval_ast_formula x' b y'
+  | Cardinality (c, x, y) ->
+      let x', y' = (eval_ast x, eval_ast y) in
+      let i, s =
+        match (x', y') with
+        | Int i, Set s -> (i, s)
+        | _, _ ->
             raise_type_error2 ast x x' y y'
-              "'int' (left-hand) and a 'prop-set' (right-hand)")
-  | Atleast (x, y) ->
-      rm_top_bot
-        (match (eval_ast x, eval_ast y) with
-        | Int 0, Set s when AstSet.is_empty s -> Top
-        | Int k, Set s when k > 0 && AstSet.is_empty s -> Bottom
-        | Int x, Set s ->
-            if !check_only then Prop "dummy"
-            else atleast_str (AstSet.atleast x s)
-        | x', y' ->
-            raise_type_error2 ast x x' y y'
-              "'int' (left-hand) and a 'prop-set' (right-hand)")
-  | Atmost (x, y) ->
-      rm_top_bot
-        (match (eval_ast x, eval_ast y) with
-        | Int _, Set s when AstSet.is_empty s -> Top
-        | Int 0, Set _ -> Bottom
-        | Int x, Set s ->
-            if !check_only then Prop "dummy" else atmost_str (AstSet.atmost x s)
-        | x', y' ->
-            raise_type_error2 ast x x' y y'
-              "'int' (left-hand) and a 'prop-set' (right-hand)")
+              "'int' (left-hand) and a 'prop-set' (right-hand)"
+      in
+      rm_top_bot (eval_cardinality_formula i s c)
   (* We consider 'bigand' as the universal quantification; it could be translated as
          for all elements i of E, p(i) is true
      As such, whenever 'bigand' returns nothing (when condition always false or empty
@@ -650,7 +645,7 @@ and eval_ast_formula (env : env) (ast : Ast.t) : Ast.t =
       match (vars, sets) with
       | [], [] | _, [] | [], _ ->
           failwith "shouln't happen: non-variable in big construct"
-      | [ Loc (Var (name, _), loc) ], [ set ] ->
+      | [ Layout (Loc loc, Var (name, _)) ], [ set ] ->
           (* we don't need the indices because bigand's vars are 'simple' *)
           let rec process_list_set env (set_list : Ast.t list) =
             match set_list with
@@ -660,7 +655,10 @@ and eval_ast_formula (env : env) (ast : Ast.t) : Ast.t =
                 let env = (name, (x, loc)) :: env in
                 match ast_to_bool env when_cond with
                 | true when xs != [] ->
-                    And (eval_ast_formula_env env body, process_list_set env xs)
+                    LogicBinop
+                      ( eval_ast_formula_env env body,
+                        And,
+                        process_list_set env xs )
                 | true -> eval_ast_formula_env env body
                 | false -> process_list_set env xs)
           in
@@ -683,7 +681,7 @@ and eval_ast_formula (env : env) (ast : Ast.t) : Ast.t =
       match (vars, sets) with
       | [], [] | _, [] | [], _ ->
           failwith "shouln't happen: non-variable in big construct"
-      | [ Loc (Var (name, _), loc) ], [ set ] ->
+      | [ Layout (Loc loc, Var (name, _)) ], [ set ] ->
           let rec process_list_set env (set_list : Ast.t list) =
             match set_list with
             | [] -> Bottom
@@ -691,7 +689,10 @@ and eval_ast_formula (env : env) (ast : Ast.t) : Ast.t =
                 let env = (name, (x, loc)) :: env in
                 match ast_to_bool env when_cond with
                 | true when xs != [] ->
-                    Or (eval_ast_formula_env env body, process_list_set env xs)
+                    LogicBinop
+                      ( eval_ast_formula_env env body,
+                        Or,
+                        process_list_set env xs )
                 | true -> eval_ast_formula_env env body
                 | false -> process_list_set env xs)
           in
@@ -708,11 +709,12 @@ and eval_ast_formula (env : env) (ast : Ast.t) : Ast.t =
         | c' -> raise_type_error ast c c' "boolean"
       in
       if test then eval_ast_formula y else eval_ast_formula z
-  | Let (Loc (Var (p, i), loc), content, formula) ->
+  | Let (Layout (Loc loc, Var (p, i)), content, formula) ->
       let name = expand_var_name env (p, i)
       and desc = (eval_ast content, loc) in
       eval_ast_formula_env ((name, desc) :: env) formula
-  | Paren x -> eval_ast_formula x
+  | Layout (Paren, x) | Layout (NewlineBefore, x) | Layout (NewlineAfter, x) ->
+      eval_ast_formula x
   | Exists (p, f) ->
       let p =
         match eval_ast_formula p with
@@ -733,7 +735,7 @@ and eval_ast_formula (env : env) (ast : Ast.t) : Ast.t =
              ^ string_of_ast_type wrong ^ "'.\n")
       in
       Forall (p, eval_ast_formula f)
-  | For (Loc (Var (p, i), loc), content, Loc (formula, _)) -> (
+  | For (Layout (Loc loc, Var (p, i)), content, Layout (Loc _, formula)) -> (
       let name = expand_var_name env (p, i) in
       match (formula, eval_ast content) with
       | Exists (x, f), Set s ->
@@ -749,33 +751,10 @@ and eval_ast_formula (env : env) (ast : Ast.t) : Ast.t =
                 (eval_ast_formula_env ((name, (content, loc)) :: env) x, acc))
             s (eval_ast_formula f)
       | _, content' -> raise_type_error ast content content' " 'prop-set'")
-  | NewlineBefore f | NewlineAfter f -> eval_ast_formula f
   | Formula f -> eval_ast_formula f
   | e ->
       raise_with_loc ast
         ("this expression is not a formula: " ^ string_of_ast e ^ "\n")
-
-and exact_str lst =
-  let rec go = function
-    | [], [] -> Top
-    | t :: ts, [] -> And (t, go (ts, []))
-    | [], f :: fs -> And (Not f, go ([], fs))
-    | t :: ts, f :: fs -> And (And (t, Not f), go (ts, fs))
-  in
-  match lst with [] -> Bottom | x :: xs -> Or (go x, exact_str xs)
-
-and atleast_str lst =
-  List.fold_left
-    (fun acc str -> Or (acc, formula_of_string_list str))
-    Bottom lst
-
-and atmost_str lst =
-  List.fold_left
-    (fun acc str ->
-      Or (acc, List.fold_left (fun acc' str' -> And (acc', Not str')) Top str))
-    Bottom lst
-
-and formula_of_string_list = List.fold_left (fun acc str -> And (acc, str)) Top
 
 (* [expand_prop_with_set] takes care of expanding all expressions. Two cases:
    (a) all indices are propositions, meaning that it retuns a simple proposition.
@@ -883,7 +862,7 @@ and expand_var_name (env : env) ((prefix, indices) : string * Ast.t list option)
    If [!check_only] is true, then the lists *)
 and set_to_ast_list (env : env) (ast : Ast.t) : Ast.t list =
   let lst =
-    match ast_without_loc (eval_ast env ast) with
+    match ast_without_layout (eval_ast env ast) with
     | Set s -> AstSet.elements s
     | ast' ->
         raise_with_loc ast
@@ -919,24 +898,13 @@ and ast_to_bool env (ast : Ast.t) : bool =
 and has_top_or_bot = function
   | Top | Bottom -> true
   | Not x -> has_top_or_bot x
-  | And (x, y) -> has_top_or_bot x || has_top_or_bot y
-  | Or (x, y) -> has_top_or_bot x || has_top_or_bot y
-  | Xor (x, y) -> has_top_or_bot x || has_top_or_bot y
-  | Implies (x, y) -> has_top_or_bot x || has_top_or_bot y
-  | Equiv (x, y) -> has_top_or_bot x || has_top_or_bot y
+  | LogicBinop (x, _, y) -> has_top_or_bot x || has_top_or_bot y
   (* the following items are just here because of SMT that
      allows ==, <, >, +, -, *... in formulas. *)
-  | Neg x -> has_top_or_bot x
-  | Add (x, y) -> has_top_or_bot x || has_top_or_bot y
-  | Sub (x, y) -> has_top_or_bot x || has_top_or_bot y
-  | Mul (x, y) -> has_top_or_bot x || has_top_or_bot y
-  | Div (x, y) -> has_top_or_bot x || has_top_or_bot y
-  | Equal (x, y) -> has_top_or_bot x || has_top_or_bot y
-  | Not_equal (x, y) -> has_top_or_bot x || has_top_or_bot y
-  | Lesser_than (x, y) -> has_top_or_bot x || has_top_or_bot y
-  | Lesser_or_equal (x, y) -> has_top_or_bot x || has_top_or_bot y
-  | Greater_than (x, y) -> has_top_or_bot x || has_top_or_bot y
-  | Greater_or_equal (x, y) -> has_top_or_bot x || has_top_or_bot y
+  | ArithUnop (Neg, x) ->
+      has_top_or_bot x (* AS: What about other unary operators? *)
+  | ArithBinop (x, _, y) -> has_top_or_bot x || has_top_or_bot y
+  | ArithBinrel (x, _, y) -> has_top_or_bot x || has_top_or_bot y
   | Exists (_, y) -> has_top_or_bot y
   | Forall (_, y) -> has_top_or_bot y
   | _ -> false
