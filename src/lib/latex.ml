@@ -120,7 +120,7 @@ let rec latex_of_ast ?(matrix_instead_of_substack = false) ~full ast =
   | Subset (x, y) -> latex_of_ast x ^ "\\subseteq " ^ latex_of_ast y
   | Powerset x -> "\\textrm{powerset}(" ^ latex_of_ast x ^ ")"
   | In (x, y) -> latex_of_ast x ^ " \\in " ^ latex_of_ast y
-  | Empty x -> "\\textrm{empty}(" ^ latex_of_ast x ^ ")"
+  | IsEmpty x -> "\\textrm{empty}(" ^ latex_of_ast x ^ ")"
   | Card x -> "\\textrm{card}(" ^ latex_of_ast x ^ ")"
   | If (x, y, z) ->
       "\\textrm{if}\\;" ^ latex_of_ast x ^ "\\;\\textrm{then}\\;"
@@ -230,7 +230,7 @@ and ast_fun (f : 'a -> Ast.t -> 'a) (acc : 'a) ast : 'a =
   | SetBuilder _ ->
       acc
   (* non-formulas *)
-  | SetBinop _ | Range _ | Subset _ | Powerset _ | In _ | Empty _ -> acc
+  | SetBinop _ | Range _ | Subset _ | Powerset _ | In _ | IsEmpty _ -> acc
 
 and contains_newline ast =
   ast

@@ -351,7 +351,7 @@ and eval_ast (env : env) (ast : Ast.t) : Ast.t =
       | Float x, Float y ->
           Set (AstSet.of_list (frange x (if !check_only then x else y) 1.))
       | x', y' -> raise_type_error2 ast x x' y y' "two integers or two floats")
-  | Empty x -> (
+  | IsEmpty x -> (
       match eval_ast x with
       | Set x -> Bool (AstSet.is_empty x)
       | x' -> raise_type_error ast x x' "a 'float-set', 'int-set' or 'prop-set'"

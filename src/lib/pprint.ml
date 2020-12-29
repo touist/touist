@@ -113,8 +113,8 @@ let rec string_of_ast ?(utf8 = false) ?(show_var = fun _ -> "") ?(debug = false)
   | Powerset x -> "powerset(" ^ of_ast x ^ ")"
   | In (x, y) when utf8 -> of_ast x ^ " ∈ " ^ of_ast y
   | In (x, y) -> of_ast x ^ " in " ^ of_ast y
-  | Empty x when utf8 -> of_ast x ^ "=∅"
-  | Empty x -> "empty(" ^ of_ast x ^ ")"
+  | IsEmpty x when utf8 -> of_ast x ^ "=∅"
+  | IsEmpty x -> "empty(" ^ of_ast x ^ ")"
   | Card x when utf8 -> "|" ^ of_ast x ^ "|"
   | Card x -> "card(" ^ of_ast x ^ ")"
   | If (x, y, z) ->
@@ -178,7 +178,7 @@ and string_of_ast_type ?(debug = false) (ast : Ast.t) : string =
   | Subset (_, _) -> "subset()"
   | Powerset _ -> "powerset()"
   | In (_, _) -> "in"
-  | Empty _ -> "empty()"
+  | IsEmpty _ -> "empty()"
   | Card _ -> "card()"
   | If (_, _, _) -> "if"
   | Bigand (_, _, None, _) -> "bigand"

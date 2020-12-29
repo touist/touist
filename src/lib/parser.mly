@@ -221,7 +221,7 @@ expr:
   | b=bool {b}
   | b=connectors(expr)
   | b=binrel(expr) {b}
-  | EMPTY  (*LPAREN*) s=expr RPAREN { Layout (Loc ($startpos,$endpos), Empty s) }
+  | EMPTY  (*LPAREN*) s=expr RPAREN { Layout (Loc ($startpos,$endpos), IsEmpty s) }
   | s1=expr SUBSET s2=expr { Layout (Loc ($startpos,$endpos), Subset (s1,s2)) }
   | SUBSET_PR (*LPAREN*) s1=expr COMMA s2=expr RPAREN {
       let loc = ($startpos,$endpos) in

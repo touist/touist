@@ -69,7 +69,7 @@ module rec Ast : sig
     | ArithBinrel of t * arith_binrel * t
     | SetBinop of t * set_binop * t
     | Range of t * t
-    | Empty of t
+    | IsEmpty of t
     | Card of t
     | Subset of t * t
     | Powerset of t
