@@ -37,12 +37,15 @@ let raise_with_loc (ast : Ast.t) (message : string) =
    'an integer or a float'. *)
 let raise_type_error operator operand expanded (expected_types : string) =
   raise_with_loc operator
-    ("'"
-    ^ string_of_ast_type operator
-    ^ "' expects " ^ expected_types ^ ". " ^ "The operand:\n" ^ "    "
-    ^ string_of_ast operand ^ "\n" ^ "has been expanded to something of type '"
-    ^ string_of_ast_type expanded
-    ^ "':\n" ^ "    " ^ string_of_ast expanded ^ "\n")
+    (sprintf
+       "'%s' expects %s. The operand:\n\
+       \    %s\n\
+        has been expanded to something of type '%s':\n\
+       \    %s\n"
+       (string_of_ast_type operator)
+       expected_types (string_of_ast operand)
+       (string_of_ast_type expanded)
+       (string_of_ast expanded))
 
 (* Same as above but for functions of two parameters. Example: with And (x,y),
    operator is And (x,y),
@@ -50,28 +53,38 @@ let raise_type_error operator operand expanded (expected_types : string) =
    exp1 and exp2 are the expanded parameters x and y. *)
 let raise_type_error2 operator _op1 exp1 _op2 exp2 (expected_types : string) =
   raise_with_loc operator
-    ("incorrect types with '"
-    ^ string_of_ast_type operator
-    ^ "'; expects " ^ expected_types ^ ". " ^ "In statement:\n" ^ "    "
-    ^ string_of_ast operator ^ "\n" ^ "Left-hand operand has type '"
-    ^ string_of_ast_type exp1 ^ "':\n" ^ "    " ^ string_of_ast exp1 ^ "\n"
-    ^ "Right-hand operand has type '" ^ string_of_ast_type exp2 ^ "':\n"
-    ^ "    " ^ string_of_ast exp2 ^ "\n")
+    (sprintf
+       "incorrect types with '%s'; expects %s. In statement:\n\
+       \    %s\n\
+        Left-hand operand has type '%s':\n\
+       \    %s\n\
+        Right-hand operand has type '%s':\n\
+       \    %s\n"
+       (string_of_ast_type operator)
+       expected_types (string_of_ast operator) (string_of_ast_type exp1)
+       (string_of_ast exp1) (string_of_ast_type exp2) (string_of_ast exp2))
 
 (* [raise_set_decl] is the same as [raise_type_error2] but between one element
    and the set this element is supposed to be added to. *)
 let raise_set_decl ast elmt elmt_expanded set set_expanded
     (expected_types : string) =
   raise_with_loc ast
-    ("Ill-formed set declaration. It expects " ^ expected_types ^ ". "
-   ^ "One of the elements is of type '"
-    ^ string_of_ast_type elmt_expanded
-    ^ "':\n" ^ "    " ^ string_of_ast elmt ^ "\n"
-    ^ "This element has been expanded to\n" ^ "    "
-    ^ string_of_ast elmt_expanded
-    ^ "\n" ^ "Up to now, the set declaration\n" ^ "    " ^ string_of_ast set
-    ^ "\n" ^ "has been expanded to:\n" ^ "    " ^ string_of_ast set_expanded
-    ^ "\n")
+    (sprintf
+       "Ill-formed set declaration. It expects %s. One of the elements is of \
+        type '%s':\n\
+       \    %s\n\
+        This element has been expanded to\n\
+       \    %s\n\
+        Up to now, the set declaration\n\
+       \    %s\n\
+        has been expanded to:\n\
+       \    %s\n"
+       expected_types
+       (string_of_ast_type elmt_expanded)
+       (string_of_ast elmt)
+       (string_of_ast elmt_expanded)
+       (string_of_ast set)
+       (string_of_ast set_expanded))
 
 let check_nb_vars_same_as_nb_sets (ast : Ast.t) (vars : Ast.t list)
     (sets : Ast.t list) : unit =
@@ -84,21 +97,19 @@ let check_nb_vars_same_as_nb_sets (ast : Ast.t) (vars : Ast.t list)
   match List.length vars = List.length sets with
   | true -> ()
   | false ->
-      fatal
-        ( Error,
-          Eval,
-          "Ill-formed '" ^ string_of_ast_type ast
-          ^ "'. The number of variables and sets must be the same. "
-          ^ "You defined "
-          ^ string_of_int (List.length vars)
-          ^ " variables:\n" ^ "    "
-          ^ string_of_ast_list "," vars
-          ^ "\n" ^ "but you gave "
-          ^ string_of_int (List.length sets)
-          ^ " sets:\n" ^ "    "
-          ^ string_of_ast_list "," sets
-          ^ "\n",
-          Some loc )
+      let message =
+        sprintf
+          "Ill-formed '%s'. The number of variables and sets must be the same. \
+           You defined %d variables:\n\
+          \    %s\n\
+           but you gave %d sets:\n\
+          \    %s\n"
+          (string_of_ast_type ast) (List.length vars)
+          (string_of_ast_list "," vars)
+          (List.length sets)
+          (string_of_ast_list "," sets)
+      in
+      fatal (Error, Eval, message, Some loc)
 
 let extenv = ref (Hashtbl.create 0)
 
@@ -467,9 +478,10 @@ and eval_set_decl (env : env) (set_decl : Ast.t) =
     | _ ->
         raise_set_decl set_decl elmt elmt_expanded (Set_decl sets)
           (Set_decl sets_expanded)
-          ("at this point a comma-separated list of '"
-          ^ string_of_ast_type first_elmt
-          ^ "', because previous elements of the list had this type")
+          (sprintf
+             "at this point a comma-separated list of '%s', because previous \
+              elements of the list had this type"
+             (string_of_ast_type first_elmt))
   in
   (* We take the first elmnt of 'sets' and 'sets_expanded' in order to enforce
      what the following elmnts should be. 'x' is only useful for raising the
@@ -540,16 +552,18 @@ and eval_ast_formula (env : env) (ast : Ast.t) : Ast.t =
         | Formula x -> x
         | _ ->
             raise_with_loc ast
-              ("local variable '" ^ name
-             ^ "' (defined in bigand, bigor, let or list comprehension) "
-             ^ "cannot be expanded into a 'prop' or 'formula' because its \
-                content " ^ "is of type '" ^ string_of_ast_type content
-             ^ "' instead of "
-              ^ (if !smt then "'int', 'float', " else "")
-              ^ "'prop' or 'formula'. "
-              ^ "Why? Because this variable is part of a formula, and thus is \
-                 expected " ^ "to be a proposition. Here is the content of '"
-              ^ name ^ "':\n" ^ "    " ^ string_of_ast content ^ "\n")
+              (sprintf
+                 "local variable '%s' (defined in bigand, bigor, let or list \
+                  comprehension) cannot be expanded into a 'prop' or 'formula' \
+                  because its content is of type '%s' instead of %s'prop' or \
+                  'formula'. Why? Because this variable is part of a formula, \
+                  and thus is expected to be a proposition. Here is the \
+                  content of '%s':\n\
+                 \    %s\n"
+                 name
+                 (string_of_ast_type content)
+                 (if !smt then "'int', 'float', " else "")
+                 name (string_of_ast content))
       with Not_found -> (
         (* Case 2. Check if this variable name has been affected globally, i.e.,
            in the 'data' section. To be accepted, this variable must contain
@@ -563,16 +577,17 @@ and eval_ast_formula (env : env) (ast : Ast.t) : Ast.t =
           | Formula x -> x
           | _ ->
               raise_with_loc ast
-                ("global variable '" ^ name
-               ^ "' cannot be expanded into a 'prop' or 'formula' "
-               ^ "because its content is of type '" ^ string_of_ast_type content
-               ^ "' instead of "
-                ^ (if !smt then "'int', 'float', " else "")
-                ^ "'prop' or 'formula'. "
-                ^ "Why? Because this variable is part of a formula, and thus \
-                   is expected "
-                ^ "to be a proposition. Here is the content of '" ^ name
-                ^ "':\n" ^ "    " ^ string_of_ast content ^ "\n")
+                (sprintf
+                   "global variable '%s' cannot be expanded into a 'prop' or \
+                    'formula' because its content is of type '%s' instead of \
+                    %s'prop' or 'formula'. Why? Because this variable is part \
+                    of a formula, and thus is expected to be a proposition. \
+                    Here is the content of '%s':\n\
+                   \    %s\n"
+                   name
+                   (string_of_ast_type content)
+                   (if !smt then "'int', 'float', " else "")
+                   name (string_of_ast content))
         with Not_found -> (
           try
             match (p, i) with
@@ -598,21 +613,19 @@ and eval_ast_formula (env : env) (ast : Ast.t) : Ast.t =
                   match content with
                   | Prop x -> Prop x
                   | wrong ->
-                      fatal
-                        ( Error,
-                          Eval,
-                          "the proposition '" ^ name
-                          ^ "' cannot be expanded because '" ^ prefix
-                          ^ "' is of type '" ^ string_of_ast_type wrong ^ "'. "
-                          ^ "In order to produce an expanded proposition of \
-                             this kind, '" ^ prefix
-                          ^ "' must be a proposition. "
-                          ^ "Why? Because this variable is part of a formula, \
-                             and thus is expected "
-                          ^ "to be a proposition. Here is the content of '"
-                          ^ prefix ^ "':\n" ^ "    " ^ string_of_ast content
-                          ^ "\n",
-                          Some loc_affect )
+                      let message =
+                        sprintf
+                          "the proposition '%s' cannot be expanded because \
+                           '%s' is of type '%s'. In order to produce an \
+                           expanded proposition of this kind, '%s' must be a \
+                           proposition. Why? Because this variable is part of \
+                           a formula, and thus is expected to be a \
+                           proposition. Here is the content of '%s':\n\
+                          \    %s\n"
+                          name prefix (string_of_ast_type wrong) prefix prefix
+                          (string_of_ast content)
+                      in
+                      fatal (Error, Eval, message, Some loc_affect)
                 in
                 eval_ast_formula (UnexpProp (string_of_ast term, Some indices))
             (* Case 5. the variable was of the form '$v(1,2,3)' and was not declared
@@ -853,10 +866,12 @@ and set_to_ast_list (env : env) (ast : Ast.t) : Ast.t list =
     | Set s -> AstSet.elements s
     | ast' ->
         raise_with_loc ast
-          ("after 'in', only sets are allowed, but got '"
-         ^ string_of_ast_type ast' ^ "':\n" ^ "    " ^ string_of_ast ast' ^ "\n"
-         ^ "This element has been expanded to\n" ^ "    " ^ string_of_ast ast'
-         ^ "\n")
+          (sprintf
+             "after 'in', only sets are allowed, but got '%s':\n\
+             \    %s\n\
+              This element has been expanded to\n\
+             \    %s\n"
+             (string_of_ast_type ast') (string_of_ast ast') (string_of_ast ast'))
   in
   match (!check_only, lst) with
   (* useful when you only want to check types *)
@@ -872,10 +887,12 @@ and ast_to_bool env (ast : Ast.t) : bool =
   | Bool b -> b
   | ast' ->
       raise_with_loc ast
-        ("'when' expects a 'bool' but got '" ^ string_of_ast_type ast' ^ "':\n"
-       ^ "    " ^ string_of_ast ast' ^ "\n"
-       ^ "This element has been expanded to\n" ^ "    " ^ string_of_ast ast'
-       ^ "\n")
+        (sprintf
+           "'when' expects a 'bool' but got '%s':\n\
+           \    %s\n\
+            This element has been expanded to\n\
+           \    %s\n"
+           (string_of_ast_type ast') (string_of_ast ast') (string_of_ast ast'))
 
 (* To_int, To_float, Var, Int... all these cannot contain ToRemove because
    ToRemove can only be generated by exact, atleast, atmost, bigand and bigor.
