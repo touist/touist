@@ -321,8 +321,8 @@ formula_qbf:
   | f=prop {f}
   | TOP { Top }
   | BOTTOM { Bottom }
-  | f=exists(formula_qbf)
-  | f=forall(formula_qbf) {f}
+  | f=quant(exists,formula_qbf)
+  | f=quant(forall,formula_qbf) {f}
 
 formula_smt:
   | f=formula(formula_smt)
@@ -354,14 +354,12 @@ expr_smt:
 
 %inline prop_or_var: p=prop | p=var {p}
 
-%inline exists(F): EXISTS v=comma_list(prop_or_var) for_opt=for_statement? COLON form=F
-  { let res = form |> List.fold_right (fun v acc -> Layout (Loc ($startpos,$endpos), Exists (v,acc))) v in
-    match for_opt with
-    | None -> res
-    | Some (var,content) -> Layout (Loc ($startpos,$endpos), For (var,content,res))
-  }
-%inline forall(F): FORALL v=comma_list(prop_or_var) for_opt=for_statement? COLON form=F
-  { let res = form |> List.fold_right (fun v acc -> Layout (Loc ($startpos,$endpos), Forall (v,acc))) v in
+%inline exists:
+  | EXISTS { Types.Exists }
+%inline forall:
+  | FORALL { Types.Forall }
+%inline quant(Q,F): q=Q v=comma_list(prop_or_var) for_opt=for_statement? COLON form=F
+  { let res = form |> List.fold_right (fun v acc -> Layout (Loc ($startpos,$endpos), Quantifier (q,v,acc))) v in
     match for_opt with
     | None -> res
     | Some (var,content) -> Layout (Loc ($startpos,$endpos), For (var,content,res))

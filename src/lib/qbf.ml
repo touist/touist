@@ -79,44 +79,60 @@ let rec to_prenex debug quant_l conflict_l only_rename ast : Ast.t =
      of [to_prenex_new] or [to_prenex] will still be able to run [transform]).
   *)
   let transform = function
-    | Not (Forall (x, f)) ->
-        Forall (to_prenex x, Not (to_prenex_new x f)) (* 1 *)
-    | LogicBinop (f, And, Forall (x, g)) | LogicBinop (Forall (x, g), And, f) ->
-        Forall
-          (to_prenex x, LogicBinop (to_prenex_rn x f, And, to_prenex_new x g))
+    | Not (Quantifier (Forall, x, f)) ->
+        Quantifier (Forall, to_prenex x, Not (to_prenex_new x f)) (* 1 *)
+    | LogicBinop (f, And, Quantifier (Forall, x, g))
+    | LogicBinop (Quantifier (Forall, x, g), And, f) ->
+        Quantifier
+          ( Forall,
+            to_prenex x,
+            LogicBinop (to_prenex_rn x f, And, to_prenex_new x g) )
         (* 2,5 *)
-    | LogicBinop (f, Or, Forall (x, g)) | LogicBinop (Forall (x, g), Or, f) ->
-        Forall
-          (to_prenex x, LogicBinop (to_prenex_rn x f, Or, to_prenex_new x g))
+    | LogicBinop (f, Or, Quantifier (Forall, x, g))
+    | LogicBinop (Quantifier (Forall, x, g), Or, f) ->
+        Quantifier
+          ( Forall,
+            to_prenex x,
+            LogicBinop (to_prenex_rn x f, Or, to_prenex_new x g) )
         (* 3,6 *)
-    | LogicBinop (Forall (x, f), Implies, g) ->
-        Exists
-          ( to_prenex x,
+    | LogicBinop (Quantifier (Forall, x, f), Implies, g) ->
+        Quantifier
+          ( Exists,
+            to_prenex x,
             LogicBinop (to_prenex_new x f, Implies, to_prenex_rn x g) )
         (* 4 *)
-    | LogicBinop (f, Implies, Forall (x, g)) ->
-        Forall
-          ( to_prenex x,
+    | LogicBinop (f, Implies, Quantifier (Forall, x, g)) ->
+        Quantifier
+          ( Forall,
+            to_prenex x,
             LogicBinop (to_prenex_rn x f, Implies, to_prenex_new x g) )
         (* 7 *)
-    | Not (Exists (x, f)) ->
-        Forall (to_prenex x, Not (to_prenex_new x f)) (* 8 *)
-    | LogicBinop (f, And, Exists (x, g)) | LogicBinop (Exists (x, g), And, f) ->
-        Exists
-          (to_prenex x, LogicBinop (to_prenex_rn x f, And, to_prenex_new x g))
+    | Not (Quantifier (Exists, x, f)) ->
+        Quantifier (Forall, to_prenex x, Not (to_prenex_new x f)) (* 8 *)
+    | LogicBinop (f, And, Quantifier (Exists, x, g))
+    | LogicBinop (Quantifier (Exists, x, g), And, f) ->
+        Quantifier
+          ( Exists,
+            to_prenex x,
+            LogicBinop (to_prenex_rn x f, And, to_prenex_new x g) )
         (* 9,12 *)
-    | LogicBinop (f, Or, Exists (x, g)) | LogicBinop (Exists (x, g), Or, f) ->
-        Exists
-          (to_prenex x, LogicBinop (to_prenex_rn x f, Or, to_prenex_new x g))
+    | LogicBinop (f, Or, Quantifier (Exists, x, g))
+    | LogicBinop (Quantifier (Exists, x, g), Or, f) ->
+        Quantifier
+          ( Exists,
+            to_prenex x,
+            LogicBinop (to_prenex_rn x f, Or, to_prenex_new x g) )
         (* 10,13 *)
-    | LogicBinop (Exists (x, f), Implies, g) ->
-        Forall
-          ( to_prenex x,
+    | LogicBinop (Quantifier (Exists, x, f), Implies, g) ->
+        Quantifier
+          ( Forall,
+            to_prenex x,
             LogicBinop (to_prenex_new x f, Implies, to_prenex_rn x g) )
         (* 11 *)
-    | LogicBinop (f, Implies, Exists (x, g)) ->
-        Exists
-          ( to_prenex x,
+    | LogicBinop (f, Implies, Quantifier (Exists, x, g)) ->
+        Quantifier
+          ( Exists,
+            to_prenex x,
             LogicBinop (to_prenex_rn x f, Implies, to_prenex_new x g) )
         (* 14 *)
     | _ -> raise Not_found
@@ -147,8 +163,7 @@ let rec to_prenex debug quant_l conflict_l only_rename ast : Ast.t =
           ^ Pprint.string_of_ast ~debug:true e)
   in
   let process = function
-    | Forall (x, f) -> Forall (to_prenex x, to_prenex_new x f)
-    | Exists (x, f) -> Exists (to_prenex x, to_prenex_new x f)
+    | Quantifier (q, x, f) -> Quantifier (q, to_prenex x, to_prenex_new x f)
     | v -> (
         if only_rename then traverse v
         else try transform v with Not_found -> traverse v)
@@ -161,7 +176,7 @@ let rec to_prenex debug quant_l conflict_l only_rename ast : Ast.t =
   new_ast
 
 let rec is_unquant = function
-  | Exists (_, _) | Forall (_, _) -> false
+  | Quantifier (_, _, _) -> false
   | Prop _ | Top | Bottom -> true
   | Not x -> is_unquant x
   | LogicBinop (x, _, y) -> is_unquant x && is_unquant y
@@ -173,7 +188,7 @@ let rec is_unquant = function
         ^ Pprint.string_of_ast ~debug:true e)
 
 let rec is_prenex = function
-  | Exists (_, f) | Forall (_, f) -> is_prenex f
+  | Quantifier (_, _, f) -> is_prenex f
   | f -> is_unquant f
 
 (* [quantify_free_variables] takes a prenex form and quantifies existentially
@@ -198,12 +213,12 @@ let rec quantify_free_variables env ast =
     | h :: t -> h :: remove_dups (List.filter (fun x -> x <> h) t)
   in
   match ast with
-  | Exists (Prop x, f) -> Exists (Prop x, quantify_free_variables (x :: env) f)
-  | Forall (Prop x, f) -> Forall (Prop x, quantify_free_variables (x :: env) f)
+  | Quantifier (q, Prop x, f) ->
+      Quantifier (q, Prop x, quantify_free_variables (x :: env) f)
   | other ->
       let free = search_free env other in
       free |> remove_dups
-      |> List.fold_left (fun acc x -> Exists (Prop x, acc)) other
+      |> List.fold_left (fun acc x -> Quantifier (Exists, Prop x, acc)) other
 
 let prenex ?(debug = false) ast : Ast.t =
   let rec to_prenex_loop ast =
@@ -221,8 +236,7 @@ let prenex ?(debug = false) ast : Ast.t =
 
 let cnf ?(debug_cnf = false) ast =
   let rec process = function
-    | Forall (x, f) -> Forall (x, process f)
-    | Exists (x, f) -> Exists (x, process f)
+    | Quantifier (q, x, f) -> Quantifier (q, x, process f)
     | inner -> Cnf.ast_to_cnf ~debug_cnf inner
   in
   ast |> process |> quantify_free_variables []
@@ -233,22 +247,24 @@ type 'a quantlist = A of 'a list | E of 'a list
    constructed the wrong way around. *)
 let rec regroup_quantors ast quantlist =
   match ast with
-  | Forall (Prop x, f) ->
-      let rec process_forall ast l =
-        match ast with
-        | Forall (Prop x', f') -> process_forall f' (x' :: l)
-        | f' -> (l, f')
-      in
-      let foralls, inner = process_forall f [ x ] in
-      regroup_quantors inner (A (List.rev foralls) :: quantlist)
-  | Exists (Prop x, f) ->
-      let rec process_exists ast l =
-        match ast with
-        | Exists (Prop x', f') -> process_exists f' (x' :: l)
-        | f' -> (l, f')
-      in
-      let exists, inner = process_exists f [ x ] in
-      regroup_quantors inner (E (List.rev exists) :: quantlist)
+  | Quantifier (q, Prop x, f) -> (
+      match q with
+      | Forall ->
+          let rec process_forall ast l =
+            match ast with
+            | Quantifier (Forall, Prop x', f') -> process_forall f' (x' :: l)
+            | f' -> (l, f')
+          in
+          let foralls, inner = process_forall f [ x ] in
+          regroup_quantors inner (A (List.rev foralls) :: quantlist)
+      | Exists ->
+          let rec process_exists ast l =
+            match ast with
+            | Quantifier (Exists, Prop x', f') -> process_exists f' (x' :: l)
+            | f' -> (l, f')
+          in
+          let exists, inner = process_exists f [ x ] in
+          regroup_quantors inner (E (List.rev exists) :: quantlist))
   | inner -> (List.rev quantlist, inner)
 
 (* NOTE: I use [fold_right] (which is non-tail recursive, thus less

@@ -36,6 +36,8 @@ type layout =
 
 type cardinality = Exact | Atleast | Atmost
 
+type quantifier = Exists | Forall
+
 (*  Do you think this file is wierd, with this 'module rec' thing?
     This is because we want the type 'Ast.t' to be used in 'Set' and
     also we want 'Set' to be inside an 'Ast.t', I had to come up with
@@ -95,8 +97,7 @@ module rec Ast : sig
                                   logical proposition                      v}
     *)
     | Layout of layout * t
-    | Exists of t * t
-    | Forall of t * t
+    | Quantifier of quantifier * t * t
     | For of t * t * t
     | Formula of t
     | SetBuilder of t * t list * t list * t option

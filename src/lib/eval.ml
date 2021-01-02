@@ -2,6 +2,7 @@ open Types.Ast
 open Types
 open Pprint
 open Err
+open Printf
 
 (* Variables are stored in two data structures (global and local scopes). *)
 
@@ -196,6 +197,8 @@ let rec process_formulas ast = function
   | [] -> raise_with_loc ast "no formulas" (* AS: return Top instead? *)
   | [ x ] -> x
   | x :: xs -> LogicBinop (x, And, process_formulas ast xs)
+
+let quantifier = function Exists -> "exists" | Forall -> "forall"
 
 let rec exact_str lst =
   let rec go = function
@@ -715,40 +718,24 @@ and eval_ast_formula (env : env) (ast : Ast.t) : Ast.t =
       eval_ast_formula_env ((name, desc) :: env) formula
   | Layout (Paren, x) | Layout (NewlineBefore, x) | Layout (NewlineAfter, x) ->
       eval_ast_formula x
-  | Exists (p, f) ->
+  | Quantifier (q, p, f) ->
       let p =
         match eval_ast_formula p with
         | Prop p -> Prop p
         | wrong ->
             raise_with_loc p
-              ("'exists' only works on propositions. Instead, got a " ^ "'"
-             ^ string_of_ast_type wrong ^ "'.\n")
+              (sprintf "'%s' only works on propositions. Instead, got a '%s'.\n"
+                 (quantifier q) (string_of_ast_type wrong))
       in
-      Exists (p, eval_ast_formula f)
-  | Forall (p, f) ->
-      let p =
-        match eval_ast_formula p with
-        | Prop p -> Prop p
-        | wrong ->
-            raise_with_loc p
-              ("'forall' only works on propositions. Instead, got a " ^ "'"
-             ^ string_of_ast_type wrong ^ "'.\n")
-      in
-      Forall (p, eval_ast_formula f)
+      Quantifier (q, p, eval_ast_formula f)
   | For (Layout (Loc loc, Var (p, i)), content, Layout (Loc _, formula)) -> (
       let name = expand_var_name env (p, i) in
       match (formula, eval_ast content) with
-      | Exists (x, f), Set s ->
+      | Quantifier (q, x, f), Set s ->
           AstSet.fold
             (fun content acc ->
-              Exists
-                (eval_ast_formula_env ((name, (content, loc)) :: env) x, acc))
-            s (eval_ast_formula f)
-      | Forall (x, f), Set s ->
-          AstSet.fold
-            (fun content acc ->
-              Forall
-                (eval_ast_formula_env ((name, (content, loc)) :: env) x, acc))
+              Quantifier
+                (q, eval_ast_formula_env ((name, (content, loc)) :: env) x, acc))
             s (eval_ast_formula f)
       | _, content' -> raise_type_error ast content content' " 'prop-set'")
   | Formula f -> eval_ast_formula f
@@ -905,8 +892,7 @@ and has_top_or_bot = function
       has_top_or_bot x (* AS: What about other unary operators? *)
   | ArithBinop (x, _, y) -> has_top_or_bot x || has_top_or_bot y
   | ArithBinrel (x, _, y) -> has_top_or_bot x || has_top_or_bot y
-  | Exists (_, y) -> has_top_or_bot y
-  | Forall (_, y) -> has_top_or_bot y
+  | Quantifier (_, _, y) -> has_top_or_bot y
   | _ -> false
 
 (* Simplify an AST by removing Bot and Top that can be absorbed
