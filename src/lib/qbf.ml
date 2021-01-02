@@ -14,6 +14,12 @@ let add_suffix name =
            (str |> matched_string |> int_of_string) + 1 |> string_of_int)
   with Not_found -> name ^ "_1"
 
+let rec remove_dups = function
+  | [] -> []
+  | h :: t -> h :: remove_dups (List.filter (fun x -> x <> h) t)
+
+let dual = function Forall -> Exists | Exists -> Forall
+
 (** [to_prenex] is used over and over by {!prenex} as long as the formula
     is not in prenex form.
 
@@ -79,62 +85,27 @@ let rec to_prenex debug quant_l conflict_l only_rename ast : Ast.t =
      of [to_prenex_new] or [to_prenex] will still be able to run [transform]).
   *)
   let transform = function
-    | Not (Quantifier (Forall, x, f)) ->
-        Quantifier (Forall, to_prenex x, Not (to_prenex_new x f)) (* 1 *)
-    | LogicBinop (f, And, Quantifier (Forall, x, g))
-    | LogicBinop (Quantifier (Forall, x, g), And, f) ->
+    | Not (Quantifier (q, x, f)) ->
+        Quantifier (dual q, to_prenex x, Not (to_prenex_new x f)) (* 1,8 *)
+    | LogicBinop (f, (And as b), Quantifier (q, x, g))
+    | LogicBinop (Quantifier (q, x, g), (And as b), f)
+    | LogicBinop (f, (Or as b), Quantifier (q, x, g))
+    | LogicBinop (Quantifier (q, x, g), (Or as b), f) ->
         Quantifier
-          ( Forall,
-            to_prenex x,
-            LogicBinop (to_prenex_rn x f, And, to_prenex_new x g) )
-        (* 2,5 *)
-    | LogicBinop (f, Or, Quantifier (Forall, x, g))
-    | LogicBinop (Quantifier (Forall, x, g), Or, f) ->
+          (q, to_prenex x, LogicBinop (to_prenex_rn x f, b, to_prenex_new x g))
+        (* 2,5,9,12,3,6,10,13 *)
+    | LogicBinop (Quantifier (q, x, f), Implies, g) ->
         Quantifier
-          ( Forall,
-            to_prenex x,
-            LogicBinop (to_prenex_rn x f, Or, to_prenex_new x g) )
-        (* 3,6 *)
-    | LogicBinop (Quantifier (Forall, x, f), Implies, g) ->
-        Quantifier
-          ( Exists,
+          ( dual q,
             to_prenex x,
             LogicBinop (to_prenex_new x f, Implies, to_prenex_rn x g) )
-        (* 4 *)
-    | LogicBinop (f, Implies, Quantifier (Forall, x, g)) ->
+        (* 4,11 *)
+    | LogicBinop (f, Implies, Quantifier (q, x, g)) ->
         Quantifier
-          ( Forall,
+          ( q,
             to_prenex x,
             LogicBinop (to_prenex_rn x f, Implies, to_prenex_new x g) )
-        (* 7 *)
-    | Not (Quantifier (Exists, x, f)) ->
-        Quantifier (Forall, to_prenex x, Not (to_prenex_new x f)) (* 8 *)
-    | LogicBinop (f, And, Quantifier (Exists, x, g))
-    | LogicBinop (Quantifier (Exists, x, g), And, f) ->
-        Quantifier
-          ( Exists,
-            to_prenex x,
-            LogicBinop (to_prenex_rn x f, And, to_prenex_new x g) )
-        (* 9,12 *)
-    | LogicBinop (f, Or, Quantifier (Exists, x, g))
-    | LogicBinop (Quantifier (Exists, x, g), Or, f) ->
-        Quantifier
-          ( Exists,
-            to_prenex x,
-            LogicBinop (to_prenex_rn x f, Or, to_prenex_new x g) )
-        (* 10,13 *)
-    | LogicBinop (Quantifier (Exists, x, f), Implies, g) ->
-        Quantifier
-          ( Forall,
-            to_prenex x,
-            LogicBinop (to_prenex_new x f, Implies, to_prenex_rn x g) )
-        (* 11 *)
-    | LogicBinop (f, Implies, Quantifier (Exists, x, g)) ->
-        Quantifier
-          ( Exists,
-            to_prenex x,
-            LogicBinop (to_prenex_rn x f, Implies, to_prenex_new x g) )
-        (* 14 *)
+        (* 7,14 *)
     | _ -> raise Not_found
   in
   let traverse = function
@@ -176,7 +147,7 @@ let rec to_prenex debug quant_l conflict_l only_rename ast : Ast.t =
   new_ast
 
 let rec is_unquant = function
-  | Quantifier (_, _, _) -> false
+  | Quantifier _ -> false
   | Prop _ | Top | Bottom -> true
   | Not x -> is_unquant x
   | LogicBinop (x, _, y) -> is_unquant x && is_unquant y
@@ -207,10 +178,6 @@ let rec quantify_free_variables env ast =
           ^ Pprint.string_of_ast_type e
           ^ "' in "
           ^ Pprint.string_of_ast ~debug:true e)
-  in
-  let rec remove_dups = function
-    | [] -> []
-    | h :: t -> h :: remove_dups (List.filter (fun x -> x <> h) t)
   in
   match ast with
   | Quantifier (q, Prop x, f) ->

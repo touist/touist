@@ -240,7 +240,7 @@ and contains_newline ast =
        false
 
 and is_binary_op = function
-  | ArithBinop (_, _, _) | LogicBinop (_, _, _) | ArithBinrel _ -> true
+  | ArithBinop _ | LogicBinop _ | ArithBinrel _ -> true
   | _ -> false
 
 and contains_binary_op ast =
