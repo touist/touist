@@ -35,3 +35,5 @@
 (install
  (section man)
  (files touist.1))
+
+(documentation)

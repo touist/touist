@@ -18,3 +18,5 @@
    (yices2 -> smtSolveReal.mli)
    (!yices2 -> smtSolveDummy.mli)))
  (wrapped true))
+
+(documentation)

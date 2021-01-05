@@ -18,3 +18,5 @@
    (qbf.quantor -> qbfSolveReal.mli)
    (!qbf.quantor -> qbfSolveDummy.mli)))
  (wrapped true))
+
+(documentation)
