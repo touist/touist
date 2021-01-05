@@ -8,8 +8,8 @@ homepage: "https://www.irit.fr/touist"
 dev-repo: "https://github.com/touist/touist.git"
 bug-reports: "https://github.com/touist/touist/issues"
 build: [
-  ["dune" "subst"] {pinned}
-  ["dune" "build" "-p" name "-j" jobs "@install" "@runtest" {with-test}]
+  ["dune" "subst"] {dev}
+  ["dune" "build" "-j" jobs "-p" name "@install" "@runtest" {with-test} "@doc" {with-doc}]
 ]
 depends: [
   "dune" {build & >= "1.0"}
@@ -17,8 +17,8 @@ depends: [
   "minisat"
   "re" {>= "1.7.2"}
   "cmdliner" {>= "0.9.8"}
-  "ounit" {test}
-  "odoc" {doc}
+  "ounit" {with-test}
+  "odoc" {with-doc}
 ]
 depopts: [
   "qbf"
