@@ -71,19 +71,10 @@ jobs:
       - uses: actions-ml/setup-ocaml@master
         with:
           ocaml-version: ${{ matrix.ocaml-version }}
-      - uses: actions/setup-java@v1
-        with:
-          java-version: "13"
 
-      # libyaml and libgmp are needed for Ruby and are missing as I reinstalled brew
-      # Ubuntu's apt has an old opam 1.2.2. I need opam2. I had to use
-      # --disable-sandboxing as Travis's ubuntu is old and doesn't have bubblewrap.
-      # - run: opam init -y --auto-setup --reinit --disable-sandboxing --comp ocaml-base-compiler.4.07.1
-      # - run: opam switch create -y ocaml-base-compiler.4.07.1 || opam switch set -y ocaml-base-compiler.4.07.1
-
-      - if: runner.os == 'Windows'
-        shell: powershell
-        run: c:\cygwin\setup-x86_64.exe --quiet-mode --root c:\cygwin --site http://cygwin.mirror.constant.com --packages mingw64-x86_64-gcc-core,mingw64-x86_64-gmp,binutils
+      # Let's check that the formatting is good as soon as possible.
+      - run: opam install dune ocamlformat
+      - run: opam exec -- dune build @fmt
 
       # Due to ocaml-qbf beig outdated on opam, I have to pin it to master.
       # We need the latest of ocaml-qbf due to x86_64 issues that were
@@ -99,13 +90,15 @@ jobs:
         run: .github/workflows/win-install-yices2.sh
       - if: runner.os != 'Windows'
         run: opam install -y yices2
-
-      - run: opam install -y ocamlfind menhir minisat ounit dune re cmdliner zarith
-
+      - run: opam install -y ocamlfind menhir minisat ounit re cmdliner zarith
       - run: opam install . --with-test --with-doc
-        # Build the Java GUI touist.jar (in support/gui)
       - run: cp $(opam exec -- which touist) support/gui/external/touist
       - run: chmod ugo+x support/gui/external/touist
+
+      # Build the Java GUI touist.jar (in support/gui)
+      - uses: actions/setup-java@v1
+        with:
+          java-version: "13"
       - run: cd ./support/gui && TERM=dumb ./gradlew createJarZip
       - if: contains(matrix.image, 'windows')
         run: cd ./support/gui && TERM=dumb ./gradlew createExeZip
