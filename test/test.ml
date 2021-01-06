@@ -86,10 +86,6 @@ let test_sat_raise ?(during = Touist.Err.Eval) ?(typ = Touist.Err.Error)
     ?(nth = 0) loc text _ =
   test_raise sat during typ nth loc text
 
-let test_sat_raise ?(during = Touist.Err.Eval) ?(typ = Touist.Err.Error)
-    ?(nth = 0) loc text _ =
-  test_raise sat during typ nth loc text
-
 let test_smt_raise ?(during = Touist.Err.Eval) ?(typ = Touist.Err.Error)
     ?(nth = 0) ?(logic = "QF_IDL") loc text _ =
   test_raise (smt logic) during typ nth loc text
@@ -155,60 +151,6 @@ let qbf_expands_to text expected _ =
        "The other operand is of type 'float':\n    3.",loc))
       (fun _ -> eval "let $i=1: if $i < 3.0 then a else b end"));
 *)
-and read_file (filename : string) : string list =
-  let lines = ref [] in
-  let chan = open_in filename in
-  try
-    while true do
-      lines := input_line chan :: !lines
-    done;
-    !lines
-  with End_of_file ->
-    close_in chan;
-    List.rev !lines
-
-let open_stream name =
-  let chan = open_in name in
-  Stream.from (fun _ -> try Some (input_line chan) with End_of_file -> None)
-
-let check_solution (sorted_solution : string) (stream : char Stream.t) =
-  let rec one_line stream : string =
-    try
-      match Stream.next stream with
-      | '\n' -> ""
-      | c -> Printf.sprintf "%c" c ^ one_line stream
-    with Stream.Failure -> ""
-  in
-  let lines_from_stream (stream : char Stream.t) : string list =
-    let rec multiple_lines stream =
-      match one_line stream with
-      | "" -> []
-      | line -> line :: multiple_lines stream
-    in
-    multiple_lines stream
-  in
-  let rec rm_unwanted_lines (l : string list) : string list =
-    match l with
-    | [] -> []
-    | x :: xs ->
-        if Re.Str.string_match (Re.Str.regexp "^=") x 0 then
-          rm_unwanted_lines xs
-        else x :: rm_unwanted_lines xs
-  in
-  let expected = read_file sorted_solution in
-  let actual =
-    rm_unwanted_lines (List.sort compare (lines_from_stream stream))
-  in
-  let rec check expected actual =
-    match (expected, actual) with
-    | [], [] -> ()
-    | [], _ | _, [] -> OUnit2.assert_failure "not the same number of output"
-    | exp :: xs, act :: ys ->
-        OUnit2.assert_equal ~printer:(fun e -> e) exp act;
-        (*Printf.fprintf stdout "expected: %s actual: %s\n" exp act;*)
-        check xs ys
-  in
-  check expected actual
 
 (* Name the test cases and group them together *)
 let () =
@@ -397,21 +339,6 @@ let () =
                   >:: sat_expands_to "t(p(a,[]))" "t(p(a))";
                   "p(1,[a]) in an expr should return [p(1,a)]"
                   >:: sat_expands_to "t(p(1,[a]))" "t([p(1,a)])";
-                  ( "the p([a,b,c]) syntax" >:: fun ctx ->
-                    OUnit2.skip_if (Sys.os_type = "Win32")
-                      "won't work on windows (unix-only??)";
-                    OUnit2.assert_command ~use_stderr:false ~ctxt:ctx
-                      ~foutput:
-                        (check_solution "sat/unittest_setgen_solution.txt")
-                      "dune"
-                      [
-                        "exec";
-                        "--";
-                        "touist";
-                        "--solve";
-                        "--sat";
-                        "sat/unittest_setgen.touist";
-                      ] );
                 ];
            "samples of code that should be correct with --smt"
            >::: [
@@ -424,7 +351,8 @@ let () =
                   >:: test_smt "(a+1) > 3";
                   "takuzu4x4.touist"
                   >:: test_smt
-                        (Touist.Parse.string_of_file "smt/takuzu4x4.touist");
+                        (Touist.Parse.string_of_file
+                           "examples.t/smt_takuzu4x4.touist");
                 ];
            "QBF testing"
            >::: [
@@ -439,7 +367,7 @@ let () =
                          "allumettes2.touist"
                          >:: test_qbf
                                (Touist.Parse.string_of_file
-                                  "qbf/allumettes2.touist");
+                                  "examples.t/qbf_allumettes2.touist");
                        ];
                   "samples that shouldn't be correct with --qbf"
                   >::: [
@@ -468,119 +396,6 @@ let () =
                                "(exists a: a) and (a and exists a: a)"
                                "exists a: exists a_1: exists a_2: (a and (a_2 \
                                 and a_1))";
-                       ];
-                ];
-           "real-size tests"
-           >::: [
-                  "with --sat --solve"
-                  >::: [
-                         ( "sat/sodoku.touist (SAT solver)" >:: fun ctx ->
-                           OUnit2.skip_if (Sys.os_type = "Win32")
-                             "won't work on windows (unix-only??)";
-                           OUnit2.assert_command ~use_stderr:false ~ctxt:ctx
-                             ~foutput:(check_solution "sat/sudoku_solution.txt")
-                             "dune"
-                             [
-                               "exec";
-                               "--";
-                               "touist";
-                               "--solve";
-                               "--sat";
-                               "test/sat/sudoku.touist";
-                             ] );
-                         ( "sat/minisat_clause_add_unsat.touist, should be unsat"
-                         >:: fun ctx ->
-                           OUnit2.skip_if (Sys.os_type = "Win32")
-                             "won't work on windows (unix-only??)";
-                           OUnit2.assert_command ~exit_code:(Unix.WEXITED 8)
-                             ~use_stderr:true ~ctxt:ctx "dune"
-                             [
-                               "exec";
-                               "--";
-                               "touist";
-                               "--solve";
-                               "--sat";
-                               "test/sat/minisat_clause_add_unsat.touist";
-                             ] );
-                       ];
-                  "with --smt --solve"
-                  >::: [
-                         ( "sat/sodoku.touist (using SMT QF_BV solver)"
-                         >:: fun ctx ->
-                           OUnit2.skip_if (Sys.os_type = "Win32")
-                             "won't work on windows (unix-only??)";
-                           OUnit2.skip_if
-                             (not Touist_yices2.SmtSolve.enabled)
-                             "touist built without yices2";
-                           OUnit2.assert_command ~use_stderr:false ~ctxt:ctx
-                             ~foutput:(check_solution "sat/sudoku_solution.txt")
-                             "dune"
-                             [
-                               "exec";
-                               "--";
-                               "touist";
-                               "--solve";
-                               "--smt";
-                               "QF_BV";
-                               "test/sat/sudoku.touist";
-                             ] );
-                         ( "smt/takuzu4x4.touist" >:: fun ctx ->
-                           OUnit2.skip_if (Sys.os_type = "Win32")
-                             "won't work on windows (unix-only??)";
-                           OUnit2.skip_if
-                             (not Touist_yices2.SmtSolve.enabled)
-                             "touist built without yices2";
-                           OUnit2.assert_command ~use_stderr:false ~ctxt:ctx
-                             ~foutput:
-                               (check_solution "smt/takuzu4x4_solution.txt")
-                             "dune"
-                             [
-                               "exec";
-                               "--";
-                               "touist";
-                               "--solve";
-                               "--smt";
-                               "QF_IDL";
-                               "smt/takuzu4x4.touist";
-                             ] );
-                       ];
-                  "with --qbf --solve"
-                  >::: [
-                         ( "sat/sodoku.touist (using QBF solver)" >:: fun ctx ->
-                           OUnit2.skip_if (Sys.os_type = "Win32")
-                             "won't work on windows (unix-only??)";
-                           OUnit2.skip_if
-                             (not Touist_qbf.QbfSolve.enabled)
-                             "touist built without qbf";
-                           OUnit2.assert_command ~use_stderr:false ~ctxt:ctx
-                             ~foutput:(check_solution "sat/sudoku_solution.txt")
-                             "dune"
-                             [
-                               "exec";
-                               "--";
-                               "touist";
-                               "--solve";
-                               "--qbf";
-                               "test/sat/sudoku.touist";
-                             ] );
-                         ( "qbf/allumettes2.touist" >:: fun ctx ->
-                           OUnit2.skip_if (Sys.os_type = "Win32")
-                             "won't work on windows (unix-only??)";
-                           OUnit2.skip_if
-                             (not Touist_qbf.QbfSolve.enabled)
-                             "touist built without qbf";
-                           OUnit2.assert_command ~use_stderr:false ~ctxt:ctx
-                             ~foutput:
-                               (check_solution "qbf/allumettes2.solution")
-                             "dune"
-                             [
-                               "exec";
-                               "--";
-                               "touist";
-                               "--solve";
-                               "--qbf";
-                               "qbf/allumettes2.touist";
-                             ] );
                        ];
                 ];
            "formula-vars tests"

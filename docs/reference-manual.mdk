@@ -1554,18 +1554,18 @@ Tested SAT solvers (`brew` is available on [linux][Linuxbrew] and [mac][Homebrew
 - [minisat]
 
       brew install minisat
-      touist test/sat/sudoku.touist --solver="minisat /dev/stdin /dev/stdout"
+      touist test/examples.t/sat_sudoku.touist --solver="minisat /dev/stdin /dev/stdout"
 
 - [picosat] (2015, version 965, SAT Race'15)
 
       brew install touist/touist/picosat
-      touist test/sat/sudoku.touist --solver="picosat --partial"
+      touist test/examples.t/sat_sudoku.touist --solver="picosat --partial"
 
 - [glucose] (2016, version 4.1, syrup is the parallel version)
 
       brew install touist/touist/glucose
-      touist test/sat/sudoku.touist --solver="glucose -model"
-      touist test/sat/sudoku.touist --solver="glucose-syrup -model"
+      touist test/examples.t/sat_sudoku.touist --solver="glucose -model"
+      touist test/examples.t/sat_sudoku.touist --solver="glucose-syrup -model"
 
 [picosat]: http://fmv.jku.at/picosat
 [glucose]: https://www.labri.fr/perso/lsimon/glucose "lsimon"
@@ -1576,7 +1576,7 @@ Tested QBF solvers:
   Download the version _CAQE qbfeval 2017 (2017-07-19) binary release without certification_
   which will give you `caqe-mac`:
 
-      touist test/qbf/allumettes2.touist --qbf --solver="./caqe-mac --partial-assignments"
+      touist test/examples.t/qbf_allumettes2.touist --qbf --solver="./caqe-mac --partial-assignments"
 
   They also have a Homebrew tap repository but this version does not contain
   the needed `--partial-assignments`.
@@ -1584,23 +1584,23 @@ Tested QBF solvers:
 - [qute] (2017-02-27, fork maelvalais/qute, minisat-based)
 
       brew install touist/touist/qute
-      touist test/qbf/allumettes2.touist --qbf --solver="qute --partial-certificate"
+      touist test/examples.t/qbf_allumettes2.touist --qbf --solver="qute --partial-certificate"
 
 - [depqbf] (2017-08-02, DepQBF 6.03, Minisat-based QCDCL)
 
       brew install depqbf
-      touist test/qbf/allumettes2.touist --qbf --solver="depqbf --qdo --no-dynamic-nenofex"
+      touist test/examples.t/qbf_allumettes2.touist --qbf --solver="depqbf --qdo --no-dynamic-nenofex"
 
 - [quantor] (2014-10-26, Quantor 3.2). It is not necessary to use this
   solver externally as it is included with `touist` (see Section [#usage-qbf-solver]).
 
       brew install touist/touist/quantor
-      touist test/qbf/allumettes2.touist --qbf --solver="quantor"
+      touist test/examples.t/qbf_allumettes2.touist --qbf --solver="quantor"
 
 - [rareqs] (2012, v1.1, CEGAR)
 
       brew install touist/touist/rareqs
-      touist test/qbf/allumettes2.touist --qbf --solver="rareqs"
+      touist test/examples.t/qbf_allumettes2.touist --qbf --solver="rareqs"
 
 
 [caqe]: https://www.react.uni-saarland.de/tools/caqe/index.html "Leander Tentrup"
