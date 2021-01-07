@@ -2,9 +2,7 @@
  (alias runtest)
  (deps
   (:< test.exe)
-  (glob_files sat/*)
-  (glob_files qbf/*)
-  (glob_files smt/*))
+  (glob_files **/*))
  (action
   (run %{<})))
 
