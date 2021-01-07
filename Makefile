@@ -1,27 +1,31 @@
 #
 # Just a simple makefile for helping people get into the project
 build:
-	@dune build
+	opam exec -- dune external-lib-deps --missing @build
+	opam exec -- dune build
 
 install:
-	@dune install
+	opam install . --deps-only --working-dir --with-test --with-doc
 
 uninstall:
-	@dune uninstall
+	opam uninstall . --working-dir --with-test --with-doc
 
 clean:
-	@dune clean
+	dune clean
 
 test:
-	@dune runtest
+	opam exec -- dune external-lib-deps --missing @runtest
+	opam exec -- dune runtest
 
 # For finding the errors that should be in parser.messages but are not
 # because parser.mly has been updated and some new errors appeared.
 missing:
-	@dune build @src/lib/missing
+	opam exec -- dune external-lib-deps --missing @src/lib/missing
+	opam exec -- dune build @src/lib/missing
 
 doc:
-	@dune build @doc
+	opam exec -- dune external-lib-deps --missing @doc
+	opam exec -- dune build @doc
 #
 # These targets aim to build the java GUI in support/gui/
 # It basically calls `./gradlew` (which is like `make` but for java)
