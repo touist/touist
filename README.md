@@ -7,14 +7,9 @@ I am working on [a fix](https://github.com/touist/touist/pull/301). For now, the
 | :------------------: | :---------------------: | :---------------------: | :---------------------: |
 | [![trv-img]][travis] | [![apvy-img]][appveyor] |  [![cir-img]][circle]   | [![gitter-img]][gitter] |
 
-[circle]: https://circleci.com/gh/touist/touist/tree/master
-[cir-img]: https://circleci.com/gh/touist/touist/tree/master.svg?style=svg
-[travis]: https://travis-ci.org/touist/touist
-[trv-img]: https://travis-ci.org/touist/touist.svg?branch=master
-[appveyor]: https://ci.appveyor.com/project/maelvalais/touist-kila4/branch/master
-[apvy-img]: https://ci.appveyor.com/api/projects/status/rayupfflmut8xbe0/branch/master?svg=true
-[gitter]: https://gitter.im/touist-project/touist
-[gitter-img]: https://badges.gitter.im/touist-project/touist.svg "Join the chat at https://gitter.im/touist-project/touist"
+|                                                        Linux, MacOS, Windows                                                        |
+| :----------------------------------------------------------------------------------------------------------------------------------: |
+| [![ci](https://github.com/touist/touist/workflows/ci/badge.svg)](https://github.com/touist/touist/actions?query=workflow%3Aci) |
 
 **New:** you can start hacking with `touist` using **Gitpod**; to start the
 online editor with the touist project open, [click
