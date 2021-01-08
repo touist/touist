@@ -75,8 +75,8 @@ problem](docs/images/screenshot.png)](https://github.com/maelvalais/allumettes)
 
 [opam]: https://opam.ocaml.org/doc/Install.html#Using-your-distribution-39-s-package-system
 [releases]: https://github.com/touist/touist/releases
-[ref]: http://touist.github.io/doc/reference-manual.html
-[ref-pdf]: http://touist.github.io/doc/reference-manual.pdf
+[ref]: https://touist.github.io/doc/reference-manual.html
+[ref-pdf]: https://touist.github.io/doc/reference-manual.pdf
 [vscode]: https://marketplace.visualstudio.com/items?itemName=maelvalais.touist
 [Vim]: https://github.com/touist/touist-vim
 
