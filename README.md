@@ -1,15 +1,13 @@
 # TouIST, the language for propositional logic
 
+[![ci](https://github.com/touist/touist/workflows/ci/badge.svg)](https://github.com/touist/touist/actions?query=workflow%3Aci)
+
 **July 4th, 2018:** on **macOS**, TouIST.jar only works with Java <= 8 (cf. [issue](https://github.com/touist/touist/issues/308)).
 I am working on [a fix](https://github.com/touist/touist/pull/301). For now, the workaround is to use Java 8 😕.
 
-|      Mac, Linux      |         Windows         | [Reference manual][ref] |    Come and discuss!    |
-| :------------------: | :---------------------: | :---------------------: | :---------------------: |
-| [![trv-img]][travis] | [![apvy-img]][appveyor] |  [![cir-img]][circle]   | [![gitter-img]][gitter] |
-
-|                                                        Linux, MacOS, Windows                                                        |
-| :----------------------------------------------------------------------------------------------------------------------------------: |
-| [![ci](https://github.com/touist/touist/workflows/ci/badge.svg)](https://github.com/touist/touist/actions?query=workflow%3Aci) |
+|                         |
+| :---------------------: |
+| [🔰 Reference manual][ref] |
 
 **New:** you can start hacking with `touist` using **Gitpod**; to start the
 online editor with the touist project open, [click
@@ -77,8 +75,8 @@ problem](docs/images/screenshot.png)](https://github.com/maelvalais/allumettes)
 
 [opam]: https://opam.ocaml.org/doc/Install.html#Using-your-distribution-39-s-package-system
 [releases]: https://github.com/touist/touist/releases
-[ref]: http://www.irit.fr/touist/doc/reference-manual.html
-[ref-pdf]: http://www.irit.fr/touist/doc/reference-manual.pdf
+[ref]: http://touist.github.io/doc/reference-manual.html
+[ref-pdf]: http://touist.github.io/doc/reference-manual.pdf
 [vscode]: https://marketplace.visualstudio.com/items?itemName=maelvalais.touist
 [Vim]: https://github.com/touist/touist-vim
 
