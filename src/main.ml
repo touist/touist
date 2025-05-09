@@ -1207,11 +1207,18 @@ let cmd =
       `S Manpage.s_see_also;
     ]
   in
-  Term.
-    ( ret (const main $ lang_and_mode $ input $ output $ common_opt),
-      info "touist" ~version:Version.v ~doc ~man
-        ~exits:
-          (code_msgs
-          |> List.map (fun (doc, err) -> exit_info ~doc (get_code err))) )
+  let term = Term.(ret (const main $ lang_and_mode $ input $ output $ common_opt))
+  in
+  let info = Cmd.info "touist" ~version:Version.v ~doc ~man
+              ~exits:
+                (code_msgs
+                |> List.map (fun (doc, err) -> Cmd.Exit.info ~doc (get_code err)))
+  in
+  Cmd.v info term
 
-let () = Term.exit ~term_err:(get_code CLI_ERROR) @@ Term.eval cmd
+let () =
+  let exit_code = Cmd.eval cmd
+  in
+  match exit_code with
+  | 0 -> Stdlib.exit 0
+  | _ -> Stdlib.exit (get_code CLI_ERROR)
