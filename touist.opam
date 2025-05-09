@@ -14,7 +14,7 @@ build: [
 depends: [
   "dune" {build & >= "2.7"}
   "menhir" {>= "20151023"}
-  "minisat"
+  "minisat" {= "0.5" }
   "re" {>= "1.7.2"}
   "cmdliner" {>= "0.9.8"}
   "ounit" {with-test}
