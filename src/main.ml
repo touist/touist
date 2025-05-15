@@ -1220,5 +1220,5 @@ let () =
   let exit_code = Cmd.eval cmd
   in
   match exit_code with
-  | 0 -> Stdlib.exit (get_code OK)
-  | _ -> Stdlib.exit (get_code CLI_ERROR)
+  | 0 -> exit_with OK
+  | _ -> exit_with CLI_ERROR
