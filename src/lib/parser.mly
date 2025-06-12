@@ -44,6 +44,7 @@
 %token FORALL EXISTS
 %token FOR NEWLINE
 %token QUOTE
+%token BOX DIAMOND
 
 (* The following lines define in which order the tokens should
  * be reduced, e.g. it tells the parser to reduce * before +.
@@ -132,8 +133,8 @@
    Hence we are sure that $1 will give b,c and $3 will give "a" !
 *)
 
-(* The two entry points of our parser *)
-%start <Types.Ast.t> touist_simple, touist_smt, touist_qbf
+(* The entry points of our parser *)
+%start <Types.Ast.t> touist_simple, touist_smt, touist_qbf, touist_modalLogic
 
 %% (* Everthing below that mark is expected to be a production rule *)
    (* Note that VAR { $0 } is equivalent to v=VAR { v } *)
@@ -159,6 +160,10 @@ touist_smt:
   | f=affect_or(formula_smt)+ EOF {Loc (Touist_code (f),($startpos,$endpos))}
 
 touist_qbf: f=affect_or(formula_qbf)+ EOF {Loc (Touist_code (f),($startpos,$endpos))}
+
+(* [touist_modalLogic] is the entry point of the parser in modalLogic mode *)
+touist_modalLogic:
+  | f=affect_or(formula_modalLogic)+ EOF {Loc (Touist_code (f),($startpos,$endpos))}
 
 (* Used in tuple expression; see tuple_variable and tuple_term *)
 %inline indices: i=expr { i }
@@ -203,6 +208,10 @@ var:
 %inline int: x=INT {Loc (Int x,($startpos,$endpos))}
 %inline float: x=FLOAT {Loc (Float x,($startpos,$endpos))}
 %inline bool: x=BOOL {Loc (Bool x,($startpos,$endpos))}
+
+%inline modalities(T):
+  | BOX (*LPAREN*) x=T RPAREN {Loc (Box x,($startpos,$endpos))}
+  | DIAMOND (*LPAREN*) x=T RPAREN {Loc (Diamond x,($startpos,$endpos))}
 
 expr:
   | b=var {b}
@@ -309,6 +318,14 @@ formula_simple:
   | f=prop {f}
   | TOP { Top }
   | BOTTOM { Bottom }
+
+formula_modalLogic:
+  | f=var {f}
+  | f=formula(formula_modalLogic)
+  | f=prop {f}
+  | TOP { Top }
+  | BOTTOM { Bottom }
+  | f=modalities(formula_modalLogic) {f}
 
 formula_qbf:
   | f=var {f}

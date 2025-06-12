@@ -107,9 +107,13 @@ let check_only = ref false
    (formulas can be 'int' or 'float' for example). *)
 let smt = ref false
 
-let rec eval ?smt:(smt_mode = false) ?(onlychecktypes = false) ast : Ast.t =
+(* When [modal_logic] is true, Box and Diamond AST types become valid and usable types*)
+let modal_logic = ref false
+
+let rec eval ?smt:(smt_mode = false) ?(onlychecktypes = false) ?is_modal_logic:(is_modal_logic = false) ast : Ast.t =
   check_only := onlychecktypes;
   smt := smt_mode;
+  modal_logic := is_modal_logic;
   extenv := Hashtbl.create 50;
   (* extenv must be re-init between two calls to [eval] *)
   eval_touist_code [] ast
@@ -751,6 +755,10 @@ and eval_ast_formula (env : env) (ast : Ast.t) : Ast.t =
       | _, content' -> raise_type_error ast content content' " 'prop-set'")
   | NewlineBefore f | NewlineAfter f -> eval_ast_formula f
   | Formula f -> eval_ast_formula f
+  | Box _ when not !modal_logic -> failwith "Box allowed only with Modal Logic solver"
+  | Box x when !modal_logic -> Box (eval_ast_formula x)
+  | Diamond _ when not !modal_logic -> failwith "Diamond allowed only with Modal Logic solver"
+  | Diamond x when !modal_logic -> Diamond (eval_ast_formula x)
   | e ->
       raise_with_loc ast
         ("this expression is not a formula: " ^ string_of_ast e ^ "\n")
@@ -924,6 +932,8 @@ and has_top_or_bot = function
   | Xor (x, y) -> has_top_or_bot x || has_top_or_bot y
   | Implies (x, y) -> has_top_or_bot x || has_top_or_bot y
   | Equiv (x, y) -> has_top_or_bot x || has_top_or_bot y
+  | Box x -> has_top_or_bot x
+  | Diamond x -> has_top_or_bot x
   (* the following items are just here because of SMT that
      allows ==, <, >, +, -, *... in formulas. *)
   | Neg x -> has_top_or_bot x

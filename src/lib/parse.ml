@@ -88,6 +88,10 @@ let parse_smt ?debug_syntax:(d = false) ?(filename = "foo.touistl") text =
 let parse_qbf ?debug_syntax:(d = false) ?(filename = "foo.touistl") text =
   parse Parser.Incremental.touist_qbf ~debug:d filename text
 
+(** Same for [Parser.Incremental.touist_modalLogic] *)
+let parse_modalLogic ?debug_syntax:(d = false) ?(filename = "foo.touistl") text =
+  parse Parser.Incremental.touist_modalLogic ~debug:d filename text
+
 (** [string_of_channel] takes an opened file and returns a string of its content. *)
 let string_of_chan (input : in_channel) : string =
   let text = ref "" in

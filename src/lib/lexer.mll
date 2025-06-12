@@ -88,6 +88,8 @@
     "exists",        EXISTS;
     "forall",        FORALL;
     "for",        FOR;
+    "nec(",        BOX;
+    "pos(",        DIAMOND;
     ]
 }
 
