@@ -130,126 +130,119 @@ module EvaluatedS5Ast = struct
         (try Sys.remove input_file with _ -> ());
         (try Sys.remove output_file with _ -> ())
       in
-      (* the `parse_model` function has been purposefully optimized for fast performance *)
       let parse_model filename =
         let buf = Buffer.create 1000 in
-        let write_to_buf = Buffer.add_string buf in
         let ic = open_in filename in
         try
           let first_line = input_line ic in
           match first_line with
           | "SAT" ->
-              write_to_buf "SAT";
+              Buffer.add_string buf "SAT";
               ignore (input_line ic);
               let to_be_discarded_world = "v possible world0: any assignment is ok!" in
-              let seen_valuations : (string, unit) Hashtbl.t = Hashtbl.create 16 in
-              let labelled_valuations_rev : string list ref = ref [] in
-              (* Core function: extract after ':', remap, defer output *)
-              let remap_valuation (line : string) =
-                match String.index_opt line ':' with
-                | None -> ()  (* Skip malformed line *)
-                | Some idx ->
-                    let raw_valuation =
-                      String.sub line (idx + 1) (String.length line - idx - 1) |> String.trim
-                    in
-                    if raw_valuation = "any assignment is ok!" then ()
+              let seen_valuations : (string, unit) Hashtbl.t = Hashtbl.create 16 in (* for having fast lookups *)
+              let all_valuations : (string * StringSet.t) list ref = ref [] in (* for having fast iterations *)
+              let filter_unique_valuations (line : string) =
+                let separator_index = String.index line ':' in
+                (* instead of trim, using the following functions for not creating extra string copy*)
+                let first_non_space_index_after_separator s =
+                  let len = String.length s in
+                  let rec aux i =
+                    if i >= len then
+                      failwith "Modal logic world valuations only contained whitespace"
+                    else if ' ' <> s.[i] then
+                      i
                     else
-                      let temp_buf = Buffer.create 128 in
-                      let len = String.length raw_valuation in
-                      let rec loop i j =
-                        if i >= len then (
-                          if j < len then (
-                            let token_len = i - j in
-                            if token_len > 0 && raw_valuation.[j] = '-' then (
-                              Buffer.add_char temp_buf '-';
-                              let token = String.sub raw_valuation (j + 1) (token_len - 1) in
-                              match Hashtbl.find_opt IntohyloSerializer.prop_backward_map token with
-                              | Some v -> Buffer.add_string temp_buf v
-                              | None -> Buffer.add_string temp_buf token
-                            ) else (
-                              let token = String.sub raw_valuation j token_len in
-                              match Hashtbl.find_opt IntohyloSerializer.prop_backward_map token with
-                              | Some v -> Buffer.add_string temp_buf v
-                              | None -> Buffer.add_string temp_buf token
-                            )
-                          )
-                        )
-                        else if raw_valuation.[i] = ' ' then (
-                          if j < i then (
-                            let token_len = i - j in
-                            if token_len > 0 && raw_valuation.[j] = '-' then (
-                              Buffer.add_char temp_buf '-';
-                              let token = String.sub raw_valuation (j + 1) (token_len - 1) in
-                              match Hashtbl.find_opt IntohyloSerializer.prop_backward_map token with
-                              | Some v -> Buffer.add_string temp_buf v
-                              | None -> Buffer.add_string temp_buf token
-                            ) else (
-                              let token = String.sub raw_valuation j token_len in
-                              match Hashtbl.find_opt IntohyloSerializer.prop_backward_map token with
-                              | Some v -> Buffer.add_string temp_buf v
-                              | None -> Buffer.add_string temp_buf token
-                            )
-                          );
-                          Buffer.add_char temp_buf ' ';
-                          loop (i + 1) (i + 1)
-                        )
-                        else loop (i + 1) j
-                      in
-                      loop 0 0;
-                      (* === Discard worlds with duplicated valuations === *)
-                      let normalized = String.trim (Buffer.contents temp_buf) in
-                      if not (Hashtbl.mem seen_valuations normalized) then (
-                        Hashtbl.add seen_valuations normalized ();
-                        labelled_valuations_rev := normalized :: !labelled_valuations_rev
-                      )
+                      aux (i + 1)
+                  in
+                  aux (separator_index+1)
+                in
+                let last_non_space_index s =
+                  let rec aux i =
+                    if i < 0 then
+                      failwith "Modal logic world valuations only contained whitespace"
+                    else if ' ' <> s.[i] then
+                      i
+                    else
+                      aux (i - 1)
+                  in
+                  aux (String.length s - 1)
+                in
+                let valuations_start_index = first_non_space_index_after_separator line in
+                let valuations = String.sub line valuations_start_index (last_non_space_index line - valuations_start_index + 1) in
+                (* Discard worlds with duplicated valuations *)
+                if not (Hashtbl.mem seen_valuations valuations) then (
+                  Hashtbl.add seen_valuations valuations ();
+                  let tokens = String.split_on_char ' ' valuations in
+                  let token_set =
+                    List.fold_left (fun acc tok -> StringSet.add tok acc) StringSet.empty tokens
+                  in
+                  all_valuations := (valuations, token_set) :: !all_valuations
+                )
               in
               (* Process first world *)
               let first_world = input_line ic in
               if first_world <> to_be_discarded_world then
-                remap_valuation first_world;
+                filter_unique_valuations first_world;
               (* Process remaining worlds *)
               let rec loop () =
                 match input_line ic with
-                | line -> remap_valuation line; loop ()
+                | line ->
+                    filter_unique_valuations line;
+                    loop ()
                 | exception End_of_file -> ()
               in
               loop ();
               close_in ic;
-              (* === Subset elimination === *)
-              let labelled_valuations = List.rev !labelled_valuations_rev in
-              let valuation_sets =
-                List.map (fun valuation ->
-                  let tokens = String.split_on_char ' ' valuation in
-                  let token_set =
-                    List.fold_left (fun acc tok -> StringSet.add tok acc) StringSet.empty tokens
-                  in
-                  (valuation, token_set)
-                ) labelled_valuations
-              in
               let is_strict_subset set1 set2 =
                 StringSet.subset set1 set2 && not (StringSet.equal set1 set2)
               in
-              let filtered =
-                List.filter (fun (_, tokens1) ->
-                  not (
-                    List.exists (fun (_, tokens2) ->
-                      is_strict_subset tokens1 tokens2
-                    ) valuation_sets
-                  )
-                ) valuation_sets
-              in
-              (* Assign labels after all filtering is done *)
               let counter = ref 0 in
-              List.iter (fun (valuation, _) ->
-                incr counter;
-                let label = Printf.sprintf "w%d" !counter in
-                Buffer.add_string buf "\n";
-                Buffer.add_string buf (Printf.sprintf "%s: %s" label valuation)
-              ) filtered;
+              (* Discard worlds with duplicated subset valuations *)
+              List.iter (fun (unmapped_valuations, tokens1) ->
+                if not (List.exists (fun (_, tokens2) -> is_strict_subset tokens1 tokens2) !all_valuations) then (
+                  incr counter;
+                  let world_label = Printf.sprintf "w%d" !counter in
+                  let unmapped_valuations_len = String.length unmapped_valuations in
+                  let remap_prop_to_buf token =
+                    Buffer.add_string buf (Hashtbl.find IntohyloSerializer.prop_backward_map token)
+                  in
+                  let process_unmapped_proposition token_start token_end =
+                    let token_len = token_end - token_start in
+                    if token_len > 0 && '-' = unmapped_valuations.[token_start] then (
+                      Buffer.add_char buf '-';
+                      let unmapped_prop = String.sub unmapped_valuations (token_start + 1) (token_len - 1) in
+                      remap_prop_to_buf unmapped_prop
+                    ) else (
+                      let unmapped_prop = String.sub unmapped_valuations token_start token_len in
+                      remap_prop_to_buf unmapped_prop
+                    )
+                  in
+                  let rec remap_valuations_to_buf token_start token_end =
+                    if token_end >= unmapped_valuations_len then ( (* token (proposition) found *)
+                      if token_start < unmapped_valuations_len then (
+                        process_unmapped_proposition token_start token_end
+                      )
+                    ) else if ' ' = unmapped_valuations.[token_end] then ( (* token (proposition) found *)
+                      if token_start < token_end then (
+                        process_unmapped_proposition token_start token_end;
+                        Buffer.add_char buf ' ';
+                      );
+                      remap_valuations_to_buf (token_end + 1) (token_end + 1)
+                    ) else ( (* token becomes longer *)
+                      remap_valuations_to_buf token_start (token_end + 1)
+                    )
+                  in
+                  Buffer.add_string buf "\n";
+                  Buffer.add_string buf world_label;
+                  Buffer.add_string buf ": ";
+                  remap_valuations_to_buf 0 0;
+                )
+              ) !all_valuations;
               Buffer.add_string buf ("\nworlds_count: " ^ (string_of_int !counter));
               (SolveResult.SAT, buf)
           | "UNSAT" ->
-              write_to_buf "UNSAT";
+              Buffer.add_string buf "UNSAT";
               close_in ic;
               (SolveResult.UNSAT, buf)
           | x -> failwith ("Received unexpected line in S5Cheetah_model instead of SAT/UNSAT, line: " ^ x);
