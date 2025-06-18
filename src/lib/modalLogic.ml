@@ -60,6 +60,8 @@ module EvaluatedS5Ast = struct
       in
       (match ast with
       | Prop x -> write_to_buf (obtain_prop_mapped_name x)
+      | Top -> write_to_buf "true"
+      | Bottom -> write_to_buf "false"
       | Not x ->
           write_char_to_buf '~';
           write_to_buf_with_parens x;
