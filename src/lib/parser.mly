@@ -44,7 +44,8 @@
 %token FORALL EXISTS
 %token FOR NEWLINE
 %token QUOTE
-%token BOX DIAMOND
+%token <string> BOX
+%token <string> DIAMOND
 
 (* The following lines define in which order the tokens should
  * be reduced, e.g. it tells the parser to reduce * before +.
@@ -210,8 +211,8 @@ var:
 %inline bool: x=BOOL {Loc (Bool x,($startpos,$endpos))}
 
 %inline modalities(T):
-  | BOX (*LPAREN*) x=T RPAREN {Loc (Box x,($startpos,$endpos))}
-  | DIAMOND (*LPAREN*) x=T RPAREN {Loc (Diamond x,($startpos,$endpos))}
+  | relation=BOX (*LPAREN*) x=T RPAREN     { Loc (Box (relation, x), ($startpos, $endpos)) }
+  | relation=DIAMOND (*LPAREN*) x=T RPAREN { Loc (Diamond (relation, x), ($startpos, $endpos)) }
 
 expr:
   | b=var {b}

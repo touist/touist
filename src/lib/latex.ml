@@ -164,8 +164,8 @@ let rec latex_of_ast ?(matrix_instead_of_substack = false) ~full ast =
       ^ latex_of_commalist " \\times " sets
       ^ (match cond with Some c -> ", " ^ latex_of_ast c | _ -> "")
       ^ "]"
-  | Box x -> "\\Box " ^ latex_of_ast x
-  | Diamond x -> "\\Diamond " ^ latex_of_ast x
+  | Box (r, x) -> "\\Box_{" ^ r ^ "} " ^ latex_of_ast x
+  | Diamond (r, x) -> "\\Diamond_{" ^ r ^ "} " ^ latex_of_ast x
 
 and latex_of_commalist ~matrix_instead_of_substack ~full sep el =
   String.concat sep
@@ -197,8 +197,8 @@ and ast_fun (f : 'a -> Ast.t -> 'a) (acc : 'a) ast : 'a =
   | Exists (_, f)
   | Forall (_, f)
   | For (_, _, f)
-  | Box f
-  | Diamond f
+  | Box (_, f)
+  | Diamond (_, f)
   | NewlineBefore f
   | NewlineAfter f ->
       acc |> ast_fun' f

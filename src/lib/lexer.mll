@@ -88,8 +88,6 @@
     "exists",        EXISTS;
     "forall",        FORALL;
     "for",        FOR;
-    "nec(",        BOX;
-    "pos(",        DIAMOND;
     ]
 }
 
@@ -117,6 +115,10 @@ rule token = parse (* is a function (Lexing.lexbuf -> Parser.token list) *)
   | eof               {[ EOF            ]}
   | empty+            {  token lexbuf    }
   | "\""              {[ QUOTE          ]} (* for an formula-expr *)
+  | "[]("             {[ BOX ("r1")     ]}
+  | "<>("             {[ DIAMOND ("r1") ]}
+  | '['('r' ['1'-'9']['0'-'9']* as relation)"](" {[ BOX (relation) ]}
+  | '<'('r' ['1'-'9']['0'-'9']* as relation)">(" {[ DIAMOND (relation) ]}
   | "["               {[ LBRACK         ]}
   | "]"               {[ RBRACK         ]}
   | ".."              {[ RANGE          ]}

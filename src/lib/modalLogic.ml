@@ -89,11 +89,11 @@ module EvaluatedS5Ast = struct
           write_to_buf_with_parens x;
           write_to_buf " <-> ";
           write_to_buf_with_parens y;
-      | Box x ->
-          write_to_buf "[r1]";
+      | Box (r, x) ->
+          write_to_buf ("[" ^ r ^ "]");
           write_to_buf_with_parens x;
-      | Diamond x ->
-          write_to_buf "<r1>";
+      | Diamond (r, x) ->
+          write_to_buf ("<" ^ r ^ ">");
           write_to_buf_with_parens x;
       | x -> failwith ("Not supported AST type when writing modal logic AST to buffer (AST Type:" ^ (Pprint.string_of_ast_type ~debug:true x) ^ ")"))
     let serialize ast =

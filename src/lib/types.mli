@@ -102,8 +102,8 @@ module rec Ast : sig
     | NewlineBefore of t
     | Formula of t
     | SetBuilder of t * t list * t list * t option
-    | Box of t
-    | Diamond of t
+    | Box of string * t
+    | Diamond of string * t
 end
 
 and AstSet : sig
