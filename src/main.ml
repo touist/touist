@@ -34,7 +34,7 @@ let string_of_lang = function
   | Sat -> "--sat"
   | Qbf -> "--qbf"
   | Smt l -> "--smt=" ^ l
-  | ModalLogic modal_system -> "--modalLogic=" ^ modal_system
+  | ModalLogic modal_system -> "--modal-logic=" ^ modal_system
 
 type solve_opts = {
   count : bool;
@@ -246,7 +246,7 @@ let main (lang, mode) (input, _input_f)
           | Sat -> ast_plain input_text |> Eval.eval ~smt |> Cnf.ast_to_cnf
           | Qbf -> ast_plain input_text |> Eval.eval ~smt |> Qbf.cnf
           | Smt _ -> failwith "no --show=cnf with --smt"
-          | ModalLogic _ -> failwith "no --show=cnf with --modalLogic"
+          | ModalLogic _ -> failwith "no --show=cnf with --modal-logic"
         in
         Printf.fprintf output_f "%s\n" (Pprint.string_of_ast ~utf8:true ast);
         exit_with OK
@@ -255,14 +255,14 @@ let main (lang, mode) (input, _input_f)
         | Sat -> ast_plain input_text |> Eval.eval ~smt |> Cnf.ast_to_cnf ~debug_cnf:true
         | Qbf -> ast_plain input_text |> Eval.eval ~smt |> Qbf.cnf ~debug_cnf:true
         | Smt _ -> failwith "no --show=duringcnf with --smt"
-        | ModalLogic _ -> failwith "no --show=duringcnf with --modalLogic") |> ignore
+        | ModalLogic _ -> failwith "no --show=duringcnf with --modal-logic") |> ignore
     | _, Show Prenex ->
         let ast =
           match lang with
           | Sat -> failwith "no --show=prenex with --sat"
           | Qbf -> ast_plain input_text |> Eval.eval ~smt |> Qbf.cnf |> Qbf.prenex
           | Smt _ -> failwith "no --show=prenex with --smt"
-          | ModalLogic _ -> failwith "no --show=prenex with --modalLogic"
+          | ModalLogic _ -> failwith "no --show=prenex with --modal-logic"
         in
         Printf.fprintf output_f "%s\n" (Pprint.string_of_ast ~utf8:true ast);
         exit_with OK
@@ -272,7 +272,7 @@ let main (lang, mode) (input, _input_f)
           | Sat -> failwith "no --show=duringprenex with --smt"
           | Qbf -> ast_plain input_text |> Eval.eval ~smt |> Qbf.cnf |> Qbf.prenex ~debug:true
           | Smt _ -> failwith "no --show=duringprenex with --smt"
-          | ModalLogic _ -> failwith "no --show=duringprenex with --modalLogic"
+          | ModalLogic _ -> failwith "no --show=duringprenex with --modal-logic"
         in
         Printf.fprintf output_f "%s\n" (Pprint.string_of_ast ~utf8:true ast);
         exit_with OK
@@ -502,7 +502,7 @@ let main (lang, mode) (input, _input_f)
         | ModalLogic.SolveResult.UNSAT ->
             Printf.fprintf stderr "UNSAT\n";
             exit_with UNSAT)
-    | ModalLogic _, _ -> failwith "--modalLogic not implemented error with given modal_system and mode"
+    | ModalLogic _, _ -> failwith "--modal-logic not implemented error with given modal_system and mode"
     );
 
     (* I had to comment these close_out and close_in because it would
@@ -615,7 +615,7 @@ let language =
     Arg.(
       value
       & opt (some Arg.string) None ~vopt:(Some "S5")
-      & info [ "modalLogic" ] ~docv:"modal_system" ~docs
+      & info [ "modal-logic" ] ~docv:"modal_system" ~docs
           ~doc:
             "Select the Modal Logic modal_system. By default, $(docv) is \
              set to\n\
@@ -635,7 +635,7 @@ let language =
                 ^ "' is not known (e.g., --smt=QF_IDL, see --help)" ))
     | false, true, None, None -> `Ok Qbf
     | _, false, None, None -> `Ok Sat (* default to sat *)
-    | _, _, _, _ -> `Error (false, "only one of {--sat,--smt,--qbf,--modalLogic} is allowed")
+    | _, _, _, _ -> `Error (false, "only one of {--sat,--smt,--qbf,--modal-logic} is allowed")
   in
   Term.(ret (const one_of $ sat $ qbf $ smt $ modalLogic))
 
