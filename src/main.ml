@@ -208,7 +208,7 @@ let main (lang, mode) (input, _input_f)
     | _, Latex { mode; linter } ->
         let ast_plain = ast_plain input_text in
         if linter then
-          ast_plain |> Eval.eval ~smt ~onlychecktypes:true |> ignore;
+          ast_plain |> Eval.eval ~smt ~onlychecktypes:true ~is_modal_logic:is_modal_logic |> ignore;
         if mode = Mathjax then
           Printf.fprintf output_f "%s\n"
             (Latex.latex_of_ast ~full:false ast_plain)
@@ -228,7 +228,7 @@ let main (lang, mode) (input, _input_f)
              \\end{document}\n"
             (Latex.latex_of_ast ~full:true ast_plain)
     | _, Translate { linter = true; _ } ->
-        ast_plain input_text |> Eval.eval ~smt ~onlychecktypes:true |> ignore;
+        ast_plain input_text |> Eval.eval ~smt ~onlychecktypes:true ~is_modal_logic:is_modal_logic |> ignore;
         exit_with OK
     | _, Show Form ->
         let ast =
