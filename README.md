@@ -20,7 +20,7 @@ problem](docs/images/screenshot.png)](https://github.com/maelvalais/allumettes)
 ## Install
 
 1. TouIST has a java-based graphical interface (which embeds the
-   command-line tool). It be downloaded in the [releases] page and is available
+   command-line tool). It can be downloaded from the [releases] page and is available
    for Linux, Windows and macOS. Two options are available: the plain **jar**
    for any platform or the non-signed **native** version for macOS and
    Windows (see below warning).
@@ -104,7 +104,7 @@ of their work at school.
 
 1. the main program, `touist`, is written in OCaml and is compiled
    into a native and standalone binary. It does the parsing, the transformations
-   (e.g., latex) and embeds one solver per theory (SAT, SMT and QBF) in order
+   (e.g., latex) and embeds one solver per theory (SAT, SMT, QBF and MODAL LOGIC) in order
    to solve the problem.
 
 2. the java-based graphical interface uses Java (>= jre7) and Swing; it embeds
@@ -129,6 +129,7 @@ See the [./INSTALL.md](/INSTALL.md) file for building from source.
 | `qbf` (opam)           | yes            | yes (minw32 only [^1]) | yes   |
 | `yices2` (opam) [^2]   | yes            | no                     | yes   |
 | `yices2` (source) [^2] | yes            | yes (mingw32+mingw64)  | yes   |
+| `--modal-logic`        | yes            | no                     | no    |
 
 [^1]: the `qbf` package only works on mingw32 because of a slight bug in the
      `./configure` of quantor-3.2. See maelvalais's PR on the ocaml-qbf repo.
