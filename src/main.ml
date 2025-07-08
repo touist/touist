@@ -502,7 +502,7 @@ let main (lang, mode) (input, _input_f)
         | ModalLogic.SolveResult.UNSAT ->
             Printf.fprintf stderr "UNSAT\n";
             exit_with UNSAT)
-    | ModalLogic _, _ -> failwith "--modal-logic not implemented error with given modal_system and mode"
+    | ModalLogic _, _ -> failwith "--modal-logic not implemented error with given SYSTEM and mode"
     );
 
     (* I had to comment these close_out and close_in because it would
@@ -573,9 +573,9 @@ let output =
     & info [ "o"; "output" ] ~docv:"OUTPUT"
         ~doc:
           "Select the file $(docv) for printing results. With $(b,--sat),\n\
-          \    $(b,--smt) or $(b,--qbf), results will be respectively the \
+          \    $(b,--smt), $(b,--qbf) and $(b,--modal-logic) results will be respectively the \
            DIMACS,\n\
-          \    QDIMACS and SMT-LIB translations of the TouIST given in \
+          \    QDIMACS, SMT-LIB and InToHyLo translations of the TouIST given in \
            $(i,INPUT).")
 
 let language_section = "LANGUAGES"
@@ -611,17 +611,17 @@ let language =
              set to\n\
             \      `QF_LRA' (Linear Real Arithmetic).")
   in
-  let modalLogic =
+  let modal_logic =
     Arg.(
       value
       & opt (some Arg.string) None ~vopt:(Some "S5")
-      & info [ "modal-logic" ] ~docv:"modal_system" ~docs
+      & info [ "modal-logic" ] ~docv:"SYSTEM" ~docs
           ~doc:
-            "Select the Modal Logic modal_system. By default, $(docv) is \
+            "Select the Modal Logic $(docv). By default, $(docv) is \
              set to\n\
             \      'S5'.")
-  and one_of sat qbf smt modalLogic =
-    match (sat, qbf, smt, modalLogic) with
+  and one_of sat qbf smt modal_logic =
+    match (sat, qbf, smt, modal_logic) with
     | false, false, None, Some modal_system -> `Ok (ModalLogic modal_system)
     | false, false, Some l, None -> (
         (* SMT Mode: check if one of the available QF_? has been given after
@@ -637,7 +637,7 @@ let language =
     | _, false, None, None -> `Ok Sat (* default to sat *)
     | _, _, _, _ -> `Error (false, "only one of {--sat,--smt,--qbf,--modal-logic} is allowed")
   in
-  Term.(ret (const one_of $ sat $ qbf $ smt $ modalLogic))
+  Term.(ret (const one_of $ sat $ qbf $ smt $ modal_logic))
 
 let external_solv_section = "EXTERNAL SOLVER"
 
@@ -897,42 +897,42 @@ let common_opt =
   Term.(const common_opt $ error_format $ wrap_width $ verbose_flag)
 
 let cmd =
-  let doc = "translate and solves SAT, QBF and SMT problems written in TouIST."
+  let doc = "translate and solve SAT, QBF, SMT, MODAL LOGIC problems written in TouIST."
   and usage1 =
-    "$(mname) [$(b,--sat)|$(b,--qbf)|$(b,--smt)[=$(i,LOGIC)]] [$(i,OPTION)] \
+    "$(mname) [$(b,--sat)|$(b,--qbf)|$(b,--smt)[=$(i,LOGIC)]|$(b,--modal-logic)[=$(i,SYSTEM)]] [$(i,OPTION)] \
      $(i,INPUT)"
   and usage2 =
-    "$(mname) [$(b,--sat)|$(b,--qbf)|$(b,--smt)[=$(i,LOGIC)]] [$(i,OPTION)] \
+    "$(mname) [$(b,--sat)|$(b,--qbf)|$(b,--smt)[=$(i,LOGIC)]|$(b,--modal-logic)[=$(i,SYSTEM)]] [$(i,OPTION)] \
      $(b,--solve) $(i,INPUT)"
   and usage3 =
-    "$(mname) [$(b,--sat)|$(b,--qbf)|$(b,--smt)[=$(i,LOGIC)]] [$(i,OPTION)] \
+    "$(mname) [$(b,--sat)|$(b,--qbf)|$(b,--smt)[=$(i,LOGIC)]|$(b,--modal-logic)[=$(i,SYSTEM)]] [$(i,OPTION)] \
      $(b,--solver)=$(i,CMD) $(i,INPUT)"
   and usage4 =
-    "$(mname) [$(b,--sat)|$(b,--qbf)|$(b,--smt)[=$(i,LOGIC)]] [$(i,OPTION)] \
+    "$(mname) [$(b,--sat)|$(b,--qbf)|$(b,--smt)[=$(i,LOGIC)]|$(b,--modal-logic)[=$(i,SYSTEM)]] [$(i,OPTION)] \
      $(b,--latex)[=$(i,TEX)] $(i,INPUT)"
   and usage5 =
-    "$(mname) [$(b,--sat)|$(b,--qbf)|$(b,--smt)[=$(i,LOGIC)]] [$(i,OPTION)] \
+    "$(mname) [$(b,--sat)|$(b,--qbf)|$(b,--smt)[=$(i,LOGIC)]|$(b,--modal-logic)[=$(i,SYSTEM)]] [$(i,OPTION)] \
      $(b,--show)[=$(i,AST)] $(i,INPUT)"
   in
   let man =
     [
       `S Manpage.s_synopsis;
-      `P usage1;
+      `Pre usage1;
       `Noblank;
-      `P usage2;
+      `Pre usage2;
       `Noblank;
-      `P usage3;
+      `Pre usage3;
       `Noblank;
-      `P usage4;
+      `Pre usage4;
       `Noblank;
-      `P usage5;
+      `Pre usage5;
       `S Manpage.s_description;
       `P
         "$(tname) translates and solves problems written in TouIST language,\n\
         \       which is based on propositional logic (SAT) with extensions to \
-         SMT and\n\
-        \       QBF. Output formats for translation include DIMACS, QDIMACS \
-         and SMT-LIB.";
+         SMT,\n\
+        \       QBF and MODAL LOGIC. Output formats for translation include DIMACS, QDIMACS, \
+         SMT-LIB and InToHyLo.";
       `P
         "In some cases, e.g., $(b,--smt) or $(b,--latex) which can take an\n\
         \        optional argument, you might want to use $(b,--) in order to\n\
@@ -948,17 +948,18 @@ let cmd =
         ("Embedded solvers compiled in $(mname): minisat"
         ^ (if Touist_yices2.SmtSolve.enabled then ", yices2" else "")
         ^ (if Touist_qbf.QbfSolve.enabled then ", qbf" else "")
+        ^ (", S5cheetah")
         ^ ".");
       `S Manpage.s_arguments;
       `S language_section;
       `P
-        "$(mname) accepts three language variants: $(b,--sat),  $(b,--qbf) and \n\
-        \       $(b,--smt)[=$(i,LOGIC)]. To learn more on the associated \
+        "$(mname) accepts four language variants: $(b,--sat),  $(b,--qbf), \n\
+        \       $(b,--smt)[=$(i,LOGIC)] and $(b,--modal-logic)[=$(i,SYSTEM)]. To learn more on the associated \
          TouIST grammars,\n\
         \       see $(i,https://www.irit.fr/touist/doc/reference-manual.html).";
       `P
-        "By default, $(i,LOGIC) is `QF_LRA' (QF stands for Quantifier Free).\n\
-        \     $(i,LOGIC) can one of:";
+        "By default, $(i,SYSTEM) is 'S5', $(i,LOGIC) is `QF_LRA' (QF stands for Quantifier Free).\n\
+        \     $(i,LOGIC) can be one of:";
       `Noblank;
       `I
         ( "`QF_IDL'",
@@ -977,18 +978,18 @@ let cmd =
         "Other QF_* exist by cannot be expressed in TouIST. For more information\n\
         \        on QF_* logics, see \
          $(i,http://smtlib.cs.uiowa.edu/logics.shtml)";
-      `P "Detail of the language flags:";
+      `P "Details of the language flags:";
       `S mode_section;
       `P
         "$(mname) has four modes depending on {$(b,--solve),\n\
         \        $(b,--solver), $(b,--latex)}. With none of these flags, \
          $(mname)\n\
-        \        will default to the DIMACS translation. To see more on the \
+        \        will default to the logic format translation. To see more on the \
          different\n\
         \        modes, look at their respective sections:";
       `I
         ( "$(b," ^ translation_section ^ ")",
-          "by default, translate into DIMACS, QDIMACS or SMT-LIB." );
+          "the default mode, translate into DIMACS, QDIMACS, SMT-LIB or InToHyLo." );
       `Noblank;
       `I
         ( "$(b," ^ solve_section ^ ")",
@@ -1007,10 +1008,12 @@ let cmd =
       `S translation_section;
       `P
         "You can translate the TouIST syntax into DIMACS ($(b,--sat)),\n\
-        \    QDIMACS ($(b,--qbf)) and SMT-LIB ($(b,--smt)). The syntax is:";
+        \    QDIMACS ($(b,--qbf)), SMT-LIB ($(b,--smt)) and InToHyLo ($(b,--modal-logic)). The syntax is:";
       `Pre "    $(mname) [$(b,--sat)|$(b,--qbf)] [--debug-dimacs] $(i,INPUT)";
       `Noblank;
       `Pre "    $(mname) $(b,--smt)[=$(i,LOGIC)] $(i,INPUT)";
+      `Noblank;
+      `Pre "    $(mname) $(b,--modal-logic)[=$(i,SYSTEM)] $(i,INPUT)";
       `P
         "By default, when translating to DIMACS or QDIMACS, the mapping table\n\
         \    (i.e., the link between proposition names and (Q)DIMACS integers) \
@@ -1033,14 +1036,16 @@ let cmd =
       `S solve_section;
       `P
         "The $(b,--solve) option asks $(mname) to solve the problem. Depending\n\
-        \    on the input language ($(b,--sat), $(b,--smt), $(b,--qbf)), the\n\
-        \    corresponding internal solver is picked (MiniSat, Yices, Quantor).\n\
+        \    on the input language ($(b,--sat), $(b,--smt), $(b,--qbf), $(b,--modal-logic)), the\n\
+        \    corresponding internal solver is picked (MiniSat, Yices, Quantor, S5cheetah).\n\
         \    Syntax is:";
       `Pre
         "    $(mname) $(b,--solve) [$(b,--sat)|$(b,--qbf)] \
          [--show-hidden|--table] $(i,INPUT)";
       `Noblank;
       `Pre "    $(mname) $(b,--solve) $(b,--smt)[=$(i,LOGIC)] $(i,INPUT)";
+      `Noblank;
+      `Pre "    $(mname) $(b,--solve) $(b,--modal-logic)[=$(i,SYSTEM)] $(i,INPUT)";
       `P
         ("Exit codes are "
         ^ string_of_int (get_code OK)
@@ -1106,7 +1111,16 @@ let cmd =
       `Pre "    ? x";
       `Noblank;
       `Pre "    ? y";
-      `P "Detail of the options related to solving:";
+      `P
+        "Using $(b,--solve) with $(b,--modal-logic), an example output model will be:\n";
+      `Pre "
+        SAT
+        w1: -a b
+        w2: a b
+        w3: b c
+        worlds_count: 3";
+      `P "where a means a=1, -a means a=0.";
+      `P "Details of the options related to solving:";
       `S external_solv_section;
       `P
         {|$(mname) can use an external solver using $(b,--solver)=$(i,CMD).
@@ -1161,7 +1175,7 @@ let cmd =
       `P "$(mname) can produce LaTeX from any TouIST file. The syntax is:";
       `Pre
         "    $(mname) $(b,--latex)[=$(i,TEX)] \
-         [$(b,--smt),$(b,--sat)|$(b,--qbf)] $(i,INPUT)";
+         [$(b,--smt),$(b,--sat)|$(b,--qbf)|$(b,--modal-logic)] $(i,INPUT)";
       `P "$(i,TEX) allows you to select what kind of LaTeX you want:";
       `I
         ( "`mathjax'",
@@ -1178,7 +1192,7 @@ let cmd =
           \        that you can directly give to pdfLaTeX. The `mathtools' \
            package is\n\
           \        necessary for `\\\\begin{pmatrix*}'." );
-      `P "Detail of the options related to LaTeX output:";
+      `P "Details of the options related to LaTeX output:";
       `S show_section;
       `P
         "Sometimes, you want to know what are the different internal\n\
@@ -1188,7 +1202,7 @@ let cmd =
         \        Syntax is:";
       `Pre
         "    $(mname) $(b,--show)[=$(i,AST)] \
-         [$(b,--sat)|$(b,--qbf)|$(b,--smt)] $(i,INPUT)";
+         [$(b,--sat)|$(b,--qbf)|$(b,--smt)|$(b,--modal-logic)] $(i,INPUT)";
       `P "$(b,AST) can take the following values:";
       `Noblank;
       `I
@@ -1214,7 +1228,7 @@ let cmd =
         ( "`duringprenex'",
           "($(b,--qbf) only) print the steps during the Prenex transformation."
         );
-      `P "Detail of the options related to showing AST:";
+      `P "Details of the options related to showing AST:";
       `S Manpage.s_bugs;
       `P "Report bugs to <mael.valais@gmail.com>.";
       `S Manpage.s_see_also;
