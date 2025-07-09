@@ -65,7 +65,7 @@ jobs:
       - name: Try to restore opam cache (Windows)
         if: runner.os == 'Windows'
         id: opam-cache-windows
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: c:\cygwin\home\runneradmin\.opam
           key: ${{ matrix.image }}-${{ matrix.ocaml-version }}
