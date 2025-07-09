@@ -28,12 +28,13 @@ let code_msgs =
     ("on unexpected internal errors (bugs).", BUG);
   ]
 
-type lang = Sat | Qbf | Smt of string
+type lang = Sat | Qbf | Smt of string | ModalLogic of string
 
 let string_of_lang = function
   | Sat -> "--sat"
   | Qbf -> "--qbf"
   | Smt l -> "--smt=" ^ l
+  | ModalLogic modal_system -> "--modal-logic=" ^ modal_system
 
 type solve_opts = {
   count : bool;
@@ -191,6 +192,7 @@ let main (lang, mode) (input, _input_f)
 
     let input_text = Parse.string_of_chan input_f in
     let smt = match lang with Smt _ -> true | _ -> false in
+    let is_modal_logic = match lang with ModalLogic modal_system -> ModalLogic.ModalSystem.assert_supported modal_system; true | _ -> false in
     let debug_syntax = common_opt.verbose > 0 in
 
     let ast_plain text =
@@ -198,6 +200,7 @@ let main (lang, mode) (input, _input_f)
       | Sat -> Parse.parse_sat ~debug_syntax ~filename:input text
       | Smt _ -> Parse.parse_smt ~debug_syntax ~filename:input text
       | Qbf -> Parse.parse_qbf ~debug_syntax ~filename:input text
+      | ModalLogic _ -> Parse.parse_modalLogic ~debug_syntax ~filename:input text
     in
     (* latex = parse and transform with latex_of_ast *)
     (* linter = only show syntax and semantic errors *)
@@ -205,15 +208,15 @@ let main (lang, mode) (input, _input_f)
     | _, Latex { mode; linter } ->
         let ast_plain = ast_plain input_text in
         if linter then
-          ast_plain |> Eval.eval ~smt ~onlychecktypes:true |> ignore;
+          ast_plain |> Eval.eval ~smt ~onlychecktypes:true ~is_modal_logic:is_modal_logic |> ignore;
         if mode = Mathjax then
           Printf.fprintf output_f "%s\n"
-            (Latex.latex_of_ast ~full:false ast_plain);
-        if mode = Katex then
+            (Latex.latex_of_ast ~full:false ast_plain)
+        else if mode = Katex then
           Printf.fprintf output_f "%s\n"
             (Latex.latex_of_ast ~matrix_instead_of_substack:true ~full:false
-               ast_plain);
-        if mode = Document then
+               ast_plain)
+        else if mode = Document then
           Printf.fprintf output_f
             "\\documentclass[fleqn]{article}\n\
              \\usepackage{mathtools}\n\
@@ -225,55 +228,41 @@ let main (lang, mode) (input, _input_f)
              \\end{document}\n"
             (Latex.latex_of_ast ~full:true ast_plain)
     | _, Translate { linter = true; _ } ->
-        ast_plain input_text |> Eval.eval ~smt ~onlychecktypes:true |> ignore;
+        ast_plain input_text |> Eval.eval ~smt ~onlychecktypes:true ~is_modal_logic:is_modal_logic |> ignore;
         exit_with OK
     | _, Show Form ->
         let ast =
           match lang with
-          | Sat ->
-              Parse.parse_sat ~debug_syntax ~filename:input input_text
-              |> Eval.eval ~smt
-          | Smt _ ->
-              Parse.parse_smt ~debug_syntax ~filename:input input_text
-              |> Eval.eval ~smt
-          | Qbf ->
-              Parse.parse_qbf ~debug_syntax ~filename:input input_text
-              |> Eval.eval ~smt
+          | Sat -> ast_plain input_text |> Eval.eval ~smt
+          | Smt _ -> ast_plain input_text |> Eval.eval ~smt
+          | Qbf -> ast_plain input_text |> Eval.eval ~smt
+          | ModalLogic _ -> ast_plain input_text |> Eval.eval ~is_modal_logic:is_modal_logic
         in
         Printf.fprintf output_f "%s\n" (Pprint.string_of_ast ~utf8:true ast);
         exit_with OK
     | _, Show Cnf ->
         let ast =
           match lang with
-          | Sat ->
-              Parse.parse_sat ~debug_syntax ~filename:input input_text
-              |> Eval.eval ~smt |> Cnf.ast_to_cnf
-          | Qbf ->
-              Parse.parse_qbf ~debug_syntax ~filename:input input_text
-              |> Eval.eval ~smt |> Qbf.cnf
-          | Smt _ -> failwith "no --show=form with --smt"
+          | Sat -> ast_plain input_text |> Eval.eval ~smt |> Cnf.ast_to_cnf
+          | Qbf -> ast_plain input_text |> Eval.eval ~smt |> Qbf.cnf
+          | Smt _ -> failwith "no --show=cnf with --smt"
+          | ModalLogic _ -> failwith "no --show=cnf with --modal-logic"
         in
         Printf.fprintf output_f "%s\n" (Pprint.string_of_ast ~utf8:true ast);
         exit_with OK
     | _, Show CnfDuring ->
         (match lang with
-        | Sat ->
-            Parse.parse_sat ~debug_syntax ~filename:input input_text
-            |> Eval.eval ~smt
-            |> Cnf.ast_to_cnf ~debug_cnf:true
-        | Qbf ->
-            Parse.parse_qbf ~debug_syntax ~filename:input input_text
-            |> Eval.eval ~smt |> Qbf.cnf ~debug_cnf:true
-        | Smt _ -> failwith "no --show=duringcnf with --smt")
-        |> ignore
+        | Sat -> ast_plain input_text |> Eval.eval ~smt |> Cnf.ast_to_cnf ~debug_cnf:true
+        | Qbf -> ast_plain input_text |> Eval.eval ~smt |> Qbf.cnf ~debug_cnf:true
+        | Smt _ -> failwith "no --show=duringcnf with --smt"
+        | ModalLogic _ -> failwith "no --show=duringcnf with --modal-logic") |> ignore
     | _, Show Prenex ->
         let ast =
           match lang with
-          | Sat -> failwith "no --show=prenex with --smt"
-          | Qbf ->
-              Parse.parse_qbf ~debug_syntax ~filename:input input_text
-              |> Eval.eval ~smt |> Qbf.cnf |> Qbf.prenex
+          | Sat -> failwith "no --show=prenex with --sat"
+          | Qbf -> ast_plain input_text |> Eval.eval ~smt |> Qbf.cnf |> Qbf.prenex
           | Smt _ -> failwith "no --show=prenex with --smt"
+          | ModalLogic _ -> failwith "no --show=prenex with --modal-logic"
         in
         Printf.fprintf output_f "%s\n" (Pprint.string_of_ast ~utf8:true ast);
         exit_with OK
@@ -281,10 +270,9 @@ let main (lang, mode) (input, _input_f)
         let ast =
           match lang with
           | Sat -> failwith "no --show=duringprenex with --smt"
-          | Qbf ->
-              Parse.parse_qbf ~debug_syntax ~filename:input input_text
-              |> Eval.eval ~smt |> Qbf.cnf |> Qbf.prenex ~debug:true
+          | Qbf -> ast_plain input_text |> Eval.eval ~smt |> Qbf.cnf |> Qbf.prenex ~debug:true
           | Smt _ -> failwith "no --show=duringprenex with --smt"
+          | ModalLogic _ -> failwith "no --show=duringprenex with --modal-logic"
         in
         Printf.fprintf output_f "%s\n" (Pprint.string_of_ast ~utf8:true ast);
         exit_with OK
@@ -313,8 +301,7 @@ let main (lang, mode) (input, _input_f)
             exit_with UNSAT)
     | Sat, Solve { equiv = None; count = true; _ } ->
         SatSolve.(
-          Parse.parse_sat ~debug_syntax ~filename:input input_text
-          |> Eval.eval |> Cnf.ast_to_cnf |> minisat_clauses_of_cnf
+          ast_plain input_text |> Eval.eval |> Cnf.ast_to_cnf |> minisat_clauses_of_cnf
           |> solve_clauses ~verbose:(common_opt.verbose > 0)
           |> ModelSet.cardinal
           |> Printf.fprintf output_f "%d\n";
@@ -350,8 +337,7 @@ let main (lang, mode) (input, _input_f)
         and continue_limit _ i = i < limit || limit = 0 in
         let start = Unix.gettimeofday () in
         let cls, tbl =
-          Parse.parse_sat ~debug_syntax ~filename:input input_text
-          |> Eval.eval |> Cnf.ast_to_cnf |> SatSolve.minisat_clauses_of_cnf
+          ast_plain input_text |> Eval.eval |> Cnf.ast_to_cnf |> SatSolve.minisat_clauses_of_cnf
         in
         if common_opt.verbose > 0 then
           Printf.eprintf
@@ -385,11 +371,8 @@ let main (lang, mode) (input, _input_f)
     | Sat, Translate { linter = false; table; debug_dimacs } ->
         (* B. solve not asked: print the Sat file *)
         let start = Unix.gettimeofday () in
-        let ast =
-          Parse.parse_sat ~debug_syntax ~filename:input input_text |> Eval.eval
-        in
         let clauses, tbl =
-          Cnf.ast_to_cnf ast |> SatSolve.minisat_clauses_of_cnf
+          ast_plain input_text |> Eval.eval |> Cnf.ast_to_cnf |> SatSolve.minisat_clauses_of_cnf
         in
         SatSolve.print_dimacs ~debug_dimacs (clauses, tbl)
           ~out_table:(match table with Some (_, f) -> f | None -> output_f)
@@ -400,11 +383,8 @@ let main (lang, mode) (input, _input_f)
         exit_with OK
     | Sat, SolveExt { cmd; hidden } ->
         let start = Unix.gettimeofday () in
-        let ast =
-          Parse.parse_sat ~debug_syntax ~filename:input input_text |> Eval.eval
-        in
         let clauses, tbl =
-          Cnf.ast_to_cnf ast |> SatSolve.minisat_clauses_of_cnf
+          ast_plain input_text |> Eval.eval |> Cnf.ast_to_cnf |> SatSolve.minisat_clauses_of_cnf
         in
         if common_opt.verbose > 0 then
           Printf.eprintf
@@ -421,17 +401,12 @@ let main (lang, mode) (input, _input_f)
              (fun ?(line_begin = "") out ->
                SatSolve.print_dimacs ~line_begin (clauses, tbl) out)
     | Smt logic, Translate _ ->
-        let ast =
-          Parse.parse_smt ~debug_syntax ~filename:input input_text
-          |> Eval.eval ~smt
-        in
-        ast |> Smt.to_smt2 logic |> Buffer.output_buffer output_f;
+        ast_plain input_text |> Eval.eval ~smt |> Smt.to_smt2 logic |> Buffer.output_buffer output_f;
         exit_with OK
     | Smt logic, Solve _ -> (
         let start = Unix.gettimeofday () in
         let yices_form, tbl =
-          Parse.parse_smt ~debug_syntax ~filename:input input_text
-          |> Eval.eval ~smt |> Touist_yices2.SmtSolve.ast_to_yices
+          ast_plain input_text |> Eval.eval ~smt |> Touist_yices2.SmtSolve.ast_to_yices
         in
         if common_opt.verbose > 0 then
           Printf.eprintf "== translation time: %f sec\n"
@@ -453,8 +428,7 @@ let main (lang, mode) (input, _input_f)
         (* --qbf + --solver CMD: use external solver *)
         let start = Unix.gettimeofday () in
         let quants, int_clauses, int_tbl =
-          Parse.parse_qbf ~debug_syntax ~filename:input input_text
-          |> Eval.eval ~smt |> Qbf.prenex |> Qbf.cnf |> Qbf.qbfclauses_of_cnf
+          ast_plain input_text |> Eval.eval ~smt |> Qbf.prenex |> Qbf.cnf |> Qbf.qbfclauses_of_cnf
         in
         if common_opt.verbose > 0 then
           Printf.eprintf
@@ -471,8 +445,7 @@ let main (lang, mode) (input, _input_f)
         (* --qbf: we print QDIMACS *)
         let start = Unix.gettimeofday () in
         let quants, int_clauses, int_tbl =
-          Parse.parse_qbf ~debug_syntax ~filename:input input_text
-          |> Eval.eval ~smt |> Qbf.prenex |> Qbf.cnf |> Qbf.qbfclauses_of_cnf
+          ast_plain input_text |> Eval.eval ~smt |> Qbf.prenex |> Qbf.cnf |> Qbf.qbfclauses_of_cnf
         in
         Qbf.print_qdimacs ~debug_dimacs
           (quants, int_clauses, int_tbl)
@@ -485,9 +458,7 @@ let main (lang, mode) (input, _input_f)
         (* --qbf + --solve: we solve using Quantor *)
         let start = Unix.gettimeofday () in
         let qcnf, table =
-          Parse.parse_qbf ~debug_syntax ~filename:input input_text
-          |> Eval.eval ~smt |> Qbf.prenex |> Qbf.cnf
-          |> Touist_qbf.QbfSolve.qcnf_of_cnf
+          ast_plain input_text |> Eval.eval ~smt |> Qbf.prenex |> Qbf.cnf |> Touist_qbf.QbfSolve.qcnf_of_cnf
         in
         if common_opt.verbose > 0 then
           Printf.eprintf "== translation time: %f sec\n"
@@ -501,7 +472,38 @@ let main (lang, mode) (input, _input_f)
         if common_opt.verbose > 0 then
           Printf.eprintf "== solve time: %f sec\n"
             (Unix.gettimeofday () -. start)
-    | Smt _, SolveExt _ -> failwith "--solver not compatible with --smt");
+    | Smt _, SolveExt _ -> failwith "--solver not compatible with --smt"
+    | ModalLogic modal_system, Translate _ ->
+        let start = Unix.gettimeofday () in
+        let (proposition_mapping_out, final_out) =
+          ast_plain input_text |> Eval.eval ~smt ~is_modal_logic:is_modal_logic
+          |> ModalLogic.EvaluatedAst.translate (ModalLogic.ModalSystem.of_string modal_system)
+        in
+        if common_opt.verbose > 0 then
+          Printf.eprintf "== translate time: %f sec\n"
+            (Unix.gettimeofday () -. start);
+        Buffer.output_buffer output_f proposition_mapping_out;
+        Buffer.output_buffer output_f final_out;
+        exit_with OK
+    | ModalLogic modal_system, Solve _ ->
+        let start = Unix.gettimeofday () in
+        let (solve_result, solve_buf) =
+          ast_plain input_text |> Eval.eval ~smt ~is_modal_logic:is_modal_logic
+          |> ModalLogic.EvaluatedAst.solve (ModalLogic.ModalSystem.of_string modal_system)
+        in
+        if common_opt.verbose > 0 then
+          Printf.eprintf "\n== solve time: %f sec\n"
+            (Unix.gettimeofday () -. start);
+        (match solve_result with
+        | ModalLogic.SolveResult.SAT ->
+            Buffer.output_buffer output_f solve_buf;
+            print_endline "";
+            exit_with OK
+        | ModalLogic.SolveResult.UNSAT ->
+            Printf.fprintf stderr "UNSAT\n";
+            exit_with UNSAT)
+    | ModalLogic _, _ -> failwith "--modal-logic not implemented error with given SYSTEM and mode"
+    );
 
     (* I had to comment these close_out and close_in because it would
         raise 'bad descriptor file' for some reason. Because the program is always
@@ -571,9 +573,9 @@ let output =
     & info [ "o"; "output" ] ~docv:"OUTPUT"
         ~doc:
           "Select the file $(docv) for printing results. With $(b,--sat),\n\
-          \    $(b,--smt) or $(b,--qbf), results will be respectively the \
+          \    $(b,--smt), $(b,--qbf) and $(b,--modal-logic) results will be respectively the \
            DIMACS,\n\
-          \    QDIMACS and SMT-LIB translations of the TouIST given in \
+          \    QDIMACS, SMT-LIB and InToHyLo translations of the TouIST given in \
            $(i,INPUT).")
 
 let language_section = "LANGUAGES"
@@ -608,9 +610,20 @@ let language =
             "Select the SAT Modulo Theory (SMT) input. By default, $(docv) is \
              set to\n\
             \      `QF_LRA' (Linear Real Arithmetic).")
-  and one_of sat qbf smt =
-    match (sat, qbf, smt) with
-    | false, false, Some l -> (
+  in
+  let modal_logic =
+    Arg.(
+      value
+      & opt (some Arg.string) None ~vopt:(Some "S5")
+      & info [ "modal-logic" ] ~docv:"SYSTEM" ~docs
+          ~doc:
+            "Select the Modal Logic $(docv). By default, $(docv) is \
+             set to\n\
+            \      'S5'.")
+  and one_of sat qbf smt modal_logic =
+    match (sat, qbf, smt, modal_logic) with
+    | false, false, None, Some modal_system -> `Ok (ModalLogic modal_system)
+    | false, false, Some l, None -> (
         (* SMT Mode: check if one of the available QF_? has been given after
            --smt is Yices2 is available. *)
         match Touist_yices2.SmtSolve.(enabled, logic_supported l) with
@@ -620,11 +633,11 @@ let language =
               ( false,
                 "given --smt=LOGIC '" ^ l
                 ^ "' is not known (e.g., --smt=QF_IDL, see --help)" ))
-    | false, true, None -> `Ok Qbf
-    | _, false, None -> `Ok Sat (* default to sat *)
-    | _, _, _ -> `Error (false, "only one of {--sat,--smt,--qbf} is allowed")
+    | false, true, None, None -> `Ok Qbf
+    | _, false, None, None -> `Ok Sat (* default to sat *)
+    | _, _, _, _ -> `Error (false, "only one of {--sat,--smt,--qbf,--modal-logic} is allowed")
   in
-  Term.(ret (const one_of $ sat $ qbf $ smt))
+  Term.(ret (const one_of $ sat $ qbf $ smt $ modal_logic))
 
 let external_solv_section = "EXTERNAL SOLVER"
 
@@ -884,42 +897,42 @@ let common_opt =
   Term.(const common_opt $ error_format $ wrap_width $ verbose_flag)
 
 let cmd =
-  let doc = "translate and solves SAT, QBF and SMT problems written in TouIST."
+  let doc = "translate and solve SAT, QBF, SMT, MODAL LOGIC problems written in TouIST."
   and usage1 =
-    "$(mname) [$(b,--sat)|$(b,--qbf)|$(b,--smt)[=$(i,LOGIC)]] [$(i,OPTION)] \
+    "$(mname) [$(b,--sat)|$(b,--qbf)|$(b,--smt)[=$(i,LOGIC)]|$(b,--modal-logic)[=$(i,SYSTEM)]] [$(i,OPTION)] \
      $(i,INPUT)"
   and usage2 =
-    "$(mname) [$(b,--sat)|$(b,--qbf)|$(b,--smt)[=$(i,LOGIC)]] [$(i,OPTION)] \
+    "$(mname) [$(b,--sat)|$(b,--qbf)|$(b,--smt)[=$(i,LOGIC)]|$(b,--modal-logic)[=$(i,SYSTEM)]] [$(i,OPTION)] \
      $(b,--solve) $(i,INPUT)"
   and usage3 =
-    "$(mname) [$(b,--sat)|$(b,--qbf)|$(b,--smt)[=$(i,LOGIC)]] [$(i,OPTION)] \
+    "$(mname) [$(b,--sat)|$(b,--qbf)|$(b,--smt)[=$(i,LOGIC)]|$(b,--modal-logic)[=$(i,SYSTEM)]] [$(i,OPTION)] \
      $(b,--solver)=$(i,CMD) $(i,INPUT)"
   and usage4 =
-    "$(mname) [$(b,--sat)|$(b,--qbf)|$(b,--smt)[=$(i,LOGIC)]] [$(i,OPTION)] \
+    "$(mname) [$(b,--sat)|$(b,--qbf)|$(b,--smt)[=$(i,LOGIC)]|$(b,--modal-logic)[=$(i,SYSTEM)]] [$(i,OPTION)] \
      $(b,--latex)[=$(i,TEX)] $(i,INPUT)"
   and usage5 =
-    "$(mname) [$(b,--sat)|$(b,--qbf)|$(b,--smt)[=$(i,LOGIC)]] [$(i,OPTION)] \
+    "$(mname) [$(b,--sat)|$(b,--qbf)|$(b,--smt)[=$(i,LOGIC)]|$(b,--modal-logic)[=$(i,SYSTEM)]] [$(i,OPTION)] \
      $(b,--show)[=$(i,AST)] $(i,INPUT)"
   in
   let man =
     [
       `S Manpage.s_synopsis;
-      `P usage1;
+      `Pre usage1;
       `Noblank;
-      `P usage2;
+      `Pre usage2;
       `Noblank;
-      `P usage3;
+      `Pre usage3;
       `Noblank;
-      `P usage4;
+      `Pre usage4;
       `Noblank;
-      `P usage5;
+      `Pre usage5;
       `S Manpage.s_description;
       `P
         "$(tname) translates and solves problems written in TouIST language,\n\
         \       which is based on propositional logic (SAT) with extensions to \
-         SMT and\n\
-        \       QBF. Output formats for translation include DIMACS, QDIMACS \
-         and SMT-LIB.";
+         SMT,\n\
+        \       QBF and MODAL LOGIC. Output formats for translation include DIMACS, QDIMACS, \
+         SMT-LIB and InToHyLo.";
       `P
         "In some cases, e.g., $(b,--smt) or $(b,--latex) which can take an\n\
         \        optional argument, you might want to use $(b,--) in order to\n\
@@ -935,17 +948,18 @@ let cmd =
         ("Embedded solvers compiled in $(mname): minisat"
         ^ (if Touist_yices2.SmtSolve.enabled then ", yices2" else "")
         ^ (if Touist_qbf.QbfSolve.enabled then ", qbf" else "")
+        ^ (", S5cheetah")
         ^ ".");
       `S Manpage.s_arguments;
       `S language_section;
       `P
-        "$(mname) accepts three language variants: $(b,--sat),  $(b,--qbf) and \n\
-        \       $(b,--smt)[=$(i,LOGIC)]. To learn more on the associated \
+        "$(mname) accepts four language variants: $(b,--sat),  $(b,--qbf), \n\
+        \       $(b,--smt)[=$(i,LOGIC)] and $(b,--modal-logic)[=$(i,SYSTEM)]. To learn more on the associated \
          TouIST grammars,\n\
         \       see $(i,https://www.irit.fr/touist/doc/reference-manual.html).";
       `P
-        "By default, $(i,LOGIC) is `QF_LRA' (QF stands for Quantifier Free).\n\
-        \     $(i,LOGIC) can one of:";
+        "By default, $(i,SYSTEM) is 'S5', $(i,LOGIC) is `QF_LRA' (QF stands for Quantifier Free).\n\
+        \     $(i,LOGIC) can be one of:";
       `Noblank;
       `I
         ( "`QF_IDL'",
@@ -964,18 +978,18 @@ let cmd =
         "Other QF_* exist by cannot be expressed in TouIST. For more information\n\
         \        on QF_* logics, see \
          $(i,http://smtlib.cs.uiowa.edu/logics.shtml)";
-      `P "Detail of the language flags:";
+      `P "Details of the language flags:";
       `S mode_section;
       `P
         "$(mname) has four modes depending on {$(b,--solve),\n\
         \        $(b,--solver), $(b,--latex)}. With none of these flags, \
          $(mname)\n\
-        \        will default to the DIMACS translation. To see more on the \
+        \        will default to the logic format translation. To see more on the \
          different\n\
         \        modes, look at their respective sections:";
       `I
         ( "$(b," ^ translation_section ^ ")",
-          "by default, translate into DIMACS, QDIMACS or SMT-LIB." );
+          "the default mode, translate into DIMACS, QDIMACS, SMT-LIB or InToHyLo." );
       `Noblank;
       `I
         ( "$(b," ^ solve_section ^ ")",
@@ -994,10 +1008,12 @@ let cmd =
       `S translation_section;
       `P
         "You can translate the TouIST syntax into DIMACS ($(b,--sat)),\n\
-        \    QDIMACS ($(b,--qbf)) and SMT-LIB ($(b,--smt)). The syntax is:";
+        \    QDIMACS ($(b,--qbf)), SMT-LIB ($(b,--smt)) and InToHyLo ($(b,--modal-logic)). The syntax is:";
       `Pre "    $(mname) [$(b,--sat)|$(b,--qbf)] [--debug-dimacs] $(i,INPUT)";
       `Noblank;
       `Pre "    $(mname) $(b,--smt)[=$(i,LOGIC)] $(i,INPUT)";
+      `Noblank;
+      `Pre "    $(mname) $(b,--modal-logic)[=$(i,SYSTEM)] $(i,INPUT)";
       `P
         "By default, when translating to DIMACS or QDIMACS, the mapping table\n\
         \    (i.e., the link between proposition names and (Q)DIMACS integers) \
@@ -1020,14 +1036,16 @@ let cmd =
       `S solve_section;
       `P
         "The $(b,--solve) option asks $(mname) to solve the problem. Depending\n\
-        \    on the input language ($(b,--sat), $(b,--smt), $(b,--qbf)), the\n\
-        \    corresponding internal solver is picked (MiniSat, Yices, Quantor).\n\
+        \    on the input language ($(b,--sat), $(b,--smt), $(b,--qbf), $(b,--modal-logic)), the\n\
+        \    corresponding internal solver is picked (MiniSat, Yices, Quantor, S5cheetah).\n\
         \    Syntax is:";
       `Pre
         "    $(mname) $(b,--solve) [$(b,--sat)|$(b,--qbf)] \
          [--show-hidden|--table] $(i,INPUT)";
       `Noblank;
       `Pre "    $(mname) $(b,--solve) $(b,--smt)[=$(i,LOGIC)] $(i,INPUT)";
+      `Noblank;
+      `Pre "    $(mname) $(b,--solve) $(b,--modal-logic)[=$(i,SYSTEM)] $(i,INPUT)";
       `P
         ("Exit codes are "
         ^ string_of_int (get_code OK)
@@ -1093,7 +1111,16 @@ let cmd =
       `Pre "    ? x";
       `Noblank;
       `Pre "    ? y";
-      `P "Detail of the options related to solving:";
+      `P
+        "Using $(b,--solve) with $(b,--modal-logic), an example output model will be:\n";
+      `Pre "
+        SAT
+        w1: -a b
+        w2: a b
+        w3: b c
+        worlds_count: 3";
+      `P "where a means a=1, -a means a=0.";
+      `P "Details of the options related to solving:";
       `S external_solv_section;
       `P
         {|$(mname) can use an external solver using $(b,--solver)=$(i,CMD).
@@ -1148,7 +1175,7 @@ let cmd =
       `P "$(mname) can produce LaTeX from any TouIST file. The syntax is:";
       `Pre
         "    $(mname) $(b,--latex)[=$(i,TEX)] \
-         [$(b,--smt),$(b,--sat)|$(b,--qbf)] $(i,INPUT)";
+         [$(b,--smt),$(b,--sat)|$(b,--qbf)|$(b,--modal-logic)] $(i,INPUT)";
       `P "$(i,TEX) allows you to select what kind of LaTeX you want:";
       `I
         ( "`mathjax'",
@@ -1165,7 +1192,7 @@ let cmd =
           \        that you can directly give to pdfLaTeX. The `mathtools' \
            package is\n\
           \        necessary for `\\\\begin{pmatrix*}'." );
-      `P "Detail of the options related to LaTeX output:";
+      `P "Details of the options related to LaTeX output:";
       `S show_section;
       `P
         "Sometimes, you want to know what are the different internal\n\
@@ -1175,7 +1202,7 @@ let cmd =
         \        Syntax is:";
       `Pre
         "    $(mname) $(b,--show)[=$(i,AST)] \
-         [$(b,--sat)|$(b,--qbf)|$(b,--smt)] $(i,INPUT)";
+         [$(b,--sat)|$(b,--qbf)|$(b,--smt)|$(b,--modal-logic)] $(i,INPUT)";
       `P "$(b,AST) can take the following values:";
       `Noblank;
       `I
@@ -1201,7 +1228,7 @@ let cmd =
         ( "`duringprenex'",
           "($(b,--qbf) only) print the steps during the Prenex transformation."
         );
-      `P "Detail of the options related to showing AST:";
+      `P "Details of the options related to showing AST:";
       `S Manpage.s_bugs;
       `P "Report bugs to <mael.valais@gmail.com>.";
       `S Manpage.s_see_also;

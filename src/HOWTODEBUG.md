@@ -103,12 +103,27 @@ Please report this problem to the compiler vendor.
 ```
 meaning that the state 92 isn't in parserMsgs.ml, and thus not in
 parser.messages. To fix that, anytime you modify parser.mly, check that
-no new errors have been intruduced:
+no new errors have been introduced. If there are new errors, those error entries should be manually added to parser.messages:
 
 ```
-menhir --list-errors src/parser.mly > parser.messages_fresh
-menhir --compare-errors parser.messages_fresh --compare-errors src/lib/parser.messages--list-errors src/parser.mly
+menhir --list-errors parser.mly > parser.messages_fresh
+menhir --compare-errors parser.messages_fresh --compare-errors parser.messages --list-errors parser.mly
 ```
+
+Detailed notes when working with missing errors:
+    Go through Menhir's ".messages file format" documentation.
+
+    All missing error entries should be manually added to parser.messages.
+
+    After updating parser.mly, whatever missing errors are given as a result, one by one go through the mentioned (command's output) error state in parser.messages_fresh, copy that error entry and paste it in the parser.messages file. Now you can run again the --compare-errors command and see that the error is not missing anymore. You should not manually change error state numbers, but in the end you should do the steps of 2. (To update the existing `parser.messages` whenever you modify the `parser.mly`) so that no duplicate error states will exist after your new changes.
+
+    Example scenario:
+    For example, if you search "error in state" occurrence count in parser.messages it may return 315,
+    "error in state" in parser.message_fresh may return 377,
+    So, 62 new error_states (entries) have been added after modifying parser.mly.
+    After executing the `Missing error cases in parser.messages` commands, if you search "error in state" in that output, it will return the same 62.
+
+    When modifying error entry messages of the new errors, pay attention to each error entry's "The known suffix of the stack is as follows" content and look up that for other already existing formulas in parser.messages, based on it you should (typically) group that error together with other entries (in the way that it is already done).
 
 ## Testing your hand-written messages ##
 There are two ways to test if the messages actually work. The first one

@@ -101,6 +101,10 @@ let rec string_of_ast ?(utf8 = false) ?(show_var = fun _ -> "") ?(debug = false)
       ^ of_ast_list "," sets
       ^ (match cond with Some c -> " when " ^ of_ast c | None -> "")
       ^ "]"
+  | Box (r, x) when utf8 -> "□" ^ r ^ "(" ^ of_ast x ^ ")"
+  | Box (r, x) -> "[" ^ r ^ "](" ^ of_ast x ^ ")"
+  | Diamond (r, x) when utf8 -> "◇" ^ r ^ "(" ^ of_ast x ^ ")"
+  | Diamond (r, x) -> "<" ^ r ^ ">(" ^ of_ast x ^ ")"
 
 and string_of_ast_type ?(debug = false) (ast : Ast.t) : string =
   let of_ast_type ast = string_of_ast_type ~debug ast in
@@ -166,6 +170,8 @@ and string_of_ast_type ?(debug = false) (ast : Ast.t) : string =
   | NewlineBefore _ | NewlineAfter _ -> "newline"
   | Formula _ -> "quoted formula"
   | SetBuilder (_, _, _, _) -> "set builder"
+  | Box _ -> "box"
+  | Diamond _ -> "diamond"
 
 and string_of_ast_list ?(utf8 = false) ?(show_var = fun _ -> "")
     ?(debug = false) ?(parenthesis = debug) sep el =

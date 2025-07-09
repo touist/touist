@@ -4,7 +4,7 @@
     [eval] is the main function.
 *)
 
-val eval : ?smt:bool -> ?onlychecktypes:bool -> Types.Ast.t -> Types.Ast.t
+val eval : ?smt:bool -> ?onlychecktypes:bool -> ?is_modal_logic:bool -> Types.Ast.t -> Types.Ast.t
 (** [eval] checks the types, evaluates TouIST-specific constructs (variables,
     bigand, bigor, let...) and returns an {b evaluated} formula.
 
@@ -15,6 +15,8 @@ val eval : ?smt:bool -> ?onlychecktypes:bool -> Types.Ast.t -> Types.Ast.t
     type errors as fast as possible.
 
     [smt] enables the SMT mode. By default, the SAT/QBF mode is used.
+
+    [modal_logic] enables the Modal Logic mode.
 
     @raise Err.Fatal msg where {!Err.msg} contains the error. *)
 

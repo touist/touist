@@ -9,7 +9,7 @@
 (library
  (name touist)
  (public_name touist)
- (libraries re re.str menhirLib minisat)
+ (libraries re re.str menhirLib minisat unix)
  (virtual_deps menhir)
  (wrapped true) ; All modules will have the prefix 'Touist.'
  )
