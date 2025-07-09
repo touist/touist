@@ -113,7 +113,7 @@ of their work at school.
 Here is a small figure showing the architecture of the whole thing:  
 ![Architecture of touist][arch]
 
-[arch]: docs/images/architecture.png
+[arch]: docs/images/architecture-with-modal-logic.png
 [DIMACS]: http://www.satcompetition.org/2009/format-benchmarks2009.html
 [SMT2]: http://smtlib.github.io/jSMTLIB/SMTLIBTutorial.pdf
 
