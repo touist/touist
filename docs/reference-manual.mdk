@@ -1596,6 +1596,18 @@ the following model will be returned:
 where SAT means satisfiable, w1 and w2 are the possible worlds with their corresponding valuations. x means x=True,
 -x means x=False.
 
+If you run:
+
+```
+    echo '[](x) and [](not x)' | touist --modal-logic=S5 --solve -
+```
+the following will be returned:
+```
+    UNSAT
+```
+
+where UNSAT means not satisfiable.
+
 [touist_github]: https://github.com/touist/touist
 [s5cheetah]: https://www.ijcai.org/proceedings/2019/0153.pdf
 
