@@ -1,4 +1,4 @@
-# TouIST, the language for propositional logic
+# TouIST, the IDE & Language for Logic (backed by SAT, SMT, QBF and Modal Logic solvers)
 
 [![ci](https://github.com/touist/touist/workflows/ci/badge.svg)](https://github.com/touist/touist/actions?query=workflow%3Aci)
 
@@ -129,13 +129,16 @@ See the [./INSTALL.md](/INSTALL.md) file for building from source.
 | `qbf` (opam)           | yes            | yes (minw32 only [^1]) | yes   |
 | `yices2` (opam) [^2]   | yes            | no                     | yes   |
 | `yices2` (source) [^2] | yes            | yes (mingw32+mingw64)  | yes   |
-| `--modal-logic`        | yes            | no                     | no    |
+| `--modal-logic`        | yes ([^3])     | no                     | no    |
 
 [^1]: the `qbf` package only works on mingw32 because of a slight bug in the
      `./configure` of quantor-3.2. See maelvalais's PR on the ocaml-qbf repo.
 
 [^2]: yices2 needs the gmp library on the system. On linux and macos, opam
      will install it for you using the command `opam depext conf-gmp`.
+
+[^3]: --modal-logic requires launching the touist right from the root directory
+     of the touist project.
 
 ## TouIST API
 
