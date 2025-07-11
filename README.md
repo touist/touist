@@ -1,4 +1,4 @@
-# TouIST, the language for propositional logic
+# TouIST, the IDE & Language for Logic (backed by SAT, SMT, QBF and Modal Logic solvers)
 
 [![ci](https://github.com/touist/touist/workflows/ci/badge.svg)](https://github.com/touist/touist/actions?query=workflow%3Aci)
 
