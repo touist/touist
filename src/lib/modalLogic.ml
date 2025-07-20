@@ -106,16 +106,26 @@ module EvaluatedS5Ast = struct
   module S5CheetahSolver = struct
     module StringSet = Set.Make(String)
     let solve ast =
-      let create_temp_io_files ast =
-        let (_, intohylo_buf) = IntohyloSerializer.serialize ast in
-        let input_file = Filename.temp_file ~temp_dir:"./.tmp_for_modal_logic_s5" ".tmp_" ".intohylo" in
-        let output_file =
+      let create_temp_io_files () =
+        let temp_dir_path =
           try
-            Filename.temp_file ~temp_dir:"./.tmp_for_modal_logic_s5" ".tmp_" ".s5cheetah_model"
+            let tmp_path = Filename.temp_file ".tmp_touist_" "_dir" in
+            Sys.remove tmp_path;
+            Unix.mkdir tmp_path 0o700;
+            tmp_path
           with exn ->
-            (try Sys.remove input_file with _ -> ());
-            raise exn
+            Printf.eprintf "Exception while creating temp directory: %s\n" (Printexc.to_string exn);
+            failwith "Failed to create temporary directory for Modal Logic S5CheetahSolver"
         in
+        let create_file filename =
+          let full_path = Filename.concat temp_dir_path filename in
+          let oc = open_out full_path in
+          close_out oc;
+          full_path
+        in
+        let input_file = create_file "input.intohylo" in
+        let output_file = create_file "output.s5cheetah_model" in
+        let (_, intohylo_buf) = IntohyloSerializer.serialize ast in
         let write_to_file filename content =
           let oc = open_out filename in
           try
@@ -126,11 +136,12 @@ module EvaluatedS5Ast = struct
             raise exn
         in
         write_to_file input_file (Buffer.contents intohylo_buf);
-        (input_file, output_file)
+        (temp_dir_path, input_file, output_file)
       in
-      let cleanup_temp_io_files input_file output_file =
+      let cleanup_temp_io_files temp_dir input_file output_file =
         (try Sys.remove input_file with _ -> ());
-        (try Sys.remove output_file with _ -> ())
+        (try Sys.remove output_file with _ -> ());
+        (try Unix.rmdir temp_dir with _ -> ())
       in
       let parse_model filename =
         let buf = Buffer.create 1000 in
@@ -257,34 +268,39 @@ module EvaluatedS5Ast = struct
             raise exn
       in
       let exec input_intohylo_file output_file =
-          let executable_path = "./solver_executables/modal_logic/S5Cheetah" in
-          if not (Sys.file_exists input_intohylo_file) then
-            failwith ("Error: input_intohylo_file: '" ^ input_intohylo_file ^ "' not found.");
-          if not (Sys.file_exists executable_path) then
-            failwith ("Error: executable '" ^ executable_path ^ "' not found.");
-          let args = [| executable_path; "-model"; input_intohylo_file; output_file |] in
-          let dev_null = Unix.openfile "/dev/null" [Unix.O_WRONLY] 0o666 in
-          try
-            let pid = Unix.create_process executable_path args dev_null dev_null dev_null in
-            (* Wait for the child process to finish *)
-            let _, status = Unix.waitpid [] pid in
-            Unix.close dev_null;
-            match status with
-            | Unix.WEXITED 0 -> parse_model output_file
-            | Unix.WEXITED code -> failwith (executable_path ^ " failed with exit code: " ^ string_of_int code)
-            | Unix.WSIGNALED n -> failwith (executable_path ^ " killed by signal: " ^ string_of_int n)
-            | Unix.WSTOPPED n -> failwith (executable_path ^ " stopped by signal: " ^ string_of_int n)
-          with exn ->
-            Unix.close dev_null;
-            raise exn
+        let get_exe_dir () =
+          Sys.executable_name
+          |> Unix.realpath
+          |> Filename.dirname
+        in
+        let executable_path = Filename.concat (get_exe_dir ()) "modal_logic_s5cheetah_solver" in
+        if not (Sys.file_exists input_intohylo_file) then
+          failwith ("Error: input_intohylo_file: '" ^ input_intohylo_file ^ "' not found.");
+        if not (Sys.file_exists executable_path) then
+          failwith ("Error: executable '" ^ executable_path ^ "' not found.");
+        let args = [| executable_path; "-model"; input_intohylo_file; output_file |] in
+        let dev_null = Unix.openfile "/dev/null" [Unix.O_WRONLY] 0o700 in
+        try
+          let pid = Unix.create_process executable_path args dev_null dev_null dev_null in
+          (* Wait for the child process to finish *)
+          let _, status = Unix.waitpid [] pid in
+          Unix.close dev_null;
+          match status with
+          | Unix.WEXITED 0 -> parse_model output_file
+          | Unix.WEXITED code -> failwith (executable_path ^ " failed with exit code: " ^ string_of_int code)
+          | Unix.WSIGNALED n -> failwith (executable_path ^ " killed by signal: " ^ string_of_int n)
+          | Unix.WSTOPPED n -> failwith (executable_path ^ " stopped by signal: " ^ string_of_int n)
+        with exn ->
+          Unix.close dev_null;
+          raise exn
       in
-      let (input_file, output_file) = create_temp_io_files ast in
+      let (temp_dir, input_file, output_file) = create_temp_io_files () in
       try
         let (solve_result, solve_buf) = exec input_file output_file in
-        cleanup_temp_io_files input_file output_file;
+        cleanup_temp_io_files temp_dir input_file output_file;
         (solve_result, solve_buf)
       with exn ->
-        cleanup_temp_io_files input_file output_file;
+        cleanup_temp_io_files temp_dir input_file output_file;
         raise exn;
   end
   let solve ast = S5CheetahSolver.solve ast;

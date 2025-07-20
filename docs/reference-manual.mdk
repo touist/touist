@@ -269,7 +269,7 @@ The assignment syntax is the following:
     | """<formula-simple>"""         <-- TouIST >= 3.5.1
 ```
 
-Global variables apply for the whole code, even if the assignment is
+Global variables apply for the whole code, even if the assignment
 occurs after the use of the variable. This is because all global
 assignments are evaluated before any formula.
 
@@ -304,7 +304,7 @@ Example:
 $letters = [a,b,c,d,e]
 bigand $letter,$number in $letters,[1..card($letters)]:
   has($letter,$number) =>
-  let $without_letter = diff($letters,[$letter]): ;; keep temorary result
+  let $without_letter = diff($letters,[$letter]): ;; keep temporary result
   bigand $l1 in $without_letter:
       p($letter)
   end
@@ -995,6 +995,34 @@ You can use one of the two notations:
     exists $p for $p in [a,b,c,d]: phi          ;; equivalent to (1)
 ```
 
+### Modal Logic formulas {#modal-logic-formulas}
+
+The &touist; language accepts Modal Logic {S5} formulas. Using
+the `--modal-logic` and `--solve` flags (in `touist`),
+you can solve Modal Logic {S5} problems. This logic is basically the
+same as the SAT grammar, except for the two new modalities:
+
+| Modality   | Meaning            | TouIST    |
+|------------|--------------------|-----------|
+| $\Diamond$ | possible           | `<>(...)` |
+| $\Box$     | necessary          | `[](...)` |
+
+``` Grammar
+<formula-modalLogic> ::=
+    [...]
+    | <modalities(<formula-modalLogic>)>
+```
+
+| TouIST                           | Formula                                                         |
+|----------------------------------|-----------------------------------------------------------------|
+| `<>(x)`                          | $\Diamond x$                                                    |
+| `[](x)`                          | $\Box x$                                                        |
+| `not <>(x and y)`                | $\lnot \Diamond(x \wedge y)$                                    |
+| `[](<>(x))`                      | $\Box\Diamond x$                                                |
+| `[](P => Q) => ([](P) => [](Q))` | $\Box(P \Rightarrow Q) \Rightarrow (\Box P \Rightarrow \Box Q)$ |
+
+See Section [#usage-modal-logic] for more information.
+
 ### Quoted formulas (formulas as expressions) {#quoted-formulas}
 
 When you want to use formulas in sets, you must use double quotes `"..."`
@@ -1182,6 +1210,14 @@ TERM      = [_0-9]*[a-zA-Z][a-zA-Z_0-9]*
     | "exists" <comma-list(<prop>|<var>)> [<for>] ":" <formula-qbf>
     | "forall" <comma-list(<prop>|<var>)> [<for>] ":" <formula-qbf>
 
+<formula-modalLogic> ::=
+    | "Top"
+    | "Bot"
+    | <prop>
+    | <var>
+    | <formula(<formula-modalLogic>)>
+    | <modalities(<formula-modalLogic>)>
+
 <for> ::= "for" <var> "in" <set>
 ```
 
@@ -1197,15 +1233,15 @@ and `opam`) with the command
 
 ~ Note
 By default, `touist` only comes with a SAT solver. Problems written in
-&touist; using the Satisfiability Modulo Theory (SMT) or Quantified
-Boolean Formulas (QBF) grammars can also be used (see Sections [#usage-smt] and
-[#usage-qbf]).
+&touist; using the Satisfiability Modulo Theory (SMT), Quantified
+Boolean Formulas (QBF) or Modal Logic grammars can also be used (see Sections [#usage-smt],
+[#usage-qbf] and [#usage-modal-logic]).
 ~
 
 ![architecture]
 
-[architecture]: images/architecture.[pdf,png] { vertical-align: middle; width:100% }
-<!-- This image has been created using Ipe. You can open `architecture.pdf`
+[architecture]: images/architecture-with-modal-logic.png { vertical-align: middle; width:100% }
+<!-- The old "architecture.[pdf/png]" image was created using Ipe. You can open `architecture.pdf`
      with Ipe in order to edit it. -->
 
 ## Usage {#cli}
@@ -1335,7 +1371,7 @@ number of models explodes when the number of propositions is big.
 
 ### Other general options {#usage-general-options}
 
-The following general options must be using in conjunction of `--smt`
+The following general options must be using in conjunction of `--smt`, `--modal-logic`
 , `--qbf` or `--sat` (`--sat` is used by default and can be omitted).
 
 **`--latex`** translate the given &touist; code to &logolatex;. Two
@@ -1415,11 +1451,11 @@ With N &ge; 2, `--solver=CMD` displays the stdin, stdout and stderr of
 ~ Note {#timings}
 Availability of timings using `-v`:
 
-|             | `--sat`     | `--smt`             | `--qbf`     |
-|-------------|:-----------:|:-------------------:|:-----------:|
-| `translate` | &checkmark; | (instantaneous)     | &checkmark; |
-| `--solve`   | &checkmark; | &checkmark;         | &checkmark; |
-| `--solver=` | &checkmark; | (cmd not available) | &checkmark; |
+|             | `--sat`     | `--smt`             | `--qbf`     | `--modal-logic`     |
+|-------------|:-----------:|:-------------------:|:-----------:|:-------------------:|
+| `translate` | &checkmark; | (instantaneous)     | &checkmark; | &checkmark;         |
+| `--solve`   | &checkmark; | &checkmark;         | &checkmark; | &checkmark;         |
+| `--solver=` | &checkmark; | (cmd not available) | &checkmark; | (cmd not available) |
 ~
 
 
@@ -1452,9 +1488,9 @@ embeds the Yices sources:
 If `touist` was previously installed, it will be re-installed to support
 the newly installed `yices2`.
 
-When using both `--smt=LOGIC` and `--solve`, the `LOGIC` argument must be
+When both `--smt=LOGIC` and `--solve` are used, the `LOGIC` argument must be
 one of [the logics][yices-logics] Yices 2.5.2 supports. Here is a table
-with the logics that are can be used through the &touist; language:
+with the logics that can be used through the &touist; language:
 
 | `LOGIC`  | Meaning                   |
 |----------|---------------------------|
@@ -1520,6 +1556,59 @@ way to do it is by hand.
 
 [quantor]: http://fmv.jku.at/quantor/
 [ocaml-qbf]: https://github.com/c-cube/ocaml-qbf
+
+### Usage for Modal Logic mode {#usage-modal-logic}
+
+The language accepted by the Modal Logic mode is described in [#modal-logic-formulas].
+
+By default, `touist` is able to translate problems into the
+`InToHyLo` format with the `--modal-logic=SYSTEM` flag. In this mode,
+`SYSTEM` can be any non-whitespace string of characters. `SYSTEM` will simply be used
+for selecting the appropriate Modal Logic system and solver.
+
+It is necessary to have Linux OS in order to use Modal Logic S5 in `touist`.
+
+#### Modal Logic solvers
+
+&touist; automatically embeds a state-of-the-art Modal Logic S5 solver, [S5cheetah][s5cheetah].
+
+When both `--modal-logic=SYSTEM` and `--solve` are used, the `SYSTEM` argument must be
+one of the following Modal Logic systems:
+
+| SYSTEM        | Description               | Solver      |
+|---------------|---------------------------|-------------|
+| `S5`          | mono-modal S5             | S5cheetah   |
+
+If you run:
+
+```
+    echo '<>(x) and <>(not x) and [](y)' | touist --modal-logic=S5 --solve -
+```
+the following model will be returned:
+```
+    SAT
+    w1: y -x
+    w2: y x
+    worlds_count: 2
+```
+
+where SAT means satisfiable, w1 and w2 are the possible worlds with their corresponding valuations. x means x=True,
+-x means x=False.
+
+If you run:
+
+```
+    echo '[](x) and [](not x)' | touist --modal-logic=S5 --solve -
+```
+the following will be returned:
+```
+    UNSAT
+```
+
+where UNSAT means not satisfiable.
+
+[touist_github]: https://github.com/touist/touist
+[s5cheetah]: https://www.ijcai.org/proceedings/2019/0153.pdf
 
 ## Using external solvers from `touist` (`--solver`)
 
