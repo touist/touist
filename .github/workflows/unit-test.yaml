@@ -1,0 +1,46 @@
+name: Run unit tests
+
+on:
+    pull_request:
+        types: 
+            - opened
+            - synchronize
+
+jobs:
+    run-test:
+        strategy:
+            matrix:
+                os: 
+                    - ubuntu-latest
+                    - macos-latest
+                    # - windows-latest
+                
+        runs-on: ${{ matrix.os }}
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: Install OCaml
+              uses: ocaml/setup-ocaml@v3
+              with:
+                ocaml-compiler: 4.13
+
+            - name: Install TouIST from the pr's source
+              run: |
+                opam install yices2 qbf && \
+                opam install . --working-dir
+              
+            - name: Test SAT solver
+              run: |
+                eval $(opam env) && \
+                cat << EOF | touist --solve --sat - 
+                    a and b
+                EOF
+            
+            - name: Test Modal Logic S5 solver
+              if: ${{ github.base_ref == 'feature/s5' }}
+              run: |
+                eval $(opam env) && \
+                cat << EOF | touist --solve --modal-logic S5 -
+                    [](P) => P
+                EOF
+
