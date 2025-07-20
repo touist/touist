@@ -30,7 +30,8 @@
 (install
  (section bin)
  (files
-  (main.exe as touist)))
+  (main.exe as touist)
+  (solver_executables/modal_logic/S5Cheetah as modal_logic_s5cheetah_solver)))
 
 (install
  (section man)
