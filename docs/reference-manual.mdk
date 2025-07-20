@@ -1567,7 +1567,6 @@ By default, `touist` is able to translate problems into the
 for selecting the appropriate Modal Logic system and solver.
 
 It is necessary to have Linux OS in order to use Modal Logic S5 in `touist`.
-Modal Logic mode should be used right from the root directory of the `touist` [project][touist_github].
 
 #### Modal Logic solvers
 
